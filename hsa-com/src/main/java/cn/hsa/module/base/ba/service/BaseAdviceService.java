@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.util.MapUtils;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -232,5 +233,29 @@ public interface BaseAdviceService {
     **/
     WrapperResponse<Boolean> updateWithPipePrint(Map map);
 
+    /**
+     * @Menthod: 取消合管
+     * @Desrciption: updateCancelMerge
+     * @Param: paramMap：{
+     *     mergeIds：合管主ids
+     * }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 11:47
+     * @Return:
+     **/
+    @PostMapping("/service/base/baseAdvice/updateCancelMerge")
+    WrapperResponse<Boolean> updateCancelMerge(Map map);
 
+    /**
+     * @Menthod: updateMergePipePrint
+     * @Desrciption: 合管打印
+     * @Param: paramMap：{ mergeIds：合管主ids }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 17:11
+     * @Return:
+     **/
+    @PostMapping("/service/base/baseAdvice/updateMergePipePrint")
+    WrapperResponse<List<MedicalApplyDTO>> updateMergePipePrint(Map map);
 }

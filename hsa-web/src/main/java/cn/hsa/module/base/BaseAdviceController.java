@@ -10,6 +10,7 @@ import cn.hsa.module.base.ba.service.BaseAdviceService;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
@@ -365,4 +366,45 @@ public class BaseAdviceController extends BaseController {
         return baseAdviceService_customer.updateWithPipePrint(map);
     }
 
+    /**
+     * @Menthod: 取消合管
+     * @Desrciption: updateCancelMerge
+     * @Param: paramMap：{
+     *     mergeIds：合管主ids
+     * }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 11:47
+     * @Return:
+     **/
+    @PostMapping("/updateCancelMerge")
+    public WrapperResponse<Boolean> updateCancelMerge(@RequestBody Map<String,Object> paramMap, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        log.debug("paramMap:{}", paramMap);
+        paramMap.put("hospCode",sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("paramMap",paramMap);
+        return baseAdviceService_customer.updateCancelMerge(map);
+    }
+
+    /**
+     * @Menthod: updateMergePipePrint
+     * @Desrciption: 合管打印
+     * @Param: paramMap：{ mergeIds：合管主ids }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 17:11
+     * @Return:
+     **/
+    @PostMapping("/updateMergePipePrint")
+    public WrapperResponse<List<MedicalApplyDTO>> updateMergePipePrint(@RequestBody Map<String,Object> paramMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        log.debug("paramMap:{}", paramMap);
+        paramMap.put("hospCode",sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("paramMap",paramMap);
+        return baseAdviceService_customer.updateMergePipePrint(map);
+    }
 }

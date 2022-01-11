@@ -70,8 +70,15 @@ public interface MessageInfoDao extends BaseMapper<MessageInfoModel> {
     * 查询历史消息列表
     */
    List<MessageInfoModel> queryHistoryMessageInfoList(MessageInfoModel messageInfoDTO);
-
+   /**
+    * 查询系统消息列表
+    */
    List<MessageInfoModel> querySysMessageInfoList(MessageInfoModel messageInfoDTO);
+
+   /**
+    * 查询推送个人消息列表
+    */
+   List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel messageInfoDTO);
 
 
 

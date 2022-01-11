@@ -12,6 +12,7 @@ import cn.hsa.module.stro.inventory.dao.InventoryDAO;
 import cn.hsa.module.stro.inventory.dao.StroInventoryDetailDao;
 import cn.hsa.module.stro.inventory.dto.InventoryDTO;
 import cn.hsa.module.stro.inventory.dto.StroInventoryDetailDTO;
+import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dao.StroStockDetailDao;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stock.service.StroStockService;
@@ -59,6 +60,12 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
 
     @Resource
     private StroStockDetailDao stroStockDetailDao;
+
+    @Resource
+    private StroStockBO stroStockBO;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * 通过ID查询单条数据
@@ -224,175 +231,187 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
      **/
     @Override
     public boolean updateAuditCode(InventoryDTO inventoryDTO) {
-        if (ListUtils.isEmpty(inventoryDTO.getIds())) {
-            throw new AppException("参数为空");
-        }
+      if (ListUtils.isEmpty(inventoryDTO.getIds())) {
+          throw new AppException("参数为空");
+      }
+      String redisKey = new StringBuilder(inventoryDTO.getHospCode()).append(inventoryDTO.getBizId()).
+        append(Constants.STRO_INVENTORY_TF_REDIS_KEY).toString();
+      if (!redisUtils.setIfAbsent(redisKey,inventoryDTO.getId(),600)){
+        throw new AppException("盘点正在进行,请稍后!");
+      }
+      try {
         //审核流程
         if ("1".equals(inventoryDTO.getAuditCode())) {
-            //常用数据
-            String hospCode = inventoryDTO.getHospCode();
-            String bizId = inventoryDTO.getBizId();
-            String auditName = inventoryDTO.getAuditName();
-            String auditId = inventoryDTO.getAuditId();
-            String auditcode = inventoryDTO.getAuditCode();
-            //待更新列表
-            List<InventoryDTO> inventorys = new ArrayList<>();
-            //库存明细
-            List<StroStockDetailDTO> stroStockDetailDTOList = new ArrayList<>();
-            //报损明细
-            List<StroIncdecDetailDTO> stroIncdecDetailDTOList = new ArrayList<>();
-
-            //根据ID查询盘点单记录
-            List<InventoryDTO> inventoryDTOList = inventoryDAO.queryByids(inventoryDTO.getIds(),hospCode);
-            if (ListUtils.isEmpty(inventoryDTOList)) {
-                throw new AppException("盘点单为空,审核失败");
+          //常用数据
+          String hospCode = inventoryDTO.getHospCode();
+          String bizId = inventoryDTO.getBizId();
+          String auditName = inventoryDTO.getAuditName();
+          String auditId = inventoryDTO.getAuditId();
+          String auditcode = inventoryDTO.getAuditCode();
+          //待更新列表
+          List<InventoryDTO> inventorys = new ArrayList<>();
+          //库存明细
+          List<StroStockDetailDTO> stroStockDetailDTOList = new ArrayList<>();
+          //报损明细
+          List<StroIncdecDetailDTO> stroIncdecDetailDTOList = new ArrayList<>();
+          //根据ID查询盘点单记录
+          List<InventoryDTO> inventoryDTOList = inventoryDAO.queryByids(inventoryDTO.getIds(),hospCode);
+          if (ListUtils.isEmpty(inventoryDTOList)) {
+            throw new AppException("盘点单为空,审核失败");
+          }
+          // 分批处理数量
+          int count = 100;
+          //校验是否审核
+          for (InventoryDTO outDTO : inventoryDTOList) {
+            if (!"0".equals(outDTO.getAuditCode())) {
+              throw new AppException("请审核待审核状态的记录,审核失败");
             }
-            //校验是否审核
-            for (InventoryDTO outDTO : inventoryDTOList) {
-                if (!"0".equals(outDTO.getAuditCode())) {
-                    throw new AppException("请审核待审核状态的记录,审核失败");
-                }
+          }
+          for (InventoryDTO dto:inventoryDTOList) {
+            InventoryDTO inventory = new InventoryDTO();
+            inventory.setId(dto.getId());
+            inventory.setAuditCode(auditcode);
+            inventory.setAuditName(auditName);
+            inventory.setAuditId(auditId);
+            inventory.setAuditTime(DateUtils.getNow());
+            inventorys.add(inventory);
+            //根据盘点单ID获取盘点单明细
+            List<String> inIds = new ArrayList<>();
+            inIds.add(dto.getId());
+            List<StroInventoryDetailDTO> stroInventoryDetailDTOList = stroInventoryDetailDao.queryAllid(inIds,hospCode);
+            if (ListUtils.isEmpty(stroInventoryDetailDTOList)) {
+              throw new AppException("盘点单明细为空,审核失败");
             }
-
-            for (InventoryDTO dto:inventoryDTOList) {
-                InventoryDTO inventory = new InventoryDTO();
-                inventory.setId(dto.getId());
-                inventory.setAuditCode(auditcode);
-                inventory.setAuditName(auditName);
-                inventory.setAuditId(auditId);
-                inventory.setAuditTime(DateUtils.getNow());
-                inventorys.add(inventory);
-
-                //根据盘点单ID获取盘点单明细
-                List<String> inIds = new ArrayList<>();
-                inIds.add(dto.getId());
-                List<StroInventoryDetailDTO> stroInventoryDetailDTOList = stroInventoryDetailDao.queryAllid(inIds,hospCode);
-                if (ListUtils.isEmpty(stroInventoryDetailDTOList)) {
-                    throw new AppException("盘点单明细为空,审核失败");
+            for (StroInventoryDetailDTO stroInventoryDetailDTO:stroInventoryDetailDTOList) {
+              //正常
+              if ("1".equals(stroInventoryDetailDTO.getResultCode())) {
+                // 库存明细 + 拆零单位、规格、剂型、库位码、订单号、拆零购进价、创建人、创建人ID
+                StroStockDetailDTO stroStockDetailDTO = new StroStockDetailDTO();
+                stroStockDetailDTO.setHospCode(hospCode);
+                stroStockDetailDTO.setBizId(bizId);
+                stroStockDetailDTO.setCrteId(auditId);
+                stroStockDetailDTO.setCrteName(auditName);
+                stroStockDetailDTO.setItemCode(stroInventoryDetailDTO.getItemCode());
+                stroStockDetailDTO.setItemId(stroInventoryDetailDTO.getItemId());
+                stroStockDetailDTO.setItemName(stroInventoryDetailDTO.getItemName());
+                stroStockDetailDTO.setSplitNum(BigDecimalUtils.subtract(stroInventoryDetailDTO.getFinalSplitNum(),stroInventoryDetailDTO.getBeforeSplitNum()));
+                stroStockDetailDTO.setNum(stroInventoryDetailDTO.getIncdecNum());
+                stroStockDetailDTO.setBuyPrice(stroInventoryDetailDTO.getBuyPrice());
+                stroStockDetailDTO.setSellPrice(stroInventoryDetailDTO.getSellPrice());
+                stroStockDetailDTO.setBatchNo(stroInventoryDetailDTO.getBatchNo());
+                stroStockDetailDTO.setOrderNo(stroInventoryDetailDTO.getOrderno());
+                stroStockDetailDTO.setUnitCode(stroInventoryDetailDTO.getUnitCode());
+                stroStockDetailDTO.setSplitUnitCode(stroInventoryDetailDTO.getSplitUnitCode());
+                stroStockDetailDTO.setSplitRatio(stroInventoryDetailDTO.getSplitRatio());
+                stroStockDetailDTO.setHospCode(stroInventoryDetailDTO.getHospCode());
+                stroStockDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
+                stroStockDetailDTO.setInvoicingTargetName(stroInventoryDetailDTO.getInvoicingTargetName());
+                stroStockDetailDTO.setInvoicingTargetId(stroInventoryDetailDTO.getInvoicingTargetId());
+                //查询库存明细数据
+                StroStockDetailDTO stockDetailDTO =stroStockDetailDao.queryByItemIdAndNo(stroInventoryDetailDTO.getItemCode(),stroInventoryDetailDTO.getItemId(),
+                  stroInventoryDetailDTO.getBatchNo(),inventoryDTO.getBizId(),inventoryDTO.getHospCode());
+                if (stockDetailDTO != null) {
+                  stroStockDetailDTO.setExpiryDate(stockDetailDTO.getExpiryDate());
+                  // 库存拆零单价
+                  stroStockDetailDTO.setNewSplitPrice(stockDetailDTO.getSplitPrice());
+                  // 库存单价
+                  stroStockDetailDTO.setNewPrice(stockDetailDTO.getSellPrice());
                 }
-
-                for (StroInventoryDetailDTO stroInventoryDetailDTO:stroInventoryDetailDTOList) {
-                    //正常
-                    if ("1".equals(stroInventoryDetailDTO.getResultCode())) {
-                        // 库存明细 + 拆零单位、规格、剂型、库位码、订单号、拆零购进价、创建人、创建人ID
-                        StroStockDetailDTO stroStockDetailDTO = new StroStockDetailDTO();
-                        stroStockDetailDTO.setHospCode(hospCode);
-                        stroStockDetailDTO.setBizId(bizId);
-                        stroStockDetailDTO.setCrteId(auditId);
-                        stroStockDetailDTO.setCrteName(auditName);
-                        stroStockDetailDTO.setItemCode(stroInventoryDetailDTO.getItemCode());
-                        stroStockDetailDTO.setItemId(stroInventoryDetailDTO.getItemId());
-                        stroStockDetailDTO.setItemName(stroInventoryDetailDTO.getItemName());
-                        stroStockDetailDTO.setSplitNum(BigDecimalUtils.subtract(stroInventoryDetailDTO.getFinalSplitNum(),stroInventoryDetailDTO.getBeforeSplitNum()));
-                        stroStockDetailDTO.setNum(stroInventoryDetailDTO.getIncdecNum());
-                        stroStockDetailDTO.setBuyPrice(stroInventoryDetailDTO.getBuyPrice());
-                        stroStockDetailDTO.setSellPrice(stroInventoryDetailDTO.getSellPrice());
-                        stroStockDetailDTO.setBatchNo(stroInventoryDetailDTO.getBatchNo());
-                        stroStockDetailDTO.setOrderNo(stroInventoryDetailDTO.getOrderno());
-                        stroStockDetailDTO.setUnitCode(stroInventoryDetailDTO.getUnitCode());
-                        stroStockDetailDTO.setSplitUnitCode(stroInventoryDetailDTO.getSplitUnitCode());
-                        stroStockDetailDTO.setSplitRatio(stroInventoryDetailDTO.getSplitRatio());
-                        stroStockDetailDTO.setHospCode(stroInventoryDetailDTO.getHospCode());
-                        stroStockDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
-                        stroStockDetailDTO.setInvoicingTargetName(stroInventoryDetailDTO.getInvoicingTargetName());
-                        stroStockDetailDTO.setInvoicingTargetId(stroInventoryDetailDTO.getInvoicingTargetId());
-                        //查询库存明细数据
-                        StroStockDetailDTO stockDetailDTO =stroStockDetailDao.queryByItemIdAndNo(stroInventoryDetailDTO.getItemCode(),stroInventoryDetailDTO.getItemId(),
-                                stroInventoryDetailDTO.getBatchNo(),inventoryDTO.getBizId(),inventoryDTO.getHospCode());
-                        if (stockDetailDTO != null) {
-                            stroStockDetailDTO.setExpiryDate(stockDetailDTO.getExpiryDate());
-                            // 库存拆零单价
-                            stroStockDetailDTO.setNewSplitPrice(stockDetailDTO.getSplitPrice());
-                            // 库存单价
-                            stroStockDetailDTO.setNewPrice(stockDetailDTO.getSellPrice());
-                        }
-                        stroStockDetailDTOList.add(stroStockDetailDTO);
-                    } else { //需要报损
-                        StroIncdecDetailDTO stroIncdecDetailDTO = new StroIncdecDetailDTO();
-                        stroIncdecDetailDTO.setHospCode(stroInventoryDetailDTO.getHospCode());
-                        stroIncdecDetailDTO.setItemCode(stroInventoryDetailDTO.getItemCode());
-                        stroIncdecDetailDTO.setItemId(stroInventoryDetailDTO.getItemId());
-                        stroIncdecDetailDTO.setItemName(stroInventoryDetailDTO.getItemName());
-                        stroIncdecDetailDTO.setSellPrice(stroInventoryDetailDTO.getSellPrice());
-                        stroIncdecDetailDTO.setBuyPrice(stroInventoryDetailDTO.getBuyPrice());
-                        stroIncdecDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
-                        stroIncdecDetailDTO.setBatchNo(stroInventoryDetailDTO.getBatchNo());
-                        stroIncdecDetailDTO.setExpiryDate(stroInventoryDetailDTO.getExpiryDate());
-                        stroIncdecDetailDTO.setBeforeNum(stroInventoryDetailDTO.getBeforeNum());
-                        stroIncdecDetailDTO.setSplitRatio(stroInventoryDetailDTO.getSplitRatio());
-                        stroIncdecDetailDTO.setSplitNum(BigDecimalUtils.multiply(stroInventoryDetailDTO.getIncdecNum(),stroInventoryDetailDTO.getSplitRatio()));
-                        if(BigDecimalUtils.compareTo(stroInventoryDetailDTO.getIncdecNum(), BigDecimal.valueOf(0)) > 0) {
-                          // 如果数量大于0,报溢
-                          stroIncdecDetailDTO.setProfitLossType("1");
-                          stroIncdecDetailDTO.setNum(stroInventoryDetailDTO.getIncdecNum());
-                        } else {
-                          // 如果数量小于0,报损
-                          stroIncdecDetailDTO.setProfitLossType("0");
-                          // 转化为正数
-                          stroIncdecDetailDTO.setNum(BigDecimalUtils.multiply(stroInventoryDetailDTO.getIncdecNum(), BigDecimal.valueOf(-1)));
-                          stroIncdecDetailDTO.setSplitNum(BigDecimalUtils.multiply(stroIncdecDetailDTO.getNum(),stroIncdecDetailDTO.getSplitRatio()));
-                        }
-                        stroIncdecDetailDTO.setUnitCode(stroInventoryDetailDTO.getUnitCode());
-                        stroIncdecDetailDTO.setResultCode(stroInventoryDetailDTO.getResultCode());
-
-                        stroIncdecDetailDTO.setSplitUnitCode(stroInventoryDetailDTO.getSplitUnitCode());
-                        stroIncdecDetailDTO.setSellBeforePrice(BigDecimalUtils.multiply(stroIncdecDetailDTO.getBeforeNum(),stroIncdecDetailDTO.getSellPrice()));
-                        stroIncdecDetailDTO.setSellAfterPrice(BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroIncdecDetailDTO.getSellPrice()));
-                        stroIncdecDetailDTO.setBuyBeforePrice(BigDecimalUtils.multiply(stroIncdecDetailDTO.getBeforeNum(),stroIncdecDetailDTO.getBuyPrice()));
-                        stroIncdecDetailDTO.setBuyAfterPrice(BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroIncdecDetailDTO.getBuyPrice()));
-                        stroIncdecDetailDTOList.add(stroIncdecDetailDTO);
-                    }
+                stroStockDetailDTOList.add(stroStockDetailDTO);
+              } else { //需要报损
+                StroIncdecDetailDTO stroIncdecDetailDTO = new StroIncdecDetailDTO();
+                stroIncdecDetailDTO.setHospCode(stroInventoryDetailDTO.getHospCode());
+                stroIncdecDetailDTO.setItemCode(stroInventoryDetailDTO.getItemCode());
+                stroIncdecDetailDTO.setItemId(stroInventoryDetailDTO.getItemId());
+                stroIncdecDetailDTO.setItemName(stroInventoryDetailDTO.getItemName());
+                stroIncdecDetailDTO.setSellPrice(stroInventoryDetailDTO.getSellPrice());
+                stroIncdecDetailDTO.setBuyPrice(stroInventoryDetailDTO.getBuyPrice());
+                stroIncdecDetailDTO.setSplitPrice(stroInventoryDetailDTO.getSplitSellPrice());
+                stroIncdecDetailDTO.setBatchNo(stroInventoryDetailDTO.getBatchNo());
+                stroIncdecDetailDTO.setExpiryDate(stroInventoryDetailDTO.getExpiryDate());
+                stroIncdecDetailDTO.setBeforeNum(stroInventoryDetailDTO.getBeforeNum());
+                stroIncdecDetailDTO.setSplitRatio(stroInventoryDetailDTO.getSplitRatio());
+                stroIncdecDetailDTO.setSplitNum(BigDecimalUtils.multiply(stroInventoryDetailDTO.getIncdecNum(),stroInventoryDetailDTO.getSplitRatio()));
+                if(BigDecimalUtils.compareTo(stroInventoryDetailDTO.getIncdecNum(), BigDecimal.valueOf(0)) > 0) {
+                  // 如果数量大于0,报溢
+                  stroIncdecDetailDTO.setProfitLossType("1");
+                  stroIncdecDetailDTO.setNum(stroInventoryDetailDTO.getIncdecNum());
+                } else {
+                  // 如果数量小于0,报损
+                  stroIncdecDetailDTO.setProfitLossType("0");
+                  // 转化为正数
+                  stroIncdecDetailDTO.setNum(BigDecimalUtils.multiply(stroInventoryDetailDTO.getIncdecNum(), BigDecimal.valueOf(-1)));
+                  stroIncdecDetailDTO.setSplitNum(BigDecimalUtils.multiply(stroIncdecDetailDTO.getNum(),stroIncdecDetailDTO.getSplitRatio()));
                 }
+                stroIncdecDetailDTO.setUnitCode(stroInventoryDetailDTO.getUnitCode());
+                stroIncdecDetailDTO.setResultCode(stroInventoryDetailDTO.getResultCode());
 
-                //进入报损流程
-                if (!(ListUtils.isEmpty(stroIncdecDetailDTOList))) {
-                    StroIncdecDTO stroIncdecDTO = new StroIncdecDTO();
-                    stroIncdecDTO.setBizId(dto.getBizId());
-                    stroIncdecDTO.setHospCode(dto.getHospCode());
-                    stroIncdecDTO.setBeforePrice(dto.getBeforePrice());
-                    stroIncdecDTO.setAfterPrice(dto.getAfterPrice());
-                    stroIncdecDTO.setPrice(dto.getIncdecPrice());
-                    stroIncdecDTO.setRemark(dto.getRemark());
-                    stroIncdecDTO.setStroIncdecDetailDTOs(stroIncdecDetailDTOList);
-                    stroIncdecBO.insertOrUpdateStroIncdecDTO(stroIncdecDTO);
-                }
+                stroIncdecDetailDTO.setSplitUnitCode(stroInventoryDetailDTO.getSplitUnitCode());
+                stroIncdecDetailDTO.setSellBeforePrice(BigDecimalUtils.multiply(stroIncdecDetailDTO.getBeforeNum(),stroIncdecDetailDTO.getSellPrice()));
+                stroIncdecDetailDTO.setSellAfterPrice(BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroIncdecDetailDTO.getSellPrice()));
+                stroIncdecDetailDTO.setBuyBeforePrice(BigDecimalUtils.multiply(stroIncdecDetailDTO.getBeforeNum(),stroIncdecDetailDTO.getBuyPrice()));
+                stroIncdecDetailDTO.setBuyAfterPrice(BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroIncdecDetailDTO.getBuyPrice()));
+                stroIncdecDetailDTOList.add(stroIncdecDetailDTO);
+              }
             }
-
-            //更新库存
-            if (!(ListUtils.isEmpty(stroStockDetailDTOList))) {
+            //进入报损流程
+            if (!(ListUtils.isEmpty(stroIncdecDetailDTOList))) {
+              StroIncdecDTO stroIncdecDTO = new StroIncdecDTO();
+              stroIncdecDTO.setBizId(dto.getBizId());
+              stroIncdecDTO.setHospCode(dto.getHospCode());
+              stroIncdecDTO.setBeforePrice(dto.getBeforePrice());
+              stroIncdecDTO.setAfterPrice(dto.getAfterPrice());
+              stroIncdecDTO.setPrice(dto.getIncdecPrice());
+              stroIncdecDTO.setRemark(dto.getRemark());
+              stroIncdecDTO.setStroIncdecDetailDTOs(stroIncdecDetailDTOList);
+              stroIncdecBO.insertOrUpdateStroIncdecDTO(stroIncdecDTO);
+            }
+          }
+          //更新库存
+          if (!(ListUtils.isEmpty(stroStockDetailDTOList))) {
+            List<StroStockDetailDTO> newList = new ArrayList(); //定义新的list 用于接收每次的值
+            for (int i = 0; i < stroStockDetailDTOList.size(); i++) {
+              newList.add(stroStockDetailDTOList.get(i));
+              if ((count == newList.size()) || (i == (stroStockDetailDTOList.size() - 1))) {
+                //如果list的size=cont 或者 刚好是全部数量(说明list数据循环完毕),因为上边从0开始,所以size-1,不然数组越界
                 Map map = new HashMap();
                 map.put("hospCode", hospCode);
                 map.put("type", EnumUtil.CRFS7.getKey());
                 map.put("sfBatchNo", "true");
-                map.put("stroStockDetailDTOList", stroStockDetailDTOList);
-                stroStockService.saveStock(map);
+                map.put("stroStockDetailDTOList", newList);
+                stroStockBO.saveStock(map);
+                newList.clear();
+              }
             }
-
-            return inventoryDAO.updateAuditCode(inventorys,hospCode)>0;
+          }
+          return inventoryDAO.updateAuditCode(inventorys,hospCode)>0;
         } else if ("2".equals(inventoryDTO.getAuditCode())) { //作废流程
-            //根据ID查询盘点单记录
-            List<InventoryDTO> inventoryDTOList = inventoryDAO.queryByids(inventoryDTO.getIds(),inventoryDTO.getHospCode());
-            if (ListUtils.isEmpty(inventoryDTOList)) {
-                throw new AppException("盘点单为空,审核失败");
-            }
-
-            //待更新列表
-            List<InventoryDTO> inventorys = new ArrayList<>();
-            //拼接需要更新审核信息的数据
-            for (String id:inventoryDTO.getIds()) {
-                InventoryDTO inventory = new InventoryDTO();
-                inventory.setId(id);
-                inventory.setAuditCode(inventoryDTO.getAuditCode());
-                inventory.setAuditName(inventoryDTO.getAuditName());
-                inventory.setAuditId(inventoryDTO.getAuditId());
-                inventory.setAuditTime(DateUtils.getNow());
-                inventorys.add(inventory);
-            }
-
-            return inventoryDAO.updateAuditCode(inventorys,inventoryDTO.getHospCode())>0;
+          //根据ID查询盘点单记录
+          List<InventoryDTO> inventoryDTOList = inventoryDAO.queryByids(inventoryDTO.getIds(),inventoryDTO.getHospCode());
+          if (ListUtils.isEmpty(inventoryDTOList)) {
+            throw new AppException("盘点单为空,审核失败");
+          }
+          //待更新列表
+          List<InventoryDTO> inventorys = new ArrayList<>();
+          //拼接需要更新审核信息的数据
+          for (String id:inventoryDTO.getIds()) {
+            InventoryDTO inventory = new InventoryDTO();
+            inventory.setId(id);
+            inventory.setAuditCode(inventoryDTO.getAuditCode());
+            inventory.setAuditName(inventoryDTO.getAuditName());
+            inventory.setAuditId(inventoryDTO.getAuditId());
+            inventory.setAuditTime(DateUtils.getNow());
+            inventorys.add(inventory);
+          }
+          return inventoryDAO.updateAuditCode(inventorys,inventoryDTO.getHospCode())>0;
         }
-
-        return true;
+      }catch (AppException e) {
+        log.error("盘点失败",e.getMessage());
+        throw new AppException(e.getMessage());
+      }finally {
+        redisUtils.del(redisKey);
+      }
+      return true;
     }
 
     /**

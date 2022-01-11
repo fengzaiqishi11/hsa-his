@@ -27,8 +27,8 @@ import cn.hsa.module.base.drug.service.BaseDrugService;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.base.rate.service.BaseRateService;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDAO;
 import cn.hsa.module.inpt.doctor.dao.InptAdviceDetailDAO;
@@ -172,8 +172,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     @Resource
     private OutptDoctorPrescribeService outptDoctorPrescribeService_consumer;
 
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
+//    @Resource
+//    private MessageInfoDAO messageInfoDAO;
 
 
     /**
@@ -323,13 +323,13 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //更新住院病人表(inpt_visit)  护理级别(nursing_code)、膳食类型(diet_type)、病情标识(Illness_code)
             updateInpVIsitInfo(inptVisitDTOList);
 
+            //判断是否存在停同类、停非同类以及停自身的医嘱(新开医嘱)
+            stopAdvice(medicalAdviceDTO, adviceIds,stopAdviceList);
+
             // 医嘱停嘱核收-->膳食/护理/危重修改 add luoyong 2021-12-28
             if (!ListUtils.isEmpty(stopAdviceList)) {
                 this.updateStopInptVisitBizType(stopAdviceList);
             }
-
-            //判断是否存在停同类、停非同类以及停自身的医嘱(新开医嘱)
-            stopAdvice(medicalAdviceDTO, adviceIds,stopAdviceList);
 
             //退费，取消执行记录，退药
             changeReturnCost(medicalAdviceDTO, stopAdviceList);
@@ -3675,9 +3675,20 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     messageInfoDTO.setHospCode(hospCode);
                     messageInfoDTO.setSourceId("");
                     messageInfoDTO.setVisitId(inptVisitDTO.getId());
-                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    // 推送到科室
+                    if ("1".equals(configInfoDO.getIsPersonal())) {
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }else if ("0".equals(configInfoDO.getIsPersonal())){
+                        // 推送到个人
+                        messageInfoDTO.setDeptId("");
+                        messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    }else {
+                        // 默认推送到科室
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }
                     messageInfoDTO.setLevel(configInfoDO.getLevel());
-                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
                     messageInfoDTO.setContent(inptVisitDTO.getName() + "的医嘱已被拒收");

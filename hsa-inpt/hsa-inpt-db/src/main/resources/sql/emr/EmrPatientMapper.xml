@@ -268,7 +268,7 @@
         <if test='zgbrQuery =="1"'>
             and v.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by v.in_time desc
+        order by v.bed_name+0 asc,v.in_time desc
     </select>
 
     <select id="selectOutptVisits" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
@@ -474,7 +474,7 @@
 
     <select id="queryEmrPatientDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO"
             parameterType="java.util.Map">
-        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,
+        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,ind.is_main,
                (select jz_doctor_name from inpt_visit iv where iv.id = ind.visit_id and iv.hosp_code = ind.hosp_code)  jzDoctorName
         from inpt_diagnose ind
                  left join base_disease bd on ind.disease_id = bd.id and ind.hosp_code = bd.hosp_code
@@ -628,4 +628,20 @@
             </otherwise>
         </choose>
     </select>
+
+    <select id="queryHisEmrJosnInfo" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            b.emr_json emrJson,
+            c.classify_code classifyCode,
+            ( SELECT NAME FROM emr_classify WHERE CODE = ( SELECT up_code FROM emr_classify WHERE CODE = c.classify_code LIMIT 1 ) LIMIT 1 ) AS classifyName
+        FROM
+            emr_patient a
+            LEFT JOIN emr_patient_record b ON a.patient_record_id = b.id
+            LEFT JOIN emr_classify_template c ON b.classify_template_id = c.id
+        WHERE
+            a.hosp_code = #{hospCode}
+          AND a.visit_id = #{visitId}
+          AND a.patient_record_id IS NOT NULL
+    </select>
+
 </mapper>

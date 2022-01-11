@@ -12,7 +12,9 @@ import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
 import cn.hsa.module.emr.emrclassify.dao.EmrClassifyDAO;
 import cn.hsa.module.emr.emrclassify.dto.EmrClassifyDTO;
 import cn.hsa.module.emr.emrclassifytemplate.dto.EmrClassifyTemplateDTO;
+import cn.hsa.module.emr.emrelement.dao.EmrElementDAO;
 import cn.hsa.module.emr.emrelement.dto.EmrElementDTO;
+import cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO;
 import cn.hsa.module.emr.emrpatient.bo.EmrPatientBO;
 import cn.hsa.module.emr.emrpatient.dao.EmrPatientDAO;
 import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
@@ -25,12 +27,7 @@ import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
-import cn.hsa.module.inpt.patientcomprehensivequery.service.PatientComprehensiveQueryService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
-import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
-import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
-import cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO;
-import cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -46,7 +43,8 @@ import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.logging.ErrorManager;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Package_name: cn.hsa.emr.emrpatient.bo.impl
@@ -63,6 +61,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 
 	@Resource
 	private EmrPatientDAO emrPatientDAO;
+
+	@Resource
+	private EmrElementDAO emrElementDAO;
 
 	@Resource
 	private EmrPatientRecordDAO emrPatientRecordDAO;
@@ -84,6 +85,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 
 	@Resource
 	private  InsureUnifiedEmrUploadService insureUnifiedEmrUploadService_consumer;
+
+	@Resource
+	RedisUtils redisUtils;
 
 	/**
 	 * @Description: 1、新建病人病历，获取能够使用的病历模板;  前提是病人病历没有归档
@@ -1089,27 +1093,29 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		EmrPatientDTO emrPatientDTO =new EmrPatientDTO();
 		emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
 		emrPatientDTO.setVisitId(inptVisitDTO.getVisitId());
-		List<EmrPatientDTO> emrPatientDTOS=emrPatientDAO.queryEmrPaitentInfo(map);
-		if (emrPatientDTOS!=null&&emrPatientDTOS.size()>0) {
-			InptVisitDTO inptVisitMap = emrPatientDAO.getEmrInptVisit(emrPatientDTO);
-			List<InptDiagnoseDTO> diagnoseDTOS = emrPatientDAO.queryEmrPatientDiagnose(map);
-			List<OperInfoRecordDO> operInfoRecordInfos = emrPatientDAO.queryEmrOperRecordInfo(map);
-			EmrPatientRecordDTO courseRecord = emrPatientDAO.queryEmrCourseInfo(map);
-			EmrPatientRecordDTO outRecord = emrPatientDAO.queryEmrOutInfo(map);
-			Map emrInfoMap = new HashMap();
-			emrInfoMap.put("visitId", inptVisitDTO.getVisitId());
-			emrInfoMap.put("hospCode", map.get("hospCode"));
-			emrInfoMap.put("inptVisit", inptVisitMap);
-			emrInfoMap.put("diagnoseDTOS", diagnoseDTOS);
-			emrInfoMap.put("operInfoRecordInfos", operInfoRecordInfos);
-			emrInfoMap.put("courseRecord", courseRecord);
-			emrInfoMap.put("outRecord", outRecord);
-			insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(emrInfoMap);
-		}else {
-			throw new AppException("该病人还没写电子病历，不能进行上传");
+		List<EmrPatientDTO> emrPatientDTOS = emrPatientDAO.queryEmrPaitentInfo(map);
+		if (ListUtils.isEmpty(emrPatientDTOS)) {
+			throw new AppException("该患者还未书写病历，不能进行上传！");
 		}
+
+		InptVisitDTO inptVisitMap = emrPatientDAO.getEmrInptVisit(emrPatientDTO);
+		List<InptDiagnoseDTO> diagnoseDTOS = emrPatientDAO.queryEmrPatientDiagnose(map);
+		List<OperInfoRecordDO> operInfoRecordInfos = emrPatientDAO.queryEmrOperRecordInfo(map);
+		EmrPatientRecordDTO courseRecord = emrPatientDAO.queryEmrCourseInfo(map);
+		EmrPatientRecordDTO outRecord = emrPatientDAO.queryEmrOutInfo(map);
+		Map emrInfoMap = new HashMap();
+		emrInfoMap.put("visitId", inptVisitDTO.getVisitId());
+		emrInfoMap.put("hospCode", map.get("hospCode"));
+		emrInfoMap.put("inptVisit", inptVisitMap);
+		emrInfoMap.put("diagnoseDTOS", diagnoseDTOS);
+		emrInfoMap.put("operInfoRecordInfos", operInfoRecordInfos);
+		emrInfoMap.put("courseRecord", courseRecord);
+		emrInfoMap.put("outRecord", outRecord);
+		insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(emrInfoMap);
 		return true;
 	}
+
+
 
 	@Override
 	public Boolean insertEmrPrint(EmrPatientPrintDO emrPatientPrintDO) {
@@ -1146,6 +1152,131 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		EmrPatientReportFormDTO reportFormDTO= (EmrPatientReportFormDTO) MapUtils.get(map,"reportFormDTO");
 		PageHelper.startPage(reportFormDTO.getPageNo(), reportFormDTO.getPageSize());
 		return PageDTO.of(emrPatientDAO.queryPatientEmrReportForm(reportFormDTO));
+	}
+
+	/**
+	 * @param inptVisitDTO
+	 * @Description: 电子病历数据抓取
+	 * @Param:
+	 * @Author: 廖继广
+	 * @Email: jiguang.liao@powersi.com.cn
+	 * @Date 2022/01/06 14:32
+	 * @Return
+	 */
+	@Override
+	public Boolean updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO) {
+		String key = this.setHisEmrJosnInfo(inptVisitDTO);
+        /*Map<String,Object> admMap = redisUtils.get(key);
+        Map<String,Object> A = MapUtils.get(admMap,"adminfo");
+        List<Map<String,Object>> B = MapUtils.get(admMap,"oprninfo");*/
+
+		return true;
+	}
+
+	/**
+	 * 将病历元素写入redis
+	 */
+	private String setHisEmrJosnInfo(InptVisitDTO inptVisit) {
+		Map<String,String> selectMap = new HashMap<>();
+		selectMap.put("hospCode", inptVisit.getHospCode());
+		selectMap.put("visitId", inptVisit.getVisitId());
+		List<Map<String,String>> emrJosnList = emrPatientDAO.queryHisEmrJosnInfo(selectMap);
+		List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfoAll();
+
+		Map<String,Object> insureEmrInfo = new HashMap<>();
+		if (!ListUtils.isEmpty(emrJosnList) && !ListUtils.isEmpty(emrMatchList)) {
+			Map<String,Object> emrInReMap = new HashMap<>(); // 入院记录
+			List<Map<String,Object>> emrCoReList = new ArrayList<>(); // 病程记录
+			List<Map<String,Object>> emrOpReList = new ArrayList<>(); // 手术记录
+			List<Map<String,Object>> emrRescReList = new ArrayList<>(); // 抢救记录
+			List<Map<String,Object>> emrDieReList = new ArrayList<>(); // 死亡记录
+			List<Map<String,Object>> emrOutReList = new ArrayList<>(); // 出院小结
+
+			for (Map<String,String> map : emrJosnList) {
+				Map<String,Object> emrCoReMap = new HashMap<>(); // 病程记录
+				Map<String,Object> emrOpReMap = new HashMap<>(); // 手术记录
+				Map<String,Object> emrRescReMap = new HashMap<>(); // 抢救记录
+				Map<String,Object> emrDieReMap = new HashMap<>(); // 死亡记录
+				Map<String,Object> emrOutReMap = new HashMap<>(); // 出院小结
+				String classifyName = MapUtils.get(map,"classifyName");
+				JSONObject jsonObject = JSONObject.parseObject(MapUtils.get(map,"emrJson"));
+				for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
+					String hisEmrCode = emrElementMatchDO.getEmrElementCode();
+					String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
+					if (jsonObject.containsKey(hisEmrCode)) {
+						String emrValue = delHTMLTag(jsonObject.get(hisEmrCode).toString());
+						switch (classifyName) {
+							case Constants.BLLX.YYJL : // 入院记录
+								emrInReMap.put(insureEmrCode,emrValue);
+								break;
+							case Constants.BLLX.BCJL : // 病程记录
+								emrCoReMap.put(insureEmrCode,emrValue);
+								break;
+							case Constants.BLLX.SSJL : // 手术记录
+								emrOpReMap.put(insureEmrCode,emrValue);
+								break;
+							case Constants.BLLX.BQQJ : // 抢救记录
+								emrRescReMap.put(insureEmrCode,emrValue);
+								break;
+							case Constants.BLLX.SWJL : // 死亡记录
+								emrDieReMap.put(insureEmrCode,emrValue);
+								break;
+							case Constants.BLLX.CYXJ : // 出院小结
+								emrOutReMap.put(insureEmrCode,emrValue);
+								break;
+							default:
+								break;
+						}
+					}
+				}
+				if (!MapUtils.isEmpty(emrCoReMap)) {
+					emrCoReList.add(emrCoReMap);
+				}
+				if (!MapUtils.isEmpty(emrOpReMap)) {
+					emrOpReList.add(emrOpReMap);
+				}
+				if (!MapUtils.isEmpty(emrRescReMap)) {
+					emrRescReList.add(emrRescReMap);
+				}
+				if (!MapUtils.isEmpty(emrDieReMap)) {
+					emrDieReList.add(emrDieReMap);
+				}
+				if (!MapUtils.isEmpty(emrOutReMap)) {
+					emrOutReList.add(emrOutReMap);
+				}
+			}
+			insureEmrInfo.put("adminfo",emrInReMap);
+			insureEmrInfo.put("coursrinfo",emrRescReList);
+			insureEmrInfo.put("oprninfo",emrOpReList);
+			insureEmrInfo.put("rescinfo",emrRescReList);
+			insureEmrInfo.put("dieinfo",emrDieReList);
+			insureEmrInfo.put("dscginfo",emrOutReList);
+		}
+		String key = inptVisit.getHospCode() + "_" + inptVisit.getVisitId() + "_insureEmrInfo" ;
+		redisUtils.del(key);
+		redisUtils.set(key,insureEmrInfo);
+		return key;
+	}
+
+	public static String delHTMLTag(String htmlStr){
+		String regEx_script="<script[^>]*?>[\\s\\S]*?<\\/script>"; //定义script的正则表达式
+		String regEx_style="<style[^>]*?>[\\s\\S]*?<\\/style>"; //定义style的正则表达式
+		String regEx_html="<[^>]+>"; //定义HTML标签的正则表达式
+
+		Pattern p_script=Pattern.compile(regEx_script,Pattern.CASE_INSENSITIVE);
+		Matcher m_script=p_script.matcher(htmlStr);
+		htmlStr=m_script.replaceAll(""); //过滤
+
+		Pattern p_style=Pattern.compile(regEx_style,Pattern.CASE_INSENSITIVE);
+		Matcher m_style=p_style.matcher(htmlStr);
+		htmlStr=m_style.replaceAll(""); //过滤style标签
+
+		Pattern p_html=Pattern.compile(regEx_html,Pattern.CASE_INSENSITIVE);
+		Matcher m_html=p_html.matcher(htmlStr);
+		htmlStr=m_html.replaceAll(""); //过滤html标签
+
+		htmlStr = htmlStr.replaceAll("&nbsp;","");
+		return htmlStr.trim(); //返回文本字符串
 	}
 
 }

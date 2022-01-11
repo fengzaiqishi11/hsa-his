@@ -23,6 +23,12 @@ public interface Constants {
         public static final String ZZJGH = "3"; // 自助机挂号
     }
 
+    class LNDW{
+        public static final String S = "1"; // 岁
+        public static final String Y= "2"; // 月
+        public static final String Z= "3"; // 周
+        public static final String T = "4"; // 天
+    }
     /**
      * 证件类别（ZJLB）
      */
@@ -307,6 +313,13 @@ public interface Constants {
      * @Date 2021/11/22 15:41
      */
     String INPT_DISPENSE_TF_REDIS_KEY = "inpt_dispense_tf";
+
+    /**
+     * @Desrciption 盘点key
+     * @Author jiahong.yang
+     * @Date 2021/11/22 15:41
+     */
+    String STRO_INVENTORY_TF_REDIS_KEY = "INVENTORY_ONLY";
 
     /**
      * @Desrciption 票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
@@ -1175,5 +1188,14 @@ public interface Constants {
     class MSG_TOPIC{
         public static final String producerTopicKey = "msg_product_topic";
         public static final String consumerTopicKey = "msg_consumer_topic";
+    }
+
+    public static class BLLX{
+        public static final String YYJL = "入院记录";
+        public static final String BCJL = "病程记录";
+        public static final String SSJL = "手术记录";
+        public static final String SWJL = "死亡记录";
+        public static final String BQQJ = "病情抢救";
+        public static final String CYXJ = "出院小结";
     }
 }

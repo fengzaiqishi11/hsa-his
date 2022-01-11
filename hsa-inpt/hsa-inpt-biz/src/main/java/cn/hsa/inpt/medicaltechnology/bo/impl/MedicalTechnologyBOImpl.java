@@ -48,6 +48,10 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 			medicalTechnologyDTO.setKeyword(null);
 		}
 		PageHelper.startPage(medicalTechnologyDTO.getPageNo(),medicalTechnologyDTO.getPageSize());
+		//"1"为门诊查询医技
+		if("1".equals(medicalTechnologyDTO.getClinicType())){
+			return PageDTO.of(medicalTechnologyDAO.getOutPutLISorPASSNeedConfirmCost(medicalTechnologyDTO));
+		}
 		return PageDTO.of(medicalTechnologyDAO.getLISorPASSNeedConfirmCost(medicalTechnologyDTO));
 	}
 
@@ -73,6 +77,10 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 			}
 		}
 		map.put("costIds", ids.toString());
+		//"1"为门诊确费
+		if("1".equals(MapUtils.get(map, "clinicType").toString())){
+			return medicalTechnologyDAO.saveOutPtMwdicalTechnologyConfirmCost(map) > 0;
+		}
 		return medicalTechnologyDAO.saveMwdicalTechnologyConfirmCost(map) > 0;
 	}
 
@@ -97,6 +105,10 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 			}
 		}
 		map.put("costIds", ids.toString());
+		//"1"为门诊取消
+		if("1".equals(MapUtils.get(map, "clinicType").toString())){
+			return medicalTechnologyDAO.updateOutPtMedicalTechnologyConfirmCost(map) > 0;
+		}
 		return medicalTechnologyDAO.updateMedicalTechnologyConfirmCost(map) > 0;
 	}
 }

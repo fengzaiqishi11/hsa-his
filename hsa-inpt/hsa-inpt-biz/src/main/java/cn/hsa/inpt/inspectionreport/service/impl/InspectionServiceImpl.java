@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inspectionreport.bo.InspectionReportBO;
 import cn.hsa.module.inpt.inspectionreport.dto.*;
 import cn.hsa.module.inpt.inspectionreport.service.InspectionReportService;
@@ -154,5 +155,18 @@ public class InspectionServiceImpl extends HsafService implements InspectionRepo
             }
             set.add(treeMenuNode.getId());
         }
+    }
+
+
+    /**
+     * @description 根据住院号查询病人lis信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/1/4 14:45
+     **/
+    @Override
+    public WrapperResponse<List<ExaminationItem>> queryPatientAllMedicResult(Map map) {
+        InptVisitDTO inptVisitDTO =MapUtils.get(map,"inptVisitDTO");
+        return WrapperResponse.success(inspectionReportBO.queryPatientAllMedicResult(inptVisitDTO));
     }
 }

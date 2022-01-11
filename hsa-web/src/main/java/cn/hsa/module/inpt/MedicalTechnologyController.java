@@ -98,6 +98,7 @@ public class MedicalTechnologyController extends BaseController {
 		map.put("crteId", sysUserDTO.getId());
 		map.put("crteName", sysUserDTO.getName());
 		map.put("ids", medicalTechnologyDTO.getIds());
+		map.put("clinicType",medicalTechnologyDTO.getClinicType());
 		return medicalTechnologyService_consumer.saveMwdicalTechnologyConfirmCost(map);
 	}
 
@@ -115,6 +116,7 @@ public class MedicalTechnologyController extends BaseController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("ids", medicalTechnologyDTO.getIds());
+		map.put("clinicType",medicalTechnologyDTO.getClinicType());
 		return medicalTechnologyService_consumer.updateMedicalTechnologyConfirmCost(map);
 	}
 

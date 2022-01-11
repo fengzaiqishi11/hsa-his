@@ -8,8 +8,8 @@ import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.bedlist.bo.BedListBO;
 import cn.hsa.module.inpt.bedlist.dao.BedListDAO;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
@@ -66,8 +66,8 @@ public class BedListBOImpl implements BedListBO {
     @Resource
     private SysParameterService sysParameterService_consumer;
 
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
+//    @Resource
+//    private MessageInfoDAO messageInfoDAO;
 
     /**
      * @Method queryPage
@@ -1427,9 +1427,20 @@ public class BedListBOImpl implements BedListBO {
                     messageInfoDTO.setHospCode(hospCode);
                     messageInfoDTO.setSourceId("");
                     messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                    // 推送到科室
+                if ("1".equals(configInfoDO.getIsPersonal())) {
+                    messageInfoDTO.setReceiverId("");
                     messageInfoDTO.setDeptId(configInfoDO.getDeptId());
-                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                }else if ("0".equals(configInfoDO.getIsPersonal())){
+                    // 推送到个人
+                    messageInfoDTO.setDeptId("");
                     messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                }else {
+                    // 默认推送到科室
+                    messageInfoDTO.setReceiverId("");
+                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                }
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_SF);
                     messageInfoDTO.setContent(inptVisitDTO.getName() + "已预出院，请及时结算");

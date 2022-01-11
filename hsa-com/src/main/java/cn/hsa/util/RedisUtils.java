@@ -2,14 +2,17 @@ package cn.hsa.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @Package_name: cn.hsa.util
@@ -25,7 +28,10 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtils {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
+    /**
+     *  公平锁
+     */
+    private final ReentrantLock lock = new ReentrantLock(true);
     /**
      * 指定缓存失效时间
      *
@@ -74,6 +80,34 @@ public class RedisUtils {
         }
     }
 
+    /**
+     *  获取缓存中的key值
+     * @param pattern 通配符
+     * @return java.util.Set
+     */
+    @SuppressWarnings("unchecked")
+    public Set<String> keys(String pattern) {
+        try {
+            return redisTemplate.keys(pattern);
+        } catch (Exception e) {
+            log.error(pattern, e);
+            return Collections.EMPTY_SET;
+        }
+    }
+
+    /**
+     *  返回 key 值类型
+     * @param rKeyName 数值 key 名称
+     * @return  org.springframework.data.redis.connection.DataType
+     */
+    public DataType type(String rKeyName) {
+        try {
+            return redisTemplate.type(rKeyName);
+        } catch (Exception e) {
+            log.error(rKeyName, e);
+            return DataType.NONE;
+        }
+    }
     /**
      * 删除缓存
      *
@@ -777,15 +811,21 @@ public class RedisUtils {
      * @return 获取分布式锁是否成功, true表示成功,false表示失败
      */
   public boolean setIfAbsent(String key, Object value, long time) {
-    try {
-      boolean result = setIfAbsent(key, value);
-      if (time > 0) {
-        expire(key, time);
+      // 使用setIfAbsent 方法time参数必须大于0
+      if(time <= 0){
+          return false;
       }
+    try {
+        // 对该请求进行加锁
+        lock.lock();
+        boolean result = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(key, value, time, TimeUnit.SECONDS));
       return result;
     } catch (Exception e) {
       log.error(key, e);
       return false;
+    }finally{
+        // 释放锁
+        lock.unlock();
     }
   }
 }

@@ -1427,9 +1427,20 @@ public class BedListBOImpl implements BedListBO {
                     messageInfoDTO.setHospCode(hospCode);
                     messageInfoDTO.setSourceId("");
                     messageInfoDTO.setVisitId(inptVisitDTO.getId());
+                    // 推送到科室
+                if ("1".equals(configInfoDO.getIsPersonal())) {
+                    messageInfoDTO.setReceiverId("");
                     messageInfoDTO.setDeptId(configInfoDO.getDeptId());
-                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                }else if ("0".equals(configInfoDO.getIsPersonal())){
+                    // 推送到个人
+                    messageInfoDTO.setDeptId("");
                     messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                }else {
+                    // 默认推送到科室
+                    messageInfoDTO.setReceiverId("");
+                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                }
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_SF);
                     messageInfoDTO.setContent(inptVisitDTO.getName() + "已预出院，请及时结算");

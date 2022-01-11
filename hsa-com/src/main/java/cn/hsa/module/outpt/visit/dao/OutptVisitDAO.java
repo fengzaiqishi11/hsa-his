@@ -188,4 +188,13 @@ public interface OutptVisitDAO {
      */
     OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
 
+    /**
+     * @Description: 根据就诊id更新患者的病人类型
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2022/1/10 17:32
+     * @Return
+     */
+    void updateOutptVisitCodeByid(OutptVisitDTO outptVisitDTO);
 }

@@ -2,10 +2,12 @@ package cn.hsa.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -78,6 +80,34 @@ public class RedisUtils {
         }
     }
 
+    /**
+     *  获取缓存中的key值
+     * @param pattern 通配符
+     * @return java.util.Set
+     */
+    @SuppressWarnings("unchecked")
+    public Set<String> keys(String pattern) {
+        try {
+            return redisTemplate.keys(pattern);
+        } catch (Exception e) {
+            log.error(pattern, e);
+            return Collections.EMPTY_SET;
+        }
+    }
+
+    /**
+     *  返回 key 值类型
+     * @param rKeyName 数值 key 名称
+     * @return  org.springframework.data.redis.connection.DataType
+     */
+    public DataType type(String rKeyName) {
+        try {
+            return redisTemplate.type(rKeyName);
+        } catch (Exception e) {
+            log.error(rKeyName, e);
+            return DataType.NONE;
+        }
+    }
     /**
      * 删除缓存
      *

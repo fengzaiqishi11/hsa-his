@@ -466,4 +466,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      * 手术报表统计方式： 0：按明细；1：按科室
      */
     private String statisticType;
+
+    private String regCode; // 机构编码
 }

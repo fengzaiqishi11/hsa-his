@@ -412,4 +412,19 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 	public WrapperResponse<PageDTO> queryPatientEmrReportForm(Map map) {
 		return WrapperResponse.success(emrPatientBO.queryPatientEmrReportForm(map));
 	}
+
+	/**
+	 * @param map
+	 * @Description: 电子病历数据抓取
+	 * @Param:
+	 * @Author: 廖继广
+	 * @Email: jiguang.liao@powersi.com.cn
+	 * @Date 2022/01/06 14:32
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<Boolean> updateHisEmrJosnInfo(Map map) {
+		InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+		return WrapperResponse.success(emrPatientBO.updateHisEmrJosnInfo(inptVisitDTO));
+	}
 }

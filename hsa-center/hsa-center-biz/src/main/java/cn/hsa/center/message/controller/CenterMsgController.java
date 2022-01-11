@@ -68,7 +68,8 @@ public class CenterMsgController extends CenterBaseController {
         Map map = new HashMap();
         messageInfoDTO.setCrteId(userId);
         messageInfoDTO.setCrteName(userName);
-        messageInfoDTO.setId(SnowflakeUtils.getId());
+        messageInfoDTO.setIsPublish("1");
+        messageInfoDTO.setHospCode("");
         map.put("messageInfoDTO",messageInfoDTO);
         return messageInfoService_consumer.updateMssageInfoStatusById(map);
     }

@@ -85,7 +85,7 @@ public class WebsocketRunnable implements Runnable {
                         ImContentModel contentModel = imContentModelMap.get(k);
                         if (requestContentModel.getHospCode().equals(contentModel.getHospCode()) &&personalMessageInfo.getReceiverId().contains(contentModel.getUnionId().toString())) {
                             infoModels.add(personalMessageInfo);
-                            channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(personalMessageInfo)));
+                            channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(infoModels)));
                         }
                     });
                 }

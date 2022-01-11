@@ -850,6 +850,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 所有费用明细里面的费用来源只要有来源于处方的费用就代表是处方病人
         if (tempMap.containsKey(Constants.FYLYFS.CF)) {
             isChange = true;
+            outptVisitDAO.updateOutptVisitCodeByid(outptVisitDTO);
         } else {
             isChange = false;
         }

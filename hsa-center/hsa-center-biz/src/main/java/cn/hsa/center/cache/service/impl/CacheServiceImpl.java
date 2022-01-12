@@ -9,6 +9,7 @@ import cn.hsa.util.Constants;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.RedisUtils;
 import cn.hsa.util.StringUtils;
+import com.aliyun.openservices.shade.com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.stereotype.Service;
@@ -87,10 +88,20 @@ public class CacheServiceImpl extends HsafService implements CacheService {
     @Override
     public WrapperResponse<Object> getRedisCacheDataByKey(Map<String, String> params) {
         String rKeyName = MapUtils.get(params,"rKeyName");
-        String retMsg = "暂时只支持value类型为String的数据查看";
+        String retMsg = "暂时只支持value类型为String,Hash的数据查看";
         // 获取value值类型为String 的缓存值
         if(0 == DataType.STRING.compareTo(redisUtils.type(rKeyName))){
             return WrapperResponse.success(redisUtils.get(rKeyName));
+        }else if(0 == DataType.HASH.compareTo(redisUtils.type(rKeyName))){
+            Map<Object,Object> map = redisUtils.hmget(rKeyName);
+            List<Map<String,Object>> result = new ArrayList<>();
+            map.entrySet().parallelStream().forEach(entry ->{
+                Map<String,Object> m = new HashMap<>();
+                m.put("hashItemKey", entry.getKey());
+                m.put("hashItemValue", JSON.toJSONString(entry.getValue()));
+                result.add(m);
+            });
+            return WrapperResponse.success("hash",result);
         }
         return WrapperResponse.success(retMsg);
     }

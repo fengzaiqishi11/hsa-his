@@ -1,4 +1,4 @@
-package cn.hsa.interf.config;
+package cn.hsa.center.config;
 
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchEntityInformation;
 import org.springframework.data.elasticsearch.repository.support.ElasticsearchRepositoryFactory;
+import org.springframework.session.web.http.DefaultCookieSerializer;
 
 @Configuration
 public class ApplicationConfig {
@@ -59,5 +60,19 @@ public class ApplicationConfig {
     @Bean
     public SearchableNationStandardTCMDrugRepository searchableNationStandardTCMDrugRepository(ElasticsearchEntityInformation<NationStandardDrugZYDO,String> metaMappingData, ElasticsearchOperations elasticsearchOperations){
         return new SearchableNationStandardTCMDrugRepository(metaMappingData,elasticsearchOperations);
+    }
+    
+    /**
+     *  <p>自定义 Cookie序列化器，解决同一服务器不同应用串 Session的问题
+     *  <p> 注意 cookiePath需要与对应应用的servlet.context-path 保持一致,
+     *  <p>否则会出现验证码一直不正确导致无法登录的情况
+     * @see org.springframework.session.web.http.DefaultCookieSerializer
+     * @return org.springframework.session.web.http.DefaultCookieSerializer
+     */
+    @Bean
+    public DefaultCookieSerializer getDefaultCookieSerializer(){
+        DefaultCookieSerializer  cookieSerializer = new DefaultCookieSerializer();
+        cookieSerializer.setCookiePath("/hsa-center");
+        return cookieSerializer;
     }
 }

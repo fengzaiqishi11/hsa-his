@@ -3675,9 +3675,20 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     messageInfoDTO.setHospCode(hospCode);
                     messageInfoDTO.setSourceId("");
                     messageInfoDTO.setVisitId(inptVisitDTO.getId());
-                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    // 推送到科室
+                    if ("1".equals(configInfoDO.getIsPersonal())) {
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }else if ("0".equals(configInfoDO.getIsPersonal())){
+                        // 推送到个人
+                        messageInfoDTO.setDeptId("");
+                        messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    }else {
+                        // 默认推送到科室
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }
                     messageInfoDTO.setLevel(configInfoDO.getLevel());
-                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
                     messageInfoDTO.setContent(inptVisitDTO.getName() + "的医嘱已被拒收");

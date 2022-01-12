@@ -8,6 +8,7 @@ import cn.hsa.module.center.message.bo.MessageInfoBO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.center.message.service.MessageInfoService;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ public class CenterMsgInfoServiceImpl extends HsafService implements MessageInfo
     @Override
     public WrapperResponse<Boolean> insertMessageInfo(Map map) {
         MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
+        messageInfoDTO.setId(SnowflakeUtils.getId());
         return WrapperResponse.success(messageInfoBO.insertMessageInfo(messageInfoDTO));
     }
 

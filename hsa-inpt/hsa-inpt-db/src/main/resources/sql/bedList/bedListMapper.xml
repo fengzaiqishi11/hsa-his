@@ -435,4 +435,48 @@
         and id = #{id}
     </update>
 
+    <select id="checkIsAllowHk" resultType="java.lang.String">
+        select if( status_code = '0', if( count( 1 ) > 0, concat('[',group_concat(ic.item_name),']药品未发'), '' ), if( count( 1 ) > 0, concat('[',group_concat(ic.item_name),']药品未退'), '' )) errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ic.item_code in ('1', '2') and ic.use_code in ('1', '4')
+        and (
+        <!-- 发药 -->
+        ( status_code = '0' AND ifnull( ic.is_dist, '0' ) = '0' )
+        or
+        <!-- 退药 -->
+        ( status_code = '1' AND back_code != '2' AND back_code != '3' )
+        )
+        group by status_code
+
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ia.content),']未填写皮试结果'), '' ) errMsg from inpt_advice ia,
+        (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
+        where ic.source_ia_id = ia.id
+        and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
+        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'
+        union all
+        select if(count(1) > 0, concat('[',group_concat(ic.item_name),']退费未确认'), '') errMsg from inpt_cost ic
+        where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '1'
+    </select>
+
+    <update id="updateVisitKS">
+        <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
+        update inpt_advice set in_dept_id = #{inDeptId}, dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
+        where hosp_code = #{hospCode} and visit_id = #{id};
+
+        <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
+        update inpt_advice_exec set dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
+        where hosp_code = #{hospCode} and visit_id = #{id};
+
+        <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
+        update inpt_cost set source_dept_id = #{inDeptId}, in_dept_id = #{inDeptId}, dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
+        where hosp_code = #{hospCode} and visit_id = #{id};
+    </update>
+
+    <select id="getDeptName" parameterType="java.util.Map" resultType="java.lang.String">
+        select name from base_dept where hosp_code = #{hospCode} and id = #{inDeptId}
+    </select>
+
 </mapper>

@@ -655,4 +655,22 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
     OutptCostDTO outptCostDTO =MapUtils.get(map,"outptCostDTO");
     return WrapperResponse.success(patientCostLedgerBO.queryoutptMonthDaily(outptCostDTO));
   }
+
+
+  /**
+   * @Menthod queryOutptIncomePage
+   * @Desrciption  门诊医生科室收入统计分页数据
+   * @param map
+   * @Author liuliyun
+   * @Date   2022/1/11 16:10
+   * @Return java.util.List<java.lang.Map>
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryOutptIncomePage(Map map){
+    return WrapperResponse.success(patientCostLedgerBO.queryOutptIncomePage(map));
+  }
+
+  public WrapperResponse<Map<String,Object>> queryOutptIncomeList(Map map){
+    return WrapperResponse.success(patientCostLedgerBO.queryOutptIncomeList(map));
+  }
 }

@@ -451,4 +451,16 @@ public interface PatientCostLedgerBO {
    *
    * @return*/
   Map<String, List<OutptCostDTO>> queryoutptMonthDaily(OutptCostDTO outptCostDTO);
+
+  /**
+   * @Menthod queryOutptIncomeList
+   * @Desrciption 门诊科室医生收入统计
+   * @Param visitDTO
+   * @Author liuliyun
+   * @Date   2022/1/11 15:44
+   * @Return map
+   **/
+  Map queryOutptIncomeList(Map<String, Object> paraMap);
+
+  PageDTO queryOutptIncomePage(Map<String, Object> paraMap);
 }

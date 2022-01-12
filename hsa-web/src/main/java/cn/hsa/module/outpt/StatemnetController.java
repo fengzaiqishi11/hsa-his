@@ -928,4 +928,42 @@ public class StatemnetController extends BaseController {
     map.put("outptCostDTO", outptCostDTO);
     return patientCostLedgerService_consumer.queryoutptMonthDaily(map);
   }
+
+  /**
+   * @Menthod queryOutptIncomePage
+   * @Desrciption  开方科室/开方医生收入统计分页数据
+   * @param paraMap
+   * @Author caoliang
+   * @Date   2021/6/10 21:00
+   * @Return java.util.List<java.lang.Map>
+   **/
+  @GetMapping("/queryOutptIncomePage")
+  public WrapperResponse<PageDTO> queryOutptIncomePage(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    String statement = MapUtils.get(paraMap, "statement");
+    if (StringUtils.isEmpty(statement)) {
+      paraMap.put("statement", "1");
+    }
+    return patientCostLedgerService_consumer.queryOutptIncomePage(paraMap);
+  }
+
+  /**
+   * @param paraMap
+   * @Menthod queryOutptCostAndRegisterCost
+   * @Desrciption 开方科室/开方医生收入统计
+   * @Author xingyu.xie
+   * @Date 2020/12/12 11:00
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+   **/
+  @PostMapping("/queryOutptIncomeList")
+  public WrapperResponse<Map<String, Object>> queryOutptIncomeList(@RequestBody Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    String statement = MapUtils.get(paraMap, "statement");
+    if (StringUtils.isEmpty(statement)) {
+      paraMap.put("statement", "1");
+    }
+    return patientCostLedgerService_consumer.queryOutptIncomeList(paraMap);
+  }
 }

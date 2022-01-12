@@ -523,5 +523,19 @@ public interface PatientCostLedgerService {
    * @return*/
   @GetMapping("/service/outpt/statement/queryoutptMonthDaily")
   WrapperResponse<Map<String, List<OutptCostDTO>>> queryoutptMonthDaily(Map map);
+
+  /**
+   * @Menthod queryOutptIncomePage
+   * @Desrciption  门诊科室医生收入统计分页数据(加优惠前金额)
+   * @param map
+   * @Author liuliyun
+   * @Date   2022/1/11 16:12
+   * @Return java.util.List<java.lang.Map>
+   **/
+  @PostMapping("/service/outpt/statement/queryOutptIncomePage")
+  WrapperResponse<PageDTO> queryOutptIncomePage(Map map);
+
+  @PostMapping("/service/outpt/statement/queryOutptIncomeList")
+  WrapperResponse<Map<String,Object>> queryOutptIncomeList(Map map);
 }
 

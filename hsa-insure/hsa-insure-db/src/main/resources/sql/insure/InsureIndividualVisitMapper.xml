@@ -1383,6 +1383,12 @@
             or b.in_no like concat('%',#{keyWord},'%')
             )
         </if>
+        <if test="startDate != null">
+            <![CDATA[ and date(a.visit_time) >= date(#{startDate}) ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[ and date(a.visit_time) <= date(#{endDate}) ]]>
+        </if>
         order by a.crte_time desc
     </select>
     <select id="queryOutptInsurePatient" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
@@ -1398,6 +1404,12 @@
             b.name like concat('%',#{keyWord},'%')
             or b.visit_no like concat('%',#{keyWord},'%')
             )
+        </if>
+        <if test="startDate != null">
+            <![CDATA[ and date(a.visit_time) >= date(#{startDate}) ]]>
+        </if>
+        <if test="endDate != null">
+            <![CDATA[ and date(a.visit_time) <= date(#{endDate}) ]]>
         </if>
         order by a.crte_time desc
     </select>

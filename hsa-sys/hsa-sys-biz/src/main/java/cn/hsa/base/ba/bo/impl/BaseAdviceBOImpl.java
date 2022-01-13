@@ -795,12 +795,16 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             throw new RuntimeException("未查询到相关数据");
         }
         String msg = "";
+        Map map = new HashMap();
+        map.put("hospCode", MapUtils.get(paramMap, "hospCode"));
+        map.put("typeCode", "49");
         for (MedicalApplyDTO medicalApplyDTO : medicalApplyDTOS) {
             if (medicalApplyDTO.getPrintTime() != null || Integer.parseInt(medicalApplyDTO.getPrintTimes() == null ? "0" : medicalApplyDTO.getPrintTimes()) > 0) {
                 msg += medicalApplyDTO.getContent()+ ",";
             }
             medicalApplyDTO.setIsMerge(Constants.SF.F);
             medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+            medicalApplyDTO.setBarCode(baseOrderRuleService.getOrderNo(map).getData());
         }
         if (StringUtils.isNotEmpty(msg)) {
             msg = msg.substring(0, msg.length()-1);
@@ -876,6 +880,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
                 if (!ListUtils.isEmpty(applyDTOList)) {
                     for (MedicalApplyDTO medicalApplyDTO : applyDTOList) {
                         medicalApplyDTO.setMergeId(applyDTOList.get(0).getId());
+                        medicalApplyDTO.setBarCode(applyDTOList.get(0).getBarCode());
                         medicalApplyDTO.setIsMerge(Constants.SF.S);
                         medicalApplyDTOList.add(medicalApplyDTO);
                     }

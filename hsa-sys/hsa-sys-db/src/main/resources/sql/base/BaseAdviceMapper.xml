@@ -517,7 +517,8 @@
         <foreach collection="medicalApplyDTOS" item="item" index="index" separator=";">
             update medic_apply
             set is_merge = #{item.isMerge},
-            merge_id = #{item.mergeId}
+            merge_id = #{item.mergeId},
+            bar_code = #{item.barCode}
             where hosp_code= #{item.hospCode} and id = #{item.id}
         </foreach>
     </update>

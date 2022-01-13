@@ -699,7 +699,16 @@
                 fertility_pay,
             </if>
             <if test="psnPartAmt != null ">
-                psn_part_amt
+                psn_part_amt,
+            </if>
+            <if test="clrType != null and clrType != ''">
+                clr_type,
+            </if>
+            <if test="clrOptins != null and clrOptins != ''">
+                clr_optins,
+            </if>
+            <if test="clrWay != null and clrWay != '' ">
+                clr_way
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -944,7 +953,16 @@
                 #{fertilityPay,jdbcType=DECIMAL},
             </if>
             <if test="psnPartAmt != null">
-                #{psnPartAmt,jdbcType=DECIMAL}
+                #{psnPartAmt,jdbcType=DECIMAL},
+            </if>
+            <if test="clrType != null and clrType != ''">
+                #{clrType,jdbcType=VARCHAR},
+            </if>
+            <if test="clrOptins != null and clrOptins != ''">
+                #{clrOptins,jdbcType=VARCHAR},
+            </if>
+            <if test="clrWay != null and clrWay != '' ">
+                #{clrWay,jdbcType=VARCHAR}
             </if>
         </trim>
     </insert>

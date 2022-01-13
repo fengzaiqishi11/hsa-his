@@ -275,7 +275,7 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
                 orderMap.put("hosplist_name", MapUtils.get(map,"hospItemName"));  //TODO 医院目录名称
                 orderMap.put("hosplist_dosform", "");  // 医院目录(药品)剂型（非必填）
                 DecimalFormat df1 = new DecimalFormat("0.00");
-                String num = df1.format(BigDecimalUtils.convert(map.get("num").toString()));
+                String num = df1.format(BigDecimalUtils.convert(map.get("totalNum").toString()));
                 BigDecimal convertNum = BigDecimalUtils.convert(num);
                 orderMap.put("cnt", convertNum);  // 数量
                 String price = df1.format(BigDecimalUtils.convert(map.get("price").toString()));
@@ -287,7 +287,7 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
                 orderMap.put("ownpay_amt", new BigDecimal(0.00));  //TODO 自费金额
                 orderMap.put("selfpay_amt", new BigDecimal(0.00));  //TODO 自付金额
                 orderMap.put("spec", MapUtils.get(map,"spec"));  // 规格
-                orderMap.put("spec_unt", MapUtils.get(map,"unit_code"));  // 数量单位
+                orderMap.put("spec_unt", MapUtils.get(map,"numUnitCode"));  // 数量单位
                 orderMap.put("drord_begn_date", DateUtils.format(MapUtils.get(map,"crteTime"),DateUtils.Y_M_DH_M_S));
                 if(!"1".equals(insureIndividualVisitDTO.getIsHospital())){
                     orderMap.put("drord_stop_date", null);  // 医嘱停止日期
@@ -295,10 +295,10 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
                 else{
                     orderMap.put("drord_stop_date", DateUtils.format(MapUtils.get(map,"stopTime"),DateUtils.Y_M_DH_M_S));  // 医嘱停止日期
                 }
-                orderMap.put("drord_dept_codg", MapUtils.get(map,"dept_id"));  // 下达医嘱的科室标识
-                orderMap.put("drord_dept_name", MapUtils.get(map,"dept_name"));  // 下达医嘱科室名称
-                orderMap.put("drord_dr_codg", MapUtils.get(map,"crte_id"));  // 开处方(医嘱)医生标识
-                orderMap.put("drord_dr_name", MapUtils.get(map,"crte_name"));  // 开处方(医嘱)医生姓名
+                orderMap.put("drord_dept_codg", MapUtils.get(map,"deptId"));  // 下达医嘱的科室标识
+                orderMap.put("drord_dept_name", MapUtils.get(map,"deptName"));  // 下达医嘱科室名称
+                orderMap.put("drord_dr_codg", MapUtils.get(map,"pracCertiNo"));  // 开处方(医嘱)医生标识
+                orderMap.put("drord_dr_name", MapUtils.get(map,"doctorName"));  // 开处方(医嘱)医生姓名
                 if("103".equals(MapUtils.get(map,"workTypeCode"))){
                     orderMap.put("drord_dr_profttl", "3");
                 }
@@ -313,7 +313,6 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
                 }else{
                     orderMap.put("drord_dr_profttl", "9");
                 }
-                orderMap.put("drord_dr_profttl", MapUtils.get(map,"workTypeCode"));  // 开处方(医嘱)医职称
                 orderMap.put("curr_drord_flag", Constants.SF.S);  //TODO 是否当前处方(医嘱)
                 orderDTOS.add(orderMap);
             });
@@ -513,17 +512,17 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
         encounterMap.put("medins_admdvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 医疗机构行政区划编码
         encounterMap.put("medins_type", MapUtils.get(medisnInfMap,"fixmedins_type"));//TODO 医疗服务机构类型
         encounterMap.put("medins_lv", MapUtils.get(medisnInfMap,"hosp_lv"));//TODO 医疗机构等级
-        encounterMap.put("wardarea_codg", "0");// 病区标识
-        encounterMap.put("wardno", "0");// 病房号(非必填)
+        encounterMap.put("wardarea_codg", null);// 病区标识
+        encounterMap.put("wardno", null);// 病房号(非必填)
         encounterMap.put("bedno", insureIndividualVisitDTO.getVisitBerth());// 病床号
-        encounterMap.put("adm_date", DateUtils.format(insureIndividualVisitDTO.getVisitTime(),DateUtils.Y_M_DH_M_S));// 入院日期
         if("1".equals(insureIndividualVisitDTO.getIsHospital())){
+            encounterMap.put("adm_date", DateUtils.format(insureIndividualVisitDTO.getInTime(),DateUtils.Y_M_DH_M_S));// 入院日期
             encounterMap.put("dscg_date",DateUtils.format( insureIndividualVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));// 出院日期
-            encounterMap.put("dr_codg", insureIndividualVisitDTO.getZzDoctorId());// 医师标识
         }else{
+            encounterMap.put("adm_date", DateUtils.format(insureIndividualVisitDTO.getVisitTime(),DateUtils.Y_M_DH_M_S));// 入院日期
             encounterMap.put("dscg_date",DateUtils.format( insureIndividualVisitDTO.getVisitTime(),DateUtils.Y_M_DH_M_S));// 出院日期
-            encounterMap.put("dr_codg", insureIndividualVisitDTO.getDoctorName());// 医师标识
         }
+        encounterMap.put("dr_codg", insureIndividualVisitDTO.getPracCertiNo());// 医师标识
         encounterMap.put("dscg_main_dise_codg", insureIndividualVisitDTO.getVisitIcdCode());// 主诊断编码
         encounterMap.put("dscg_main_dise_name", insureIndividualVisitDTO.getVisitIcdName());// 主诊断名称
         encounterMap.put("diagnoseDtos", diagnoseList);// 诊断信息DTO

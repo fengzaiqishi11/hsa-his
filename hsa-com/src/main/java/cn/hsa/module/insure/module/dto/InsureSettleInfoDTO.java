@@ -52,7 +52,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String ntly; // 国籍 *
 
-    private int nwbAge; // （年龄不足一周岁 ）年龄*/
+    private int nebAge; // （年龄不足一周岁 ）年龄*/
 
     private String naty; // 民族 *
 
@@ -315,5 +315,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dscgTime;
+    // 单位邮编
+    private String poscode;
 
 }

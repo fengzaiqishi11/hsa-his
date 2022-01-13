@@ -1038,4 +1038,15 @@ List<InptCostDTO> queryItemName(InptCostDTO inptCostDTO);
    * @Return List<Map>
    **/
   List<OutptCostAndReigsterCostDTO> queryOperCostListGroupByDept(InptVisitDTO inptVisitDTO);
+
+
+  /**
+   * @Menthod queryOutptIncomeList
+   * @Desrciption  门诊科室医生收入统计
+   * @param paraMap
+   * @Author liuliyun
+   * @Date   2021/1/11 15:28
+   * @Return List<OutptCostAndReigsterCostDTO>
+   **/
+  List<OutptCostAndReigsterCostDTO> queryOutptIncomeList(Map<String, Object> paraMap);
 }

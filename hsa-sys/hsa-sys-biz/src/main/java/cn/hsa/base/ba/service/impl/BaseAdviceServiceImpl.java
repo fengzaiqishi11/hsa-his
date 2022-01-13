@@ -9,6 +9,7 @@ import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.ba.service.BaseAdviceService;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -294,5 +295,35 @@ public class BaseAdviceServiceImpl extends HsafService implements BaseAdviceServ
     public WrapperResponse<Boolean> updateWithPipePrint(Map map) {
         Boolean result = baseAdviceBO.updateWithPipePrint(MapUtils.get(map, "paramMap"));
         return WrapperResponse.success(result);
+    }
+
+    /**
+     * @Menthod: 取消合管
+     * @Desrciption: updateCancelMerge
+     * @Param: paramMap：{
+     *     mergeIds：合管主ids
+     * }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 11:47
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateCancelMerge(Map map) {
+        return WrapperResponse.success(baseAdviceBO.updateCancelMerge(MapUtils.get(map, "paramMap")));
+    }
+
+    /**
+     * @Menthod: updateMergePipePrint
+     * @Desrciption: 合管打印
+     * @Param: paramMap：{ mergeIds：合管主ids }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 17:11
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<MedicalApplyDTO>> updateMergePipePrint(Map map) {
+        return WrapperResponse.success(baseAdviceBO.updateMergePipePrint(MapUtils.get(map, "paramMap")));
     }
 }

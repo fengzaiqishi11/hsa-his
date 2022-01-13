@@ -54,5 +54,10 @@ public class ConfigInfoDO extends PageDO implements Serializable {
 	 */
 	private String level;
 
+	/**
+	 * 推送个人还是科室 0：个人 1：科室
+	 */
+	private String isPersonal;
+
 
 }

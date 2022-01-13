@@ -262,4 +262,10 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
     // 退费时，原结算时舍入金额
     private BigDecimal truncPrice;
+
+    // 发票领用人，复核人
+    private String receiveName;
+
+    // 发票前缀
+    private String prefix;
 }

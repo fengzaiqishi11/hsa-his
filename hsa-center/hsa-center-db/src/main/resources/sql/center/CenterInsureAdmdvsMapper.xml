@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 医保区块划分映射表(center_insure_admdvs) -->
+<mapper namespace="cn.hsa.module.center.admdvs.dao.CenterInsureAdmdvsDAO">
+
+    <select id="queryAdmdvsInfoPage" resultType="java.util.HashMap" parameterType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        select
+        id, hosp_code, admdvs_code admdvsCode, admdvs_name admdvsName
+        from center_insure_admdvs
+        where
+        hosp_code = #{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and (admdvs_name like concat('%',#{keyword},'%')
+            or admdvs_code like concat('%',#{keyword},'%'))
+        </if>
+    </select>
+
+    <select id="queryAdmdvsInfo" resultType="java.util.HashMap" >
+        select
+            admdvs_code admdvsCode, admdvs_name admdvsName
+        from center_insure_admdvs
+        where
+            hosp_code = #{hospCode}
+    </select>
+
+</mapper>

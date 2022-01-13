@@ -4,7 +4,6 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
@@ -119,6 +118,9 @@ public class DoctorAdviceController extends BaseController {
             inptAdviceDTO.setCrteId(sysUserDTO.getId());
             //医生姓名
             inptAdviceDTO.setCrteName(sysUserDTO.getName());
+            if (StringUtils.isEmpty(inptAdviceDTO.getBabyId())){
+                inptAdviceDTO.setBabyId(null);
+            }
             //就诊科室，会诊病人开嘱科室前端赋值过来
             if(StringUtils.isEmpty(inptAdviceDTO.getDeptId())) {
                 inptAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());

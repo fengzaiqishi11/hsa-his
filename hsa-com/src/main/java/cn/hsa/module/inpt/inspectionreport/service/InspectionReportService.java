@@ -60,4 +60,12 @@ public interface InspectionReportService {
      * @Date: 2021/5/19 18:20
      **/
     WrapperResponse<PageDTO> getHospitalInfo(Map map);
+
+    /**
+     * @description 根据住院号查询病人lis信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/1/4 15:06
+     **/
+    WrapperResponse<List<ExaminationItem>> queryPatientAllMedicResult(Map map);
 }

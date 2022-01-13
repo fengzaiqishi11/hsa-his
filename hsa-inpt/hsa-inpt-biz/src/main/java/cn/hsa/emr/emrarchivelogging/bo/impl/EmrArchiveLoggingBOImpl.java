@@ -8,8 +8,8 @@ import cn.hsa.module.emr.emrarchivelogging.dao.EmrArchiveLoggingDAO;
 import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
 import cn.hsa.module.emr.emrpatient.dao.EmrPatientDAO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -45,8 +45,6 @@ public class EmrArchiveLoggingBOImpl extends HsafBO implements EmrArchiveLogging
 	@Resource
 	private SysParameterService sysParameterService_consumer;
 
-	@Resource
-	MessageInfoDAO messageInfoDAO;
 	/**
 	 * @Description: 新增病人病历归档记录, 新增只会在设置为归档时才会增，如果有未审核完成病历，不允许归档
 	 * 1.校验传入的就诊id的病历是否全部完成审核

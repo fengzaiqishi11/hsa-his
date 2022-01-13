@@ -261,7 +261,7 @@ public interface InsureIndividualCostDAO {
      * @Date   2021/6/8 16:12 
      * @Return 
     **/
-    List<InptCostDO> queryInptFeeCost(Map<String, Object> map);
+    List<InsureIndividualCostDTO> queryInptFeeCost(Map<String, Object> map);
 
     /**
      * @param inptVisitDTO

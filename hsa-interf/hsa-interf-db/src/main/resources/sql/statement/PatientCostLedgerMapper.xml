@@ -2001,6 +2001,7 @@
         select A.* from (
         select
         max(a.item_name) as itemName,
+        case max(a.item_code) when '1' then max(bd.last_buy_price) when '2' then max(bm.last_buy_price) end lastBuyPrice,
         sum(a.num) as num,
         sum(a.split_num) as splitNum,
         sum(a.total_price) as totalPrice,

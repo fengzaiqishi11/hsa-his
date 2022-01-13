@@ -590,6 +590,32 @@ public class EmrPatientController extends BaseController {
 	}
 
 	/**
+	 * @Description: 电子病历数据抓取
+	 * @Param:
+	 * @Author: 廖继广
+	 * @Email: jiguang.liao@powersi.com.cn
+	 * @Date 2022/01/06 14:32
+	 * @Return
+	 */
+	@GetMapping("/updateHisEmrJosnInfo")
+		public WrapperResponse<Boolean> updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+		SysUserDTO sysUserDTO = getSession(req, res);
+		if (StringUtils.isEmpty(inptVisitDTO.getVisitId())){
+			throw new AppException("请选择要上传病历的病人");
+		}
+		if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+			inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+		}
+		inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+		Map map = new HashMap();
+		map.put("hospCode", sysUserDTO.getHospCode());
+		map.put("inptVisitDTO", inptVisitDTO);
+		return emrPatientService_consumer.updateHisEmrJosnInfo(map);
+	}
+
+
+
+	/**
 	 * @Description: 记录病历打印次数
 	 * @Param:
 	 * @Author: liuliyun

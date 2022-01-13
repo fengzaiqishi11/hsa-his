@@ -384,4 +384,11 @@ public interface BedListDAO {
      * @Return int
      **/
     int updateInptVisitTotalDays(InptVisitDTO inptVisitDTO);
+
+    List<String> checkIsAllowHk(@Param("type") int type, @Param("hospCode") String hospCode, @Param("visitId") String visitId);
+
+    // 更新患者开医嘱科室id，执行科室id
+    void updateVisitKS(InptVisitDTO inptVisitDTO);
+
+	String getDeptName(Map map);
 }

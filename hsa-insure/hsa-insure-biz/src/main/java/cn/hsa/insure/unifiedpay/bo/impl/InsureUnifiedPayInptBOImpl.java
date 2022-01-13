@@ -141,13 +141,21 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             this.insertNotUpLoadFee(insureCostList,inptVisitDTO);
             return map;
         }
-
         List<Map<String,Object>> list1 = new ArrayList<>();
         List<Map<String,Object>> list2 = new ArrayList<>();
         List<Map<String,Object>> list3 = new ArrayList<>(); // 处理正负直接相抵的集合
+        /**
+         * 如果存在退费
+         * 1.开5个  已经上传医保  退了3  下次需要上传  -5  +3
+         * 2.开5个  没有上传医保  退了3  下次需要上传  +2
+         */
+
         if(!ListUtils.isEmpty(inptCostDTOList)){
-            Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
-            // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
+            if(!ListUtils.isEmpty(individualCostDTOList)){
+                list2.addAll(insureCostList);
+            }else{
+                Map<String, InptCostDTO> collect = inptCostDTOList.stream().collect(Collectors.toMap(InptCostDTO::getOldCostId, Function.identity()));
+                // 传正常的数据    假如最原始已经上传 10条  退4条     第二次传输 则  传-10  正6
                 for(Map<String,Object> item : insureCostList){
                     if(!MapUtils.isEmpty(collect) && collect.containsKey(MapUtils.get(item,"id"))){
                         list3.add(item);
@@ -161,13 +169,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     else {
                         list1.add(item);
                     }
-            }
-            // 传退费对应的数据
-            if(!ListUtils.isEmpty(individualCostDTOList)){
-                for(Map<String,Object> item : individualCostDTOList){
-                    if(collect.containsKey(MapUtils.get(item,"costId"))){
-                        list2.add(item);
-                    }
                 }
             }
 
@@ -175,11 +176,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 insertNotUpLoadFee(list3,inptVisitDTO);
             }
             list2.addAll(list1);
-        }else{
+        }
+        // 说明没有退费数据
+        else{
             list2.addAll(insureCostList);
         }
-        List<InptCostDO> inptCostDOList = insureIndividualCostDAO.queryInptFeeCost(map);
-        Map<String, InptCostDO> inptCostDOMap = inptCostDOList.stream().collect(Collectors.toMap(InptCostDO::getId,
+        List<InsureIndividualCostDTO> individualCostDTOS = insureIndividualCostDAO.queryInptFeeCost(map);
+        Map<String, InsureIndividualCostDTO> inptCostDOMap = individualCostDTOS.stream().collect(Collectors.toMap(InsureIndividualCostDTO::getCostId,
                 Function.identity(), (k1, k2) -> k1));
 
         Boolean isCompound = false;
@@ -564,8 +567,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         insureIndividualCostDTO.setSettleId(null);
                         insureIndividualCostDTO.setIsHospital("1");
                         insureIndividualCostDTO.setItemType(MapUtils.get(feedetlSnObjectMap,"list_type"));
-                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"medins_list_code"));
-                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnMap,"medins_list_name"));
+                        insureIndividualCostDTO.setItemCode(MapUtils.get(feedetlSnObjectMap,"med_list_codg"));
+                        insureIndividualCostDTO.setItemName(MapUtils.get(feedetlSnObjectMap,"med_list_name"));
                         insureIndividualCostDTO.setCostId(MapUtils.get(feedetlSnObjectMap,"id"));//费用id
                         insureIndividualCostDTO.setFeedetlSn(MapUtils.get(item,"feedetl_sn").toString()); // 费用明细流水号(上传到医保)
                         insureIndividualCostDTO.setGuestRatio(MapUtils.get(item, "selfpay_prop").toString()); // 自付比例

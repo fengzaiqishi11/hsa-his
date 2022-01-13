@@ -228,7 +228,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
                 insureIndividualCostDO.setItemType((String) item.get("insureItemType"));//医保项目类别
                 insureIndividualCostDO.setItemCode((String) item.get("insureItemCode"));//医保项目编码
                 insureIndividualCostDO.setItemName((String) item.get("insureItemName"));//医保项目名称
-                insureIndividualCostDO.setGuestRatio((String)item.get("deductible"));//自付比例
+                insureIndividualCostDO.setGuestRatio("0");//自付比例
                 insureIndividualCostDO.setPrimaryPrice((BigDecimal)item.get("realityPrice"));//原费用
                 insureIndividualCostDO.setApplyLastPrice(null);//报销后费用
                 insureIndividualCostDO.setOrderNo(count+"");//顺序号
@@ -405,20 +405,6 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
      **/
     @Override
     public PageDTO queryInptPatientPage(InptVisitDTO inptVisitDTO) {
-
-        String hospCode = inptVisitDTO.getHospCode();
-        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
-        if(StringUtils.isNotEmpty(inptVisitDTO.getOrgCode())){
-            inptVisitDTO.setMedicineOrgCode(inptVisitDTO.getOrgCode());
-        }else{
-            isInsureUnifiedMap.put("hospCode", hospCode);
-            isInsureUnifiedMap.put("code", "HOSP_INSURE_CODE");
-            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
-            if(sysParameterDTO == null){
-                throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
-            }
-            inptVisitDTO.setMedicineOrgCode(sysParameterDTO.getValue());
-        }
         PageHelper.startPage(inptVisitDTO.getPageNo(), inptVisitDTO.getPageSize());
         List<InptVisitDTO> visitDTOList = insureIndividualCostDAO.queryInptPatientPage(inptVisitDTO);
         return PageDTO.of(visitDTOList);

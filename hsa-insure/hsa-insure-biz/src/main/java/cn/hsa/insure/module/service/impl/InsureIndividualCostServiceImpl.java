@@ -86,6 +86,7 @@ public class InsureIndividualCostServiceImpl implements InsureIndividualCostServ
     @Override
     public WrapperResponse<PageDTO> queryInptPatientPage(Map map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+
         return WrapperResponse.success(insureIndividualCostBO.queryInptPatientPage(inptVisitDTO));
     }
 

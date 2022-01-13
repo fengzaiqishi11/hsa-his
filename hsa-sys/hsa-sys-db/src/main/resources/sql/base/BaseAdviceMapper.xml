@@ -517,7 +517,8 @@
         <foreach collection="medicalApplyDTOS" item="item" index="index" separator=";">
             update medic_apply
             set is_merge = #{item.isMerge},
-            merge_id = #{item.mergeId}
+            merge_id = #{item.mergeId},
+            bar_code = #{item.barCode}
             where hosp_code= #{item.hospCode} and id = #{item.id}
         </foreach>
     </update>
@@ -537,7 +538,12 @@
             a.crte_time,
             a.print_time as printTime,
             IFNULL(a.print_times, '0') as printTimes,
-            GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            <if test="isGroupBy != null and isGroupBy == '1'.toString()">
+                GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            </if>
+            <if test="isGroupBy == null">
+                b.content content,
+            </if>
             visit.dept_name,
             visit.visit_no,
             visit.name,
@@ -557,7 +563,9 @@
         <foreach collection="mergeIds" item="mergeId" open="(" close=")" separator=",">
             #{mergeId}
         </foreach>
-        group by a.merge_id
+        <if test="isGroupBy != null and isGroupBy == '1'.toString()">
+            group by a.merge_id
+        </if>
 
         union all
 
@@ -574,7 +582,12 @@
             a.crte_time,
             a.print_time as printTime,
             IFNULL(a.print_times, '0') as printTimes,
-            GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            <if test="isGroupBy != null and isGroupBy == '1'.toString()">
+                GROUP_CONCAT(DISTINCT b.content SEPARATOR ',') content,
+            </if>
+            <if test="isGroupBy == null">
+                b.content content,
+            </if>
             visit.in_dept_name as dept_name,
             visit.in_no as visit_no,
             visit.name,
@@ -594,6 +607,8 @@
         <foreach collection="mergeIds" item="mergeId" open="(" close=")" separator=",">
             #{mergeId}
         </foreach>
-        group by a.merge_id
+        <if test="isGroupBy != null and isGroupBy == '1'.toString()">
+            group by a.merge_id
+        </if>
     </select>
 </mapper>

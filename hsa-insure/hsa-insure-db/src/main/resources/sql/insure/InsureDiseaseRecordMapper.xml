@@ -134,6 +134,9 @@
         from insure_record
         where hosp_code = #{hospCode}
           and trt_dcla_detl_sn = #{trtDclaDetlSn}
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
     </select>
     <select id="getFixRecordById" resultType="cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO">
         select id,
@@ -169,6 +172,9 @@
         from insure_inpt_record iir
                  join insure_individual_visit iiv on iir.visit_id = iiv.visit_id and iir.hosp_code = iiv.hosp_code
         where iir.hosp_code = #{hospCode}
+          <if test="visitId != null and visitId != ''">
+              and iir.visit_id = #{visitId}
+          </if>
           and iir.trt_dcla_detl_sn = #{trtDclaDetlSn}
     </select>
     <select id="queryPageInptRecord" resultType="cn.hsa.module.insure.module.dto.InsureInptRecordDTO">
@@ -278,6 +284,10 @@
         select id, hosp_code, reg_code, psn_no, trtDclaDetlSn
         from insure_outpt_twodise
         where hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+
+            and visit_id = #{visitId}
+        </if>
           and trtDclaDetlSn = #{trtDclaDetlSn}
     </select>
     <select id="queryPageSpecialRecord" resultType="cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO">

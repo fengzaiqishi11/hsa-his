@@ -748,6 +748,9 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         insureIndividualSettleDO.setFamilyPay(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(combineResultMap,"familyPay"))));
         insureIndividualSettleDO.setBehalfPay(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(combineResultMap,"behalfPay"))));
         insureIndividualSettleDO.setPsnPartAmt(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(combineResultMap,"psn_part_amt"))));
+        insureIndividualSettleDO.setClrType(MapUtils.get(combineResultMap,"clr_type"));
+        insureIndividualSettleDO.setClrOptins(MapUtils.get(combineResultMap,"clr_optins"));
+        insureIndividualSettleDO.setClrWay(MapUtils.get(combineResultMap,"clr_way"));
         Map<String, Object> insureSettleParam = new HashMap<String, Object>();
         insureSettleParam.put("hospCode",hospCode);//医院编码
         insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);

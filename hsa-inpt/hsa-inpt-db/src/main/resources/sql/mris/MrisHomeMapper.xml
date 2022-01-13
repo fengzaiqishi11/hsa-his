@@ -23,8 +23,11 @@
             ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
         </if>
         <!--病案是否已写-->
-        <if test="isLoadMris == '0'.toString() or isLoadMris == '1'.toString()">
+        <if test="isLoadMris == '0'.toString() or isLoadMris == '1'.toString() or isInsureUpload =='1'.toString()  or isInsureUpload =='0'.toString()">
           left join mris_base_info mris on a.hosp_code = mris.hosp_code and a.id = mris.visit_id
+        </if>
+        <if test="regCode != null and regCode !=''  ">
+            left join insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and iiv.visit_id = a.id
         </if>
         WHERE a.hosp_code = #{hospCode}
         <if test="keyword != null and keyword !=''">
@@ -62,6 +65,15 @@
         <!--未写病案-->
         <if test="isLoadMris == '0'.toString()">
             and (mris.id is null or mris.id ='')
+        </if>
+        <if test="isInsureUpload == '1'.toString()">
+            and mris.is_upload_insure ='1'
+        </if>
+        <if test="isInsureUpload == '0'.toString()">
+            and mris.is_upload_insure ='0'
+        </if>
+        <if test="regCode != null and regCode !=''  ">
+            and iiv.insure_reg_code =#{regCode}
         </if>
         order by a.in_time desc
     </select>
@@ -124,9 +136,13 @@
                    inpt_before_minute, inpt_last_day, inpt_last_hour, inpt_last_minute, yljg_code,iiv.medical_reg_no,
                    iiv.medicine_org_code,
                    turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
-                   outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count
-            FROM mris_base_info mbi left join insure_individual_visit iiv on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
-
+                   outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count,
+                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1) as  deptdrtCode,
+                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id) as  atddrCode,
+                  (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zr_nurse_id) as  respNursCode,
+     (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id) as  iptDrCode
+            FROM mris_base_info mbi left join insure_individual_visit iiv
+                on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
             WHERE  mbi.hosp_code = #{hospCode}
             AND  mbi.visit_id = #{id}
             order by iiv.crte_time desc limit 1

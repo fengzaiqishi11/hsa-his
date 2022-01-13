@@ -598,6 +598,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                     }
                 }
             }
+
+            insureIndividualSettleDTO.setClrOptins(MapUtils.get(setlinfo,"clr_optins"));
+            insureIndividualSettleDTO.setClrType(MapUtils.get(setlinfo,"clr_type"));
+            insureIndividualSettleDTO.setClrWay(MapUtils.get(setlinfo,"clr_way"));
+
             insureIndividualSettleDAO.updateByInsureSettleId(insureIndividualSettleDTO);
 
             map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);

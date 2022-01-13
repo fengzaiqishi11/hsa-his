@@ -7964,84 +7964,88 @@
     <select id="queryOutptIncomeList" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO">
         select * from (
         <!-- 门诊医生室收入 -->
-            select
-            ifnull(B.reality_price,0) as realityPrice,
-            ifnull(B.total_price,0) as totalPrice,
-            ifnull(B.preferential_price,0) as preferentialPrice,
-            ifnull(B.bfc_id,'0') as bfcId,
-            ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
-            ),'其他')
-            as bfcName,
-            ifnull(B.doctor_id,'0') as doctorId,
-            ifnull(B.doctor_name,t.doctor_name) as doctorName,
-            <if test="'2'.toString() == flag">
-                ifnull(B.dept_id,'0') as deptId,
-                ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
-                as deptName,
-            </if>
-            <!-- 优惠类别-->
-            <if test="'3'.toString() == flag">
-                ifnull(t.preferential_type_id,'0') as preferentialId,
-                ifnull((select name from base_preferential_type bpt where bpt.id = t.preferential_type_id and bpt.hosp_code = '1000001'
-                ),'其他') as preferentialName,
-            </if>
-            ifnull(B.visit_id,'0') as visitId,
-            t.name as visitName
-            from
-            outpt_settle A
-            left join outpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
-            left join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
-            where
-            A.hosp_code = #{hospCode}
-            and A.is_settle = '1' and b.settle_code = '2'
-            <if test="startDate != null and startDate !='' ">
-                and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
-            </if>
-            /*结束日期*/
-            <if test="endDate != null and endDate != '' ">
-                and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
-            </if>
-            union all
-            <!-- 挂号结算费用 -->
-            select
-            ifnull(B.reality_price,0) as realityPrice,
-            ifnull(B.total_price,0) as totalPrice,
-            ifnull(B.preferential_price,0) as preferentialPrice,
-            ifnull(B.bfc_id,'0') as bfcId,
-            ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
-            ),'其他')
-            as bfcName,
-            ifnull(C.doctor_id,'0') as doctorId,
-            ifnull(C.doctor_name,t.doctor_name) as doctorName,
-            <if test="'2'.toString() == flag">
-                ifnull(c.dept_id,'0') as deptId,
-                ifnull((select name from base_dept bfc where bfc.id = c.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
-                as deptName,
-            </if>
-            <!-- 优惠类别-->
-            <if test="'3'.toString() == flag">
-                ifnull(t.preferential_type_id,'0') as preferentialId,
-                ifnull((select name from base_preferential_type bpt where bpt.id = t.preferential_type_id and bpt.hosp_code = '1000001'
-                ),'其他') as preferentialName,
-            </if>
-            ifnull(B.visit_id,'0') as visitId,
-            t.name as visitName
-            from
-            outpt_register_settle A
-            left join outpt_register_detail B on A.register_id = B.register_id and A.hosp_code = B.hosp_code and A.status_code = B.status_code
-            left join outpt_register C on A.register_id = C.id and A.hosp_code = C.hosp_code
-            left join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
-            where
-            A.hosp_code = #{hospCode}
-            and A.status_code = '0'
-            and B.status_code = '0'
-            <if test="startDate != null and startDate !='' ">
-                and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
-            </if>
-            /*结束日期*/
-            <if test="endDate != null and endDate != '' ">
-                and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
-            </if>
+        select
+        ifnull(B.reality_price,0) as realityPrice,
+        ifnull(B.total_price,0) as totalPrice,
+        ifnull(B.preferential_price,0) as preferentialPrice,
+        ifnull(B.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        ifnull(B.doctor_id,'0') as doctorId,
+        ifnull(B.doctor_name,t.doctor_name) as doctorName,
+        <if test="'2'.toString() == flag">
+            ifnull(B.dept_id,'0') as deptId,
+            ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
+            as deptName,
+        </if>
+        <!-- 优惠类别-->
+        <if test="'3'.toString() == flag">
+            ifnull(t.preferential_type_id,'0') as preferentialId,
+            ifnull((select name from base_preferential_type bpt where bpt.id = t.preferential_type_id and bpt.hosp_code = #{hospCode}
+            ),'其他') as preferentialName,
+            ifnull((select name from base_dept bfc where bfc.id = B.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
+            as deptName,
+        </if>
+        ifnull(B.visit_id,'0') as visitId,
+        t.name as visitName
+        from
+        outpt_settle A
+        left join outpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+        left join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.is_settle = '1' and b.settle_code = '2'
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        union all
+        <!-- 挂号结算费用 -->
+        select
+        ifnull(B.reality_price,0) as realityPrice,
+        ifnull(B.total_price,0) as totalPrice,
+        ifnull(B.preferential_price,0) as preferentialPrice,
+        ifnull(B.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        ifnull(C.doctor_id,'0') as doctorId,
+        ifnull(C.doctor_name,t.doctor_name) as doctorName,
+        <if test="'2'.toString() == flag">
+            ifnull(c.dept_id,'0') as deptId,
+            ifnull((select name from base_dept bfc where bfc.id = c.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
+            as deptName,
+        </if>
+        <!-- 优惠类别-->
+        <if test="'3'.toString() == flag">
+            ifnull(t.preferential_type_id,'0') as preferentialId,
+            ifnull((select name from base_preferential_type bpt where bpt.id = t.preferential_type_id and bpt.hosp_code = #{hospCode}
+            ),'其他') as preferentialName,
+            ifnull((select name from base_dept bfc where bfc.id = c.dept_id and bfc.hosp_code = #{hospCode} ),'其他')
+            as deptName,
+        </if>
+        ifnull(B.visit_id,'0') as visitId,
+        t.name as visitName
+        from
+        outpt_register_settle A
+        left join outpt_register_detail B on A.register_id = B.register_id and A.hosp_code = B.hosp_code and A.status_code = B.status_code
+        left join outpt_register C on A.register_id = C.id and A.hosp_code = C.hosp_code
+        left join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.status_code = '0'
+        and B.status_code = '0'
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
         ) tab
         <where>
             <if test="doctorName != null and doctorName !='' ">

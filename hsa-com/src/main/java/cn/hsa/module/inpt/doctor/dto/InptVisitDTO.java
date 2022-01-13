@@ -468,4 +468,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String statisticType;
 
     private String regCode; // 机构编码
+    /**
+     *是否上传医保
+     */
+    private String isInsureUpload;
+
+
 }

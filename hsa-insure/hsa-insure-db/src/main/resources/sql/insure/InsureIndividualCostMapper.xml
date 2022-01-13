@@ -869,6 +869,9 @@
                ic.is_reimburse                                                                                isReimburse,
                iim.manufacturer                                                                               manufacturer,
                iim.tcmdrug_used_way                                                                           tcmdrugUsedWay,
+               iim.hilist_price hilistPrice,
+               iim.hilist_lv  hilistLv,
+               iim.chrg_type chrgType,
                (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM outpt_cost ic
                  JOIN insure_item_match iim

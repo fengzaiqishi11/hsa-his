@@ -912,6 +912,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             MedicalApplyDTO applyDTO = inptAdviceDAO.queryApplyByAdviceId(medicalApplyDTO.getHospCode(), mergeAdviceDetailList.get(0).getId(), medicalApplyDTO.getVisitId());
             if (applyDTO != null) {
                 medicalApplyDTO.setMergeId(applyDTO.getMergeId());
+                medicalApplyDTO.setBarCode(applyDTO.getBarCode());
             }
 
             medicalApplyDTO.setIsMerge(Constants.SF.S);

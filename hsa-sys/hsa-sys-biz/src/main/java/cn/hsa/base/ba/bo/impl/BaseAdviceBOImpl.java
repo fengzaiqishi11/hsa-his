@@ -895,6 +895,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
         baseAdviceDAO.updateWithPipePrint(paramMap);
 
         // 返回前台合管打印后的数据，用于展示
+        paramMap.put("isGroupBy", Constants.SF.S);
         List<MedicalApplyDTO> result = baseAdviceDAO.queryMedicApplyByMergeIds(paramMap);
         return result;
     }

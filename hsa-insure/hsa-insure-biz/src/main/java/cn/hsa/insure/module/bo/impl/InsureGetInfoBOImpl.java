@@ -220,7 +220,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("adm_caty", settleInfoDTO.getAdmCaty()); // 入院科别
         setlinfo.put("refldept_dept", settleInfoDTO.getRefldeptDept()); // 转科科别
         setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
-        setlinfo.put("dscg_time", settleInfoDTO.getOutTime()); // 出院时间 *******
+        setlinfo.put("dscg_time", DateUtils.format(settleInfoDTO.getDscgTime(),DateUtils.Y_M_DH_M_S)); // 出院时间 *******
         setlinfo.put("act_ipt_days", settleInfoDTO.getActIptDays()); // 实际住院天数 *******
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
         setlinfo.put("wm_dise_code", settleInfoDTO.getWmDiswCode()); // 西医诊断疾病代码 *******

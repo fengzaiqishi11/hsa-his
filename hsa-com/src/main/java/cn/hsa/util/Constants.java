@@ -230,6 +230,7 @@ public interface Constants {
         public static final String BCQX = "4"; //释放包床
         public static final String YCY = "5"; //预出院
         public static final String CYZH = "6"; //出院召回
+        public static final String ZHC = "7"; //转换科
     }
 
     /**
@@ -316,7 +317,7 @@ public interface Constants {
 
     /**
      * @Desrciption 盘点key
-     * @Author zhangguorui
+     * @Author jiahong.yang
      * @Date 2021/11/22 15:41
      */
     String STRO_INVENTORY_TF_REDIS_KEY = "INVENTORY_ONLY";

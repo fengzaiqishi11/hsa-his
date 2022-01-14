@@ -869,6 +869,9 @@
                ic.is_reimburse                                                                                isReimburse,
                iim.manufacturer                                                                               manufacturer,
                iim.tcmdrug_used_way                                                                           tcmdrugUsedWay,
+               iim.hilist_price hilistPrice,
+               iim.hilist_lv  hilistLv,
+               iim.chrg_type chrgType,
                (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM outpt_cost ic
                  JOIN insure_item_match iim
@@ -887,10 +890,12 @@
           AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
           AND iim.insure_reg_code = #{insureRegCode}
         <if test="opIds != null and opIds.size() > 0">
-            and ic.op_id in
+            and (ic.op_id in
             <foreach collection="opIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
+                or ic.op_id is null
+                )
         </if>
         order by ic.crte_time desc
     </select>

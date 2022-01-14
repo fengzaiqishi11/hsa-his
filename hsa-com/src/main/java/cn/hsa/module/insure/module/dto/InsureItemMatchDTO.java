@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -56,4 +57,7 @@ public class InsureItemMatchDTO extends InsureItemMatchDO implements Serializabl
         private String insureId; // 医保端ID
         private List<String> itemIdCollectList;
         private String remark;
+        private String hilistLv; // 医保目录等级
+        private String chrgType; // 收费类别
+        private BigDecimal hilistPrice; // 医保价格
 }

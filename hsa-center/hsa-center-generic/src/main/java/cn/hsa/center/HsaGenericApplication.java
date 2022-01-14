@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @Package_name: cn.hsa.center
@@ -22,6 +23,7 @@ import org.springframework.context.annotation.ImportResource;
 @MapperScan({"cn.hsa.module.sync.*.dao"})
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
 @EnableEncryptableProperties
+@EnableAsync
 public class HsaGenericApplication {
     /**
      * @Method 中心平台模块启动函数

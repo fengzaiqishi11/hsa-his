@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedEmrUploadDAO">
-
-
+    <update id="updateEmrBaseInfo">
+        update mris_base_info set is_upload_insure ='1'
+        where  hosp_code =#{hospCode} and id =#{id}
+    </update>
     <select id="selectDiseinfo" resultType="java.util.Map">
 
         select mid.id,
                mid.hosp_code,
                mid.mbi_id,
+               mid.disease_icd10,
+               mid.disease_icd10_name,
                mid.visit_id,
                idm.insure_illness_code diag_code,
                idm.insure_illness_name diag_name,
                in_situation_code as    adm_cond,
                mid.disease_code  as    maindiag_flag
         from mris_inpt_diagnose mid
-                 join insure_disease_match idm on mid.hosp_code = idm.hosp_code
+                 left join insure_disease_match idm on mid.hosp_code = idm.hosp_code
             and idm.hosp_illness_code = mid.disease_icd10
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
-          and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
+          and idm.insure_reg_code = #{insureRegCode}
         order by  mid.disease_code desc
 
     </select>
     <select id="selectOperInfo" resultType="java.util.Map">
-        select '2'                            as oprn_oprt_type,
+        select columns_num  as oprn_oprt_sn,
                moi.oper_disease_name          as oprn_oprt_name,
                moi.oper_disease_icd9,
                moi.oper_time                  as oprn_oprt_date,
@@ -49,8 +53,10 @@
                ana_name                     as anst_mtd_name,
                ana_code                     as anst_mtd_code,
                ana_name1                    as anst_dr_name,
-               oper_position                as anst_lv_code,
-               oper_position_name          as anst_lv_name
+               oper_position                as oprn_oper_part_code,
+               oper_position_name           as oprn_oper_part,
+               oper_code                    as oprn_lv_code,
+               oper_name                 as oprn_lv_name
         from mris_oper_info moi
                  left join insure_disease_match idm on moi.oper_disease_id = idm.hosp_illness_id
             and idm.hosp_code = moi.hosp_code
@@ -58,5 +64,6 @@
           and moi.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode}
           and idm.audit_code = '1'
+        order by moi.columns_num asc
     </select>
 </mapper>

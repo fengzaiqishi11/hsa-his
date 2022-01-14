@@ -624,7 +624,7 @@
         values (#{id}, #{hospCode}, #{visitId}, #{insureSettleId}, #{settleNo},
                 #{fixmedinsName}, #{fixmedinsCode}, #{hiSetlLv},
                 #{hiNo}, #{medcasno}, #{dclaTime}, #{psnName}, #{gend},
-                #{brdy}, #{age}, #{ntly}, #{nebAge}, #{naty}, #{patnCertType}, #{certno}, #{prfs}, #{currAddr},
+                #{brdy}, #{age}, #{ntly}, #{nwbAge}, #{naty}, #{patnCertType}, #{certno}, #{prfs}, #{currAddr},
                 #{empName}, #{empAddr}, #{empTel}, #{poscode}, #{conerName}, #{patnRlts}, #{conerAddr}, #{conerTel},
                 #{hiType}, #{insuplc}, #{spPsnType}, #{nwbAdmType}, #{nwbBirWt}, #{nwbAdmWt}, #{opspDiagCaty},
                 #{opspMdtrtDate}, #{iptMedType}, #{admWay}, #{trtType}, #{admTime}, #{admCaty}, #{refldeptDept},

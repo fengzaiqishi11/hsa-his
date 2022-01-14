@@ -23,6 +23,9 @@ import java.util.List;
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class SysParameterDTO extends SysParameterDO implements Serializable{
+
+    private static final long serialVersionUID = -3196059295550051870L;
+
     private List<String> ids;
     private List<String> codes;
     private String keyword;

@@ -82,8 +82,13 @@ public class NationStandardDrugServiceImpl  implements NationStandardDrugService
         // 计算总页数,每次只查询500行数据
         int totalPages = (int) Math.ceil(total/500.0);
         for(int i=0;i<totalPages;i++){
-            PageHelper.startPage(i+1,500);
-            list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            try {
+                PageHelper.startPage(i + 1, 500);
+                list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            }catch(Exception e){
+                PageHelper.startPage(i + 1, 500);
+                list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            }
             fillWubiCodeAndNamepyIfNull(list);
             searchableWesternMedicineDrugRepository.saveAll(list);
         }

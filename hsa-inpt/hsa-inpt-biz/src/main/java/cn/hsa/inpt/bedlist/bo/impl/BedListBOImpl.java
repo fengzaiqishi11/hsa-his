@@ -7,9 +7,8 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
-import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.center.message.dao.MessageInfoDAO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
 import cn.hsa.module.inpt.bedlist.bo.BedListBO;
 import cn.hsa.module.inpt.bedlist.dao.BedListDAO;
 import cn.hsa.module.inpt.bedlist.dto.InptLongCostDTO;
@@ -182,6 +181,10 @@ public class BedListBOImpl implements BedListBO {
                     else {
                         handleCyzh_Zhfy(map);
                     }
+                    break;
+                // 转换科室
+                case Constants.YDLX.ZHC :
+                    handleHk(map);
                     break;
                 default:
                     throw new AppException("床位异动失败：异动类型参数不匹配");
@@ -1188,6 +1191,80 @@ public class BedListBOImpl implements BedListBO {
         // 修改住院病人信息
         if (!bedListDAO.updateInptVisit_Zk(inptVisitDTO)) {
             throw new AppException("转科失败：病人【" + inptVisitDTO.getName() + "】状态发生变化");
+        }
+    }
+
+    /**
+     * @Description: 换科，仅修改患者的医嘱，费用科室
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2022/1/11 16:22
+     * @Return
+     */
+    private void handleHk(Map map) {
+        validParam(Constants.YDLX.ZHC, map);
+
+        // 查询就诊病人
+        InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+
+        // 查询已占用床位信息
+        List<BaseBedDTO> bedList = bedListDAO.queryBaseBedByVisit(inptVisitDTO.getHospCode(), inptVisitDTO.getId());
+        if (ListUtils.isEmpty(bedList)) {
+            throw new AppException("换科失败：病人无在床信息");
+        }
+		inptVisitDTO.setInDeptId(MapUtils.get(map, "inDeptId"));
+        inptVisitDTO.setInWardId(MapUtils.get(map, "inWardId"));
+
+        // 查询科室名字
+        String inDeptName = bedListDAO.getDeptName(map);
+        if (inDeptName != null && !"".equals(inDeptName)) {
+            inptVisitDTO.setInDeptName(inDeptName);
+        }
+
+        // 校验是否有未停止的长期医嘱、未核收的医嘱、未填写皮试结果的医嘱、未确认的费用、未发并且未退的药品
+        checkIsAllowHk(0, inptVisitDTO.getHospCode(), inptVisitDTO.getId());
+
+        // 待停止的长期费用列表
+        List<String> bedIdList = new ArrayList<>();
+        // 待生成的床位异动列表
+        List<InptBedChangeDO> bedChangeList = new ArrayList<>();
+        for (BaseBedDTO dto : bedList) {
+            bedIdList.add(dto.getId());
+
+            // 床位异动数据
+            bedChangeList.add(buildBedChange(Constants.YDLX.ZK, map, dto, inptVisitDTO));
+        }
+
+        // 补全床位长期费用
+        //compBedLongCost(map);
+
+        // 补全医嘱长期费用
+        //compAdviceLongCost(map);
+
+        // 停止床位长期费用
+        //String cancelRemark = "科室【" + inptVisitDTO.getInDeptName() + "】，护士【" + MapUtils.get(map, "userName") + "】转科";
+        //stopInptLongCostByBedId(map, bedIdList, cancelRemark);
+
+        // 清空已占床就诊ID、状态
+        bedListDAO.clearBaseBedVisitByBedId(bedIdList);
+
+        // 生成床位异动
+        bedListDAO.insertInptBedChange(bedChangeList);
+
+        // 修改住院病人信息
+        bedListDAO.updateInptVisit_Zk(inptVisitDTO);
+
+        // 修改医嘱 的就诊科室、开医嘱科室id， 医嘱执行表的开医嘱科室id、执行科室id， 费用表来源科室id、就诊科室id、开医嘱科室id、执行科室id
+        bedListDAO.updateVisitKS(inptVisitDTO);
+    }
+
+    private void checkIsAllowHk(int type, String hospCode, String visitId) {
+        List<String> errMsgList = bedListDAO.checkIsAllowHk(type, hospCode, visitId);
+        for(String errMsg : errMsgList) {
+            if (StringUtils.isNotEmpty(errMsg)) {
+                throw new AppException(errMsg);
+            }
         }
     }
 

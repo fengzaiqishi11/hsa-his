@@ -191,7 +191,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("brdy", DateUtils.format(settleInfoDTO.getBrdy(),DateUtils.Y_M_DH_M_S)); // 出生日期
         setlinfo.put("age", settleInfoDTO.getAge()); // 年龄
         setlinfo.put("ntly", settleInfoDTO.getNtly()); // 国籍
-        setlinfo.put("nwb_age", settleInfoDTO.getNwbAge()); // （年龄不足1周岁）年龄
+        setlinfo.put("nwb_age", settleInfoDTO.getNebAge()); // （年龄不足1周岁）年龄
         setlinfo.put("naty", settleInfoDTO.getNaty()); // 民族
         setlinfo.put("patn_cert_type", settleInfoDTO.getPatnCertType()); // 患者证件类别
         setlinfo.put("certno", settleInfoDTO.getCertNo()); // 证件号码
@@ -220,7 +220,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("adm_caty", settleInfoDTO.getAdmCaty()); // 入院科别
         setlinfo.put("refldept_dept", settleInfoDTO.getRefldeptDept()); // 转科科别
         setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
-        setlinfo.put("dscg_time", settleInfoDTO.getOutTime()); // 出院时间 *******
+        setlinfo.put("dscg_time", DateUtils.format(settleInfoDTO.getDscgTime(),DateUtils.Y_M_DH_M_S)); // 出院时间 *******
         setlinfo.put("act_ipt_days", settleInfoDTO.getActIptDays()); // 实际住院天数 *******
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
         setlinfo.put("wm_dise_code", settleInfoDTO.getWmDiswCode()); // 西医诊断疾病代码 *******
@@ -579,9 +579,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("psnName", infoDTO.getPsnName());// 人员姓名
         setlinfo.put("gend", infoDTO.getGend());// 性别
         setlinfo.put("brdy", infoDTO.getBrdy()); // 出生日期
-        setlinfo.put("age", infoDTO.getAge()); // 年龄
+        setlinfo.put("age", infoDTO.getAge()==0?null:infoDTO.getAge()); // 年龄
         setlinfo.put("ntly", infoDTO.getNtly()); // 国籍
-        setlinfo.put("nwbAge", infoDTO.getNwbAge()); // （年龄不足1周岁）年龄
+        setlinfo.put("nwbAge", infoDTO.getNebAge()==0?null:infoDTO.getNebAge()); // （年龄不足1周岁）年龄
         setlinfo.put("naty",  infoDTO.getNaty()); // 民族
         setlinfo.put("patnCertType",  infoDTO.getPatnCertType()); // 患者证件类别
         setlinfo.put("certno", infoDTO.getCertNo()); // 证件号码
@@ -590,7 +590,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("empName", infoDTO.getEmpName()); // 单位名称
         setlinfo.put("empAddr", infoDTO.getEmpAddr()); // 单位地址
         setlinfo.put("empTel", infoDTO.getEmpTel()); // 单位电话
-        setlinfo.put("poscode", infoDTO.getWorkPostCode()); // 邮编
+        setlinfo.put("poscode", infoDTO.getPoscode()); // 邮编
         setlinfo.put("conerName", infoDTO.getConerName()); // 联系人姓名
         setlinfo.put("patnRlts", infoDTO.getPatnRlts()); // 与患者关系
         setlinfo.put("conerAddr", infoDTO.getConerAddr()); // 联系人地址
@@ -821,6 +821,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(setlEndDate !=null){
             setlInfoMap.put("setlEndDate",DateUtils.getNumerToStringDate(setlEndDate)); // 结算结束时间
         }
+        Object ageObject = MapUtils.get(setlInfoMap, "age");
+        if(ageObject instanceof String && StringUtils.isEmpty(ageObject.toString())){
+            setlInfoMap.put("age",null); // 年龄
+        }
+        Object nwbAgeObject = MapUtils.get(setlInfoMap, "nwbAge");
+        if(nwbAgeObject instanceof String && StringUtils.isEmpty(nwbAgeObject.toString())){
+            setlInfoMap.put("nwbAge",null); // 新生儿年龄
+        }
         insureGetInfoDAO.deleteSetleInfo(setlInfoMap);
         insureGetInfoDAO.insertSetleInfo(setlInfoMap);
     }
@@ -1048,9 +1056,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("psnName", insureIndividualVisitDTO.getAac003());// 人员姓名
         setlinfo.put("gend", insureIndividualVisitDTO.getAac004());// 性别
         setlinfo.put("brdy", insureIndividualVisitDTO.getAac006()); // 出生日期
-        setlinfo.put("age", MapUtils.get(baseInfoMap,"age")); // 年龄
+        // 当年龄单位是天的时候
+        String ageUnitCode =  MapUtils.get(baseInfoMap,"age_unit_code");
+        if(Constants.LNDW.S.equals(ageUnitCode)){
+            setlinfo.put("age", MapUtils.get(baseInfoMap,"age")); // 年龄
+            setlinfo.put("nwbAge",null);
+        }else{
+            int age = MapUtils.get(baseInfoMap,"age");
+            if(Constants.LNDW.Y.equals(ageUnitCode)){
+                setlinfo.put("nwbAge",age*30 ); // （年龄不足1周岁）年龄
+            }else if(Constants.LNDW.Z.equals(ageUnitCode)){
+                age = MapUtils.get(baseInfoMap,"age");
+                setlinfo.put("nwbAge",age*7);
+            }else{
+                setlinfo.put("nwbAge",age);
+            }
+
+            setlinfo.put("age", null); // 年龄
+        }
         setlinfo.put("ntly", MapUtils.getMapVS(mriBaseInfo,"nationality_cation",MapUtils.get(baseInfoMap,"ntly"))); // 国籍
-        setlinfo.put("nwbAge", null); // （年龄不足1周岁）年龄
         // his的名族码表是0  1 2 3 医保码表是01 02 03
         Object  mapVS = MapUtils.getMapVS(mriBaseInfo, "nation_code", MapUtils.get(baseInfoMap, "naty"));
         if(mapVS == null){

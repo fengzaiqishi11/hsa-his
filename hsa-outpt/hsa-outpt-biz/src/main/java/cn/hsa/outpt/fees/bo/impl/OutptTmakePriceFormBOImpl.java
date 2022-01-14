@@ -1440,6 +1440,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             // 13、 将优惠发票总金额返回给前端（优惠后总金额）
             outptVisitDTO.setRealityPrice(realityPrice);
             outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
+
+            outptVisitDTO.setReceiveName(outinInvoiceDTO.getReceiveName());
+            outptVisitDTO.setPrefix(outinInvoiceDTO.getPrefix());
         } catch (Exception e) {
             throw e;
         } finally {

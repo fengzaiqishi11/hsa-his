@@ -134,14 +134,8 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
          * 取值参考【事前：1:门诊挂号，2:门诊收费登记，3:住院登记，4:住院收费登记，5:住院执行医嘱；
          * 事中：6:门诊结算，7:门诊预结算，8:住院结算，9:住院预结算，10:购药划卡】
          */
-        if("1".equals(insureIndividualVisitDTO.getIsHospital())){
-            inptMap.put("trig_scen", "3"); //触发场景
-        }else{
-            inptMap.put("trig_scen", "1,2"); //触发场景
-        }
-
+        inptMap.put("trigScen", MapUtils.get(map,"trigScenStr")); //触发场景
         inptMap.put("patientDtos", patientDTOS);
-
         Map<String,Object> trigScenMap = new HashMap<>();
         trigScenMap.put("trigScen",inptMap);
 
@@ -257,16 +251,20 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
                 Map<String, Object> orderMap = new HashMap<>();
                 orderMap.put("rx_id", MapUtils.get(map,"opId"));  // 处方(医嘱)标识
                 orderMap.put("rxno", MapUtils.get(map,"rxNo"));  // 处方号
-                orderMap.put("grpno", MapUtils.get(map,"groupNo"));  // 组编号
-                orderMap.put("long_drord_flag", MapUtils.get(map,"isLong"));  // 是否为长期医嘱
+                orderMap.put("grpno", MapUtils.getMapVS(map,"groupNo",""));  // 组编号
+                orderMap.put("long_drord_flag", MapUtils.getMapVS(map,"isLong","0"));  // 是否为长期医嘱
                 orderMap.put("hilist_type", MapUtils.get(map,"insureItemType"));  // 目录类别
-                orderMap.put("chrg_type", "");  //TODO 收费类别
-                orderMap.put("drord_bhvr", map.get("use_code"));  // 医嘱行为
+                orderMap.put("chrg_type", MapUtils.get(map,"chrgType"));  //TODO 收费类别
+                orderMap.put("drord_bhvr", MapUtils.getMapVS(map,"use_code","0"));  // 医嘱行为
                 orderMap.put("hilist_code", MapUtils.get(map,"insureItemCode"));  //TODO 医保目录代码
                 orderMap.put("hilist_name",MapUtils.get(map,"insureItemName"));  //TODO 医保目录名称
                 orderMap.put("hilist_dosform", "");  // 医保目录(药品)剂型（非必填）
-                orderMap.put("hilist_lv", "");  //TODO 医保目录等级
-                orderMap.put("hilist_pric", "");  //TODO 医保目录价格
+                orderMap.put("hilist_lv", MapUtils.get(map,"hilistLv"));  //TODO 医保目录等级
+                if(MapUtils.get(map,"hilistPric") == null){
+                    orderMap.put("hilist_pric", MapUtils.get(map,"price"));  //TODO 医保目录价格
+                }else{
+                    orderMap.put("hilist_pric", MapUtils.get(map,"hilistPric") );  //TODO 医保目录价格
+                }
                 orderMap.put("lv1_hospItem_pric", null);  // 一级医院目录价格（非必填）
                 orderMap.put("lv2_hospItem_pric", null);  // 二级医院目录价格（非必填）
                 orderMap.put("lv3_hospItem_pric", null);  // 三级医院目录价格（非必填）
@@ -533,7 +531,15 @@ public class InsureUnifiedPayMatterBOImpl implements InsureUnifiedPayMatterBO {
         encounterMap.put("med_type", insureIndividualVisitDTO.getAka130());//insureVisit.getAka130());// 医疗类别
         encounterMap.put("orderDtos", orderList);// 处方(医嘱)信息
         encounterMap.put("matn_stas", "0");//TODO 生育状态
-        encounterMap.put("medfee_sumamt", "");//TODO 总费用
+
+        /**
+         * 计算总费用
+         */
+        BigDecimal medfeeSumamt = new BigDecimal(0.00);
+        for(Map<String, Object> item : orderList){
+            medfeeSumamt = BigDecimalUtils.add(medfeeSumamt,MapUtils.get(item,"sumamt"));
+        }
+        encounterMap.put("medfee_sumamt", medfeeSumamt);//TODO 总费用
         encounterMap.put("ownpay_amt", 0);//TODO 自费金额
         encounterMap.put("selfpay_amt", 0);//TODO 自付金额
         encounterMap.put("acct_payamt", ""); // 个人账户支付金额(非必填)

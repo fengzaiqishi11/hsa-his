@@ -15,7 +15,6 @@ import cn.hsa.util.WuBiUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -52,8 +51,6 @@ public class NationStandardDrugServiceImpl  implements NationStandardDrugService
     @Resource
     private SearchableNationStandardDrugRepository searchableWesternMedicineDrugRepository;
 
-    private final String [] searchFieldNames = new String[]{"prod","goodName","registerName","wbm","pym","code","dan"};
-
 
     /**
      *  删除建立的索引
@@ -82,8 +79,13 @@ public class NationStandardDrugServiceImpl  implements NationStandardDrugService
         // 计算总页数,每次只查询500行数据
         int totalPages = (int) Math.ceil(total/500.0);
         for(int i=0;i<totalPages;i++){
-            PageHelper.startPage(i+1,500);
-            list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            try {
+                PageHelper.startPage(i + 1, 1000);
+                list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            }catch(Exception e){
+                PageHelper.startPage(i + 1, 1000);
+                list = nationStandardDrugDAO.queryNationStandardDrugPage(param);
+            }
             fillWubiCodeAndNamepyIfNull(list);
             searchableWesternMedicineDrugRepository.saveAll(list);
         }
@@ -139,7 +141,7 @@ public class NationStandardDrugServiceImpl  implements NationStandardDrugService
      * @param list 需要填充五笔码的数据
      */
     private void fillWubiCodeAndNamepyIfNull(List<NationStandardDrugDTO> list) {
-        list.stream().forEach(drugDO ->{
+        list.forEach(drugDO ->{
             drugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(drugDO.getRegisterName()));
             drugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(drugDO.getRegisterName()));
         });
@@ -149,7 +151,7 @@ public class NationStandardDrugServiceImpl  implements NationStandardDrugService
      * @param list 需要填充五笔码的数据
      */
     private void fillWubiCodeAndNamepyIfNull2(List<NationStandardDrugZYDTO> list) {
-        list.stream().forEach(drugDO ->{
+        list.forEach(drugDO ->{
             drugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(drugDO.getRegisterName()));
             drugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(drugDO.getRegisterName()));
         });

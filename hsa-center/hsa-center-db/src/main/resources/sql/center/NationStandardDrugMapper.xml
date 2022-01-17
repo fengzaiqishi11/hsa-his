@@ -50,6 +50,101 @@
     </foreach>
     </insert>
 
+    <insert id="saveNationStandardDrug">
+        insert into nation_standard_drug
+        (
+            id, data_sources, code, register_name, good_name, register_prep, actual_prep,
+            register_spec, actual_spec, packaging, split_ratio, unit, split_unit, prod,
+            dan, packag_prod, market_status, insure, ratio_at_one, code_no, insurance_name,
+            insurance_prep, remark, is_valid, crte_id, crte_name
+        )
+        values
+       (
+            #{id},#{dataSources},#{code},#{registerName},#{goodName},#{registerPrep},#{actualPrep},
+            #{registerSpec},#{actualSpec},#{packaging},#{splitRatio},#{unit},#{splitUnit},#{prod},
+            #{dan},#{packagProd},#{marketStatus},#{insure},#{ratioAtOne},#{codeNo},#{insuranceName},
+            #{insurancePrep},#{remark},#{isValid},#{crteId},#{crteName}
+            )
+    </insert>
+
+    <update id="updateNationStandardDrug">
+        UPDATE nation_standard_drug
+        <set>
+        <if test="dataSources !=null and dataSources !=''">
+            data_sources=#{dataSources},
+        </if>
+
+        <if test="code !=null and code !=''">
+            code=#{code},
+        </if>
+        <if test="goodName !=null and goodName !=''">
+            good_name=#{goodName},
+        </if>
+        <if test="registerName !=null and registerName !=''">
+            register_name=#{registerName},
+        </if>
+        <if test="registerPrep !=null and registerPrep !=''">
+            register_prep=#{registerPrep},
+        </if>
+        <if test="actualPrep !=null and actualPrep !=''">
+            actual_prep=#{actualPrep},
+        </if>
+        <if test="registerSpec !=null and registerSpec !=''">
+            register_spec=#{registerSpec},
+        </if>
+        <if test="actualSpec !=null and actualSpec !=''">
+            actual_spec=#{actualSpec},
+        </if>
+        <if test="packaging !=null and packaging !=''">
+                packaging=#{packaging},
+        </if>
+        <if test="splitRatio !=null and splitRatio !=''">
+            split_ratio=#{splitRatio},
+        </if>
+        <if test="unit !=null and unit !=''">
+            unit=#{unit},
+        </if>
+        <if test="splitUnit !=null and splitUnit !=''">
+            split_unit=#{splitUnit},
+        </if>
+        <if test="prod !=null and prod !=''">
+            prod=#{prod},
+        </if>
+        <if test="dan !=null and dan !=''">
+            dan=#{dan},
+        </if>
+        <if test="packagProd !=null and packagProd !=''">
+            packag_prod=#{packagProd},
+        </if>
+        <if test="marketStatus !=null and marketStatus !=''">
+            market_status=#{marketStatus},
+        </if>
+        <if test="insure !=null and insure !=''">
+            insure=#{insure},
+        </if>
+        <if test="ratioAtOne !=null and ratioAtOne !=''">
+            ratio_at_one=#{ratioAtOne},
+        </if>
+        <if test="codeNo !=null and codeNo !=''">
+            code_no=#{codeNo},
+        </if>
+        <if test="insuranceName !=null and insuranceName !=''">
+            insurance_name=#{insuranceName},
+        </if>
+        <if test="insurancePrep !=null and insurancePrep !=''">
+            insurance_prep=#{insurancePrep},
+        </if>
+        <if test="remark !=null and remark !=''">
+                remark=#{remark},
+        </if>
+        <if test="isValid !=null and isValid !=''">
+            is_valid=#{isValid},
+        </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
     <!--查询单个-->
     <select id="getById" resultMap="NationStandardDrugMap">
         select

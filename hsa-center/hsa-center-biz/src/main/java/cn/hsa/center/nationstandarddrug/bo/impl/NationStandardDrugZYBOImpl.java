@@ -7,6 +7,7 @@ import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugZYDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugZYDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugZYDO;
+import cn.hsa.module.elasticsearch.HsaElasticsearchRepository;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +30,8 @@ public class NationStandardDrugZYBOImpl implements NationStandardDrugZYBO {
     @Resource
     private NationStandardDrugZYDAO nationStandardDrugZYDAO;
 
-
+    @Resource
+    private HsaElasticsearchRepository elasticsearchRepository;
     @Override
     public PageDTO queryNationStandardDrugZYPage(NationStandardDrugZYDTO nationStandardDrugZYDTO) {
         PageHelper.startPage(nationStandardDrugZYDTO.getPageNo(),nationStandardDrugZYDTO.getPageSize());
@@ -117,15 +119,39 @@ public class NationStandardDrugZYBOImpl implements NationStandardDrugZYBO {
         {
             throw new AppException("参数不能为空！");
         }
-        nationStandardDrugZYDO.setPym(PinYinUtils.toFullPY(nationStandardDrugZYDO.getGoodName()));
-        nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugZYDO.getGoodName()));
+
         if(StringUtils.isEmpty(nationStandardDrugZYDO.getId())){
             nationStandardDrugZYDO.setId(SnowflakeUtils.getId());
             nationStandardDrugZYDO.setCrteTime(DateUtils.format(new Date(),DateUtils.Y_M_DH_M_S));
             nationStandardDrugZYDO.setCrteName("管理员");
             nationStandardDrugZYDO.setCrteId("8888");
+            // 更新ES搜索数据
+            nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(nationStandardDrugZYDO.getGoodName()));
+            nationStandardDrugZYDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(nationStandardDrugZYDO.getGoodName()));
+            try {
+                elasticsearchRepository.save(nationStandardDrugZYDO);
+            }catch (Exception ignored) {
+                // 确保es对正常业务无影响
+            }
+            nationStandardDrugZYDO.setPym(PinYinUtils.toFullPY(nationStandardDrugZYDO.getGoodName()));
+            nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugZYDO.getGoodName()));
             return nationStandardDrugZYDAO.saveNationStandardDrugZY(nationStandardDrugZYDO) > 0;
         }
+        try {
+            // 更新ES搜索数据
+            if (Constants.SF.S.equals(nationStandardDrugZYDO.getIsValid())) {
+                nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(nationStandardDrugZYDO.getGoodName()));
+                nationStandardDrugZYDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(nationStandardDrugZYDO.getGoodName()));
+                elasticsearchRepository.save(nationStandardDrugZYDO);
+            }else{
+                // 药品设置为无效后将其从ES中删除
+                elasticsearchRepository.delete(nationStandardDrugZYDO);
+            }
+        }catch (Exception ignored) {
+                // 确保es对正常业务无影响
+        }
+        nationStandardDrugZYDO.setPym(PinYinUtils.toFullPY(nationStandardDrugZYDO.getGoodName()));
+        nationStandardDrugZYDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugZYDO.getGoodName()));
         return nationStandardDrugZYDAO.updateNationStandardDrugZY(nationStandardDrugZYDO) > 0;
     }
 }

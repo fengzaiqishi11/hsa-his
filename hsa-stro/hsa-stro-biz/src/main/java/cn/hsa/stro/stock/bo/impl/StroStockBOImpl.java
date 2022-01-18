@@ -487,8 +487,8 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         }
 
         for(StroStockDetailDTO stroStockDetailDTO : stroStockDetailDTOList){
-            // 退供应商 、 盘点单出库 不用过滤有效期
-            if ("3".equals(map.get("type")) ||"7".equals(map.get("type")) ||"8".equals(map.get("type"))){
+            // 退供应商 、退库， 盘点单出库 不用过滤有效期
+            if ("3".equals(map.get("type")) ||"7".equals(map.get("type")) ||"8".equals(map.get("type")) ||"6".equals(map.get("type")) ){
                 stroStockDetailDTO.setIsExpiryDate("1");
             }
             //拆零数量如果出现小数四舍五入

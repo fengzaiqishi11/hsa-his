@@ -354,7 +354,8 @@
         ynyh,
         remark,
         mafPay,
-        personalPrice
+        personalPrice,
+        restsPrice
         FROM
         (
         SELECT
@@ -374,6 +375,7 @@
         b.retire_price AS retirePrice,
         b.hosp_price AS hospPrice,
         b.person_price AS personPrice,
+        b.rests_price AS restsPrice,
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
         b.remark,
@@ -405,6 +407,7 @@
         b.civil_price AS civilPrice,
         b.serious_price AS seriousPrice,
         b.retire_price AS retirePrice,
+        b.rests_price AS restsPrice,
         b.hosp_price AS hospPrice,
         b.person_price AS personPrice,
         a.ap_total_price AS apTotalPrice,

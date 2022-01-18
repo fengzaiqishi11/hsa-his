@@ -881,7 +881,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
 
     private String getRedisKey (InptVisitDTO inptVisit) {
-        return inptVisit.getHospCode() + "_" + inptVisit.getVisitId() + "_insureEmrInfo" ;
+        return inptVisit.getHospCode() + "_" + inptVisit.getId() + "_insureEmrInfo" ;
     }
 
     /**
@@ -1064,7 +1064,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("back_oprn","无");//	是否重返手术（明确定义）
             diseinfoMap.put("selv","无");//	是否择期
             diseinfoMap.put("prev_abtl_medn","无");//	是否预防使用抗菌药物
-            diseinfoMap.put("abtl_medn_days","无");//	预防使用抗菌药物天数
+            diseinfoMap.put("abtl_medn_days","0");//	预防使用抗菌药物天数
             diseinfoMap.put("oprn_oprt_code","无"); //手术操作代码
             diseinfoMap.put("oprn_oprt_name","无"); //手术操作名称
             diseinfoMap.put("oprn_lv_code","无"); //手术级别代码

@@ -751,7 +751,7 @@
             select max(oid.settle_id) as settleId, max(oi.receive_name) as receiveName, max(oi.prefix) as prefix  from outin_invoice_detail oid
             left join outin_invoice oi on oi.hosp_code = oid.hosp_code and oi.id = oid.invoice_id and oid.status_code = '0'
             where oi.hosp_code = #{hospCode} and oid.settle_id = b.settleId
-        ) temp on temp.settleId = os.id
+        ) temp on temp.settleId = b.settleId
 			where b.totalPrice>0
     </select>
 

@@ -72,6 +72,15 @@ public interface LisResultDAO {
     */ 
     List<Map> queryNoResultLis(Map map);
 
+    /**
+     * @Description:
+     * @Param: [map]
+     * @return: java.util.List<java.util.Map>
+     * @Author: zhangxuan
+     * @Date: 2022-01-13
+     */
+    List<Map> queryNoResultLisS(Map map);
+
     /** 
     * @Description: 查询没有结果的lis申请单的医嘱id
     * @Param: 

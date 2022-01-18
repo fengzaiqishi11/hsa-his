@@ -890,10 +890,12 @@
           AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
           AND iim.insure_reg_code = #{insureRegCode}
         <if test="opIds != null and opIds.size() > 0">
-            and ic.op_id in
+            and (ic.op_id in
             <foreach collection="opIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
+                or ic.op_id is null
+                )
         </if>
         order by ic.crte_time desc
     </select>

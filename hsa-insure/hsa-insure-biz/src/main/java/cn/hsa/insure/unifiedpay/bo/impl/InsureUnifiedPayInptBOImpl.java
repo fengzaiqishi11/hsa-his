@@ -1060,8 +1060,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("hospPrice",outDataMap.get("hosp_part_amt").toString());// 医院负担金额
         paramMap.put("balc",outDataMap.get("balc").toString());// 余额账户
         paramMap.put("acctMulaidPay",outDataMap.get("acct_mulaid_pay").toString());// 个人账户共济支付金额
-        String hifmiPay = outDataMap.get("hifmi_pay").toString();
-        String hifobPay = outDataMap.get("hifob_pay").toString();
+        String hifmiPay = BigDecimalUtils.convert(outDataMap.get("hifmi_pay").toString()).toString();
+        String hifobPay = BigDecimalUtils.convert(outDataMap.get("hifob_pay").toString()).toString();
         paramMap.put("ake029",BigDecimalUtils.add(hifmiPay,hifobPay).toString()); // 大额医疗费用支出
 
         String bka832 = outDataMap.get("fund_pay_sumamt").toString(); // 基金支付总额

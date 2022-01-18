@@ -1714,7 +1714,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         diseinfoMap = new HashMap<>();
                         diseinfoMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());//	mdtrt_id
                         diseinfoMap.put("psn_no", insureIndividualVisitDTO.getAac001());//	人员编号
-                        diseinfoMap.put("diag_type", "2");//	诊断类别
+                        diseinfoMap.put("diag_type", "1");//	诊断类别
                         diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
                         diseinfoMap.put("diag_srt_no", i);//	诊断排序号
                         diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
@@ -1732,13 +1732,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         diseinfoMap = new HashMap<>();
                         diseinfoMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());//	mdtrt_id
                         diseinfoMap.put("psn_no", insureIndividualVisitDTO.getAac001());//	人员编号
-                        diseinfoMap.put("diag_type", "2");//	诊断类别
+                        diseinfoMap.put("diag_type", "1");//	诊断类别
                         diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
                         diseinfoMap.put("diag_srt_no", i);//	诊断排序号
                         diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
                         diseinfoMap.put("diag_name", inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
                         diseinfoMap.put("diag_dept", inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
-                        diseinfoMap.put("dise_dor_no", inptDiagnoseDTOList.get(i).getZzDoctorId());//	诊断医生编码
+                        diseinfoMap.put("dise_dor_no", inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
                         diseinfoMap.put("dise_dor_name", inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
                         diseinfoMap.put("diag_time", DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(), DateUtils.Y_M_DH_M_S));//	诊断时间
                         diseinfoList.add(diseinfoMap);

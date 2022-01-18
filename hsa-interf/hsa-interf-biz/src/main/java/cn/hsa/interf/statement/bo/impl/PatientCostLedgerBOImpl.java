@@ -812,7 +812,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                         "        left join phar_in_distribute si on sid.order_no = si.order_no and si.status_code in ('0','1')  and sid.hosp_code = si.hosp_code\n" +
                                 "        left join phar_out_distribute sii on sid.order_no = sii.order_no and sii.status_code in ('0','1') and sid.hosp_code = sii.hosp_code\n" +
                                 "        left join base_dept bs on bs.id = si.dept_id or bs.id = sii.dept_id or bs.id = sid.invoicing_target_id and sid.hosp_code =  bs.hosp_code\n" +
-                                "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('23','25','27','28','4',10)";
+                                "        where sid.hosp_code = #{hospCode}  and sid.outin_code in ('23','25','27','28','4','10')";
                 paraMap.put("sql",sql3);
                 // 是否根据药品大类分组（YPDL）
                 paraMap.put("type","Y");
@@ -1399,8 +1399,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1606,8 +1610,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1790,8 +1798,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1985,8 +1997,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 

@@ -218,7 +218,12 @@
 
     <!-- 查询当前科室所有的病人信息 -->
     <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        select  CONCAT(
+        v.name,'/',
+        IFNULL((case v.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(v.age,'-'),
+        IFNULL((case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS patientInfo,v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
         if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive
         <if test="zgbrQuery == '2'.toString()">

@@ -6,6 +6,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.data.elasticsearch.client.ClientConfiguration;
@@ -29,6 +30,7 @@ public class RestClientConfig extends AbstractElasticsearchConfiguration {
     @Value("${elasticsearch.password}")
     private String elasticsearchPassword;
 
+    @Bean
     @Override
     public RestHighLevelClient elasticsearchClient() {
         ClientConfiguration config  = ClientConfiguration.builder()

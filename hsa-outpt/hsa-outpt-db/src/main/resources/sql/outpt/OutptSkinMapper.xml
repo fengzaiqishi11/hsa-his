@@ -81,7 +81,7 @@
         d.name,d.age,d.age_unit_code,d.gender_code,
         e.remark
         from outpt_prescribe_detail a
-        inner JOIN outpt_prescribe c on a.op_id = c.id and a.hosp_code = c.hosp_code and a.visit_id
+        inner JOIN outpt_prescribe c on a.op_id = c.id and a.hosp_code = c.hosp_code
         inner JOIN outpt_visit d on a.visit_id = d.id and a.hosp_code = d.hosp_code
         left JOIN outpt_skin_result e on a.visit_id = e.visit_id and a.hosp_code = e.hosp_code and a.id = e.opd_id
         left JOIN base_dept b on b.hosp_code = a.hosp_code and e.exec_dept_id = b.id
@@ -98,10 +98,10 @@
                 and e.is_positive is null
             </if>
             <if test="startTime != null and startTime != ''">
-                and DATE_FORMAT(c.crte_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+                and c.crte_time  &gt;= #{startTime}
             </if>
             <if test="endTime != null and endTime != ''">
-                and DATE_FORMAT(c.crte_time,'%Y-%m-%d') &lt;= DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+                and c.crte_time &lt; DATE_ADD(#{endTime}, INTERVAL 1 day)
             </if>
               and a.hosp_code = #{hospCode} and a.is_skin = '1' and c.is_settle = '1' and c.is_cancel = '0'
         </where>

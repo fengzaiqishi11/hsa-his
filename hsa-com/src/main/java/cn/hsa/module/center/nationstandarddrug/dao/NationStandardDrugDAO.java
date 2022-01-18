@@ -75,5 +75,4 @@ public interface NationStandardDrugDAO {
   Integer saveNationStandardDrug(NationStandardDrugDO nationStandardDrugDO);
 
   Integer updateNationStandardDrug(NationStandardDrugDO nationStandardDrugDO);
-  List<SyncCodeDetailDo> getSyncCodeDetailByCode(List<String> codeList);
 }

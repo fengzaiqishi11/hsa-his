@@ -592,7 +592,7 @@ public interface InptAdviceDAO {
     **/
     void modifyLastExeTimeById(String id, Date date, String hospCode);
 
-    List<BaseAdviceDTO> queryAdvicesByVisitId(String hospCode, String visitId);
+    List<BaseAdviceDTO> queryAdvicesByVisitId(String hospCode, String visitId, List<String> adviceIds);
 
     /**
     * @Method: queryApplyByAdviceId
@@ -904,4 +904,5 @@ public interface InptAdviceDAO {
      * @Return: List<InptVisitDTO>
      **/
     List<InptVisitDTO> querySubmitAdviceList(Map param);
+
 }

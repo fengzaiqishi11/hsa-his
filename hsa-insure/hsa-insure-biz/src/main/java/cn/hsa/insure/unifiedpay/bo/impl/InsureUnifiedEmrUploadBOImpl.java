@@ -881,7 +881,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
 
     private String getRedisKey (InptVisitDTO inptVisit) {
-        return inptVisit.getHospCode() + "_" + inptVisit.getVisitId() + "_insureEmrInfo" ;
+        return inptVisit.getHospCode() + "_" + inptVisit.getId() + "_insureEmrInfo" ;
     }
 
     /**

@@ -686,7 +686,7 @@
         se_vi_id
     </select>
 
-    <!--申报表合计费用-->
+    <!--申报表合计费用 2102 990101-->
     <select id="querySumDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
         A.medicineOrgCode,
@@ -745,7 +745,10 @@
         e.hosp_price AS hospPrice,
         e.rests_price AS restsPrice,
         ifnull( e.maf_pay, 0 ) AS mafPay,
-        ( e.insure_price - e.personal_price ) AS planSumPrice,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price end as planSumPrice,
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         IF
         (
@@ -989,7 +992,10 @@
         ifnull(e.government_pay,0) AS governmentPay,
         (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull(e.maf_pay,0.00) AS mafPay,
-        ( e.insure_price - e.personal_price ) AS planSumPrice,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price end as planSumPrice,
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         e.insure_reg_code AS insureRegCode,
         e.all_portion_price as allPortionPrice,
@@ -1228,7 +1234,10 @@
         ifnull(e.government_pay,0) AS governmentPay,
         (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) +ifnull(e.hosp_exem_amount,0) + ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull( e.maf_pay, 0 ) AS mafPay,
-        ( e.insure_price - e.personal_price ) AS planSumPrice,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price end as planSumPrice,
         ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
         e.clr_optins AS clrOptins,
         e.medicine_org_code AS medicineOrgCode,

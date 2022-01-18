@@ -725,7 +725,7 @@
     <select id="queryRegiestItemInfoByParams" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select b.*, v.name, v.crte_name as crteName, v.crte_time as crteTime, v.visit_no as visitNo, b.totalPrice as invoiceTotalPrice,
         v.visit_code as visitCode,b.pay_code as sourcePayCode,b.payCode as payCode,'自费病人' as bka006Name,'0.00' as personalPrice,'-' as personalNo,'0.00' as miPrice, b.totalPrice as selfPrice,
-        temp.receiveName as receiveName, temp.prefix as prefix
+        oi.receive_name as receiveName, oi.prefix as prefix
         from (
         SELECT
         ifnull(sum(a.reality_price),0) as totalPrice,
@@ -747,11 +747,8 @@
         WHERE a.hosp_code = #{hospCode} and a.register_id = #{registerId}
         group by a.bfc_id,a.visit_id
         )b join outpt_visit v on b.visit_id = v.id
-        left join (
-            select max(oid.settle_id) as settleId, max(oi.receive_name) as receiveName, max(oi.prefix) as prefix  from outin_invoice_detail oid
-            left join outin_invoice oi on oi.hosp_code = oid.hosp_code and oi.id = oid.invoice_id and oid.status_code = '0'
-            where oi.hosp_code = #{hospCode} and oid.settle_id = b.settleId
-        ) temp on temp.settleId = b.settleId
+        left join outin_invoice_detail oid on v.hosp_code = oid.hosp_code and b.settleId = oid.settle_id and oid.status_code = '0'
+        left join outin_invoice oi on oi.hosp_code = v.hosp_code and oi.id = oid.invoice_id
 			where b.totalPrice>0
     </select>
 

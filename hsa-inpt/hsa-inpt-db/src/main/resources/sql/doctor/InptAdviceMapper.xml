@@ -1649,6 +1649,12 @@
         where a.is_valid='1' and b.item_code='4' and b.type_code = '3' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and b.visit_id=#{visitId}
         and (b.is_reject='0' or b.is_reject is null)
         and !(b.is_stop='1' and b.is_stop_check='1')
+        <if test="adviceIds !=null and adviceIds.size()>0">
+            and b.id in
+            <foreach collection="adviceIds" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <select id="queryApplyByAdviceId" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">

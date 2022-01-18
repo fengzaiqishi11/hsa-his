@@ -3388,7 +3388,7 @@
             ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
             ),'其他')
             as bfcName,
-            ifnull(C.doctor_id,'0') as doctorId,
+            ifnull(t.doctor_id,'0') as doctorId,
             ifnull(C.doctor_name,t.doctor_name) as doctorName,
             <if test="'4'.toString() == flag">
                 ifnull((select id from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =

@@ -1399,8 +1399,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1606,8 +1610,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1790,8 +1798,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 
@@ -1985,8 +1997,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                     Map<String,Object> dataItemMap = new HashMap<>();
                     List<OutptCostAndReigsterCostDTO> groupByList = doctorIdCollect.get(doctorId);
-                    // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
-                    dataItemMap.put("name",groupByList.get(0).getDoctorName());
+                    if ("0".equals(doctorId)) { // 医生id为空 说明是挂号未接诊的
+                        dataItemMap.put("name", "挂号未接诊");
+                    } else {
+                        // 因为已根据医生id分组， 所以可以直接拿第一个的医生名
+                        dataItemMap.put("name", groupByList.get(0).getDoctorName());
+                    }
 
                     this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
 

@@ -183,15 +183,30 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     */ 
     @Override
     public Map updateNoResultLis(Map map){
-        List<Map> mapList = lisResultDAO.queryNoResultLis(map);
-        List<String> backList = lisResultDAO.queryDXBackResult(map);
-        if(mapList.size() > 0){
-            lisResultDAO.updateStatusMap(mapList);
-        }
+        map = new HashMap();
+        map.put("hospCode", MapUtils.get(map,"hospCode"));
+        map.put("code", "LIS_TXM");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        String a = sysParameterDTO.getValue();
+        List<Map> mapList = new ArrayList<>();
+        List<String> backList = new ArrayList<>();
         Map newMap = new HashMap();
+        if(a.equals("1")){
+            mapList = lisResultDAO.queryNoResultLis(map);
+            if(mapList.size() > 0){
+                lisResultDAO.updateStatusMap(mapList);
+            }
+        } else {
+            mapList = lisResultDAO.queryNoResultLisS(map);
+            if(mapList.size() > 0){
+                lisResultDAO.updateStatusMap(mapList);
+            }
+        }
+        backList = lisResultDAO.queryDXBackResult(map);
         newMap.put("result",mapList);
         newMap.put("backList",backList);
         return newMap;
+
     }
 
     /**

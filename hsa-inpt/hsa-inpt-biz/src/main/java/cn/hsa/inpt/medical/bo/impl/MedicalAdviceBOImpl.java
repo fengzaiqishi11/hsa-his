@@ -1923,6 +1923,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     private InptCostDTO buildInptCostDTO(MedicalAdviceDTO medicalAdviceDTO, InptAdviceDTO adviceDTO, InptAdviceDetailDTO inptAdviceDetailDTO,
                                          int dailyTimes, Date date, InptVisitDTO visitDTO,Map<String, BaseDrugDTO> drugMap,Map<String, BaseMaterialDTO> materiaMap) {
 
+
+        //药品、材料如果是个人自备不收费
+        if ((Constants.XMLB.YP.equals(adviceDTO.getItemCode()) || Constants.XMLB.CL.equals(adviceDTO.getItemCode()))
+                && Constants.YYXZ.GRZB.equals(adviceDTO.getUseCode()) && !Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode()) ) {
+            return null;
+        }
         InptCostDTO inptCostDTO = new InptCostDTO();
         //用量单位和数量不变
         inptCostDTO.setNum(inptAdviceDetailDTO.getNum());
@@ -2524,12 +2530,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 continue;
             }
 
-            //药品、材料如果是个人自备不收费
-            if ((Constants.XMLB.YP.equals(inptAdviceDTO.getItemCode()) || Constants.XMLB.CL.equals(inptAdviceDTO.getItemCode()))
-                    && Constants.YYXZ.GRZB.equals(inptAdviceDTO.getUseCode())) {
-                continue;
-            }
-
             //计算开始日期、结束日期、判断是否预停
             Map<String,Object> map = getTime(inptAdviceDTO, type);
             //开始日期
@@ -2601,6 +2601,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //组装住院费用对象
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
+                if(inptCostDTO == null ){
+                    startTime = DateUtils.dateAdd(startTime, day);
+                    continue;
+                }
                 //判断当前集合是否已经存在对应的待领记录
 //                Date finalDate = date;
 //                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())

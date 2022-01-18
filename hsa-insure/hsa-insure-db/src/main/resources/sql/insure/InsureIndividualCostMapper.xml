@@ -343,6 +343,9 @@
         <if test="statusCode != null and statusCode != ''">
             and iv.status_code = #{statusCode}
         </if>
+        <if test="regCode != null and regCode != ''">
+            and b.insure_org_code = #{regCode}
+        </if>
         <if test="orgCode != null and orgCode != ''">
             and b.medicine_org_code = #{orgCode}
         </if>
@@ -866,6 +869,9 @@
                ic.is_reimburse                                                                                isReimburse,
                iim.manufacturer                                                                               manufacturer,
                iim.tcmdrug_used_way                                                                           tcmdrugUsedWay,
+               iim.hilist_price hilistPrice,
+               iim.hilist_lv  hilistLv,
+               iim.chrg_type chrgType,
                (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM outpt_cost ic
                  JOIN insure_item_match iim
@@ -884,10 +890,12 @@
           AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
           AND iim.insure_reg_code = #{insureRegCode}
         <if test="opIds != null and opIds.size() > 0">
-            and ic.op_id in
+            and (ic.op_id in
             <foreach collection="opIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
+                or ic.op_id is null
+                )
         </if>
         order by ic.crte_time desc
     </select>
@@ -1014,7 +1022,8 @@
                iim.check_price                                                                                checkCode,
                iim.lmt_user_flag                                                                              lmtUserFlag,
                iim.manufacturer                                                                               manufacturer,
-               iim.tcmdrug_used_way                                                                           tcmdrugUsedWay
+               iim.tcmdrug_used_way                                                                           tcmdrugUsedWay,
+               (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM insure_individual_cost iic
                  join inpt_cost ic on iic.cost_id = ic.id and iic.hosp_code = ic.hosp_code
                  join insure_item_match iim on iim.insure_item_code = iic.item_code and iim.hosp_code = iic.hosp_code
@@ -1077,82 +1086,9 @@
           and feedetl_sn is not null and medChrgitmType is not null
           and insure_settle_id = #{insureSettleId}
     </select>
-    <select id="queryInptFeeCost" resultType="cn.hsa.module.inpt.doctor.entity.InptCostDO">
-        select id,
-               hosp_code,
-               visit_id,
-               baby_id,
-               iat_id,
-               iatd_group_no,
-               iatd_seq_no,
-               advice_exec_id,
-               source_code,
-               source_id,
-               old_cost_id,
-               source_dept_id,
-               in_dept_id,
-               bfc_id,
-               item_code,
-               item_id,
-               item_name,
-               price,
-               num,
-               spec,
-               prep_code,
-               dosage,
-               dosage_unit_code,
-               usage_code,
-               rate_id,
-               speed_code,
-               use_days,
-               num_unit_code,
-               total_num,
-               total_num_unit_code,
-               herb_note_code,
-               use_code,
-               herb_num,
-               total_price,
-               preferential_price,
-               reality_price,
-               back_num,
-               back_code,
-               doctor_id,
-               doctor_name,
-               dept_id,
-               phar_id,
-               is_dist,
-               is_give,
-               is_ok,
-               ok_id,
-               ok_name,
-               ok_time,
-               settle_code,
-               settle_id,
-               is_check,
-               check_id,
-               check_name,
-               check_time,
-               zz_doctor_id,
-               zz_doctor_name,
-               jz_doctor_id,
-               jz_doctor_name,
-               zg_doctor_id,
-               zg_doctor_name,
-               exec_id,
-               exec_name,
-               exec_time,
-               exec_dept_id,
-               plan_exec_time,
-               status_code,
-               is_cost,
-               cost_time,
-               crte_id,
-               crte_name,
-               crte_time,
-               is_wait,
-               distribute_all_detail_id,
-               feedetl_sn
-        from inpt_cost
+    <select id="queryInptFeeCost" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select id,cost_id, feedetl_sn
+        from insure_individual_cost
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
     </select>

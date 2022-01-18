@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inspectionreport.dto.*;
 import cn.hsa.module.inpt.inspectionreport.service.InspectionReportService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -143,5 +144,21 @@ public class InspectionReportController extends BaseController {
         Map<String,String> map1 = new HashMap<>();
         map1.put("hospCode", sysUserDTO.getHospCode());
         return inspectionReportService.getHospitalInfo(map1);
+    }
+
+    /**
+     * @description 根据住院号查询病人lis信息
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/1/4 15:06
+     **/
+    @GetMapping("/queryPatientAllMedicResult")
+    public WrapperResponse<List<ExaminationItem>> queryPatientAllMedicResult(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map =new HashMap();
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("inptVisitDTO", inptVisitDTO);
+        return inspectionReportService.queryPatientAllMedicResult(map);
     }
 }

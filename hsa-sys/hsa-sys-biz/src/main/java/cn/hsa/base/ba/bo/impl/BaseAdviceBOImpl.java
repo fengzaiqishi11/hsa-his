@@ -11,6 +11,7 @@ import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
@@ -769,6 +770,139 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
 
         int count = baseAdviceDAO.updateWithPipePrint(paramMap);
         return count>0;
+    }
+
+    /**
+     * @Menthod: 取消合管
+     * @Desrciption: updateCancelMerge
+     * @Param: paramMap：{
+     *     mergeIds：合管主ids
+     * }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 11:47
+     * @Return:
+     **/
+    @Override
+    public Boolean updateCancelMerge(Map<String, Object> paramMap) {
+        List<String> mergeIds = MapUtils.get(paramMap, "mergeIds");
+        if (ListUtils.isEmpty(mergeIds)) {
+            throw new RuntimeException("未选择需要取消合管的数据");
+        }
+        // 根据合管ids查询出医技申请集合
+        List<MedicalApplyDTO> medicalApplyDTOS = baseAdviceDAO.queryMedicApplyByMergeIds(paramMap);
+        if (ListUtils.isEmpty(medicalApplyDTOS)) {
+            throw new RuntimeException("未查询到相关数据");
+        }
+        String msg = "";
+        Map map = new HashMap();
+        map.put("hospCode", MapUtils.get(paramMap, "hospCode"));
+        map.put("typeCode", "49");
+        for (MedicalApplyDTO medicalApplyDTO : medicalApplyDTOS) {
+            if (medicalApplyDTO.getPrintTime() != null || Integer.parseInt(medicalApplyDTO.getPrintTimes() == null ? "0" : medicalApplyDTO.getPrintTimes()) > 0) {
+                msg += medicalApplyDTO.getContent()+ ",";
+            }
+            medicalApplyDTO.setIsMerge(Constants.SF.F);
+            medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+            medicalApplyDTO.setBarCode(baseOrderRuleService.getOrderNo(map).getData());
+        }
+        if (StringUtils.isNotEmpty(msg)) {
+            msg = msg.substring(0, msg.length()-1);
+            throw new RuntimeException("【" + msg + "】已进行合管打印，不可取消合管");
+        }
+        return baseAdviceDAO.updateCancelMerge(medicalApplyDTOS) > 0;
+    }
+
+    /**
+     * @Menthod: updateMergePipePrint
+     * @Desrciption: 合管打印
+     * @Param: paramMap：{ mergeIds：合管主ids }
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-01-06 17:11
+     * @Return:
+     **/
+    @Override
+    public List<MedicalApplyDTO> updateMergePipePrint(Map<String, Object> paramMap) {
+        List<String> mergeIds = MapUtils.get(paramMap, "mergeIds");
+        if (ListUtils.isEmpty(mergeIds)) {
+            throw new RuntimeException("未选择需要合管打印的数据");
+        }
+        // 根据合管ids查询出医技申请集合
+        List<MedicalApplyDTO> medicalApplyDTOS = baseAdviceDAO.queryMedicApplyByMergeIds(paramMap);
+        if (ListUtils.isEmpty(medicalApplyDTOS)) {
+            throw new RuntimeException("未查询到相关数据");
+        }
+
+        // 入库操作打印的数据
+        List<MedicalApplyDTO> medicalApplyDTOList = new ArrayList<>();
+        // 医技_容器_标本不为空的医技集合，用于分组区分是否能合管
+        List<MedicalApplyDTO> mergeList = new ArrayList<>();
+        // 是否存在已合管打印的提示语
+        String isMergeMsg = "";
+        // 所有医技类型组合，格式：就诊id_医技_容器_标本
+        List<String> yjlxStrList = new ArrayList<>();
+        //
+        Map<String, List<MedicalApplyDTO>> yjlxStrMap = new HashMap<>();
+
+        for (MedicalApplyDTO medicalApplyDTO : medicalApplyDTOS) {
+            if (medicalApplyDTO.getPrintTime() != null || Integer.parseInt(medicalApplyDTO.getPrintTimes() == null ? "0" : medicalApplyDTO.getPrintTimes()) > 0) {
+                isMergeMsg += medicalApplyDTO.getContent()+ ",";
+            }
+            // lis医技、医技类型不为空、容器类型不为空、标本类型不为空
+            if (StringUtils.isNotEmpty(medicalApplyDTO.getTypeCode())
+                    && Constants.CFLB.LIS.equals(medicalApplyDTO.getTypeCode())
+                    && StringUtils.isNotEmpty(medicalApplyDTO.getTechnologyCode())
+                    && StringUtils.isNotEmpty(medicalApplyDTO.getContainerCode())
+                    && StringUtils.isNotEmpty(medicalApplyDTO.getSpecimenCode())) {
+                mergeList.add(medicalApplyDTO);
+                String str = medicalApplyDTO.getVisitId() + "_" + medicalApplyDTO.getTechnologyCode() + "_" + medicalApplyDTO.getContainerCode() + "_" + medicalApplyDTO.getSpecimenCode();
+                if (!yjlxStrList.contains(str)) {
+                    yjlxStrList.add(str);
+                }
+            } else {
+                // 不合管
+                medicalApplyDTOList.add(medicalApplyDTO);
+            }
+        }
+        if (StringUtils.isNotEmpty(isMergeMsg)) {
+            isMergeMsg = isMergeMsg.substring(0, isMergeMsg.length()-1);
+            throw new RuntimeException("【" + isMergeMsg + "】已进行合管打印，不可进行合管打印");
+        }
+
+        // 合管的数据处理
+        if (!ListUtils.isEmpty(mergeList)) {
+            yjlxStrMap = mergeList.stream().collect(Collectors.groupingBy(medicalApplyDTO -> medicalApplyDTO.getVisitId() + "_" + medicalApplyDTO.getTechnologyCode() + "_" + medicalApplyDTO.getContainerCode() + "_" + medicalApplyDTO.getSpecimenCode()));
+        }
+        if (!ListUtils.isEmpty(yjlxStrList)) {
+            for (String yjlxStr : yjlxStrList) {
+                List<MedicalApplyDTO> applyDTOList = yjlxStrMap.get(yjlxStr);
+                if (!ListUtils.isEmpty(applyDTOList)) {
+                    for (MedicalApplyDTO medicalApplyDTO : applyDTOList) {
+                        medicalApplyDTO.setMergeId(applyDTOList.get(0).getId());
+                        medicalApplyDTO.setBarCode(applyDTOList.get(0).getBarCode());
+                        medicalApplyDTO.setIsMerge(Constants.SF.S);
+                        medicalApplyDTOList.add(medicalApplyDTO);
+                    }
+                }
+            }
+        }
+        // 更新合管数据
+        baseAdviceDAO.updateCancelMerge(medicalApplyDTOList);
+
+        // 合管后的mergeIdList
+        List<String> mergeIdList = medicalApplyDTOList.stream().map(MedicalApplyDTO::getMergeId).distinct().collect(Collectors.toList());
+        paramMap.put("mergeIds", mergeIdList);
+        paramMap.put("ids", mergeIdList);
+
+        // 更新打印时间、打印次数
+        paramMap.put("printTime", DateUtils.format(DateUtils.getNow(),DateUtils.Y_M_DH_M_S));
+        baseAdviceDAO.updateWithPipePrint(paramMap);
+
+        // 返回前台合管打印后的数据，用于展示
+        paramMap.put("isGroupBy", Constants.SF.S);
+        List<MedicalApplyDTO> result = baseAdviceDAO.queryMedicApplyByMergeIds(paramMap);
+        return result;
     }
 
 

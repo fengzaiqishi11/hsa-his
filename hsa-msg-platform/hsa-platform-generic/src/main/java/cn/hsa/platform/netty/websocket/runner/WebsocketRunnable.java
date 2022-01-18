@@ -4,6 +4,7 @@ import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
 import cn.hsa.platform.service.MessageInfoService;
+import cn.hsa.platform.util.Constants;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -62,23 +63,33 @@ public class WebsocketRunnable implements Runnable {
             channelMap.forEach((k, v) -> {
                 Channel channel = channelMap.get(k);
                 ImContentModel contentModel = imContentModelMap.get(k);
-                if (requestContentModel.getDeptId().equals(contentModel.getDeptId())) {
+                if (requestContentModel.getDeptId().equals(contentModel.getDeptId())&&requestContentModel.getHospCode().equals(contentModel.getHospCode())) {
                     channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
                 }
             });
         }
             //channelHandlerContext.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-        // 推送系统消息
-        List<MessageInfoModel> sysMessageInfoList =messageInfoService.getSysMessageInfoList(param);
-        if (sysMessageInfoList!=null &&sysMessageInfoList.size()>0){
-            messageInfoService.updateMessageInfoList(sysMessageInfoList);
-            //获取与用户主键绑定的channel
-            Map<String, Channel> channelMap = HsaPlatformWebSocketHandler.getChannelMap();
-            channelMap.forEach((k,v)->{
-                Channel channel = channelMap.get(k);
-                channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(sysMessageInfoList)));
-            });
-        }
+
+            // 推送个人消息
+            List<MessageInfoModel> personalMessageInfoList = messageInfoService.queryPersonalMessageInfoByType(param);
+            if (personalMessageInfoList != null && personalMessageInfoList.size() > 0) {
+                List<MessageInfoModel> infoModels =new ArrayList<>();
+                messageInfoService.updateMessageInfoList(personalMessageInfoList);
+                //获取与用户主键绑定的channel
+                Map<String, Channel> channelMap = HsaPlatformWebSocketHandler.getChannelMap();
+                Map<String, ImContentModel> imContentModelMap = HsaPlatformWebSocketHandler.getClientParamMap();
+                for (MessageInfoModel personalMessageInfo:personalMessageInfoList) {
+                    channelMap.forEach((k, v) -> {
+                        infoModels.clear();
+                        Channel channel = channelMap.get(k);
+                        ImContentModel contentModel = imContentModelMap.get(k);
+                        if (requestContentModel.getHospCode().equals(contentModel.getHospCode()) &&personalMessageInfo.getReceiverId().contains(contentModel.getUnionId().toString())) {
+                            infoModels.add(personalMessageInfo);
+                            channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(infoModels)));
+                        }
+                    });
+                }
+            }
 //        List<MessageInfoModel> messageInfoModels =messageInfoDao.queryMessageInfoByType(param);
 //        // 查询系统消息
 //        List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);

@@ -13,8 +13,10 @@ import cn.hsa.module.base.bpft.dto.BasePreferentialDTO;
 import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
+import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
 import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
 import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
@@ -50,6 +52,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -367,6 +370,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         returnMap.put("settleId", settleId);
         returnMap.put("ghdh", ghdh);
         returnMap.put("registerid", ghid);
+        // 推送消息到挂号医生处  liuliyun 2022-01-06
+        sendMessage(outptRegisterDTO);
         return returnMap;
     }
 
@@ -1439,6 +1444,72 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         updateMap.put("hospCode",outptRegisterDO.getHospCode());
         updateMap.put("drId",outptRegisterDO.getDrId());
         outptRegisterDAO.updateDoctorRegister(updateMap);
+    }
+
+    // 推送挂号消息到医生  2022-01-06 liuliyun
+    public void sendMessage(OutptRegisterDO outptRegisterDO){
+        if (outptRegisterDO!=null && StringUtils.isNotEmpty(outptRegisterDO.getDoctorId())){
+            String hospCode =outptRegisterDO.getHospCode();
+            String name = outptRegisterDO.getCrteName();
+            String crteId = outptRegisterDO.getCrteId();
+            Map openParam = new HashMap();
+            openParam.put("hospCode", hospCode);
+            openParam.put("code", "MSG_OPEN");
+            SysParameterDTO openSysParameterDTO = sysParameterService.getParameterByCode(openParam).getData();
+            if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+                Map paramMap = new HashMap();
+                paramMap.put("hospCode", hospCode);
+                paramMap.put("code", "XXTS_SETTING");
+                SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(paramMap).getData();
+                ConfigInfoDO configInfoDO = null;
+                if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                    configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(),"outRegisterMsg");
+                }
+                if (configInfoDO ==null){
+                    return;
+                }
+                if (outptRegisterDO != null) {
+                    MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
+                    messageInfoDTO.setId(SnowflakeUtils.getId());
+                    messageInfoDTO.setHospCode(hospCode);
+                    messageInfoDTO.setSourceId("");
+                    messageInfoDTO.setVisitId(outptRegisterDO.getVisitId());
+                    messageInfoDTO.setDeptId("");
+                    messageInfoDTO.setLevel(configInfoDO.getLevel());
+                    messageInfoDTO.setReceiverId(outptRegisterDO.getDoctorId());   // 推送至挂号医生
+                    messageInfoDTO.setSendCount(configInfoDO.getSendCount());
+                    messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
+                    messageInfoDTO.setContent(outptRegisterDO.getName() + "已挂号到当前科室，请及时处理就诊信息");
+                    Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
+                    Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
+                    messageInfoDTO.setStartTime(startTime);
+                    messageInfoDTO.setEndTime(endTime);
+                    messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);
+                    messageInfoDTO.setIntervalTime(configInfoDO.getIntervalTime());
+                    messageInfoDTO.setUrl(configInfoDO.getUrl());
+                    messageInfoDTO.setCrteName(name);
+                    messageInfoDTO.setCrteTime(DateUtils.getNow());
+                    messageInfoDTO.setCrteId(crteId);
+                    List<MessageInfoDTO> messageInfoDTOList =new ArrayList<>();
+                    messageInfoDTOList.add(messageInfoDTO);
+                    // 获取医院kafka 的IP与端口
+                    Map<String, Object> sysMap = new HashMap<>();
+                    sysMap.put("hospCode", hospCode);
+                    sysMap.put("code", "KAFKA_MSG_IP");
+                    SysParameterDTO sys = sysParameterService.getParameterByCode(sysMap).getData();
+                    if (sys == null || sys.getValue() == null) {
+                        return;
+                    }
+                    String server = sys.getValue();
+                    // 1. 创建一个kafka生产者
+                    String producerTopic = Constants.MSG_TOPIC.producerTopicKey;//生产者消息推送Topic
+                    KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+                    String message = JSONObject.toJSONString(messageInfoDTOList);
+                    KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+                }
+            }
+        }
+
     }
 
 }

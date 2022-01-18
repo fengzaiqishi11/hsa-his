@@ -363,4 +363,11 @@ public interface EmrPatientDAO {
 	String queryDataIsExist(@Param("sql") String sql);
 
 	List<EmrQualityDataRulesDTO> queryEmrQualityDataRulesByCode(EmrPatientDTO emrPatientDTO);
+
+	/**
+	 * 获取此病人的所有病历JSON串
+	 * @param selectMap
+	 * @return
+	 */
+    List<Map<String,String>> queryHisEmrJosnInfo(Map<String, String> selectMap);
 }

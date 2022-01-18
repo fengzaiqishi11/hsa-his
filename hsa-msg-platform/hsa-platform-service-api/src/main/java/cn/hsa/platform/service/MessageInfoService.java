@@ -18,4 +18,7 @@ public interface MessageInfoService {
 
     // 获取科室消息
     List<MessageInfoModel> getDeptMessageInfoList(MessageInfoModel infoModel);
+
+    // 获取个人消息
+    List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel infoModel);
 }

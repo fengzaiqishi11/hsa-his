@@ -12,8 +12,8 @@ import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.emr.emrarchivelogging.dto.EmrArchiveLoggingDTO;
 import cn.hsa.module.emr.emrarchivelogging.entity.ConfigInfoDO;
-import cn.hsa.module.emr.message.dao.MessageInfoDAO;
-import cn.hsa.module.emr.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.dao.MessageInfoDAO;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.consultation.dao.InptConsultationApplyDAO;
 import cn.hsa.module.inpt.consultation.dto.InptConsultationApplyDTO;
 import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
@@ -113,11 +113,6 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     @Resource
     private InptConsultationApplyDAO inptConsultationApplyDAO;
 
-    /**
-     * 消息dao
-     */
-    @Resource
-    private MessageInfoDAO messageInfoDAO;
     /**
     * @Method updateInptAdviceBatch
     * @Desrciption 批量更新医嘱
@@ -1625,9 +1620,20 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                     messageInfoDTO.setHospCode(hospCode);
                     messageInfoDTO.setSourceId("");
                     messageInfoDTO.setVisitId(inptVisitDTO.getId());
-                    messageInfoDTO.setDeptId(configInfoDO.getDeptId());
+                    // 推送到科室
+                    if ("1".equals(configInfoDO.getIsPersonal())) {
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }else if ("0".equals(configInfoDO.getIsPersonal())){
+                        // 推送到个人
+                        messageInfoDTO.setDeptId("");
+                        messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
+                    }else {
+                        // 默认推送到科室
+                        messageInfoDTO.setReceiverId("");
+                        messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
+                    }
                     messageInfoDTO.setLevel(configInfoDO.getLevel());
-                    messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
                     messageInfoDTO.setStatusCode(Constants.MSGZT.MSG_WD);

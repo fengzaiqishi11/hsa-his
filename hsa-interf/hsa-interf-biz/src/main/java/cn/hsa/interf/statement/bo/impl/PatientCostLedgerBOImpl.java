@@ -3903,7 +3903,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         headItemMap3.put("label","优惠前总计");
         headItemMap3.put("prop","deptTotalPrice");
         headItemMap3.put("type","money");
-        headItemMap3.put("minWidth","120");
+        headItemMap3.put("width","120");
         headItemMap3.put("showSummary",true);
         headItemMap3.put("toFixed",2);
         tableHeader.put("personNum",headItemMap1);
@@ -3964,7 +3964,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             dataItemMap.put(bfcId,bfcPrice);
 
             headItemBfcMap1.put("label",deptBfcList.get(0).getBfcName()+"(优惠前)");
-            headItemBfcMap1.put("minWidth","120");
+            headItemBfcMap1.put("width","120");
             headItemBfcMap1.put("prop",bfcId+"total");
             headItemBfcMap1.put("type","money");
             headItemBfcMap1.put("showSummary",true);

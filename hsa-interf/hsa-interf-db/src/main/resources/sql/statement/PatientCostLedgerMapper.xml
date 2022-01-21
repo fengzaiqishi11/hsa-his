@@ -1389,11 +1389,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null and timeFlag == '2'.toString()">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and DATE_FORMAT(s.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and timeFlag == '2'.toString() ">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and DATE_FORMAT(s.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}

@@ -9,6 +9,7 @@ import cn.hsa.module.center.nationstandarddrug.bo.NationStandardDrugBO;
 import cn.hsa.module.center.nationstandarddrug.dao.NationStandardDrugDAO;
 import cn.hsa.module.center.nationstandarddrug.dto.NationStandardDrugDTO;
 import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
+import cn.hsa.module.elasticsearch.HsaElasticsearchRepository;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,8 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
 
   @Resource
   private NationStandardDrugDAO nationStandardDrugDAO;
+  @Resource
+  private HsaElasticsearchRepository elasticsearchRepository;
 
   /**
    * @Menthod queryNationStandardDrugPage
@@ -167,6 +170,11 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
    */
   @Override
   public Boolean saveNationStandardDrug(NationStandardDrugDO nationStandardDrugDO) {
+    // 更新ES搜索数据
+    nationStandardDrugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(nationStandardDrugDO.getRegisterName()));
+    nationStandardDrugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(nationStandardDrugDO.getRegisterName()));
+    elasticsearchRepository.save(nationStandardDrugDO);
+
     nationStandardDrugDO.setPym(PinYinUtils.toFullPY(nationStandardDrugDO.getGoodName()));
     nationStandardDrugDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugDO.getGoodName()));
 
@@ -181,6 +189,15 @@ public class NationStandardDrugBOImpl extends HsafBO implements NationStandardDr
    */
   @Override
   public Boolean updateNationStandardDrug(NationStandardDrugDO nationStandardDrugDO) {
+    // 更新ES搜索数据
+    if(Constants.SF.S.equals(nationStandardDrugDO.getIsValid())){
+      nationStandardDrugDO.setWbm(WuBiUtils.getWBCodeSplitWithWhiteSpace(nationStandardDrugDO.getRegisterName()));
+      nationStandardDrugDO.setPym(PinYinUtils.toFirstPYWithWhiteSpace(nationStandardDrugDO.getRegisterName()));
+      elasticsearchRepository.save(nationStandardDrugDO);
+    }else{
+      // 药品设置为无效后将其从ES中删除
+      elasticsearchRepository.delete(nationStandardDrugDO);
+    }
     nationStandardDrugDO.setPym(PinYinUtils.toFullPY(nationStandardDrugDO.getGoodName()));
     nationStandardDrugDO.setWbm(WuBiUtils.getWBCode(nationStandardDrugDO.getGoodName()));
     return nationStandardDrugDAO.updateNationStandardDrug(nationStandardDrugDO) > 0;

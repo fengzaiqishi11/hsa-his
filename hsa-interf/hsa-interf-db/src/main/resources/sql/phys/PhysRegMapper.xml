@@ -88,5 +88,6 @@
 
     <select id="queryCostPhys" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
         select visit_id, item_id from outpt_cost where visit_id = #{visitId} and back_num is null
+        and settle_code = '2' and hosp_code = #{hospCode}
     </select>
 </mapper>

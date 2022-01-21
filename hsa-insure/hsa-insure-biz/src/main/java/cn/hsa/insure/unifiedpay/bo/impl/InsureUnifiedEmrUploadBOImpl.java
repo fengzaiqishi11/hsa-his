@@ -891,7 +891,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author liuliyun
      * @Date   2021/8/21 11:18
      * @return*/
-    public Boolean updateInsureUnifiedEmr(Map<String,Object>map){
+    public Boolean updateInsureUnifiedEmr(Map<String,Object> map){
         String hospCode = MapUtils.get(map,"hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
@@ -913,6 +913,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         paramMap.put("dieInfo",dieInfoList.get(0));
         paramMap.put("dscgoInfo",dscgoInfo.get(0));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_4701, paramMap);
+        String redisKey = this.getRedisKey(MapUtils.get(map,"inptVisit")) ;
+        redisUtils.del(redisKey);
         return true;
 
     }

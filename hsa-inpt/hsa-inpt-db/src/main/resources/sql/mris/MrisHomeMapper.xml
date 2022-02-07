@@ -775,40 +775,40 @@
                 zl_level = #{zlLevel},
             </if>
             <if test="apgarNum != null">
-                apgar_num = #{apgarNum}
+                apgar_num = #{apgarNum},
             </if>
             <if test="turnTime1 != null">
-                turn_time1 = #{turnTime1}
+                turn_time1 = #{turnTime1},
             </if>
             <if test="turnTime2 != null">
-                turn_time2 = #{turnTime2}
+                turn_time2 = #{turnTime2},
             </if>
             <if test="turnTime3 != null">
-                turn_time2 = #{turnTime3}
+                turn_time2 = #{turnTime3},
             </if>
             <if test="turnDept1 != null">
-                turn_dept1 = #{turnDept1}
+                turn_dept1 = #{turnDept1},
             </if>
             <if test="turnDept2 != null">
-                turn_dept2 = #{turnDept2}
+                turn_dept2 = #{turnDept2},
             </if>
             <if test="turnDept3 != null">
-                turn_dept3 = #{turnDept3}
+                turn_dept3 = #{turnDept3},
             </if>
             <if test="outptDoctorId != null">
-            outpt_doctor_id = #{outptDoctorId}
+            outpt_doctor_id = #{outptDoctorId},
             </if>
             <if test="outptDoctorName != null">
-                outpt_doctor_name = #{outptDoctorName}
+                outpt_doctor_name = #{outptDoctorName},
             </if>
             <if test="caseClassify != null">
-                case_classify = #{caseClassify}
+                case_classify = #{caseClassify},
             </if>
             <if test="clinicalPathCase != null">
-                clinical_path_case = #{clinicalPathCase}
+                clinical_path_case = #{clinicalPathCase},
             </if>
             <if test="rescueCount != null">
-                rescue_count = #{rescueCount}
+                rescue_count = #{rescueCount},
             </if>
             <if test="rescueSuccessCount != null">
                 rescue_success_count = #{rescueSuccessCount}

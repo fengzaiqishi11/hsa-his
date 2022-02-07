@@ -437,7 +437,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 if (StringUtils.isEmpty(tcmDiagnoseDTO.getDiseaseIcd10())&&StringUtils.isEmpty(tcmDiagnoseDTO.getTcmSyndromesId())) {
                     continue;
                 }
-                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())) {
+                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())||StringUtils.isNotEmpty(tcmDiagnoseDTO.getDiseaseIcd10())) {
                     tcmDiagnoseDTO.setDiseaseName("主要诊断");
                     tcmDiagnoseDTO.setDiseaseCode("1");
                 } else {

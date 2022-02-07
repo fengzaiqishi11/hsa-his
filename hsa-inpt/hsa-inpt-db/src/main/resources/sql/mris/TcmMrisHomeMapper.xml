@@ -1,113 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO">
-    <!--分页查询已出院患者信息-->
-    <select id="queryOutHospPatientPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        SELECT a.*
-        <if test="zgbrQuery == '2'.toString()">
-            , t.is_consule, t.apply_deptid
-        </if>
-        FROM inpt_visit a
-        <!--会诊病人，关联会诊申请表-->
-        <if test="zgbrQuery == '2'.toString()">
-            join (
-            SELECT
-            '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
-            FROM
-            inpt_consultation_apply ss
-            WHERE ss.hosp_code = #{hospCode}
-            and ss.consul_state = '1'
-            AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
-            GROUP BY ss.visit_id, ss.hosp_code
-            ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
-        </if>
-        <!--病案是否已写-->
-        <if test="isLoadMris == '0'.toString() or isLoadMris == '1'.toString() or isInsureUpload =='1'.toString()  or isInsureUpload =='0'.toString()">
-          left join mris_base_info mris on a.hosp_code = mris.hosp_code and a.id = mris.visit_id
-        </if>
-        <if test="regCode != null and regCode !=''  ">
-            left join insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and iiv.visit_id = a.id
-        </if>
-        WHERE a.hosp_code = #{hospCode}
-        <if test="keyword != null and keyword !=''">
-            and (
-            a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
-            or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
-            or a.in_profile LIKE CONCAT('%',#{keyword},'%')
-            )
-        </if>
-        <if test="zgbrQuery != '2'.toString()">
-            <if test="inDeptId != null and inDeptId != ''">
-                and a.in_dept_id = #{inDeptId}
-            </if>
-        </if>
-        <if test="patientCode != null and patientCode !=''">
-            and a.patient_code = #{patientCode}
-        </if>
-        <if test="statusCode != null and statusCode !=''">
-            and a.status_code = #{statusCode}
-        </if>
-        <if test="startTime != null and startTime != ''">
-            and a.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
-        </if>
-        <if test="endTime != null and endTime != '' ">
-            and a.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
-        </if>
-        <!--liuliyun 20211022 病案首页添加主管医生过滤-->
-        <if test='zgbrQuery =="1"'>
-            and a.zg_doctor_id = #{zgDoctorId}
-        </if>
-        <!--已写病案-->
-        <if test="isLoadMris == '1'.toString()">
-            and mris.id is not null and mris.id !=''
-        </if>
-        <!--未写病案-->
-        <if test="isLoadMris == '0'.toString()">
-            and (mris.id is null or mris.id ='')
-        </if>
-        <if test="isInsureUpload == '1'.toString()">
-            and mris.is_upload_insure ='1'
-        </if>
-        <if test="isInsureUpload == '0'.toString()">
-            and mris.is_upload_insure ='0'
-        </if>
-        <if test="regCode != null and regCode !=''  ">
-            and iiv.insure_reg_code =#{regCode}
-        </if>
-        order by a.in_time desc
-    </select>
-
-    <!--分页查询已出院患者信息(珠海)-->
-    <select id="queryOutHospPatientPageZ" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        SELECT v.*,CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1')) as inNo
-        FROM inpt_visit v
-        left join  base_profile_file b on b.hosp_code=#{hospCode} and v.profile_id =b.id
-        WHERE v.hosp_code = #{hospCode}
-        <if test="keyword != null and keyword !=''">
-            and CONCAT(v.in_profile,'-00',ifnull(b.total_in, '1'),v.name,v.phone,v.cert_no,v.in_no) LIKE CONCAT('%',#{keyword},'%')
-        </if>
-        <if test="inDeptId != null and inDeptId !=''">
-            and v.in_dept_id = #{inDeptId}
-        </if>
-        <if test="patientCode != null and patientCode !=''">
-            and v.patient_code = #{patientCode}
-        </if>
-        <if test="statusCode != null and statusCode !=''">
-            and v.status_code = #{statusCode}
-        </if>
-        <if test="startTime != null and startTime != ''">
-            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
-        </if>
-        <if test="endTime != null and endTime != '' ">
-            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
-        </if>
-    </select>
+<mapper namespace="cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO">
 
     <!--查询病案患者基本信息-->
-    <select id="getMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
+    <select id="getTcmMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
             SELECT  mbi.id,  mbi.hosp_code,  mbi.visit_id, in_profile, in_blh,
                    in_no, name, gender_code, gender_name, age, ifnull(age_unit_code,'1') as age_unit_code,
                    age_unit_name, birthday, cert_code, cert_name, cert_no, nationality_cation,
@@ -140,8 +37,10 @@
                    (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1) as  deptdrtCode,
                    (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id) as  atddrCode,
                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zr_nurse_id) as  respNursCode,
-     (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id) as  iptDrCode
-            FROM mris_base_info mbi left join insure_individual_visit iiv
+                  (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id) as  iptDrCode,
+                  treat_code,treat_name,tcm_disease_code,tcm_disease_name,clinical_way_code,clinical_way_name,zyzj_code,zyzj_name,
+                  zyyljs_code,zyyljs_name,zyylsb_code,zyylsb_code,zyylsb_name,bzsh_code,bzsh_name,zyhljs_code
+            FROM tcm_mris_base_info mbi left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
             WHERE  mbi.hosp_code = #{hospCode}
             AND  mbi.visit_id = #{id}
@@ -149,8 +48,8 @@
     </select>
 
     <!-- 插入数据 病案患者基本信息-->
-    <insert id="insertMrisBaseInfo" parameterType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
-        INSERT INTO mris_base_info (
+    <insert id="insertTcmMrisBaseInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
+        INSERT INTO tcm_mris_base_info (
             id, hosp_code, visit_id, in_profile, in_blh, in_no, name, gender_code,
             gender_name, age, age_unit_code, age_unit_name, birthday, cert_code, cert_name, cert_no,
             nationality_cation, nationality_name, nation_code, nation_name, native_place, occupation_code, occupation_name, marry_code,
@@ -170,7 +69,9 @@
             case_classification, is_monitor, monitor_day, monitor_hour, is_dzb, lclj_status, drg_status, is_kss,
             is_xjsj, is_cry, zl_level, apgar_num,is_inpt,aim,inpt_before_day,inpt_before_hour,inpt_before_minute,inpt_last_day,inpt_last_hour,inpt_last_minute,yljg_code,
             turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
-            outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count
+            outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count,
+            treat_code,treat_name,tcm_disease_code,tcm_disease_name,clinical_way_code,clinical_way_name,zyzj_code,zyzj_name,
+            zyyljs_code,zyyljs_name,zyylsb_code,zyylsb_name,bzsh_code,bzsh_name,zyhljs_code
         ) VALUES (
             #{id},
             #{hospCode},
@@ -331,13 +232,28 @@
             #{caseClassify},
             #{clinicalPathCase},
             #{rescueCount},
-            #{rescueSuccessCount}
+            #{rescueSuccessCount},
+            #{treatCode},
+            #{treatName},
+            #{tcmDiseaseCode},
+            #{tcmDiseaseName},
+            #{clinicalWayCode},
+            #{clinicalWayName},
+            #{zyzjCode},
+            #{zyzjName},
+            #{zyylsbCode},
+            #{zyylsbName},
+            #{zyyljsCode},
+            #{zyyljsName},
+            #{bzshCode},
+            #{bzshName},
+            #{zyhljsCode}
         )
     </insert>
 
     <!-- 修改数据 病案患者基本信息 -->
-    <update id="updateMrisBaseInfo" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisBaseInfoDO">
-        UPDATE mris_base_info
+    <update id="updateTcmMrisBaseInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisBaseInfoDO">
+        UPDATE tcm_mris_base_info
         <set>
             <if test="visitId != null">
                 visit_id = #{visitId},
@@ -775,95 +691,125 @@
                 zl_level = #{zlLevel},
             </if>
             <if test="apgarNum != null">
-                apgar_num = #{apgarNum}
+                apgar_num = #{apgarNum},
             </if>
             <if test="turnTime1 != null">
-                turn_time1 = #{turnTime1}
+                turn_time1 = #{turnTime1},
             </if>
             <if test="turnTime2 != null">
-                turn_time2 = #{turnTime2}
+                turn_time2 = #{turnTime2},
             </if>
             <if test="turnTime3 != null">
-                turn_time2 = #{turnTime3}
+                turn_time2 = #{turnTime3},
             </if>
             <if test="turnDept1 != null">
-                turn_dept1 = #{turnDept1}
+                turn_dept1 = #{turnDept1},
             </if>
             <if test="turnDept2 != null">
-                turn_dept2 = #{turnDept2}
+                turn_dept2 = #{turnDept2},
             </if>
             <if test="turnDept3 != null">
-                turn_dept3 = #{turnDept3}
+                turn_dept3 = #{turnDept3},
             </if>
             <if test="outptDoctorId != null">
-            outpt_doctor_id = #{outptDoctorId}
+            outpt_doctor_id = #{outptDoctorId},
             </if>
             <if test="outptDoctorName != null">
-                outpt_doctor_name = #{outptDoctorName}
+                outpt_doctor_name = #{outptDoctorName},
             </if>
             <if test="caseClassify != null">
-                case_classify = #{caseClassify}
+                case_classify = #{caseClassify},
             </if>
             <if test="clinicalPathCase != null">
-                clinical_path_case = #{clinicalPathCase}
+                clinical_path_case = #{clinicalPathCase},
             </if>
             <if test="rescueCount != null">
-                rescue_count = #{rescueCount}
+                rescue_count = #{rescueCount},
             </if>
             <if test="rescueSuccessCount != null">
-                rescue_success_count = #{rescueSuccessCount}
+                rescue_success_count = #{rescueSuccessCount},
+            </if>
+            <if test="treatCode != null">
+                treat_code = #{treatCode},
+            </if>
+            <if test="treatName != null">
+                treat_name = #{treatName},
+            </if>
+            <if test="tcmDiseaseCode != null">
+                tcm_disease_code = #{tcmDiseaseCode},
+            </if>
+            <if test="tcmDiseaseName != null">
+                tcm_disease_name = #{tcmDiseaseName},
+            </if>
+            <if test="clinicalWayCode != null">
+                clinical_way_code = #{clinicalWayCode},
+            </if>
+            <if test="clinicalWayName != null">
+                clinical_way_name = #{clinicalWayName},
+            </if>
+            <if test="zyzjCode != null">
+                zyzj_code = #{zyzjCode},
+            </if>
+            <if test="zyzjName != null">
+                zyzj_name = #{zyzjName},
+            </if>
+            <if test="zyylsbCode != null">
+                zyylsb_code = #{zyylsbCode},
+            </if>
+            <if test="zyylsbName != null">
+                zyylsb_name = #{zyylsbName},
+            </if>
+            <if test="zyyljsCode != null">
+                zyyljs_code = #{zyyljsCode},
+            </if>
+            <if test="zyyljsName != null">
+                zyyljs_name = #{zyyljsName},
+            </if>
+            <if test="bzshCode != null">
+                bzsh_code = #{bzshCode},
+            </if>
+            <if test="bzshName != null">
+                bzsh_name = #{bzshName},
+            </if>
+            <if test="zyhljsCode != null">
+                zyhljs_code = #{zyhljsCode},
             </if>
         </set>
         WHERE id = #{id} AND hosp_code = #{hospCode}
     </update>
 
     <!-- 删除数据 病案患者基本信息-->
-    <delete id="deleteMrisBaseInfoByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_base_info WHERE hosp_code = #{hospCode} AND visit_id = #{visitId}
-    </delete>
-
-    <!-- 删除数据 病案控制信息 -->
-    <delete id="deleteMrisControlByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_control WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    <delete id="deleteTcmMrisBaseInfoByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_base_info WHERE hosp_code = #{hospCode} AND visit_id = #{visitId}
     </delete>
 
     <!-- 删除数据 病案费用信息 -->
-    <delete id="deleteMrisCostByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_cost WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    <delete id="deleteTcmMrisCostByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_cost WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
     </delete>
 
     <!-- 删除数据 病案诊断信息 -->
-    <delete id="deleteMrisDiagnoseByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    <delete id="deleteTcmMrisDiagnoseByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 中医诊断信息 -->
+    <delete id="deleteTcmDiagnoseByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_syndromes_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
     </delete>
 
     <!-- 删除数据 病案手术信息 -->
-    <delete id="deleteMrisOperInfoByVisitId" parameterType="java.util.Map">
+    <delete id="deleteTcmMrisOperInfoByVisitId" parameterType="java.util.Map">
         DELETE FROM mris_oper_info WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
     </delete>
 
-    <!-- 删除数据 病案中医药信息 -->
-    <delete id="deleteMrisTcmInfoByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_tcm_info WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
-    </delete>
-
-    <!-- 删除数据 病案肿瘤化疗信息 -->
-    <delete id="deleteMrisTumourChemoByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_tumour_chemo WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
-    </delete>
-
-    <!-- 删除数据 病案肿瘤信息 -->
-    <delete id="deleteMrisTumourInfoByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_tumour_info WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
-    </delete>
-
     <!-- 删除数据 病案转科信息 -->
-    <delete id="deleteMrisTurnDeptByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_turn_dept WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    <delete id="deleteTcmMrisTurnDeptByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_turn_dept WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
     </delete>
 
     <!--HIS数据抽取 获取患者基本信息-->
-    <select id="getMrisBaseInfoByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
+    <select id="getTcmMrisBaseInfoByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
         SELECT
            DISTINCT
            a.hosp_code as hospCode,
@@ -954,87 +900,43 @@
         limit 1
     </select>
 
-    <!--HIS数据抽取 中心平台个人档案编码统一转义-->
-    <select id="getSysCodeValueByCode" parameterType="cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO"
-            resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
-        select
-            code_1.name as nationalityName,
-            code_2.name as occupationName,
-            code_3.name as contactRelaName
-        from
-            (select name from sys_code_detail where c_code = 'GJ' and value = #{nationalityCation} ) code_1,
-            (select name from sys_code_detail where c_code = 'ZY' and value = #{occupationCode} ) code_2
-            (select name from sys_code_detail where c_code = 'RYGX' and value = #{contactRelaCode} ) code_3
-
-           -- b.now_prov as nowProv,
-           -- b.now_prov_name as nowProvName,居住地省名称
-           -- b.now_city as nowCity,
-           -- now_city_name 居住地市名称
-           -- b.now_area as nowArea,
-           -- now_area_name 居住地区名称
-
-           -- b.native_prov as nativeProv,
-           -- native_prov_name 户口地省名称
-           -- native_city as nativeCity
-           -- native_native_city_name 户口地市名称
-           -- native_area as nativeArea
-           -- native_area_name as native_area_name 户口地区名称
-           -- 住院次数
+    <!--查询病案诊断信息-->
+    <select id="queryTcmMrisDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO">
+            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
+                   md.icd_version, md.disease_icd10, md.disease_icd10_name,
+                   md.in_situation_code
+            FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id} order by md.disease_code desc
     </select>
 
-    <!--HIS数据抽取 获取药物过敏信息-->
-    <select id="queryAllergyInfo" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO">
-        select *
-        from inpt_past_allergy where hosp_code = #{hospCode} and visit_id = #{visitId}
-    </select>
-
-    <!--HIS数据抽取 获取科室医生信息-->
-    <select id="getDoctorInfo" parameterType="java.util.Map" resultType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO">
-        select user_1.id as directorId1,user_1.name as directorName1,user_2.id as directorId2,user_2.name as directorName2 from inpt_visit a
-        left join base_dept b on a.in_dept_id = b.id
-        left join sys_user user_1 on (b.code = user_1.dept_code and user_1.work_type_code = '101')
-        left join sys_user user_2 on (b.code = user_1.dept_code and user_1.work_type_code = '102')
-        where a.hosp_code = #{hospCode} and a.id = #{visitId} limit 1
-    </select>
-
-    <!--HIS数据抽取 获取入院次数-->
-    <select id="getInCnt" parameterType="cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO" resultType="java.lang.Integer">
-        select count(*) from inpt_visit
-        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo}
-    </select>
-
-    <!--HIS数据抽取 获取血型代码-->
-    <select id="getBloodInfo" parameterType="java.util.Map" resultType="java.util.Map">
-        select b.blood_code as bloodCode,code_1.name as bloodName from inpt_visit a
-        left join oper_info_record b on a.id = b.visit_id
-        left join sys_code_detail code_1 on (code_1.value = b.blood_code and code_1.c_code = 'XX')
-        where a.hosp_code = #{hospCode} and a.id = #{visitId} limit 1
+    <!--查询病案诊断信息-->
+    <select id="queryTcmDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmDiagnoseDO">
+            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
+                   md.icd_version,md.disease_icd10, md.disease_icd10_name,
+                   md.in_situation_code,md.tcm_syndromes_id,md.tcm_syndromes_name
+            FROM tcm_mris_syndromes_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id} order by md.disease_code desc
     </select>
 
     <!--HIS数据抽取 获取诊断信息-->
     <select id="queryHisDiagnoseInfo" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
-        select a.*,b.code as diseaseCode,b.name as diseaseName from inpt_diagnose a left join base_disease b on a.disease_id = b.id
+        select a.id,a.hosp_code,a.disease_id,a.visit_id,a.type_code,a.is_main,a.crte_id,a.crte_name,a.crte_time,
+        b.code as diseaseCode,b.name as diseaseName,a.tcm_syndromes_name, c.code as tcmSyndromesId
+        from inpt_diagnose a
+        left join base_disease b on a.disease_id = b.id and a.hosp_code = #{hospCode}
+        left join base_disease c on a.tcm_syndromes_id = c.id and a.hosp_code = #{hospCode}
         where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and a.type_code !='201'
     </select>
 
-    <!--查询病案诊断信息-->
-    <select id="queryMrisDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
-            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
-                   md.icd_version, disease_icd10_1, md.disease_icd10, md.disease_icd10_name,
-                   in_situation_code2, in_situation_code1, md.in_situation_code, columns_num,
-                   disease_icd10_2, disease_icd10_name1, disease_icd10_name2,mbi.in_blh,disease_code2,disease_name2
-            FROM mris_diagnose md join mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
-            WHERE md.hosp_code = #{hospCode}
-            AND md.visit_id = #{id}
-    </select>
-
     <!--病案诊断数据批量插入-->
-    <insert id="insertMrisDiagnoseBatch" parameterType="list">
-        INSERT INTO mris_diagnose (
+    <insert id="insertTcmMrisDiagnoseBatch" parameterType="list">
+        INSERT INTO tcm_mris_diagnose (
         id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version, disease_icd10,
-        disease_icd10_name,in_situation_code,disease_icd10_1,disease_icd10_2,disease_icd10_name1,disease_icd10_name2,
-        in_situation_code1,in_situation_code2,columns_num,disease_code2,disease_name2
+        disease_icd10_name,in_situation_code
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -1047,29 +949,14 @@
             #{item.icdVersion},
             #{item.diseaseIcd10},
             #{item.diseaseIcd10Name},
-            #{item.inSituationCode},
-            #{item.diseaseIcd101},
-            #{item.diseaseIcd102},
-            #{item.diseaseIcd10Name1},
-            #{item.diseaseIcd10Name2},
-            #{item.inSituationCode1},
-            #{item.inSituationCode2},
-            #{item.columnsNum},
-            #{item.diseaseCode2},
-            #{item.diseaseName2}
+            #{item.inSituationCode}
             )
         </foreach>
     </insert>
 
-    <!--HIS数据抽取 获取床位异动信息-->
-    <select id="queryHisBedChanfeInfo" parameterType="java.util.Map" resultType="cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO">
-        select * from inpt_bed_change
-        where hosp_code = #{hospCode} and visit_id = #{visitId} order by crte_time asc
-    </select>
-
     <!--HIS数据抽取 批量插入转科信息-->
-    <insert id="insetMrisTurnDeptBatch" parameterType="list">
-        INSERT INTO mris_turn_dept (
+    <insert id="insertTcmMrisTurnDeptBatch" parameterType="list">
+        INSERT INTO tcm_mris_turn_dept (
             id, hosp_code, mbi_id, visit_id, out_dept_id, out_dept_name, in_dept_id, in_dept_name,
             in_dept_time
         ) VALUES
@@ -1088,23 +975,18 @@
         </foreach>
     </insert>
 
-    <!--HIS数据抽取 获取手术信息-->
-    <select id="queryOperRecordInfo" parameterType="java.util.Map" resultType="cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO">
-        select * from oper_info_record where hosp_code = #{hospCode} and visit_id = #{visitId}
-    </select>
-
     <!--查询病案手术信息-->
-    <select id="queryMrisOperInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.dto.MrisOperDTO">
+    <select id="queryTcmMrisOperInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisOperDTO">
             SELECT *, oper_disease_name as 'name'
-            FROM mris_oper_info
+            FROM tcm_mris_oper_info
             WHERE hosp_code = #{hospCode}
             AND visit_id = #{id}
     </select>
 
     <!--插入手术信息-->
-    <insert id="insertMrisOperBatch" parameterType="list">
-        INSERT INTO mris_oper_info (
+    <insert id="insertTcmMrisOperBatch" parameterType="list">
+        INSERT INTO tcm_mris_oper_info (
         id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
         notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
         assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
@@ -1150,112 +1032,18 @@
         </foreach>
     </insert>
 
-    <!--查询病案控制信息-->
-    <select id="getMrisControl" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisControlDO">
-            SELECT *
-            FROM mris_control
-            WHERE hosp_code = #{hospCode}
-            AND visit_id = #{id}
-    </select>
-
-    <insert id="insertMrisControl" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisControlDO">
-        INSERT INTO mris_control (
-            id, hosp_code, mbi_id, visit_id, is_commit, commit_id, commit_name, commit_time,
-            is_print, print_id, print_name, print_time, is_send, send_id, send_name, send_time,
-            is_receive, receive_id, receive_name, receive_time, borrow_code, borrow_id, borrow_name, borrow_time,
-            back_id, back_name, back_time, is_copy, copy_id, copy_name, copy_time
-        ) VALUES (
-            #{id},
-            #{hospCode},
-            #{mbiId},
-            #{visitId},
-            #{isCommit},
-            #{commitId},
-            #{commitName},
-            #{commitTime},
-            #{isPrint},
-            #{printId},
-            #{printName},
-            #{printTime},
-            #{isSend},
-            #{sendId},
-            #{sendName},
-            #{sendTime},
-            #{isReceive},
-            #{receiveId},
-            #{receiveName},
-            #{receiveTime},
-            #{borrowCode},
-            #{borrowId},
-            #{borrowName},
-            #{borrowTime},
-            #{backId},
-            #{backName},
-            #{backTime},
-            #{isCopy},
-            #{copyId},
-            #{copyName},
-            #{copyTime}
-        )
-    </insert>
-
-    <!--HIS数据抽取 获取费用信息-->
-    <select id="queryInptCostByVisit" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        select * from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}
-    </select>
-
-    <!--HIS数据抽取 获取住院结算总金额-->
-    <select id="getInptSettleTotalPrice" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select ifnull(sum(reality_price),0) from inpt_settle where hosp_code = #{hospCode} and visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-    </select>
-
-    <!--HIS数据抽取 获取住院费用总金额-->
-    <select id="getInptCostTotalPrice" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select ifnull(sum(reality_price),0) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-    </select>
-
-    <!--HIS数据抽取 获取住院结算个人自付金额-->
-    <select id="getInptSettleSelfPrice" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select ifnull(sum(self_price),0) from inpt_settle where hosp_code = #{hospCode} and visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-    </select>
-
-    <!--HIS数据抽取 获取住院结算个人预交金金额-->
-    <select id="getInptSettleAdvicePrice" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select ifnull(sum(ap_total_price),0) from inpt_settle where hosp_code = #{hospCode} and visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-    </select>
-
-    <!--HIS数据抽取 获取住院结算个人退费金额-->
-    <select id="getInptSettlebackPrice" parameterType="java.util.Map" resultType="java.math.BigDecimal">
-        select ifnull(sum(settle_back_price),0) from inpt_settle where hosp_code = #{hospCode} and visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-    </select>
-
-    <!--HIS数据抽取 获取财务类别费用信息-->
-    <select id="queryInptCostBfcInfo" parameterType="java.util.Map" resultType="java.util.Map">
-        select a.bfc_id as bfcId,b.code,b.name, if(sum(a.total_price),0) as totalPrice from inpt_cost a
-        left join base_finance_classify b on b.id = a.bfc_id
-        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId}
-        and (baby_id ='' or baby_id is null)
-        group by a.bfc_id
-    </select>
-
     <!--查询病案费用信息-->
-    <select id="getMrisCost" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisCostDO">
+    <select id="getTcmMrisCost" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
             SELECT *
-            FROM mris_cost
+            FROM tcm_mris_cost
             WHERE hosp_code = #{hospCode}
             AND visit_id = #{id}
     </select>
 
     <!-- 插入数据 病案费用信息-->
-    <insert id="insertMrisCost" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisCostDO">
-        INSERT INTO mris_cost (
+    <insert id="insertTcmMrisCost" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        INSERT INTO tcm_mris_cost (
             id, hosp_code, mbi_id, visit_id, fy01, fy02, fy03, fy04,
             fy05, fy06, fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05,
             zhylfwl06, zdl01, zdl02, zdl03, zdl04, zll01, zll02, zll03,
@@ -1316,8 +1104,8 @@
     </insert>
 
     <!-- 修改数据 病案更新信息-->
-    <update id="updateMrisCost" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisCostDO">
-        UPDATE mris_cost
+    <update id="updateTcmMrisCost" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        UPDATE tcm_mris_cost
         <set>
             <if test="mbiId != null">
                 mbi_id = #{mbiId},
@@ -1464,93 +1252,10 @@
         WHERE id = #{id} and hosp_code = #{hospCode}
     </update>
 
-    <!-- 插入数据 病案诊断信息-->
-    <insert id="insertMrisDiagnose" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
-        INSERT INTO mris_diagnose (
-            id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version, disease_icd10,
-            disease_icd10_name,in_situation_code,disease_code2,disease_name2
-        ) VALUES (
-            #{id},
-            #{hospCode},
-            #{mbiId},
-            #{visitId},
-            #{diseaseCode},
-            #{diseaseName},
-            #{icdVersion},
-            #{diseaseIcd10},
-            #{diseaseIcd10Name},
-            #{inSituationCode},
-            #{diseaseCode2},
-            #{diseaseName2}
-        )
-    </insert>
-
-    <!-- 修改数据 病案诊断信息更新-->
-    <update id="updateMrisDiagnose" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
-        UPDATE mris_diagnose
-        <set>
-            <if test="mbiId != null">
-                mbi_id = #{mbiId},
-            </if>
-            <if test="visitId != null">
-                visit_id = #{visitId},
-            </if>
-            <if test="diseaseCode != null">
-                disease_code = #{diseaseCode},
-            </if>
-            <if test="diseaseName != null">
-                disease_name = #{diseaseName},
-            </if>
-            <if test="icdVersion != null">
-                icd_version = #{icdVersion},
-            </if>
-            <if test="diseaseIcd10 != null">
-                disease_icd10 = #{diseaseIcd10},
-            </if>
-            <if test="diseaseIcd10Name != null">
-                disease_icd10_name = #{diseaseIcd10Name}
-            </if>
-            <if test="inSituationCode != null">
-                in_situation_code = #{inSituationCode}
-            </if>
-            <if test="diseaseIcd101 != null">
-                disease_icd10_1 = #{diseaseIcd101},
-            </if>
-            <if test="diseaseIcd102 != null">
-                disease_icd10_2 = #{diseaseIcd102},
-            </if>
-            <if test="diseaseIcd10Name1 != null">
-                disease_icd10_name1 = #{diseaseIcd10Name1}
-            </if>
-            <if test="diseaseIcd10Name != null">
-                disease_icd10_name1 = #{diseaseIcd10Name1}
-            </if>
-            <if test="diseaseIcd10Name2 != null">
-                disease_icd10_name2 = #{diseaseIcd10Name2}
-            </if>
-            <if test="diseaseIcd10Name != null">
-                disease_icd10_name2 = #{diseaseIcd10Name2}
-            </if>
-            <if test="inSituationCode1 != null">
-                in_situation_code1 = #{inSituationCode1}
-            </if>
-            <if test="inSituationCode2 != null">
-                in_situation_code2 = #{inSituationCode2}
-            </if>
-            <if test="diseaseCode2 != null">
-                disease_code2 = #{diseaseCode2},
-            </if>
-            <if test="diseaseName2 != null">
-                disease_name2 = #{diseaseName2},
-            </if>
-
-        </set>
-        WHERE id = #{id} and hosp_code = #{hospCode}
-    </update>
 
     <!-- 插入数据 病案手术信息-->
-    <insert id="insertMrisOperInfo" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO">
-        INSERT INTO mris_oper_info (
+    <insert id="insertTcmMrisOperInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+        INSERT INTO tcm_mris_oper_info (
             id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
             notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
             assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
@@ -1593,8 +1298,8 @@
     </insert>
 
     <!-- 修改数据 更新病案手术信息-->
-    <update id="updateMrisOperInfo" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO">
-        UPDATE mris_oper_info
+    <update id="updateTcmMrisOperInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+        UPDATE tcm_mris_oper_info
         <set>
             <if test="mbiId != null">
                 mbi_id = #{mbiId},
@@ -1694,17 +1399,17 @@
     </update>
 
     <!--查询病案转科信息-->
-    <select id="queyMrisTurnDeptPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO">
+    <select id="queyTcmMrisTurnDeptPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
             SELECT *
-            FROM mris_turn_dept
+            FROM tcm_mris_turn_dept
             WHERE hosp_code = #{hospCode}
             AND visit_id = #{id}
     </select>
 
     <!-- 插入数据 病案转科信息-->
-    <insert id="insertMrisTurnDept" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO">
-        INSERT INTO mris_turn_dept (
+    <insert id="insertTcmMrisTurnDept" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+        INSERT INTO tcm_mris_turn_dept (
             id, hosp_code, mbi_id, visit_id, out_dept_id, out_dept_name, in_dept_id, in_dept_name,
             in_dept_time
         ) VALUES (
@@ -1721,8 +1426,8 @@
     </insert>
 
     <!-- 修改数据 病案转科信息更新-->
-    <update id="updateMrisTurnDept" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO">
-        UPDATE mris_turn_dept
+    <update id="updateTcmMrisTurnDept" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+        UPDATE tcm_mris_turn_dept
         <set>
             <if test="mbiId != null">
                 mbi_id = #{mbiId},
@@ -1748,116 +1453,12 @@
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}
     </update>
-    <update id="updateMrisControl"></update>
-
-    <!--获取病案费用关联的财务分类编码-->
-    <select id="qureyMrisBfcInfo" parameterType="java.util.Map" resultType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
-        SELECT DISTINCT
-            a.*,
-            b.mris_code ,
-            b.bfc_codes
-        FROM
-            sys_code_detail a
-            LEFT JOIN base_mris_classify b ON a.value = b.mris_code
-        WHERE
-            a.c_code = 'BAFY' and a.hosp_code = #{hospCode}
-    </select>
-
-    <!--获取住院费用关联的财务分类编码-->
-    <select id="queryInptBfcInfo" parameterType="java.util.Map" resultType="cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO">
-        SELECT b.code,ifnull(sum(a.reality_price),0) as totalPrice from inpt_cost a
-        left join base_finance_classify b on a.bfc_id = b.id
-        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} GROUP BY a.bfc_id
-    </select>
-
-    <!-- 获取支付方式信息 -->
-    <select id="queryInptPayByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.fees.dto.InptPayDTO">
-        select a.pay_code,b.name as payName from inpt_pay a left join sys_code_detail b on (a.pay_code = b.value and b.c_code = 'ZFFS')
-        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and price &gt;0
-    </select>
-
-    <!--通过就诊ID获取医保入院登记信息-->
-    <select id="getInsureVisitByVisitId" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
-		select * from insure_individual_visit where hosp_code = #{hospCode} and visit_id = #{visitId}
-	</select>
-
-    <!--通过就诊ID获取就诊信息-->
-    <select id="getVisitById" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-		select * from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
-	</select>
-
-    <select id="getInsureIndividualBasic" parameterType="java.util.Map" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
-		select * from insure_individual_basic where hosp_code = #{hospCode} and id = #{id}
-	</select>
-
-    <select id="getSysParamterByMap" parameterType="java.util.Map" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
-		select value,name from sys_paramter where hosp_code = #{hospCode} and code = #{code}
-	</select>
-    <select id="queryMriCost" resultType="cn.hsa.module.mris.mrisHome.entity.MrisCostDO">
-        select id, hosp_code, mbi_id, visit_id, fy01, fy02, fy03, fy04, fy05, fy06,
-               fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05, zhylfwl06, zdl01,
-               zdl02, zdl03, zdl04, zll01, zll02, zll03, zll04, zll05, kfl01,
-               xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03, xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01,
-               zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06 from mris_cost
-                where hosp_code = #{hospCode} and visit_id = #{visitId}
-    </select>
-
-    <!-- 查询病案婴儿信息-->
-    <select id="queryMrisBabyInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisBabyInfoDO">
-        SELECT *, ib.`code` as babyCode
-        FROM mris_obstetrics mb
-        left join inpt_baby ib on mb.hosp_code = ib.hosp_code and mb.baby_id = ib.id
-        WHERE mb.hosp_code = #{hospCode}
-        AND mb.visit_id = #{id}
-    </select>
-    <!-- 根据条件参数查询数据列表 -->
-    <select id="queryHisBabyInfo" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptBabyDTO">
-        SELECT
-        *
-        FROM inpt_baby ib
-        where
-        ib.hosp_code = #{hospCode}
-        <if test="visitId != null and visitId != ''">
-            AND ib.visit_id = #{visitId}
-        </if>
-    </select>
-
-    <!--插入病案信息-->
-    <insert id="insertMrisBabyBatch" parameterType="list">
-        INSERT INTO mris_obstetrics (
-        id, hosp_code, mbi_id, visit_id,baby_id,name,gender_code,weight,childbirth_code,
-        outcome_code,rescue_num,rescue_success_num,breathing_code
-        ) VALUES
-        <foreach collection="list" index="index" item="item" separator=",">
-            (
-            #{item.id},
-            #{item.hospCode},
-            #{item.mbiId},
-            #{item.visitId},
-            #{item.babyId},
-            #{item.name},
-            #{item.genderCode},
-            #{item.weight},
-            #{item.childBirthCode},
-            #{item.outComeCode},
-            #{item.rescueNum},
-            #{item.rescueSuccessNum},
-            #{item.breathingCode}
-            )
-        </foreach>
-    </insert>
-
-    <!-- 删除数据 病案婴儿-->
-    <delete id="deleteMrisBabyInfoByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_obstetrics WHERE hosp_code = #{hospCode} AND visit_id = #{visitId}
-    </delete>
 
     <!--病案诊断数据批量插入-->
-    <insert id="insertMrisInptDiagnoseBatch" parameterType="list">
-        INSERT INTO mris_inpt_diagnose (
+    <insert id="insertTcmDiagnoseBatch" parameterType="list">
+        INSERT INTO tcm_mris_syndromes_diagnose (
         id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version,
-         disease_icd10, disease_icd10_name, in_situation_code
+         disease_icd10, disease_icd10_name, in_situation_code,tcm_syndromes_id,tcm_syndromes_name
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -1870,57 +1471,26 @@
             #{item.icdVersion},
             #{item.diseaseIcd10},
             #{item.diseaseIcd10Name},
-            #{item.inSituationCode}
+            #{item.inSituationCode},
+            #{item.tcmSyndromesId},
+            #{item.tcmSyndromesName}
             )
         </foreach>
     </insert>
 
-    <!--查询分行病案诊断信息-->
-    <select id="queryMrisDiagnoseRowPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
-            resultType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
-            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
-                   md.icd_version, md.disease_icd10, md.disease_icd10_name,md.in_situation_code,
-                   ifnull((select type_code from base_disease where `code` = md.disease_icd10
-                   and hosp_code = #{hospCode} limit 1),'') as typeCode
-            FROM mris_inpt_diagnose md join mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
-            WHERE md.hosp_code = #{hospCode}
-            AND md.visit_id = #{id}
+    <!--HIS数据抽取 获取入院次数-->
+    <select id="getInCnt" parameterType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO" resultType="java.lang.Integer">
+        select count(*) from inpt_visit
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo}
     </select>
 
-    <!-- 删除数据 分行病案诊断信息 -->
-    <delete id="deleteRowMrisDiagnoseByVisitId" parameterType="java.util.Map">
-        DELETE FROM mris_inpt_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
-    </delete>
+    <!--查询病案转科信息-->
+    <select id="queryTcmMrisTurnDeptPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+            SELECT *
+            FROM tcm_mris_turn_dept
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
 
-    <!-- 修改数据 病案诊断信息更新-->
-    <update id="updateRowMrisDiagnose" parameterType="cn.hsa.module.mris.mrisHome.entity.MrisDiagnoseDO">
-        UPDATE mris_inpt_diagnose
-        <set>
-            <if test="mbiId != null">
-                mbi_id = #{mbiId},
-            </if>
-            <if test="visitId != null">
-                visit_id = #{visitId},
-            </if>
-            <if test="diseaseCode != null">
-                disease_code = #{diseaseCode},
-            </if>
-            <if test="diseaseName != null">
-                disease_name = #{diseaseName},
-            </if>
-            <if test="icdVersion != null">
-                icd_version = #{icdVersion},
-            </if>
-            <if test="diseaseIcd10 != null">
-                disease_icd10 = #{diseaseIcd10},
-            </if>
-            <if test="diseaseIcd10Name != null">
-                disease_icd10_name = #{diseaseIcd10Name}
-            </if>
-            <if test="inSituationCode != null">
-                in_situation_code = #{inSituationCode}
-            </if>
-        </set>
-        WHERE id = #{id} and hosp_code = #{hospCode}
-    </update>
 </mapper>

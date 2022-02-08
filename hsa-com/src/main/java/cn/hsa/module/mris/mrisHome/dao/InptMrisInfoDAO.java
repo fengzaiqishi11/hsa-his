@@ -90,4 +90,49 @@ public interface InptMrisInfoDAO {
      **/
     List<LinkedHashMap<String,Object>> queryData(@Param(value = "sql") String sql);
 
+    /**
+     * @Menthod: getMrisBaseInfo
+     * @Desrciption: 中医病案基础信息查询
+     * @Param: 1. hospCode: 医院编码, 2、startTime:开始时间，3、endTime:结束时间，4、keyword: 搜索关键字, 5、statusCode: 在院状态
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-01-20 16:14
+     * @Return: List<LinkedHashMap < String, Object>>
+     **/
+    List<LinkedHashMap<String,Object>> getTcmMrisBaseInfo(Map<String, Object> map);
+
+    /**
+     * @Menthod: getTcmMrisDiagnose
+     * @Desrciption: 中医病案诊断信息查询（西医诊断）
+     * @Param: 1. visitId 就诊id, 2 hospCode 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-01-20 15:39
+     * @Return:  List<MrisDiagnoseDTO>
+     **/
+    List<Map<String, Object>> getTcmMrisDiagnose(Map<String, Object> map);
+
+    /**
+     * @Menthod: getTcmDiagnose
+     * @Desrciption: 中医病案诊断信息查询（中医诊断）
+     * @Param: 1、visitId 就诊id, 2、hospCode 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-01-20 15:35
+     * @Return:  List<MrisDiagnoseDTO>
+     **/
+    List<Map<String, Object>> getTcmDiagnose(Map<String, Object> map);
+
+
+    /**
+     * @Menthod: getTcmMrisOperInfo
+     * @Desrciption: 病案手术信息查询
+     * @Param: 1、visitId： 就诊id, 2、hospCode： 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-01-20 16:46
+     * @Return:  List<Map<String, Object>>
+     **/
+    List<Map<String, Object>> getTcmMrisOperInfo(Map<String, Object> map);
+
 }

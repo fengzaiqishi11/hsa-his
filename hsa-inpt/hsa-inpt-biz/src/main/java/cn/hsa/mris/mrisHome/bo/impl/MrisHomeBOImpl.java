@@ -1349,7 +1349,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorId(mrisBaseInfoDTO.getOutptDoctorId());
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
-        mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZkNurseName());
+        mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);

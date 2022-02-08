@@ -85,6 +85,8 @@
 
     <!--病案首页-->
     <dubbo:service interface="cn.hsa.module.mris.mrisHome.service.MrisHomeService" ref="mrisHomeService_provider"/>
+    <!--中医病案首页-->
+    <dubbo:service interface="cn.hsa.module.mris.tcmMrisHome.service.TcmMrisHomeService" ref="tcmMrisHomeService_provider"/>
 
 
     <!-- 电子病历子系统 -> 电子病历打印设置生产者 -->

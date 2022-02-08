@@ -338,11 +338,12 @@
             result_unit AS resultUnit,
             DATE_FORMAT(crte_time,'%Y-%m-%d') AS crteTime,
             mr.is_positive as isPositive,
-            (select item_name from inpt_advice_detail where id = mr.advice_id and hosp_code =#{hospCode}) as adviceName
+            (select item_name from inpt_advice_detail where id = mr.advice_id and hosp_code =#{hospCode}) as adviceName,
+            (select dept_name as deptName from medic_apply  where visit_id =#{visitId} and apply_no =mr.apply_no and hosp_code =#{hospCode} limit 1) as deptName
         FROM
             medic_result mr
         WHERE
-            mr.in_no = #{inNo} and hosp_code =#{hospCode}
+            mr.visit_id=#{visitId} and hosp_code =#{hospCode}
         ORDER BY
             crte_time ASC
     </select>

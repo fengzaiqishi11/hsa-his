@@ -45,7 +45,7 @@ public class InsureReadCardBOImpl extends HsafBO implements InsureReadCardBO {
      */
     @Override
     public Map<String, Object> getReadIdCard(Map<String, Object> map) {
-        String hospCode =MapUtils.get(map, "hospCpde");
+        String hospCode =MapUtils.get(map, "hospCode");
         String orgCode =MapUtils.get(map, "insureRegCode");
 
         Map<String, Object> dataMap = new HashMap<>();

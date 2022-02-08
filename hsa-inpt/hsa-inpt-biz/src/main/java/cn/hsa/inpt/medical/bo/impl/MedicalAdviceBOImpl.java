@@ -2555,7 +2555,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //获取药品/项目信息,如果拆分比为空,默认给1
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (drugMap==null || drugMap.isEmpty()|| drugMap.get(inptAdviceDetailDTO.getItemId())==null) {
-                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),medicalAdviceDTO.getDeptId());
+                    //科室 取执行参数科室  如果为空 取当前病人的入院科室
+                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),StringUtils.isEmpty(medicalAdviceDTO.getDeptId())?visitDTO.getInDeptId():medicalAdviceDTO.getDeptId());
                     if (drugDTO.getSplitRatio() == null) {
                         drugDTO.setSplitRatio(BigDecimal.valueOf(1));
                     }

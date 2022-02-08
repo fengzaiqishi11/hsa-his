@@ -54,5 +54,9 @@ public class ExaminationItem implements Serializable {
      * 检验项目名称
      */
     private String adviceName;
+    /**
+     * 送检科室名称
+    * */
+    private String deptName;
 
 }

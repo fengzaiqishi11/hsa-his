@@ -45,7 +45,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
         isInsureUnifiedMap.put("code", "BASFBM");
         sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
         Map sfMaps =null;
-        // 开启大人婴儿合并结算
+        // 获取病案首页省份编码
         if(sysParameterDTO !=null) {
             if (StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
                 sfMaps = (Map) JSON.parse(sysParameterDTO.getValue());
@@ -154,6 +154,121 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
         }
         data = (String) object;
         data = data.replace("\n","").replace("null","").replace("\t","");
+        return data;
+    }
+
+
+    @Override
+    public List<LinkedHashMap<String, Object>> importTcmMrisInfo(Map map) throws Exception {
+        List<LinkedHashMap<String, Object>> data =inptMrisInfoDAO.getTcmMrisBaseInfo(map);
+        SysParameterDTO sysParameterDTO =null;
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", map.get("hospCode"));
+        isInsureUnifiedMap.put("code", "BASFBM");
+        sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        Map sfMaps =null;
+        // 获取病案首页省份编码
+        if(sysParameterDTO !=null) {
+            if (StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+                sfMaps = (Map) JSON.parse(sysParameterDTO.getValue());
+            }
+        }
+        if (data!=null&&data.size()>0) {
+            for (LinkedHashMap<String, Object> ma : data) {
+                Map diagnoseParam = new HashMap();
+                diagnoseParam.put("hospCode", (String) map.get("hospCode"));
+                diagnoseParam.put("visitId", ma.get("visit_id"));
+                if (!MapUtils.isEmpty(sfMaps)) {
+                    String key = (String) ma.get("GG");
+                    if (StringUtils.isNotEmpty(key)) {
+                        ma.put("GG", sfMaps.get(key)!=null?sfMaps.get(key):"18");
+                    }
+                }else {
+                    ma.put("GG", "18");
+                }
+                // 西医出院诊断
+                List<Map<String, Object>> mrisDiagnose = inptMrisInfoDAO.getTcmMrisDiagnose(diagnoseParam);
+                LinkedHashMap<String, Object> diagnoseMap = new LinkedHashMap<>();
+                int i = 1;
+                if (mrisDiagnose != null && mrisDiagnose.size() > 0) {
+                    for (Map<String, Object> mrisDiagnosedata : mrisDiagnose) {
+                        if (mrisDiagnosedata.get("disease_code") != null && mrisDiagnosedata.get("disease_code").equals("1")) {
+                            diagnoseMap.put("ZYZD", mrisDiagnose.get(0).get("disease_icd10_name"));
+                            diagnoseMap.put("ZYZD_JBBM", mrisDiagnose.get(0).get("disease_icd10"));
+                            diagnoseMap.put("XY_RYBQ", mrisDiagnose.get(0).get("in_situation_code"));
+                            diagnoseMap.put("XY_CYQK", "-");
+                        } else {
+                            diagnoseMap.put("QTZD" + i, changeData(mrisDiagnosedata.get("disease_icd10_name")));
+                            diagnoseMap.put("ZYZD_JBBM" +i, changeData(mrisDiagnosedata.get("disease_icd10")));
+                            diagnoseMap.put("RYBQ" + i, changeData(mrisDiagnosedata.get("in_situation_code")));
+                            diagnoseMap.put("CYQK" + i, "-");
+                            i = i + 1;
+                        }
+                    }
+                }
+                ma.putAll(diagnoseMap);
+                // 中医出院诊断
+                List<Map<String, Object>> tcmMrisDiagnose = inptMrisInfoDAO.getTcmDiagnose(diagnoseParam);
+                LinkedHashMap<String, Object> tcmDiagnoseMap = new LinkedHashMap<>();
+                int k = 1;
+                if (tcmMrisDiagnose != null && tcmMrisDiagnose.size() > 0) {
+                    for (Map<String, Object> mrisDiagnosedata : tcmMrisDiagnose) {
+                        if ((mrisDiagnosedata.get("disease_code") != null && mrisDiagnosedata.get("disease_code").equals("1"))) {
+                            tcmDiagnoseMap.put("ZB", changeData(mrisDiagnosedata.get("disease_icd10_name")));
+                            tcmDiagnoseMap.put("ZB_JBBM", changeData(mrisDiagnosedata.get("disease_icd10")));
+                            tcmDiagnoseMap.put("ZY_RYBQ_ZB", changeData(mrisDiagnosedata.get("in_situation_code")));
+                            tcmDiagnoseMap.put("ZY_CYQK_ZB", "-");
+                        } else {
+                            tcmDiagnoseMap.put("ZZ" + k, changeData(mrisDiagnosedata.get("tcm_syndromes_name")));
+                            tcmDiagnoseMap.put("ZZ_JBBM" +k, changeData(mrisDiagnosedata.get("tcm_syndromes_id")));
+                            tcmDiagnoseMap.put("ZZ_RYBQ" + k, changeData(mrisDiagnosedata.get("in_situation_code")));
+                            tcmDiagnoseMap.put("ZZ_CYQK" + k, "-");
+                            tcmDiagnoseMap.put("ZZ_ZFMC" + k, "-");
+                            tcmDiagnoseMap.put("ZZ_ZFBM" + k, "-");
+                            k = k + 1;
+                        }
+                    }
+                }
+                ma.putAll(tcmDiagnoseMap);
+                List<Map<String, Object>> tcmMrisOperInfo = inptMrisInfoDAO.getTcmMrisOperInfo(diagnoseParam);
+                LinkedHashMap<String, Object> tcmOperInfoMap = new LinkedHashMap<>();
+                if (tcmMrisOperInfo != null && tcmMrisOperInfo.size() > 0) {
+                    Map<String, Object> dataMap = tcmMrisOperInfo.get(0);
+                    tcmOperInfoMap.put("SSJCZBM1", changeData(dataMap.get("oper_disease_icd9")));
+                    tcmOperInfoMap.put("SSJCZMC1", changeData(dataMap.get("oper_disease_name")));
+                    tcmOperInfoMap.put("SSJCZRQ1", changeData(dataMap.get("oper_time")));
+                    tcmOperInfoMap.put("SHJB1", changeData(dataMap.get("oper_code")));
+                    tcmOperInfoMap.put("SZ1", changeData(dataMap.get("oper_doctor_name")));
+                    tcmOperInfoMap.put("YZ1", changeData(dataMap.get("assistant_name1")));
+                    tcmOperInfoMap.put("EZ1", changeData(dataMap.get("assistant_name2")));
+                    tcmOperInfoMap.put("QKDJ1", changeData(dataMap.get("heal_code")));
+                    tcmOperInfoMap.put("QKYLB1", changeData(dataMap.get("heal_type")));
+                    tcmOperInfoMap.put("MZFS1", changeData(dataMap.get("ana_code")));
+                    tcmOperInfoMap.put("MZYS1", changeData(dataMap.get("ana_name1")));
+                    tcmOperInfoMap.put("SSCZSJ1", "");
+                    tcmOperInfoMap.put("MZFJ1", "");
+                    for (int j = 1; j < tcmMrisOperInfo.size(); j++) {
+                        if (tcmMrisOperInfo.get(j)!=null) {
+                            tcmOperInfoMap.put("SSJCZBM" + j, changeData(dataMap.get("oper_disease_icd9")));
+                            tcmOperInfoMap.put("SSJCZMC" + j, changeData(dataMap.get("oper_disease_name")));
+                            tcmOperInfoMap.put("SSJCZRQ"  + j, changeData(dataMap.get("oper_time")));
+                            tcmOperInfoMap.put("SHJB" + j, changeData(dataMap.get("oper_code")));
+                            tcmOperInfoMap.put("SZ" + j, changeData(dataMap.get("oper_doctor_name")));
+                            tcmOperInfoMap.put("YZ" + j, changeData(dataMap.get("assistant_name1")));
+                            tcmOperInfoMap.put("EZ" + j, changeData(dataMap.get("assistant_name2")));
+                            tcmOperInfoMap.put("QKDJ" + j, changeData(dataMap.get("heal_code")));
+                            tcmOperInfoMap.put("QKYLB" + j, changeData(dataMap.get("heal_type")));
+                            tcmOperInfoMap.put("MZFS" + j, changeData(dataMap.get("ana_code")));
+                            tcmOperInfoMap.put("MZYS" + j, changeData(dataMap.get("ana_name1")));
+                            tcmOperInfoMap.put("SSCZSJ" + j, "");
+                            tcmOperInfoMap.put("MZFJ" + j, "");
+                        }
+                    }
+                }
+                ma.putAll(tcmOperInfoMap);
+                ma.remove("visit_id");
+            }
+        }
         return data;
     }
 }

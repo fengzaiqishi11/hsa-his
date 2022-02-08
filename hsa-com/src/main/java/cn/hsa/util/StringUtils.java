@@ -357,6 +357,7 @@ public class StringUtils {
                     configInfoDO.setIntervalTime(MapUtils.get(configInfo, "interval_time"));
                     configInfoDO.setDeptId(MapUtils.get(configInfo, "dept_id"));
                     configInfoDO.setUrl(MapUtils.get(configInfo, "url"));
+                    configInfoDO.setIsPersonal(MapUtils.get(configInfo, "isPersonal"));
                 }
             }
             return configInfoDO;

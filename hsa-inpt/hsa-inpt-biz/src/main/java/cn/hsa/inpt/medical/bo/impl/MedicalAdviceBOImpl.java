@@ -425,7 +425,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             visitDTO.setTotalCost(BigDecimal.valueOf(-1));
 
             //获取用户下所有的医嘱目录集合
-            List<BaseAdviceDTO> baseAdviceDTOList = inptAdviceDAO.queryAdvicesByVisitId(visitDTO.getHospCode(), visitDTO.getId());
+            List<BaseAdviceDTO> baseAdviceDTOList = inptAdviceDAO.queryAdvicesByVisitId(visitDTO.getHospCode(), visitDTO.getId(), adviceIds);
             if (ListUtils.isEmpty(baseAdviceDTOList)) {
                 continue;
             }
@@ -478,33 +478,37 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                                 || StringUtils.isEmpty(baseAdviceDTO.getSpecimenCode()) || StringUtils.isEmpty(baseAdviceDTO.getTechnologyCode())) {
                             continue;
                         }
-                        //医技分类、容器、标本都相同那么就合管(排除医嘱自身)
-                        if (!adviceDTO.getId().equals(baseAdviceDTO.getId()) && baseAdvice.getContainerCode().equals(baseAdviceDTO.getContainerCode())
-                                && baseAdvice.getSpecimenCode().equals(baseAdviceDTO.getSpecimenCode())
-                                && baseAdvice.getTechnologyCode().equals(baseAdviceDTO.getTechnologyCode())) {
-                            //查询该用户下采血费记录,不存在就新增
-                            if (cxfBaseItem != null) {
-                                List<InptCostDTO> cxCostDTOList = inptCostDAO.queryCxFfCost(visitDTO.getHospCode(), visitDTO.getId(),
-                                        DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), cxfBaseItem.getId());
-                                if (ListUtils.isEmpty(cxCostDTOList)) {
-                                    //判断该医嘱目录的医技分类是否包含在参数里面
-                                    if (codeArray!=null && codeArray.length>0 && isContainsInBloodParameters) {
-                                        saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
+                        //医技分类、容器、标本都相同那么就合管
+                            if (baseAdvice.getContainerCode().equals(baseAdviceDTO.getContainerCode())
+                                    && baseAdvice.getSpecimenCode().equals(baseAdviceDTO.getSpecimenCode())
+                                    && baseAdvice.getTechnologyCode().equals(baseAdviceDTO.getTechnologyCode())) {
+                                //查询该用户下采血费记录,不存在就新增
+                                if (cxfBaseItem != null) {
+                                    List<InptCostDTO> cxCostDTOList = inptCostDAO.queryCxFfCost(visitDTO.getHospCode(), visitDTO.getId(),
+                                            DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), cxfBaseItem.getId());
+                                    if (ListUtils.isEmpty(cxCostDTOList)) {
+                                        //判断该医嘱目录的医技分类是否包含在参数里面
+                                        if (codeArray!=null && codeArray.length>0 && isContainsInBloodParameters) {
+                                            saveBaseAdviceCost(medicalAdviceDTO, visitDTO, adviceDTO, cxfBaseItem);
+                                        }
                                     }
                                 }
-                            }
 
-                            //查询该用户下容器费记录,不存在就新增
-                            if (!ListUtils.isEmpty(sysCodeDetailDTOList) && !StringUtils.isEmpty(sysCodeDetailDTOList.get(0).getRemark())) {
-                                List<InptCostDTO> rqCostDTOList = inptCostDAO.queryRqfCost(visitDTO.getHospCode(), visitDTO.getId(),
-                                        DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), sysCodeDetailDTOList.get(0).getRemark());
-                                if (ListUtils.isEmpty(rqCostDTOList)) {
-                                    saveRqfCost(medicalAdviceDTO, visitDTO, adviceDTO, sysCodeDetailDTOList);
+                                //查询该用户下容器费记录,不存在就新增
+                                if (!ListUtils.isEmpty(sysCodeDetailDTOList) && !StringUtils.isEmpty(sysCodeDetailDTOList.get(0).getRemark())) {
+                                    List<InptCostDTO> rqCostDTOList = inptCostDAO.queryRqfCost(visitDTO.getHospCode(), visitDTO.getId(),
+                                            DateUtils.format(medicalAdviceDTO.getCheckTime(), DateUtils.Y_M_D), sysCodeDetailDTOList.get(0).getRemark());
+                                    if (ListUtils.isEmpty(rqCostDTOList)) {
+                                        saveRqfCost(medicalAdviceDTO, visitDTO, adviceDTO, sysCodeDetailDTOList);
+                                    }
                                 }
+                                if (StringUtils.isEmpty(mergeId)) {
+                                    mergeId = baseAdviceDTO.getId();
+                                } else {
+                                    System.out.println("合管啦");
+                                }
+                                flag = true;
                             }
-                            mergeId = baseAdviceDTO.getId();
-                            flag = true;
-                        }
                     }
 
                     //不合管的医嘱,费用入库
@@ -1923,6 +1927,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     private InptCostDTO buildInptCostDTO(MedicalAdviceDTO medicalAdviceDTO, InptAdviceDTO adviceDTO, InptAdviceDetailDTO inptAdviceDetailDTO,
                                          int dailyTimes, Date date, InptVisitDTO visitDTO,Map<String, BaseDrugDTO> drugMap,Map<String, BaseMaterialDTO> materiaMap) {
 
+
+        //药品、材料如果是个人自备不收费
+        if ((Constants.XMLB.YP.equals(adviceDTO.getItemCode()) || Constants.XMLB.CL.equals(adviceDTO.getItemCode()))
+                && Constants.YYXZ.GRZB.equals(adviceDTO.getUseCode()) && !Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode()) ) {
+            return null;
+        }
         InptCostDTO inptCostDTO = new InptCostDTO();
         //用量单位和数量不变
         inptCostDTO.setNum(inptAdviceDetailDTO.getNum());
@@ -2524,12 +2534,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 continue;
             }
 
-            //药品、材料如果是个人自备不收费
-            if ((Constants.XMLB.YP.equals(inptAdviceDTO.getItemCode()) || Constants.XMLB.CL.equals(inptAdviceDTO.getItemCode()))
-                    && Constants.YYXZ.GRZB.equals(inptAdviceDTO.getUseCode())) {
-                continue;
-            }
-
             //计算开始日期、结束日期、判断是否预停
             Map<String,Object> map = getTime(inptAdviceDTO, type);
             //开始日期
@@ -2551,7 +2555,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //获取药品/项目信息,如果拆分比为空,默认给1
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (drugMap==null || drugMap.isEmpty()|| drugMap.get(inptAdviceDetailDTO.getItemId())==null) {
-                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),medicalAdviceDTO.getDeptId());
+                    //科室 取执行参数科室  如果为空 取当前病人的入院科室
+                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),StringUtils.isEmpty(medicalAdviceDTO.getDeptId())?visitDTO.getInDeptId():medicalAdviceDTO.getDeptId());
                     if (drugDTO.getSplitRatio() == null) {
                         drugDTO.setSplitRatio(BigDecimal.valueOf(1));
                     }
@@ -2601,6 +2606,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //组装住院费用对象
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
+                if(inptCostDTO == null ){
+                    startTime = DateUtils.dateAdd(startTime, day);
+                    continue;
+                }
                 //判断当前集合是否已经存在对应的待领记录
 //                Date finalDate = date;
 //                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())

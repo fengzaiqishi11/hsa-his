@@ -891,7 +891,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author liuliyun
      * @Date   2021/8/21 11:18
      * @return*/
-    public Boolean updateInsureUnifiedEmr(Map<String,Object>map){
+    public Boolean updateInsureUnifiedEmr(Map<String,Object> map){
         String hospCode = MapUtils.get(map,"hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
         String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
@@ -913,6 +913,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         paramMap.put("dieInfo",dieInfoList.get(0));
         paramMap.put("dscgoInfo",dscgoInfo.get(0));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_4701, paramMap);
+        String redisKey = this.getRedisKey(MapUtils.get(map,"inptVisit")) ;
+        redisUtils.del(redisKey);
         return true;
 
     }
@@ -1064,7 +1066,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("back_oprn","无");//	是否重返手术（明确定义）
             diseinfoMap.put("selv","无");//	是否择期
             diseinfoMap.put("prev_abtl_medn","无");//	是否预防使用抗菌药物
-            diseinfoMap.put("abtl_medn_days","无");//	预防使用抗菌药物天数
+            diseinfoMap.put("abtl_medn_days","0");//	预防使用抗菌药物天数
             diseinfoMap.put("oprn_oprt_code","无"); //手术操作代码
             diseinfoMap.put("oprn_oprt_name","无"); //手术操作名称
             diseinfoMap.put("oprn_lv_code","无"); //手术级别代码

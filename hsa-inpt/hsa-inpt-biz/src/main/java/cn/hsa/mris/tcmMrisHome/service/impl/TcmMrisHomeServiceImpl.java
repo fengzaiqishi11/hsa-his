@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.mris.mrisHome.bo.InptMrisInfoBO;
 import cn.hsa.module.mris.tcmMrisHome.bo.TcmMrisHomeBO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
@@ -14,6 +15,7 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.CSVWriterUtils;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -211,6 +213,21 @@ public class TcmMrisHomeServiceImpl extends HsafService implements TcmMrisHomeSe
         CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
         String path = rootPath+"/"+fileName+".csv";
         return WrapperResponse.success(path);
+    }
+
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:49
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @Override
+    public PageDTO queryOutHospPatientPageZY(Map<String, Object> selectMap) {
+        return tcmMrisHomeBO.queryOutHospPatientPageZY(MapUtils.get(selectMap,"inptVisitDTO"));
     }
 
 }

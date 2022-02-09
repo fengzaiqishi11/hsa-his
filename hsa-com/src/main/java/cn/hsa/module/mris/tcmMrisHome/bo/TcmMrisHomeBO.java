@@ -130,5 +130,16 @@ public interface TcmMrisHomeBO {
      **/
     Map<String,Object> updateTcmMrisFeesInfo(Map<String, Object> map);
 
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:46
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    PageDTO queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO);
+
 
 }

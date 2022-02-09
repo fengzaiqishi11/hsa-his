@@ -245,4 +245,34 @@ public class TcmMrisHomeController extends BaseController {
         }
     }
 
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:51
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @GetMapping(value = "/queryOutHospPatientPageZY")
+    public WrapperResponse<PageDTO> queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        inptVisitDTO.setZgDoctorId(sysUserDTO.getId()); // liuliyun 20211022 病案首页添加主管医生过滤
+        Map<String,Object> selectMap = new HashMap<>();
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                inptVisitDTO.setInDeptId(null);
+            } else {
+                inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
+        }
+        selectMap.put("hospCode",sysUserDTO.getHospCode());
+        selectMap.put("inptVisitDTO", inptVisitDTO);
+        return WrapperResponse.success(tcmMrisHomeService_consumer.queryOutHospPatientPageZY(selectMap));
+    }
+
 }

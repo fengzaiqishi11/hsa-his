@@ -879,7 +879,7 @@
         order by cost_time desc
     </select>
     <select id="queryYWLX" resultType="java.util.Map">
-        SELECT  `name`,`value` FROM insure_dict WHERE hosp_code =#{hospCode}
+        SELECT  concat(insure_reg_code, `name`) as name ,`value` FROM insure_dict WHERE hosp_code =#{hospCode}
         <if test="codesList != null">
             AND code in (
             <foreach collection="codesList" item="code" separator=",">

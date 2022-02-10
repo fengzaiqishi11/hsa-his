@@ -162,4 +162,17 @@ public interface TcmMrisHomeService {
     @GetMapping("/service/mris/mrisHome/importCSVTcmMrisInfo")
     WrapperResponse<String> importCSVTcmMrisInfo(Map map) throws Exception;
 
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:51
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @GetMapping("/service/mris/mrisHome/queryOutHospPatientPageZY")
+    PageDTO queryOutHospPatientPageZY(Map<String,Object> selectMap);
+
 }

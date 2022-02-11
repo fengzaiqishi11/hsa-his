@@ -16,5 +16,15 @@ import lombok.Data;
 @Data
 public class VersionInfoDTO extends VersionInfoDO implements Serializable {
 
+    /**
+     * 开始日期
+     */
+    private String startDate;
+
+    /**
+     * 结束日期
+     */
+    private String endDate;
+
 
 }

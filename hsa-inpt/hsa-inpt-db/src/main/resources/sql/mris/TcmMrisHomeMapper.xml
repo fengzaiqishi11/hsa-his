@@ -881,7 +881,11 @@
             bf.native_address as nativeAdress,
             code_9.remark as payWayCode,
             a.outpt_doctor_id as outptDoctorId,
-            a.outpt_doctor_name as outptDoctorName
+            a.outpt_doctor_name as outptDoctorName,
+            a.contact_name as contactName,
+            a.contact_rela_code as contactRelaCode,
+            a.contact_address as contactAddress,
+            a.contact_phone as contactPhone
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

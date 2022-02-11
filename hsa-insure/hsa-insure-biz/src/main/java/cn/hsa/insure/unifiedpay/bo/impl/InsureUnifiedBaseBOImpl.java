@@ -159,7 +159,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("resultDataMap", resultDataMap);
         return map;
     }
-    
+
 
     /**
      * @Method queryDoctorInfo
@@ -305,6 +305,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String mdtrtCertNo = insureIndividualVisitDTO.getMdtrtCertNo();
         if("06".equals(insureIndividualVisitDTO.getMdtrtCertType())){
             mdtrtCertType = "02";
+            mdtrtCertNo = insureIndividualVisitDTO.getAac002();
         }
 
         // 电子凭证
@@ -1143,7 +1144,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         // 如果有病种去查询病种限额（湖南专属）
         if (!ListUtils.isEmpty(mapList)) {
             try {
-                 map = this.queryMzSpecialLimitPriceHuNan(map);
+                map = this.queryMzSpecialLimitPriceHuNan(map);
             } catch (Exception e) {
                 System.out.println(e.getMessage().toString());
             } finally {

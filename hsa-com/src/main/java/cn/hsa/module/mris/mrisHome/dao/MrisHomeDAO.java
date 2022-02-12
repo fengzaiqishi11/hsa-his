@@ -663,4 +663,27 @@ public interface MrisHomeDAO {
      * @Return: Boolean
      **/
     int updateRowMrisDiagnose(List<MrisDiagnoseDO> mrisDiagnoseDOList);
+
+    /**
+     * @Description: 查询病案首页诊断信息，用于drg
+     * @Param:
+     * @Author: guanhongqiang
+     * @Email: hongqiang.guan@powersi.com.cn
+     * @Date 2022/2/11 11:34
+     * @Return
+     */
+	List<Map<String, Object>> getMrisDiagnosePage(Map<String, Object> map);
+
+	/**
+	 * @Description: 查询病案首页手术信息，用于DRG
+	 * @Param:
+	 * @Author: guanhongqiang
+	 * @Email: hongqiang.guan@powersi.com.cn
+	 * @Date 2022/2/11 11:35
+	 * @Return
+	 */
+    List<Map<String, Object>> getMrisOperInfoForDRG(Map<String, Object> map);
+
+
+    Map<String, Object> getMrisPatientBaseInfo(Map<String, Object> map);
 }

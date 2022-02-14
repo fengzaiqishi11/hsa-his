@@ -1051,7 +1051,7 @@
             v.age as age,
             v.age_unit_code as ageUnitCode,
             s.reality_price as settleRealityPrice,
-            s.self_price as selfPrice,
+            (ifnull(s.ap_total_price, 0) + ifnull(s.settle_take_price, 0) - ifnull(s.settle_back_price, 0)) as selfPrice,
             s.mi_price as miPrice,
             u.prac_certi_no as pracCertiNo,
             (select sum(reality_price) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id =#{settleId} and a.status_code = '0') as sumRealityPrice,

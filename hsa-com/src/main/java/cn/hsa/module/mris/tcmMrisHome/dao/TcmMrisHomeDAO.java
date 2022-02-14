@@ -307,4 +307,16 @@ public interface TcmMrisHomeDAO {
      **/
     List<InptDiagnoseDTO> queryHisDiagnoseInfo(Map<String,Object> map);
 
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询中医已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:39
+     * @Return: java.util.List<cn.hsa.module.inpt.doctor.dto.InptVisitDTO>
+     **/
+    List<InptVisitDTO> queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO);
+
 }

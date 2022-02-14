@@ -753,6 +753,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName());
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode());
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress());
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone());
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
@@ -856,6 +860,27 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 return 0;
             }
         });
+    }
+
+
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:46
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @Override
+    public PageDTO queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO) {
+        // 设置分页
+        PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
+
+        // 查询
+        List<InptVisitDTO> patientInfoList = tcmMrisHomeDAO.queryOutHospPatientPageZY(inptVisitDTO);
+        return PageDTO.of(patientInfoList);
     }
 
 }

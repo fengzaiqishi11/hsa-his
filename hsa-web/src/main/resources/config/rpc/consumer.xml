@@ -121,6 +121,10 @@
 
 
     <!-- ########################################### 系统管理服务consumer start ########################################### -->
+
+    <!-- 系统管理子系统 -> 参数管理 -->
+    <dubbo:reference id="sysVersionInfoService_consumer" interface="cn.hsa.module.sys.version.service.VersionInfoService" check="false"/>
+
     <!-- 系统管理子系统 -> 参数管理 -->
     <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
 

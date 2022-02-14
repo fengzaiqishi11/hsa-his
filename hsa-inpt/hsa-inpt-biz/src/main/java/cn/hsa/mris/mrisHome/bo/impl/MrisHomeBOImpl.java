@@ -863,6 +863,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
                     diagnoseDO.setMbiId(mbiId);
                     diagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                    diagnoseDO.setDiseaseCode(mrisDiagnoseDO.getDiseaseCode2());
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
@@ -973,6 +974,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setHospCode(mrisBaseInfoDTO.getHospCode());
                     diagnoseDO.setMbiId(mbiId);
                     diagnoseDO.setVisitId(mrisBaseInfoDTO.getVisitId());
+                    diagnoseDO.setDiseaseCode(mrisDiagnoseDO.getDiseaseCode2());
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());

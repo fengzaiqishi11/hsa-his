@@ -966,4 +966,35 @@ public class StatemnetController extends BaseController {
     }
     return patientCostLedgerService_consumer.queryOutptIncomeList(paraMap);
   }
+
+
+  /**
+   * @Menthod queryHosptialInComeList
+   * @Desrciption  住院业务收入统计报表
+   * @param paraMap
+   * @Author liuliyun
+   * @Date   2022/2/10 16:12
+   * @Return java.util.List<java.lang.Map>
+   **/
+  @GetMapping("/queryHosptialInComeList")
+  public WrapperResponse<PageDTO> queryHosptialInComeList(@RequestParam Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    return patientCostLedgerService_consumer.queryHosptialInComeList(paraMap);
+  }
+
+  /**
+   * @param paraMap
+   * @Menthod queryHosptialInComeListTitle
+   * @Desrciption 住院业务收入统计表头
+   * @Author  liuliyun
+   * @Date 2022/2/11 11:00
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+   **/
+  @PostMapping("/queryHosptialInComeListTitle")
+  public WrapperResponse<Map<String, Object>> queryHosptialInComeListTitle(@RequestBody Map<String, Object> paraMap,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO userDTO = getSession(req, res) ;
+    paraMap.put("hospCode", userDTO.getHospCode());
+    return patientCostLedgerService_consumer.queryHosptialInComeListTitle(paraMap);
+  }
 }

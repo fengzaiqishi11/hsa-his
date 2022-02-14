@@ -196,6 +196,9 @@ public interface MrisHomeService {
     @GetMapping("/service/mris/mrisHome/queryAllMrisInfo")
     Map<String,Object> queryAllMrisInfo(Map<String, Object> map);
 
+    @PutMapping("/service/mris/mrisHome/upMrisForDRG")
+    Map<String, Object> upMrisForDRG(Map<String, Object> map);
+
     /**
      * @Method: updateMrisTurnDept
      * @Description: 修改病案转科信息

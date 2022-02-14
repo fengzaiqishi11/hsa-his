@@ -753,6 +753,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName());
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode());
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress());
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone());
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);

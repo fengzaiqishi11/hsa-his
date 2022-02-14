@@ -899,17 +899,17 @@
 
             -- 出院床位
             ifnull((select before_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_id) as outBedId,
             ifnull((select before_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_name) as outBedName,
             a.out_time as outTime,
             a.out_dept_id as outDeptId,
             a.out_dept_name as outDeptName,
             timestampdiff(day,a.in_time,a.out_time) as inDays,
             -- icd_version 疾病版本（疾病分类名称）
-            a.out_disease_icd10 as diseaseIcd10,
+            ifnull((select code from base_disease where id = a.out_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.out_disease_name as  diseaseName,
             -- bl_icd10 病理诊断
             -- turn_org_name 转院机构
@@ -1064,7 +1064,7 @@
     <!--HIS数据抽取 获取床位异动信息-->
     <select id="queryHisBedChanfeInfo" parameterType="java.util.Map" resultType="cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO">
         select * from inpt_bed_change
-        where hosp_code = #{hospCode} and visit_id = #{visitId} order by crte_time asc
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and change_code ='3' order by crte_time asc
     </select>
 
     <!--HIS数据抽取 批量插入转科信息-->

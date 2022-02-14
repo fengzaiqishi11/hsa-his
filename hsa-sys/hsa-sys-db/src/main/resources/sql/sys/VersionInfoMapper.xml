@@ -19,6 +19,15 @@
     <select id="queryPage" parameterType="cn.hsa.module.sys.version.dto.VersionInfoDTO" resultType="cn.hsa.module.sys.version.dto.VersionInfoDTO">
         SELECT <include refid="Base_Column_List"/>
         FROM version_info
+        <where>
+          <if test="startDate != '' and startDate != null">
+              and DATE_FORMAT(create_time, "%Y-%m-%d") &gt;= #{startDate}
+          </if>
+          <if test="endDate != '' and endDate != null">
+              and DATE_FORMAT(create_time, "%Y-%m-%d") &lt;= #{endDate}
+          </if>
+        </where>
+        order by create_time desc
     </select>
 
     <!--新增所有列-->

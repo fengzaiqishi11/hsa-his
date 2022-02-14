@@ -30,7 +30,7 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
-import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -396,6 +396,71 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         return resultMap;
     }
+
+    // 整理病案首页数据，上传drg
+    @Override
+    public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));
+        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));
+        Map<String, Object> paramMap = new HashMap<>();
+
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "BA_DRG");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String url = "http://172.18.22.8:8080/drg_web/drgGroupThird/groupAndQuality.action";
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
+            url = sysParameterDTO.getValue();
+        } else {
+            throw new AppException("请在系统参数中配置病案上传drg时，drg地址  例：BA_DRG: url");
+        }
+
+        paramMap.put("url", url);
+        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        String result = HttpConnectUtil.doPost(paramMap);
+        dataMap.put("result", result);
+
+        return dataMap;
+    }
+
+    public Map<String, Object> getMaisPatientInfo(Map<String, Object> map) {
+        return mrisHomeDAO.getMrisPatientBaseInfo(map);
+    }
+
+    // 根据就诊id查询患者诊断信息
+    public List<Map<String, Object>> getMrisDiagnosePage(Map<String, Object> map) {
+        // 将患者诊断信息封装成DRG需要的格式的map
+        List<Map<String, Object>> strArrMap = mrisHomeDAO.getMrisDiagnosePage(map);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        int i = 1;
+        for (Map<String, Object> tempMap : strArrMap) {
+            tempMap.put("order", i);
+            resultList.add(tempMap);
+            i++;
+        }
+        return resultList;
+    }
+
+    // 根据就诊id查询手术信息,用于drg
+    public List<Map<String, Object>> getMrisOperInfoForDRG(Map<String, Object> map) {
+        // 将患者诊断信息封装成DRG需要的格式的map
+        List<Map<String, Object>> strSsxxArr = mrisHomeDAO.getMrisOperInfoForDRG(map);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        int i = 1;
+        for (Map<String, Object> tempMap : strSsxxArr) {
+            tempMap.put("order", i);
+            resultList.add(tempMap);
+            i++;
+        }
+        return resultList;
+    }
+
+
+
+
 
     /**
      * @Method: updateMrisTurnDept

@@ -1,7 +1,6 @@
 package cn.hsa.module.login;
 
 import cn.hsa.base.BaseController;
-import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -17,10 +16,8 @@ import cn.hsa.module.sys.system.service.SysSystemService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
-import cn.hutool.core.net.Ipv4Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.session.SessionRepository;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,9 +32,6 @@ import java.util.List;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
-
-import static cn.hsa.util.Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY;
-import static cn.hsa.util.IPWhiteListUtil.checkLoginIP;
 
 /**
  * @Package_name: cn.hsa.module.login

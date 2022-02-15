@@ -30,7 +30,9 @@
                         <module>hsa-interf</module>
         <!-- 消息推送平台 -->
         <module>hsa-msg-platform</module>
-<!--         定时任务子系统-->
+        <!-- 报表子系统 -->
+        <module>hsa-report</module>
+        <!--         定时任务子系统-->
 <!--                        <module>hsa-cron</module>-->
 <!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
 <!--                        <module>hsa-cron/xxl-job-executor</module>-->
@@ -424,6 +426,12 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
+            </dependency>
+            <!-- 报表设计器 -->
+            <dependency>
+                <groupId>com.bstek.ureport</groupId>
+                <artifactId>ureport2-console</artifactId>
+                <version>2.2.9</version>
             </dependency>
 
         </dependencies>

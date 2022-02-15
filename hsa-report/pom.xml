@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.report</groupId>
+    <artifactId>hsa-report</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-report</name>
+    <packaging>pom</packaging>
+
+    <parent>
+        <artifactId>hsa-his</artifactId>
+        <groupId>cn.hsa.his</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modules>
+        <module>hsa-report-biz</module>
+        <module>hsa-report-db</module>
+        <module>hsa-report-generic</module>
+        <module>hsa-report-tencent</module>
+        <module>hsa-report-ali</module>
+    </modules>
+
+    <dependencies>
+        <!--公共包依赖-->
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+
+</project>

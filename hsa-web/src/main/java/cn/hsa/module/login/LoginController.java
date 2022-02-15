@@ -17,6 +17,7 @@ import cn.hsa.module.sys.system.service.SysSystemService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
+import cn.hutool.core.net.Ipv4Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.session.SessionRepository;
@@ -119,13 +120,13 @@ public class LoginController extends BaseController {
             if (hospitalDTOto == null) {
                 throw new AppException("医院编码【" + hospCode + "】：无医院信息，请联系管理员！");
             }
-
+            // 校验访问ip
+            checkAccessIP(getIP(req,res),hospitalDTOto);
             if (!DateUtils.betweenDate(hospitalDTOto.getStartDate(), hospitalDTOto.getEndDate())) {
                 String startDate = DateUtils.format(hospitalDTOto.getStartDate(), DateUtils.Y_M_DH_M_S);
                 String endDate = DateUtils.format(hospitalDTOto.getEndDate(), DateUtils.Y_M_DH_M_S);
                 throw new AppException("医院编码【" + hospCode + "】：未在有效服务期内，服务开始时间【" + startDate + "】，服务结束时间【" + endDate + "】");
             }
-            // checkAccessIP(getIP(req,res),hospitalDTOto);
             // 校验服务有效期
             //  checkServiceTimeout(hospitalDTOto);
             // 指定医院数据源查询用户信息
@@ -217,7 +218,7 @@ public class LoginController extends BaseController {
      */
     private void checkAccessIP(String requestIp, CenterHospitalDTO hospitalDTOto) {
         String whiteIps = hospitalDTOto.getAccessIps();
-        if(null == whiteIps || "127.0.0.1".equals(requestIp)){
+        if(null == whiteIps || "".equals(requestIp.trim()) ||"127.0.0.1".equals(requestIp)){
             return;
         }
 
@@ -226,7 +227,7 @@ public class LoginController extends BaseController {
         if(!IPWhiteListUtil.checkLoginIP(requestIp,whiteIps) &&
                 !IPWhiteListUtil.checkLoginIP(requestIp,accessIpOfGlobalConfig)){
             throw new AppException("您的IP: "+requestIp+" ,不在允许访问的范围内,请联系系统管理员!");
-        };
+        }
     }
 
     /**

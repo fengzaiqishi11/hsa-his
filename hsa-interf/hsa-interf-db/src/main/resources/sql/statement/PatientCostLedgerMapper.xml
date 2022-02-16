@@ -3221,7 +3221,8 @@
         a.surplus_num,
         (a.surplus_num - a.up_surplus_num) as numSpread,
         a.expiry_date,
-        a.batch_no
+        a.batch_no,
+        a.crte_time as crteTime
         from stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'

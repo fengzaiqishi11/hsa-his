@@ -333,5 +333,18 @@ public class InsureIndividualCostServiceImpl implements InsureIndividualCostServ
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(insureVisitParam,"insureIndividualVisitDTO");
         return WrapperResponse.success(insureIndividualCostBO.delInsureCost(insureIndividualVisitDTO));
     }
+    /**
+     * @param map
+     * @Method selectFeeStartAndEndTime
+     * @Desrciption 查询中途结算的区间
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/17 14:39
+     * @Return
+     */
+    @Override
+    public WrapperResponse<InsureIndividualCostDTO> selectFeeStartAndEndTime(Map<String, Object> map) {
+        return WrapperResponse.success(insureIndividualCostBO.selectFeeStartAndEndTime(map));
+    }
 
 }

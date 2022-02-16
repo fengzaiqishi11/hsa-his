@@ -18,10 +18,7 @@ import cn.hsa.module.insure.module.service.InsureIndividualCostService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.Constants;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -71,6 +68,9 @@ public class InptBOImpl extends HsafBO implements InptBO {
 
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * @Method udapteCanleInptSettle
@@ -228,6 +228,20 @@ public class InptBOImpl extends HsafBO implements InptBO {
                    //删除本次患者取消医保费用信息
                    insureIndividualCostService_consumer.delInsureCost(insureVisitParam).getData();
                }
+            /**
+             * 如果撤销的费用包含中途结算次数 应该减redis里面保存的中途结算次数
+             * 同时 更新医保就诊表的中途结算标志
+             */
+            if(Constants.SF.S.equals(insureIndividualVisitDTO.getIsHalfSettle())){
+
+                String settleCountKey = new StringBuffer().append(hospCode).append(":").append(visitId).append(":").
+                        append(insureIndividualVisitDTO.getMedicalRegNo()).toString();
+                if(redisUtils.hasKey(settleCountKey)){
+                    redisUtils.decr(settleCountKey,1);
+                }
+                param.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+                insureIndividualVisitService.updateInsureSettleCounts(param);
+            }
 
         } else{
             String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();//医保注册编码

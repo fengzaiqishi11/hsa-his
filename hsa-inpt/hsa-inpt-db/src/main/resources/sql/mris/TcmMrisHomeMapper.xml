@@ -860,7 +860,6 @@
             a.out_dept_name as outDeptName,
             timestampdiff(day,a.in_time,a.out_time) as inDays,
             -- icd_version 疾病版本（疾病分类名称）
-            ifnull((select code from base_disease where id = a.out_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.out_disease_name as  diseaseName,
             -- bl_icd10 病理诊断
             -- turn_org_name 转院机构
@@ -880,6 +879,7 @@
             baby.weight as babyWeight,
             a.address as nowAdress,
             a.phone as phone,
+            ifnull((select code from base_disease where id = a.outpt_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.outpt_disease_name as diseaseIcd10Name,
             case when a.in_mode_code='0' then '9' else a.in_mode_code end as inWay,
             bf.native_place as nativePlace,

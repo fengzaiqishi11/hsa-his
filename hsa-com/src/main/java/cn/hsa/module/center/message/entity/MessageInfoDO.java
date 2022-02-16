@@ -1,6 +1,7 @@
 package cn.hsa.module.center.message.entity;
 
 import cn.hsa.base.PageDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -62,10 +63,12 @@ public class MessageInfoDO extends PageDO implements Serializable {
 	/**
 	 * 开始时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date startTime;
 	/**
 	 * 结束时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 	/**
 	 * 间隔时间
@@ -87,6 +90,7 @@ public class MessageInfoDO extends PageDO implements Serializable {
 	/**
      * 创建时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date crteTime;
 	/**
 	 * 创建人
@@ -100,6 +104,7 @@ public class MessageInfoDO extends PageDO implements Serializable {
 	/**
 	 * 最后执行时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date lastTime;
 
 	/**

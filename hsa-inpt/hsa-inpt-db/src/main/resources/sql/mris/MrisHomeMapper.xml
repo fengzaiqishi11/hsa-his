@@ -899,17 +899,17 @@
 
             -- 出院床位
             ifnull((select before_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_id) as outBedId,
             ifnull((select before_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_name) as outBedName,
             a.out_time as outTime,
             a.out_dept_id as outDeptId,
             a.out_dept_name as outDeptName,
             timestampdiff(day,a.in_time,a.out_time) as inDays,
             -- icd_version 疾病版本（疾病分类名称）
-            a.out_disease_icd10 as diseaseIcd10,
+            ifnull((select code from base_disease where id = a.out_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.out_disease_name as  diseaseName,
             -- bl_icd10 病理诊断
             -- turn_org_name 转院机构
@@ -1064,7 +1064,7 @@
     <!--HIS数据抽取 获取床位异动信息-->
     <select id="queryHisBedChanfeInfo" parameterType="java.util.Map" resultType="cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO">
         select * from inpt_bed_change
-        where hosp_code = #{hospCode} and visit_id = #{visitId} order by crte_time asc
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and change_code ='3' order by crte_time asc
     </select>
 
     <!--HIS数据抽取 批量插入转科信息-->
@@ -1923,4 +1923,266 @@
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}
     </update>
+
+    <select id="getMrisDiagnosePage" parameterType="java.util.Map"
+            resultType="java.util.Map">
+            SELECT
+                (case when ifnull(mid.disease_code, '0') = '0' then '2' else '1' end)as dagns_type,
+                ifnull(mid.disease_icd10_name,'') as disease_name,
+                ifnull(mid.disease_icd10, '') as icd_code,
+				'' as dagns_condi_id,
+				ifnull(mid.in_situation_code, '') as dagns_condi,
+				mid.visit_id as visit_id
+            FROM mris_inpt_diagnose mid
+            WHERE mid.hosp_code = #{hospCode}
+            AND mid.visit_id = #{visitId} order by mid.disease_code desc
+    </select>
+
+    <select id="getMrisOperInfoForDRG" parameterType="java.util.Map"
+            resultType="java.util.Map">
+        select
+            ifnull(moi.oper_disease_icd9 , '') as oprt_code,
+            ifnull(moi.oper_disease_name , '') as oprt_name,
+            ifnull(moi.oper_time , '') as oprt_date,
+            ifnull(moi.notched_code , '') as oprt_cut_id,
+            ifnull(moi.notched_name , '') as oprt_cut,
+            ifnull(moi.heal_code , '') as heal_id,
+            ifnull(moi.heal_name , '') as heal,
+            ifnull(moi.oper_doctor_id , '') as oprt_doctor_id,
+            ifnull(moi.oper_doctor_name , '') as oprt_doctor,
+            ifnull(moi.ana_code , '') as anthsa_mode_id,
+            ifnull(moi.ana_name , '') as anthsa_mode,
+            '' as is_add_port,
+            ifnull(moi.assistant_id4 , '') as first_ass_id,
+            ifnull(moi.assistant_name1 , '') as first_ass,
+            ifnull(moi.assistant_id2 , '') as second_ass_id,
+            ifnull(moi.assistant_name2 , '') as second_ass,
+            ifnull(moi.ana_id1 , '') as anthsa_doctor_id,
+            ifnull(moi.ana_name1 , '') as anthsa_doctor,
+            '' as plan_oprt_id,
+            '' as plan_oprt,
+            ifnull(moi.oper_code , '') as oprt_level_id,
+            ifnull(moi.oper_name , '') as oprt_level,
+            ifnull(moi.visit_id , '') as visit_id
+
+        from mris_oper_info moi
+        WHERE moi.hosp_code = #{hospCode}
+        AND moi.visit_id = #{visitId}
+    </select>
+
+    <select id="getMrisPatientBaseInfo" parameterType="java.util.Map"
+            resultType="java.util.Map">
+        SELECT
+        IFNULL(yljg_code,'') as hospital_code,
+        IFNULL(mbi.visit_id,'') as visit_id,
+        IFNULL(hosp_name,'') as hospital_name,
+        IFNULL(iiv.medical_reg_no,'') as serial_no,
+        '' as hosp_id,
+        '' as branch_hosp_id,
+        '' as social_curity_card,
+        IFNULL(cert_code,'') as card_type,
+        IFNULL(cert_no,'') as card_number,
+        IFNULL(in_profile,'') as patient_no,
+        IFNULL(in_cnt,1) as hsptzd_count,
+        IFNULL(icd_version,'') as icd_version,
+        IFNULL(in_no,'') as adm_no,
+        IFNULL(age,'') as age,
+        IFNULL(name,'') as name,
+        IFNULL(gender_code,'') as sex_id,
+        IFNULL(gender_name,'') as sex,
+        IFNULL(birthday,'') as birthday,
+        IFNULL(id_card,'') as id_card,
+        IFNULL(nationality_cation,'') as country_id,
+        IFNULL(nationality_name,'') as country,
+        IFNULL(nation_code,'') as nation_id,
+        IFNULL(nation_name,'') as nation,
+        IFNULL(occupation_name,'') as job,
+        IFNULL(marry_code,'') as marriage_status_id,
+        IFNULL(marry_name,'') as marriage_status,
+        IFNULL(work,'') as company_name,
+        IFNULL(work_address,'') as company_address,
+        IFNULL(work_phone,'') as work_phone,
+        IFNULL(work_post_code,'') as company_post,
+        IFNULL(native_adress,'') as resident_address,
+        IFNULL(native_post_code,'') as resident_post,
+        IFNULL(contact_name,'') as cont,
+        IFNULL(contact_rela_code,'') as cont_rel_patient,
+        IFNULL(contact_address,'') as cont_address,
+        IFNULL(contact_phone,'') as cont_tel,
+        IFNULL(health_card,'') as as_card,
+        IFNULL(in_time,'') as hsptzd_date,
+        IFNULL(in_dept_id,'') as hsptzd_unified_dept,
+        IFNULL(in_dept_name,'') as hsptzd_dept,
+        IFNULL(in_ward,'') as hsptzd_ward,
+        IFNULL(out_time,'') as hosp_disch_date,
+        IFNULL(out_dept_id,'') as disch_unified_dept,
+        IFNULL(out_dept_name,'') as disch_dept,
+        IFNULL(in_ward,'') as disch_ward,
+        IFNULL(in_days,0) as  actual_adm_days,
+        IFNULL(disease_icd10,'') as outemgc_dagns_id,
+        IFNULL(disease_icd10_name,'') as outemgc_dagns,
+        '无' as outemgc_doc_id,
+        '无' as outemgc_doc,
+        IFNULL(bl_icd10_name,'') as  pthlgy_dagns,
+        IFNULL(allergy_list,'') as allergic_drugs,
+        IFNULL(rescue_count,'') as rescue_num,
+        IFNULL(rescue_success_count,'') as rescue_succ_num,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1),'') as dept_direct_id,
+        IFNULL(director_name1,'') as dept_direct,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id2),'') as arch_id,
+        IFNULL(director_name2,'') as arch,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id),'') as att_doctor_id,
+        IFNULL(zz_doctor_name,'') as att_doctor,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id),'') as resident_id,
+        IFNULL(zg_doctor_name,'') as resident,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.jx_doctor_id),'') as refre_doctor_id,
+        IFNULL(jx_doctor_name,'') as refre_doctor,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as intern_id,
+        IFNULL(sx_doctor_name,'') as intern,
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as doctor_coder_id,
+        IFNULL(sx_doctor_name,'') as doctor_coder_name,
+        IFNULL(emr_quality_code,'') as patient_quality_id,
+        IFNULL(emr_quality_name,'') as patient_quality,
+        IFNULL( (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_doctor_id),'') as quality_doctor_id,
+        IFNULL(zk_doctor_name,'') as quality_doctor,
+       IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_nurse_id),'') as quality_nurs_id,
+        IFNULL(zk_nurse_name,'') as quality_nurs,
+        IFNULL(zk_time,'') as quality_date,
+        IFNULL(c.fy01,0) as total_fee,
+        IFNULL(c.fy02,0) as west_drug_fee,
+        IFNULL(c.fy03,0) as ch_drug_fee,
+        IFNULL(c.fy04,0) as ch_patent_fee,
+        IFNULL(c.fy05,0) as ch_herbal_fee,
+        IFNULL(c.fy06,0) as other_fee,
+        IFNULL(is_autopsy,'') as is_autopsy_id,
+        IFNULL(is_autopsy_name,'') as is_autopsy,
+        IFNULL(blood_code,'') as blood_type_id,
+        IFNULL(blood_name,'') as blood_type,
+        IFNULL(rh_code,'') as rh_id,
+        IFNULL(rh_name,'') as rh,
+        '无' as first_transf_unidept,
+        '' as first_transf_dept,
+        '' as first_transf_date,
+        '' as first_transf_time,
+        IFNULL(case_classification,'') as disease_class_id,
+        '' as disease_class,
+        IFNULL(native_place,'') as native_place,
+        IFNULL(now_adress,'') as curr_address,
+        IFNULL(phone,'') as curr_tel,
+        IFNULL(now_post_code,'') as curr_post,
+        IFNULL(occupation_code,'') as job_id,
+        IFNULL(baby_age_month,'') as newborn_age,
+        IFNULL(baby_birth_weight,'') as newborn_weight,
+        IFNULL(baby_in_weight,'') as newborn_hsptzd_weight,
+        IFNULL(in_way,'') as hsptzd_ways_id,
+        '' as hsptzd_ways,
+         '' as clinical_pathway_id,
+        IFNULL(clinical_path_case,'') as clinical_pathway,
+        IFNULL(bl_icd10,'') as pthlgy_id,
+        IFNULL(in_blh,'') as pthlgy,
+        IFNULL(is_allergy,'') as is_allergic_id,
+        case when is_allergy = '1' then '是'
+         else '否' end as is_allergic,
+         IFNULL(zr_nurse_id,'') as respon_nurs_id,
+         IFNULL(zr_nurse_name,'') as respon_nurs,
+         IFNULL(out_mode_code,'') as out_hosp_id,
+         IFNULL(out_mode_name,'') as out_hosp,
+         case when out_mode_code = '2' then IFNULL(turn_org_name,'-')
+         else '-' end as mdcl_advice_out,
+         case when out_mode_code = '3' then IFNULL(turn_org_name,'-')
+          else '-' end as commu_out,
+         IFNULL(is_inpt,'') as isagain_hsptzd_id,
+         case when is_inpt = '1' then '是'
+         else '否' end as isagain_hsptzd,
+         IFNULL(aim,'') as again_aim,
+         case when inpt_before_day = '-' then 0 else ifnull(inpt_before_day, 0) end as bef_coma_days,
+         case when inpt_before_hour = '-' then 0 else ifnull(inpt_before_hour, 0) end as bef_coma_hours,
+         case when inpt_before_minute = '-' then 0 else ifnull(inpt_before_minute, 0) end as bef_coma_mins,
+         '' as bef_coma_total,
+         case when inpt_last_day = '-' then 0 else ifnull(inpt_last_day, 0) end as aft_coma_days,
+         case when inpt_last_hour = '-' then 0 else ifnull(inpt_last_hour, 0) end as aft_coma_hours,
+         case when inpt_last_minute = '-' then 0 else ifnull(inpt_last_minute, 0) end as aft_coma_mins,
+         '' as aft_coma_total,
+         IFNULL(pay_way_code,'') as fee_mode_id,
+         IFNULL(pay_way_name,'') as fee_mode,
+         IFNULL(c.fy07,0) as self_fee,
+         IFNULL(c.zhylfwl01,0) as inte_serv_fee,
+         IFNULL(c.zhylfwl02,0) as inte_opera_fee,
+         IFNULL(c.zhylfwl03,0) as inte_nurs_fee,
+         IFNULL(c.zhylfwl04,0) as inte_other_fee,
+         IFNULL(c.zdl01,0) as dagns_patholo_fee,
+         IFNULL(c.zdl02,0) as dagns_lab_fee,
+         IFNULL(c.zdl03,0) as dagns_ima_fee,
+         IFNULL(c.zdl04,0) as dagns_cli_fee,
+         IFNULL(c.zll01,0) as trea_nooprt_fee,
+         IFNULL(c.zll02,0) as trea_cli_fee,
+         IFNULL(c.zll03,0) as trea_oprtreat_fee,
+         IFNULL(c.zll04,0) as trea_anthsa_fee,
+         IFNULL(c.zll05,0) as trea_oprt_fee,
+         IFNULL(c.kfl01,0) as rec_fee,
+         IFNULL(c.zyl01,0) as tradi_meditrea_fee,
+         IFNULL(c.xyl01,0) as western_antibac_fee,
+         IFNULL(c.xyzpl01,0) as bloo_blood_fee,
+         IFNULL(c.xyzpl02,0) as bloo_albumin_fee,
+         IFNULL(c.xyzpl03,0) as bloo_globulin_fee,
+         IFNULL(c.xyzpl04,0) as bloo_coagula_fee,
+         IFNULL(c.xyzpl05,0) as bloo_cell_fee,
+         IFNULL(c.hcl01,0) as comsu_chkdisp_fee,
+         IFNULL(c.hcl02,0) as comsu_treadisp_fee,
+         IFNULL(c.hcl03,0) as comsu_oprtdisp_fee,
+         IFNULL(c.zhylfwl05,0)  as inte_dialect_fee,
+         IFNULL(c.zhylfwl06,0) as inte_consul_fee,
+         IFNULL(c.zyl02,0) as tradi_dagns_fee,
+         IFNULL(c.zyl01,0) as tradi_trea_fee,
+         IFNULL(c.zyl03,0) as tradi_treaout_fee,
+         IFNULL(c.zyl04,0) as tradi_treabone_fee,
+         IFNULL(c.zyl05,0) as tradi_treaacup_fee,
+         IFNULL(c.zyl06,0) as tradi_treamani_fee,
+         IFNULL(c.zyl07,0) as tradi_treaanor_fee,
+         IFNULL(c.zyl08,0) as tradi_treaspec_fee,
+         IFNULL(c.zyl09,0) as tradi_othe_fee,
+         IFNULL(c.zyl10,0) as tradi_othemake_fee,
+         IFNULL(c.zyl11,0) as tradi_othefood_fee,
+         IFNULL(c.zyf01,0) as tradi_patemake_fee,
+         '' as treatype_tradi_id,
+         '' as treatype_tradi,
+         '' as outemgc_tradi_id,
+         '' as outemgc_tradi,
+         '' as implcli_tradi_id,
+         '' as implcli_tradi_path,
+         '' as useprep_tradi_id,
+         '' as useprep_tradi,
+         '' as usedev_tradi_id,
+         '' as usedev_tradi,
+         '' as usetech_tradi_id,
+         '' as usetech_tradi,
+         '' as tradi_dlctnurs_id,
+         '' as tradi_dlctnurs,
+         IFNULL(damage_reason,'') as inju_pois_exter_rsn,
+         IFNULL(disease_icd10_other,'') as inju_pois_exter_rsn_code,
+         '' as is_code,
+          IFNULL(iiv.aka130_name,'') as insur_business_type,
+          '' as insur_nonlocal_flag,
+          '' as in_state,
+          IFNULL(iiv.aka130,'') as insur_business_type_id,
+          '' as cont_addr_prov,
+          '' as cont_addr_city,
+           '' as cont_addr_county,
+           '' as cont_addr_street,
+           '' as addr_province,
+           '' as addr_city,
+           '' as addr_county,
+           '' as addr_street,
+           '' as disch_dept_id,
+           '' as hsptzd_dept_id,
+           IFNULL(iiv.bka006_name,'') as insur_type
+            FROM mris_base_info mbi
+           left join insure_individual_visit iiv
+                on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
+           LEFT JOIN mris_cost c on mbi.visit_id = c.visit_id and mbi.hosp_code = c.hosp_code
+           WHERE  mbi.hosp_code = #{hospCode}
+            AND  mbi.visit_id = #{visitId}
+            order by iiv.crte_time desc limit 1
+    </select>
+
 </mapper>

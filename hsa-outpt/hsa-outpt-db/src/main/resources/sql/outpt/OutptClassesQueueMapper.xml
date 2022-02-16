@@ -121,6 +121,11 @@
             <foreach collection="doctorIdList" open="(" separator="," close=")" item="item">
                 #{item}
             </foreach>
+
+            <if test="id !=null and id !=''">
+                AND ocq.id != #{id}
+            </if>
+
             and ocq.hosp_code = #{hospCode}
           and ocq.queue_date = date(#{queueDate})
           and oc.id = #{classId}

@@ -328,7 +328,7 @@
         b.is_half_settle,b.aac001 as psn_no,
         date_format(
         IFNULL(        DATE_ADD((select iic.fee_end_time from insure_individual_cost iic where iic.visit_id = iv.id
-        and iic.hosp_code = iv.hosp_code and iv.id=#{id}
+        and iic.hosp_code = iv.hosp_code
         and iic.insure_settle_id is not null order by crte_time desc limit 1 ),INTERVAL 1 DAY),
         iv.in_time),"%Y-%m-%d") AS startDate,
         DATE_FORMAT(now(),"%Y-%m-%d") as endDate,
@@ -632,6 +632,9 @@
         WHERE visit_id = #{visitId} and hosp_code =#{hospCode}
         <if test="insureIsTransmit !=null and insureIsTransmit != ''">
             and insure_is_transmit is not null
+        </if>
+        <if test="medicalRegNo !=null and medicalRegNo !='' ">
+            and insure_register_no = #{medicalRegNo}
         </if>
     </delete>
     <!-- 查询费用信息 -->
@@ -1204,7 +1207,7 @@
         fulamtOwnpayFlag, ownpayRea, hiLmtpric, fulamt_ownpay_amt, overlmt_selfpay, preselfpay_amt,
         inscp_scp_amt, medChrgitmType, overlmt_amt, lmt_used_flag, pric_uplmt_amt, insure_settle_id,
         insure_is_transmit, batch_no, sum_fee, det_item_fee_sumamt, feedetl_sn,
-        init_feedetl_sn, fee_start_time, fee_end_time, insure_register_no, settle_count
+        fee_start_time, fee_end_time, insure_register_no, settle_count
         from insure_individual_cost where visit_id =#{visitId} and hosp_code =#{hospCode} and insure_register_no
         =#{medicalRegNo}
         <if test="insureSettleId == '1'.toString()">
@@ -1324,5 +1327,10 @@
           and insure_register_no = #{medicalRegNo}
           and insure_settle_id is null
     </select>
-
+    <select id="selectFeeStartAndEndTime" resultType="cn.hsa.module.insure.module.dto.InsureIndividualCostDTO">
+        select fee_start_time,fee_end_time,insure_register_no from insure_individual_cost
+        where hosp_code =#{hospCode} and visit_id =#{visitId}
+          and insure_register_no = #{medicalRegNo}
+          and insure_settle_id is null order by crte_time desc limit 1
+    </select>
 </mapper>

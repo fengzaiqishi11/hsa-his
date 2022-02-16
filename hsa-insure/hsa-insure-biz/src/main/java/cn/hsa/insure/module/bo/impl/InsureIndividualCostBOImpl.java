@@ -253,9 +253,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             unifiedMap.put("code", code);
             unifiedMap.put("crteName", crteName);
             unifiedMap.put("crteId", crteId);
-            unifiedMap.put("startDate", startDate);
-            unifiedMap.put("isHalfSettle", isHalfSettle);
-            unifiedMap.put("endDate", endDate);
+            unifiedMap.put("isHalfSettle", isHalfSettle);// 是否中途结算
+            unifiedMap.put("feeStartDate", feeStartDate);
+            unifiedMap.put("feeEndDate", feeEndDate);// 是否中途结算
             unifiedMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
             unifiedMap.put("inptVisitDTO", inptVisitDTO);
             unifiedMap.put("queryBaby",MapUtils.get(insureCostParam,"queryBaby"));
@@ -812,5 +812,18 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
     @Override
     public Integer delInsureCost(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         return insureIndividualCostDAO.delInsureCost(insureIndividualVisitDTO);
+    }
+    /**
+     * @param map
+     * @Method selectFeeStartAndEndTime
+     * @Desrciption 查询中途结算的区间
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/17 14:39
+     * @Return
+     */
+    @Override
+    public InsureIndividualCostDTO selectFeeStartAndEndTime(Map<String, Object> map) {
+        return insureIndividualCostDAO.selectFeeStartAndEndTime(map);
     }
 }

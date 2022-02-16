@@ -47,6 +47,7 @@
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
         <result property="isOffical" column="is_offical" jdbcType="VARCHAR"/>
+        <result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -57,7 +58,7 @@
            (select count(0) from stro_stock e where e.item_code = '2' and e.item_id = base_material.id ) as stockFlag,
            (select name from base_product  where base_product.hosp_code = #{hospCode} and prod_code = code) as prodName,
            (select id from base_finance_classify where hosp_code=base_material.hosp_code and code=base_material.bfc_code) bfcId,
-           is_offical
+           is_offical, reimbursement_ratio
         from base_material
         where id = #{id}  and hosp_code = #{hospCode}
     </select>
@@ -232,7 +233,7 @@
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
         insert into base_material(id,hosp_code, type_code, bfc_code, code,nation_code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price, is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm,
-        last_buy_price,last_split_buy_price,avg_buy_price,avg_sell_price,
+        last_buy_price,last_split_buy_price,avg_buy_price,avg_sell_price, reimbursement_ratio,
         <if test="isValid != null and isValid != ''">
         is_valid,
         </if>
@@ -241,7 +242,7 @@
             ,is_offical
         </if>)
         values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{name}, #{spec}, #{price}, #{unitCode}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm},
-        #{lastBuyPrice},#{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},
+        #{lastBuyPrice},#{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},#{reimbursementRatio}
         <if test="isValid != null and isValid != ''">
             #{isValid},
         </if>
@@ -281,7 +282,8 @@
                 is_valid = #{isValid},
                 model = #{model},
                 other_name = #{otherName},
-                is_offical = #{isOffical}
+                is_offical = #{isOffical},
+                reimbursement_ratio = #{reimbursementRatio}
         </set>
             where id = #{id}  and hosp_code = #{hospCode}
     </update>

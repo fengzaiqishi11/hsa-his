@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.insure.item.dao.CenterInsureItemDiseaseDAO">
+
+
+    <select id="selectCenterInsureDiseaseLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO" parameterType="map">
+        select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date,
+               lose_date, remark, crte_id, crte_name, crte_time, ver, ver_name, down_load_type,num,size,record_counts from insure_disease
+        where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code =#{insureRegCode}
+        order by crte_time desc limit 1
+    </select>
+
+    <select id="selectCenterInsureItemLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select id, hosp_code, insure_reg_code, item_mark, item_code, item_name, item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible, check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time, ver, ver_name,
+               down_load_type, sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,num,size,record_counts
+        from insure_item where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code =#{insureRegCode}
+                           and ver_name is not null
+        order by crte_time desc limit 1
+    </select>
+
+    <insert id="insertCenterDisease" parameterType="java.util.List">
+        insert into insure_disease (id, hosp_code, insure_reg_code,
+        insure_illness_id, insure_illness_code,
+        `insure_illness_name`, icd10, pym,
+        wbm, take_date, lose_date, remark, crte_id,down_load_type,
+        crte_name, crte_time, ver, ver_name,size,num,record_counts) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.insureRegCode}, #{item.insureIllnessId}, #{item.insureIllnessCode},
+            #{item.insureIllnessName},#{item.icd10},
+            #{item.pym},#{item.wbm},#{item.takeDate},#{item.loseDate},
+            #{item.remark},
+            #{item.crteId},
+            #{item.downLoadType},
+            #{item.crteName},
+            #{item.crteTime},
+            #{item.ver},
+            #{item.verName},#{item.size},#{item.num},#{item.recordCounts}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="insertCenterInsureItem" parameterType="java.util.List">
+        insert into insure_item(id, hosp_code, insure_reg_code, item_mark,
+        item_code, item_name, item_type, item_dosage, item_spec,
+        item_price, item_unit_code, prod, deductible, check_price, directory,
+        take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+        ver, ver_name, down_load_type,
+        sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,drugadm_strdcode,
+        num,size,record_counts) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.insureRegCode}, #{item.itemMark}, #{item.itemCode},
+            #{item.itemName},#{item.itemType},#{item.itemDosage},
+            #{item.itemSpec},
+            #{item.itemPrice},
+            #{item.itemUnitCode},
+            #{item.prod},
+            #{item.deductible},#{item.checkPrice},#{item.directory},#{item.takeDate},#{item.loseDate},
+            #{item.pym},#{item.wbm},#{item.isValid},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime},#{item.ver},#{item.verName},#{item.downLoadType},
+            #{item.spDrugFlag},#{item.spLmtpricDrugFlag},#{item.lmtUsedFlag},#{item.hospItemName},#{item.hospItemCode},#{item.drugadmStrdcode},
+            #{item.num},#{item.size},#{item.recordCounts})
+        </foreach>
+
+    </insert>
+
+
+    <select id="queryCenterInsureItemPage" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
+        select id, hosp_code, insure_reg_code, item_mark, item_code, item_name,
+        item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible,
+        check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id,
+        crte_name, crte_time, ver, ver_name, down_load_type
+        sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code from insure_item
+        where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( item_code like concat('%',#{keyword},'%')
+            or item_name like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="insureRegCode !=null and insureRegCode != ''">
+            and insure_reg_code =#{insureRegCode}
+        </if>
+        <if test="downLoadType !=null and downLoadType != ''">
+            and down_load_type =#{downLoadType}
+        </if>
+        <if test="handItemList != null and handItemList.size() > 0">
+            and down_load_type in
+            <foreach collection="handItemList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="queryCenterInsureDiseasePage" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO">
+        select id, hosp_code, insure_reg_code, insure_illness_id,
+        insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date, lose_date,
+        remark, crte_id, crte_name, crte_time, ver, ver_name,
+        down_load_type from insure_disease where hosp_code =#{hospCode}
+        <if test="keyword != null and keyword != ''">
+            and ( insure_illness_name like concat('%',#{keyword},'%')
+            or insure_illness_code like concat('%',#{keyword},'%')
+            or pym like concat('%',#{keyword},'%')
+            or wbm like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="insureRegCode !=null and insureRegCode != ''">
+            and insure_reg_code =#{insureRegCode}
+        </if>
+        <if test="downLoadType !=null and downLoadType != ''">
+            and down_load_type =#{downLoadType}
+        </if>
+    </select>
+</mapper>

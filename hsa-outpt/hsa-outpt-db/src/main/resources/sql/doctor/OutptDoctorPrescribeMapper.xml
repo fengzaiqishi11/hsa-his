@@ -80,6 +80,7 @@
             <result property="type" column="type" jdbcType="VARCHAR"></result>
             <result property="phCode" column="phCode" jdbcType="VARCHAR"></result>
             <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"></result>
+            <result property="deptName" column="sqDeptName" jdbcType="VARCHAR"></result>
             <result property="skinGoodName" column="skinGoodName" jdbcType="VARCHAR"></result>
             <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"></result>
             <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"></result>
@@ -560,7 +561,7 @@
                                      when b.item_code = '4' and h.type_code = '3' then '4' when b.item_code = '4' and h.type_code = '12' then '5' when  b.item_code = '4' then '6' end type,
                case when b.item_code = '1' and f.ph_code = '5' then '1' when b.item_code = '1' and f.ph_code = '1' or b.item_code = '1' and (f.ph_code = '2' or f.ph_code = '3') then '4'
                     when b.item_code = '1' and f.ph_code = '6' then '5' when b.item_code = '1' and f.ph_code = '4' then '6' else '1'
-                   end phCode, d.name execDeptName, e.good_name skinGoodName,
+                   end phCode, d.name execDeptName, e.good_name skinGoodName, a.dept_name as sqDeptName,
                case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
                case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
                case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,

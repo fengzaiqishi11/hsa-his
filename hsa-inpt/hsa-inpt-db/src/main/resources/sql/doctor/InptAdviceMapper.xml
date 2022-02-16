@@ -106,6 +106,8 @@
         <result property="technologyCode" column="technology_code" jdbcType="VARCHAR"/>
         <result property="containerCode" column="container_code" jdbcType="VARCHAR"/>
         <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
+        <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
+        <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -308,6 +310,8 @@
         case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then d.split_unit_code else a.total_num_unit_code end splitUnitCode,
         case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode,
         a.is_submit,
+        (select name from base_dept where hosp_code = #{hospCode} and id = a.dept_id) as deptName,
+        (select name from base_dept where hosp_code = #{hospCode} and id = a.exec_dept_id) as execDeptName,
         if(a.item_code = '4', b.is_stop_same,null  ) isStopSame,if(a.item_code = '4', b.is_stop_same_not,null  ) isStopSameNot,
         if(a.item_code = '4', b.is_stop_myself,null  ) isStopMyself, a.source_ia_id source_ia_id, a.advice_prefix, a.advice_suffix, a.collect_blood_time,
         case when e.id is null then '0' else '1' end isWz, a.cancel_id, a.cancel_name, a.cancel_time, a.skin_durg_id,

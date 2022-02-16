@@ -81,6 +81,7 @@ public class OutptPrescribeDetailsDTO extends OutptPrescribeDetailsDO {
     private String bfcName;
     /** 执行部门名称 **/
     private String execDeptName;
+    private String deptName;
     /** 皮试药品 **/
     private String skinGoodName;
     /** 操作类型 **/

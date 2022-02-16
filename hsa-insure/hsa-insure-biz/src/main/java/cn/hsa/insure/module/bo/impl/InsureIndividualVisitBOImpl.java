@@ -335,7 +335,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
              */
             if (!"qrcode".equals(info.get("bka895"))) {  // 不是电子凭证才执行
                 InsureIndividualVisitDTO responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
-                insureIndividualVisitDAO.updateByPrimaryKeySelective(responseData);
+                insureIndividualVisitDAO.updateInsureMedicalRegNo(responseData);
             }
             Map<String, Object> outptVisitMap = new HashMap<>();
             outptVisitDTO = new OutptVisitDTO();
@@ -511,5 +511,33 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     @Override
     public InsureIndividualVisitDTO selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam) {
         return insureIndividualVisitDAO.selectMaxAndMinRegisterTime(insureUnifiedPayParam);
+    }
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method selectHalfVisit
+     * @Desrciption 查询出中途结算次数
+     * @Param
+     * @Author fuhui
+     * @Date 2022/2/15 10:15
+     * @Return
+     */
+    @Override
+    public Integer selectHalfVisit(InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        return insureIndividualVisitDAO.selectHalfVisit(insureIndividualVisitDTO);
+    }
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method updateInsureSettleCounts
+     * @Desrciption 更新中途结算医保标志和次数
+     * @Param
+     * @Author fuhui
+     * @Date 2022/2/16 8:55
+     * @Return
+     */
+    @Override
+    public void updateInsureSettleCounts(InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        insureIndividualVisitDAO.updateInsureSettleCounts(insureIndividualVisitDTO);
     }
 }

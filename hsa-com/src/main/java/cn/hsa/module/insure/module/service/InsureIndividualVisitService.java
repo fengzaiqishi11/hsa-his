@@ -143,8 +143,8 @@ public interface InsureIndividualVisitService {
     WrapperResponse<List<InsureIndividualVisitDTO>> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam);
     
     /**
-     * @Method 
-     * @Desrciption  
+     * @Method selectMaxAndMinRegisterTime
+     * @Desrciption
      * @Param 
      * 
      * @Author fuhui
@@ -152,4 +152,26 @@ public interface InsureIndividualVisitService {
      * @Return 
     **/
     WrapperResponse<InsureIndividualVisitDTO> selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
+
+    /**
+     * @Method selectHalfVisit
+     * @Desrciption  查询出中途结算次数
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/2/15 10:15
+     * @Return
+    **/
+    WrapperResponse<Integer> selectHalfVisit(Map<String,Object> map);
+    
+    /**
+     * @Method updateInsureSettleCounts
+     * @Desrciption  更新中途结算医保标志和次数
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2022/2/16 8:55
+     * @Return 
+    **/
+    void updateInsureSettleCounts(Map<String, Object> param);
 }

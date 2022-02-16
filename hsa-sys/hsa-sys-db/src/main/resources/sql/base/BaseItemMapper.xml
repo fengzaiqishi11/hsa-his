@@ -40,6 +40,7 @@
 		<result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
 		<result property="itemName" column="itemName" jdbcType="VARCHAR"/>
 		<result property="otherName" column="other_name" jdbcType="VARCHAR"/>
+		<result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<!--查询单个-->
@@ -52,7 +53,7 @@
 		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
 		a.crte_name, a.crte_time,a.other_name,
 		(select count(0) from base_advice_detail d where d.type_code = '3' and d.item_code = a.code) as adviceFlag,
-		b.name as outDeptName,
+		b.name as outDeptName, a.reimbursement_ratio,
 		c.name as inDeptName
 		from base_item a
 		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
@@ -318,8 +319,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_item(id, hosp_code, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name)
-        values (#{id}, #{hospCode}, #{nationCode}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm},'1', #{crteId}, #{crteName}, #{crteTime},#{otherName})
+        insert into base_item(id, hosp_code, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name, reimbursement_ratio)
+        values (#{id}, #{hospCode}, #{nationCode}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm},'1', #{crteId}, #{crteName}, #{crteTime},#{otherName}, #{reimbursementRatio})
     </insert>
 	<insert id="insertBatch">
         insert into base_item
@@ -386,6 +387,7 @@
 			name_wbm = #{nameWbm},
 			abbr_pym = #{abbrPym},
 			abbr_wbm = #{abbrWbm},
+			reimbursement_ratio = #{reimbursementRatio},
 			other_name=#{otherName}
 		</set>
 		where id = #{id} and hosp_code = #{hospCode}

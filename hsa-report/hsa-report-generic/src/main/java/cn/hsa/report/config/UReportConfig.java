@@ -1,16 +1,12 @@
 package cn.hsa.report.config;
 
 import com.bstek.ureport.console.UReportServlet;
-import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
-import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.annotation.Order;
 
 /**
  * @Package_ame: cn.hsa.report.config
@@ -22,7 +18,8 @@ import org.springframework.core.annotation.Order;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 @Configuration
-@ImportResource("classpath:config/ureport/ureport.xml")
+@ImportResource("classpath:ureport-console-context.xml")
+@PropertySource(value = "classpath:config/ureport/ureport.properties", ignoreResourceNotFound = true)
 public class UReportConfig {
 
     @Bean

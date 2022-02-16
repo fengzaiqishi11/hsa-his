@@ -80,6 +80,7 @@
             <result property="type" column="type" jdbcType="VARCHAR"></result>
             <result property="phCode" column="phCode" jdbcType="VARCHAR"></result>
             <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"></result>
+            <result property="deptName" column="sqDeptName" jdbcType="VARCHAR"></result>
             <result property="skinGoodName" column="skinGoodName" jdbcType="VARCHAR"></result>
             <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"></result>
             <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"></result>
@@ -560,7 +561,7 @@
                                      when b.item_code = '4' and h.type_code = '3' then '4' when b.item_code = '4' and h.type_code = '12' then '5' when  b.item_code = '4' then '6' end type,
                case when b.item_code = '1' and f.ph_code = '5' then '1' when b.item_code = '1' and f.ph_code = '1' or b.item_code = '1' and (f.ph_code = '2' or f.ph_code = '3') then '4'
                     when b.item_code = '1' and f.ph_code = '6' then '5' when b.item_code = '1' and f.ph_code = '4' then '6' else '1'
-                   end phCode, d.name execDeptName, e.good_name skinGoodName,
+                   end phCode, d.name execDeptName, e.good_name skinGoodName, a.dept_name as sqDeptName,
                case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
                case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
                case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
@@ -851,7 +852,7 @@
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.reimbursement_ratio
         from base_drug a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -909,7 +910,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-        a.pym usual_pym ,'' as technology_code,a.nation_code
+        a.pym usual_pym ,'' as technology_code,a.nation_code, a.reimbursement_ratio
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -951,7 +952,7 @@
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
         '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code, '' as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code

@@ -162,4 +162,7 @@ public class BaseItemDO extends PageDO implements Serializable  {
      * 创建时间
      */
     private Date crteTime;
+
+    // 报销比例
+    private String reimbursementRatio;
 }

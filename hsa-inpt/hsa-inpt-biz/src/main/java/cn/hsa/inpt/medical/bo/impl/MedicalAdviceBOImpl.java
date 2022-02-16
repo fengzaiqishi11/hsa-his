@@ -904,7 +904,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //是否合管
         medicalApplyDTO.setIsMerge(Constants.SF.F);
         //合管主单ID（自身ID）
-        medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+        medicalApplyDTO.setMergeId(mergeId);
         if (flag && !StringUtils.isEmpty(mergeId)) {
             //根据医嘱ID获取医嘱明细ID
             List<InptAdviceDetailDTO> mergeAdviceDetailList = inptAdviceDetailDAO.getAdviceDetailByAdviceId(adviceDTO.getHospCode(), mergeId);

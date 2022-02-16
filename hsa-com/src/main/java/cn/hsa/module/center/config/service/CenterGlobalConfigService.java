@@ -21,7 +21,11 @@ public interface CenterGlobalConfigService {
   @GetMapping("/service/center/config/queryCenterGlobalConfig")
   WrapperResponse<PageDTO> queryCenterGlobalConfig(CenterGlobalConfigDTO centerConfigDTO);
 
-
+  /**
+   *  获取中心端配置信息并存入redis
+   * @param centerConfigDTO 参数
+   * @return
+   */
   Map<String,Object>  refreshGlobalConfig(CenterGlobalConfigDTO centerConfigDTO);
   /**
    *  保存中心端配置信息

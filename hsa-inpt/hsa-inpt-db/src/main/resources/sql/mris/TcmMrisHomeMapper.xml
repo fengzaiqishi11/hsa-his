@@ -833,29 +833,33 @@
            a.marry_code as marryCode,
            code_5.name as marryName,
            a.in_time as inTime,
-           a.in_dept_id as inDeptId,
-           a.in_dept_name as inDeptName,
+           -- 入院科室
+           ifnull((select after_dept_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.in_dept_id) as inDeptId,
+           ifnull((select after_dept_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.in_dept_name) as inDeptName,
            -- 入院床位
-            ifnull((select before_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            ifnull((select after_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
             order BY a.crte_time ASC limit 1),a.bed_id) as inBedId,
-            ifnull((select before_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            ifnull((select after_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
             order BY a.crte_time ASC limit 1),a.bed_name) as inBedName,
 
             -- 出院床位
             ifnull((select before_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_id) as outBedId,
             ifnull((select before_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
-            where a.visit_id = #{visitId}
+            where a.visit_id = #{visitId} and change_code ='5'
             order BY a.crte_time DESC limit 1),a.bed_name) as outBedName,
             a.out_time as outTime,
             a.out_dept_id as outDeptId,
             a.out_dept_name as outDeptName,
             timestampdiff(day,a.in_time,a.out_time) as inDays,
             -- icd_version 疾病版本（疾病分类名称）
-            a.out_disease_icd10 as diseaseIcd10,
             a.out_disease_name as  diseaseName,
             -- bl_icd10 病理诊断
             -- turn_org_name 转院机构
@@ -875,13 +879,18 @@
             baby.weight as babyWeight,
             a.address as nowAdress,
             a.phone as phone,
+            ifnull((select code from base_disease where id = a.outpt_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.outpt_disease_name as diseaseIcd10Name,
             case when a.in_mode_code='0' then '9' else a.in_mode_code end as inWay,
             bf.native_place as nativePlace,
             bf.native_address as nativeAdress,
             code_9.remark as payWayCode,
             a.outpt_doctor_id as outptDoctorId,
-            a.outpt_doctor_name as outptDoctorName
+            a.outpt_doctor_name as outptDoctorName,
+            a.contact_name as contactName,
+            a.contact_rela_code as contactRelaCode,
+            a.contact_address as contactAddress,
+            a.contact_phone as contactPhone
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

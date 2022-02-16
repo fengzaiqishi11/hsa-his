@@ -10,6 +10,7 @@
     <version>1.0.0</version>
     <name>hsa-his</name>
 
+
     <modules>
         <!-- 公共模块 -->
         <module>hsa-com</module>
@@ -27,8 +28,8 @@
         <module>hsa-inpt</module>
         <!--  医保管理子系统 -->
         <module>hsa-insure</module>
-                        <module>hsa-interf</module>
-        <!-- 消息推送平台 -->
+        <module>hsa-interf</module>
+<!--        &lt;!&ndash; 消息推送平台 &ndash;&gt;-->
         <module>hsa-msg-platform</module>
 <!--         定时任务子系统-->
 <!--                        <module>hsa-cron</module>-->
@@ -385,6 +386,12 @@
                 <groupId>io.swagger</groupId>
                 <artifactId>swagger-annotations</artifactId>
                 <version>1.5.21</version>
+            </dependency>
+            <!-- 日志收集 -->
+            <dependency>
+                <groupId>de.siegmar</groupId>
+                <artifactId>logback-gelf</artifactId>
+                <version>3.0.0</version>
             </dependency>
             <!--注解依赖-->
             <dependency>

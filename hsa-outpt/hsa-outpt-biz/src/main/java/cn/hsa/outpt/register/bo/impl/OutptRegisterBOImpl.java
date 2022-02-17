@@ -340,7 +340,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptProfileFileDTO.setPatientCode(outptVisitDTO.getPatientCode());
             outptProfileFileDTO.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
             outptProfileFileDTO.setContactAddress(outptVisitDTO.getContactAddress());
-
+            outptProfileFileDTO.setContactName(outptVisitDTO.getContactName());
+            outptProfileFileDTO.setOccupationCode(outptVisitDTO.getOccupationCode());
             /**
              * 档案不走中心端
              * @Date: 2021.12.02

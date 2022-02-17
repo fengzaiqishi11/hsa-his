@@ -956,7 +956,9 @@
             omr.start_date as startDate,
             ifnull( a.is_food_borne, 0 ) AS isFoodBorne,
             b.reality_price as totalPrice,
-            a.now_address as nowAddress
+            a.now_address as nowAddress,
+            a.occupation_code as occupationCode,
+            a.contact_name as contactName
         FROM
             outpt_visit a
         JOIN (

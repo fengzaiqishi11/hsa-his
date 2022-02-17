@@ -4,6 +4,7 @@ import cn.hsa.module.report.config.entity.ReportConfigurationDO;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @ClassName ReportConfigurationDTO
@@ -14,5 +15,7 @@ import java.io.Serializable;
  **/
 @Data
 public class ReportConfigurationDTO extends ReportConfigurationDO implements Serializable {
+
+    private List<String> ids;
 
 }

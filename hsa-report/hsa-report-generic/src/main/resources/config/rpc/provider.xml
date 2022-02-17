@@ -5,4 +5,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
+    <!-- 报表信息子系统 -> 配置信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.report.config.service.ReportConfigurationService" ref="reportConfigurationService_provider"/>
+
 </beans>

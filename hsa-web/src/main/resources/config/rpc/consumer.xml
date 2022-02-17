@@ -516,5 +516,8 @@
     <!-- 国标基础药品搜索服务 -->
     <dubbo:reference id="searchableNationStandardDrugService_consumer" interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" check="false"/>
 
+    <!-- 报表管理子系统 -> 模板配置 -->
+    <dubbo:reference id="reportConfigurationService_consumer" interface="cn.hsa.module.report.config.service.ReportConfigurationService" check="false"/>
+
 </beans>
 

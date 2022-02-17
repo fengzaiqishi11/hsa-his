@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.report.record.dao.ReportFileRecordDAO">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.hsa.module.report.record.dto.ReportFileRecordDTO">
+        <id column="id" property="id"/>
+        <result column="temp_code" property="tempCode"/>
+        <result column="file_address" property="fileAddress"/>
+        <result column="crter_id" property="crterId"/>
+        <result column="crter_name" property="crterName"/>
+        <result column="crte_time" property="crteTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, temp_code, file_address, crter_id, crter_name, crte_time
+    </sql>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true"
+            parameterType="cn.hsa.module.report.record.dto.ReportFileRecordDTO">
+        insert into report_file_record(id, temp_code, file_address, crter_id, crter_name, crte_time)
+        values (#{id}, #{tempCode}, #{fileAddress}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+</mapper>

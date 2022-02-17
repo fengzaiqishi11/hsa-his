@@ -22,6 +22,10 @@ public class ReportConfigurationDO extends PageDO implements Serializable {
      */
     private String id;
     /**
+     * 医院编码
+     */
+    private String hospCode;
+    /**
      * 模板编码
      */
     private String tempCode;
@@ -30,17 +34,13 @@ public class ReportConfigurationDO extends PageDO implements Serializable {
      */
     private String tempName;
     /**
-     * 报表模板文件内容
-     */
-    private byte[] tempContent;
-    /**
      * 返回数据类型 1-html 2-文件地址 3-文件流
      */
     private String returnDataType;
     /**
-     * 文件格式 1-html 2-pdf 3-txt 4-jpg
+     * 自定义配置
      */
-    private String fileFormat;
+    private String customConfig;
     /**
      * 更新时间
      */

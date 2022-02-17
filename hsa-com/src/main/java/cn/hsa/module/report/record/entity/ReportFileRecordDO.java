@@ -22,6 +22,10 @@ public class ReportFileRecordDO extends PageDO implements Serializable {
      */
     private String id;
     /**
+     * 医院编码
+     */
+    private String hospCode;
+    /**
      * 模板编码
      */
     private String tempCode;

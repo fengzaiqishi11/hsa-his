@@ -526,8 +526,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String visitId = MapUtils.get(unifiedPayMap,"visitId");
         String isHalfSettle = MapUtils.get(unifiedPayMap,"isHalfSettle");
         String insureRegisterNo = MapUtils.get(unifiedPayMap,"insureRegisterNo");
-        Date startDate = MapUtils.get(unifiedPayMap,"startDate");
-        Date endDate = MapUtils.get(unifiedPayMap,"endDate");
+        String startDate = MapUtils.get(unifiedPayMap,"feeStartDate");
+        String endDate = MapUtils.get(unifiedPayMap,"feeEndDate");
         String crteName = MapUtils.get(unifiedPayMap,"crteName");
         String crteId  = MapUtils.get(unifiedPayMap,"crteId");
         InsureIndividualCostDTO insureIndividualCostDTO = null;
@@ -539,8 +539,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(hospCode);
         inptVisitDTO.setId(visitId);
-        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(unifiedPayMap,"insureIndividualVisitDTO");
-        Integer settleCount = insureIndividualCostDAO.queryLasterCounter(insureIndividualVisitDTO);
+        Integer settleCount = 0; // 保存唯一患者的中途结算次数
+        if("1".equals(isHalfSettle)){
+            String settleCountKey = new StringBuffer().append(hospCode).append(":").append(visitId).append(":").
+                    append(insureRegisterNo).toString();
+            long incr = redisUtils.incr(settleCountKey, 1);
+            settleCount = (int) incr;
+        }
         String orderNo = insureIndividualCostDAO.queryLastestOrderNo(inptVisitDTO);
         if (StringUtils.isEmpty(orderNo)) {
             count = 0;
@@ -602,16 +607,20 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         insureIndividualCostDTO.setChrgItemLv(MapUtils.get(item,"chrgitm_lv"));
                         insureIndividualCostDTO.setSumFee(sumBigDecimal); // 本次上传到医保的费用总金额
                         insureIndividualCostDTO.setIsHalfSettle(isHalfSettle); // 是否中途结算
-                        insureIndividualCostDTO.setFeeStartTime(startDate);
-                        insureIndividualCostDTO.setFeeEndTime(endDate);
-                        if("0".equals(isHalfSettle)){
-                            insureIndividualCostDTO.setSettleCount(0); // 中途结算次数
+                        if(StringUtils.isNotEmpty(startDate)){
+                            insureIndividualCostDTO.setFeeStartTime(DateUtils.parse(startDate,DateUtils.Y_M_D));
                         }else{
-                            if(settleCount == null){
-                                insureIndividualCostDTO.setSettleCount(1); // 中途结算次数
-                            }else{
-                                insureIndividualCostDTO.setSettleCount(++settleCount); // 中途结算次数
-                            }
+                            insureIndividualCostDTO.setFeeStartTime(null);
+                        }
+                        if(StringUtils.isNotEmpty(endDate)){
+                            insureIndividualCostDTO.setFeeEndTime(DateUtils.parse(endDate,DateUtils.Y_M_D));
+                        }else {
+                            insureIndividualCostDTO.setFeeEndTime(null);
+                        }
+                        if(settleCount<=0){
+                            insureIndividualCostDTO.setSettleCount(1);
+                        }else{
+                            insureIndividualCostDTO.setSettleCount(settleCount);
                         }
                         individualCostDTOList.add(insureIndividualCostDTO);
                     }
@@ -620,6 +629,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         }
         if(!ListUtils.isEmpty(individualCostDTOList)){
             insureIndividualCostDAO.batchInsertCost(individualCostDTOList);
+        }
+        // 如果在费用传输的时候 选择了中途结算，则更新医保就诊表里面的结算次数,同时更新是否结算标志
+        if("1".equals(isHalfSettle)){
+            inptVisitDTO.setMedicalRegNo(insureRegisterNo);
+            inptVisitDTO.setIsHalfSettle(isHalfSettle);
+            inptVisitDTO.setSettleCount(settleCount);
+            insureIndividualVisitDAO.updateInsureInidivdual(inptVisitDTO);
         }
     }
 
@@ -1468,12 +1484,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("main_cond_dscr", dscg_maindiag_name);//	主要病情描述
         String diseCode = inptVisitDTO.getInsureIndividualBasicDTO().getBka006();
         String diseCodeName = inptVisitDTO.getInsureIndividualBasicDTO().getBka006Name();
-        if(StringUtils.isEmpty(diseCode)){
+        if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
             mdtrtinfoMap.put("dise_code", "");//	病种编码
         }else{
             mdtrtinfoMap.put("dise_code", diseCode);//	病种编码
         }
-        if(StringUtils.isEmpty(diseCodeName)){
+        if(StringUtils.isEmpty(diseCodeName) || "null".equals(diseCodeName)){
             mdtrtinfoMap.put("dise_name", "");//	病种名称
         }else{
             mdtrtinfoMap.put("dise_name", diseCodeName);//	病种名称
@@ -1717,9 +1733,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         commonHandlerDisease(inptDiagnoseDTOList,data,"2402");
         for(int i=0;i<inptDiagnoseDTOList.size();i++) {
             if("1".equals(insureIndividualVisitDTO.getIsHalfSettle())){
-                if("101".equals(inptDiagnoseDTOList.get(i).getTypeCode()) ||
-                        "102".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
-                        "201".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
+                if("204".equals(inptDiagnoseDTOList.get(i).getTypeCode()) ||
                         "202".equals(inptDiagnoseDTOList.get(i).getTypeCode())||
                         "203".equals(inptDiagnoseDTOList.get(i).getTypeCode())){
                     diseinfoMap = new HashMap<>();

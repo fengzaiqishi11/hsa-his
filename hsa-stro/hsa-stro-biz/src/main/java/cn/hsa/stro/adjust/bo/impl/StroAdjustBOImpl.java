@@ -281,20 +281,26 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
             });
             // 校验药品是否存在同级调拨、退供应商、平级出库等未审核完成的情况
             judgeAdjustDruag(stroStockDetailDTOS);
+            // 调价是否过滤掉科室库存，注意我们虽然没有科室库存的概念，但是出库到科室确认之后，库存表中的biz_id就是科室的
+            Map<String, String> sfdeptFilterMap = this.getParameterValue(stroAdjustDTO.getHospCode(),
+                    new String[]{"SF_DEPTFILTER"});
+            String sfdeptFilter = MapUtils.get(sfdeptFilterMap, "SF_DEPTFILTER", "0");
+
             Map<String,Object> jxcMap = new HashMap<>();
             jxcMap.put("type", Constants.CRFS.TJ);
             jxcMap.put("sfBatchNo", true);
             jxcMap.put("hospCode",stroAdjustDTO.getHospCode());
             jxcMap.put("stroStockDetailDTOList",stroStockDetailDTOS);
+            jxcMap.put("sfdeptFilter",sfdeptFilter);
             stroStockBO.saveStock(jxcMap);
             //更新库存
-            stroAdjustDetailDao.adjustUpdateStock(stroAdjustDetailDTOs);
-            stroAdjustDetailDao.adjustUpdateStockDetail(stroAdjustDetailDTOs);
+            stroAdjustDetailDao.adjustUpdateStock(stroAdjustDetailDTOs,sfdeptFilter);
+            stroAdjustDetailDao.adjustUpdateStockDetail(stroAdjustDetailDTOs,sfdeptFilter);
 
             //审核
             stroAdjustDao.updateStroAdjustDtoByIds(stroAdjustDTO);
             // 回写调价单数据
-            updateAdjustDetail(stroAdjustDTOS);
+            updateAdjustDetail(stroAdjustDTOS,sfdeptFilter);
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
             List<StroAdjustDetailDTO> drugList = new ArrayList<>();
             List<StroAdjustDetailDTO> materialList = new ArrayList<>();
@@ -434,7 +440,7 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
     * @Date   2021/5/18 11:39
     * @Return void
     **/
-    public void updateAdjustDetail(List<StroAdjustDTO> stroAdjustDTOS) {
+    public void updateAdjustDetail(List<StroAdjustDTO> stroAdjustDTOS,String sfdeptFilter) {
       for (StroAdjustDTO stroAdjustDTO: stroAdjustDTOS) {
         List ids = new ArrayList();
         ids.add(stroAdjustDTO.getId());
@@ -456,7 +462,9 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         // 调价单调价后总金额
         BigDecimal sumAfterPrice = BigDecimal.valueOf(0);
         for (StroAdjustDetailDTO stroAdjustDetailDTO :stroAdjustDetailDTOs) {
-          List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockSumNum(stroAdjustDetailDTO);
+            stroAdjustDetailDTO.setSfdeptFilter(sfdeptFilter);
+
+            List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockSumNum(stroAdjustDetailDTO);
           if(!ListUtils.isEmpty(stroStockDTOS)) {
             stroAdjustDetailDTO.setNum(stroStockDTOS.get(0).getNum());
             stroAdjustDetailDTO.setSplitNum(stroStockDTOS.get(0).getSplitNum());

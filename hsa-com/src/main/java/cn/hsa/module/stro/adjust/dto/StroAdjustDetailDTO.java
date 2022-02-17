@@ -44,4 +44,6 @@ public class StroAdjustDetailDTO extends StroAdjustDetailDO implements Serializa
     private BigDecimal beforePriceAll;
     // 材料型号
     private String model;
+    // 是否过滤科室库存
+    private String sfdeptFilter;
 }

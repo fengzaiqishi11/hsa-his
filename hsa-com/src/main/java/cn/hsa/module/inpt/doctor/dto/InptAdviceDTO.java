@@ -13,9 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  *@Package_name: cn.hsa.module.inpt.dto
@@ -109,6 +107,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String medicalRegNo ; // 医保就诊号
     private String deptCode;  // 开嘱科室编码
     private String deptName; // 开嘱科室名称
+    private String execDeptName; // 执行科室名称
     private String creterCode; // 开嘱人工号
     private String checkerCode; // 医嘱核对人工号
     private String adviceExecDeptName; // 医嘱执行科室名称

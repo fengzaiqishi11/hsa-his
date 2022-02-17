@@ -243,4 +243,16 @@ public interface InsureIndividualCostBO {
      * @Return
      */
     Integer delInsureCost(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+
+    /**
+     * @param map
+     * @Method selectFeeStartAndEndTime
+     * @Desrciption 查询中途结算的区间
+     * @Param
+     * @Author fuhui
+     * @Date 2022/1/17 14:39
+     * @Return
+     */
+    InsureIndividualCostDTO selectFeeStartAndEndTime(Map<String, Object> map);
 }

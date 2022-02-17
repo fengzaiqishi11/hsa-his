@@ -166,7 +166,7 @@ public class CenterHospitalDO extends PageDO implements Serializable {
     private String encryptEndDate;
 
     /**
-     *  访问ip白名单,未配置的话默认全部允许访问
+     *  访问ip白名单,未配置的话默认全部允许访问，需要配置多个ip或ip段，使用分号';'分隔
      */
     private String accessIps;
 }

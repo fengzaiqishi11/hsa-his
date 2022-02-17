@@ -135,7 +135,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
             if (!ListUtils.isEmpty(newProfileIds)) {
                 // 根据档案ids查询查询本地档案信息
-                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds,inptVisitDTO.getHospCode());
+                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds, inptVisitDTO.getHospCode());
 
                 if (!ListUtils.isEmpty(data)) {
                     // 存储处理后的就诊的患者的资料
@@ -201,7 +201,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     @Override
     public OutptVisitDTO queryPrintInpt(Map map) {
         OutptVisitDTO outptVisitDTO = inptVisitDAO.queryPrintInpt(map);
-        return  outptVisitDTO;
+        return outptVisitDTO;
     }
 
     /**
@@ -231,8 +231,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 // 去掉重复的档案ID
                 List<String> newProfileIds = profileIds.stream().distinct().collect(Collectors.toList());
 //                List<OutptProfileFileDTO> data = queryProfileS(newProfileIds,outptVisitDTO.getHospCode());
-                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds,outptVisitDTO.getHospCode());
-                if(!ListUtils.isEmpty(data)){
+                List<OutptProfileFileDTO> data = this.queryBaseProfileByIds(newProfileIds, outptVisitDTO.getHospCode());
+                if (!ListUtils.isEmpty(data)) {
                     Map profileMap = new HashMap();
                     for (int i = 0; i < data.size(); i++) {
                         if (!profileMap.containsKey(data.get(i).getId())) {
@@ -281,14 +281,14 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     }
 
     /**
+     * @return
      * @Method queryByCertNo
      * @Desrciption 查询病人住院状态
      * @Param [String]
      * @Author caoliang
      * @Date 2021/6/1 16:07
      * @Return java.lang.Boolean
-     *
-     * @return*/
+     */
     @Override
     public InptVisitDTO queryByCertNo(InptVisitDTO inptVisitDTO) {
 
@@ -314,12 +314,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         inptAdviceDTO.setHospCode(inptVisitDTO.getHospCode());
         inptAdviceDTO.setVisitId(inptVisitDTO.getId());
 
-        Map<String,Object> selectMap = new HashMap<>();
+        Map<String, Object> selectMap = new HashMap<>();
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         insureIndividualVisitDTO.setVisitId(inptVisitDTO.getId());
         insureIndividualVisitDTO.setHospCode(inptVisitDTO.getHospCode());
-        selectMap.put("hospCode",inptVisitDTO.getHospCode());
-        selectMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        selectMap.put("hospCode", inptVisitDTO.getHospCode());
+        selectMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         List<InsureIndividualVisitDTO> list = insureIndividualVisitService_consumer.findByCondition(selectMap);
         if (!ListUtils.isEmpty(list)) {
             throw new AppException("当前已完成医保登记，请先取消医保登记");
@@ -415,7 +415,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         //TODO 入院诊断处理
         String akc193 = insureIndividualVisitDTO.getVisitIcdCode();
         String[] akc193Arr = null;
-        if(StringUtils.isNotEmpty(akc193)){
+        if (StringUtils.isNotEmpty(akc193)) {
             akc193Arr = akc193.split(",");
         }
         insureInptRegisterDTO.setAkc193(insureIndividualVisitDTO.getVisitIcdCode());
@@ -439,9 +439,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureInptRegisterDTO.setBkz101(inptVisitDTO.getInDiseaseName());
 
         List<Map<String, Object>> diagnoseList = new ArrayList<>();
-        for (int i = 0; i < akc193Arr.length; i++){
+        for (int i = 0; i < akc193Arr.length; i++) {
             Map<String, Object> diagnoseMap = new HashMap<>();
-            diagnoseMap.put("bke558", i+1); // 诊断序号(只会产生一条入院诊断)
+            diagnoseMap.put("bke558", i + 1); // 诊断序号(只会产生一条入院诊断)
             diagnoseMap.put("bke559", "1"); // 诊断类别编码（1-入院诊断;2-出院诊断）
             diagnoseMap.put("aka120", akc193Arr[i]); // 诊断编码
             diagnoseMap.put("akb020", inptVisitDTO.getInsureRegCode()); // 医疗机构编码
@@ -490,27 +490,27 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     public PageDTO queryPatients(Map<String, Object> paramMap) {
         String pageNo = (String) paramMap.get("pageNo");
         String pageSize = (String) paramMap.get("pageSize");
-        PageHelper.startPage(Integer.parseInt(pageNo),Integer.parseInt(pageSize));
-        List<Map<String, Object>> inptVisitDTOS =null;
+        PageHelper.startPage(Integer.parseInt(pageNo), Integer.parseInt(pageSize));
+        List<Map<String, Object>> inptVisitDTOS = null;
         // 获取系统参数 是否开启大人婴儿合并结算
-        SysParameterDTO mergeParameterDTO =null;
+        SysParameterDTO mergeParameterDTO = null;
         Map<String, Object> isMergeParam = new HashMap<>();
         isMergeParam.put("hospCode", paramMap.get("hospCode"));
         isMergeParam.put("code", "BABY_INSURE_FEE");
         mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
         //《========新生婴儿试算========》
-        if(mergeParameterDTO !=null && "1".equals(mergeParameterDTO.getValue())){
+        if (mergeParameterDTO != null && "1".equals(mergeParameterDTO.getValue())) {
             // 开启合并结算
             inptVisitDTOS = inptVisitDAO.queryPatients(paramMap);
-        }else {
+        } else {
             // 大人婴儿费用单独结算
             inptVisitDTOS = inptVisitDAO.queryNoMergePatients(paramMap);
             return PageDTO.of(inptVisitDTOS);
         }
 //        List<Map<String, Object>> finalResult = new ArrayList<>();
         if (!ListUtils.isEmpty(inptVisitDTOS)) {
-            List<String> visitIdList = inptVisitDTOS.stream().map(map-> (String)map.get("id")).collect(Collectors.toList());
-            List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap,"hospCode"),visitIdList);
+            List<String> visitIdList = inptVisitDTOS.stream().map(map -> (String) map.get("id")).collect(Collectors.toList());
+            List<Map<String, Object>> patientCostDataList = inptVisitDAO.queryPatientsCostsByVisitIds(MapUtils.get(paramMap, "hospCode"), visitIdList);
 //            finalResult = inptVisitDTOS.stream().map(data -> {
 //                patientCostDataList.stream().map(costsData ->{
 //                    if(data.get("id").equals(costsData.get("visit_id")))
@@ -523,12 +523,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 //                });
 //                return data;
 //            }).collect(Collectors.toList());
-            outer: for (Map<String, Object> map : inptVisitDTOS) {
+            outer:
+            for (Map<String, Object> map : inptVisitDTOS) {
                 for (Map<String, Object> map2 : patientCostDataList) {
                     if (map.get("id").equals(map2.get("visit_id"))) {
-                        map.put("ypfy",map2.get("item_price"));
-                        map.put("total_price",map2.get("total_price"));
-                        map.put("fyb",map2.get("fyb"));
+                        map.put("ypfy", map2.get("item_price"));
+                        map.put("total_price", map2.get("total_price"));
+                        map.put("fyb", map2.get("fyb"));
                         continue outer;
                     }
                 }
@@ -539,14 +540,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
     /**
      * @Method deleteInsureRegister
-     * @Desrciption  取消医保入院登记
-     *   业务处理说明
-     *   1.查询是否为医保病人
-     *
-     *
+     * @Desrciption 取消医保入院登记
+     * 业务处理说明
+     * 1.查询是否为医保病人
      * @Param [inptVisitDTO]
      * @Author 廖继广
-     * @Date   2020/12/21 18:59
+     * @Date 2020/12/21 18:59
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
@@ -599,17 +598,23 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台*/
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             /**统一支付平台调用   开始*/
-             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
-             insureUnifiedPayParam.put("hospCode",insureIndividualVisitDTO.getHospCode());
-             insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
-             insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
-             insureUnifiedPayParam.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
-             insureUnifiedPayParam.put("id",inptVisitDTO.getId());
-             insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
-             // 删除医保费用数据
-             insureIndividualCostService_consumer.deleteOutptInsureCost(insureUnifiedPayParam);
+            Map<String, Object> insureUnifiedPayParam = new HashMap<>();
+            insureUnifiedPayParam.put("hospCode", insureIndividualVisitDTO.getHospCode());
+            insureUnifiedPayParam.put("insureInptOutFeeDTO", insureInptOutFeeDTO);
+            insureUnifiedPayParam.put("inptVisitDTO", inptVisitDTO);
+            insureUnifiedPayParam.put("medicalRegNo", insureIndividualVisitDTO.getMedicalRegNo());
+            insureUnifiedPayParam.put("id", inptVisitDTO.getId());
+
+            /**
+             *  如果存在中途结算、则取消结算时，应该要先取消最后一笔登记记录
+             *  可以根据中途结算次数来判断
+             */
+            checkSettleCount(inptVisitDTO,insureIndividualVisitDTO);
+            insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
+            // 删除医保费用数据
+            insureIndividualCostService_consumer.deleteOutptInsureCost(insureUnifiedPayParam);
             /**统一支付平台调用   结束*/
-        } else{
+        } else {
             if (!Constants.BRLX.SNYDBR.equals(visit.getPatientCode()) && !Constants.BRLX.SWYDBR.equals(visit.getPatientCode())) {
                 inptService_consumer.deteleInptRegister(insureParam);
             } else {
@@ -618,35 +623,69 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 insureRemoteInptRegisterDTO.setAaz217(insureIndividualVisitDTO.getMedicalRegNo());
                 insureRemoteInptRegisterDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
                 insureRemoteInptRegisterDTO.setAae011(inptVisitDTO.getCrteId());
-                insureRemoteInptRegisterDTO.setBka015 (inptVisitDTO.getCrteName());
+                insureRemoteInptRegisterDTO.setBka015(inptVisitDTO.getCrteName());
                 insureRemoteInptRegisterDTO.setInsureOrgCode(insureIndividualVisitDTO.getInsureOrgCode());
                 insureRemoteInptRegisterDTO.setCardIden(insureIndividualVisitDTO.getCardIden());
-                insureParam.put("insureRemoteInptRegisterDTO",insureRemoteInptRegisterDTO);
+                insureParam.put("insureRemoteInptRegisterDTO", insureRemoteInptRegisterDTO);
                 inptService_consumer.deteleRemoteInptRegister(insureParam);
             }
         }
         inptVisitDAO.deleteInsureInptRegisterByParams(insureIndividualVisitDTO);
-        // 医保病人更改为普通病人
-        inptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
-        inptVisitDAO.updateInptVisit(inptVisitDTO);
+        /**
+         * 如果取消医保入院登记的时候 还存在中途结算的数据 则不修改病人类型
+         * 否则 修改为普通病人类型
+         */
+        insureParam.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        Integer count = insureIndividualVisitService_consumer.selectHalfVisit(insureParam).getData();
+        if (count == null || count < 1) {
+            inptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
+            inptVisitDAO.updateInptVisit(inptVisitDTO);
+        }
         return true;
     }
 
     /**
-    * @Menthod saveInsureInRegisterEMD
-    * @Desrciption  电子凭证医保登记（住院）  往insure_individual_visit插入登记信息  并根据就诊id删除原有记录
-     * @param inptVisitDTO
-    * @Author xingyu.xie
-    * @Date   2021/3/1 14:30
-    * @Return java.lang.Boolean
+     * @Method checkSettleCount
+     * @Desrciption  验证是否取消入院登记的规则 后登记的先取消
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/2/15 10:52
+     * @Return
     **/
+    private void checkSettleCount(InptVisitDTO inptVisitDTO, InsureIndividualVisitDTO insureIndividualVisitDTO) {
+        Map<String, Object> insureUnifiedPayParam = new HashMap<>();
+        insureUnifiedPayParam.put("hospCode",inptVisitDTO.getHospCode());
+        insureUnifiedPayParam.put("id",inptVisitDTO.getId());
+        InsureIndividualVisitDTO data = insureIndividualVisitService_consumer.
+                selectMaxAndMinRegisterTime(insureUnifiedPayParam).getData();
+        if(data !=null){
+            if(DateUtils.dateCompare(insureIndividualVisitDTO.getCrteTime(),data.getMaxRegister())){
+                throw new AppException("请先取消最晚一次的医保登记记录信息");
+            }
+        }
+
+    }
+
+    /**
+     * @param inptVisitDTO
+     * @Menthod saveInsureInRegisterEMD
+     * @Desrciption 电子凭证医保登记（住院）  往insure_individual_visit插入登记信息  并根据就诊id删除原有记录
+     * @Author xingyu.xie
+     * @Date 2021/3/1 14:30
+     * @Return java.lang.Boolean
+     **/
     @Override
     public Boolean saveInsureInRegisterEMD(InptVisitDTO inptVisitDTO) {
         InsureIndividualBasicDTO insureIndividualBasicDTO = inptVisitDTO.getInsureIndividualBasicDTO();
         List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOS = insureIndividualBasicDTO.getDiagnose();//诊断信息
-        if (insureDiseaseMatchDTOS == null || insureDiseaseMatchDTOS.isEmpty()) { throw new AppException("未获取到诊断信息，请联系管理员"); }
+        if (insureDiseaseMatchDTOS == null || insureDiseaseMatchDTOS.isEmpty()) {
+            throw new AppException("未获取到诊断信息，请联系管理员");
+        }
         InptVisitDTO inptVisitDto = inptVisitDAO.getInptVisitById(inptVisitDTO);//获取患者入院登记信息
-        if (inptVisitDto == null) { throw new AppException("未查询到病人入院登记信息"); }
+        if (inptVisitDto == null) {
+            throw new AppException("未查询到病人入院登记信息");
+        }
         //编辑住院就诊信息
         String baseId = SnowflakeUtils.getId();
         inptVisitDTO.setInsureCode(insureIndividualBasicDTO.getBaa027());//参保类型
@@ -664,8 +703,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         StringBuilder icdName = new StringBuilder();
         //副诊断
         List<InptDiagnoseDTO> inptDiagnoseDTODTOList = new ArrayList<InptDiagnoseDTO>();
-        for (InsureDiseaseMatchDTO insureDiseaseMatchDTO1 : insureDiseaseMatchDTOS){
-            if (index > 0){
+        for (InsureDiseaseMatchDTO insureDiseaseMatchDTO1 : insureDiseaseMatchDTOS) {
+            if (index > 0) {
                 //副诊断存库参数
                 InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
                 inptDiagnoseDTO.setId(SnowflakeUtils.getId());//id
@@ -679,11 +718,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 inptDiagnoseDTO.setCrteTime(DateUtils.getNow());//创建时间
                 inptDiagnoseDTODTOList.add(inptDiagnoseDTO);
             }
-            index ++;
+            index++;
             icdCode.append(insureDiseaseMatchDTO1.getInsureIllnessCode()).append(",");
             icdName.append(insureDiseaseMatchDTO1.getInsureIllnessName()).append(",");
         }
-        if (!inptDiagnoseDTODTOList.isEmpty()){
+        if (!inptDiagnoseDTODTOList.isEmpty()) {
             //先删除当前患者住院次诊断信息
             InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
             inptDiagnoseDTO.setHospCode(inptVisitDto.getHospCode());//医院编码
@@ -693,8 +732,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             inptAdviceDAO.insertDiagnose(inptDiagnoseDTODTOList);
         }
 
-        Map<String,Object> electronicBillParam = JSONObject.parseObject(inptVisitDTO.getElectronicBillParam(),HashMap.class);//医保个人信息
-        Map<String,String> app = (Map<String, String>) electronicBillParam.get("app");//解码信息
+        Map<String, Object> electronicBillParam = JSONObject.parseObject(inptVisitDTO.getElectronicBillParam(), HashMap.class);//医保个人信息
+        Map<String, String> app = (Map<String, String>) electronicBillParam.get("app");//解码信息
         String userId = inptVisitDTO.getCrteId();//当前登录用户id
         String userName = inptVisitDTO.getCrteName();//当前登录用户名称
         Date now = new Date();//创建时间
@@ -736,8 +775,8 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureIndividualVisitDTO.setBka006(insureIndividualBasicDTO.getBka006());//待遇类型
         insureIndividualVisitDTO.setBka006Name(null);//待遇类型名称
         insureIndividualVisitDTO.setInjuryBorthSn(inptVisitDTO.getInjuryBorthSn());//业务申请号
-        insureIndividualVisitDTO.setVisitIcdCode(icdCode.substring(0,icdCode.length()-1));//就诊疾病编码
-        insureIndividualVisitDTO.setVisitIcdName(icdName.substring(0,icdName.length()-1));//就诊疾病名称
+        insureIndividualVisitDTO.setVisitIcdCode(icdCode.substring(0, icdCode.length() - 1));//就诊疾病编码
+        insureIndividualVisitDTO.setVisitIcdName(icdName.substring(0, icdName.length() - 1));//就诊疾病名称
         insureIndividualVisitDTO.setVisitTime(now);//就诊时间
         insureIndividualVisitDTO.setVisitDrptId(inptVisitDto.getInDeptId());//科室id
         insureIndividualVisitDTO.setVisitDrptName(inptVisitDto.getInDeptName());//科室名称
@@ -756,10 +795,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // 获取码表值字段名称
         //insureIndividualBasicDTO.setHospCode(inptVisitDTO.getHospCode());
         //Map dictNameMap = this.getDictNameMapByCodeV(insureIndividualBasicDTO);
-        Map<String,Object> insertMap = new HashMap<>();
-        insertMap.put("hospCode",inptVisitDto.getHospCode());
-        insertMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-        insertMap.put("visitId",inptVisitDto.getId());
+        Map<String, Object> insertMap = new HashMap<>();
+        insertMap.put("hospCode", inptVisitDto.getHospCode());
+        insertMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        insertMap.put("visitId", inptVisitDto.getId());
         // 先根据就诊ID删除原记录
         insureIndividualVisitService_consumer.deleteByVisitId(insertMap);
         // 再重新插入
@@ -769,10 +808,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
     /**
      * @Method saveInsureInRegister
-     * @Desrciption 医保入院登记(2020-12-21)
+     * @Desrciption 医保入院登记(2020 - 12 - 21)
      * @Param [inptVisitDTO]
      * @Author 廖继广
-     * @Date   2020/12/21 20:44
+     * @Date 2020/12/21 20:44
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
@@ -795,7 +834,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
 
         // 异地病人返回akb020参数为null,医保中心编码使用湘潭核三医保中心编码，否则使用医保端返回中心编码
-        if (StringUtils.isEmpty( insureIndividualBasicDTO.getAkb020())) {
+        if (StringUtils.isEmpty(insureIndividualBasicDTO.getAkb020())) {
             insureIndividualBasicDTO.setAkb020(insureIndividualBasicDTO.getInsureRegCode());
         }
 
@@ -806,7 +845,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // TODO 医保获取的人员信息保存
         String baseId = SnowflakeUtils.getId();
         inptVisitDTO.setPhone(inptVisitDto.getPhone());
-        this.insetInsureIndividualBasic(inptVisitDTO, baseId,dictNameMap);
+        this.insetInsureIndividualBasic(inptVisitDTO, baseId, dictNameMap);
 
         // TODO 住院就诊信息更新
         inptVisitDTO.setInsureCode(insureIndividualBasicDTO.getBaa027());
@@ -860,12 +899,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         StringBuilder icdName = new StringBuilder();
         //副诊断
         List<InptDiagnoseDTO> inptDiagnoseDTODTOList = new ArrayList<InptDiagnoseDTO>();
-        for (InsureDiseaseMatchDTO insureDiseaseMatchDTO1 : insureDiseaseMatchDTOS){
-            if (index > 0){
-                Map<String, Object> diagnoseMap = new HashMap<String,Object>();
-                diagnoseMap.put("bke558",index); // 诊断序号(只会产生一条入院诊断)
+        for (InsureDiseaseMatchDTO insureDiseaseMatchDTO1 : insureDiseaseMatchDTOS) {
+            if (index > 0) {
+                Map<String, Object> diagnoseMap = new HashMap<String, Object>();
+                diagnoseMap.put("bke558", index); // 诊断序号(只会产生一条入院诊断)
                 diagnoseMap.put("bke559", "1"); // 诊断类别编码（1-入院诊断;2-出院诊断）
-                diagnoseMap.put("aka120",insureDiseaseMatchDTO1.getInsureIllnessCode()); // 诊断编码
+                diagnoseMap.put("aka120", insureDiseaseMatchDTO1.getInsureIllnessCode()); // 诊断编码
                 diagnoseList.add(diagnoseMap);
                 //副诊断存库参数
                 InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
@@ -880,12 +919,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 inptDiagnoseDTO.setCrteTime(DateUtils.getNow());//创建时间
                 inptDiagnoseDTODTOList.add(inptDiagnoseDTO);
             }
-            index ++;
+            index++;
             icdCode.append(insureDiseaseMatchDTO1.getInsureIllnessCode()).append(",");
             icdName.append(insureDiseaseMatchDTO1.getInsureIllnessName()).append(",");
         }
         insureInptRegisterDTO.setDiagnoseinfos(diagnoseList);
-        if (!inptDiagnoseDTODTOList.isEmpty()){
+        if (!inptDiagnoseDTODTOList.isEmpty()) {
             //先删除当前患者住院次诊断信息
             InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
             inptDiagnoseDTO.setHospCode(inptVisitDto.getHospCode());//医院编码
@@ -930,13 +969,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureParam.put("insureInptRegisterDTO", insureInptRegisterDTO);
 
         Map<String, Object> resultMap = new HashMap<>();
-        Map<String,Object> dataMap = new HashMap<>(2);
+        Map<String, Object> dataMap = new HashMap<>(2);
 
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(inptVisitDTO.getHospCode());
         insureConfigurationDTO.setRegCode(inptVisitDTO.getInsureOrgCode());
-        dataMap.put("insureConfigurationDTO",insureConfigurationDTO);
-        dataMap.put("hospCode",inptVisitDTO.getHospCode());
+        dataMap.put("insureConfigurationDTO", insureConfigurationDTO);
+        dataMap.put("hospCode", inptVisitDTO.getHospCode());
         insureConfigurationDTO = insureConfigurationService_consumer.queryInsureIndividualConfig(dataMap).getData();
 
         // 获取页面传递的是否走统一支付平台值，为1走，0/null不走
@@ -953,24 +992,23 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             /**统一支付平台调用   开始*/
             Map<String, Object> insureUnifiedPayParam = new HashMap<>();
             String pracCertiNo = inptVisitDto.getPracCertiNo();
-            if(StringUtils.isEmpty(pracCertiNo)){
-                throw  new AppException("该【"+inptVisitDTO.getZzDoctorName()+"】医生的医师编码没有维护,请先去用户管理里面维护");
+            if (StringUtils.isEmpty(pracCertiNo)) {
+                throw new AppException("该【" + inptVisitDTO.getZzDoctorName() + "】医生的医师编码没有维护,请先去用户管理里面维护");
             }
             inptVisitDTO.setPracCertiNo(inptVisitDto.getPracCertiNo());
-            insureUnifiedPayParam.put("inptVisitDTO",inptVisitDTO);
-            insureUnifiedPayParam.put("hospCode",inptVisitDTO.getHospCode());
-            insureUnifiedPayParam.put("insureInptRegisterDTO",insureInptRegisterDTO);
-            insureUnifiedPayParam.put("diseinfo",insureDiseaseMatchDTOS);
+            insureUnifiedPayParam.put("inptVisitDTO", inptVisitDTO);
+            insureUnifiedPayParam.put("hospCode", inptVisitDTO.getHospCode());
+            insureUnifiedPayParam.put("insureInptRegisterDTO", insureInptRegisterDTO);
+            insureUnifiedPayParam.put("diseinfo", insureDiseaseMatchDTOS);
             resultMap = insureUnifiedPayInptService_consumer.UP_2401(insureUnifiedPayParam);
             /**统一支付平台调用   结束*/
-        }
-        else{
+        } else {
 
             if (!Constants.BRLX.SNYDBR.equals(inptVisitDTO.getPatientCode()) && !Constants.BRLX.SWYDBR.equals(inptVisitDTO.getPatientCode())) {
                 resultMap = inptService_consumer.insertInptRegister(insureParam);
             } else {
                 InsureRemoteInptRegisterDTO insureRemoteInptRegisterDTO = new InsureRemoteInptRegisterDTO();
-                BeanUtils.copyProperties(insureInptRegisterDTO,insureRemoteInptRegisterDTO);
+                BeanUtils.copyProperties(insureInptRegisterDTO, insureRemoteInptRegisterDTO);
                 insureRemoteInptRegisterDTO.setHospCode(insureInptRegisterDTO.getHospCode());
                 insureRemoteInptRegisterDTO.setAac001(insureIndividualBasicDTO.getAac001()); // 个人电脑号
                 insureRemoteInptRegisterDTO.setAaa027(insureIndividualBasicDTO.getAaa027()); // 参保人行政编码
@@ -978,7 +1016,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 insureRemoteInptRegisterDTO.setAac002(insureIndividualBasicDTO.getAac002()); // 社会保障号
                 insureRemoteInptRegisterDTO.setAka130(insureIndividualBasicDTO.getAka130()); // 业务类型
                 insureRemoteInptRegisterDTO.setBka006(insureIndividualBasicDTO.getBka006()); // 待遇类型
-                insureRemoteInptRegisterDTO.setAae030(DateUtils.format(inptVisitDto.getInTime(),DateUtils.Y_M_DH_M_S)); // 入院日期
+                insureRemoteInptRegisterDTO.setAae030(DateUtils.format(inptVisitDto.getInTime(), DateUtils.Y_M_DH_M_S)); // 入院日期
                 insureRemoteInptRegisterDTO.setBka015(insureInptRegisterDTO.getBka015()); // 登记人姓名
                 insureRemoteInptRegisterDTO.setAae011(insureInptRegisterDTO.getAae011()); // 登记人工号
                 insureRemoteInptRegisterDTO.setBka021(insureInptRegisterDTO.getBka021()); // 病区编码
@@ -999,35 +1037,35 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                     insureRemoteInptRegisterDTO.setBka036("1"); // 是否读卡
                     insureRemoteInptRegisterDTO.setBka100(insureIndividualBasicDTO.getBka896());
                 }
-                insureParam.put("insureRemoteInptRegisterDTO",insureRemoteInptRegisterDTO);
+                insureParam.put("insureRemoteInptRegisterDTO", insureRemoteInptRegisterDTO);
                 resultMap = inptService_consumer.insertRemoteInptRegister(insureParam);
             }
         }
         String medicalegNo = String.valueOf(resultMap.get("aaz217"));
-        String omsgid = MapUtils.get(resultMap,"omsgid");
-        String oinfno = MapUtils.get(resultMap,"oinfno");
+        String omsgid = MapUtils.get(resultMap, "omsgid");
+        String oinfno = MapUtils.get(resultMap, "oinfno");
         // 处理医保回参数据
         try {
             InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
 
             // 人员身份类别判断是否一站式
             String isOneSettle = Constants.SF.F;
-            List<Map<String,Object>> identMapList = inptVisitDTO.getIdetinList();
+            List<Map<String, Object>> identMapList = inptVisitDTO.getIdetinList();
             if (!ListUtils.isEmpty(identMapList)) {
-                for (Map<String,Object> identMap : identMapList) {
-                    String psnIdetType = MapUtils.get(identMap,"psn_idet_type"); // 人员身份类别
-                    String begntime = MapUtils.get(identMap,"begntime"); // 开始时间
-                    String endtime = MapUtils.get(identMap,"endtime"); // 结算时间
+                for (Map<String, Object> identMap : identMapList) {
+                    String psnIdetType = MapUtils.get(identMap, "psn_idet_type"); // 人员身份类别
+                    String begntime = MapUtils.get(identMap, "begntime"); // 开始时间
+                    String endtime = MapUtils.get(identMap, "endtime"); // 结算时间
                     if (!StringUtils.isEmpty(endtime)) {
                         if (StringUtils.isEmpty(begntime)) {
                             continue;
                         }
-                        Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime,-1),DateUtils.Y_M_D);
+                        Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime, -1), DateUtils.Y_M_D);
 
                         if (StringUtils.isEmpty(endtime)) {
                             endtime = "2099-12-31 00:00:00";
                         }
-                        Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime,1),DateUtils.Y_M_D);
+                        Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime, 1), DateUtils.Y_M_D);
 
                         if (DateUtils.getNow().before(endDate) && DateUtils.getNow().after(begnDate)) {
                             isOneSettle = Constants.SF.S;
@@ -1057,10 +1095,15 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             insureIndividualVisitDTO.setAka130(insureIndividualBasicDTO.getAka130());
             insureIndividualVisitDTO.setAka130Name(String.valueOf(dictNameMap.get("aka130Name")));
             insureIndividualVisitDTO.setBka006(insureIndividualBasicDTO.getBka006());
-            insureIndividualVisitDTO.setBka006Name(String.valueOf(dictNameMap.get("bka006Name")));
+            String bka006Name =String.valueOf(dictNameMap.get("bka006Name"));
+            if("null".equals(bka006Name) || StringUtils.isEmpty(bka006Name) ){
+                insureIndividualVisitDTO.setBka006Name("");
+            }else{
+                insureIndividualVisitDTO.setBka006Name(bka006Name);
+            }
             insureIndividualVisitDTO.setInjuryBorthSn(inptVisitDTO.getInjuryBorthSn()); // 业务申请号
-            insureIndividualVisitDTO.setVisitIcdCode(icdCode.substring(0,icdCode.length()-1));
-            insureIndividualVisitDTO.setVisitIcdName(icdName.substring(0,icdName.length()-1));
+            insureIndividualVisitDTO.setVisitIcdCode(icdCode.substring(0, icdCode.length() - 1));
+            insureIndividualVisitDTO.setVisitIcdName(icdName.substring(0, icdName.length() - 1));
             insureIndividualVisitDTO.setVisitTime(inptVisitDTO.getInTime());
             insureIndividualVisitDTO.setVisitDrptId(inptVisitDTO.getInDeptId());
             insureIndividualVisitDTO.setVisitDrptName(inptVisitDTO.getInDeptName());
@@ -1073,16 +1116,16 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             insureIndividualVisitDTO.setCrteTime(DateUtils.getNow());
             insureIndividualVisitDTO.setInjuryBorthSn(insureIndividualBasicDTO.getInjuryBorthSn());
             //  统一支付平台需要的值 start
-			insureIndividualVisitDTO.setInsuplcAdmdvs(insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
+            insureIndividualVisitDTO.setInsuplcAdmdvs(insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
             insureIndividualVisitDTO.setMdtrtCertType(insureIndividualBasicDTO.getBka895()); // 就诊凭证类型
             insureIndividualVisitDTO.setMdtrtCertNo(insureIndividualBasicDTO.getBka896());  // 就诊凭证号码
             insureIndividualVisitDTO.setHcardBasinfo(insureIndividualBasicDTO.getHcardBasinfo()); //广州读卡就诊基本填信息
             insureIndividualVisitDTO.setHcardChkinfo(insureIndividualBasicDTO.getHcardChkinfo()); //广州读卡就诊校验信息
-			// 统一支付平台需要的值 end
+            // 统一支付平台需要的值 end
 
-            Map<String,Object> insertMap = new HashMap<>();
-            insertMap.put("hospCode",inptVisitDto.getHospCode());
-            insertMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+            Map<String, Object> insertMap = new HashMap<>();
+            insertMap.put("hospCode", inptVisitDto.getHospCode());
+            insertMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
             return insureIndividualVisitService_consumer.insertIndividualVisit(insertMap);
         } catch (Exception e) { // TODO 出现异常，医保端取消入院登记
             inptVisitDTO.setMedicalRegNo(medicalegNo);
@@ -1102,11 +1145,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
                 /**统一支付平台调用   开始*/
                 Map<String, Object> insureUnifiedPayParam = new HashMap<>();
-                insureUnifiedPayParam.put("hospCode",insureInptRegisterDTO.getHospCode());
-                insureUnifiedPayParam.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
+                insureUnifiedPayParam.put("hospCode", insureInptRegisterDTO.getHospCode());
+                insureUnifiedPayParam.put("insureInptOutFeeDTO", insureInptOutFeeDTO);
 //                insureUnifiedPayInptService_consumer.UP_2404(insureUnifiedPayParam);
                 /**统一支付平台调用   结束*/
-            }else{
+            } else {
                 if (!Constants.BRLX.SNYDBR.equals(inptVisitDTO.getPatientCode()) && !Constants.BRLX.SWYDBR.equals(inptVisitDTO.getPatientCode())) {
                     inptService_consumer.deteleInptRegister(insureParam);
                 } else {
@@ -1115,9 +1158,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                     insureRemoteInptRegisterDTO.setAaz217(medicalegNo);
                     insureRemoteInptRegisterDTO.setHospCode(insureInptOutFeeDTO.getHospCode());
                     insureRemoteInptRegisterDTO.setAae011(inptVisitDTO.getCrteId());
-                    insureRemoteInptRegisterDTO.setBka015 (inptVisitDTO.getCrteName());
+                    insureRemoteInptRegisterDTO.setBka015(inptVisitDTO.getCrteName());
                     insureRemoteInptRegisterDTO.setInsureOrgCode(insureInptOutFeeDTO.getInsureOrgCode());
-                    insureParam.put("insureRemoteInptRegisterDTO",insureRemoteInptRegisterDTO);
+                    insureParam.put("insureRemoteInptRegisterDTO", insureRemoteInptRegisterDTO);
                     inptService_consumer.deteleRemoteInptRegister(insureParam);
                 }
             }
@@ -1130,7 +1173,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
      * @Desrciption 获取医保登记人员信息
      * @Param [inptVisitDTO]
      * @Author 廖继广
-     * @Date   2020/12/22 14:54
+     * @Date 2020/12/22 14:54
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<PageDTO>
      **/
     @Override
@@ -1156,13 +1199,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
 
         // 获取医院kafka 的IP与端口
-		Map<String, Object> sysMap = new HashMap<>();
-		sysMap.put("hospCode", inptVisitDTO.getHospCode());
-		sysMap.put("code", "KAFKA_IP");
-		SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
-		if (sys == null || sys.getValue() == null) {  // 调用统一支付平台
-			throw new AppException("请在系统参数中配置医院医保中间件所在主机IP与端口 【KAFKA_IP】");
-		}
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", inptVisitDTO.getHospCode());
+        sysMap.put("code", "KAFKA_IP");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sys == null || sys.getValue() == null) {  // 调用统一支付平台
+            throw new AppException("请在系统参数中配置医院医保中间件所在主机IP与端口 【KAFKA_IP】");
+        }
 
         // 1、根据勾选的结算单号查询患者信息
         List<Map<String, Object>> nhPatient = inptVisitDAO.selectNHPatientData(inptVisitDTO);
@@ -1341,36 +1384,36 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // 档案表操作
         OutptProfileFileDTO extend = getProfileFileDTO(inptVisitDTO);
         // 20210805 liuliyun 珠海住院号生成 start
-        Map sysParam=new HashMap();
-        sysParam.put("hospCode",inptVisitDTO.getHospCode());
-        sysParam.put("code","BAH_SF");
-        SysParameterDTO sysParameterDTO=sysParameterService_consumer.getParameterByCode(sysParam).getData();
+        Map sysParam = new HashMap();
+        sysParam.put("hospCode", inptVisitDTO.getHospCode());
+        sysParam.put("code", "BAH_SF");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParam).getData();
         // 未配置系统参数时，添加默认值
-        if (sysParameterDTO ==null){
-            sysParameterDTO=new SysParameterDTO();
+        if (sysParameterDTO == null) {
+            sysParameterDTO = new SysParameterDTO();
             sysParameterDTO.setValue("0");
         }
         //设置住院号
         String orderNo = getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.ZYH);
         inptVisitDTO.setInNo(orderNo);
 
-        if (sysParameterDTO!=null&&sysParameterDTO.getValue()!=null&&sysParameterDTO.getValue().equals("1")){
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && sysParameterDTO.getValue().equals("1")) {
             // 住院次数获取(未获取，默认1次)
-            Map countMap=new HashMap();
-            countMap.put("hospCode",inptVisitDTO.getHospCode());
-            countMap.put("certCode",inptVisitDTO.getCertCode());
-            countMap.put("certNo",inptVisitDTO.getCertNo());
+            Map countMap = new HashMap();
+            countMap.put("hospCode", inptVisitDTO.getHospCode());
+            countMap.put("certCode", inptVisitDTO.getCertCode());
+            countMap.put("certNo", inptVisitDTO.getCertNo());
             List<Map> info = inptVisitDAO.getBaseProfileInfo(countMap);
             int inCnt = 1;
-            if (info == null|| info.size() ==0) {
+            if (info == null || info.size() == 0) {
                 inCnt = 1;
-                orderNo = extend.getInProfile()+"-00"+inCnt;
-            }else {
-                if (info.get(0).get("total_in")!=null) {
+                orderNo = extend.getInProfile() + "-00" + inCnt;
+            } else {
+                if (info.get(0).get("total_in") != null) {
                     inCnt = (int) info.get(0).get("total_in");
                     inCnt = inCnt + 1;
                 }
-                orderNo = info.get(0).get("in_profile")+"-00"+inCnt;
+                orderNo = info.get(0).get("in_profile") + "-00" + inCnt;
             }
             inptVisitDTO.setInNo(orderNo);
         }
@@ -1417,7 +1460,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     }
 
     // 修改门诊转入院状态
-    public void updateTranInCode(InptVisitDTO inptVisitDTO){
+    public void updateTranInCode(InptVisitDTO inptVisitDTO) {
         //门诊就诊表的转入院代码转为 2-已登记住院
         Map map = new HashMap();
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
@@ -1430,12 +1473,13 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (wr.getCode() != 0) {
             throw new AppException(wr.getMessage());
         }
-        if(!wr.getData()){
+        if (!wr.getData()) {
             throw new AppException("修改转入院状态失败，请联系管理员进行处理");
         }
     }
+
     // 插入就诊表
-    public void insertInptDiagnose(InptVisitDTO inptVisitDTO){
+    public void insertInptDiagnose(InptVisitDTO inptVisitDTO) {
         InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
         inptDiagnoseDTO.setId(SnowflakeUtils.getId());
         inptDiagnoseDTO.setHospCode(inptVisitDTO.getHospCode());
@@ -1446,10 +1490,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         inptDiagnoseDTO.setCrteId(inptVisitDTO.getCrteId());
         inptDiagnoseDTO.setCrteName(inptVisitDTO.getCrteName());
         Boolean flag = inptVisitDAO.insertDiagnose(inptDiagnoseDTO);
-        if(!flag){
+        if (!flag) {
             throw new AppException("插入入院诊断失败，请联系管理员进行处理");
         }
     }
+
     // 插入预交金
     private void insertInptAdvance(InptVisitDTO inptVisitDTO) {
         if (BigDecimalUtils.nullToZero(inptVisitDTO.getPrice()).intValue() != 0) {
@@ -1468,7 +1513,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             // 手续费：TODO 需从系统参数中获取手续费比例计算
             advancePayDTO.setServicePrice(BigDecimal.ZERO);
             // 微信支付宝
-            if (Constants.ZFFS.WX.equals(inptVisitDTO.getPayCode()) || Constants.ZFFS.ZFB.equals(inptVisitDTO.getPayCode()) ) {
+            if (Constants.ZFFS.WX.equals(inptVisitDTO.getPayCode()) || Constants.ZFFS.ZFB.equals(inptVisitDTO.getPayCode())) {
                 inptVisitDTO.setOrderNo(inptVisitDTO.getChequeNo());
             }
             // 支票
@@ -1484,6 +1529,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             }
         }
     }
+
     // 单号生成
     private String getOrderNo(String hospCode, String typeCode) {
         //设置住院号
@@ -1497,6 +1543,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         return wr.getData();
     }
+
     // 新增档案
     private OutptProfileFileDTO getProfileFileDTO(InptVisitDTO inptVisitDTO) {
         // 档案表
@@ -1558,7 +1605,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
      * @Date 2020/12/22 21:50
      * @Return java.util.List<cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO>
      **/
-    public List<OutptProfileFileDTO> queryProfileS(List<String> ids,String hospCode) {
+    public List<OutptProfileFileDTO> queryProfileS(List<String> ids, String hospCode) {
         OutptProfileFileDTO outptProfileFileDTO = new OutptProfileFileDTO();
         outptProfileFileDTO.setHospCode(hospCode);
         outptProfileFileDTO.setIds(ids);
@@ -1593,7 +1640,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("修改患者信息失败：门诊/住院均未找到患者就诊信息【就诊id:" + inptVisitDTO.getId() + "】");
         }
         // 修改入院登记信息，使用数据库中的病人状态 20211015
-        if (selectEntiey!=null){
+        if (selectEntiey != null) {
             inptVisitDTO.setStatusCode(selectEntiey.getStatusCode());
             inptVisitDTO.setBedId(selectEntiey.getBedId());
             inptVisitDTO.setBedName(selectEntiey.getBedName());
@@ -1601,9 +1648,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 //        param.put("code", "UNIFIED_PAY");
 //        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(param).getData();
         // 获取医保个人信息
-        Map<String,Object> insureVisitParam =new HashMap<String,Object>();
-        insureVisitParam.put("id",inptVisitDTO.getId());
-        insureVisitParam.put("hospCode",inptVisitDTO.getHospCode());
+        Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+        insureVisitParam.put("id", inptVisitDTO.getId());
+        insureVisitParam.put("hospCode", inptVisitDTO.getHospCode());
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
 
         if (insureIndividualVisitDTO != null) {
@@ -1623,9 +1670,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             // 获取该医保配置是否走统一支付平台，1走，0/null不走
             String isUnifiedPay = insureConfigurationDTO.getIsUnifiedPay();
             if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay) && !"0".equals(inptVisitDTO.getPatientCode())) {
-                Map<String,Object> dataMap = new HashMap<>();
-                dataMap.put("hospCode",inptVisitDTO.getHospCode());
-                dataMap.put("inptVisitDTO",inptVisitDTO);
+                Map<String, Object> dataMap = new HashMap<>();
+                dataMap.put("hospCode", inptVisitDTO.getHospCode());
+                dataMap.put("inptVisitDTO", inptVisitDTO);
                 insureIndividualVisitService_consumer.updateInsureInidivdual(dataMap).getData();
             } else {
                 throw new AppException("当前已完成医保登记，请先取消医保登记");
@@ -1634,20 +1681,20 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
         //入院时间不能早于最小费用产生时间
         InptCostDTO minInptCost = inptVisitDAO.getMinTimeCostByVisitId(inptVisitDTO);
-        if (minInptCost != null && DateUtils.dateCompare(minInptCost.getCostTime(),inptVisitDTO.getInTime())) {
-            throw new AppException("入院时间不能大于最小费用时间：" + DateUtils.format(minInptCost.getCostTime(),DateUtils.Y_M_DH_M_S));
+        if (minInptCost != null && DateUtils.dateCompare(minInptCost.getCostTime(), inptVisitDTO.getInTime())) {
+            throw new AppException("入院时间不能大于最小费用时间：" + DateUtils.format(minInptCost.getCostTime(), DateUtils.Y_M_DH_M_S));
         }
 
         //入院时间不能早于最小医嘱开始时间
         InptAdviceDTO minInptAdvice = inptVisitDAO.getMinTimeInptAdviceByVisitId(inptVisitDTO);
-        if (minInptAdvice != null && DateUtils.dateCompare(minInptAdvice.getLongStartTime(),inptVisitDTO.getInTime())) {
-            throw new AppException("入院时间不能大于最小医嘱时间：" + DateUtils.format(minInptAdvice.getLongStartTime(),DateUtils.Y_M_DH_M_S));
+        if (minInptAdvice != null && DateUtils.dateCompare(minInptAdvice.getLongStartTime(), inptVisitDTO.getInTime())) {
+            throw new AppException("入院时间不能大于最小医嘱时间：" + DateUtils.format(minInptAdvice.getLongStartTime(), DateUtils.Y_M_DH_M_S));
         }
 
         // add by 张国瑞； 修改之前 比对入院科室是否一致，如果当前病人 已经安床住院且前端传过来的入院科室不一致，那么抛出异常
         String inDeptId = inptVisitDTO.getInDeptId();
         String inDeptIdForDataBase = selectEntiey.getInDeptId();
-        if (!Constants.BRZT.DR.equals(selectEntiey.getStatusCode()) && inDeptId != null && !inDeptId.equals(inDeptIdForDataBase)){
+        if (!Constants.BRZT.DR.equals(selectEntiey.getStatusCode()) && inDeptId != null && !inDeptId.equals(inDeptIdForDataBase)) {
             throw new AppException("该病人不是待入, 不可修改入院科室");
         }
         return Integer.toString(inptVisitDAO.updateInptVisit(inptVisitDTO));
@@ -1685,30 +1732,30 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     }
 
     private Map getDictNameMapByCodeV(InsureIndividualBasicDTO insureIndividualBasicDTO) {
-        Map<String,Object> resultMap = new HashMap();
-        Map<String,Object> selectmap = new HashMap();
+        Map<String, Object> resultMap = new HashMap();
+        Map<String, Object> selectmap = new HashMap();
 
         // TODO 自定义规则。按顺序写入
-        String codes[] = {"YWLX_ZY","DYLX_ZY","aac148","aac013","akc193"};
-        String values[] = {insureIndividualBasicDTO.getAka130(),insureIndividualBasicDTO.getBka006(),insureIndividualBasicDTO.getAac148(),insureIndividualBasicDTO.getAac013(),insureIndividualBasicDTO.getAkc193() };
-        String names[] = {"aka130Name","bka006Name","aac148Name","aac013Name","akc193Name"};
+        String codes[] = {"YWLX_ZY", "DYLX_ZY", "aac148", "aac013", "akc193"};
+        String values[] = {insureIndividualBasicDTO.getAka130(), insureIndividualBasicDTO.getBka006(), insureIndividualBasicDTO.getAac148(), insureIndividualBasicDTO.getAac013(), insureIndividualBasicDTO.getAkc193()};
+        String names[] = {"aka130Name", "bka006Name", "aac148Name", "aac013Name", "akc193Name"};
 
         InsureDictDTO insureDictEntity = new InsureDictDTO();
         insureDictEntity.setCodes(codes);
         insureDictEntity.setHospCode(insureIndividualBasicDTO.getHospCode());
         insureDictEntity.setInsureRegCode(insureIndividualBasicDTO.getAkb020());
-        selectmap.put("insureDictDTO",insureDictEntity);
-        selectmap.put("hospCode",insureIndividualBasicDTO.getHospCode());
+        selectmap.put("insureDictDTO", insureDictEntity);
+        selectmap.put("hospCode", insureIndividualBasicDTO.getHospCode());
 
         WrapperResponse wr = insureDictService_consumer.queryInsureDictList(selectmap);
         if (wr.getData() != null) {
-            Map<String,Object> dataMap = (Map<String,Object>) wr.getData();
-            List<InsureDictDO> list =  (List<InsureDictDO>) (dataMap.get("insureDict"));
+            Map<String, Object> dataMap = (Map<String, Object>) wr.getData();
+            List<InsureDictDO> list = (List<InsureDictDO>) (dataMap.get("insureDict"));
             if (!ListUtils.isEmpty(list)) {
-                for (int i = 0; i < codes.length; i ++) {
+                for (int i = 0; i < codes.length; i++) {
                     for (InsureDictDO insureDictDO : list) {
                         if (codes[i].equals(insureDictDO.getCode()) && values[i].equals(insureDictDO.getValue())) {
-                            resultMap.put(names[i],insureDictDO.getName());
+                            resultMap.put(names[i], insureDictDO.getName());
                             break;
                         }
                     }
@@ -1724,12 +1771,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
      *
      * @param inptVisitDTO
      */
-    private void insetInsureIndividualBasic(InptVisitDTO inptVisitDTO, String id,Map dictNameMap) {
+    private void insetInsureIndividualBasic(InptVisitDTO inptVisitDTO, String id, Map dictNameMap) {
         InsureIndividualBasicDTO insureIndividualBasicDTO = inptVisitDTO.getInsureIndividualBasicDTO();
         if (insureIndividualBasicDTO == null) {
             throw new AppException("未获取到就诊人员医保业务参数信息");
         }
-        if (StringUtils.isEmpty( insureIndividualBasicDTO.getAkb020())) {
+        if (StringUtils.isEmpty(insureIndividualBasicDTO.getAkb020())) {
             insureIndividualBasicDTO.setAkb020(insureIndividualBasicDTO.getInsureRegCode());
         }
         insureIndividualBasicDTO.setId(id);
@@ -1737,12 +1784,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureIndividualBasicDTO.setCrteId(inptVisitDTO.getCrteId());
         insureIndividualBasicDTO.setCrteName(inptVisitDTO.getCrteName());
         insureIndividualBasicDTO.setCrteTime(DateUtils.getNow());
-        insureIndividualBasicDTO.setAka130Name(MapUtils.get(dictNameMap,"aka130Name"));
-        insureIndividualBasicDTO.setBka006Name(MapUtils.get(dictNameMap,"bka006Name"));
-        insureIndividualBasicDTO.setAac148Name(MapUtils.get(dictNameMap,"aac148Name"));
-        insureIndividualBasicDTO.setAac013Name(MapUtils.get(dictNameMap,"aac013Name"));
-        insureIndividualBasicDTO.setBaa027Name(MapUtils.get(dictNameMap,"baa027Name"));
-        insureIndividualBasicDTO.setAkc193Name(MapUtils.get(dictNameMap,"akc193Name"));
+        insureIndividualBasicDTO.setAka130Name(MapUtils.get(dictNameMap, "aka130Name"));
+        insureIndividualBasicDTO.setBka006Name(MapUtils.get(dictNameMap, "bka006Name"));
+        insureIndividualBasicDTO.setAac148Name(MapUtils.get(dictNameMap, "aac148Name"));
+        insureIndividualBasicDTO.setAac013Name(MapUtils.get(dictNameMap, "aac013Name"));
+        insureIndividualBasicDTO.setBaa027Name(MapUtils.get(dictNameMap, "baa027Name"));
+        insureIndividualBasicDTO.setAkc193Name(MapUtils.get(dictNameMap, "akc193Name"));
         insureIndividualBasicDTO.setBaa027Name(insureIndividualBasicDTO.getBaa027_name());
         insureIndividualBasicDTO.setAkc252(BigDecimalUtils.convert(insureIndividualBasicDTO.getBacu18()));
         insureIndividualBasicDTO.setAae005(inptVisitDTO.getPhone());
@@ -1770,6 +1817,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         return true;
     }*/
+
     /**
      * @Method: insertUnInbedPatientList
      * @Description: 入院登记写入消息
@@ -1780,7 +1828,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
      * @Return: cn.hsa.module.inpt.doctor.dto.InptVisitDTO
      **/
     public List<MessageInfoDTO> insertUnInbedPatientList(InptVisitDTO inptVisitDTO) {
-        String hospCode =inptVisitDTO.getHospCode();
+        String hospCode = inptVisitDTO.getHospCode();
         String name = inptVisitDTO.getCrteName();
         String crteId = inptVisitDTO.getCrteId();
         Map openParam = new HashMap();
@@ -1789,19 +1837,19 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         // 是否开启消息推送 lly 2021-12-02
         SysParameterDTO openSysParameterDTO = sysParameterService_consumer.getParameterByCode(openParam).getData();
         List<MessageInfoDTO> messageInfoDTOList = new ArrayList<>();
-        if (openSysParameterDTO!=null&& "1".equals(openSysParameterDTO.getValue())) {
+        if (openSysParameterDTO != null && "1".equals(openSysParameterDTO.getValue())) {
             Map paramMap = new HashMap();
             paramMap.put("hospCode", hospCode);
             paramMap.put("code", "XXTS_SETTING");
             SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(paramMap).getData();
             ConfigInfoDO configInfoDO = null;
             if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
-                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(),"inHospitalMsg");
+                configInfoDO = StringUtils.getConfigInfoDOFromSys(sysParameterDTO.getValue(), "inHospitalMsg");
             }
-            if (configInfoDO ==null){
+            if (configInfoDO == null) {
                 return new ArrayList<>();
             }
-            if (inptVisitDTO != null&& configInfoDO!=null) {
+            if (inptVisitDTO != null && configInfoDO != null) {
                 MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
                 messageInfoDTO.setId(SnowflakeUtils.getId());
                 messageInfoDTO.setHospCode(hospCode);
@@ -1811,11 +1859,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 if ("1".equals(configInfoDO.getIsPersonal())) {
                     messageInfoDTO.setReceiverId("");
                     messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
-                }else if ("0".equals(configInfoDO.getIsPersonal())){
+                } else if ("0".equals(configInfoDO.getIsPersonal())) {
                     // 推送到个人
                     messageInfoDTO.setDeptId("");
                     messageInfoDTO.setReceiverId(configInfoDO.getReceiverId());
-                }else {
+                } else {
                     // 默认推送到科室
                     messageInfoDTO.setReceiverId("");
                     messageInfoDTO.setDeptId(inptVisitDTO.getInDeptId());
@@ -1842,14 +1890,14 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 sysMap.put("code", "KAFKA_MSG_IP");
                 SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
                 if (sys == null || sys.getValue() == null) {  // 调用统一支付平台
-                   return messageInfoDTOList;
+                    return messageInfoDTOList;
                 }
                 String server = sys.getValue();
                 // 1. 创建一个kafka生产者
                 String producerTopic = Constants.MSG_TOPIC.producerTopicKey;//生产者消息推送Topic
                 KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
                 String message = JSONObject.toJSONString(messageInfoDTOList);
-                KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+                KafkaUtil.sendMessage(kafkaProducer, producerTopic, message);
             }
         }
         return messageInfoDTOList;

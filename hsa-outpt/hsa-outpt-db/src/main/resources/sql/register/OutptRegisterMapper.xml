@@ -144,7 +144,9 @@
             is_add,
             crte_id,
             crte_name,
-            crte_time
+            crte_time,
+            occupation_code,
+            contact_name
         ) values (
                      #{id,jdbcType=VARCHAR},
                      #{hospCode,jdbcType=VARCHAR},
@@ -176,7 +178,9 @@
                      #{isAdd,jdbcType=VARCHAR},
                      #{crteId,jdbcType=VARCHAR},
                      #{crteName,jdbcType=VARCHAR},
-                     #{crteTime,jdbcType=TIMESTAMP}
+                     #{crteTime,jdbcType=TIMESTAMP},
+                     #{occupationCode,jdbcType=VARCHAR},
+                     #{contactName,jdbcType=VARCHAR}
                  )
     </insert>
 

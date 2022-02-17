@@ -116,7 +116,7 @@ public interface OutptVisitDAO {
      * @Date   2021/4/8 15:25
      * @Return
      **/
-    int insertInsureSettleInfo(InsureIndividualSettleDO insureIndividualSettleDO);
+    int insertInsureSettleInfo(InsureIndividualSettleDTO insureIndividualSettleDO);
 
     int updateInsureSettleInfo(InsureIndividualSettleDO insureIndividualSettleDO);
 

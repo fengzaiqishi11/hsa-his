@@ -675,6 +675,11 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setCrteName(outptRegisterDTO.getCrteName());
         //创建时间
         outptVisitDTO.setCrteTime(DateUtils.getNow());
+        //2022/2/16
+        //职业
+        outptVisitDTO.setOccupationCode(outptRegisterDTO.getOccupationCode());
+        //联系人姓名
+        outptVisitDTO.setContactName(outptRegisterDTO.getContactName());
         return outptVisitDTO;
     }
 
@@ -3182,6 +3187,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptProfileFileDTO.setCrteId(outptVisitDTO.getCrteId());
         outptProfileFileDTO.setCrteName(outptVisitDTO.getCrteName());
         outptProfileFileDTO.setCrteTime(DateUtils.getNow());
+        //2022/2/16
+        outptProfileFileDTO.setOccupationCode(outptVisitDTO.getOccupationCode());
+        outptProfileFileDTO.setContactName(outptVisitDTO.getContactName());
 //        WrapperResponse<OutptProfileFileExtendDTO> outptProfileFileExtendDTO = outptProfileFileService_consumer.save(outptProfileFileDTO);
 
         //调用本地建档服务

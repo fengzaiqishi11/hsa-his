@@ -224,8 +224,8 @@
                 start_time,
                 end_time,
                 max(register_num) as register_num,
-                IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
-                (max(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
+                IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
+                (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
             FROM
                  outpt_doctor_register
             GROUP BY dq_id,hosp_code,start_time, end_time
@@ -389,7 +389,7 @@
         WHERE a.hosp_code = #{hospCode}
           and b.status_code = '0'
           and c.status_code = '0'
-          and a.source_bz_code = '4'
+          -- and a.source_bz_code = '4'
         <if test="data.keyword != null and data.keyword != ''">
             and (a.name like concat('%', #{data.keyword}, '%') or a.cert_no =  #{data.keyword} or a.register_no = #{data.keyword})
         </if>

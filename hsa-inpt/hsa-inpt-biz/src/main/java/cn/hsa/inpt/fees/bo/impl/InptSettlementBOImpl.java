@@ -1543,6 +1543,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         map.put("visitId",id);
         map.put("medicalRegNo",medicalRegNo);
         map.put("psnNo",insureIndividualVisitDTO.getAac001());
+        map.put("isHalfSettle",insureIndividualVisitDTO.getIsHalfSettle());
         map.put("medisCode",insureIndividualVisitDTO.getMedicineOrgCode());
         checkInsureAndHisFee(map);
         /**
@@ -1616,6 +1617,15 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
      * @Return
     **/
     private void checkInsureAndHisFee(Map<String, Object> map) {
+        /**
+         * 如果是中途结算，验证费用是否传输完时，需要加上中途结算时间区间
+         */
+        if("1".equals(MapUtils.get(map,"isHalfSettle"))){
+            InsureIndividualCostDTO insureIndividualCostDTO= insureIndividualCostService.selectFeeStartAndEndTime(map).getData();
+            map.put("feeStartDate",insureIndividualCostDTO.getFeeStartTime());
+            map.put("feeEndDate",insureIndividualCostDTO.getFeeEndTime());
+            map.put("medicialRegNo",insureIndividualCostDTO.getInsureRegisterNo());
+        }
         List<InptCostDTO> inptCostDTOList  =  inptCostDAO.checkInsureAndHisFee(map);
         if(!ListUtils.isEmpty(inptCostDTOList)){
             List<String> itemNameCollect = inptCostDTOList.stream().map(InptCostDTO::getItemName).collect(Collectors.toList());

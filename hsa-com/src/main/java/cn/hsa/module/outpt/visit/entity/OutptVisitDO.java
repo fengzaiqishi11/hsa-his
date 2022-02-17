@@ -223,4 +223,12 @@ public class OutptVisitDO extends PageDO implements Serializable {
      * 居住地地址
      */
     private String nowAddress;
+    /**
+     * 职业代码（ZY）
+     */
+    private String occupationCode;
+    /**
+     * 联系人姓名
+     */
+    private String contactName;
 }

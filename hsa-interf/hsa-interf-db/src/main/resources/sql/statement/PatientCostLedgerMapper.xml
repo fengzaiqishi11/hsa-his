@@ -2859,6 +2859,12 @@
         <if test="code != null and code != ''">
             and item_code = #{code}
         </if>
+        <if test="SF != null and SF == '1'.toString()">
+            and b.is_basic = #{SF}
+        </if>
+        <if test="SF != null and SF == '0'.toString()">
+            and (b.is_basic = '0' or b.is_basic = ''or b.is_basic is null)
+        </if>
         <if test="keyword != null and keyword != ''">
             and (
             siv.item_name like concat('%', #{keyword}, '%')
@@ -2960,6 +2966,12 @@
         </if>
         <if test="code != null and code != ''">
             and item_code = #{code}
+        </if>
+        <if test="SF != null and SF == '1'.toString()">
+            and b.is_basic = #{SF}
+        </if>
+        <if test="SF != null and SF == '0'.toString()">
+            and (b.is_basic = '0' or b.is_basic = ''or b.is_basic is null)
         </if>
         <if test="keyword != null and keyword != ''">
             and (

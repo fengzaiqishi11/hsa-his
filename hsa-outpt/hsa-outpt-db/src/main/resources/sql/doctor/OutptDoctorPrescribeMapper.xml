@@ -495,7 +495,9 @@
                                remark = #{remark},
                                now_address = #{nowAddress},
                                source_tj_code = #{sourceTjCode},
-                               source_tj_remark = #{sourceTjRemark}
+                               source_tj_remark = #{sourceTjRemark},
+                               occupation_code = #{occupationCode},
+                               contact_name = #{contactName}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -2299,7 +2301,9 @@
                                phone = #{phone},
                                visit_code = #{visitCode},
                                source_tj_code = #{sourceTjCode},
-                               source_tj_remark = #{sourceTjRemark}
+                               source_tj_remark = #{sourceTjRemark},
+                               occupation_code = #{occupationCode},
+                               contact_name = #{contactName}
         where visit_id = #{id} and hosp_code = #{hospCode}
     </update>
 

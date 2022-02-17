@@ -53,6 +53,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String age; // 年龄
     private List<String> ids;
     private String signCode; // 执行签名状态
+    private String exeSignCode;//单个医嘱执行状态标志
     private String pharId; // 是否当前科室
     private String startOnlyDate; //开始日期
     private String startOnlyTime; //开始时间

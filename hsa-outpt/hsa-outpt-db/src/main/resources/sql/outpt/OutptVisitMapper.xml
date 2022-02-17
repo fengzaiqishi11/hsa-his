@@ -241,7 +241,7 @@
         birthday, marry_code, nation_code, cert_code, cert_no, phone, now_address, visit_no, visit_code, patient_code,
         preferential_type_id, source_tj_code, source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
         insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
-        pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
+        pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time,occupation_code,contact_name
         )
         values
         (
@@ -249,7 +249,7 @@
         #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{nowAddress}, #{visitNo}, #{visitCode}, #{patientCode},
         #{preferentialTypeId}, #{sourceTjCode}, #{sourceTjRemark}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
         #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
-        #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
+        #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime},#{occupationCode},#{contactName}
         )  on duplicate key update pym=#{pym};
 
     </insert>
@@ -287,7 +287,7 @@
         a.insure_patient_id, a.insure_remark, a.doctor_id, a.doctor_name, a.dept_id, a.dept_name, a.visit_time, a.remark,
         a.pym, a.wbm, a.is_visit, a.tran_in_code,  a.is_first_visit, a.crte_id, a.crte_name, a.crte_time, a.tran_in_code,
         a.in_dept_id, ifnull(a.in_disease_id, d.disease_id) in_disease_id, a.in_remark, ifnull(c.name, e.name) inDiseaseName, a.advance_payment,
-        a.source_tj_code, a.source_tj_remark
+        a.source_tj_code, a.source_tj_remark,a.occupation_code,a.contact_name
         from outpt_visit a
         left join base_disease c on a.in_disease_id = c.id and a.hosp_code = c.hosp_code
         left join outpt_medical_record d on a.id = d.visit_id and a.hosp_code = d.hosp_code

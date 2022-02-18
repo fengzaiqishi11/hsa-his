@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -152,6 +153,8 @@ public class BackStroConfirmBOImpl extends HsafBO implements BackStroConfirmBO {
      **/
     @Override
     public int insert(StroOutDTO stroOutDTO) {
+        // 校验 接收单位是否合理
+        checkOutStrock(stroOutDTO.getInStockId(),stroOutDTO.getHospCode(),stroOutDTO.getStroOutDetailDTOS());
         stroOutDTO.setOutCode(Constants.CRFS.YFTK);
         stroOutDTO.setAuditCode("0");
         stroOutDTO.setCrteTime(DateUtils.getNow());
@@ -161,6 +164,7 @@ public class BackStroConfirmBOImpl extends HsafBO implements BackStroConfirmBO {
         stroOutDTO.setId(id);
         BigDecimal buyPriceAll= BigDecimal.valueOf(0);
         BigDecimal sellPriceAll= BigDecimal.valueOf(0);
+
         if (!ListUtils.isEmpty(stroOutinDetailDTOS)) {
             for (int i = 0; i < stroOutinDetailDTOS.size(); i++) {
                 stroOutinDetailDTOS.get(i).setOutId(id);
@@ -174,7 +178,55 @@ public class BackStroConfirmBOImpl extends HsafBO implements BackStroConfirmBO {
         stroOutDTO.setSellPriceAll(sellPriceAll);
         return backStroConfirmDAO.insert(stroOutDTO);
     }
+    /**
+     * @Meth: checkOutStrock
+     * @Description: 保存之前校验，接受单位能否有权限接收所有项目
+     * @Param: []
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/2/17
+     */
+    public void checkOutStrock(String inStockId,String hospCode,List<StroOutDetailDTO> stroOutinDetailDTOS){
 
+        // 获得接收单位标识
+        String loginTypeIdentity = backStroConfirmDAO.queryDeptById(inStockId, hospCode);
+        if(StringUtils.isEmpty(loginTypeIdentity)) {
+            throw new AppException("接受科室未配置药房药库类别标识");
+        }
+        List<String> types = new ArrayList<>();
+
+        for (String loginType:loginTypeIdentity.split(",")) {
+            if (loginType.equals("2")) {//中成药
+                types.add("1");
+            } else if (loginType.equals("3")) {//中草药
+                types.add("2");
+            } else if (loginType.equals("1")) {//西药
+                types.add("0");
+            } else if(loginType.contains("4")){ // 藏药
+                types.add("3");
+            } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
+                types.add("material");
+            } else {
+                throw new AppException("没有该药房药库类别标识");
+            }
+        }
+       // 根据item_code进行分组,药品是1 材料是2
+        Map<String, List<StroOutDetailDTO>> itemlistMap = stroOutinDetailDTOS.stream().collect(Collectors.groupingBy(StroOutDetailDTO::getItemCode));
+        for (Map.Entry<String, List<StroOutDetailDTO>> itemMap : itemlistMap.entrySet()) {
+            String itemCode = itemMap.getKey();
+            List<StroOutDetailDTO> value = itemMap.getValue();
+            if ("2".equals(itemCode) && !types.contains("material")) { // 材料
+                throw new AppException("接受单位没有设置材料标识，不能退材料");
+            } else {
+                List<String> errorType = backStroConfirmDAO.queryDrug(types, value);
+                if (!ListUtils.isEmpty(errorType)) {
+                    throw new AppException("接受单位没有设置药品标识");
+                }
+            }
+        }
+
+
+    }
     /**
      * @param stroOutDTO 出入库表数据传输对象
      * @Menthod update

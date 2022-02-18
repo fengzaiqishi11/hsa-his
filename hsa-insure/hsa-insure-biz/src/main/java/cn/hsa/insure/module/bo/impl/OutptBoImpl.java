@@ -148,11 +148,11 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                 String akb020 = payinfo.get("akb020");//医院编码
                 String aaz217 = payinfo.get("aaz217");//就医登记号
                 //编辑医保患者信息表
-                InsureIndividualVisitDO insureIndividualVisitDO = new InsureIndividualVisitDO();
-                insureIndividualVisitDO.setVisitId(visitId);//就诊id
-                insureIndividualVisitDO.setMedicalRegNo(aaz217);//医保登记号
-                insureIndividualVisitDO.setHospCode(hospCode);
-                insureIndividualVisitDAO.updateByPrimaryKeySelective(insureIndividualVisitDO);
+                InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+                insureIndividualVisitDTO.setVisitId(visitId);//就诊id
+                insureIndividualVisitDTO.setMedicalRegNo(aaz217);//医保登记号
+                insureIndividualVisitDTO.setHospCode(hospCode);
+                insureIndividualVisitDAO.updateInsureMedicalRegNo(insureIndividualVisitDTO);
                 if (trialMap.containsKey("insureIndividualCostDOList")) {
                     List<InsureIndividualCostDO> insureIndividualCostDOList = (List<InsureIndividualCostDO>) trialMap.get("insureIndividualCostDOList");
                     insureIndividualCostDAO.batchInsertInsureCost(insureIndividualCostDOList);

@@ -531,6 +531,59 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
         selectEntity.setPsnPartAmt(BigDecimalUtils.negate(selectEntity.getPsnPartAmt()));// 个人负担总金额
         selectEntity.setLastSettle(BigDecimalUtils.negate(selectEntity.getLastSettle()));// 结算后余额
         selectEntity.setBeforeSettle(BigDecimalUtils.negate(selectEntity.getBeforeSettle()));// 结算后余额
+
+        // 生育基金
+        selectEntity.setFertilityPay(BigDecimalUtils.negate(selectEntity.getFertilityPay()));
+        // 代缴基金（破产改制）
+        selectEntity.setBehalfPay(BigDecimalUtils.negate(selectEntity.getBehalfPay()));
+        // 居民家庭账户金
+        selectEntity.setFamilyPay(BigDecimalUtils.negate(selectEntity.getFamilyPay()));
+        // 新冠肺炎核酸检测财政补助
+        selectEntity.setCOVIDPay(BigDecimalUtils.negate(selectEntity.getCOVIDPay()));
+        // 公益补充保险基金
+        selectEntity.setWelfarePay(BigDecimalUtils.negate(selectEntity.getWelfarePay()));
+        // 军转干部医疗补助基金
+        selectEntity.setSoldierToPay(BigDecimalUtils.negate(selectEntity.getSoldierToPay()));
+        // 厅级干部补助基金
+        selectEntity.setHallPay(BigDecimalUtils.negate(selectEntity.getHallPay()));
+        //工伤保险基金
+        selectEntity.setInjuryPay(BigDecimalUtils.negate(selectEntity.getInjuryPay()));
+        // 离休老工人门慢保障基金
+        selectEntity.setRetiredOutptPay(BigDecimalUtils.negate(selectEntity.getRetiredOutptPay()));
+        // 一至六级残疾军人医疗补助基金
+        selectEntity.setSoldierPay(BigDecimalUtils.negate(selectEntity.getSoldierPay()));
+        // 离休人员医疗保障基金
+        selectEntity.setRetiredPay(BigDecimalUtils.negate(selectEntity.getSoldierPay()));
+        // 其他基金
+        selectEntity.setOthPay(BigDecimalUtils.negate(selectEntity.getOthPay()));
+        // 农村低收入人口医疗补充保险
+        selectEntity.setLowInPay(BigDecimalUtils.negate(selectEntity.getLowInPay()));
+        // 优抚对象医疗补助基金
+        selectEntity.setCarePay(BigDecimalUtils.negate(selectEntity.getCarePay()));
+        // 特惠保补偿金
+        selectEntity.setThbPay(BigDecimalUtils.negate(selectEntity.getThbPay()));
+        // 政府兜底基金
+        selectEntity.setGovernmentPay(BigDecimalUtils.negate(selectEntity.getGovernmentPay()));
+        // 居民意外伤害基金
+        selectEntity.setRetAcctInjPay(BigDecimalUtils.negate(selectEntity.getRetAcctInjPay()));
+        // 职工意外伤害基金
+        selectEntity.setAcctInjPay(BigDecimalUtils.negate(selectEntity.getAcctInjPay()));
+        // 个人账户共计支付金额
+        selectEntity.setAcctMulaidPay(BigDecimalUtils.negate(selectEntity.getAcctMulaidPay()));
+        // 符合政策范围金额
+        selectEntity.setInscpScpAmt(BigDecimalUtils.negate(selectEntity.getInscpScpAmt()));
+        // 先行自付金额
+        selectEntity.setPreselfpayAmt(BigDecimalUtils.negate(selectEntity.getPreselfpayAmt()));
+        // 超限价
+        selectEntity.setOverSelfPrice(BigDecimalUtils.negate(selectEntity.getOverSelfPrice()));
+        // 全自费金额
+        selectEntity.setAllPortionPrice(BigDecimalUtils.negate(selectEntity.getAllPortionPrice()));
+        // 企业支付
+        selectEntity.setComPay(BigDecimalUtils.negate(selectEntity.getComPay()));
+        // 医院减免金额
+        selectEntity.setHospExemAmount(BigDecimalUtils.negate(selectEntity.getHospExemAmount()));
+        //医疗救助金额
+        selectEntity.setMafPay(BigDecimalUtils.negate(selectEntity.getMafPay()));
         inptVisitDAO.insertInsureIndividualSettle(selectEntity);
     }
 }

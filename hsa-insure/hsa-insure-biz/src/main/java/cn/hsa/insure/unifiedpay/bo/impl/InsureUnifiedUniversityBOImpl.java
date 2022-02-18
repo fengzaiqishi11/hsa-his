@@ -117,12 +117,12 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         // 校验就诊信息
         OutptVisitDTO outptVisitDTO =  outptVisitService.selectOutptVisitById(map).getData();
         if(outptVisitDTO == null || StringUtils.isEmpty(outptVisitDTO.getCertNo())){
-           return false;
+            return false;
         }
         // 效验门诊结算信息
         OutptSettleDTO outptSettleDTO = outptVisitService.selectOutptSettleById(map).getData();
         if(outptSettleDTO == null){
-           return false;
+            return false;
         }
         // 校验医保结算信息
         InsureIndividualSettleDTO individualSettleDTO = insureIndividualSettleService.selectInsureIndividualSettleById(map).getData();
@@ -204,7 +204,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/20 11:27
      * @Return
-    **/
+     **/
     private void handlerSettleError(Map<String,Object> map, InsureConfigurationDTO insureConfigurationDTO) {
         String hospCode = MapUtils.get(map,"hospCode");
         String settleId = MapUtils.get(map,"settleId");
@@ -228,18 +228,19 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         map.put("settleKey",settleKey);
         map.put("feeKey",feeKey);
         if(redisUtils.hasKey(settleKey) && redisUtils.hasKey(feeKey)  && redisUtils.hasKey(registerKey)){
-            handlerOutpt_2208(map, insureConfigurationDTO);
-            handlerOutpt_2205(map, insureConfigurationDTO);
-            handlerOutpt_2202(map, insureConfigurationDTO);
+            handlerOutpt_2208(map, insureConfigurationDTO,settleKey);
+            handlerOutpt_2205(map, insureConfigurationDTO,feeKey);
+            handlerOutpt_2202(map, insureConfigurationDTO,registerKey);
+
         }
         //如果没有结算key 有费用key 有医保登记号key 说明需要调用门诊挂号撤销接口  费用撤销
         if(!redisUtils.hasKey(settleKey) && redisUtils.hasKey(feeKey) && redisUtils.hasKey(registerKey)){
-            handlerOutpt_2205(map, insureConfigurationDTO);
-            handlerOutpt_2202(map, insureConfigurationDTO);
+            handlerOutpt_2205(map, insureConfigurationDTO,feeKey);
+            handlerOutpt_2202(map, insureConfigurationDTO,registerKey);
         }
-       if( !redisUtils.hasKey(settleKey) && !redisUtils.hasKey(feeKey) && redisUtils.hasKey(registerKey)){
-           handlerOutpt_2202(map, insureConfigurationDTO);
-       }
+        if( !redisUtils.hasKey(settleKey) && !redisUtils.hasKey(feeKey) && redisUtils.hasKey(registerKey)){
+            handlerOutpt_2202(map, insureConfigurationDTO,registerKey);
+        }
     }
     /**
      * @Method handlerOutpt_2202
@@ -250,8 +251,8 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Date   2021/12/20 15:03
      * @Return
      **/
-    private void handlerOutpt_2208(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO) {
-        String settleKey = MapUtils.get(map,"settleKey");
+    private void handlerOutpt_2208(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO,String settleKey) {
+
         String settleKeyValue = redisUtils.get(settleKey);
         if(StringUtils.isNotEmpty(settleKeyValue)){
             String[] settleKeyValueSplit = settleKeyValue.split("-");
@@ -259,6 +260,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
                 return ;
             }
             outpt_2208(map,insureConfigurationDTO,settleKeyValueSplit);
+            redisUtils.del(settleKey);
         }
     }
 
@@ -271,9 +273,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Date   2021/12/20 15:03
      * @Return
      **/
-    private void handlerOutpt_2205(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO) {
-
-        String feeKey = MapUtils.get(map,"feeKey");
+    private void handlerOutpt_2205(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO,String feeKey) {
         String feeKeyValue = redisUtils.get(feeKey);
         if (StringUtils.isNotEmpty(feeKeyValue)) {
             String[] feeKeyValueSplit = feeKeyValue.split("-");
@@ -281,6 +281,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
                 return ;
             }
             outpt_2205(map, insureConfigurationDTO, feeKeyValueSplit);
+            redisUtils.del(feeKey);
         }
     }
 
@@ -292,9 +293,8 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/20 15:03
      * @Return
-    **/
-    private void handlerOutpt_2202(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO) {
-        String registerKey = MapUtils.get(map,"registerKey");
+     **/
+    private void handlerOutpt_2202(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO,String registerKey) {
         String registerKeyValue = redisUtils.get(registerKey);
         if (StringUtils.isNotEmpty(registerKeyValue)) {
             String[] registerKeyValueSplit = registerKeyValue.split("-");
@@ -302,6 +302,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
                 return ;
             }
             outpt_2202(map, insureConfigurationDTO, registerKeyValueSplit);
+            redisUtils.del(registerKey);
         }
     }
 
@@ -313,7 +314,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/20 14:50
      * @Return
-    **/
+     **/
     private void outpt_2205(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO, String[] feeKeyValueSplit) {
         String hospCode = insureConfigurationDTO.getHospCode();
         String regCode = insureConfigurationDTO.getRegCode();
@@ -336,7 +337,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/20 13:52
      * @Return
-    **/
+     **/
     private void outpt_2202(Map<String, Object> map, InsureConfigurationDTO insureConfigurationDTO, String[] registerKeyValueSplit) {
         String hospCode = insureConfigurationDTO.getHospCode();
         String regCode = insureConfigurationDTO.getRegCode();
@@ -360,7 +361,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/20 13:41
      * @Return
-    **/
+     **/
     private void outpt_2208(Map<String,Object>map, InsureConfigurationDTO insureConfigurationDTO, String[] split) {
         String hospCode = insureConfigurationDTO.getHospCode();
         String regCode = insureConfigurationDTO.getRegCode();
@@ -383,7 +384,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/15 15:27
      * @Return
-    **/
+     **/
     private Map<String, Object> handlerInsureRegister(Map<String, Object> map, OutptVisitDTO outptVisitDTO) {
         Map<String, Object> dataMap = new HashMap<>(11);
         String hospCode = MapUtils.get(map,"hospCode");
@@ -423,7 +424,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         // 医保登记的键
         String registerKey = stringBuffer.append(hospCode).append(settleId).append(functionCode).toString();
         String registerValue =medicalRegNo+"-"+aac001+"-"+iptOtpNo;
-        redisUtils.set(registerKey,registerValue);
+        redisUtils.set(registerKey,registerValue, 3*24*60*60);
         log.info("门诊挂号登记redis键"+registerKey+"值为:"+registerValue);
         resultDataMap.put("registerKey",registerKey);
         return resultDataMap;
@@ -437,7 +438,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/15 14:29
      * @Return
-    **/
+     **/
     private void handlerOutptInsurePay(Map<String, Object> map,InsureConfigurationDTO configurationDTO) {
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");
@@ -459,12 +460,12 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Method handlerResultFundData
      * @Desrciption
      *      医保结算以后：处理医保结算基金信息
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/12/15 14:03 
-     * @Return 
-    **/
+     * @Date   2021/12/15 14:03
+     * @Return
+     **/
     private void handlerResultFundData(Map<String, Object> resultDataMap, Map<String, Object> map) {
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");
@@ -521,7 +522,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 16:30
      * @Return
-    **/
+     **/
     private void handlerResultFeeData( Map<String, Object> settleDataMap,Map<String,Object> map,Map<String,Object> patientSumMap) {
         String hospCode = MapUtils.get(map,"hospCode");
         String crteName = MapUtils.get(map,"crteName");
@@ -578,7 +579,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 16:13
      * @Return
-    **/
+     **/
     private Map<String,Object> queryInsurePatientSum(Map<String, Object> map) {
         Map<String, Object> patientSumMap = insureUnifiedBaseService.queryPatientSumInfo(map).getData();
         return patientSumMap;
@@ -592,7 +593,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 15:57
      * @Return
-    **/
+     **/
     private void handlerOutptAcctPay(Map<String, Object> resultDataMap, Map<String, Object> map) {
         Map<String, Object> outputMap = MapUtils.get(resultDataMap,"output");
         Map<String, Object> settleDataMap = MapUtils.get(outputMap,"setlinfo");
@@ -614,7 +615,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 13:45
      * @Return
-    **/
+     **/
     private Map<String,Object> handlerOutptInsureSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO,String funtionCode,String msgName,BigDecimal bigFee) {
         String hospCode = MapUtils.get(map,"hospCode");
         String regCode = MapUtils.get(map,"regCode");
@@ -646,7 +647,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
             StringBuffer stringBuffer = new StringBuffer();
             String settleKey = stringBuffer.append(hospCode).append(setlId).append(funtionCode).toString();
             String settleValue = setlId+"-"+medicalRegNo+"-"+aac001+"-"+batchNo;
-            redisUtils.set(settleKey,settleValue);
+            redisUtils.set(settleKey,settleValue,3*24*60*60);
             log.info("redis存了结算键"+settleKey);
             resultMap.put("settleKey",settleKey);
         }
@@ -661,7 +662,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 14:10
      * @Return
-    **/
+     **/
     private void handlerResultData(Map<String, Object> resultMap, Map<String, Object> map,InsureConfigurationDTO insureConfigurationDTO) {
         Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
         Map<String, Object> settleDataMap = (Map<String, Object>) outputMap.get("setlinfo");
@@ -759,15 +760,15 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         map.put("setlId",setlId);
     }
 
-   /**
-    * @Method doResultSetdetailList
-    * @Desrciption  处理基金信息
-    * @Param
-    *
-    * @Author fuhui
-    * @Date   2021/12/14 15:51
-    * @Return
-   **/
+    /**
+     * @Method doResultSetdetailList
+     * @Desrciption  处理基金信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/12/14 15:51
+     * @Return
+     **/
     private Map<String, Object> doResultSetdetailList(Map<String, Object> outDataMap) {
         Map <String,Object> resultMap = new HashMap<>();
         List<Map<String,Object>> setldetailList = MapUtils.get(outDataMap,"setldetailList");
@@ -856,7 +857,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 13:39
      * @Return
-    **/
+     **/
     private Map<String,Object> handlerOutptInsureCostFee(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO,OutptVisitDTO outptVisitDTO) {
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");
@@ -897,7 +898,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         StringBuffer stringBuffer = new StringBuffer();
         String feeKey = stringBuffer.append(hospCode).append(settleId).append("2204").toString();
         String feeKeyValue = insureIndividualVisitDTO.getMedicalRegNo()+"-"+batchNo+insureIndividualVisitDTO.getAac001();
-        redisUtils.set(feeKey,feeKeyValue);
+        redisUtils.set(feeKey,feeKeyValue,3*24*60*60);
         log.info("redis存了费用键"+feeKey);
         map.put("feeKey",feeKey);
         return map;
@@ -912,7 +913,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 11:14
      * @Return
-    **/
+     **/
     private void uploadInsureDiagnoseInfo(Map<String, Object> map,InsureIndividualVisitDTO insureIndividualVisitDTO,OutptVisitDTO outptVisitDTO) {
         String hospCode = MapUtils.get(map,"hospCode");
         String regCode = MapUtils.get(map,"regCode");
@@ -948,7 +949,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 11:45
      * @Return
-    **/
+     **/
     private List<Map<String, Object>> getOutptDiagnose(Map<String, Object> map,OutptVisitDTO outptVisitDTO) {
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");
@@ -1048,7 +1049,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 10:16
      * @Return
-    **/
+     **/
     private void handlerBasicInfo(Map<String, Object> map, OutptVisitDTO outptVisitDTO, Map<String, Object> patientInfoMap) {
 
 
@@ -1159,7 +1160,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/14 8:40
      * @Return
-    **/
+     **/
     private InsureIndividualVisitDTO handlerRegisterInfo(Map<String, Object> map, OutptVisitDTO outptVisitDTO, Map<String,Object> registerDataMap,InsureConfigurationDTO insureConfigurationDTO) {
         InsureIndividualVisitDTO data = new InsureIndividualVisitDTO();
         data.setId(SnowflakeUtils.getId());//id
@@ -1240,7 +1241,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
      * @Author fuhui
      * @Date   2021/12/13 16:48
      * @Return
-    **/
+     **/
     private Map<String, Object> getInsurePatientInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map,"hospCode");
         String regCode = MapUtils.get(map,"regCode");

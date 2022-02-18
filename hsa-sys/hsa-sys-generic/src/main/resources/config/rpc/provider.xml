@@ -7,6 +7,9 @@
 
     <!-- 生产者：暴露接口 -->
 
+    <!-- 基础信息子系统 -> 版本信息生产者 -->
+    <dubbo:service interface="cn.hsa.module.sys.version.service.VersionInfoService" ref="sysVersionInfoService_provider"/>
+
     <!-- 基础信息子系统 -> 值域代码生产者 -->
     <dubbo:service interface="cn.hsa.module.sys.code.service.SysCodeService" ref="sysCodeService_provider"/>
 

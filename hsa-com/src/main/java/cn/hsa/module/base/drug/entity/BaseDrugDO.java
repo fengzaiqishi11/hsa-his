@@ -254,4 +254,7 @@ public class BaseDrugDO extends PageDO implements Serializable {
      * 批准文号
      */
     private String dan;
+
+    // 报销比例
+    private String reimbursementRatio;
 }

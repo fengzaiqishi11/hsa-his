@@ -64,8 +64,7 @@ public class MrisBaseInfoDO implements Serializable {
     private String ageUnitName;
 
     /** 出生日期 */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     /** 证件类型代码（ZJLX） */

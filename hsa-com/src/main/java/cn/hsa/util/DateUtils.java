@@ -6,10 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.*;
 
 /**
  * @Package_ame: cn.hsa.util
@@ -649,5 +648,19 @@ public class DateUtils {
             date.setTime( ((Integer) object).longValue());
         }
         return simpleDateFormat.format(date);
+    }
+
+    /**
+     * @Method getDayOfMonth
+     * @Desrciption java获取当前月的天数
+     * @Param
+     * @Author liuliyun
+     * @Date   2022/2/14 14:22
+     * @Return int
+     **/
+    public static int getDayOfMonth(){
+        Calendar aCalendar = Calendar.getInstance(Locale.CHINA);
+        int day=aCalendar.getActualMaximum(Calendar.DATE);
+        return day;
     }
 }

@@ -31,4 +31,8 @@ public interface OperInfoRecordDAO {
     List<InptCostDTO> queryOperCostByVisitId(Map<String, Object> paramMap);
 
     int updateOperStatusBatch(@Param("operList") List<OperInfoRecordDTO> applyUnScheduledList);
+
+    List<OperInfoRecordDTO> queryOperInfoRecordInpt(OperInfoRecordDTO operInfoRecordDTO);
+
+    List<OperInfoRecordDTO> queryOperInfoRecordOutpt(OperInfoRecordDTO operInfoRecordDTO);
 }

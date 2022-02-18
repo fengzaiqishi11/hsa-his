@@ -766,6 +766,132 @@
           and a.visit_id = #{visitId}
           AND a.source_code = '8'
     </select>
+    <select id="queryOperInfoRecordInpt" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        SELECT
+        oper.id,oper.hosp_code,oper.visit_id,oper.baby_id,inpt.in_no as in_no,oper.advice_id,
+        oper.name,oper.gender_code,oper.age,oper.age_unit_code,oper.blood_code,
+        oper.dept_id,oper.oper_dept_id,oper.bed_id,oper.bed_name,oper.oper_disease_id,
+        oper.oper_disease_icd9,oper.oper_disease_name,oper.in_disease_id,oper.in_disease_name,
+        oper.in_disease_icd10,oper.doctor_id,oper.doctor_name,oper.assistant_id1,oper.assistant_name1,
+        oper.assistant_id2,oper.assistant_name2,oper.assistant_id3,oper.assistant_name3,
+        oper.special_request,oper.content,oper.oper_Type,oper.audit_id,oper.audit_name,oper.audit_time,
+        oper.audit_remark,oper.oper_plan_time,oper.oper_room_Id,oper.oper_room_name,
+        oper.xh_nurse_id,oper.xh_nurse_name,oper.qx_nurse_id,oper.qx_nurse_name,oper.ana_code,
+        oper.ana_id1,oper.ana_name1,oper.ana_id2,oper.ana_name2,oper.ana_id3,oper.ana_name3,
+        oper.oper_end_time,oper.notched_code,oper.heal_code,oper.oper_time_hour,oper.status_code,
+        oper.is_cost,oper.total_price,oper.cost_time,oper.cost_id,oper.cost_name,
+        oper.remark,oper.crte_id,oper.crte_name,oper.crte_time,oper.rank,oper.ward_id,
+        ( SELECT CODE FROM base_dept AS b WHERE b.hosp_code = hosp_code AND b.id = inpt.in_dept_id ) AS deptCode,
+        CONCAT(
+        oper.name,'/',
+        IFNULL((case oper.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((case oper.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS keyword,
+        '住院病人' as inptOrOutpt,
+        '' as outptVisitNo,
+        inpt.Illness_code as IllnessCode,
+        inpt.zz_doctor_id as zzDoctorId,
+        inpt.total_advance,
+        inpt.total_cost,
+        inpt.total_balance,
+        (inpt.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id)) as totalMergeBalance,
+        (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id) as totalMergeCost
+        FROM
+        inpt_visit inpt,
+        oper_info_record oper
+        WHERE
+        inpt.hosp_code =  #{hospCode}
+        AND oper.hosp_code = inpt.hosp_code
+        AND oper.in_no = inpt.in_no
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (oper.name like concat('%',#{keyword},'%') or oper.in_no like concat('%',#{keyword},'%') or oper.bed_name like concat('%',#{keyword},'%'))
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and oper.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and oper.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and oper.dept_id = #{deptId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and oper.status_code = #{statusCode}
+        </if>
+        <if test="statusCode == null or statusCode == '' ">
+            and (oper.status_code is null or oper.status_code = 1)
+        </if>
+        ORDER BY
+        inpt.in_time DESC
+
+    </select>
+    <select id="queryOperInfoRecordOutpt" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        SELECT
+        oper.id,oper.hosp_code,oper.visit_id,oper.baby_id,outpt.visit_no as in_no,oper.advice_id,
+        oper.name,oper.gender_code,oper.age,oper.age_unit_code,oper.blood_code,
+        oper.dept_id,oper.oper_dept_id,oper.bed_id,oper.bed_name,oper.oper_disease_id,
+        oper.oper_disease_icd9,oper.oper_disease_name,oper.in_disease_id,oper.in_disease_name,
+        oper.in_disease_icd10,oper.doctor_id,oper.doctor_name,oper.assistant_id1,oper.assistant_name1,
+        oper.assistant_id2,oper.assistant_name2,oper.assistant_id3,oper.assistant_name3,
+        oper.special_request,oper.content,oper.oper_Type,oper.audit_id,oper.audit_name,oper.audit_time,
+        oper.audit_remark,oper.oper_plan_time,oper.oper_room_Id,oper.oper_room_name,
+        oper.xh_nurse_id,oper.xh_nurse_name,oper.qx_nurse_id,oper.qx_nurse_name,oper.ana_code,
+        oper.ana_id1,oper.ana_name1,oper.ana_id2,oper.ana_name2,oper.ana_id3,oper.ana_name3,
+        oper.oper_end_time,oper.notched_code,oper.heal_code,oper.oper_time_hour,oper.status_code,
+        oper.is_cost,oper.total_price,oper.cost_time,oper.cost_id,oper.cost_name,
+        oper.remark,oper.crte_id,oper.crte_name,oper.crte_time,oper.rank,oper.ward_id,
+        ( SELECT CODE FROM base_dept AS b WHERE b.hosp_code = hosp_code AND b.id = outpt.dept_id ) AS deptCode,
+        CONCAT(
+        oper.name,'/',
+        IFNULL((case oper.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(oper.age,'-'),
+        IFNULL((case oper.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS keyword,
+        '门诊病人' as inptOrOutpt,
+        outpt.visit_no as outptVisitNo,
+        '' as IllnessCode,
+        outpt.doctor_id as zzDoctorId,
+        0 as total_advance,
+        0 as total_cost,
+        0 as total_balance,
+        0 as totalMergeBalance,
+        0 as totalMergeCost
+        FROM
+        outpt_visit outpt,
+        oper_info_record oper
+        WHERE
+        outpt.hosp_code =  #{hospCode}
+        AND oper.hosp_code = outpt.hosp_code
+        AND oper.visit_id = outpt.id
+
+        <if test="id != null and id != ''">
+            and oper.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (oper.name like concat('%',#{keyword},'%') or oper.visit_id like concat('%',#{keyword},'%') )
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and oper.crte_time &gt;= DATE_FORMAT(#{startTime},'%Y-%m-%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and oper.crte_time &lt; DATE_FORMAT(DATE_ADD(#{endTime},INTERVAL 1 DAY),'%Y-%m-%d')
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and oper.dept_id = #{deptId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and oper.status_code = #{statusCode}
+        </if>
+        <if test="statusCode == null or statusCode == '' ">
+            and (oper.status_code is null or oper.status_code = 1)
+        </if>
+        ORDER BY
+        outpt.crte_time DESC
+    </select>
 
 
 </mapper>

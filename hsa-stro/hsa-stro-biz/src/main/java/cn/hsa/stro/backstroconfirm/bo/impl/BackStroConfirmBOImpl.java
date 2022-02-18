@@ -237,8 +237,11 @@ public class BackStroConfirmBOImpl extends HsafBO implements BackStroConfirmBO {
      **/
     @Override
     public int update(StroOutDTO stroOutDTO) {
+        // 校验 接收单位是否合理
+        checkOutStrock(stroOutDTO.getInStockId(),stroOutDTO.getHospCode(),stroOutDTO.getStroOutDetailDTOS());
         List<StroOutDetailDTO> stroOutinDetailDTOS = stroOutDTO.getStroOutDetailDTOS();
         String id = stroOutDTO.getId();
+
 //        String code= stroOutDTO.getOrderNo();
         backStroConfirmDAO.deleteById(id, stroOutDTO.getHospCode());
         BigDecimal buyPriceAll= BigDecimal.valueOf(0);

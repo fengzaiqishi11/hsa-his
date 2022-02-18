@@ -282,7 +282,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 冲红医保结算数据
             selectMap.put("state",Constants.ZTBZ.ZC);
-            InsureIndividualSettleDO insureIndividualSettleDO = insureIndividualSettleService_consumer.getByParams(selectMap);
+            InsureIndividualSettleDTO insureIndividualSettleDO = insureIndividualSettleService_consumer.getByParams(selectMap);
             if (insureIndividualSettleDO == null) {
                throw new AppException("未获取到医保结算数据");
             }
@@ -327,6 +327,60 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setPsnPartAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getPsnPartAmt()));// 个人负担总金额
             insureIndividualSettleDO.setBeforeSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getBeforeSettle()));// 结算后余额
             insureIndividualSettleDO.setLastSettle(BigDecimalUtils.negate(insureIndividualSettleDO.getLastSettle()));// 结算后余额
+
+            // 生育基金
+            insureIndividualSettleDO.setFertilityPay(BigDecimalUtils.negate(insureIndividualSettleDO.getFertilityPay()));
+            // 代缴基金（破产改制）
+            insureIndividualSettleDO.setBehalfPay(BigDecimalUtils.negate(insureIndividualSettleDO.getBehalfPay()));
+            // 居民家庭账户金
+            insureIndividualSettleDO.setFamilyPay(BigDecimalUtils.negate(insureIndividualSettleDO.getFamilyPay()));
+            // 新冠肺炎核酸检测财政补助
+            insureIndividualSettleDO.setCOVIDPay(BigDecimalUtils.negate(insureIndividualSettleDO.getCOVIDPay()));
+            // 公益补充保险基金
+            insureIndividualSettleDO.setWelfarePay(BigDecimalUtils.negate(insureIndividualSettleDO.getWelfarePay()));
+            // 军转干部医疗补助基金
+            insureIndividualSettleDO.setSoldierToPay(BigDecimalUtils.negate(insureIndividualSettleDO.getSoldierToPay()));
+            // 厅级干部补助基金
+            insureIndividualSettleDO.setHallPay(BigDecimalUtils.negate(insureIndividualSettleDO.getHallPay()));
+            //工伤保险基金
+            insureIndividualSettleDO.setInjuryPay(BigDecimalUtils.negate(insureIndividualSettleDO.getInjuryPay()));
+            // 离休老工人门慢保障基金
+            insureIndividualSettleDO.setRetiredOutptPay(BigDecimalUtils.negate(insureIndividualSettleDO.getRetiredOutptPay()));
+            // 一至六级残疾军人医疗补助基金
+            insureIndividualSettleDO.setSoldierPay(BigDecimalUtils.negate(insureIndividualSettleDO.getSoldierPay()));
+            // 离休人员医疗保障基金
+            insureIndividualSettleDO.setRetiredPay(BigDecimalUtils.negate(insureIndividualSettleDO.getSoldierPay()));
+            // 其他基金
+            insureIndividualSettleDO.setOthPay(BigDecimalUtils.negate(insureIndividualSettleDO.getOthPay()));
+            // 农村低收入人口医疗补充保险
+            insureIndividualSettleDO.setLowInPay(BigDecimalUtils.negate(insureIndividualSettleDO.getLowInPay()));
+            // 优抚对象医疗补助基金
+            insureIndividualSettleDO.setCarePay(BigDecimalUtils.negate(insureIndividualSettleDO.getCarePay()));
+            // 特惠保补偿金
+            insureIndividualSettleDO.setThbPay(BigDecimalUtils.negate(insureIndividualSettleDO.getThbPay()));
+            // 政府兜底基金
+            insureIndividualSettleDO.setGovernmentPay(BigDecimalUtils.negate(insureIndividualSettleDO.getGovernmentPay()));
+            // 居民意外伤害基金
+            insureIndividualSettleDO.setRetAcctInjPay(BigDecimalUtils.negate(insureIndividualSettleDO.getRetAcctInjPay()));
+            // 职工意外伤害基金
+            insureIndividualSettleDO.setAcctInjPay(BigDecimalUtils.negate(insureIndividualSettleDO.getAcctInjPay()));
+            // 个人账户共计支付金额
+            insureIndividualSettleDO.setAcctMulaidPay(BigDecimalUtils.negate(insureIndividualSettleDO.getAcctMulaidPay()));
+            // 符合政策范围金额
+            insureIndividualSettleDO.setInscpScpAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getInscpScpAmt()));
+            // 先行自付金额
+            insureIndividualSettleDO.setPreselfpayAmt(BigDecimalUtils.negate(insureIndividualSettleDO.getPreselfpayAmt()));
+            // 超限价
+            insureIndividualSettleDO.setOverSelfPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getOverSelfPrice()));
+            // 全自费金额
+            insureIndividualSettleDO.setAllPortionPrice(BigDecimalUtils.negate(insureIndividualSettleDO.getAllPortionPrice()));
+            // 企业支付
+            insureIndividualSettleDO.setComPay(BigDecimalUtils.negate(insureIndividualSettleDO.getComPay()));
+            // 医院减免金额
+            insureIndividualSettleDO.setHospExemAmount(BigDecimalUtils.negate(insureIndividualSettleDO.getHospExemAmount()));
+            //医疗救助金额
+            insureIndividualSettleDO.setMafPay(BigDecimalUtils.negate(insureIndividualSettleDO.getMafPay()));
+
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);
             insertMap.put("insureIndividualSettleDO",insureIndividualSettleDO);

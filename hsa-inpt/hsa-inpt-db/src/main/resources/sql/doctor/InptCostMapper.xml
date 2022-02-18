@@ -1521,8 +1521,10 @@
         select
         <include refid="Base_Column_List"/>
         from inpt_cost
-        where hosp_code=#{hospCode} and iat_id=#{adviceId} and source_id=#{detailId} and status_code='0'
-        and date_format(plan_exec_time, '%Y-%m-%d') = date_format(#{startTime}, '%Y-%m-%d') and is_dist='0'
+        where hosp_code=#{hospCode} and iat_id=#{adviceId} and source_id=#{detailId}
+        and date_format(plan_exec_time, '%Y-%m-%d') = date_format(#{startTime}, '%Y-%m-%d')
+        -- and status_code='0'
+        -- and is_dist='0'
     </select>
 
     <update id="editInptCostByIds" parameterType="java.util.Map">

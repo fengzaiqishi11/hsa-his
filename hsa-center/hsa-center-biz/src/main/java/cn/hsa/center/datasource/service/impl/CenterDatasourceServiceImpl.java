@@ -178,6 +178,18 @@ public class CenterDatasourceServiceImpl extends HsafService implements CenterDa
     }
 
     /**
+     * @Description: 更新版本更新的确认标识
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    @Override
+    public WrapperResponse updateIsGuide() {
+        return centerDatasourceBO.updateIsGuide();
+    }
+
+    /**
      * @Menthod getCenterHospitalDatasource
      * @Desrciption  查询医院数据源集合
      * @param

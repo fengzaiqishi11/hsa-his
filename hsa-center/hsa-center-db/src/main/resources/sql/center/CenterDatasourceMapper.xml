@@ -341,4 +341,11 @@
     WHERE
         ch.is_valid = '1' and now() BETWEEN ch.start_date and ch.end_date and ch.code = #{hospCode}
   </select>
+  <select id="findHospitalCenterDataSource"
+          resultType="cn.hsa.module.center.datasource.dto.CenterDatasourceDTO">
+     select
+    DISTINCT b.hosp_code,a.*
+    from center_datasource a, center_hospital_datasource b
+    where a.code = b.ds_code
+  </select>
 </mapper>

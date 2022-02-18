@@ -167,4 +167,6 @@ public class BaseAdviceDO extends PageDO implements Serializable {
      */
     private String operDiseaseIcd9;
 
+    // 报销比例
+    private String reimbursementRatio;
 }

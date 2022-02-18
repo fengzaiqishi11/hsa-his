@@ -1480,7 +1480,7 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
                     messageInfoDTO.setReceiverId(outptRegisterDO.getDoctorId());   // 推送至挂号医生
                     messageInfoDTO.setSendCount(configInfoDO.getSendCount());
                     messageInfoDTO.setType(Constants.MSG_TYPE.MSG_YZ);
-                    messageInfoDTO.setContent(outptRegisterDO.getName() + "已挂号到当前科室，请及时处理就诊信息");
+                    messageInfoDTO.setContent(outptRegisterDO.getName() + "已挂号到当前医生，请及时处理就诊信息");
                     Date startTime = DateUtils.dateAddMinute(new Date(), configInfoDO.getStartTime());
                     Date endTime = DateUtils.dateAddMinute(startTime, configInfoDO.getEndTime());
                     messageInfoDTO.setStartTime(startTime);

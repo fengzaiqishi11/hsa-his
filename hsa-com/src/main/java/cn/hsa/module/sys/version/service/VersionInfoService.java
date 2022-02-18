@@ -24,4 +24,7 @@ public interface VersionInfoService  {
     @PostMapping("/service/sys/version/saveVersionInfo")
     WrapperResponse<Boolean> saveVersionInfo(Map map);
 
+    @PostMapping("/service/sys/version/queryVersionInfo")
+    WrapperResponse<VersionInfoDTO> queryVersionInfo(Map map);
+
 }

@@ -38,4 +38,10 @@ public class VersionInfoServiceImpl extends HsafService implements VersionInfoSe
         return WrapperResponse.success(versionInfoBO.saveVersionInfo(MapUtils.get(map,"versionInfoDTO")));
     }
 
+    @Override
+    public WrapperResponse<VersionInfoDTO> queryVersionInfo(Map map) {
+        VersionInfoDTO versionInfoDTO = versionInfoBO.queryVersionInfo();
+        return WrapperResponse.success(versionInfoDTO);
+    }
+
 }

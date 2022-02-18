@@ -140,4 +140,13 @@ public interface CenterDatasourceBO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO> 结果集
      */
     WrapperResponse tableStructureSync(TableStructureSyncDTO tableStructureSyncDTO);
+
+    /**
+     * @Description: 更新版本更新的确认标识
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    WrapperResponse updateIsGuide();
 }

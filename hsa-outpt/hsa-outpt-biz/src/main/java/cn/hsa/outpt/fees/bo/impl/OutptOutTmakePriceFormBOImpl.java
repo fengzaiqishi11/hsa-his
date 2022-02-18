@@ -380,6 +380,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             insureIndividualSettleDO.setHospExemAmount(BigDecimalUtils.negate(insureIndividualSettleDO.getHospExemAmount()));
             //医疗救助金额
             insureIndividualSettleDO.setMafPay(BigDecimalUtils.negate(insureIndividualSettleDO.getMafPay()));
+            // 伤残人员医疗保障基金
+            insureIndividualSettleDO.setHifdmPay(BigDecimalUtils.negate(insureIndividualSettleDO.getHifdmPay()));
 
             Map insertMap = new HashMap();
             insertMap.put("hospCode",hospCode);

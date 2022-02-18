@@ -829,7 +829,9 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
       List<StroInvoicingDTO> stroInvoicingDTOList = new ArrayList<>();
       //医院编码
       String hospCode = map.get("hospCode").toString();
+      String sfdeptFilter = MapUtils.getString(map,"sfdeptFilter","0");
       for (StroStockDetailDTO stroStockDetailDTO : stroStockDetailDTOList) {
+        stroStockDetailDTO.setSfdeptFilter(sfdeptFilter);
         // 查出该项目id的所有库存明细信息
         List<StroStockDetailDTO> stroStockDetailDTOS = stroStockDao.queryStoclDetailByItemIds(stroStockDetailDTO);
         // 根据库位id进行分组

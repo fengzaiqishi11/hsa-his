@@ -1243,8 +1243,8 @@ public class BedListBOImpl implements BedListBO {
         //compAdviceLongCost(map);
 
         // 停止床位长期费用
-        //String cancelRemark = "科室【" + inptVisitDTO.getInDeptName() + "】，护士【" + MapUtils.get(map, "userName") + "】转科";
-        //stopInptLongCostByBedId(map, bedIdList, cancelRemark);
+        String cancelRemark = "科室【" + inptVisitDTO.getInDeptName() + "】，护士【" + MapUtils.get(map, "userName") + "】换科";
+        stopInptLongCostByBedId(map, bedIdList, cancelRemark);
 
         // 清空已占床就诊ID、状态
         bedListDAO.clearBaseBedVisitByBedId(bedIdList);

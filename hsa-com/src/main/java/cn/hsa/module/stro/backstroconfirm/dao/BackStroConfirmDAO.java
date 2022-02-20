@@ -3,6 +3,7 @@ package cn.hsa.module.stro.backstroconfirm.dao;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -150,4 +151,15 @@ public interface BackStroConfirmDAO {
    */
 
   List<StroOutDTO> queryByids(List<String> list);
+  /**
+   * @Meth: queryDeptById
+   * @Description: 获得类别标识
+   * @Param: [inStockId, hospCode]
+   * @return: java.lang.String
+   * @Author: zhangguorui
+   * @Date: 2022/2/17
+   */
+  String queryDeptById(@Param("inStockId") String inStockId,@Param("hospCode") String hospCode);
+
+  List<String> queryDrug(@Param("types") List<String> types, @Param("value") List<StroOutDetailDTO> value);
 }

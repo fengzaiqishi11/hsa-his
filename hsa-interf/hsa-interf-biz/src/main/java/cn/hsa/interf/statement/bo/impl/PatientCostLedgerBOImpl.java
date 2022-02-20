@@ -21,7 +21,6 @@ import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CursorableLinkedList;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -1908,8 +1907,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      * @Return java.util.List<java.lang.Map>
      **/
     public PageDTO queryOutptCostAndRegisterCostList(Map<String, Object> paraMap){
-
-
+        // 不能分页，分页后数据不对
+        //PageHelper.startPage(Integer.parseInt(MapUtils.get(paraMap, "pageNo")), Integer.parseInt(MapUtils.get(paraMap, "pageSize")));
         Map<String,Object> returnMap = new HashMap<>();
 
         // 返回的表头
@@ -2118,9 +2117,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         dataList = dataList.stream().sorted(Comparator.comparing(this::comparingByDeptName).reversed()).collect(Collectors.toList());
         returnMap.put("result",dataList);
         //return returnMap;
-        Integer pageNo =Integer.parseInt((String) paraMap.get("pageNo"));
-        Integer pageSize =Integer.parseInt((String) paraMap.get("pageSize"));
-        PageHelper.startPage(pageNo, pageSize);
+//        Integer pageNo =Integer.parseInt((String) paraMap.get("pageNo"));
+//        Integer pageSize =Integer.parseInt((String) paraMap.get("pageSize"));
+//        PageHelper.startPage(pageNo, pageSize);
         Map<String,Object> sumData = new HashMap<>();
         if (!ListUtils.isEmpty(dataList)){
             for (Map<String,Object> a :dataList){

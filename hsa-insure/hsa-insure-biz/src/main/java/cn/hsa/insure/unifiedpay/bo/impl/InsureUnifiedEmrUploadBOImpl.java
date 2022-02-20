@@ -422,7 +422,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> paramMap = new HashMap<>();
-        paramMap.put("vali_flag",Constants.SF.S);
+        paramMap.put("vali_flag",Constants.SF.F);
         paramMap.put("ipt_medcas_hmpg_sn",mid);
         StringBuffer stringBuffer = new StringBuffer();
         paramMap.put("mdtrt_sn",mdtrtSn);
@@ -477,6 +477,13 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 item.put("mdtrt_sn",mdtrtSn);  //  就医流水号
                 item.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
             });
+        }else{
+            // 用测试环境测试时，医保必须传手术节点
+            Map<String,Object> operInfoMap = new HashMap<>();
+            operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+            operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+            operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+            operInfoDOList.add(operInfoMap);
         }
         map.put("oprationMapList",operInfoDOList);
         return map;

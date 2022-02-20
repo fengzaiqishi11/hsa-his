@@ -349,6 +349,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 			if (emrElementDTO.getSysCodeDefault() != null && !"".equals(emrElementDTO.getSysCodeDefault())) {
 				targetMap.put(key, emrElementDTO.getSysCodeDefault());
 			}
+			if ("5".equals(emrElementDTO.getTypeCode())&&"1".equals(emrElementDTO.getIsSysDate())){
+				targetMap.put(key, DateUtils.format(new Date(), "yyyy-MM-dd HH:mm:ss"));
+			}
 		}
 
 		return targetMap;

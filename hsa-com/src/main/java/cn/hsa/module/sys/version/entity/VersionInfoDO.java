@@ -38,5 +38,9 @@ public class VersionInfoDO extends PageDO implements Serializable {
      * 版本服务信息
      */
     private String versionService;
+    /**
+     * 版本文件地址
+     */
+    private String versionUrl;
 
 }

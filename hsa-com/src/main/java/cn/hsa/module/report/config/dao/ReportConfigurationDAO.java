@@ -71,13 +71,14 @@ public interface ReportConfigurationDAO {
     /**
      * 根据报表名称查询
      *
-     * @param tempName 报表模板文件名称
+     * @param hospCode 医院编码
+     * @param tempCode 报表模板编码
      * @return ReportConfigurationDTO
      * @menthod queryByTempName()
      * @author liuzhuoting
      * @date 2022/02/17 09:30
      **/
-    ReportConfigurationDTO queryByTempName(String tempName);
+    ReportConfigurationDTO queryByTempCode(String hospCode, String tempCode);
 
     /**
      * 根据报表名称删除

@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * @ClassName VersionInfoDTO
+ * @ClassName ReportFileRecordDTO
  * @Deacription dto层
  * @Author liuzhoting
  * @Date 2022-02-16

@@ -80,12 +80,19 @@
         </if>
     </select>
 
-    <!-- 根据报表名称查询 -->
-    <select id="queryByTempName" resultMap="BaseResultMap">
+    <!-- 根据报表编码查询 -->
+    <select id="queryByTempCode" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from report_configuration
-        where temp_name = #{tempName}
+        <where>
+            <if test="hospCode != '' and hospCode != null">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="tempCode != '' and tempCode != null">
+                and temp_code = #{tempCode}
+            </if>
+        </where>
         LIMIT 1
     </select>
 

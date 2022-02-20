@@ -30,6 +30,10 @@ public class ReportFileRecordDO extends PageDO implements Serializable {
      */
     private String tempCode;
     /**
+     * 文件名
+     */
+    private String fileName;
+    /**
      * 文件地址
      */
     private String fileAddress;

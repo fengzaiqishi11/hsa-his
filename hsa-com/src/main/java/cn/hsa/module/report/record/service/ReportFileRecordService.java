@@ -3,7 +3,7 @@ package cn.hsa.module.report.record.service;
 import org.springframework.cloud.openfeign.FeignClient;
 
 /**
- * @ClassName VersionInfoService
+ * @ClassName ReportFileRecordService
  * @Deacription 服务接口层
  * @Author liuzhoting
  * @Date 2022-02-16

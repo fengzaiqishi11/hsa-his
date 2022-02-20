@@ -15,7 +15,8 @@ import java.io.Serializable;
 public class ReportCustomConfigDTO implements Serializable {
 
     /**
-     * 文件格式 1-html 2-pdf 3-txt 4-jpg
+     * 文件格式 html、pdf、txt、jpg
      */
     private String fileFormat;
+
 }

@@ -5,7 +5,9 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.hsa.module.report.record.dto.ReportFileRecordDTO">
         <id column="id" property="id"/>
+        <result column="hosp_code" property="hospCode"/>
         <result column="temp_code" property="tempCode"/>
+        <result column="file_name" property="fileName"/>
         <result column="file_address" property="fileAddress"/>
         <result column="crter_id" property="crterId"/>
         <result column="crter_name" property="crterName"/>
@@ -14,14 +16,14 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, temp_code, file_address, crter_id, crter_name, crte_time
+        id, hosp_code, temp_code, file_name, file_address, crter_id, crter_name, crte_time
     </sql>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true"
             parameterType="cn.hsa.module.report.record.dto.ReportFileRecordDTO">
-        insert into report_file_record(id, temp_code, file_address, crter_id, crter_name, crte_time)
-        values (#{id}, #{tempCode}, #{fileAddress}, #{crteId}, #{crteName}, #{crteTime})
+        insert into report_file_record(id, hosp_code, temp_code, file_name, file_address, crter_id, crter_name, crte_time)
+        values (#{id}, #{hospCode}, #{tempCode}, #{fileName}, #{fileAddress}, #{crterId}, #{crterName}, #{crteTime})
     </insert>
 
 </mapper>

@@ -2178,11 +2178,13 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         List<OutptCostDTO> outptCostDTOList = new ArrayList<>();
         String sfjf = MapUtils.getVS(mapParameter, "MZYS_SSJFFS", "0");
         for(OutptPrescribeDetailsDTO  outptPrescribeDetails : outptPrescribeDetailsDTOList){
-            // 个人自备
-            if(StringUtils.isNotEmpty(outptPrescribeDetails.getUseCode()) && Constants.YYXZ.GRZB.equals(outptPrescribeDetails.getUseCode())){
-                continue;
-            }
             for(OutptPrescribeDetailsExtDTO outptPrescribeDetailsExtDTO : outptPrescribeDetails.getOutptPrescribeDetailsExtDTOList()){
+
+                // 个人自备 并且 来源方式必须不是动静态费用的
+                if(StringUtils.isNotEmpty(outptPrescribeDetails.getUseCode()) && Constants.YYXZ.GRZB.equals(outptPrescribeDetails.getUseCode()) && !Constants.FYLYFS.DJTJF.equals(outptPrescribeDetailsExtDTO.getSourceCode())){
+                    continue;
+                }
+
                 //手术不生成费用(通过参数  0：医生开立时计费，1：手术室记费)
                 if(Constants.XMLB.YZML.equals(outptPrescribeDetails.getItemCode()) && "5".equals(outptPrescribeDetailsExtDTO.getYzlb())  && "1".equals(sfjf)){
                     continue;
@@ -2501,6 +2503,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
 //            outptPrescribeDetailsExtDTO.setPharId(outptPrescribeDetailsDTO.getPharId());
             //用药性质代码（YYXZ）
             outptPrescribeDetailsExtDTO.setUseCode(baseAssistCalcDetailDTO.getUseCode());
+            //费用来源
+            outptPrescribeDetailsExtDTO.setSourceCode(Constants.FYLYFS.DJTJF);
             //财务分类
             outptPrescribeDetailsExtDTO.setBfcCode(baseAssistCalcDetailDTO.getBfcCode());
             //财务分类ID

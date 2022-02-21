@@ -16,4 +16,6 @@ public interface VersionInfoBO {
 
     boolean saveVersionInfo(VersionInfoDTO versionInfoDTO);
 
+    VersionInfoDTO queryVersionInfo();
+
 }

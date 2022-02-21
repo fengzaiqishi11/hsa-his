@@ -41,4 +41,10 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
           int insert = versionInfoDAO.insert(versionInfoDTO);
           return insert > 0;
      }
+
+     @Override
+     public VersionInfoDTO queryVersionInfo() {
+          VersionInfoDTO versionInfo = versionInfoDAO.queryVersionInfo();
+          return versionInfo;
+     }
 }

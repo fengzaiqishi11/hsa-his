@@ -2595,6 +2595,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 }
 
                 //判断当天费用是否已生成，如果已生产跳过循环
+                // （2022-02-17某医院提出当人工手动退费时，这一天的数据不用产生，为了解决此问题，将费用状态，发药状态判断条件放开,只要有这一天费用数据将不会产生）
                 List<InptCostDTO> costDTOList = inptCostDAO.queryCostList(inptAdviceDTO.getHospCode(),inptAdviceDTO.getId(),inptAdviceDetailDTO.getId(),startTime);
                 if (!ListUtils.isEmpty(costDTOList)) {//已生成费用，跳出循环
                     //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="mqProducer" class="cn.hsa.hsaf.mq.MQProducerByOns" init-method="start"
+          destroy-method="shutdown">
+        <property name="properties"> <!--生产者配置信息-->
+            <props>
+                <prop key="GROUP_ID">${mq.ali.GROUP_ID}</prop>
+                <prop key="AccessKey">${mq.ali.AccessKey}</prop>
+                <prop key="SecretKey">${mq.ali.SecretKey}</prop>
+                <prop key="NAMESRV_ADDR">${mq.ali.NAMESRV_ADDR}</prop>
+            </props>
+        </property>
+    </bean>
+
+
+</beans>

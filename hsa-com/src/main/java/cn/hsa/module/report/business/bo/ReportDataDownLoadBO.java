@@ -1,5 +1,7 @@
 package cn.hsa.module.report.business.bo;
 
+import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
+
 import java.util.Map;
 
 /**
@@ -12,14 +14,25 @@ import java.util.Map;
 public interface ReportDataDownLoadBO {
 
     /**
-     * 报表数据下载
+     * 报表生成
      *
      * @param map
-     * @return java.lang.String
+     * @return cn.hsa.module.report.business.dto.ReportReturnDataDTO
      * @menthod saveBuild()
      * @author liuzhuoting
      * @date 2022/02/18 09:30
      **/
-    String saveBuild(Map map);
+    ReportReturnDataDTO saveBuild(Map map);
+
+    /**
+     * 报表删除
+     *
+     * @param map
+     * @return java.lang.Boolean
+     * @menthod deleteReport()
+     * @author liuzhuoting
+     * @date 2022/02/18 09:30
+     **/
+    Boolean deleteReport(Map map);
 
 }

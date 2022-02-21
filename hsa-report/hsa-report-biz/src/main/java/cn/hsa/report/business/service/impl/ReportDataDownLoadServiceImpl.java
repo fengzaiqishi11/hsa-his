@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.report.business.bo.ReportDataDownLoadBO;
+import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,13 @@ public class ReportDataDownLoadServiceImpl extends HsafService implements Report
     private ReportDataDownLoadBO reportDataDownLoadBO;
 
     @Override
-    public WrapperResponse<String> saveBuild(Map map) {
+    public WrapperResponse<ReportReturnDataDTO> saveBuild(Map map) {
         return WrapperResponse.success(reportDataDownLoadBO.saveBuild(map));
     }
+
+    @Override
+    public WrapperResponse<Boolean> deleteReport(Map map) {
+        return WrapperResponse.success(reportDataDownLoadBO.deleteReport(map));
+    }
+
 }

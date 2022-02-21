@@ -34,7 +34,7 @@ public class ReportConfigurationDO extends PageDO implements Serializable {
      */
     private String tempName;
     /**
-     * 返回数据类型 1-html 2-文件地址 3-文件流
+     * 返回数据类型 1-html 2-文件地址 3-base64编码
      */
     private String returnDataType;
     /**

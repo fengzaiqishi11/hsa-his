@@ -1,7 +1,7 @@
 package cn.hsa.module.report.business.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import javassist.NotFoundException;
+import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 public interface ReportDataDownLoadService {
 
     /**
-     * 报表数据下载
+     * 报表生成
      *
      * @param map
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
@@ -27,6 +27,19 @@ public interface ReportDataDownLoadService {
      * @date 2022/02/18 09:30
      **/
     @PostMapping("/service/report/business/saveBuild")
-    WrapperResponse<String> saveBuild(Map map);
+    WrapperResponse<ReportReturnDataDTO> saveBuild(Map map);
+
+    /**
+     * 报表删除
+     *
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @menthod deleteReport()
+     * @author liuzhuoting
+     * @date 2022/02/18 09:30
+     **/
+    @PostMapping("/service/report/business/deleteReport")
+    WrapperResponse<Boolean> deleteReport(Map map);
+
 
 }

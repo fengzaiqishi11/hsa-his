@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.fsstore.FSEntity;
 import cn.hsa.hsaf.core.fsstore.FSManager;
 import cn.hsa.module.report.business.bo.ReportDataDownLoadBO;
+import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.config.dto.ReportCustomConfigDTO;
@@ -58,13 +59,15 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     private ReportFileRecordDAO reportFileRecordDAO;
 
     @Override
-    public String saveBuild(Map map) {
+    public ReportReturnDataDTO saveBuild(Map map) {
         String hospCode = map.get("hospCode").toString();
         String tempCode = map.get("tempCode").toString();
-        String fileName = map.get("fileName").toString();
+        String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? hospCode : map.get("fileName").toString();
         ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, tempCode);
         String customConfigStr = configuration.getCustomConfig().replace("\\", "").replace("\"{", "{").replace("}\"", "}");
+        // 自定义配置
         ReportCustomConfigDTO customConfig = JSON.parseObject(customConfigStr, ReportCustomConfigDTO.class);
+        map.put("customConfig", customConfig);
 
         String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
@@ -84,21 +87,47 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 fsEntity.setSize(inputStream.available());
                 fsEntity.setContentType(FilenameUtils.getExtension(fileName));
                 fsEntity = fsManager.putObject(bucket, fsEntity);
+
+                ReportFileRecordDTO record = new ReportFileRecordDTO();
+                record.setId(SnowflakeUtils.getId());
+                record.setHospCode(configuration.getHospCode());
+                record.setTempCode(configuration.getTempCode());
+                record.setFileName(fileName);
+                record.setFileAddress(fsEntity.getKeyId());
+                record.setCrterId(map.get("crterId").toString());
+                record.setCrterName(map.get("crterName").toString());
+                record.setCrteTime(DateUtils.getNow());
+                reportFileRecordDAO.insert(record);
             }
         } catch (Exception e) {
             log.error("上传文件失败", e);
         }
-        ReportFileRecordDTO record = new ReportFileRecordDTO();
-        record.setId(SnowflakeUtils.getId());
-        record.setHospCode(configuration.getHospCode());
-        record.setTempCode(configuration.getTempCode());
-        record.setFileName(fileName);
-        record.setFileAddress(fsEntity.getKeyId());
-        record.setCrterId("");
-        record.setCrterName("");
-        record.setCrteTime(DateUtils.getNow());
-        reportFileRecordDAO.insert(record);
-        return url + fsEntity.getKeyId();
+        return getReturnData(configuration.getReturnDataType(), fsEntity.getKeyId(), str, url + fsEntity.getKeyId());
+    }
+
+    @Override
+    public Boolean deleteReport(Map map) {
+        String fileAddress = map.get("fileAddress").toString();
+        boolean result = fsManager.deleteObject(bucket, fileAddress);
+        if (result) {
+            reportFileRecordDAO.deleteByFileAddress(fileAddress);
+        }
+        return result;
+    }
+
+    private ReportReturnDataDTO getReturnData(String returnDataType, String key, String base64, String rUrl) {
+        ReportReturnDataDTO returnData = new ReportReturnDataDTO();
+        returnData.setKey(key);
+        switch (returnDataType) {
+            case "1":
+                returnData.setReturnData(rUrl);
+                return returnData;
+            case "2":
+                returnData.setReturnData(base64);
+                return returnData;
+            default:
+                throw new RuntimeException("暂不支持该返回数据类型");
+        }
     }
 
 }

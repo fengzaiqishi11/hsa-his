@@ -6,7 +6,7 @@ CREATE TABLE `report_configuration`
     `hosp_code`        varchar(32) DEFAULT NULL COMMENT '医院编码',
     `temp_code`        varchar(30) NOT NULL COMMENT '模板编码',
     `temp_name`        varchar(30) NOT NULL COMMENT '报表模板文件名称',
-    `return_data_type` varchar(6)  DEFAULT NULL COMMENT '返回数据类型 1-html 2-文件地址 3-base64编码',
+    `return_data_type` varchar(6)  DEFAULT NULL COMMENT '返回数据类型 1-文件地址 2-base64编码 3-html',
     `custom_config`    json        DEFAULT NULL COMMENT '自定义配置',
     `updt_time`        datetime    NOT NULL COMMENT '更新时间',
     `crter_id`         varchar(20) DEFAULT NULL COMMENT '创建人',

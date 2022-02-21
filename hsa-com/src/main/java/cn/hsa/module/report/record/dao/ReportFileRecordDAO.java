@@ -14,12 +14,23 @@ public interface ReportFileRecordDAO {
     /**
      * 新增
      *
-     * @param reportConfigurationDTO 参数数据对象
+     * @param reportFileRecordDTO 参数数据对象
      * @return int
      * @menthod insert()
      * @author liuzhuoting
      * @date 2022/02/17 09:30
      **/
-    int insert(ReportFileRecordDTO reportConfigurationDTO);
+    int insert(ReportFileRecordDTO reportFileRecordDTO);
+
+    /**
+     * 删除
+     *
+     * @param fileAddress 参数数据
+     * @return int
+     * @menthod delete()
+     * @author liuzhuoting
+     * @date 2022/02/17 09:30
+     **/
+    int deleteByFileAddress(String fileAddress);
 
 }

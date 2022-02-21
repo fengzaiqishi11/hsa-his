@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.fsstore.FSEntity;
 import cn.hsa.hsaf.core.fsstore.FSManager;
+import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -47,10 +48,18 @@ public class ReportDataDownLoadController extends BaseController {
 
     @ApiOperation("报表生成")
     @PostMapping("/saveBuild")
-    public WrapperResponse<String> saveBuild(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<ReportReturnDataDTO> saveBuild(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         return reportDataDownLoadService.saveBuild(map);
+    }
+
+    @ApiOperation("报表删除")
+    @PostMapping("/deleteReport")
+    public WrapperResponse<Boolean> deleteReport(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return reportDataDownLoadService.deleteReport(map);
     }
 
     /**

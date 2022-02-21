@@ -26,4 +26,10 @@
         values (#{id}, #{hospCode}, #{tempCode}, #{fileName}, #{fileAddress}, #{crterId}, #{crterName}, #{crteTime})
     </insert>
 
+    <!--通过主键删除-->
+    <delete id="deleteByFileAddress">
+        delete from report_file_record
+        where file_address = #{fileAddress}
+    </delete>
+
 </mapper>

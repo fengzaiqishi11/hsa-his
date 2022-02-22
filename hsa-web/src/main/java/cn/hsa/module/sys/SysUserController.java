@@ -554,9 +554,8 @@ public class SysUserController extends BaseController {
      * @Date: 2022-02-17
      */
     @PostMapping( value = "/updateIsGuide")
-    public WrapperResponse<Boolean> updateIsGuide(@RequestBody HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<Boolean> updateIsGuide(@RequestBody  SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res){
 
-        SysUserDTO sysUserDTO = new SysUserDTO();
         SysUserDTO sysUserDTOSession = getSession(req, res);
         sysUserDTO.setCode(sysUserDTOSession.getCode());
         sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());

@@ -276,8 +276,10 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
      **/
     @Override
     public Boolean save(StroOutDTO stroOutDTO) {
-        // 校验接收单位是否有标识
-        checkOutStrock(stroOutDTO.getInStockId(),stroOutDTO.getHospCode(),stroOutDTO.getStroOutDetailDTOS());
+        // 校验接收单位是否有标识,出库到科室不做校验只对出库到药房做检验
+        if ("5".equals(stroOutDTO.getOutCode())){
+            checkOutStrock(stroOutDTO.getInStockId(),stroOutDTO.getHospCode(),stroOutDTO.getStroOutDetailDTOS());
+        }
         //计算零售总金额、购买总金额、拆零总数量
         if (!ListUtils.isEmpty(stroOutDTO.getStroOutDetailDTOS())) {
             List<StroOutDetailDTO> stroOutDetailDTOS = stroOutDTO.getStroOutDetailDTOS();

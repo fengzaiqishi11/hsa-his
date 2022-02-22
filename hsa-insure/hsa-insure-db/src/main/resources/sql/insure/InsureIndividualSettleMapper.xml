@@ -93,6 +93,10 @@
         <result property="COVIDPay" column="COVID_pay" jdbcType="NUMERIC"/>
         <result property="familyPay" column="family_pay" jdbcType="NUMERIC"/>
         <result property="behalfPay" column="behalf_pay" jdbcType="NUMERIC"/>
+        <result property="fertilityPay" column="fertility_pay" jdbcType="NUMERIC"/>
+        <result property="psnPartAmt" column="psn_part_amt" jdbcType="NUMERIC"/>
+        <result property="hifdmPay" column="hifdm_pay" jdbcType="NUMERIC"/>
+
     </resultMap>
 
     <!-- 表所有字段（别名） -->
@@ -179,7 +183,10 @@
         iis.welfare_pay,
         iis.COVID_pay,
         iis.family_pay,
-        iis.behalf_pay
+        iis.behalf_pay,
+        iis.fertility_pay,
+        iis.psn_part_amt,
+        iis.hifdm_pay
     </sql>
 
     <!--通过实体作为筛选条件 分页查询个人医保结算信息-->

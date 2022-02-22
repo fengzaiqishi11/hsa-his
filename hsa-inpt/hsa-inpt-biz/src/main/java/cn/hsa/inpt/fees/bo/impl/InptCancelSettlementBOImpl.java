@@ -584,6 +584,8 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
         selectEntity.setHospExemAmount(BigDecimalUtils.negate(selectEntity.getHospExemAmount()));
         //医疗救助金额
         selectEntity.setMafPay(BigDecimalUtils.negate(selectEntity.getMafPay()));
+        // 伤残人员医疗保障基金
+        selectEntity.setHifdmPay(BigDecimalUtils.negate(selectEntity.getHifdmPay()));
         inptVisitDAO.insertInsureIndividualSettle(selectEntity);
     }
 }

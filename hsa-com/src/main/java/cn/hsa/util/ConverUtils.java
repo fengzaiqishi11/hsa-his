@@ -1,5 +1,6 @@
 package cn.hsa.util;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import sun.misc.BASE64Encoder;
@@ -11,6 +12,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -133,6 +135,8 @@ public class ConverUtils {
             }
             if (params.get(key) instanceof Map) {
                 value = JSONObject.toJSONString(params.get(key));
+            } else if (params.get(key) instanceof List) {
+                value = JSONArray.toJSONString(params.get(key));
             } else {
                 value = params.get(key);
             }

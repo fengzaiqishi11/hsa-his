@@ -472,10 +472,11 @@
         select a.id,a.hosp_code,a.visit_id,a.diagnose_ids,a.order_no,a.doctor_id,a.doctor_name,a.dept_id,a.dept_name,a.type_code,
           a.prescribe_type_code,a.settle_id,a.remark,a.is_settle,a.is_cancel,a.is_print,a.is_herb_hospital,a.herb_num,a.herb_use_code,
           a.weight,a.agent_name,a.agent_cert_no,a.cancel_id,a.cancel_name,a.cancel_date,a.cancel_reason,a.crte_id,a.crte_name,
-          a.crte_time,a.is_submit,a.submit_id,a.submit_name,a.submit_time,c.diagnose_ids, c.disease_names
+          a.crte_time,a.is_submit,a.submit_id,a.submit_name,a.submit_time,c.diagnose_ids, c.disease_names,a.tcm_disease_id as tcmDiseaseId,
+          a.tcm_disease_name as tcmDiseaseName,a.tcm_syndromes_id as tcmSyndromesId,a.tcm_syndromes_name as tcmSyndromesName
         from outpt_prescribe a
         join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
-        join(
+        left join(
             select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a
             join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code

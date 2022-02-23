@@ -81,7 +81,7 @@
     </select>
 
     <!-- 根据报表编码查询 -->
-    <select id="queryByTempCode" resultMap="BaseResultMap">
+    <select id="queryByTempCode" resultMap="BaseResultMap" parameterType="String">
         select
         <include refid="Base_Column_List"/>
         from report_configuration

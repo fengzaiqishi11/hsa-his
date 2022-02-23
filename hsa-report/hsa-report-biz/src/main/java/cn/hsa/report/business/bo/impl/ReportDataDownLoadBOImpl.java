@@ -7,7 +7,6 @@ import cn.hsa.module.report.business.bo.ReportDataDownLoadBO;
 import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
-import cn.hsa.module.report.config.dto.ReportCustomConfigDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
 import cn.hsa.util.ConverUtils;
@@ -66,8 +65,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, tempCode);
         String customConfigStr = configuration.getCustomConfig().replace("\\", "").replace("\"{", "{").replace("}\"", "}");
         // 自定义配置
-        ReportCustomConfigDTO customConfig = JSON.parseObject(customConfigStr, ReportCustomConfigDTO.class);
-        map.put("customConfig", customConfig);
+        Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
+        map.put("customConfig", customConfigMap);
 
         String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
@@ -78,7 +77,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 BASE64Decoder decoder = new BASE64Decoder();
                 byte[] byteArr = decoder.decodeBuffer(str);
                 InputStream inputStream = new ByteArrayInputStream(byteArr);
-                fileName = fileName + "." + customConfig.getFileFormat();
+                fileName = fileName + "." + customConfigMap.get("fileFormat");
                 log.debug("文件名:{}", fileName);
 
                 fsEntity = new FSEntity();

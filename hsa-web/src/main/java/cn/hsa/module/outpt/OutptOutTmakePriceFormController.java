@@ -4,6 +4,7 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptPayDTO;
@@ -117,6 +118,27 @@ public class OutptOutTmakePriceFormController extends BaseController {
         return outptOutTmakePriceFormService_consumer.updateOutptOutFee(params);
     }
 
+    /**
+     * @Meth: saveBackCostWithOutpt
+     * @Description: 门诊病人手术补记账退费,这里由于前端根据inptCostDTO进行封装的，所以dto使用住院的dto
+     * @Param: [inptCostDTOs, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangguorui
+     * @Date: 2022/2/23
+     */
+    @PostMapping("/saveBackCostWithOutpt")
+    @NoRepeatSubmit
+    WrapperResponse<Boolean> saveBackCostWithOutpt(@RequestBody List<InptCostDTO> inptCostDTOs, HttpServletRequest req,
+                                                   HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("userId", sysUserDTO.getId());
+        map.put("userName", sysUserDTO.getName());
+        map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
+        map.put("inptCostDTOs", inptCostDTOs);
+        return outptOutTmakePriceFormService_consumer.saveBackCostWithOutpt(map);
+    }
     /**
      * @Menthod queryOutptPrescribe
      * @Desrciption 查询门诊处方类别

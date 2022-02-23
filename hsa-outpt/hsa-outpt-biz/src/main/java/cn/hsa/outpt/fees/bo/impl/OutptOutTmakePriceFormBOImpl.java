@@ -3,6 +3,7 @@ package cn.hsa.outpt.fees.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
@@ -44,6 +45,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @Package_name: cn.hsa.outpt.fees.bo.impl
@@ -1213,6 +1216,55 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     @Override
     public OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO) {
         return outptPayDAO.getPayInfoByParams(outptPayDTO);
+    }
+    /**
+     * @Meth: saveBackCostWithOutpt
+     * @Description: 门诊病人手术补记账退费接口
+     * @Param: [map]
+     * @return: java.lang.Boolean
+     * @Author: zhangguorui
+     * @Date: 2022/2/23
+     */
+    @Override
+    public Boolean saveBackCostWithOutpt(Map<String, Object> map) {
+        List<InptCostDTO> inptCostDTOs = MapUtils.get(map,"inptCostDTOs");
+        if (ListUtils.isEmpty(inptCostDTOs)){
+            throw new AppException("退费数据不能为空");
+        }
+        List<String> costIds = inptCostDTOs.stream().map(InptCostDTO::getId).collect(Collectors.toList());
+        // *******校验begin********
+        // 1.查看当前费用是否结算,查出门诊费用
+        List<OutptCostDTO> outptCostDTOS = outptCostDAO.queryCostByIds(costIds);
+        List<String> errorMessage = outptCostDTOS.stream().filter(outptCostDTO -> Constants.SETTLECODE.YJS.equals(outptCostDTO.getSettleCode())).
+                map(OutptCostDTO::getItemName).distinct().collect(Collectors.toList());
+        if (!ListUtils.isEmpty(errorMessage)){
+            throw new AppException(errorMessage.toString()+ "已结算，请去门诊退费管理退费");
+        }
+        // 2.查看前端返回的退药数量是否大于0
+        if (inptCostDTOs.stream().filter(cost -> cost.getBackNum().compareTo(BigDecimal.valueOf(0)) <= 0).collect(Collectors.toList()).size() > 0) {
+            throw new AppException("退费数量小于等于0不能退费");
+        }
+        // 3.检查当前是否有结算操作，如果没有 要把结算操作锁住
+        // 医院编码
+        String hospCode = MapUtils.get(map,"hospCode");
+        // 就诊id
+        String visitId = inptCostDTOs.get(0).getVisitId();
+        // 根据就诊id 查询就诊信息
+        Map visitMap = new HashMap();
+        visitMap.put("hospCode", hospCode);
+        visitMap.put("id", visitId);
+        // 查询就诊记录
+        OutptVisitDTO outptVisitDTO = outptVisitDAO.queryByVisitID(visitMap);
+        String key = new StringBuilder(hospCode).append(StringUtils.isEmpty(visitId) ? outptVisitDTO.getCertNo() : visitId)
+                .append(Constants.OUTPT_FEES_REDIS_KEY).toString();
+        if (redisUtils.setIfAbsent(key,key,600)){
+            throw new AppException("退费提示：该患者正在别处结算；此时不可进行退费。");
+        }
+        // todo 4. 检查当前费用是否已经发药/已配未发，如果通过校验，需要把配药锁住，当前流程门诊病人补记账之后 并不会到药房
+        // 5.校验手术状态
+
+        // *******校验end********
+        return null;
     }
 
     /**

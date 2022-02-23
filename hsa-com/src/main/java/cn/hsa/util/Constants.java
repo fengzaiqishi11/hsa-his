@@ -1207,4 +1207,10 @@ public interface Constants {
         public static final String BQQJ = "病情抢救";
         public static final String CYXJ = "出院小结";
     }
+
+    class SETTLECODE {
+        public static final String WJS = "0";// 未结算
+        public static final String SS = "1";// 试算
+        public static final String YJS = "2";// 已结算
+    }
 }

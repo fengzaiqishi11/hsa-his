@@ -232,24 +232,17 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_material(id,hosp_code, type_code, bfc_code, code,nation_code, name, spec, price, unit_code, split_ratio, split_unit_code, split_price, is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm,
-        last_buy_price,last_split_buy_price,avg_buy_price,avg_sell_price, reimbursement_ratio,
-        <if test="isValid != null and isValid != ''">
-        is_valid,
-        </if>
-        crte_id, crte_name, crte_time,model,other_name
-        <if test="isOffical != null and isOffical != ''">
-            ,is_offical
-        </if>)
-        values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{name}, #{spec}, #{price}, #{unitCode}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm},
-        #{lastBuyPrice},#{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},#{reimbursementRatio}
-        <if test="isValid != null and isValid != ''">
-            #{isValid},
-        </if>
-        #{crteId}, #{crteName}, #{crteTime},#{model},#{otherName}
-        <if test="isOffical != null and isOffical != ''">
-            , #{isOffical}
-        </if>)
+        insert into base_material
+        (id,hosp_code, type_code, bfc_code, code,nation_code, name, spec, price, unit_code, split_ratio, split_unit_code,
+        split_price, is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm,last_buy_price,
+        last_split_buy_price,avg_buy_price,avg_sell_price, reimbursement_ratio,
+        is_valid,crte_id, crte_name, crte_time,model,other_name,is_offical)
+
+values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{name}, #{spec}, #{price}, #{unitCode},#{splitRatio}, #{splitUnitCode},
+        #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm}, #{lastBuyPrice},
+        #{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},#{reimbursementRatio},
+        #{isValid},#{crteId}, #{crteName}, #{crteTime},#{model},#{otherName}, #{isOffical})
+
     </insert>
 
     <!--通过主键修改数据-->

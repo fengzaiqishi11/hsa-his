@@ -284,4 +284,16 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
     public WrapperResponse<List<SysUserDTO>> queryVisitDoctorByWorkTypeCode(Map map) {
         return WrapperResponse.success(sysUserBO.queryVisitDoctorByWorkTypeCode(MapUtils.get(map,"sysUserDTO")));
     }
+
+    /**
+     * @Description: 更新已读公告的标识
+     * @Param: [sysUserDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    @Override
+    public WrapperResponse<Boolean> updateIsGuide(Map map) {
+        return WrapperResponse.success(sysUserBO.updateIsGuide(MapUtils.get(map,"sysUserDTO")));
+    }
 }

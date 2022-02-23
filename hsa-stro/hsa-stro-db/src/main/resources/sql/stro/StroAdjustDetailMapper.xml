@@ -188,12 +188,16 @@
     <!--调价更新库存零售总金额、拆零总金额 拆零单价-->
     <update id="adjustUpdateStock">
         <foreach collection="list"  item="dto" separator=";">
-            UPDATE stro_stock
-            SET sell_price_all = num * #{dto.afterPrice},
-            split_price = #{dto.splitAfterPrice}
+            UPDATE stro_stock a,(select id from base_dept b where  b.hosp_code = #{dto.hospCode} and
+            b.type_code in ('3','4','5','13','14')) bd
+            SET a.sell_price_all = a.num * #{dto.afterPrice},
+            a.split_price = #{dto.splitAfterPrice}
             WHERE
-            hosp_code = #{dto.hospCode}
-            AND item_id = #{dto.itemId}
+            a.hosp_code = #{dto.hospCode}
+            AND a.item_id = #{dto.itemId}
+            <if test="sfdeptFilter != null and sfdeptFilter == '1'.toString()">
+                and bd.id = a.biz_id
+            </if>
         </foreach>
     </update>
 
@@ -201,13 +205,17 @@
     <!--调价更新库存明细零售单价、零售总金额、拆零单价-->
     <update id="adjustUpdateStockDetail">
         <foreach collection="list"  item="dto" separator=";">
-            UPDATE stro_stock_detail
-            SET sell_price = #{dto.afterPrice},
-            sell_price_all = num * #{dto.afterPrice} ,
-            split_price = #{dto.splitAfterPrice}
+            UPDATE stro_stock_detail a,(select id from base_dept b where  b.hosp_code = #{dto.hospCode} and
+            b.type_code in ('3','4','5','13','14')) bd
+            SET a.sell_price = #{dto.afterPrice},
+            a.sell_price_all = num * #{dto.afterPrice} ,
+            a.split_price = #{dto.splitAfterPrice}
             WHERE
-            hosp_code = #{dto.hospCode}
-            AND item_id = #{dto.itemId}
+            a.hosp_code = #{dto.hospCode}
+            AND a.item_id = #{dto.itemId}
+            <if test="sfdeptFilter != null and sfdeptFilter == '1'.toString()">
+                and bd.id = a.biz_id
+            </if>
         </foreach>
     </update>
 
@@ -249,6 +257,9 @@
     <select id="queryStockSumNum" resultType="cn.hsa.module.stro.stock.dto.StroStockDTO">
         select s.item_id,sum(s.num) as num,sum(s.split_num) as splitNum,sum(s.buy_price_all) as buyPriceAll,sum(s.sell_price_all) as sellPriceAll
         from stro_stock s where s.hosp_code = #{hospCode} and s.item_id = #{itemId}
+        <if test="sfdeptFilter != null and sfdeptFilter == '1'.toString()">
+            and s.biz_id in (select id from base_dept where hosp_code = #{hospCode} and type_code in ('3','4','5','13','14'))
+        </if>
         group by s.item_id
     </select>
 

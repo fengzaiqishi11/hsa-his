@@ -890,6 +890,11 @@
         where id=#{id} and hosp_code = #{hospCode}
 	</update>
 
+	<update id="updateIsGuide">
+		update sys_user set is_guide = '3'
+        where code=#{code} and hosp_code = #{hospCode}
+	</update>
+
 	<delete id="deleteSysUserSystem">
 		delete from sys_user_system
 		where hosp_code = #{hospCode} and user_code = #{code}

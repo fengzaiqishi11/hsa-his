@@ -28,4 +28,8 @@ public class EmrElementDTO extends EmrElementDO implements Serializable {
   private String patientCodeRefName;
   private String deptId;
   private String noValue;
+  /**
+   * 是否获取当前时间
+   */
+  private String isSysDate;
 }

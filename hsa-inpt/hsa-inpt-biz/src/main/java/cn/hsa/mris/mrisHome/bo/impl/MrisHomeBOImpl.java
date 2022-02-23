@@ -1417,6 +1417,32 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName()); // 联系人姓名
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone()); // 联系人电话
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode()); // 联系人地址
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress()); // 联系人地址
+        // 年龄单位为岁
+        if ("1".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            mrisBaseInfoDTO.setAge(mrisBaseInfoDTO.getAge());
+        }else if ("2".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为月
+            mrisBaseInfoDTO.setBabyAgeMonth(mrisBaseInfoDTO.getAge());
+            mrisBaseInfoDTO.setAge("0");
+        } else if ("3".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为周
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge()) * 7) / (float)DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }else if ("4".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为天
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge())) /(float) DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);

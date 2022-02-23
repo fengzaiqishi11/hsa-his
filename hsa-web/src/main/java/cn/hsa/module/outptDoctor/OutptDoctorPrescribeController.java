@@ -26,6 +26,8 @@ import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
 import cn.hsa.module.outpt.triage.service.OutptTriageVisitService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
@@ -72,6 +74,12 @@ public class OutptDoctorPrescribeController extends BaseController {
    */
   @Resource
   private BaseOutptExecService baseOutptExecService_consumer;
+
+  /**
+   * 系统参数服务
+   */
+  @Resource
+  private SysParameterService sysParameterService_consumer;
 
   /**
    * @Menthod queryPatientByOperType
@@ -585,13 +593,24 @@ public class OutptDoctorPrescribeController extends BaseController {
     if (StringUtils.isEmpty(outptPrescribeDTO.getVisitId())) {
       throw new AppException("未获取到患者就诊ID");
     }
-    if (StringUtils.isEmpty(outptPrescribeDTO.getDiagnoseIds())) {
-      throw new AppException("诊断不能为空");
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map sysParamMap = new HashMap();
+    sysParamMap.put("hospCode", sysUserDTO.getHospCode());
+    sysParamMap.put("code", "IS_OPEN_MZZY"); // 是否使用门诊中医症候
+    SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParamMap).getData();
+    if (sysParameterDTO!=null && "1".equals(sysParameterDTO.getValue())) {
+      // 中医和西医诊断同时为空
+      if (StringUtils.isEmpty(outptPrescribeDTO.getDiagnoseIds())&&StringUtils.isEmpty(outptPrescribeDTO.getTcmDiseaseId())) {
+        throw new AppException("诊断不能为空");
+      }
+    }else {
+      if (StringUtils.isEmpty(outptPrescribeDTO.getDiagnoseIds())) {
+        throw new AppException("诊断不能为空");
+      }
     }
     if (ListUtils.isEmpty(outptPrescribeDTO.getOutptPrescribeDetailsDTOList())) {
       throw new AppException("未获取到处方明细信息");
     }
-    SysUserDTO sysUserDTO = getSession(req, res);
     Map paramMap = new HashMap();
     //医院编码
     paramMap.put("hospCode",sysUserDTO.getHospCode());

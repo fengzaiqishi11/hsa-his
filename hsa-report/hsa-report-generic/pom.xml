@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.report</groupId>
+    <artifactId>hsa-report-generic</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-report-generic</name>
+
+    <parent>
+        <artifactId>hsa-report</artifactId>
+        <groupId>cn.hsa.report</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <properties>
+        <start-class>cn.hsa.report.HsaGenericApplication</start-class>
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.bestwu</groupId>
+            <artifactId>fastdfs-client-java</artifactId>
+            <version>1.27</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.report</groupId>
+            <artifactId>hsa-report-biz</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hsa.report</groupId>
+            <artifactId>hsa-report-db</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- 1.分布式服务 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-rpc</artifactId>
+        </dependency>
+
+        <!-- 2.分布式缓存组件 -->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-cache-redis</artifactId>
+        </dependency>
+
+        <!--3.分布式消息队列组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-mq</artifactId>
+        </dependency>
+
+        <!--4.对象存储组件-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-fsstore</artifactId>
+        </dependency>
+
+        <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-ali-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-tencent-gateway</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.hsa.hsaf.adapt</groupId>
+            <artifactId>hsaf-generic-gateway</artifactId>
+        </dependency>
+
+        <!-- 6.分布式数据库 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--数据库连接驱动-->
+        <!--本地模拟用-->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.48</version>
+        </dependency>
+
+        <!--Rest接口文档-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>hsa-report</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>${start-class}</mainClass>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
+                    <excludes>
+                        <exclude>*.properties</exclude>
+                        <exclude>config/**/*.properties</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!--            <plugin>-->
+            <!--                <groupId>com.spotify</groupId>-->
+            <!--                <artifactId>docker-maven-plugin</artifactId>-->
+            <!--                <version>1.2.2</version>-->
+            <!--                &lt;!&ndash;将插件绑定在某个phase执行&ndash;&gt;-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>build-image</id>-->
+            <!--                        &lt;!&ndash;用户只需执行mvn package ，就会自动执行mvn docker:build&ndash;&gt;-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>build</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
+
+            <!--                <configuration>-->
+            <!--                    &lt;!&ndash;指定生成的镜像名,这里是我们的作者名+项目名&ndash;&gt;-->
+            <!--                    <imageName>yuanzibo/${project.build.finalName}</imageName>-->
+
+            <!--                    &lt;!&ndash;指定标签 这里指定的是镜像的版本，我们默认版本是latest&ndash;&gt;-->
+            <!--                    <imageTags>-->
+            <!--                        <imageTag>latest</imageTag>-->
+            <!--                    </imageTags>-->
+
+            <!--                    &lt;!&ndash;指定基础镜像jdk1.8&ndash;&gt;-->
+            <!--                    <baseImage>java:8</baseImage>-->
+
+            <!--                    &lt;!&ndash;切换到ROOT目录&ndash;&gt;-->
+            <!--                    <workdir>/</workdir>-->
+            <!--                    <entryPoint>["java","-Xms256m","-Xmx1024m","-jar","/${project.build.finalName}.jar"]</entryPoint>-->
+
+            <!--                    <exposes>19010</exposes>-->
+
+            <!--                    &lt;!&ndash;指定远程 docker api地址&ndash;&gt;-->
+            <!--                    <dockerHost>${dockerUrl}</dockerHost>-->
+            <!--                    <dockerCertPath>${dockerUrlZs}</dockerCertPath>-->
+            <!--                    &lt;!&ndash; 这里是复制 jar 包到 docker 容器指定目录配置 &ndash;&gt;-->
+            <!--                    <resources>-->
+            <!--                        <resource>-->
+            <!--                            <targetPath>/</targetPath>-->
+            <!--                            &lt;!&ndash;jar 包所在的路径  此处配置的 即对应 target 目录&ndash;&gt;-->
+            <!--                            <directory>${project.build.directory}</directory>-->
+            <!--                            &lt;!&ndash;用于指定需要复制的文件 需要包含的 jar包 ，这里对应的是 Dockerfile中添加的文件名　&ndash;&gt;-->
+            <!--                            <include>${project.build.finalName}.jar</include>-->
+            <!--                        </resource>-->
+            <!--                    </resources>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
+        </plugins>
+    </build>
+
+</project>

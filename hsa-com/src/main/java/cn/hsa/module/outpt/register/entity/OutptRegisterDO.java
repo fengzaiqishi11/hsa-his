@@ -127,4 +127,13 @@ public class OutptRegisterDO extends PageDO implements java.io.Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private  Date crteTime;
 
+    /**
+     * 职业代码（ZY）
+     */
+    private String occupationCode;
+    /**
+     * 联系人姓名
+     */
+    private String contactName;
+
 }

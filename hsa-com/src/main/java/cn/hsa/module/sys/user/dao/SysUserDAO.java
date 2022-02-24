@@ -282,4 +282,13 @@ public interface SysUserDAO {
      * @Return
      */
     List<SysUserDTO> queryMZAndSFYAllUser(SysUserDTO sysUserDTO);
+
+    /**
+     * @Description: 更新已读公告的标识
+     * @Param: [sysUserDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    Boolean updateIsGuide(SysUserDTO sysUserDTO);
 }

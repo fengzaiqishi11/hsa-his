@@ -234,7 +234,7 @@
         ifnull(c.reality_price, a.total_cost) as totalCost,
         c.settle_take_price as settleTakePrice,
         c.settle_back_price as settleBackPrice,
-        (c.mi_price-c.acct_pay) as miPrice,
+        (c.mi_price-ifnull(c.acct_pay, 0)) as miPrice,
         c.acct_pay as acctPay,
         case when ib.id is null then (case when DATEDIFF(ifnull(a.out_time, now()),a.in_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),a.in_time) end)
         else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
@@ -1389,11 +1389,11 @@
         </if>
         /*开始日期*/
         <if test="startDate != null and timeFlag == '2'.toString()">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
+            and DATE_FORMAT(s.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>
         /*结束日期*/
         <if test="endDate != null and timeFlag == '2'.toString() ">
-            and DATE_FORMAT(s.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
+            and DATE_FORMAT(s.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="zgDoctorId != null and zgDoctorId != ''">
             and a.zg_doctor_id = #{zgDoctorId}
@@ -2859,6 +2859,12 @@
         <if test="code != null and code != ''">
             and item_code = #{code}
         </if>
+        <if test="SF != null and SF == '1'.toString()">
+            and b.is_basic = #{SF}
+        </if>
+        <if test="SF != null and SF == '0'.toString()">
+            and (b.is_basic = '0' or b.is_basic = ''or b.is_basic is null)
+        </if>
         <if test="keyword != null and keyword != ''">
             and (
             siv.item_name like concat('%', #{keyword}, '%')
@@ -2960,6 +2966,12 @@
         </if>
         <if test="code != null and code != ''">
             and item_code = #{code}
+        </if>
+        <if test="SF != null and SF == '1'.toString()">
+            and b.is_basic = #{SF}
+        </if>
+        <if test="SF != null and SF == '0'.toString()">
+            and (b.is_basic = '0' or b.is_basic = ''or b.is_basic is null)
         </if>
         <if test="keyword != null and keyword != ''">
             and (
@@ -3221,7 +3233,8 @@
         a.surplus_num,
         (a.surplus_num - a.up_surplus_num) as numSpread,
         a.expiry_date,
-        a.batch_no
+        a.batch_no,
+        a.crte_time as crteTime
         from stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
@@ -3388,7 +3401,7 @@
             ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
             ),'其他')
             as bfcName,
-            ifnull(C.doctor_id,'0') as doctorId,
+            ifnull(t.doctor_id,'0') as doctorId,
             ifnull(C.doctor_name,t.doctor_name) as doctorName,
             <if test="'4'.toString() == flag">
                 ifnull((select id from base_dept bd where bd.hosp_code = #{hospCode} and bd.code =
@@ -8048,6 +8061,38 @@
                 tab.deptName like concat('%',#{doctorName},'%') or tab.doctorName like concat('%',#{doctorName},'%')
             </if>
         </where>
+    </select>
+
+    <select id="queryHosptialInComeList" resultType="cn.hsa.module.inpt.patientcomprehensivequery.dto.OutptCostAndReigsterCostDTO">
+        select
+            ifnull(ics.reality_price, ifnull(B.reality_price, 0)) as realityPrice,
+            ifnull(B.bfc_id,'0') as bfcId,
+            ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+            ),'其他')
+            as bfcName,
+            ifnull(B.visit_id,'0') as visitId,
+            t.name as visitName,
+            t.patient_code as patientCode,
+            ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+            ),'其他') as patientType
+            from
+                inpt_settle A
+                inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+                inner join inpt_cost_settle ics on B.id=ics.cost_id
+                inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+                where
+                A.hosp_code = #{hospCode}
+                and A.is_settle = '1'
+                and B.settle_code = '2'
+                and A.status_code = '0'
+        /*开始日期*/
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
     </select>
 
 </mapper>

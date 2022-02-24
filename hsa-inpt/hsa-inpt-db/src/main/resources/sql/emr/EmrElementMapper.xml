@@ -26,6 +26,7 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="isSysDate" column="is_sys_date" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO" id="EmrElementMacthMap">
@@ -48,7 +49,7 @@
         select
           id, hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template,
             (select name from sys_code where code = sys_code_ref and hosp_code = #{hospCode}) as sysCodeRefName,
-            (select name from sys_code_detail where c_code = 'BLBRGLX' and value = patient_code_ref and hosp_code = #{hospCode}) as patientCodeRefName
+            (select name from sys_code_detail where c_code = 'BLBRGLX' and value = patient_code_ref and hosp_code = #{hospCode}) as patientCodeRefName,is_sys_date
         from emr_element
         where hosp_code = #{hospCode} and code = #{code}
     </select>
@@ -136,8 +137,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into emr_element(id,hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template)
-        values (#{id},#{hospCode}, #{upCode}, #{code}, #{name}, #{typeCode}, #{pym}, #{wbm}, #{isEnd}, #{isRequire}, '1', #{defaultVlaue}, #{minValue}, #{maxValue}, #{genderCode}, #{minAge}, #{maxAge}, #{patientCodeRef}, #{sysCodeRef}, #{sysCodeDefault}, #{crteId}, #{crteName}, #{crteTime},#{isSingleTemplate})
+        insert into emr_element(id,hosp_code, up_code, code, name, type_code, pym, wbm, is_end, is_require, is_valid, default_vlaue, min_value, max_value, gender_code, min_age, max_age, patient_code_ref, sys_code_ref, sys_code_default, crte_id, crte_name, crte_time,is_single_template,is_sys_date)
+        values (#{id},#{hospCode}, #{upCode}, #{code}, #{name}, #{typeCode}, #{pym}, #{wbm}, #{isEnd}, #{isRequire}, '1', #{defaultVlaue}, #{minValue}, #{maxValue}, #{genderCode}, #{minAge}, #{maxAge}, #{patientCodeRef}, #{sysCodeRef}, #{sysCodeDefault}, #{crteId}, #{crteName}, #{crteTime},#{isSingleTemplate},#{isSysDate})
     </insert>
 
     <!--新增 病历元素匹配-->
@@ -234,6 +235,9 @@
             </if>
             <if test="isSingleTemplate != null">
               is_single_template = #{isSingleTemplate},
+            </if>
+            <if test="isSysDate != null">
+                is_sys_date = #{isSysDate},
             </if>
         </set>
         where id = #{id} and hosp_code = #{hospCode}

@@ -218,4 +218,13 @@ public interface SysUserService {
      * @throws
      */
     WrapperResponse<List<SysUserDTO>> queryVisitDoctorByWorkTypeCode(Map map);
+
+    /**
+     * @Description: 更新已读公告的标识
+     * @Param: [sysUserDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    WrapperResponse<Boolean> updateIsGuide(Map map);
 }

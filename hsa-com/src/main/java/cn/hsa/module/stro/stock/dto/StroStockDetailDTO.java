@@ -116,4 +116,8 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
      * 判断查询库存明细的时候是否需要加上有效期，默认为空是加上，不为空是不加上
      */
     private String  isExpiryDate;
+    // 是否为报损单查询数据 0： 不是 ，1：是
+    private String sLossList;
+    // 是否过滤科室库存
+    private String sfdeptFilter;
 }

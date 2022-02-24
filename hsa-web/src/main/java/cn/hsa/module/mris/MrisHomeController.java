@@ -22,8 +22,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.mris
@@ -132,6 +134,18 @@ public class MrisHomeController extends BaseController {
         map.put("visitId",visitId);
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.queryAllMrisInfo(map));
+    }
+
+    @PutMapping(value = "/upMrisForDRG")
+    public WrapperResponse<Map<String, Object>> upMrisForDRG(@RequestBody String visitId, HttpServletRequest req, HttpServletResponse res){
+        if (StringUtils.isEmpty(visitId)) {
+            throw new AppException("参数错误：未获取到患者就诊ID，请刷新重试");
+        }
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("visitId",visitId);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return WrapperResponse.success(mrisHomeService_consumer.upMrisForDRG(map));
     }
 
     /**

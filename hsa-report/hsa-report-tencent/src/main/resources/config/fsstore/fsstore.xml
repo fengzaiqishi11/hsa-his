@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--COS客户端-->
+    <!--设置pathStyleAccess 防止把bucket名会作为子域名-->
+    <bean id="s3ClientOptions" class="com.amazonaws.services.s3.S3ClientOptions">
+        <property name="pathStyleAccess" value="true"></property>
+    </bean>
+    <!--凭据-->
+    <bean id="awsCredentials" class="com.amazonaws.auth.BasicAWSCredentials">
+        <constructor-arg name="accessKey" value="${cos.accessKey}"></constructor-arg>
+        <constructor-arg name="secretKey" value="${cos.secretKey}"></constructor-arg>
+    </bean>
+    <!--客户端-->
+    <bean id="aws3Client" class="com.amazonaws.services.s3.AmazonS3Client">
+        <constructor-arg name="awsCredentials" ref="awsCredentials"></constructor-arg>
+        <property name="endpoint" value="${cos.endpoint}"></property>
+        <property name="s3ClientOptions" ref="s3ClientOptions"></property>
+
+    </bean>
+    <!--实现类-->
+    <bean id="dfsManagerImpl" class="cn.hsa.hsaf.tencent.fsstore.FSStoreTencentManagerImpl">
+        <property name="amazonS3Client" ref="aws3Client"></property>
+    </bean>
+
+</beans>
+

@@ -1051,7 +1051,7 @@
             v.age as age,
             v.age_unit_code as ageUnitCode,
             s.reality_price as settleRealityPrice,
-            s.self_price as selfPrice,
+            (ifnull(s.ap_total_price, 0) + ifnull(s.settle_take_price, 0) - ifnull(s.settle_back_price, 0)) as selfPrice,
             s.mi_price as miPrice,
             u.prac_certi_no as pracCertiNo,
             (select sum(reality_price) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id =#{settleId} and a.status_code = '0') as sumRealityPrice,
@@ -1750,7 +1750,7 @@
         a.type_code AS settleType,-- 结算类型
         b.total_price AS invoiceTotalPrice,-- 发票总金额
         (a.mi_price - ifnull(a.acct_pay, 0)) AS miPrice,-- 统筹支付金额
-        a.self_price AS selfPrice,-- 个人支付
+        (ifnull(a.ap_total_price, 0) + ifnull(a.settle_take_price, 0) - ifnull(a.settle_back_price, 0)) AS selfPrice,-- 个人支付
         a.total_price AS settleTotalPrice,-- 结算总金额(项目金额)
         a.reality_price AS realityPrice,-- 优惠后总金额（单据应缴金额）Mris
         c.zz_doctor_id AS doctorId,-- 医生id

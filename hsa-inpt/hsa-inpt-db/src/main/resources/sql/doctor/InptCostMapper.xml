@@ -1521,8 +1521,10 @@
         select
         <include refid="Base_Column_List"/>
         from inpt_cost
-        where hosp_code=#{hospCode} and iat_id=#{adviceId} and source_id=#{detailId} and status_code='0'
-        and date_format(plan_exec_time, '%Y-%m-%d') = date_format(#{startTime}, '%Y-%m-%d') and is_dist='0'
+        where hosp_code=#{hospCode} and iat_id=#{adviceId} and source_id=#{detailId}
+        and date_format(plan_exec_time, '%Y-%m-%d') = date_format(#{startTime}, '%Y-%m-%d')
+        -- and status_code='0'
+        -- and is_dist='0'
     </select>
 
     <update id="editInptCostByIds" parameterType="java.util.Map">
@@ -1860,13 +1862,24 @@
     </select>
     <select id="checkInsureAndHisFee" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         select distinct a.item_id,a.item_name ,
-        (select insure_reg_code from insure_individual_visit iiv where iiv.visit_id = #{id} and hosp_code =#{hospCode} ),
+        (select insure_reg_code from insure_individual_visit iiv where iiv.visit_id = #{id} and
+          hosp_code =#{hospCode} and iiv.medical_reg_no =#{medicalRegNo} ),
         (select sum(ic.reality_price)  from inpt_cost ic where ic.visit_id = #{id} and hosp_code =#{hospCode} and ic.settle_code='0' ) as inptSumPrice,
-       (select sum(iic.primary_price)  from insure_individual_cost iic where iic.visit_id = #{id} and hosp_code =#{hospCode} ) as insureSumPrice
+       (select sum(iic.primary_price)  from insure_individual_cost iic where iic.visit_id = #{id}
+       and hosp_code =#{hospCode} and iic.insure_register_no =#{medicalRegNo} ) as insureSumPrice
         from inpt_cost  a
             left join insure_individual_cost b
         on a.id = b.cost_id where a.hosp_code =#{hospCode} and a.visit_id = #{id}
         and b.id is null
+        <if test="isHalfSettle == '1'.toString() ">
+            <if test="feeStartDate != null ">
+                and date(a.cost_time) &gt;= date_format(#{feeStartDate},'%Y-%m-%d')
+            </if>
+            /*结束日期*/
+            <if test="feeEndDate != null">
+                and date(a.cost_time) &lt;= date_format(#{feeEndDate},'%Y-%m-%d')
+            </if>
+        </if>
     </select>
 
     <!--根据条件查询出待领信息集合-->

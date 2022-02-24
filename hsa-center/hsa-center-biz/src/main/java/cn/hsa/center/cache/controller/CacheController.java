@@ -1,10 +1,12 @@
 package cn.hsa.center.cache.controller;
 
+import cn.hsa.event.ElasticsearchUpdateEvent;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.cache.service.CacheService;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -18,13 +20,18 @@ public class CacheController {
 
     @Resource
     private CacheService cacheService;
+    /**
+     *  app事件发布管理器
+     */
+    @Resource
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      *  初次使用时初始化数据源, 此处必须在controller层调用避免第一次使用时数据源未初始化,导致动态切换失败
      */
     private final AtomicInteger dataSourceInitCount = new AtomicInteger(0);
 
-
+    private final List<String> dataTypes = Arrays.asList("0", "1");
 
     @GetMapping("/refreshCodeDetailsCache/{hospCodes}")
     public WrapperResponse<Boolean> refreshCodeDetailsCacheByHospCode(@PathVariable("hospCodes") String strHospCodes){
@@ -104,5 +111,14 @@ public class CacheController {
             return WrapperResponse.success(Boolean.FALSE);
         }
         return cacheService.deleteFromCacheByKey(keyName);
+    }
+
+    @PutMapping("/refreshElasticSearchNationDrug/{dataType}")
+    public WrapperResponse<String> refreshElasticSearchNationDrug(@PathVariable("dataType") String dataType){
+        if(dataType.contains(dataType)){
+            eventPublisher.publishEvent(new ElasticsearchUpdateEvent(this,Integer.parseInt(dataType)));
+            return WrapperResponse.success("更新成功,请等待5-15分钟等待后台刷新数据");
+        }
+        return WrapperResponse.fail("更新失败,数据类型非法");
     }
 }

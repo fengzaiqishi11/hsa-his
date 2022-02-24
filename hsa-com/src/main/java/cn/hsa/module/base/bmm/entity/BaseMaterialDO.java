@@ -94,4 +94,5 @@ public class BaseMaterialDO extends PageDO implements Serializable {
     // 是否办公用品（SF）
     private String isOffical;
 
+    private String reimbursementRatio;
 }

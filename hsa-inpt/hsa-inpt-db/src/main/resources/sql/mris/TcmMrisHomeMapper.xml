@@ -1,0 +1,1584 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO">
+
+    <!--查询病案患者基本信息-->
+    <select id="getTcmMrisBaseInfo" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
+            SELECT  mbi.id,  mbi.hosp_code,  mbi.visit_id, in_profile, in_blh,
+                   in_no, name, gender_code, gender_name, age, ifnull(age_unit_code,'1') as age_unit_code,
+                   age_unit_name, birthday, cert_code, cert_name, cert_no, nationality_cation,
+                   nationality_name, nation_code, nation_name, native_place, occupation_code,
+                   occupation_name, marry_code, marry_name, work, work_phone, work_post_code,
+                   work_address, contact_name, contact_rela_code, contact_rela_name, contact_phone,
+                   contact_post_code, contact_address, now_prov, now_prov_name, now_city, now_city_name,
+                   now_area, now_area_name, now_post_code, native_prov, native_prov_name, native_city,
+                   native_city_name, native_area, native_area_name, native_post_code, in_cnt, in_time,
+                   in_dept_id, in_dept_name, in_bed_id, in_bed_name, out_time, out_dept_id, out_dept_name,
+                   out_bed_id, out_bed_name, in_days, icd_version, disease_icd10, disease_icd10_name,
+                   bl_icd10, bl_icd10_name, director_id1, director_name1, director_id2, director_name2,
+                   zz_doctor_id, zz_doctor_name, zg_doctor_id, zg_doctor_name, zr_nurse_id, zr_nurse_name,
+                   emr_quality_code, emr_quality_name, zk_doctor_id, zk_doctor_name, zk_nurse_id,
+                   zk_nurse_name, zk_time, is_autopsy, is_autopsy_name, blood_code, blood_name,
+                   rh_code, rh_name, baby_weight, is_allergy, allergy_list, out_mode_code,
+                   out_mode_name, turn_org_name, in_situation_code, in_situation_name,
+                   out_situation_code, out_situation_name, mbi.crte_id,  mbi.crte_name, mbi. crte_time,
+                   hosp_name, pay_way_code, pay_way_name, health_card, baby_birth_weight,
+                   baby_in_weight, native_adress, now_adress, baby_age_month, birth_adress,
+                   id_card, phone, work_info, in_way, in_ward, damage_reason, jx_doctor_id,
+                   sx_doctor_id, jx_doctor_name, sx_doctor_name, doctor_coder_id, doctor_coder_name,
+                   in_ward2, in_dept_code, disease_icd10_other, turn_dept_ids, case_classification,
+                   is_monitor, monitor_day, monitor_hour, is_dzb, lclj_status, drg_status, is_kss, is_xjsj,
+                   is_cry, zl_level, apgar_num, aim, is_inpt, inpt_before_day, inpt_before_hour,
+                   inpt_before_minute, inpt_last_day, inpt_last_hour, inpt_last_minute, yljg_code,iiv.medical_reg_no,
+                   iiv.medicine_org_code,
+                   turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
+                   outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count,
+                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1) as  deptdrtCode,
+                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id) as  atddrCode,
+                  (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zr_nurse_id) as  respNursCode,
+                  (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id) as  iptDrCode,
+                  treat_code,treat_name,tcm_disease_code,tcm_disease_name,clinical_way_code,clinical_way_name,zyzj_code,zyzj_name,
+                  zyyljs_code,zyyljs_name,zyylsb_code,zyylsb_code,zyylsb_name,bzsh_code,bzsh_name,zyhljs_code
+            FROM tcm_mris_base_info mbi left join insure_individual_visit iiv
+                on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
+            WHERE  mbi.hosp_code = #{hospCode}
+            AND  mbi.visit_id = #{id}
+            order by iiv.crte_time desc limit 1
+    </select>
+
+    <!-- 插入数据 病案患者基本信息-->
+    <insert id="insertTcmMrisBaseInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
+        INSERT INTO tcm_mris_base_info (
+            id, hosp_code, visit_id, in_profile, in_blh, in_no, name, gender_code,
+            gender_name, age, age_unit_code, age_unit_name, birthday, cert_code, cert_name, cert_no,
+            nationality_cation, nationality_name, nation_code, nation_name, native_place, occupation_code, occupation_name, marry_code,
+            marry_name, work, work_phone, work_post_code, work_address, contact_name, contact_rela_code, contact_rela_name,
+            contact_phone, contact_post_code, contact_address, now_prov, now_prov_name, now_city, now_city_name, now_area,
+            now_area_name, now_post_code, native_prov, native_prov_name, native_city, native_city_name, native_area, native_area_name,
+            native_post_code, in_cnt, in_time, in_dept_id, in_dept_name, in_bed_id, in_bed_name, out_time,
+            out_dept_id, out_dept_name, out_bed_id, out_bed_name, in_days, icd_version, disease_icd10, disease_icd10_name,
+            bl_icd10, bl_icd10_name, director_id1, director_name1, director_id2, director_name2, zz_doctor_id, zz_doctor_name,
+            zg_doctor_id, zg_doctor_name, zr_nurse_id, zr_nurse_name, emr_quality_code, emr_quality_name, zk_doctor_id, zk_doctor_name,
+            zk_nurse_id, zk_nurse_name, zk_time, is_autopsy, is_autopsy_name, blood_code, blood_name, rh_code,
+            rh_name, baby_weight, is_allergy, allergy_list, out_mode_code, out_mode_name, turn_org_name, in_situation_code,
+            in_situation_name, out_situation_code, out_situation_name, crte_id, crte_name, crte_time, hosp_name, pay_way_code,
+            pay_way_name, health_card, baby_birth_weight, baby_in_weight, native_adress, now_adress, baby_age_month, birth_adress,
+            id_card, phone, work_info, in_way, in_ward, damage_reason, jx_doctor_id, sx_doctor_id,
+            jx_doctor_name, sx_doctor_name, doctor_coder_id, doctor_coder_name, in_ward2, disease_icd10_other, turn_dept_ids,
+            case_classification, is_monitor, monitor_day, monitor_hour, is_dzb, lclj_status, drg_status, is_kss,
+            is_xjsj, is_cry, zl_level, apgar_num,is_inpt,aim,inpt_before_day,inpt_before_hour,inpt_before_minute,inpt_last_day,inpt_last_hour,inpt_last_minute,yljg_code,
+            turn_time1,turn_time2,turn_time3,turn_dept1,turn_dept2,turn_dept3,outpt_doctor_id,
+            outpt_doctor_name,case_classify,clinical_path_case,rescue_count,rescue_success_count,
+            treat_code,treat_name,tcm_disease_code,tcm_disease_name,clinical_way_code,clinical_way_name,zyzj_code,zyzj_name,
+            zyyljs_code,zyyljs_name,zyylsb_code,zyylsb_name,bzsh_code,bzsh_name,zyhljs_code
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{visitId},
+            #{inProfile},
+            #{inBlh},
+            #{inNo},
+            #{name},
+            #{genderCode},
+            #{genderName},
+            #{age},
+            #{ageUnitCode},
+            #{ageUnitName},
+            #{birthday},
+            #{certCode},
+            #{certName},
+            #{certNo},
+            #{nationalityCation},
+            #{nationalityName},
+            #{nationCode},
+            #{nationName},
+            #{nativePlace},
+            #{occupationCode},
+            #{occupationName},
+            #{marryCode},
+            #{marryName},
+            #{work},
+            #{workPhone},
+            #{workPostCode},
+            #{workAddress},
+            #{contactName},
+            #{contactRelaCode},
+            #{contactRelaName},
+            #{contactPhone},
+            #{contactPostCode},
+            #{contactAddress},
+            #{nowProv},
+            #{nowProvName},
+            #{nowCity},
+            #{nowCityName},
+            #{nowArea},
+            #{nowAreaName},
+            #{nowPostCode},
+            #{nativeProv},
+            #{nativeProvName},
+            #{nativeCity},
+            #{nativeCityName},
+            #{nativeArea},
+            #{nativeAreaName},
+            #{nativePostCode},
+            #{inCnt},
+            #{inTime},
+            #{inDeptId},
+            #{inDeptName},
+            #{inBedId},
+            #{inBedName},
+            #{outTime},
+            #{outDeptId},
+            #{outDeptName},
+            #{outBedId},
+            #{outBedName},
+            #{inDays},
+            #{icdVersion},
+            #{diseaseIcd10},
+            #{diseaseIcd10Name},
+            #{blIcd10},
+            #{blIcd10Name},
+            #{directorId1},
+            #{directorName1},
+            #{directorId2},
+            #{directorName2},
+            #{zzDoctorId},
+            #{zzDoctorName},
+            #{zgDoctorId},
+            #{zgDoctorName},
+            #{zrNurseId},
+            #{zrNurseName},
+            #{emrQualityCode},
+            #{emrQualityName},
+            #{zkDoctorId},
+            #{zkDoctorName},
+            #{zkNurseId},
+            #{zkNurseName},
+            #{zkTime},
+            #{isAutopsy},
+            #{isAutopsyName},
+            #{bloodCode},
+            #{bloodName},
+            #{rhCode},
+            #{rhName},
+            #{babyWeight},
+            #{isAllergy},
+            #{allergyList},
+            #{outModeCode},
+            #{outModeName},
+            #{turnOrgName},
+            #{inSituationCode},
+            #{inSituationName},
+            #{outSituationCode},
+            #{outSituationName},
+            #{crteId},
+            #{crteName},
+            #{crteTime},
+            #{hospName},
+            #{payWayCode},
+            #{payWayName},
+            #{healthCard},
+            #{babyBirthWeight},
+            #{babyInWeight},
+            #{nativeAdress},
+            #{nowAdress},
+            #{babyAgeMonth},
+            #{birthAdress},
+            #{idCard},
+            #{phone},
+            #{workInfo},
+            #{inWay},
+            #{inWard},
+            #{damageReason},
+            #{jxDoctorId},
+            #{sxDoctorId},
+            #{jxDoctorName},
+            #{sxDoctorName},
+            #{doctorCoderId},
+            #{doctorCoderName},
+            #{inWard2},
+            #{diseaseIcd10Other},
+            #{turnDeptIds},
+            #{caseClassification},
+            #{isMonitor},
+            #{monitorDay},
+            #{monitorHour},
+            #{isDzb},
+            #{lcljStatus},
+            #{drgStatus},
+            #{isKss},
+            #{isXjsj},
+            #{isCry},
+            #{zlLevel},
+            #{apgarNum},
+            #{isInpt},
+            #{aim},
+            #{inptBeforeDay},
+            #{inptBeforehour},
+            #{inptBeforeMinute},
+            #{inptLastDay},
+            #{inptLastHour},
+            #{inptLastMinute},
+            #{yljgCode},
+            #{turnTime1},
+            #{turnTime2},
+            #{turnTime3},
+            #{turnDept1},
+            #{turnDept2},
+            #{turnDept3},
+            #{outptDoctorId},
+            #{outptDoctorName},
+            #{caseClassify},
+            #{clinicalPathCase},
+            #{rescueCount},
+            #{rescueSuccessCount},
+            #{treatCode},
+            #{treatName},
+            #{tcmDiseaseCode},
+            #{tcmDiseaseName},
+            #{clinicalWayCode},
+            #{clinicalWayName},
+            #{zyzjCode},
+            #{zyzjName},
+            #{zyylsbCode},
+            #{zyylsbName},
+            #{zyyljsCode},
+            #{zyyljsName},
+            #{bzshCode},
+            #{bzshName},
+            #{zyhljsCode}
+        )
+    </insert>
+
+    <!-- 修改数据 病案患者基本信息 -->
+    <update id="updateTcmMrisBaseInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisBaseInfoDO">
+        UPDATE tcm_mris_base_info
+        <set>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="yljgCode != null">
+                yljg_code = #{yljgCode},
+            </if>
+            <if test="aim != null">
+                aim = #{aim},
+            </if>
+            <if test="inProfile != null">
+                in_profile = #{inProfile},
+            </if>
+            <if test="inBlh != null">
+                in_blh = #{inBlh},
+            </if>
+            <if test="inNo != null">
+                in_no = #{inNo},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="inptBeforeDay != null">
+                inpt_before_day = #{inptBeforeDay},
+            </if>
+            <if test="inptBeforehour != null">
+                inpt_before_hour = #{inptBeforehour},
+            </if>
+            <if test="inptBeforeMinute != null">
+                inpt_before_minute = #{inptBeforeMinute},
+            </if>
+            <if test="inptLastDay != null">
+                inpt_last_day = #{inptLastDay},
+            </if>
+            <if test="inptLastHour != null">
+                inpt_last_hour = #{inptLastHour},
+            </if>
+            <if test="inptLastMinute != null">
+                inpt_last_minute = #{inptLastMinute},
+            </if>
+            <if test="genderCode != null">
+                gender_code = #{genderCode},
+            </if>
+            <if test="genderName != null">
+                gender_name = #{genderName},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="ageUnitCode != null">
+                age_unit_code = #{ageUnitCode},
+            </if>
+            <if test="ageUnitName != null">
+                age_unit_name = #{ageUnitName},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday},
+            </if>
+            <if test="certCode != null">
+                cert_code = #{certCode},
+            </if>
+            <if test="certName != null">
+                cert_name = #{certName},
+            </if>
+            <if test="certNo != null">
+                cert_no = #{certNo},
+            </if>
+            <if test="nationalityCation != null">
+                nationality_cation = #{nationalityCation},
+            </if>
+            <if test="nationalityName != null">
+                nationality_name = #{nationalityName},
+            </if>
+            <if test="nationCode != null">
+                nation_code = #{nationCode},
+            </if>
+            <if test="nationName != null">
+                nation_name = #{nationName},
+            </if>
+            <if test="nativePlace != null">
+                native_place = #{nativePlace},
+            </if>
+            <if test="occupationCode != null">
+                occupation_code = #{occupationCode},
+            </if>
+            <if test="occupationName != null">
+                occupation_name = #{occupationName},
+            </if>
+            <if test="marryCode != null">
+                marry_code = #{marryCode},
+            </if>
+            <if test="marryName != null">
+                marry_name = #{marryName},
+            </if>
+            <if test="work != null">
+                work = #{work},
+            </if>
+            <if test="workPhone != null">
+                work_phone = #{workPhone},
+            </if>
+            <if test="workPostCode != null">
+                work_post_code = #{workPostCode},
+            </if>
+            <if test="workAddress != null">
+                work_address = #{workAddress},
+            </if>
+            <if test="contactName != null">
+                contact_name = #{contactName},
+            </if>
+            <if test="contactRelaCode != null">
+                contact_rela_code = #{contactRelaCode},
+            </if>
+            <if test="contactRelaName != null">
+                contact_rela_name = #{contactRelaName},
+            </if>
+            <if test="contactPhone != null">
+                contact_phone = #{contactPhone},
+            </if>
+            <if test="contactPostCode != null">
+                contact_post_code = #{contactPostCode},
+            </if>
+            <if test="contactAddress != null">
+                contact_address = #{contactAddress},
+            </if>
+            <if test="nowProv != null">
+                now_prov = #{nowProv},
+            </if>
+            <if test="nowProvName != null">
+                now_prov_name = #{nowProvName},
+            </if>
+            <if test="nowCity != null">
+                now_city = #{nowCity},
+            </if>
+            <if test="nowCityName != null">
+                now_city_name = #{nowCityName},
+            </if>
+            <if test="nowArea != null">
+                now_area = #{nowArea},
+            </if>
+            <if test="nowAreaName != null">
+                now_area_name = #{nowAreaName},
+            </if>
+            <if test="nowPostCode != null">
+                now_post_code = #{nowPostCode},
+            </if>
+            <if test="nativeProv != null">
+                native_prov = #{nativeProv},
+            </if>
+            <if test="nativeProvName != null">
+                native_prov_name = #{nativeProvName},
+            </if>
+            <if test="nativeCity != null">
+                native_city = #{nativeCity},
+            </if>
+            <if test="nativeCityName != null">
+                native_city_name = #{nativeCityName},
+            </if>
+            <if test="nativeArea != null">
+                native_area = #{nativeArea},
+            </if>
+            <if test="nativeAreaName != null">
+                native_area_name = #{nativeAreaName},
+            </if>
+            <if test="nativePostCode != null">
+                native_post_code = #{nativePostCode},
+            </if>
+            <if test="inCnt != null">
+                in_cnt = #{inCnt},
+            </if>
+            <if test="inTime != null">
+                in_time = #{inTime},
+            </if>
+            <if test="inDeptId != null">
+                in_dept_id = #{inDeptId},
+            </if>
+            <if test="inDeptName != null">
+                in_dept_name = #{inDeptName},
+            </if>
+            <if test="inBedId != null">
+                in_bed_id = #{inBedId},
+            </if>
+            <if test="inBedName != null">
+                in_bed_name = #{inBedName},
+            </if>
+            <if test="outTime != null">
+                out_time = #{outTime},
+            </if>
+            <if test="outDeptId != null">
+                out_dept_id = #{outDeptId},
+            </if>
+            <if test="outDeptName != null">
+                out_dept_name = #{outDeptName},
+            </if>
+            <if test="outBedId != null">
+                out_bed_id = #{outBedId},
+            </if>
+            <if test="outBedName != null">
+                out_bed_name = #{outBedName},
+            </if>
+            <if test="inDays != null">
+                in_days = #{inDays},
+            </if>
+            <if test="icdVersion != null">
+                icd_version = #{icdVersion},
+            </if>
+            <if test="diseaseIcd10 != null">
+                disease_icd10 = #{diseaseIcd10},
+            </if>
+            <if test="diseaseIcd10Name != null">
+                disease_icd10_name = #{diseaseIcd10Name},
+            </if>
+            <if test="blIcd10 != null">
+                bl_icd10 = #{blIcd10},
+            </if>
+            <if test="blIcd10Name != null">
+                bl_icd10_name = #{blIcd10Name},
+            </if>
+            <if test="directorId1 != null">
+                director_id1 = #{directorId1},
+            </if>
+            <if test="directorName1 != null">
+                director_name1 = #{directorName1},
+            </if>
+            <if test="directorId2 != null">
+                director_id2 = #{directorId2},
+            </if>
+            <if test="directorName2 != null">
+                director_name2 = #{directorName2},
+            </if>
+            <if test="zzDoctorId != null">
+                zz_doctor_id = #{zzDoctorId},
+            </if>
+            <if test="zzDoctorName != null">
+                zz_doctor_name = #{zzDoctorName},
+            </if>
+            <if test="zgDoctorId != null">
+                zg_doctor_id = #{zgDoctorId},
+            </if>
+            <if test="zgDoctorName != null">
+                zg_doctor_name = #{zgDoctorName},
+            </if>
+            <if test="zrNurseId != null">
+                zr_nurse_id = #{zrNurseId},
+            </if>
+            <if test="zrNurseName != null">
+                zr_nurse_name = #{zrNurseName},
+            </if>
+            <if test="emrQualityCode != null">
+                emr_quality_code = #{emrQualityCode},
+            </if>
+            <if test="emrQualityName != null">
+                emr_quality_name = #{emrQualityName},
+            </if>
+            <if test="zkDoctorId != null">
+                zk_doctor_id = #{zkDoctorId},
+            </if>
+            <if test="zkDoctorName != null">
+                zk_doctor_name = #{zkDoctorName},
+            </if>
+            <if test="zkNurseId != null">
+                zk_nurse_id = #{zkNurseId},
+            </if>
+            <if test="zkNurseName != null">
+                zk_nurse_name = #{zkNurseName},
+            </if>
+            <if test="zkTime != null">
+                zk_time = #{zkTime},
+            </if>
+            <if test="isAutopsy != null">
+                is_autopsy = #{isAutopsy},
+            </if>
+            <if test="isAutopsyName != null">
+                is_autopsy_name = #{isAutopsyName},
+            </if>
+            <if test="bloodCode != null">
+                blood_code = #{bloodCode},
+            </if>
+            <if test="bloodName != null">
+                blood_name = #{bloodName},
+            </if>
+            <if test="rhCode != null">
+                rh_code = #{rhCode},
+            </if>
+            <if test="rhName != null">
+                rh_name = #{rhName},
+            </if>
+            <if test="babyWeight != null">
+                baby_weight = #{babyWeight},
+            </if>
+            <if test="isAllergy != null">
+                is_allergy = #{isAllergy},
+            </if>
+            <if test="allergyList != null">
+                allergy_list = #{allergyList},
+            </if>
+            <if test="outModeCode != null">
+                out_mode_code = #{outModeCode},
+            </if>
+            <if test="outModeName != null">
+                out_mode_name = #{outModeName},
+            </if>
+            <if test="turnOrgName != null">
+                turn_org_name = #{turnOrgName},
+            </if>
+            <if test="inSituationCode != null">
+                in_situation_code = #{inSituationCode},
+            </if>
+            <if test="inSituationName != null">
+                in_situation_name = #{inSituationName},
+            </if>
+            <if test="outSituationCode != null">
+                out_situation_code = #{outSituationCode},
+            </if>
+            <if test="outSituationName != null">
+                out_situation_name = #{outSituationName},
+            </if>
+            <if test="crteId != null">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="hospName != null">
+                hosp_name = #{hospName},
+            </if>
+            <if test="payWayCode != null">
+                pay_way_code = #{payWayCode},
+            </if>
+            <if test="payWayName != null">
+                pay_way_name = #{payWayName},
+            </if>
+            <if test="healthCard != null">
+                health_card = #{healthCard},
+            </if>
+            <if test="babyBirthWeight != null">
+                baby_birth_weight = #{babyBirthWeight},
+            </if>
+            <if test="babyInWeight != null">
+                baby_in_weight = #{babyInWeight},
+            </if>
+            <if test="nativeAdress != null">
+                native_adress = #{nativeAdress},
+            </if>
+            <if test="nowAdress != null">
+                now_adress = #{nowAdress},
+            </if>
+            <if test="babyAgeMonth != null">
+                baby_age_month = #{babyAgeMonth},
+            </if>
+            <if test="birthAdress != null">
+                birth_adress = #{birthAdress},
+            </if>
+            <if test="idCard != null">
+                id_card = #{idCard},
+            </if>
+            <if test="phone != null">
+                phone = #{phone},
+            </if>
+            <if test="workInfo != null">
+                work_info = #{workInfo},
+            </if>
+            <if test="inWay != null">
+                in_way = #{inWay},
+            </if>
+            <if test="inWard != null">
+                in_ward = #{inWard},
+            </if>
+            <if test="damageReason != null">
+                damage_reason = #{damageReason},
+            </if>
+            <if test="jxDoctorId != null">
+                jx_doctor_id = #{jxDoctorId},
+            </if>
+            <if test="sxDoctorId != null">
+                sx_doctor_id = #{sxDoctorId},
+            </if>
+            <if test="jxDoctorName != null">
+                jx_doctor_name = #{jxDoctorName},
+            </if>
+            <if test="sxDoctorName != null">
+                sx_doctor_name = #{sxDoctorName},
+            </if>
+            <if test="doctorCoderId != null">
+                doctor_coder_id = #{doctorCoderId},
+            </if>
+            <if test="doctorCoderName != null">
+                doctor_coder_name = #{doctorCoderName},
+            </if>
+            <if test="inWard2 != null">
+                in_ward2 = #{inWard2},
+            </if>
+            <if test="diseaseIcd10Other != null">
+                disease_icd10_other = #{diseaseIcd10Other},
+            </if>
+            <if test="turnDeptIds != null">
+                turn_dept_ids = #{turnDeptIds},
+            </if>
+            <if test="caseClassification != null">
+                case_classification = #{caseClassification},
+            </if>
+            <if test="isMonitor != null">
+                is_monitor = #{isMonitor},
+            </if>
+            <if test="monitorDay != null">
+                monitor_day = #{monitorDay},
+            </if>
+            <if test="monitorHour != null">
+                monitor_hour = #{monitorHour},
+            </if>
+            <if test="isInpt != null">
+                is_inpt = #{isInpt},
+            </if>
+            <if test="isDzb != null">
+                is_dzb = #{isDzb},
+            </if>
+            <if test="lcljStatus != null">
+                lclj_status = #{lcljStatus},
+            </if>
+            <if test="drgStatus != null">
+                drg_status = #{drgStatus},
+            </if>
+            <if test="isKss != null">
+                is_kss = #{isKss},
+            </if>
+            <if test="isXjsj != null">
+                is_xjsj = #{isXjsj},
+            </if>
+            <if test="isCry != null">
+                is_cry = #{isCry},
+            </if>
+            <if test="zlLevel != null">
+                zl_level = #{zlLevel},
+            </if>
+            <if test="apgarNum != null">
+                apgar_num = #{apgarNum},
+            </if>
+            <if test="turnTime1 != null">
+                turn_time1 = #{turnTime1},
+            </if>
+            <if test="turnTime2 != null">
+                turn_time2 = #{turnTime2},
+            </if>
+            <if test="turnTime3 != null">
+                turn_time2 = #{turnTime3},
+            </if>
+            <if test="turnDept1 != null">
+                turn_dept1 = #{turnDept1},
+            </if>
+            <if test="turnDept2 != null">
+                turn_dept2 = #{turnDept2},
+            </if>
+            <if test="turnDept3 != null">
+                turn_dept3 = #{turnDept3},
+            </if>
+            <if test="outptDoctorId != null">
+            outpt_doctor_id = #{outptDoctorId},
+            </if>
+            <if test="outptDoctorName != null">
+                outpt_doctor_name = #{outptDoctorName},
+            </if>
+            <if test="caseClassify != null">
+                case_classify = #{caseClassify},
+            </if>
+            <if test="clinicalPathCase != null">
+                clinical_path_case = #{clinicalPathCase},
+            </if>
+            <if test="rescueCount != null">
+                rescue_count = #{rescueCount},
+            </if>
+            <if test="rescueSuccessCount != null">
+                rescue_success_count = #{rescueSuccessCount},
+            </if>
+            <if test="treatCode != null">
+                treat_code = #{treatCode},
+            </if>
+            <if test="treatName != null">
+                treat_name = #{treatName},
+            </if>
+            <if test="tcmDiseaseCode != null">
+                tcm_disease_code = #{tcmDiseaseCode},
+            </if>
+            <if test="tcmDiseaseName != null">
+                tcm_disease_name = #{tcmDiseaseName},
+            </if>
+            <if test="clinicalWayCode != null">
+                clinical_way_code = #{clinicalWayCode},
+            </if>
+            <if test="clinicalWayName != null">
+                clinical_way_name = #{clinicalWayName},
+            </if>
+            <if test="zyzjCode != null">
+                zyzj_code = #{zyzjCode},
+            </if>
+            <if test="zyzjName != null">
+                zyzj_name = #{zyzjName},
+            </if>
+            <if test="zyylsbCode != null">
+                zyylsb_code = #{zyylsbCode},
+            </if>
+            <if test="zyylsbName != null">
+                zyylsb_name = #{zyylsbName},
+            </if>
+            <if test="zyyljsCode != null">
+                zyyljs_code = #{zyyljsCode},
+            </if>
+            <if test="zyyljsName != null">
+                zyyljs_name = #{zyyljsName},
+            </if>
+            <if test="bzshCode != null">
+                bzsh_code = #{bzshCode},
+            </if>
+            <if test="bzshName != null">
+                bzsh_name = #{bzshName},
+            </if>
+            <if test="zyhljsCode != null">
+                zyhljs_code = #{zyhljsCode},
+            </if>
+        </set>
+        WHERE id = #{id} AND hosp_code = #{hospCode}
+    </update>
+
+    <!-- 删除数据 病案患者基本信息-->
+    <delete id="deleteTcmMrisBaseInfoByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_base_info WHERE hosp_code = #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 病案费用信息 -->
+    <delete id="deleteTcmMrisCostByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_cost WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 病案诊断信息 -->
+    <delete id="deleteTcmMrisDiagnoseByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 中医诊断信息 -->
+    <delete id="deleteTcmDiagnoseByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_syndromes_diagnose WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 病案手术信息 -->
+    <delete id="deleteTcmMrisOperInfoByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_oper_info WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!-- 删除数据 病案转科信息 -->
+    <delete id="deleteTcmMrisTurnDeptByVisitId" parameterType="java.util.Map">
+        DELETE FROM tcm_mris_turn_dept WHERE  hosp_code= #{hospCode} AND visit_id = #{visitId}
+    </delete>
+
+    <!--HIS数据抽取 获取患者基本信息-->
+    <select id="getTcmMrisBaseInfoByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO">
+        SELECT
+           DISTINCT
+           a.hosp_code as hospCode,
+           a.contact_phone as contactPhone,
+           a.id as visitId,
+           a.in_profile as inProfile,
+           -- blh 病理号,
+           a.in_no as inNo,
+           a.name as name,
+           a.gender_code as genderCode,
+           code_1.name as genderName,
+           a.age as age,
+           a.age_unit_code as ageUnitCode,
+           code_2.name as ageUnitName,
+           a.birthday as birthday,
+           a.cert_code as certCode,
+           code_3.name as certName,
+           a.cert_no as certNo,
+           a.nation_code as nationCode,
+           code_4.name as nationName,
+           a.marry_code as marryCode,
+           code_5.name as marryName,
+           a.in_time as inTime,
+           -- 入院科室
+           ifnull((select after_dept_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.in_dept_id) as inDeptId,
+           ifnull((select after_dept_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.in_dept_name) as inDeptName,
+           -- 入院床位
+            ifnull((select after_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.bed_id) as inBedId,
+            ifnull((select after_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='0'
+            order BY a.crte_time ASC limit 1),a.bed_name) as inBedName,
+
+            -- 出院床位
+            ifnull((select before_bed_id from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='5'
+            order BY a.crte_time DESC limit 1),a.bed_id) as outBedId,
+            ifnull((select before_bed_name from inpt_bed_change a left join inpt_visit b on a.visit_id = b.id
+            where a.visit_id = #{visitId} and change_code ='5'
+            order BY a.crte_time DESC limit 1),a.bed_name) as outBedName,
+            a.out_time as outTime,
+            a.out_dept_id as outDeptId,
+            a.out_dept_name as outDeptName,
+            timestampdiff(day,a.in_time,a.out_time) as inDays,
+            -- icd_version 疾病版本（疾病分类名称）
+            a.out_disease_name as  diseaseName,
+            -- bl_icd10 病理诊断
+            -- turn_org_name 转院机构
+            -- bl_icd10_name
+            a.zz_doctor_id as zzDoctorId,
+            a.zz_doctor_name as zzDoctorName,
+            a.jz_doctor_id as zgDoctorId,
+            a.jz_doctor_name as zgDoctorName,
+            a.resp_nurse_id as zrNurseId,
+            a.resp_nurse_name as zrNurseName,
+            a.in_situation_code as inSituationCode,
+            code_6.name as inSituationName,
+            a.out_situation_code as outSituationCode,
+            code_7.name as outSituationName,
+            a.out_mode_code as outModeCode,
+            code_8.name as outModeName,
+            baby.weight as babyWeight,
+            a.address as nowAdress,
+            a.phone as phone,
+            ifnull((select code from base_disease where id = a.outpt_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
+            a.outpt_disease_name as diseaseIcd10Name,
+            case when a.in_mode_code='0' then '9' else a.in_mode_code end as inWay,
+            bf.native_place as nativePlace,
+            bf.native_address as nativeAdress,
+            code_9.remark as payWayCode,
+            a.outpt_doctor_id as outptDoctorId,
+            a.outpt_doctor_name as outptDoctorName,
+            a.contact_name as contactName,
+            a.contact_rela_code as contactRelaCode,
+            a.contact_address as contactAddress,
+            a.contact_phone as contactPhone
+        FROM inpt_visit a
+             left join inpt_bed_change bed on a.id = bed.visit_id
+             left join inpt_baby baby on a.id = baby.visit_id
+             left join base_profile_file bf on a.profile_id = bf.id
+             left join sys_code_detail code_1 on (a.gender_code = code_1.value and code_1.c_code = 'XB')
+             left join sys_code_detail code_2 on (a.age_unit_code = code_2.value and code_2.c_code = 'NLDW')
+             left join sys_code_detail code_3 on (a.cert_code = code_3.value and code_3.c_code = 'ZJLX')
+             left join sys_code_detail code_4 on (a.nation_code = code_4.value and code_4.c_code = 'MZ')
+             left join sys_code_detail code_5 on (a.marry_code = code_5.value and code_5.c_code = 'HYZK')
+             left join sys_code_detail code_6 on (a.in_situation_code = code_6.value and code_6.c_code ='RYQK')
+             left join sys_code_detail code_7 on (a.out_situation_code = code_7.value and code_7.c_code = 'CYBQ')
+             left join sys_code_detail code_8 on (a.out_mode_code = code_8.value and code_8.c_code = 'CYFS')
+             left join sys_code_detail code_9 on (a.patient_code = code_9.value and code_9.c_code = 'BRLX')
+        WHERE a.hosp_code = #{hospCode}
+        AND a.id = #{visitId}
+        limit 1
+    </select>
+
+    <!--查询病案诊断信息-->
+    <select id="queryTcmMrisDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO">
+            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
+                   md.icd_version, md.disease_icd10, md.disease_icd10_name,
+                   md.in_situation_code
+            FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id} order by md.disease_code desc
+    </select>
+
+    <!--查询病案诊断信息-->
+    <select id="queryTcmDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmDiagnoseDO">
+            SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
+                   md.icd_version,md.disease_icd10, md.disease_icd10_name,
+                   md.in_situation_code,md.tcm_syndromes_id,md.tcm_syndromes_name
+            FROM tcm_mris_syndromes_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id} order by md.disease_code desc
+    </select>
+
+    <!--HIS数据抽取 获取诊断信息-->
+    <select id="queryHisDiagnoseInfo" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        select a.id,a.hosp_code,a.disease_id,a.visit_id,a.type_code,a.is_main,a.crte_id,a.crte_name,a.crte_time,
+        b.code as diseaseCode,b.name as diseaseName,a.tcm_syndromes_name, c.code as tcmSyndromesId
+        from inpt_diagnose a
+        left join base_disease b on a.disease_id = b.id and a.hosp_code = #{hospCode}
+        left join base_disease c on a.tcm_syndromes_id = c.id and a.hosp_code = #{hospCode}
+        where a.hosp_code = #{hospCode} and a.visit_id = #{visitId} and a.type_code !='201'
+    </select>
+
+    <!--病案诊断数据批量插入-->
+    <insert id="insertTcmMrisDiagnoseBatch" parameterType="list">
+        INSERT INTO tcm_mris_diagnose (
+        id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version, disease_icd10,
+        disease_icd10_name,in_situation_code
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.mbiId},
+            #{item.visitId},
+            #{item.diseaseCode},
+            #{item.diseaseName},
+            #{item.icdVersion},
+            #{item.diseaseIcd10},
+            #{item.diseaseIcd10Name},
+            #{item.inSituationCode}
+            )
+        </foreach>
+    </insert>
+
+    <!--HIS数据抽取 批量插入转科信息-->
+    <insert id="insertTcmMrisTurnDeptBatch" parameterType="list">
+        INSERT INTO tcm_mris_turn_dept (
+            id, hosp_code, mbi_id, visit_id, out_dept_id, out_dept_name, in_dept_id, in_dept_name,
+            in_dept_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+        (
+            #{item.id},
+            #{item.hospCode},
+            #{item.mbiId},
+            #{item.visitId},
+            #{item.outDeptId},
+            #{item.outDeptName},
+            #{item.inDeptId},
+            #{item.inDeptName},
+            #{item.inDeptTime}
+        )
+        </foreach>
+    </insert>
+
+    <!--查询病案手术信息-->
+    <select id="queryTcmMrisOperInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisOperDTO">
+            SELECT *, oper_disease_name as 'name'
+            FROM tcm_mris_oper_info
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+    <!--插入手术信息-->
+    <insert id="insertTcmMrisOperBatch" parameterType="list">
+        INSERT INTO tcm_mris_oper_info (
+        id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
+        notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
+        assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
+        ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,columns_num,other_oper_time
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.mbiId},
+            #{item.visitId},
+            #{item.operDiseaseId},
+            #{item.operDiseaseIcd9},
+            #{item.operDiseaseName},
+            #{item.notchedCode},
+            #{item.notchedName},
+            #{item.healCode},
+            #{item.healName},
+            #{item.anaCode},
+            #{item.anaName},
+            #{item.operDoctorId},
+            #{item.operDoctorName},
+            #{item.operTime},
+            #{item.assistantId4},
+            #{item.assistantName1},
+            #{item.assistantId2},
+            #{item.assistantName2},
+            #{item.assistantId3},
+            #{item.assistantName3},
+            #{item.anaId1},
+            #{item.anaName1},
+            #{item.anaId2},
+            #{item.anaName2},
+            #{item.anaId3},
+            #{item.anaName3},
+            #{item.operCode},
+            #{item.operName},
+            #{item.operPosition},
+            #{item.operPositionName},
+            #{item.columnsNum},
+            #{item.otherOperTime}
+            )
+        </foreach>
+    </insert>
+
+    <!--查询病案费用信息-->
+    <select id="getTcmMrisCost" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+            SELECT *
+            FROM tcm_mris_cost
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+    <!-- 插入数据 病案费用信息-->
+    <insert id="insertTcmMrisCost" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        INSERT INTO tcm_mris_cost (
+            id, hosp_code, mbi_id, visit_id, fy01, fy02, fy03, fy04,
+            fy05, fy06, fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05,
+            zhylfwl06, zdl01, zdl02, zdl03, zdl04, zll01, zll02, zll03,
+            zll04, zll05, kfl01, xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03,
+            xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01, zyl02, zyl03,
+            zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{mbiId},
+            #{visitId},
+            #{fy01},
+            #{fy02},
+            #{fy03},
+            #{fy04},
+            #{fy05},
+            #{fy06},
+            #{fy07},
+            #{zhylfwl01},
+            #{zhylfwl02},
+            #{zhylfwl03},
+            #{zhylfwl04},
+            #{zhylfwl05},
+            #{zhylfwl06},
+            #{zdl01},
+            #{zdl02},
+            #{zdl03},
+            #{zdl04},
+            #{zll01},
+            #{zll02},
+            #{zll03},
+            #{zll04},
+            #{zll05},
+            #{kfl01},
+            #{xyl01},
+            #{zyf01},
+            #{xyzpl01},
+            #{xyzpl02},
+            #{xyzpl03},
+            #{xyzpl04},
+            #{xyzpl05},
+            #{hcl01},
+            #{hcl02},
+            #{hcl03},
+            #{zyl01},
+            #{zyl02},
+            #{zyl03},
+            #{zyl04},
+            #{zyl05},
+            #{zyl06},
+            #{zyl07},
+            #{zyl08},
+            #{zyl09},
+            #{zyl10},
+            #{zyl11},
+            #{xyzpl06}
+        )
+    </insert>
+
+    <!-- 修改数据 病案更新信息-->
+    <update id="updateTcmMrisCost" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        UPDATE tcm_mris_cost
+        <set>
+            <if test="mbiId != null">
+                mbi_id = #{mbiId},
+            </if>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="fy01 != null">
+                fy01 = #{fy01},
+            </if>
+            <if test="fy02 != null">
+                fy02 = #{fy02},
+            </if>
+            <if test="fy03 != null">
+                fy03 = #{fy03},
+            </if>
+            <if test="fy04 != null">
+                fy04 = #{fy04},
+            </if>
+            <if test="fy05 != null">
+                fy05 = #{fy05},
+            </if>
+            <if test="fy06 != null">
+                fy06 = #{fy06},
+            </if>
+            <if test="fy07 != null">
+                fy07 = #{fy07},
+            </if>
+            <if test="zhylfwl01 != null">
+                zhylfwl01 = #{zhylfwl01},
+            </if>
+            <if test="zhylfwl02 != null">
+                zhylfwl02 = #{zhylfwl02},
+            </if>
+            <if test="zhylfwl03 != null">
+                zhylfwl03 = #{zhylfwl03},
+            </if>
+            <if test="zhylfwl04 != null">
+                zhylfwl04 = #{zhylfwl04},
+            </if>
+            <if test="zhylfwl05 != null">
+                zhylfwl05 = #{zhylfwl05},
+            </if>
+            <if test="zhylfwl06 != null">
+                zhylfwl06 = #{zhylfwl06},
+            </if>
+            <if test="zdl01 != null">
+                zdl01 = #{zdl01},
+            </if>
+            <if test="zdl02 != null">
+                zdl02 = #{zdl02},
+            </if>
+            <if test="zdl03 != null">
+                zdl03 = #{zdl03},
+            </if>
+            <if test="zdl04 != null">
+                zdl04 = #{zdl04},
+            </if>
+            <if test="zll01 != null">
+                zll01 = #{zll01},
+            </if>
+            <if test="zll02 != null">
+                zll02 = #{zll02},
+            </if>
+            <if test="zll03 != null">
+                zll03 = #{zll03},
+            </if>
+            <if test="zll04 != null">
+                zll04 = #{zll04},
+            </if>
+            <if test="zll05 != null">
+                zll05 = #{zll05},
+            </if>
+            <if test="kfl01 != null">
+                kfl01 = #{kfl01},
+            </if>
+            <if test="xyl01 != null">
+                xyl01 = #{xyl01},
+            </if>
+            <if test="zyf01 != null">
+                zyf01 = #{zyf01},
+            </if>
+            <if test="xyzpl01 != null">
+                xyzpl01 = #{xyzpl01},
+            </if>
+            <if test="xyzpl02 != null">
+                xyzpl02 = #{xyzpl02},
+            </if>
+            <if test="xyzpl03 != null">
+                xyzpl03 = #{xyzpl03},
+            </if>
+            <if test="xyzpl04 != null">
+                xyzpl04 = #{xyzpl04},
+            </if>
+            <if test="xyzpl05 != null">
+                xyzpl05 = #{xyzpl05},
+            </if>
+            <if test="hcl01 != null">
+                hcl01 = #{hcl01},
+            </if>
+            <if test="hcl02 != null">
+                hcl02 = #{hcl02},
+            </if>
+            <if test="hcl03 != null">
+                hcl03 = #{hcl03},
+            </if>
+            <if test="zyl01 != null">
+                zyl01 = #{zyl01},
+            </if>
+            <if test="zyl02 != null">
+                zyl02 = #{zyl02},
+            </if>
+            <if test="zyl03 != null">
+                zyl03 = #{zyl03},
+            </if>
+            <if test="zyl04 != null">
+                zyl04 = #{zyl04},
+            </if>
+            <if test="zyl05 != null">
+                zyl05 = #{zyl05},
+            </if>
+            <if test="zyl06 != null">
+                zyl06 = #{zyl06},
+            </if>
+            <if test="zyl07 != null">
+                zyl07 = #{zyl07},
+            </if>
+            <if test="zyl08 != null">
+                zyl08 = #{zyl08},
+            </if>
+            <if test="zyl09 != null">
+                zyl09 = #{zyl09},
+            </if>
+            <if test="zyl10 != null">
+                zyl10 = #{zyl10},
+            </if>
+            <if test="zyl11 != null">
+                zyl11 = #{zyl11}
+            </if>
+            <if test="xyzpl06 != null">
+                xyzpl06 = #{xyzpl06}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+
+    <!-- 插入数据 病案手术信息-->
+    <insert id="insertTcmMrisOperInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+        INSERT INTO tcm_mris_oper_info (
+            id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
+            notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
+            assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
+            ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,other_oper_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{mbiId},
+            #{visitId},
+            #{operDiseaseId},
+            #{operDiseaseIcd9},
+            #{operDiseaseName},
+            #{notchedCode},
+            #{notchedName},
+            #{healCode},
+            #{healName},
+            #{anaCode},
+            #{anaName},
+            #{operDoctorId},
+            #{operDoctorName},
+            #{operTime},
+            #{assistantId4},
+            #{assistantName1},
+            #{assistantId2},
+            #{assistantName2},
+            #{assistantId3},
+            #{assistantName3},
+            #{anaId1},
+            #{anaName1},
+            #{anaId2},
+            #{anaName2},
+            #{anaId3},
+            #{anaName3},
+            #{operCode},
+            #{operName},
+            #{operPosition},
+            #{operPositionName},
+            #{otherOperTime}
+        )
+    </insert>
+
+    <!-- 修改数据 更新病案手术信息-->
+    <update id="updateTcmMrisOperInfo" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+        UPDATE tcm_mris_oper_info
+        <set>
+            <if test="mbiId != null">
+                mbi_id = #{mbiId},
+            </if>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="operDiseaseId != null">
+                oper_disease_id = #{operDiseaseId},
+            </if>
+            <if test="operDiseaseIcd9 != null">
+                oper_disease_icd9 = #{operDiseaseIcd9},
+            </if>
+            <if test="operDiseaseName != null">
+                oper_disease_name = #{operDiseaseName},
+            </if>
+            <if test="notchedCode != null">
+                notched_code = #{notchedCode},
+            </if>
+            <if test="notchedName != null">
+                notched_name = #{notchedName},
+            </if>
+            <if test="healCode != null">
+                heal_code = #{healCode},
+            </if>
+            <if test="healName != null">
+                heal_name = #{healName},
+            </if>
+            <if test="anaCode != null">
+                ana_code = #{anaCode},
+            </if>
+            <if test="anaName != null">
+                ana_name = #{anaName},
+            </if>
+            <if test="operDoctorId != null">
+                oper_doctor_id = #{operDoctorId},
+            </if>
+            <if test="operDoctorName != null">
+                oper_doctor_name = #{operDoctorName},
+            </if>
+            <if test="operTime != null">
+                oper_time = #{operTime},
+            </if>
+            <if test="assistantId4 != null">
+                assistant_id4 = #{assistantId4},
+            </if>
+            <if test="assistantName1 != null">
+                assistant_name1 = #{assistantName1},
+            </if>
+            <if test="assistantId2 != null">
+                assistant_id2 = #{assistantId2},
+            </if>
+            <if test="assistantName2 != null">
+                assistant_name2 = #{assistantName2},
+            </if>
+            <if test="assistantId3 != null">
+                assistant_id3 = #{assistantId3},
+            </if>
+            <if test="assistantName3 != null">
+                assistant_name3 = #{assistantName3},
+            </if>
+            <if test="anaId1 != null">
+                ana_id1 = #{anaId1},
+            </if>
+            <if test="anaName1 != null">
+                ana_name1 = #{anaName1},
+            </if>
+            <if test="anaId2 != null">
+                ana_id2 = #{anaId2},
+            </if>
+            <if test="anaName2 != null">
+                ana_name2 = #{anaName2},
+            </if>
+            <if test="anaId3 != null">
+                ana_id3 = #{anaId3},
+            </if>
+            <if test="anaName3 != null">
+                ana_name3 = #{anaName3},
+            </if>
+            <if test="operCode != null">
+                oper_code = #{operCode},
+            </if>
+            <if test="operName != null">
+                oper_name = #{operName},
+            </if>
+            <if test="operPosition != null">
+                oper_position = #{operPosition},
+            </if>
+            <if test="operPositionName != null">
+                oper_position_name = #{operPositionName},
+            </if>
+            <if test="otherOperTime != null">
+                other_oper_time = #{otherOperTime}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--查询病案转科信息-->
+    <select id="queyTcmMrisTurnDeptPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+            SELECT *
+            FROM tcm_mris_turn_dept
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+    <!-- 插入数据 病案转科信息-->
+    <insert id="insertTcmMrisTurnDept" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+        INSERT INTO tcm_mris_turn_dept (
+            id, hosp_code, mbi_id, visit_id, out_dept_id, out_dept_name, in_dept_id, in_dept_name,
+            in_dept_time
+        ) VALUES (
+            #{id},
+            #{hospCode},
+            #{mbiId},
+            #{visitId},
+            #{outDeptId},
+            #{outDeptName},
+            #{inDeptId},
+            #{inDeptName},
+            #{inDeptTime}
+        )
+    </insert>
+
+    <!-- 修改数据 病案转科信息更新-->
+    <update id="updateTcmMrisTurnDept" parameterType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+        UPDATE tcm_mris_turn_dept
+        <set>
+            <if test="mbiId != null">
+                mbi_id = #{mbiId},
+            </if>
+            <if test="visitId != null">
+                visit_id = #{visitId},
+            </if>
+            <if test="outDeptId != null">
+                out_dept_id = #{outDeptId},
+            </if>
+            <if test="outDeptName != null">
+                out_dept_name = #{outDeptName},
+            </if>
+            <if test="inDeptId != null">
+                in_dept_id = #{inDeptId},
+            </if>
+            <if test="inDeptName != null">
+                in_dept_name = #{inDeptName},
+            </if>
+            <if test="inDeptTime != null">
+                in_dept_time = #{inDeptTime}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <!--病案诊断数据批量插入-->
+    <insert id="insertTcmDiagnoseBatch" parameterType="list">
+        INSERT INTO tcm_mris_syndromes_diagnose (
+        id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version,
+         disease_icd10, disease_icd10_name, in_situation_code,tcm_syndromes_id,tcm_syndromes_name
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.mbiId},
+            #{item.visitId},
+            #{item.diseaseCode},
+            #{item.diseaseName},
+            #{item.icdVersion},
+            #{item.diseaseIcd10},
+            #{item.diseaseIcd10Name},
+            #{item.inSituationCode},
+            #{item.tcmSyndromesId},
+            #{item.tcmSyndromesName}
+            )
+        </foreach>
+    </insert>
+
+    <!--HIS数据抽取 获取入院次数-->
+    <select id="getInCnt" parameterType="cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO" resultType="java.lang.Integer">
+        select count(*) from inpt_visit
+        where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo}
+    </select>
+
+    <!--查询病案转科信息-->
+    <select id="queryTcmMrisTurnDeptPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisTurnDeptDO">
+            SELECT *
+            FROM tcm_mris_turn_dept
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+
+
+    <!--分页查询中医已出院患者信息-->
+    <select id="queryOutHospPatientPageZY" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT a.*
+        <if test="zgbrQuery == '2'.toString()">
+            , t.is_consule, t.apply_deptid
+        </if>
+        FROM inpt_visit a
+        <!--会诊病人，关联会诊申请表-->
+        <if test="zgbrQuery == '2'.toString()">
+            join (
+            SELECT
+            '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
+            FROM
+            inpt_consultation_apply ss
+            WHERE ss.hosp_code = #{hospCode}
+            and ss.consul_state = '1'
+            AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
+            GROUP BY ss.visit_id, ss.hosp_code
+            ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
+        </if>
+        <!--病案是否已写-->
+        <if test="isLoadMris == '0'.toString() or isLoadMris == '1'.toString() or isInsureUpload =='1'.toString()  or isInsureUpload =='0'.toString()">
+            left join tcm_mris_base_info mris on a.hosp_code = mris.hosp_code and a.id = mris.visit_id
+        </if>
+        <if test="regCode != null and regCode !=''  ">
+            left join insure_individual_visit iiv on a.hosp_code = iiv.hosp_code and iiv.visit_id = a.id
+        </if>
+        WHERE a.hosp_code = #{hospCode}
+        <if test="keyword != null and keyword !=''">
+            and (
+            a.name LIKE CONCAT('%',#{keyword},'%') or a.phone like CONCAT('%',#{keyword},'%')
+            or a.cert_no LIKE CONCAT('%',#{keyword},'%') or a.in_no LIKE CONCAT('%',#{keyword},'%')
+            or a.in_profile LIKE CONCAT('%',#{keyword},'%')
+            )
+        </if>
+        <if test="zgbrQuery != '2'.toString()">
+            <if test="inDeptId != null and inDeptId != ''">
+                and a.in_dept_id = #{inDeptId}
+            </if>
+        </if>
+        <if test="patientCode != null and patientCode !=''">
+            and a.patient_code = #{patientCode}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and a.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and a.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <!--liuliyun 20211022 病案首页添加主管医生过滤-->
+        <if test='zgbrQuery =="1"'>
+            and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        <!--已写病案-->
+        <if test="isLoadMris == '1'.toString()">
+            and mris.id is not null and mris.id !=''
+        </if>
+        <!--未写病案-->
+        <if test="isLoadMris == '0'.toString()">
+            and (mris.id is null or mris.id ='')
+        </if>
+        <if test="isInsureUpload == '1'.toString()">
+            and mris.is_upload_insure ='1'
+        </if>
+        <if test="isInsureUpload == '0'.toString()">
+            and mris.is_upload_insure ='0'
+        </if>
+        <if test="regCode != null and regCode !=''  ">
+            and iiv.insure_reg_code =#{regCode}
+        </if>
+        order by a.in_time desc
+    </select>
+
+</mapper>

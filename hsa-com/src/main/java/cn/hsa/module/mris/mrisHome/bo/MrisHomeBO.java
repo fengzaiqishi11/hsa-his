@@ -1,9 +1,7 @@
 package cn.hsa.module.mris.mrisHome.bo;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisOperDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisTurnDeptDTO;
@@ -179,6 +177,8 @@ public interface MrisHomeBO {
      * @Return: java.util.Map
      **/
     Map<String, Object> queryAllMrisInfo(Map<String, Object> map);
+
+    Map<String, Object> upMrisForDRG(Map<String, Object> map);
 
     /**
      * @Method: updateMrisTurnDept

@@ -195,7 +195,7 @@
         <!--select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name from emr_element e join emr_classify_element c on e.code = c.element_code
         join emr_classify_template t on c.classinfo_code = t.classify_code join emr_patient p on p.id = #{id}
         where  t.id = p.classify_template_id and t.dept_id = c.dept_id and t.hosp_code = c.hosp_code and c.classinfo_code = t.classify_code-->
-        select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name from emr_element e join emr_classify_element c on e.code = c.element_code
+        select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name,e.is_sys_date,e.type_code from emr_element e join emr_classify_element c on e.code = c.element_code
         join emr_classify_template t on c.classinfo_code = t.classify_code
         where  t.id = #{classifyTemplateId} and t.hosp_code = #{hospCode} and c.dept_id = #{deptId} and  t.dept_id = c.dept_id and t.hosp_code = c.hosp_code
     </select>
@@ -218,7 +218,12 @@
 
     <!-- 查询当前科室所有的病人信息 -->
     <select id="selectInptVisits" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
+        select  CONCAT(
+        v.name,'/',
+        IFNULL((case v.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+        IFNULL(v.age,'-'),
+        IFNULL((case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+        ) AS patientInfo,v.*,if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '3') = 0,'否','是')  as isReject,
         if((select count(*) from emr_patient where hosp_code = v.hosp_code and visit_id = v.id and audit_code = '1') = 0,'否','是')  as isAudit,
         g.archive_state as isArchive
         <if test="zgbrQuery == '2'.toString()">

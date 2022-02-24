@@ -146,4 +146,26 @@ public interface InsureIndividualVisitBO {
      * @Return
      */
     InsureIndividualVisitDTO selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
+
+    /**
+     * @param inptVisitDTO
+     * @Method selectHalfVisit
+     * @Desrciption 查询出中途结算次数
+     * @Param
+     * @Author fuhui
+     * @Date 2022/2/15 10:15
+     * @Return
+     */
+    Integer selectHalfVisit(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @Method updateInsureSettleCounts
+     * @Desrciption 更新中途结算医保标志和次数
+     * @Param
+     * @Author fuhui
+     * @Date 2022/2/16 8:55
+     * @Return
+     */
+    void updateInsureSettleCounts(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

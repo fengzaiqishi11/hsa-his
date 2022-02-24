@@ -81,11 +81,11 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
     /**
      * @Method updateInsureUnifiedElec
      * @Desrciption   1.1.1.1电子处方上传   7101
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/4/27 11:03 
-     * @Return 
+     * @Date   2021/4/27 11:03
+     * @Return
     *
      * @return*/
     public Boolean updateInsureUnifiedPrescrib(Map<String,Object>map){
@@ -106,7 +106,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         Map<String,Object> resultDataMap  = MapUtils.get(resultMap,"data");
         String hirXno = MapUtils.get(resultDataMap,"hi_rxno");
         return true;
-        
+
     }
 
     /**
@@ -169,11 +169,11 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
     /**
      * @Method insureUnifiedMdtrtInfo
      * @Desrciption  输入-门诊信息（节点标识：mdtrtinfo）
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/4/27 11:19 
-     * @Return 
+     * @Date   2021/4/27 11:19
+     * @Return
     **/
     private Map<String, Object> insureUnifiedMdtrtInfo(Map<String, Object> map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
@@ -225,12 +225,12 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
     /**
      * @Method insureUnifiedDetailMap
      * @Desrciption  输入-处方明细信息（节点标识：rxdrugdetail）
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/4/27 11:12 
-     * @Return 
-    **/
+     * @Date   2021/4/27 11:12
+     * @Return
+     **/
     private Map<String, Object> insureUnifiedDetailMap(Map<String, Object> map) {
         String hospCode = MapUtils.get(map,"hospCod");
         String visitId = MapUtils.get(map,"visitId");
@@ -295,7 +295,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author fuhui
      * @Date   2021/4/27 11:09
      * @Return
-    **/
+     **/
     private Map<String, Object> insureUnifiedDataMap(Map<String, Object> dataMap) {
         dataMap.put("hosp_rxno","");  // 定点医疗机构处方编号
         dataMap.put("init_rxno",""); // 续方的原处方编号
@@ -321,16 +321,16 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         dataMap.put("rx_cotn_flag","");
         return dataMap;
     }
-    
+
     /**
      * @Method updateInsureUnifiedMri
      * @Desrciption  住院病案首页信息上传
      * @Param map
-     * 
+     *
      * @Author fuhui
-     * @Date   2021/4/27 14:31 
-     * @Return 
-    **/
+     * @Date   2021/4/27 14:31
+     * @Return
+     **/
     public Boolean updateInsureUnifiedMri(Map<String, Object> map){
         String hospCode =MapUtils.get(map,"hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
@@ -374,7 +374,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author fuhui
      * @Date   2021/4/28 19:51
      * @Return
-    **/
+     **/
     private Map<String,Object> commonInsureUnified(String hospCode,String orgCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
@@ -417,12 +417,12 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author fuhui
      * @Date   2021/4/27 14:31
      * @Return
-    **/
+     **/
     private Map<String, Object> queryIcuinInfo(Map<String, Object> map,String mid,String mdtrtSn) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
         List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String,Object> paramMap = new HashMap<>();
-        paramMap.put("vali_flag",Constants.SF.S);
+        paramMap.put("vali_flag",Constants.SF.F);
         paramMap.put("ipt_medcas_hmpg_sn",mid);
         StringBuffer stringBuffer = new StringBuffer();
         paramMap.put("mdtrt_sn",mdtrtSn);
@@ -439,7 +439,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author fuhui
      * @Date   2021/4/27 14:31
      * @Return
-    **/
+     **/
     private Map<String, Object> queryOperationInfo(Map<String, Object> map,String mid,String mdtrtSn) {
         InsureIndividualVisitDTO insureIndividualVisitDTO =MapUtils.get(map,"insureIndividualVisitDTO");
         map.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
@@ -477,6 +477,13 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 item.put("mdtrt_sn",mdtrtSn);  //  就医流水号
                 item.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
             });
+        }else{
+            // 用测试环境测试时，医保必须传手术节点
+            Map<String,Object> operInfoMap = new HashMap<>();
+            operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+            operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+            operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+            operInfoDOList.add(operInfoMap);
         }
         map.put("oprationMapList",operInfoDOList);
         return map;
@@ -485,12 +492,12 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
     /**
      * @Method queryDiseaseInfo
      * @Desrciption 住院病案首页信息   -诊断信息（节点标识：diseinfo）
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/4/27 14:22 
-     * @Return 
-    **/
+     * @Date   2021/4/27 14:22
+     * @Return
+     **/
     private Map<String, Object> queryDiseaseInfo(Map<String, Object> map,String midId,String mdtrtSn) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
         map.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
@@ -498,43 +505,43 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         List<Map<String,Object>> mrisDiagnoseList = insureUnifiedEmrUploadDAO.selectDiseinfo(map);
         if(!ListUtils.isEmpty(mrisDiagnoseList)){
             mrisDiagnoseList.stream().forEach(item->{
-                    item.put("palg_no","");//	病理号
-                    item.put("ipt_patn_disediag_type_code",null);//	住院患者疾病诊断类型代码
-                    item.put("disediag_type",null);//	疾病诊断类型
-                    if(!"1".equals(MapUtils.get(item,"maindiag_flag"))){
-                        item.put("maindiag_flag","0");//	主诊断标志
-                    }else{
-                        item.put("maindiag_flag",MapUtils.get(item,"maindiag_flag"));//	主诊断标志
-                    }
-                    String disgCodeValue = MapUtils.get(item,"diag_code");
-                    item.put("inhosp_diag_code",MapUtils.get(item,"disease_icd10"));//	院内诊断代码
-                    String diseaseIcd10Name = MapUtils.get(item,"disease_icd10_name");
-                    item.put("inhosp_diag_name",diseaseIcd10Name);//	院内诊断名称
+                item.put("palg_no","");//	病理号
+                item.put("ipt_patn_disediag_type_code",null);//	住院患者疾病诊断类型代码
+                item.put("disediag_type",null);//	疾病诊断类型
+                if(!"1".equals(MapUtils.get(item,"maindiag_flag"))){
+                    item.put("maindiag_flag","0");//	主诊断标志
+                }else{
+                    item.put("maindiag_flag",MapUtils.get(item,"maindiag_flag"));//	主诊断标志
+                }
+                String disgCodeValue = MapUtils.get(item,"diag_code");
+                item.put("inhosp_diag_code",MapUtils.get(item,"disease_icd10"));//	院内诊断代码
+                String diseaseIcd10Name = MapUtils.get(item,"disease_icd10_name");
+                item.put("inhosp_diag_name",diseaseIcd10Name);//	院内诊断名称
 
-                    if(StringUtils.isEmpty(disgCodeValue)){
-                        throw new AppException("病案首页的"+diseaseIcd10Name+"还未匹配");
-                    }
-                    item.put("diag_code",MapUtils.get(item,"diag_code"));//	诊断代码
-                    item.put("diag_name",MapUtils.get(item,"diag_name"));//	诊断名称
-                    item.put("adm_dise_cond_name",null);//	入院疾病病情名称
-                    item.put("adm_dise_cond_code",null);//	入院疾病病情代码
-                    String admCondValue = MapUtils.get(item,"adm_cond");
-                    item.put("adm_cond_code",admCondValue);//	入院时病情代码
-                    if("1".equals(admCondValue)){
-                        item.put("adm_cond","有");//	入院时病情名称
-                    }else if("2".equals(admCondValue)){
-                        item.put("adm_cond","临床未确定");//	入院时病情名称
-                    }else if("3".equals(admCondValue)){
-                        item.put("adm_cond","情况不明");//	入院时病情名称
-                    }else{
-                        item.put("adm_cond","无");//	入院时病情名称
-                    }
-                    item.put("high_diag_evid",null);//	最高诊断依据
-                    item.put("bkup_deg",null);//	分化程度
-                    item.put("bkup_deg_code", null);//分化程度代码	分化程度代码分化程度代码
-                    item.put("vali_flag",Constants.SF.S);//	有效标志
-                    item.put("ipt_medcas_hmpg_sn",midId);//	住院病案首页流水号
-                    item.put("mdtrt_sn",mdtrtSn);//	就医流水号
+                if(StringUtils.isEmpty(disgCodeValue)){
+                    throw new AppException("病案首页的"+diseaseIcd10Name+"还未匹配");
+                }
+                item.put("diag_code",MapUtils.get(item,"diag_code"));//	诊断代码
+                item.put("diag_name",MapUtils.get(item,"diag_name"));//	诊断名称
+                item.put("adm_dise_cond_name",null);//	入院疾病病情名称
+                item.put("adm_dise_cond_code",null);//	入院疾病病情代码
+                String admCondValue = MapUtils.get(item,"adm_cond");
+                item.put("adm_cond_code",admCondValue);//	入院时病情代码
+                if("1".equals(admCondValue)){
+                    item.put("adm_cond","有");//	入院时病情名称
+                }else if("2".equals(admCondValue)){
+                    item.put("adm_cond","临床未确定");//	入院时病情名称
+                }else if("3".equals(admCondValue)){
+                    item.put("adm_cond","情况不明");//	入院时病情名称
+                }else{
+                    item.put("adm_cond","无");//	入院时病情名称
+                }
+                item.put("high_diag_evid",null);//	最高诊断依据
+                item.put("bkup_deg",null);//	分化程度
+                item.put("bkup_deg_code", null);//分化程度代码	分化程度代码分化程度代码
+                item.put("vali_flag",Constants.SF.S);//	有效标志
+                item.put("ipt_medcas_hmpg_sn",midId);//	住院病案首页流水号
+                item.put("mdtrt_sn",mdtrtSn);//	就医流水号
             });
         }
         map.put("mrisDiagnoseList",mrisDiagnoseList);
@@ -566,14 +573,14 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         baseInfoMap.put("psn_name",mrisBaseInfoDTO.getName()); //人员姓名
         baseInfoMap.put("gend",mrisBaseInfoDTO.getGenderCode()); //性别
         baseInfoMap.put("brdy",mrisBaseInfoDTO.getBirthday()); //出生日期
-        baseInfoMap.put("ntly",mrisBaseInfoDTO.getNationalityCation()); // 国籍
+        baseInfoMap.put("ntly","CHN"); // 国籍 默认是中国
         baseInfoMap.put("ntly_name",mrisBaseInfoDTO.getNationalityName()); //国籍名称
         baseInfoMap.put("nwb_bir_wt",mrisBaseInfoDTO.getBabyBirthWeight()); // 新生儿出生体重
         baseInfoMap.put("nwb_adm_wt",mrisBaseInfoDTO.getBabyInWeight()); // 新生儿入院体重
         baseInfoMap.put("birplc",mrisBaseInfoDTO.getBirthAdress()); // 出生地
         baseInfoMap.put("napl",mrisBaseInfoDTO.getNativePlace()); // 籍贯
         baseInfoMap.put("naty_name",mrisBaseInfoDTO.getNationName()); // 民族名称
-        baseInfoMap.put("naty",mrisBaseInfoDTO.getNationCode()); //民族
+        baseInfoMap.put("naty","0"+mrisBaseInfoDTO.getNationCode()); //民族
         baseInfoMap.put("certno",mrisBaseInfoDTO.getCertNo()); //证件号码
         baseInfoMap.put("prfs",mrisBaseInfoDTO.getOccupationCode()); //职业
         baseInfoMap.put("mrg_stas",mrisBaseInfoDTO.getMarryCode()); //婚姻状态
@@ -596,7 +603,30 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         baseInfoMap.put("coner_tel",mrisBaseInfoDTO.getContactPhone()); //联系人电话
         baseInfoMap.put("coner_name",mrisBaseInfoDTO.getContactName()); //联系人姓名
         baseInfoMap.put("coner_addr",mrisBaseInfoDTO.getContactAddress()); //联系人地址
-        baseInfoMap.put("coner_rlts_code",mrisBaseInfoDTO.getContactRelaCode()); //与联系人关系代码
+        String contactRelaCode = mrisBaseInfoDTO.getContactRelaCode();
+        if("0".equals(contactRelaCode)){
+            contactRelaCode = "1";
+        }else if("1".equals(contactRelaCode)){
+            contactRelaCode = "10";
+        }else if("2".equals(contactRelaCode)){
+            contactRelaCode = "20";
+        }else if("3".equals(contactRelaCode)){
+            contactRelaCode = "30";
+        }else if("4".equals(contactRelaCode)){
+            contactRelaCode = "40";
+        }else if("5".equals(contactRelaCode)){
+            contactRelaCode = "50";
+        }else if("6".equals(contactRelaCode)){
+            contactRelaCode = "69";
+        }
+        else if("7".equals(contactRelaCode)){
+            contactRelaCode = "70";
+        }else if("8".equals(contactRelaCode)){
+            contactRelaCode = "99";
+        }else{
+            contactRelaCode = "99";
+        }
+        baseInfoMap.put("coner_rlts_code",contactRelaCode); //与联系人关系代码
 
         baseInfoMap.put("adm_way_name",""); //入院途径名称
         baseInfoMap.put("adm_way_code",mrisBaseInfoDTO.getInWay()); // 入院途径代码
@@ -617,9 +647,10 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         baseInfoMap.put("rh_code",mrisBaseInfoDTO.getRhCode()); //Rh血型代码
         baseInfoMap.put("rh_name",mrisBaseInfoDTO.getRhName()); //RH血型
         baseInfoMap.put("die_flag",null); //死亡标志
+        baseInfoMap.put("ipt_days",mrisBaseInfoDTO.getInDays()); //住院天数
         baseInfoMap.put("deptdrt_name",mrisBaseInfoDTO.getDirectorName1()); //科主任姓名
         baseInfoMap.put("chfdr_name",mrisBaseInfoDTO.getDirectorName2()); //主任( 副主任)医师姓名
-        baseInfoMap.put("rh_name",mrisBaseInfoDTO.getZzDoctorName()); //主治医生姓名
+        baseInfoMap.put("atddr_name",mrisBaseInfoDTO.getZzDoctorName()); //主治医生姓名
         baseInfoMap.put("chfpdr_name",mrisBaseInfoDTO.getZgDoctorName()); //主诊医师姓名
         baseInfoMap.put("ipt_dr_name",""); //住院医师姓名
         baseInfoMap.put("resp_nurs_name",mrisBaseInfoDTO.getZrNurseName()); //责任护士姓名
@@ -732,7 +763,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
      * @Author fuhui
      * @Date   2021/5/11 10:28
      * @Return
-    **/
+     **/
     private Boolean insertInsureEmr(Map<String, Object> map){
 
         Map<String,Object> coursrinInfoMap =  queryCoursrinInfo(map);
@@ -740,16 +771,16 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         return true;
 
     }
-    
+
     /**
      * @Method queryCoursrinInfo
      * @Desrciption  医保统一支付平台：电子病历上传 病程记录信息
      * @Param map
-     * 
+     *
      * @Author fuhui
-     * @Date   2021/5/11 10:34 
-     * @Return 
-    **/
+     * @Date   2021/5/11 10:34
+     * @Return
+     **/
     private Map<String, Object> queryCoursrinInfo(Map<String, Object> map) {
 
         List<Map<String,Object>> listMap = new ArrayList<>();
@@ -881,7 +912,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
 
     private String getRedisKey (InptVisitDTO inptVisit) {
-        return inptVisit.getHospCode() + "_" + inptVisit.getVisitId() + "_insureEmrInfo" ;
+        return inptVisit.getHospCode() + "_" + inptVisit.getId() + "_insureEmrInfo" ;
     }
 
     /**
@@ -1064,7 +1095,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
             diseinfoMap.put("back_oprn","无");//	是否重返手术（明确定义）
             diseinfoMap.put("selv","无");//	是否择期
             diseinfoMap.put("prev_abtl_medn","无");//	是否预防使用抗菌药物
-            diseinfoMap.put("abtl_medn_days","无");//	预防使用抗菌药物天数
+            diseinfoMap.put("abtl_medn_days","0");//	预防使用抗菌药物天数
             diseinfoMap.put("oprn_oprt_code","无"); //手术操作代码
             diseinfoMap.put("oprn_oprt_name","无"); //手术操作名称
             diseinfoMap.put("oprn_lv_code","无"); //手术级别代码
@@ -1127,39 +1158,39 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         Map<String, Object> diseinfoMap = null;
         List<Map<String,Object>> resultList = new ArrayList<>();
         if(diagnoseDTO != null) {
-                diseinfoMap  = new HashMap<>();
-                diseinfoMap.put("dept_code",inptVisit.getInDeptId());//	科室代码
-                diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
-                diseinfoMap.put("wardarea_name",inptVisit.getInWardId());//	病区名称
-                diseinfoMap.put("bedno",inptVisit.getBedName());//病床号
-                diseinfoMap.put("rcd_time",diagnoseDTO.getCrteTime());//	记录日期时间
-                diseinfoMap.put("chfcomp","无");//	主诉
-                diseinfoMap.put("cas_ftur","无");//	病例特点
-                diseinfoMap.put("tcm4d_rslt","无");//	中医“四诊”观察结果
-                diseinfoMap.put("dise_evid",inptVisit.getInDiseaseName());//	诊断依据
-                if (StringUtils.isEmpty(inptVisit.getInDiseaseIcd10()) || StringUtils.isEmpty(inptVisit.getInDiseaseName()) ) {
-                    inptVisit.setInDiseaseIcd10("无");
-                    inptVisit.setInDiseaseName("无");
-                }
-                diseinfoMap.put("prel_wm_diag_code",inptVisit.getInDiseaseIcd10());//	初步诊断-西医诊断编码
-                diseinfoMap.put("prel_wm_dise_name",inptVisit.getInDiseaseName());//	初步诊断-西医诊断名称
-                diseinfoMap.put("prel_tcm_diag_code","无");//	初步诊断-中医病名代码
-                diseinfoMap.put("prel_tcm_dise_name","无");//	初步诊断-中医病名
-                diseinfoMap.put("prel_tcmsymp_code","无");//	初步诊断-中医证候代码
-                diseinfoMap.put("prel_tcmsymp","无");//	初步诊断-中医证候
-                diseinfoMap.put("finl_wm_diag_code","无");//	鉴别诊断-西医诊断编码
-                diseinfoMap.put("finl_wm_diag_name","无");//	鉴别诊断-西医诊断名称
-                diseinfoMap.put("finl_tcm_dise_code","无");//	鉴别诊断-中医病名代码
-                diseinfoMap.put("finl_tcm_dise_name","无");//	鉴别诊断-中医病名
-                diseinfoMap.put("finl_tcmsymp_code","无");//	鉴别诊断-中医证候代码
+            diseinfoMap  = new HashMap<>();
+            diseinfoMap.put("dept_code",inptVisit.getInDeptId());//	科室代码
+            diseinfoMap.put("dept_name",inptVisit.getInDeptName());//	科室名称
+            diseinfoMap.put("wardarea_name",inptVisit.getInWardId());//	病区名称
+            diseinfoMap.put("bedno",inptVisit.getBedName());//病床号
+            diseinfoMap.put("rcd_time",diagnoseDTO.getCrteTime());//	记录日期时间
+            diseinfoMap.put("chfcomp","无");//	主诉
+            diseinfoMap.put("cas_ftur","无");//	病例特点
+            diseinfoMap.put("tcm4d_rslt","无");//	中医“四诊”观察结果
+            diseinfoMap.put("dise_evid",inptVisit.getInDiseaseName());//	诊断依据
+            if (StringUtils.isEmpty(inptVisit.getInDiseaseIcd10()) || StringUtils.isEmpty(inptVisit.getInDiseaseName()) ) {
+                inptVisit.setInDiseaseIcd10("无");
+                inptVisit.setInDiseaseName("无");
+            }
+            diseinfoMap.put("prel_wm_diag_code",inptVisit.getInDiseaseIcd10());//	初步诊断-西医诊断编码
+            diseinfoMap.put("prel_wm_dise_name",inptVisit.getInDiseaseName());//	初步诊断-西医诊断名称
+            diseinfoMap.put("prel_tcm_diag_code","无");//	初步诊断-中医病名代码
+            diseinfoMap.put("prel_tcm_dise_name","无");//	初步诊断-中医病名
+            diseinfoMap.put("prel_tcmsymp_code","无");//	初步诊断-中医证候代码
+            diseinfoMap.put("prel_tcmsymp","无");//	初步诊断-中医证候
+            diseinfoMap.put("finl_wm_diag_code","无");//	鉴别诊断-西医诊断编码
+            diseinfoMap.put("finl_wm_diag_name","无");//	鉴别诊断-西医诊断名称
+            diseinfoMap.put("finl_tcm_dise_code","无");//	鉴别诊断-中医病名代码
+            diseinfoMap.put("finl_tcm_dise_name","无");//	鉴别诊断-中医病名
+            diseinfoMap.put("finl_tcmsymp_code","无");//	鉴别诊断-中医证候代码
 
-                diseinfoMap.put("finl_tcmsymp","无");//	鉴别诊断-中医证候
-                diseinfoMap.put("dise_plan","无");//	诊疗计划
-                diseinfoMap.put("prnp_trt","无");//	治则治法
-                diseinfoMap.put("ipdr_code",inptVisit.getZzDoctorId());//	住院医师编号
-                diseinfoMap.put("ipdr_name",inptVisit.getZzDoctorName());//	住院医师姓名
-                diseinfoMap.put("prnt_doc_name",inptVisit.getZgDoctorName());//	上级医师姓名
-                diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+            diseinfoMap.put("finl_tcmsymp","无");//	鉴别诊断-中医证候
+            diseinfoMap.put("dise_plan","无");//	诊疗计划
+            diseinfoMap.put("prnp_trt","无");//	治则治法
+            diseinfoMap.put("ipdr_code",inptVisit.getZzDoctorId());//	住院医师编号
+            diseinfoMap.put("ipdr_name",inptVisit.getZzDoctorName());//	住院医师姓名
+            diseinfoMap.put("prnt_doc_name",inptVisit.getZgDoctorName());//	上级医师姓名
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
         } else {
             diseinfoMap  = new HashMap<>();
             diseinfoMap.put("dept_code","无");//	科室代码

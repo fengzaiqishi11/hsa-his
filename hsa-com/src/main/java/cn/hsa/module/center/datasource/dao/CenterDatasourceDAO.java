@@ -140,5 +140,12 @@ public interface CenterDatasourceDAO {
      */
     List<CenterDatasourceDTO> getCenterHospitalDatasource(String hospCode);
 
-
+    /**
+     * @Description: 查询所有的数据库信息
+     * @Param: []
+     * @return: java.util.List<cn.hsa.module.center.datasource.dto.CenterDatasourceDTO>
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    List<CenterDatasourceDTO> findHospitalCenterDataSource();
 }

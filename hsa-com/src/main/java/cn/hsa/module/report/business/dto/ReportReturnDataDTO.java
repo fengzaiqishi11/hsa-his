@@ -24,4 +24,11 @@ public class ReportReturnDataDTO implements Serializable {
      */
     private String returnData;
 
+    public ReportReturnDataDTO() {
+    }
+
+    public ReportReturnDataDTO(String key, String returnData) {
+        this.key = key;
+        this.returnData = returnData;
+    }
 }

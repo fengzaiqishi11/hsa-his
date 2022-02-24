@@ -9,6 +9,8 @@ import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
+import cn.hsa.report.business.bo.impl.factory.ReportBusinessFactory;
+import cn.hsa.report.business.bo.impl.factory.ReportBusinessProcess;
 import cn.hsa.util.ConverUtils;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.SnowflakeUtils;
@@ -57,8 +59,14 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     @Autowired
     private ReportFileRecordDAO reportFileRecordDAO;
 
+    @Autowired
+    private ReportBusinessFactory reportBusinessFactory;
+
     @Override
     public ReportReturnDataDTO saveBuild(Map map) {
+        ReportBusinessProcess reportBusinessProcess = reportBusinessFactory.getReportBusinessProcess(map.get("businessType").toString());
+        map = reportBusinessProcess.getReportDataMap(map);
+
         String hospCode = map.get("hospCode").toString();
         String tempCode = map.get("tempCode").toString();
         String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? hospCode : map.get("fileName").toString();
@@ -70,6 +78,10 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
 
         String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
+
+        if (!configuration.getIsUpload()) {
+            return new ReportReturnDataDTO(null, str);
+        }
 
         FSEntity fsEntity = new FSEntity();
         try {

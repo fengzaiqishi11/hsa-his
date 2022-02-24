@@ -283,6 +283,7 @@
         select id, hosp_code, c_code, name, value, remark, seq_no, pym, wbm, up_value, is_end, is_valid, crte_id, crte_name, crte_time
         from sys_code_detail
         where hosp_code = #{hospCode}
+          and is_valid = '1'
         <if test="code != null and code != ''">
             and c_code = #{code}
         </if>

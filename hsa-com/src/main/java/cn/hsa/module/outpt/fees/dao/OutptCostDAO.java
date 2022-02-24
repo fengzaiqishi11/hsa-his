@@ -665,5 +665,5 @@ public interface OutptCostDAO {
      * @Author: zhangguorui
      * @Date: 2022/2/23
      */
-    List<OutptCostDTO> queryCostByIds(@Param("costIds") List<String> costIds);
+    List<OutptCostDTO> queryCostByIds(@Param("hospCode") String hospCode,@Param("costIds") List<String> costIds);
 }

@@ -862,12 +862,14 @@
         0 as totalMergeCost
         FROM
         outpt_visit outpt,
-        oper_info_record oper
+        oper_info_record oper,
+        outpt_prescribe op
         WHERE
         outpt.hosp_code =  #{hospCode}
         AND oper.hosp_code = outpt.hosp_code
         AND oper.visit_id = outpt.id
-
+        and oper.advice_id = op.id
+        and op.is_settle = '0'
         <if test="id != null and id != ''">
             and oper.id = #{id}
         </if>

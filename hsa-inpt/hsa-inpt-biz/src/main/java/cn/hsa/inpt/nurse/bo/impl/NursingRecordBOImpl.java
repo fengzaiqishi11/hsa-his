@@ -2,7 +2,6 @@ package cn.hsa.inpt.nurse.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.nurse.dto.BaseNurseOrderDTO;
 import cn.hsa.module.base.nurse.dto.BaseNurseTbHeadDTO;
 import cn.hsa.module.base.nurse.service.BaseNurseOrderService;
@@ -13,8 +12,10 @@ import cn.hsa.module.inpt.nurse.dto.InptNurseRecordDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -203,13 +204,121 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         }
         if (!ListUtils.isEmpty(editList)) {
             if (StringUtils.isNotEmpty(baseNurseOrderDTO.getCode()) && bnoCodeList.contains(baseNurseOrderDTO.getCode())) {
+                /*List<InptNurseRecordDTO> dtoList = this.splitNurse(editList);
+                log.debug("重新插入的数据数据===: " + JSON.toJSONString(dtoList));*/
+
                 nursingRecordDAO.delete(deleteList);
+//                nursingRecordDAO.insert(dtoList);
                 nursingRecordDAO.insert(editList);
             } else {
                 nursingRecordDAO.edit(editList);
             }
         }
         return true;
+    }
+
+    /**
+     *  @param editList
+     * @return
+     */
+    private List<InptNurseRecordDTO> splitNurse(List<InptNurseRecordDTO> editList){
+        List<InptNurseRecordDTO> result = new ArrayList<>();
+
+        // 查询系统参数护理分割行量
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", editList.get(0).getHospCode());
+        map.put("code", "HLJLD_BQJL_HHFG");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sysParameterDTO == null || StringUtils.isEmpty(sysParameterDTO.getValue())) {
+            sysParameterDTO.setValue("10"); //默认10
+        }
+        int splitNum = Integer.parseInt(sysParameterDTO.getValue());
+
+        // 根据组号查询同组的数据
+        List<String> groupNoList = editList.stream().filter(inptNurseRecordDTO -> StringUtils.isNotEmpty(String.valueOf(inptNurseRecordDTO.getGroupNo()))).map(inptNurseRecordDTO -> String.valueOf(inptNurseRecordDTO.getGroupNo())).distinct().collect(Collectors.toList());
+        map.put("groupNoList", groupNoList);
+        map.put("nurseRecordDTO", editList.get(0));
+        List<InptNurseRecordDTO> dtoList = nursingRecordDAO.queryNurseByGroup(map);
+        if (ListUtils.isEmpty(dtoList)) {
+            return result;
+        }
+
+        // listMap: hospCode_visitId_bnoId_groupNo
+        Map<String, List<InptNurseRecordDTO>> listMap = dtoList.stream().collect(Collectors.groupingBy(inptNurseRecordDTO -> inptNurseRecordDTO.getHospCode() + "_" + inptNurseRecordDTO.getVisitId() + "_" + inptNurseRecordDTO.getBnoId() + "_" + inptNurseRecordDTO.getGroupNo()));
+        for (String key : listMap.keySet()) {
+            List<InptNurseRecordDTO> list = listMap.get(key);
+            if (ListUtils.isEmpty(list)) {
+                continue;
+            }
+            list = list.stream().sorted(Comparator.comparing(InptNurseRecordDTO::getGroupSeqNo)).collect(Collectors.toList());
+
+            this.buildNurseRecord(result, splitNum, editList, list);
+        }
+        return result;
+    }
+
+    /**
+     * 构建分割的护理记录数据
+     * @param result 返回数据所有，包含分割、无须分割的数组
+     * @param splitNum 切割行数据量
+     * @param editList 页面传递的对象
+     * @param list 同组的护理记录
+     * @return
+     */
+    private void buildNurseRecord(List<InptNurseRecordDTO> result, int splitNum, List<InptNurseRecordDTO> editList, List<InptNurseRecordDTO> list) {
+        int count = 0;
+        for (InptNurseRecordDTO nurseRecordDTO : list) {
+            String item027 = nurseRecordDTO.getItem027();
+            int length = item027.toCharArray().length;
+            InptNurseRecordDTO dto = new InptNurseRecordDTO();
+            // 同组未分组的
+            if (StringUtils.isEmpty(item027) || length / splitNum < 1) {
+                BeanUtils.copyProperties(nurseRecordDTO, dto);
+                dto.setId(SnowflakeUtils.getId());
+                result.add(dto);
+            } else {
+                // 同组已分组的的只对第一条进行处理，重新分组
+                if (nurseRecordDTO.getGroupSeqNo() == 1) {
+                    count = length / splitNum;
+                    if (length % splitNum > 0) {
+                        count = count + 1;
+                    }
+                    for (int i = 0; i < count; i++) {
+                        dto = new InptNurseRecordDTO();
+                        BeanUtils.copyProperties(nurseRecordDTO, dto);
+                        dto.setId(SnowflakeUtils.getId());
+                        dto.setGroupSeqNo(i + 1);
+                        if (i == (count - 1)) {
+                            dto.setIsEnd(Constants.SF.S);
+                        } else {
+                            dto.setIsEnd(Constants.SF.F);
+                        }
+
+                        // 同组非第一条的数据处理
+                        if (dto.getGroupSeqNo() != 1) {
+                            String[] attributeNames = getAttributeNames(dto);
+                            for (String attributeName : attributeNames) {
+                                if (attributeName.startsWith("item")) {
+                                    // 分行的排除item027护理记录及item028签名
+                                    if (!("item027".equals(attributeName) || "item028".equals(attributeName))) {
+                                        setAttributeValue(dto, attributeName, null);
+                                    }
+                                }
+                            }
+                        }
+
+                        dto.setItem039(nurseRecordDTO.getItem001() + " " + nurseRecordDTO.getItem004());
+                        // 最后一条截取全部
+                        if (Constants.SF.S.equals(dto.getIsEnd())) {
+                            dto.setItem040(nurseRecordDTO.getItem027().substring( i * splitNum));
+                        } else {
+                            dto.setItem040(nurseRecordDTO.getItem027().substring( i * splitNum, (i+1) * splitNum));
+                        }
+                        result.add(dto);
+                    }
+                }
+            }
+        }
     }
 
     private List<String> getBnoCodeList(String hospCode, String code) {
@@ -389,6 +498,11 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
 
         if (bnoCodeList.contains(orderDTO.getCode())) {
             inptNurseRecordDTO.setOrderFlag(Constants.SF.S);
+        }
+
+        // 血糖记录单排序
+        if ("xtdjb".equals(orderDTO.getCode())) {
+            inptNurseRecordDTO.setOrderFlag("2");
         }
         List<InptNurseRecordDTO> list = nursingRecordDAO.queryNursingRecord(inptNurseRecordDTO);
         return PageDTO.of(list);

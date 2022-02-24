@@ -1,6 +1,7 @@
 package cn.hsa.report.business.bean;
 
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -35,4 +36,21 @@ public class GeneralTemplateBean {
             throw new RuntimeException(str);
         }
     }
+
+    public List<Map<String, Object>> generalListMethod(String dsName, String datasetName, Map<String, Object> param) {
+        String data = (String) param.get(datasetName);
+        if (StringUtils.isNotEmpty(data)) {
+            List<Map<String, Object>> list = new ArrayList<>();
+            List<Object> objs = JSONArray.parseArray(data);
+            for (Object obj : objs) {
+                list.add(JSONObject.parseObject(obj.toString(), Map.class));
+            }
+            return list;
+        } else {
+            String str = "填充通用数据报错, 模板类:" + dsName + "数据节点:" + datasetName + "模板参数:" + param;
+            log.error(str);
+            throw new RuntimeException(str);
+        }
+    }
+
 }

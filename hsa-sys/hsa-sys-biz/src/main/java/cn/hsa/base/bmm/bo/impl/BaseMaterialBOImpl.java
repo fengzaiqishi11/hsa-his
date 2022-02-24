@@ -262,7 +262,9 @@ public class BaseMaterialBOImpl extends HsafBO implements BaseMaterialBO {
             if ( this.baseMaterialDAO.isCodeExist(baseMaterialDTO)>0){
                 throw new AppException("编码【"+baseMaterialDTO.getCode()+"】的材料已存在，请检查！");
             }
-
+            if(null == baseMaterialDTO.getIsValid() ){
+                baseMaterialDTO.setIsValid(Constants.SF.S);
+            }
             int insert = this.baseMaterialDAO.insert(baseMaterialDTO);
             // 存入缓存
 //            cacheOperate(baseMaterialDTO,null,true);

@@ -1,6 +1,7 @@
 package cn.hsa.module.report.config.dao;
 
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -78,7 +79,7 @@ public interface ReportConfigurationDAO {
      * @author liuzhuoting
      * @date 2022/02/17 09:30
      **/
-    ReportConfigurationDTO queryByTempCode(String hospCode, String tempCode);
+    ReportConfigurationDTO queryByTempCode(@Param("hospCode")String hospCode, @Param("tempCode")String tempCode);
 
     /**
      * 根据报表名称删除

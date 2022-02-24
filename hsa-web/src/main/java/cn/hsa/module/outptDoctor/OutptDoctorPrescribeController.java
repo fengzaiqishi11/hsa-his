@@ -128,7 +128,9 @@ public class OutptDoctorPrescribeController extends BaseController {
     paramMap.put("hospCode",sysUserDTO.getHospCode());
     //医院编码
     outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
-    outptVisitDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+    if(StringUtils.isEmpty(outptVisitDTO.getDeptId())){
+      outptVisitDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+    }
     outptVisitDTO.setDoctorId(sysUserDTO.getId());
     //类型 1：未就诊 2：已就诊 3：
     paramMap.put("outptVisitDTO", outptVisitDTO);

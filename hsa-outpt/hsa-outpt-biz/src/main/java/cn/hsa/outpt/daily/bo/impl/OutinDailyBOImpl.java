@@ -1052,7 +1052,7 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 // 2021年12月23日11:08:15 将不在缴款单上的财务分类都计算到其他费用
                 BigDecimal huafenQiTa = new BigDecimal(0);
                 for (Map<String, Object> tempMap : RT_0201) {
-                    if (!"B".equals(tempMap.get("code")) && !"A".equals(tempMap.get("code")) && !"J".equals(tempMap.get("code"))) {
+                    if (!"B".equals(tempMap.get("code")) && !"A".equals(tempMap.get("code")) && !"C".equals(tempMap.get("code")) && !"J".equals(tempMap.get("code"))) {
                         huafenQiTa = BigDecimalUtils.add(huafenQiTa, (BigDecimal) tempMap.get("total_price"));
                     }
                 }

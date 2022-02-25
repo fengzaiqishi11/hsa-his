@@ -9,6 +9,7 @@ import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.NumberToCN;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureDictDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
@@ -19,13 +20,20 @@ import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.*;
-import cn.hutool.core.convert.Convert;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DataTypeUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.HttpConnectUtil;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.MoneyUtils;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -34,7 +42,15 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +90,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     @Resource
     private NumberToCN numberToCN;
 
+    @Resource
+    private InsureDictDAO insureDictDAO;
 
     /**
      * 医保通一支付平台,冲正交易接口调用
@@ -1041,79 +1059,27 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         List<Map<String, Object>> resultList = new ArrayList<>();
         Map<String, Object> resultMap = new HashMap<>();
         String declaraType = MapUtils.get(paraMap, "declaraType");
-        if("430105".equals(paraMap.get("insureRegCode"))){
-            resultMap.put("admdvsName","长沙市本级");
-        }
-        else if("439900".equals(paraMap.get("insureRegCode"))){
-            resultMap.put("admdvsName","湖南省本级");
-        }
-        else {
-            resultMap.put("admdvsName","湖南省");
-        }
-
-        Map<String,Object> totalMap = new HashMap<>();
-        BigDecimal totalPrice = BigDecimal.ZERO;
-        BigDecimal planSumPrice = BigDecimal.ZERO;
-
         switch (declaraType) {
             case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
                 paraMap.put("isHospital", Constants.SF.S);
                 resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
-                resultMap.put("tempCode","his_insur_declare_0001");
-                BigDecimal insurePrice = BigDecimal.ZERO;
-                for(Map map:resultList){
-                    totalPrice = BigDecimalUtils.add(totalPrice, new BigDecimal(map.get("totalPrice").toString())).setScale(2);
-                    insurePrice = BigDecimalUtils.add(insurePrice, new BigDecimal(map.get("insurePrice").toString())).setScale(2);
-                }
-                totalMap.put("medfeeSumamtSum",totalPrice);
-                totalMap.put("medFeeTotalCapital",Convert.digitToChinese(totalPrice));
-                totalMap.put("medPadFeeTotal",insurePrice);
-                totalMap.put("medPadFeeTotalCapital",Convert.digitToChinese(insurePrice));
-
-                resultMap.put("total", totalMap);
                 break;
             case Constants.SBLX.CXJM_ZY: // 城乡居民（住院）
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 paraMap.put("isHospital", Constants.SF.S);
                 resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
-                resultMap.put("tempCode","his_insur_declare_0003");
-                BigDecimal planPrice = BigDecimal.ZERO;
-                for(Map map:resultList){
-                    totalPrice = BigDecimalUtils.add(totalPrice, new BigDecimal(map.get("totalPrice").toString())).setScale(2);
-                    planSumPrice = BigDecimalUtils.add(planSumPrice, new BigDecimal(map.get("planSumPrice").toString())).setScale(2);
-                    planPrice = BigDecimalUtils.add(planPrice, new BigDecimal(map.get("planPrice").toString())).setScale(2);
-                }
-                totalMap.put("medfeeSumamtSum",totalPrice);
-                totalMap.put("medFeeTotalCapital",Convert.digitToChinese(totalPrice));
-                totalMap.put("medPadFeeTotal",planSumPrice);
-                totalMap.put("medPadFeeTotalCapital",Convert.digitToChinese(planSumPrice));
-                totalMap.put("medHifPayTotal",planPrice);
-                totalMap.put("medHifPayTotalCapital",Convert.digitToChinese(planPrice));
-
-                resultMap.put("total", totalMap);
                 break;
             case Constants.SBLX.LX_ZY: // 离休（住院）
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
                 paraMap.put("isHospital", Constants.SF.S);
                 resultList = insureReversalTradeDAO.querySumDeclareInfosPage(paraMap);
-                resultMap.put("tempCode","his_insur_declare_0002");
-                for(Map map:resultList){
-                    totalPrice = BigDecimalUtils.add(totalPrice, new BigDecimal(map.get("totalPrice").toString())).setScale(2);
-                    planSumPrice = BigDecimalUtils.add(planSumPrice, new BigDecimal(map.get("planSumPrice").toString())).setScale(2);
-                }
-                totalMap.put("medfeeSumamtSum",totalPrice);
-                totalMap.put("medFeeTotalCapital",Convert.digitToChinese(totalPrice));
-                totalMap.put("medPadFeeTotal",planSumPrice);
-                totalMap.put("medPadFeeTotalCapital",Convert.digitToChinese(planSumPrice));
-                resultMap.put("total", totalMap);
                 break;
             case Constants.SBLX.MZ: // 门诊
                 paraMap.put("isHospital", Constants.SF.F);
                 resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
             case Constants.SBLX.YZS: // 一站式
                 resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
-                resultMap.put("tempCode","his_insur_declare_0004");
             default:
                 break;
         }
@@ -1129,11 +1095,12 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         insureConfInfo.setCrteId(MapUtils.get(paraMap, "crteId"));
         insureConfInfo.setStartDate(MapUtils.get(paraMap, "startDate"));
         insureConfInfo.setEndDate(MapUtils.get(paraMap, "endDate"));
-        Map<String,Object> insureConfInfoMap = JSONObject.parseObject(JSON.toJSONString(insureConfInfo));
-        insureConfInfoMap.put("printDate",DateUtils.format(new Date(), DateUtils.Y_M_D));
         resultMap.put("resultList", resultList);
+        Map<String,Object> insureConfInfoMap = JSONObject.parseObject(JSON.toJSONString(insureConfInfo));
+        insureConfInfoMap.put("regCodeName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode()).get("admdvsName"));
+        insureConfInfoMap.put("cityName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 4) + "00").get("admdvsName"));
+        insureConfInfoMap.put("provinceName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 2) + "0000").get("admdvsName"));
         resultMap.put("baseInfo", insureConfInfoMap);
-
         return resultMap;
     }
 

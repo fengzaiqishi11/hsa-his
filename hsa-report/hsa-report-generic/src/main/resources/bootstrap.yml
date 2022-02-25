@@ -33,7 +33,7 @@ dubbo:
     name: hsa-report
   protocol:
     name: dubbo
-    port: 29010
+    port: 29015
   provider:
     threads: 1000
 

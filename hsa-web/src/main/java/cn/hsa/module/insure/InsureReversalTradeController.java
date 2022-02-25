@@ -3,16 +3,14 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
-import org.apache.dubbo.config.annotation.Reference;
+import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,22 +19,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -351,13 +344,15 @@ public class InsureReversalTradeController extends BaseController {
     @GetMapping("/querySumDeclareInfoPrints")
     public WrapperResponse<ReportReturnDataDTO> querySumDeclareInfoPrints(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        paraMap.put("hospCode",sysUserDTO.getHospCode());
-        paraMap.put("crteId",sysUserDTO.getId());
-        paraMap.put("crteName",sysUserDTO.getName());
-        WrapperResponse<Map<String,Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(paraMap);
-        result.getData().put("hospCode",sysUserDTO.getHospCode());
-        result.getData().put("crterId",sysUserDTO.getId());
-        result.getData().put("crterName",sysUserDTO.getName());
+        paraMap.put("hospCode", sysUserDTO.getHospCode());
+        paraMap.put("crteId", sysUserDTO.getId());
+        paraMap.put("crteName", sysUserDTO.getName());
+        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(paraMap);
+        result.getData().put("hospCode", sysUserDTO.getHospCode());
+        result.getData().put("crterId", sysUserDTO.getId());
+        result.getData().put("crterName", sysUserDTO.getName());
+        result.getData().put("declaraType", MapUtils.get(paraMap, "declaraType"));
+        result.getData().put("businessType", "settleDeclareSheetProcess");
         WrapperResponse<ReportReturnDataDTO> resultDTO = reportDataDownLoadService_consumer.saveBuild(result.getData());
         return resultDTO;
     }

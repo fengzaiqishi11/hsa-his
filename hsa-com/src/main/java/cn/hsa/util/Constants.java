@@ -644,6 +644,7 @@ public interface Constants {
     class ZDLX{
         public static final String MZZZD = "101"; //门诊主诊断
         public static final String MZCZD = "102"; //门诊次诊断
+        public static final String MZZYZD ="103"; //门诊中医诊断
         public static final String ZYRYZD = "201"; //住院入院诊断
         public static final String ZYQZZD = "202"; //住院确诊诊断
         public static final String ZYCZD = "203"; //住院次诊断

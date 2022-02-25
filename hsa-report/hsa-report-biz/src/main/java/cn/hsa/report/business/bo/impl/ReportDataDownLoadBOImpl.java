@@ -71,6 +71,10 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
 
+        if (!configuration.getIsUpload()) {
+            return new ReportReturnDataDTO(null, str);
+        }
+
         FSEntity fsEntity = new FSEntity();
         try {
             if (StringUtils.isNotEmpty(str)) {

@@ -1,4 +1,4 @@
-package cn.hsa.report.business.controller;
+package cn.hsa.module.report;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @RestController
-@RequestMapping("/report/business")
+@RequestMapping("/web/report/business")
 public class ReportDataDownLoadController extends BaseController {
 
     @Autowired

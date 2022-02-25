@@ -1,16 +1,15 @@
 package cn.hsa.util;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import sun.misc.BASE64Encoder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,7 +127,7 @@ public class ConverUtils {
     public static String getParamsToString(Map<String, Object> params) {
         StringBuffer param = new StringBuffer();
         int i = 0;
-        Object value;
+        String value;
         for (String key : params.keySet()) {
             if (i != 0) {
                 param.append("&");
@@ -138,9 +137,13 @@ public class ConverUtils {
             } else if (params.get(key) instanceof List) {
                 value = JSONArray.toJSONString(params.get(key));
             } else {
-                value = params.get(key);
+                value = params.get(key).toString();
             }
-            param.append(key).append("=").append(value);
+            try {
+                param.append(key).append("=").append(URLEncoder.encode(value, "UTF-8"));
+            }catch ( UnsupportedEncodingException e){
+
+            }
             i++;
         }
         return param.toString();

@@ -49,9 +49,6 @@ public class InsureReversalTradeController extends BaseController {
     @Resource
     private InsureUnifiedPayReversalTradeService insureUnifiedPayReversalTradeService_consumer;
 
-    @Resource
-    private ReportDataDownLoadService reportDataDownLoadService_consumer;
-
     /**冲正交易查询
     * @Method queryReversalTradePage
     * @Desrciption 

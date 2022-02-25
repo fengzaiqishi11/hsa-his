@@ -1,5 +1,6 @@
 package cn.hsa.report.business.bo.impl.factory;
 
+import cn.hsa.module.report.business.bo.ReportBusinessBO;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class SettleSheetProcess implements ReportBusinessProcess {
+public class SettleSheetBOImpl implements ReportBusinessBO {
 
     @Override
     public Map getReportDataMap(Map map) {

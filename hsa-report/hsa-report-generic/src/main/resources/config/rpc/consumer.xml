@@ -8,4 +8,7 @@
     <!--中心平台 >> 医院数据源管理 -->
     <dubbo:reference id="centerDatasourceService_consumer" interface="cn.hsa.module.center.datasource.service.CenterDatasourceService" check="false"/>
 
+    <!--医保业务平台 -->
+    <dubbo:reference id="insureUnifiedPayReversalTradeService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" check="false"/>
+
 </beans>

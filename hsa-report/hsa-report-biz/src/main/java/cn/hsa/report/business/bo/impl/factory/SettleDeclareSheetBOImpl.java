@@ -1,8 +1,12 @@
 package cn.hsa.report.business.bo.impl.factory;
 
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
+import cn.hsa.module.report.business.bo.ReportBusinessBO;
 import cn.hsa.util.Constants;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
@@ -13,10 +17,17 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class SettleDeclareSheetProcess implements ReportBusinessProcess {
+public class SettleDeclareSheetBOImpl implements ReportBusinessBO {
+
+    @Resource
+    private InsureUnifiedPayReversalTradeService insureUnifiedPayReversalTradeService_consumer;
 
     @Override
     public Map getReportDataMap(Map map) {
+
+        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(map);
+        map.putAll(result.getData());
+
         switch (map.get("declaraType").toString()) {
             // 城镇职工（住院）
             case Constants.SBLX.CZJM_ZY:

@@ -9,13 +9,11 @@ import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.NumberToCN;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
-import cn.hsa.module.insure.module.dao.InsureDictDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
@@ -43,7 +41,16 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -82,9 +89,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
     @Resource
     private NumberToCN numberToCN;
-
-    @Resource
-    private InsureDictDAO insureDictDAO;
 
     /**
      * 医保通一支付平台,冲正交易接口调用
@@ -1092,11 +1096,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         insureConfInfo.setStartDate(MapUtils.get(paraMap, "startDate"));
         insureConfInfo.setEndDate(MapUtils.get(paraMap, "endDate"));
         resultMap.put("resultList", resultList);
-        Map<String,Object> insureConfInfoMap = JSONObject.parseObject(JSON.toJSONString(insureConfInfo));
-        insureConfInfoMap.put("regCodeName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode()).get("admdvsName"));
-        insureConfInfoMap.put("cityName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 4) + "00").get("admdvsName"));
-        insureConfInfoMap.put("provinceName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 2) + "0000").get("admdvsName"));
-        resultMap.put("baseInfo", insureConfInfoMap);
+        resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
         return resultMap;
     }
 

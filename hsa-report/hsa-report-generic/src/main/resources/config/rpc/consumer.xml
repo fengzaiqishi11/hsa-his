@@ -10,5 +10,6 @@
 
     <!--医保业务平台 -->
     <dubbo:reference id="insureUnifiedPayReversalTradeService_consumer" interface="cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService" check="false"/>
+    <dubbo:reference id="insureDictService_consumer" interface="cn.hsa.module.insure.module.service.InsureDictService" check="false"/>
 
 </beans>

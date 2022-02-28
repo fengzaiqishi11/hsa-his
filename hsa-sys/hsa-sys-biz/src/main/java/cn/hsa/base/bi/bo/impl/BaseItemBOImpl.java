@@ -9,14 +9,14 @@ import cn.hsa.module.base.ba.dao.BaseAdviceDAO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.ba.service.BaseAdviceService;
-import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bfc.dao.BaseFinanceClassifyDAO;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.base.bi.bo.BaseItemBO;
 import cn.hsa.module.base.bi.dao.BaseItemDAO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
-import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.base.modify.dao.BaseModifyTraceDAO;
+import cn.hsa.module.base.modify.dto.BaseModifyTraceDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
@@ -24,9 +24,9 @@ import cn.hsa.module.insure.module.service.InsureItemMatchService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -75,6 +74,9 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private BaseModifyTraceDAO baseModifyTraceDAO;
     /**
      * @Method getById
      * @Desrciption 通过id获取项目信息
@@ -159,6 +161,8 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
      **/
     @Override
     public Boolean save(BaseItemDTO baseItemDTO) {
+        BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
+
         //首先对传入的编码进行判断是否存在
         BaseItemDTO b = new BaseItemDTO();
         b.setId(baseItemDTO.getId());
@@ -208,8 +212,23 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
             Integer insert = this.baseItemDAO.insert(baseItemDTO);
             // 存入缓存
 //            cacheOperate(baseItemDTO,null,true);
+
+            // 材料修改，写入异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseItemDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_item");
+            baseModifyTraceDTO.setUpdtId(baseItemDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseItemDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", "-");
+            conentMap.put("after", baseItemDTO);
+            baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
+
             return insert > 0;
         } else {
+            BaseItemDTO oldItem = baseItemDAO.getById(baseItemDTO);
             //修改
             BaseAdviceDetailDTO baseAdviceDetailDTO = new BaseAdviceDetailDTO();
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
@@ -234,6 +253,19 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
             if (Constants.SF.S.equals(baseItemDTO.getIsValid())) {
 //                cacheOperate(baseItemDTO,null,true);
             }
+
+            // 材料异动记录 写入异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseItemDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_item");
+            baseModifyTraceDTO.setUpdtId(baseItemDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseItemDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", oldItem);
+            conentMap.put("after", baseItemDTO);
+            String jsonObject= JSONObject.toJSONString(conentMap);
+            baseModifyTraceDTO.setUpdtConent(jsonObject);
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
             return update > 0;
         }
     }

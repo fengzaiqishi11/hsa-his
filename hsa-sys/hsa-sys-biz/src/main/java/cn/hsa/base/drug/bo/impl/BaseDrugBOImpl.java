@@ -16,6 +16,8 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.drug.bo.BaseDrugBO;
 import cn.hsa.module.base.drug.dao.BaseDrugDAO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.base.modify.dao.BaseModifyTraceDAO;
+import cn.hsa.module.base.modify.dto.BaseModifyTraceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
@@ -26,9 +28,9 @@ import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,11 +38,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 /**
  * @Package_name: cn.hsa.base.bi.bo.impl
@@ -87,6 +85,9 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private BaseModifyTraceDAO baseModifyTraceDAO;
 
     public final static Map PREPMAP = new HashMap() {{
         put("241", "口服常释剂型");
@@ -241,6 +242,7 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
      **/
     @Override
     public Boolean save(BaseDrugDTO baseDrugDTO) {
+        BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
         //接受页面传递的拼音码、五笔码
         String usualPym = baseDrugDTO.getUsualPym();
         String usualWbm = baseDrugDTO.getUsualWbm();
@@ -297,12 +299,39 @@ public class BaseDrugBOImpl extends HsafBO implements BaseDrugBO {
                 throw new AppException("编码重复或该药品已经存在");
             }
             Integer insert = this.baseDrugDAO.insert(baseDrugDTO);
+            // 写入药品异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseDrugDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_drug");
+            baseModifyTraceDTO.setUpdtId(baseDrugDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseDrugDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", "-");
+            conentMap.put("after", baseDrugDTO);
+            baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
             // 存入缓存
 //            cacheOperate(baseDrugDTO,null,true);
             return insert > 0;
         } else {
+            BaseDrugDTO oldDrg = baseDrugDAO.getById(baseDrugDTO);
             //修改
             Integer update = this.baseDrugDAO.updateBaseDrug(baseDrugDTO);
+
+            // 写入药品异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseDrugDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_drug");
+            baseModifyTraceDTO.setUpdtId(baseDrugDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseDrugDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", oldDrg);
+            conentMap.put("after", baseDrugDTO);
+            String jsonObject=JSONObject.toJSONString(conentMap);
+            baseModifyTraceDTO.setUpdtConent(jsonObject);
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
             // 缓存操作 -- 只有有效的时候才进行操作
             if (Constants.SF.S.equals(baseDrugDTO.getIsValid())) {
 //                cacheOperate(baseDrugDTO,null,true);

@@ -435,7 +435,8 @@
     </select>
     <!-- 手术室获取药房信息 -->
     <select id="getPharInfoOfOperDept" resultMap="BaseDeptMap">
-        select distinct a.*,c.name as pharName,c.id as pharId,b.type_code as drugstoreTypeCode
+        select distinct a.*,c.name as pharName,c.id as pharId
+--                       ,b.type_code as drugstoreTypeCode
         from  base_dept a ,
         base_dept_drugstore  b ,
         base_dept c ,

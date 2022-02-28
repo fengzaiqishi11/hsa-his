@@ -157,6 +157,7 @@ public class OperInfoRecordController extends BaseController {
         operInfoRecordDTO.setPageSize(Integer.valueOf(param.get("pageSize")));
         SysUserDTO sysUserDTO = getSession(req, res);
         operInfoRecordDTO.setHospCode(sysUserDTO.getHospCode());
+        operInfoRecordDTO.setInptOrOutpt(param.get("inptOrOutpt"));
         Map map = new HashMap<>();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("operInfoRecordDTO",operInfoRecordDTO);

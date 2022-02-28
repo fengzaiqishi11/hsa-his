@@ -386,8 +386,9 @@
          e.c_code = 'XB' ), '' )),'/',
          ifnull(c.age,''),
          (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = c.age_unit_code AND hosp_code =
-         c.hosp_code ), '岁' )))) as patientInfo,b.dept_name
-         from phar_out_distribute_all_detail a
+         c.hosp_code ), '岁' )))) as patientInfo,b.dept_name,
+        case when a.item_code = '1' then bd.code  when a.item_code = '2' then d.code end code
+        from phar_out_distribute_all_detail a
          left join phar_out_distribute pod on a.distribute_id = pod.id and a.hosp_code = pod.hosp_code
          join outpt_prescribe b on b.id = a.op_id and b.hosp_code = a.hosp_code
          join outpt_visit c on c.id = b.visit_id and c.hosp_code = b.hosp_code
@@ -431,7 +432,8 @@
                (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = c.age_unit_code AND hosp_code =
                c.hosp_code ), '岁' )))) as patientInfo,
                (select bd.name from base_dept bd where bd.id = b.dept_id and bd.hosp_code = b.hosp_code) as deptName,
-               c.status_code
+               c.status_code,
+               case when a.item_code = '1' then bd.code  when a.item_code = '2' then d.code end code
         from phar_in_distribute_all_detail a
         left join phar_in_distribute pid on a.distribute_id = pid.id and a.hosp_code = pid.hosp_code
         join inpt_advice b on a.advice_id = b.id and a.hosp_code = b.hosp_code

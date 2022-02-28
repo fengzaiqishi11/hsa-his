@@ -135,4 +135,6 @@ public interface OutptOutTmakePriceFormService {
      * @Return:
      **/
     WrapperResponse<OutptPayDTO> getPayInfoByParams(Map<String,Object> map);
+
+    WrapperResponse<Boolean> saveBackCostWithOutpt(Map<String,Object> map);
 }

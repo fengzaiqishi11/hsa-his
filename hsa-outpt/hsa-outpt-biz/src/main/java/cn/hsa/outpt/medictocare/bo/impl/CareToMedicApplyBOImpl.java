@@ -2,7 +2,7 @@ package cn.hsa.outpt.medictocare.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.module.outpt.medictocare.bo.CareToMedicBO;
+import cn.hsa.module.outpt.medictocare.bo.CareToMedicApplyBO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 @Slf4j
-public class CareToMedicBOImpl extends HsafBO implements CareToMedicBO {
+public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO {
     @Override
     public PageDTO queryPage(MedicToCareDTO medicToCareDTO) {
         return null;

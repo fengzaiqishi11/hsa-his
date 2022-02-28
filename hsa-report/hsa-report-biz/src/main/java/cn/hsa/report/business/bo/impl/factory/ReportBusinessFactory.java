@@ -1,6 +1,6 @@
 package cn.hsa.report.business.bo.impl.factory;
 
-import cn.hsa.module.report.business.bo.ReportBusinessBO;
+import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

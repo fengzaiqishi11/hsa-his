@@ -2,11 +2,10 @@ package cn.hsa.report.business.bo.impl.factory;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
-import cn.hsa.module.report.business.bo.ReportBusinessBO;
+import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.Map;
 
 /**

@@ -67,8 +67,22 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         // 自定义配置
         Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
         map.put("customConfig", customConfigMap);
-
-        String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
+        String rUrl;
+        switch ((String) customConfigMap.get("fileFormat")) {
+            case "pdf":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/pdf/show");
+                break;
+            case "xls":
+            case "xlsx":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/excel");
+                break;
+            case "doc":
+            case "docx":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/word");
+                break;
+            default:
+                throw new RuntimeException("暂不支持该返回数据类型");
+        }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
 
         if (!configuration.getIsUpload()) {
@@ -97,8 +111,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 record.setTempCode(configuration.getTempCode());
                 record.setFileName(fileName);
                 record.setFileAddress(fsEntity.getKeyId());
-                record.setCrterId(map.get("crterId").toString());
-                record.setCrterName(map.get("crterName").toString());
+                record.setCrterId(map.get("crteId").toString());
+                record.setCrterName(map.get("crteName").toString());
                 record.setCrteTime(DateUtils.getNow());
                 reportFileRecordDAO.insert(record);
             }

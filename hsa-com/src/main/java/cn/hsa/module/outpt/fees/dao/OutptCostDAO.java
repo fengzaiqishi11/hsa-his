@@ -657,4 +657,13 @@ public interface OutptCostDAO {
      * @param outotCost
      */
     void batchUpdateSettleInvoiceId(List<OutptCostDTO> outotCost);
+    /**
+     * @Meth: queryCostByIds
+     * @Description: 通过费用id集合查询出门诊费用
+     * @Param: [costIds]
+     * @return: java.util.List<cn.hsa.module.outpt.fees.dto.OutptCostDTO>
+     * @Author: zhangguorui
+     * @Date: 2022/2/23
+     */
+    List<OutptCostDTO> queryCostByIds(@Param("hospCode") String hospCode,@Param("costIds") List<String> costIds);
 }

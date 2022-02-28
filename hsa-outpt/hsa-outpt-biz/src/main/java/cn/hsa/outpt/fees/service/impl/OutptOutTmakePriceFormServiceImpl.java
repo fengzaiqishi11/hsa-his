@@ -196,4 +196,9 @@ public class OutptOutTmakePriceFormServiceImpl extends HsafService implements Ou
         return WrapperResponse.success(outptOutTmakePriceFormBO.getPayInfoByParams(outptPayDTO));
     }
 
+    @Override
+    public WrapperResponse<Boolean> saveBackCostWithOutpt(Map<String, Object> map) {
+        return WrapperResponse.success(outptOutTmakePriceFormBO.saveBackCostWithOutpt(map));
+    }
+
 }

@@ -66,6 +66,7 @@ public class BackCostByInptController extends BaseController {
         inptCostDTO.setSourceDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode",sysUserDTO.getHospCode());
+        // 只查补记账的费用
         inptCostDTO.setSourceCode(Constants.FYLYFS.BJZ);
         map.put("inptCostDTO", inptCostDTO);
         map.put("id",inptCostDTO.getId());

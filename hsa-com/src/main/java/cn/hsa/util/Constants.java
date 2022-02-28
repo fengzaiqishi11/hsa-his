@@ -153,7 +153,15 @@ public interface Constants {
         public static final String BCH = "1";//被冲红
         public static final String CH = "2"; //冲红
     }
-
+    /**
+     * @Description: 就诊类型
+     * @Author: zhangguorui
+     * @Date: 2022/2/18
+     */
+    class VISITTYPE {
+        public static final String OUTPT = "1"; // 门诊
+        public static final String INPT = "2"; // 住院
+    }
     /**
      * @Menthod ORDERRULE
      * @Desrciption  单据规则（常量定义）
@@ -1199,5 +1207,11 @@ public interface Constants {
         public static final String SWJL = "死亡记录";
         public static final String BQQJ = "病情抢救";
         public static final String CYXJ = "出院小结";
+    }
+
+    class SETTLECODE {
+        public static final String WJS = "0";// 未结算
+        public static final String SS = "1";// 试算
+        public static final String YJS = "2";// 已结算
     }
 }

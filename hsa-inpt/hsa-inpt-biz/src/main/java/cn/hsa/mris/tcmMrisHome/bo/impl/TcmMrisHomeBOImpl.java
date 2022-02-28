@@ -574,6 +574,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 mrisOperInfoDO.setOperDoctorId(operInfoRecordDO.getDoctorId()); // 术者
                 mrisOperInfoDO.setAssistantId4(operInfoRecordDO.getAssistantId1()); // I 助
                 mrisOperInfoDO.setAssistantId2(operInfoRecordDO.getAssistantId2()); // II 助
+                mrisOperInfoDO.setOperCode(operInfoRecordDO.getRank()); // 手术级别
                 mrisOperInfoDO.setColumnsNum(n + "");
                 mrisOperInfoDOList.add(mrisOperInfoDO);
                 n++;
@@ -753,6 +754,38 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName());
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode());
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress());
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone());
+        // 年龄单位为岁
+        if ("1".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+           mrisBaseInfoDTO.setAge(mrisBaseInfoDTO.getAge());
+        }else if ("2".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为月
+            mrisBaseInfoDTO.setBabyAgeMonth(mrisBaseInfoDTO.getAge());
+            mrisBaseInfoDTO.setAge("0");
+        } else if ("3".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为周
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge()) * 7) / (float)DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }else if ("4".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为天
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge())) /(float) DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }
+
+        // 获取床位异动信息
+        List<InptBedChangeDO> inptBedChangeDOList = mrisHomeDAO.queryHisBedChanfeInfo(map);
+        if (inptBedChangeDOList!=null&&inptBedChangeDOList.size()>0){
+            mrisBaseInfoDTO.setTurnDeptIds(inptBedChangeDOList.get(0).getAfterDeptId());
+        }
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
@@ -856,6 +889,27 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 return 0;
             }
         });
+    }
+
+
+
+    /**
+     * @Method: queryOutHospPatientPageZY
+     * @Description: 分页查询已出院的患者信息
+     * @Param: [inptVisitDTO]
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/8 10:46
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @Override
+    public PageDTO queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO) {
+        // 设置分页
+        PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
+
+        // 查询
+        List<InptVisitDTO> patientInfoList = tcmMrisHomeDAO.queryOutHospPatientPageZY(inptVisitDTO);
+        return PageDTO.of(patientInfoList);
     }
 
 }

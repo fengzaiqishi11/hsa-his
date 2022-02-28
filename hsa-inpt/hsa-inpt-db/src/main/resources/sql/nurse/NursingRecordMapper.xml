@@ -311,8 +311,11 @@
             and STR_TO_DATE(CONCAT(item_001,item_004),'%Y-%m-%d %H:%i:%s') &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <!--order by crte_time-->
-        <if test="orderFlag != null and orderFlag == 1">
+        <if test="orderFlag != null and orderFlag == '1'.toString()">
             order by item_039, group_no, group_seq_no asc
+        </if>
+        <if test="orderFlag != null and orderFlag == '2'.toString()">
+            order by concat(item_001, " ", item_014) asc
         </if>
         <if test="orderFlag == null">
             order by item_001, crte_time ASC

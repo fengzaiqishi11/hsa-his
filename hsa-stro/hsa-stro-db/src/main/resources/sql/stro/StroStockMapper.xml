@@ -752,7 +752,11 @@
       (select dp.name from base_dept dp where dp.id = a.biz_id and dp.hosp_code = a.hosp_code) as invoicingTargetName,
       a.biz_id as invoicingTargetId
       from stro_stock_detail a
-      where hosp_code = #{hospCode} and a.split_num > 0 and item_id = #{itemId}
+      LEFT JOIN base_dept bd on a.biz_id = bd.id and bd.hosp_code = #{hospCode}
+      where a.hosp_code = #{hospCode} and a.split_num > 0 and a.item_id = #{itemId}
+      <if test="sfdeptFilter != null and sfdeptFilter == '1'.toString()">
+            and bd.type_code in ('3','4','5','13','14')
+      </if>
 <!--        and item_id in-->
 <!--        <foreach collection="itemIds" item="id" separator="," open="(" close=")">-->
 <!--          #{id}-->
@@ -764,8 +768,8 @@
     <select id="queryStockByBatchAll" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
       select a.hosp_code, a.biz_id, a.item_code, a.item_id, a.item_name,a.batch_no,a.unit_code,
         a.split_unit_code, a.split_ratio,sum(a.num) num,
-        max(a.buy_price) as buy_price,max(a.sell_price) as sell_price, round((sum(a.num) * max(a.buy_price)),4) as buy_price_all,
-        round((sum(a.num) * max(a.sell_price)),4) as sell_price_all,max(a.expiry_date) as expiry_date,
+        max(a.buy_price) as buy_price,max(a.sell_price) as sell_price, round(sum(a.num * a.buy_price),4) as buy_price_all,
+        round(sum(a.num * a.sell_price),4) as sell_price_all,max(a.expiry_date) as expiry_date,
         sum(a.split_num) as split_num, max(a.split_price) as split_price,
         (case a.item_code when '1' then b.spec when '2' then d.spec end ) spec,
         (case a.item_code when '1' then b.code when '2' then d.code end ) code,

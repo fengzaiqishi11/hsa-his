@@ -222,4 +222,11 @@
         hosp_code = #{hospCode}
     </select>
 
+    <select id="queryOneAdmdvsInfo" resultType="java.util.HashMap">
+        select admdvs_code admdvsCode,
+               admdvs_name admdvsName
+        from insure_admdvs
+        where hosp_code = #{hospCode} AND admdvs_code = #{admdvsCode}
+    </select>
+
 </mapper>

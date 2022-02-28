@@ -249,6 +249,20 @@
         </where>
         order by crte_time desc
     </select>
+    <!--获得科室类别标识-->
+    <select id="queryDeptById" resultType="java.lang.String">
+        select type_identity from base_dept where id = #{inStockId} and hosp_code = #{hospCode}
+    </select>
+    <select id="queryDrug" resultType="java.lang.String">
+        select big_type_code from base_drug where id in
+        <foreach collection="value" item="item" separator="," open="(" close=")">
+            #{item.itemId}
+        </foreach>
+        and big_type_code not in
+        <foreach collection="types" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 
     <!--新增所有列-->
     <insert id="insert">

@@ -121,6 +121,10 @@
 
 
     <!-- ########################################### 系统管理服务consumer start ########################################### -->
+
+    <!-- 系统管理子系统 -> 参数管理 -->
+    <dubbo:reference id="sysVersionInfoService_consumer" interface="cn.hsa.module.sys.version.service.VersionInfoService" check="false"/>
+
     <!-- 系统管理子系统 -> 参数管理 -->
     <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
 
@@ -511,6 +515,10 @@
     <dubbo:reference id="centerGlobalConfigService_consumer" interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" check="false"/>
     <!-- 国标基础药品搜索服务 -->
     <dubbo:reference id="searchableNationStandardDrugService_consumer" interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" check="false"/>
+
+    <!-- 报表管理子系统 -> 模板配置 -->
+    <dubbo:reference id="reportConfigurationService_consumer" interface="cn.hsa.module.report.config.service.ReportConfigurationService" check="false"/>
+    <dubbo:reference id="reportDataDownLoadService_consumer" interface="cn.hsa.module.report.business.service.ReportDataDownLoadService" check="false"/>
 
 </beans>
 

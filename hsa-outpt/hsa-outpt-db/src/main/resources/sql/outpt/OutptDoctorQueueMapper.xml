@@ -18,13 +18,11 @@
     <!--通过实体作为筛选条件分页查询-->
     <select id="queryPage" resultMap="OutptDoctorQueueMap">
         select
-        odq.*, ocq.queue_date as queueDate,bc.`name` as clinicName
-        from outpt_doctor_queue odq, outpt_classes_queue ocq,base_clinic bc
-        where
-        bc.id = odq.clinic_id
-        and bc.hosp_code = odq.hosp_code
-        and odq.cq_id = ocq.id
-        and odq.hosp_code=#{hospCode}
+        odq.*, ocq.queue_date as queueDate,bc.name as clinicName
+        from outpt_doctor_queue odq
+        JOIN outpt_classes_queue ocq  ON odq.cq_id = ocq.id  AND odq.hosp_code = ocq.hosp_code
+        LEFT JOIN base_clinic bc  ON bc.id = odq.clinic_id  AND bc.hosp_code = odq.hosp_code
+        WHERE odq.hosp_code=#{hospCode}
         <if test="cqId !=null and cqId != ''">
             and odq.cq_id = #{cqId}
         </if>

@@ -334,6 +334,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
      * @Date 2021/3/30 16:13
      * @Return Boolean
      */
+    @Override
     public Boolean insertInptRecord(InsureInptRecordDTO insureInptRecordDTO) {
         Map<String,Object> map  = new HashMap<>();
         String hospCode = insureInptRecordDTO.getHospCode();
@@ -344,6 +345,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureOrgCode);
+        insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map<String, Object> paramMap = new HashMap<>(13);
         paramMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
@@ -422,6 +424,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
      * @Date 2021/3/30 17:36
      * @Return
      */
+    @Override
     public Boolean deleteInptRecord(InsureInptRecordDTO inptRecordDTO) {
         String memo = inptRecordDTO.getMemo();
         inptRecordDTO = insureDiseaseRecordDAO.getInptRecordById(inptRecordDTO);

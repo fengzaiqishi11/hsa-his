@@ -1243,8 +1243,8 @@ public class BedListBOImpl implements BedListBO {
         //compAdviceLongCost(map);
 
         // 停止床位长期费用
-        //String cancelRemark = "科室【" + inptVisitDTO.getInDeptName() + "】，护士【" + MapUtils.get(map, "userName") + "】转科";
-        //stopInptLongCostByBedId(map, bedIdList, cancelRemark);
+        String cancelRemark = "科室【" + inptVisitDTO.getInDeptName() + "】，护士【" + MapUtils.get(map, "userName") + "】换科";
+        stopInptLongCostByBedId(map, bedIdList, cancelRemark);
 
         // 清空已占床就诊ID、状态
         bedListDAO.clearBaseBedVisitByBedId(bedIdList);
@@ -1253,7 +1253,9 @@ public class BedListBOImpl implements BedListBO {
         bedListDAO.insertInptBedChange(bedChangeList);
 
         // 修改住院病人信息
-        bedListDAO.updateInptVisit_Zk(inptVisitDTO);
+        if (!bedListDAO.updateInptVisit_Zk(inptVisitDTO)) {
+            throw new AppException("病人换科失败：病人【" + inptVisitDTO.getName() + "】状态发生变化");
+        }
 
         // 修改医嘱 的就诊科室、开医嘱科室id， 医嘱执行表的开医嘱科室id、执行科室id， 费用表来源科室id、就诊科室id、开医嘱科室id、执行科室id
         bedListDAO.updateVisitKS(inptVisitDTO);

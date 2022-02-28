@@ -220,4 +220,16 @@ public class CenterDatasourceController extends CenterBaseController {
         return centerDatasourceService_consumer.tableStructureSync(tableStructureSyncDTO);
     }
 
+    /**
+     * @Description: 更新版本更新的确认标识
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    @PostMapping(value = "/updateIsGuide")
+    public WrapperResponse updateIsGuide(){
+        return centerDatasourceService_consumer.updateIsGuide();
+    }
+
 }

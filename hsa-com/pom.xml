@@ -173,5 +173,11 @@
             <artifactId>spring-session-data-redis</artifactId>
             <version>${spring-session-data-redis.version}</version>
         </dependency>
+        <!-- 日志收集 -->
+        <dependency>
+            <groupId>de.siegmar</groupId>
+            <artifactId>logback-gelf</artifactId>
+            <version>3.0.0</version>
+        </dependency>
     </dependencies>
 </project>

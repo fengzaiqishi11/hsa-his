@@ -546,4 +546,25 @@ public class SysUserController extends BaseController {
         return wrapperResponse;
     }
 
+    /**
+     * @Description: 更新已读公告的标识
+     * @Param: [sysUserDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    @PostMapping( value = "/updateIsGuide")
+    public WrapperResponse<Boolean> updateIsGuide(@RequestBody  SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res){
+
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserDTO.setCode(sysUserDTOSession.getCode());
+        sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("sysUserDTO",sysUserDTO);
+        return sysUserService_consumer.updateIsGuide(map);
+
+    }
+
 }

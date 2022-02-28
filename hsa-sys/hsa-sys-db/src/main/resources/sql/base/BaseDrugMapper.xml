@@ -76,6 +76,7 @@
 		<result property="name" column="name" jdbcType="VARCHAR"/>
     <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
     <result property="dan" column="dan" jdbcType="VARCHAR"/>
+		<result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<!--查询单个-->
@@ -95,7 +96,7 @@
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select d.name from base_product d where d.code = a.prod_code) as prod_name,
 		(select count(0) from stro_stock e where e.item_code = '1' and e.item_id = a.id ) as stockFlag,
-		b.trunc_code truncCode, d.id bfcId
+		b.trunc_code truncCode, d.id bfcId, a.reimbursement_ratio
 		from  base_drug a
 		left join (
 		select * from (select aa.* from base_special_calc aa, base_dept bb where aa.hosp_code = bb.hosp_code and aa.dept_code = bb.code and aa.is_valid ='1'
@@ -342,7 +343,7 @@
 		a.insure_code,
 		a.nation_code, a.drug_remark, a.drug_img_path, a.max_dosage, a.min_dosage, a.gender_code, a.min_age, a.max_age,
 		a.ddd, a.durg_code,
-		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, a.dan, a.ndan, a.prod_code, a.usual_pym,
+		a.ph_code, a.antibacterial_code, a.is_skin, a.is_basic, a.is_prescription, a.basic_code, a.proton_pump, IFNULL(a.dan,""), a.ndan, a.prod_code, a.usual_pym,
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,'1' as itemCode,
 		d.name as bfcName,
@@ -513,8 +514,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time)
-        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{isPrescription}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime})
+        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time, reimbursement_ratio)
+        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{isPrescription}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime}, #{reimbursementRatio})
     </insert>
 	<insert id="insertBatch">
         insert into base_drug
@@ -625,6 +626,7 @@
 			usual_pym = #{usualPym},
 			usual_wbm = #{usualWbm},
 			good_pym = #{goodPym},
+			reimbursement_ratio = #{reimbursementRatio},
 			good_wbm = #{goodWbm},
 		</set>
 		where id = #{id} and hosp_code = #{hospCode}

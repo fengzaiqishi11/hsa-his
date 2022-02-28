@@ -673,4 +673,30 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
   public WrapperResponse<Map<String,Object>> queryOutptIncomeList(Map map){
     return WrapperResponse.success(patientCostLedgerBO.queryOutptIncomeList(map));
   }
+
+  /**
+   * @Menthod queryHosptialInComeList
+   * @Desrciption  住院业务收入统计报表
+   * @param map
+   * @Author liuliyun
+   * @Date   2022/2/10 16:10
+   * @Return PageDTO
+   **/
+  @Override
+  public WrapperResponse<PageDTO> queryHosptialInComeList(Map map){
+    return WrapperResponse.success(patientCostLedgerBO.queryHosptialInComeList(map));
+  }
+
+  /**
+   * @Menthod queryHosptialInComeListTitle
+   * @Desrciption  住院业务收入统计报表表头
+   * @param map
+   * @Author liuliyun
+   * @Date   2022/2/10 16:10
+   * @Return java.util.List<java.lang.Map>
+   **/
+  @Override
+  public WrapperResponse<Map<String,Object>> queryHosptialInComeListTitle(Map map){
+    return WrapperResponse.success(patientCostLedgerBO.queryHosptialInComeListTitle(map));
+  }
 }

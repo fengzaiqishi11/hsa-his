@@ -283,6 +283,40 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
         }
     }
 
+    /**
+     * @Description: 更新版本更新的确认标识
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: zhangxuan
+     * @Date: 2022-02-17
+     */
+    @Override
+    public WrapperResponse updateIsGuide() {
+        List<CenterDatasourceDTO> list = new ArrayList<CenterDatasourceDTO>();
+        // 查询所有的数据库
+        list = centerDatasourceDAO.findHospitalCenterDataSource();
+        // 同步所有的数据库的更新公告标识
+        TableStructureSyncDTO tableStructureSyncDTO = new TableStructureSyncDTO();
+        // 设置更新公告已读标识
+        tableStructureSyncDTO.setSql("update sys_user set is_guide = '2'");
+        // 设置为更新表数据
+        tableStructureSyncDTO.setSyncType("1");
+        List<String> dataSoureIds = new ArrayList<>();
+        String message = "";
+        for (CenterDatasourceDTO centerDatasourceDTO:list){
+            try{
+                tableStructureSyncByHospCode(centerDatasourceDTO,tableStructureSyncDTO,dataSoureIds);
+            }catch(Exception e){
+                if(message.length()>0){
+                    message +=  ","+ e.getMessage();
+                }else{
+                    message = e.getMessage();
+                }
+            }
+        }
+        return WrapperResponse.success("同步成功!", null);
+    }
+
     //根据数据库配置操作表
     private void tableStructureSyncByHospCode(CenterDatasourceDTO centerDatasourceDTO, TableStructureSyncDTO tableStructureSyncDTO,List<String> dataSoureIds) {
         if(centerDatasourceDTO == null ){

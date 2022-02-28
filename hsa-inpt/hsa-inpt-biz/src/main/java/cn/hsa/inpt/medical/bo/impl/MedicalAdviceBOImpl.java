@@ -904,7 +904,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //是否合管
         medicalApplyDTO.setIsMerge(Constants.SF.F);
         //合管主单ID（自身ID）
-        medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+        medicalApplyDTO.setMergeId(mergeId);
         if (flag && !StringUtils.isEmpty(mergeId)) {
             //根据医嘱ID获取医嘱明细ID
             List<InptAdviceDetailDTO> mergeAdviceDetailList = inptAdviceDetailDAO.getAdviceDetailByAdviceId(adviceDTO.getHospCode(), mergeId);
@@ -1927,6 +1927,12 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     private InptCostDTO buildInptCostDTO(MedicalAdviceDTO medicalAdviceDTO, InptAdviceDTO adviceDTO, InptAdviceDetailDTO inptAdviceDetailDTO,
                                          int dailyTimes, Date date, InptVisitDTO visitDTO,Map<String, BaseDrugDTO> drugMap,Map<String, BaseMaterialDTO> materiaMap) {
 
+
+        //药品、材料如果是个人自备不收费
+        if ((Constants.XMLB.YP.equals(adviceDTO.getItemCode()) || Constants.XMLB.CL.equals(adviceDTO.getItemCode()))
+                && Constants.YYXZ.GRZB.equals(adviceDTO.getUseCode()) && !Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode()) ) {
+            return null;
+        }
         InptCostDTO inptCostDTO = new InptCostDTO();
         //用量单位和数量不变
         inptCostDTO.setNum(inptAdviceDetailDTO.getNum());
@@ -2528,12 +2534,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 continue;
             }
 
-            //药品、材料如果是个人自备不收费
-            if ((Constants.XMLB.YP.equals(inptAdviceDTO.getItemCode()) || Constants.XMLB.CL.equals(inptAdviceDTO.getItemCode()))
-                    && Constants.YYXZ.GRZB.equals(inptAdviceDTO.getUseCode())) {
-                continue;
-            }
-
             //计算开始日期、结束日期、判断是否预停
             Map<String,Object> map = getTime(inptAdviceDTO, type);
             //开始日期
@@ -2555,7 +2555,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             //获取药品/项目信息,如果拆分比为空,默认给1
             if (Constants.XMLB.YP.equals(inptAdviceDetailDTO.getItemCode())) {
                 if (drugMap==null || drugMap.isEmpty()|| drugMap.get(inptAdviceDetailDTO.getItemId())==null) {
-                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),medicalAdviceDTO.getDeptId());
+                    //科室 取执行参数科室  如果为空 取当前病人的入院科室
+                    BaseDrugDTO drugDTO = getBaseDrugDTOById(inptAdviceDetailDTO.getHospCode(),inptAdviceDetailDTO.getItemId(),StringUtils.isEmpty(medicalAdviceDTO.getDeptId())?visitDTO.getInDeptId():medicalAdviceDTO.getDeptId());
                     if (drugDTO.getSplitRatio() == null) {
                         drugDTO.setSplitRatio(BigDecimal.valueOf(1));
                     }
@@ -2594,6 +2595,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 }
 
                 //判断当天费用是否已生成，如果已生产跳过循环
+                // （2022-02-17某医院提出当人工手动退费时，这一天的数据不用产生，为了解决此问题，将费用状态，发药状态判断条件放开,只要有这一天费用数据将不会产生）
                 List<InptCostDTO> costDTOList = inptCostDAO.queryCostList(inptAdviceDTO.getHospCode(),inptAdviceDTO.getId(),inptAdviceDetailDTO.getId(),startTime);
                 if (!ListUtils.isEmpty(costDTOList)) {//已生成费用，跳出循环
                     //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
@@ -2605,6 +2607,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //组装住院费用对象
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
+                if(inptCostDTO == null ){
+                    startTime = DateUtils.dateAdd(startTime, day);
+                    continue;
+                }
                 //判断当前集合是否已经存在对应的待领记录
 //                Date finalDate = date;
 //                if (!ListUtils.isEmpty(inptCostDTOs.stream().filter(cost -> Constants.SF.S.equals(cost.getIsWait()) && cost.getIatId().equals(inptCostDTO.getIatId())

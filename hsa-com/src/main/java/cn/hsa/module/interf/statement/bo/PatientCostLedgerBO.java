@@ -463,4 +463,24 @@ public interface PatientCostLedgerBO {
   Map queryOutptIncomeList(Map<String, Object> paraMap);
 
   PageDTO queryOutptIncomePage(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod queryHosptialInComeList
+   * @Desrciption 住院业务收入统计
+   * @Param visitDTO
+   * @Author liuliyun
+   * @Date   2022/2/10 11:01
+   * @Return map
+   **/
+  PageDTO queryHosptialInComeList(Map<String, Object> paraMap);
+
+  /**
+   * @Menthod queryHosptialInComeListTitle
+   * @Desrciption 住院业务收入统计表头
+   * @Param visitDTO
+   * @Author liuliyun
+   * @Date   2022/2/10 11:01
+   * @Return map
+   **/
+  Map queryHosptialInComeListTitle(Map<String, Object> paraMap);
 }

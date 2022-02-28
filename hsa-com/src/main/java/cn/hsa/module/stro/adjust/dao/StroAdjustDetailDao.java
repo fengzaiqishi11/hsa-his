@@ -97,7 +97,7 @@ public interface StroAdjustDetailDao {
     * @Date   2020/8/3 19:21
     * @Return int
     **/
-    int adjustUpdateStock(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs);
+    int adjustUpdateStock(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs,@Param("sfdeptFilter") String sfdeptFilter);
 
     /**
      * @Method adjustUpdateStockDetail
@@ -107,7 +107,7 @@ public interface StroAdjustDetailDao {
      * @Date   2020/8/3 19:21
      * @Return int
      **/
-    int adjustUpdateStockDetail(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs);
+    int adjustUpdateStockDetail(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs,@Param("sfdeptFilter") String sfdeptFilter);
 
     /**
     * @Method adjustUpdateDrug

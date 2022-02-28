@@ -1091,10 +1091,30 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("empTel", MapUtils.getMapVS(mriBaseInfo,"work_phone",null)); // 单位电话
         setlinfo.put("poscode", MapUtils.getMapVS(mriBaseInfo,"work_post_code",null)); // 邮编
         setlinfo.put("conerName", MapUtils.getMapVS(mriBaseInfo,"contact_name",MapUtils.get(baseInfoMap,"contact_name"))); // 联系人姓名
-        Object patnRlts =  MapUtils.getMapVS(mriBaseInfo,"contact_rela_code",MapUtils.get(baseInfoMap,"contact_rela_code"));
-        if(patnRlts == null || StringUtils.isEmpty(patnRlts.toString()) || "0".equals(patnRlts.toString())){
-            setlinfo.put("patnRlts", "1"); // 与患者关系  默认患者本人
+        Object contactRelaCode =  MapUtils.getMapVS(mriBaseInfo,"contact_rela_code",MapUtils.get(baseInfoMap,"contact_rela_code"));
+        if("0".equals(contactRelaCode)){
+            contactRelaCode = "1";
+        }else if("1".equals(contactRelaCode)){
+            contactRelaCode = "10";
+        }else if("2".equals(contactRelaCode)){
+            contactRelaCode = "20";
+        }else if("3".equals(contactRelaCode)){
+            contactRelaCode = "30";
+        }else if("4".equals(contactRelaCode)){
+            contactRelaCode = "40";
+        }else if("5".equals(contactRelaCode)){
+            contactRelaCode = "50";
+        }else if("6".equals(contactRelaCode)){
+            contactRelaCode = "69";
         }
+        else if("7".equals(contactRelaCode)){
+            contactRelaCode = "70";
+        }else if("8".equals(contactRelaCode)){
+            contactRelaCode = "99";
+        }else{
+            contactRelaCode = "99";
+        }
+        setlinfo.put("patnRlts", contactRelaCode); // 与患者关系  默认患者本人
         setlinfo.put("conerAddr", MapUtils.getMapVS(mriBaseInfo,"contact_address",MapUtils.get(baseInfoMap,"contact_address"))); // 联系人地址
         setlinfo.put("conerTel", MapUtils.getMapVS(mriBaseInfo,"contact_phone",MapUtils.get(baseInfoMap,"contact_phone"))); // 联系人电话
         setlinfo.put("hiType", insureIndividualVisitDTO.getAae140()); // 医保类型  也就是险种   sp_psn_type

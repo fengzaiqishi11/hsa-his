@@ -33,7 +33,11 @@
         <result property="cflJf" column="cflJf" jdbcType="DECIMAL"></result>
         <result property="cfje" column="cfje" jdbcType="DECIMAL"></result>
         <result property="unitCode" column="unitCode" jdbcType="DECIMAL"></result>
-
+        <result property="tcmSyndromesId" column="tcmSyndromesId" jdbcType="VARCHAR"></result>
+        <result property="tcmSyndromesName" column="tcmSyndromesName" jdbcType="VARCHAR"></result>
+        <result property="tcmDiseaseId" column="tcmDiseaseId" jdbcType="VARCHAR"></result>
+        <result property="tcmDiseaseName" column="tcmDiseaseName" jdbcType="VARCHAR"></result>
+        <result property="diagnoseType" column="diagnoseType" jdbcType="VARCHAR"></result>
         <collection property="outptPrescribeDetailsDTOList" ofType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO" javaType="java.util.List">
             <id property="id" column="idDetail" jdbcType="VARCHAR"></id>
             <result property="opId" column="op_id" jdbcType="VARCHAR"></result>
@@ -80,6 +84,7 @@
             <result property="type" column="type" jdbcType="VARCHAR"></result>
             <result property="phCode" column="phCode" jdbcType="VARCHAR"></result>
             <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"></result>
+            <result property="deptName" column="sqDeptName" jdbcType="VARCHAR"></result>
             <result property="skinGoodName" column="skinGoodName" jdbcType="VARCHAR"></result>
             <result property="splitUnitCode" column="splitUnitCode" jdbcType="VARCHAR"></result>
             <result property="bigTypeCode" column="bigTypeCode" jdbcType="VARCHAR"></result>
@@ -412,7 +417,8 @@
                a.past_history pastHistory, a.oneself_history oneselfHistory, a.family_history familyHistory,
                a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion, a.specialty_check specialtyCheck,
                a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
-               a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke
+               a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke,
+               a.tcm_disease_id,a.tcm_syndromes_id
         from  outpt_medical_record a
                   join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
                   left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
@@ -426,7 +432,8 @@
                a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion,
                a.specialty_check specialtyCheck, a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
                a.breath, a.height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, c.name diagnoseName,
-               (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke
+               (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke,
+               a.tcm_disease_id as tcmDiseaseId, a.tcm_syndromes_id as tcmSyndromesId
         from  outpt_medical_record a
                   left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
@@ -437,12 +444,12 @@
         insert into outpt_medical_record (
             id, hosp_code, visit_id, profile_id, disease_id, start_date, chief_complaint, present_illness, past_history, oneself_history, family_history,
             allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure,
-            breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time
+            breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time,tcm_disease_id,tcm_syndromes_id
         )
         values (
                    #{id}, #{hospCode}, #{visitId}, #{profileId}, #{diseaseId}, #{startDate}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory},
                    #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
-                   #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now()
+                   #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now(),#{tcmDiseaseId},#{tcmSyndromesId}
                )
     </insert>
 
@@ -472,7 +479,9 @@
                                         weight = #{weight},
                                         bmi = #{bmi},
                                         entrust = #{entrust},
-                                        remarke = #{remarke}
+                                        remarke = #{remarke},
+                                        tcm_disease_id = #{tcmDiseaseId},
+                                        tcm_syndromes_id = #{tcmSyndromesId}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -495,7 +504,9 @@
                                remark = #{remark},
                                now_address = #{nowAddress},
                                source_tj_code = #{sourceTjCode},
-                               source_tj_remark = #{sourceTjRemark}
+                               source_tj_remark = #{sourceTjRemark},
+                               occupation_code = #{occupationCode},
+                               contact_name = #{contactName}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -560,15 +571,17 @@
                                      when b.item_code = '4' and h.type_code = '3' then '4' when b.item_code = '4' and h.type_code = '12' then '5' when  b.item_code = '4' then '6' end type,
                case when b.item_code = '1' and f.ph_code = '5' then '1' when b.item_code = '1' and f.ph_code = '1' or b.item_code = '1' and (f.ph_code = '2' or f.ph_code = '3') then '4'
                     when b.item_code = '1' and f.ph_code = '6' then '5' when b.item_code = '1' and f.ph_code = '4' then '6' else '1'
-                   end phCode, d.name execDeptName, e.good_name skinGoodName,
+                   end phCode, d.name execDeptName, e.good_name skinGoodName, a.dept_name as sqDeptName,
                case when f.id is not null then f.big_type_code  when b.item_code = '2' then '3' when b.item_code = '4' then '4' end bigTypeCode,
                case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
                case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
                f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
-               b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail
+               b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,
+               ifnull(a.tcm_syndromes_id,'') as tcmSyndromesId,ifnull(a.tcm_syndromes_name,'') as tcmSyndromesName,
+               ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName
         from outpt_prescribe a
                  join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
-                 join(
+                 left join(
             select a.id,a.hosp_code, group_concat(b.id) diagnose_ids, group_concat(b.name) disease_names
             from outpt_prescribe a
                      join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
@@ -851,7 +864,7 @@
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.reimbursement_ratio
         from base_drug a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -909,7 +922,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-        a.pym usual_pym ,'' as technology_code,a.nation_code
+        a.pym usual_pym ,'' as technology_code,a.nation_code, a.reimbursement_ratio
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -951,7 +964,7 @@
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
         '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
@@ -1074,7 +1087,7 @@
     <!-- 新增处方信息-->
     <insert id="insertPrescribe" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_prescribe(
-        id, hosp_code, visit_id, diagnose_ids, order_no, doctor_id, doctor_name, dept_id, dept_name,
+        id, hosp_code, visit_id, diagnose_ids,tcm_disease_id,tcm_disease_name,tcm_syndromes_id,tcm_syndromes_name, order_no, doctor_id, doctor_name, dept_id, dept_name,
         type_code, prescribe_type_code, settle_id, remark, is_herb_hospital, herb_num, herb_use_code,
         weight, agent_name, agent_cert_no, crte_id, crte_name, crte_time, is_settle, is_cancel, is_print, is_submit
         )
@@ -1085,6 +1098,10 @@
             #{item.hospCode},
             #{item.visitId},
             #{item.diagnoseIds},
+            #{item.tcmDiseaseId},
+            #{item.tcmDiseaseName},
+            #{item.tcmSyndromesId},
+            #{item.tcmSyndromesName},
             #{item.orderNo},
             #{item.doctorId},
             #{item.doctorName},
@@ -1390,7 +1407,7 @@
     <!-- 新增处方诊断信息 -->
     <insert id="insertDiagnose" parameterType="java.util.List" useGeneratedKeys="false">
         insert into outpt_diagnose(
-        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time,custom_disease
+        id, hosp_code, disease_id, visit_id, type_code, is_main, crte_id, crte_name, crte_time,custom_disease,tcm_syndromes_id,tcm_syndromes_name
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1404,7 +1421,9 @@
             #{item.crteId},
             #{item.crteName},
             now(),
-            #{item.customDisease}
+            #{item.customDisease},
+            #{item.tcmSyndromesId},
+            #{item.tcmSyndromesName}
             )
         </foreach>
     </insert>
@@ -1813,9 +1832,9 @@
 
     <!--  获取处方诊断信息 -->
     <select id="getOutptPrescribeDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select b.id diseaseId, b.name diseaseName
+        select b.id diseaseId, b.name diseaseName,a.tcm_disease_id as tcmDiseaseId,a.tcm_disease_name as tcmDiseaseName,a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName
         from outpt_prescribe a
-                 join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
+                 left join base_disease b on find_in_set(b.id, a.diagnose_ids) and a.hosp_code = b.hosp_code
         where  a.id = #{id} and a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
         group by b.id ,b.name
     </select>
@@ -1823,7 +1842,8 @@
     <!--  获取诊断信息 -->
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
-        a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName
+        a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         join outpt_visit ov on ov.id = a.visit_id and ov.hosp_code = a.hosp_code
@@ -2299,7 +2319,9 @@
                                phone = #{phone},
                                visit_code = #{visitCode},
                                source_tj_code = #{sourceTjCode},
-                               source_tj_remark = #{sourceTjRemark}
+                               source_tj_remark = #{sourceTjRemark},
+                               occupation_code = #{occupationCode},
+                               contact_name = #{contactName}
         where visit_id = #{id} and hosp_code = #{hospCode}
     </update>
 

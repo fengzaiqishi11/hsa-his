@@ -692,28 +692,34 @@
         A.medicineOrgCode,
         A.insuplcAdmdvs,
         A.medTypeName,
+        A.insuplcAdmdvsName,
         sum( psnNum ) AS psnNum,
-        sum( inDay ) AS inDay,
-        sum( totalPrice ) AS totalPrice,
-        sum( portionPrice ) AS portionPrice,
-        sum( startingPrice ) AS startingPrice,
-        sum( insurePrice ) AS insurePrice,
-        sum( planAccountPrice ) AS planAccountPrice,
-        sum( planPrice ) AS planPrice,
-        sum( seriousPrice ) AS seriousPrice,
-        sum( civilPrice ) AS civilPrice,
-        sum( retirePrice ) AS retirePrice,
-        sum( personalPrice ) AS personalPrice,
-        sum( personPrice ) AS personPrice,
-        sum( hospPrice ) AS hospPrice,
-        sum( restsPrice ) AS restsPrice,
-        sum( mafPay ) AS mafPay,
-        sum( planSumPrice ) AS planSumPrice,
-        sum(allPortionPrice) as allPortionPrice,
-        sum(overSelfPrice) as overSelfPrice,
-        sum(preselfpayAmt) as preselfpayAmt,
-        sum(inscpScpAmt) as inscpScpAmt,
-        sum(poolPropSelfpay) as poolPropSelfpay
+        sum( psnCount ) AS psnCount,
+        Round(sum( thbPay ),2) AS thbPay,
+        Round(sum( hospExemAmount ),2) AS hospExemAmount,
+        Round(sum( governmentPay ),2) AS governmentPay,
+        Round(sum( othPay ),2) AS othPay,
+        Round(sum( inDay ),2) AS inDay,
+        Round(sum( totalPrice ),2) AS totalPrice,
+        Round(sum( portionPrice ),2) AS portionPrice,
+        Round(sum( startingPrice ),2) AS startingPrice,
+        Round(sum( insurePrice ),2) AS insurePrice,
+        Round(sum( planAccountPrice ),2) AS planAccountPrice,
+        Round(sum( planPrice ),2) AS planPrice,
+        Round(sum( seriousPrice ),2) AS seriousPrice,
+        Round(sum( civilPrice ),2) AS civilPrice,
+        Round(sum( retirePrice ),2) AS retirePrice,
+        Round(sum( personalPrice ),2) AS personalPrice,
+        Round(sum( personPrice ),2) AS personPrice,
+        Round(sum( hospPrice ),2) AS hospPrice,
+        Round(sum( restsPrice ),2) AS restsPrice,
+        Round(sum( mafPay ),2) AS mafPay,
+        Round(sum( planSumPrice ),2) AS planSumPrice,
+        Round(sum(allPortionPrice),2) as allPortionPrice,
+        Round(sum(overSelfPrice),2) as overSelfPrice,
+        Round(sum(preselfpayAmt),2) as preselfpayAmt,
+        Round(sum(inscpScpAmt),2) as inscpScpAmt,
+        Round(sum(poolPropSelfpay),2) as poolPropSelfpay
         FROM
         (
         SELECT DISTINCT
@@ -731,6 +737,8 @@
         )
         ) type,
         count( 1 ) AS psnNum,
+        count( c.aac002 ) AS psnCount,
+        ifnull(e.oth_pay,0) AS othPay,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
         e.starting_price AS startingPrice,
@@ -744,6 +752,9 @@
         e.person_price AS personPrice,
         e.hosp_price AS hospPrice,
         e.rests_price AS restsPrice,
+        ifnull(e.thb_pay,0) AS thbPay,
+        ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
+        ifnull(e.government_pay,0) AS governmentPay,
         ifnull( e.maf_pay, 0 ) AS mafPay,
         case
         when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
@@ -763,12 +774,14 @@
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
+        ia.admdvs_name as insuplcAdmdvsName,
         c.aka130_name AS medTypeName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
         insure_individual_basic c,
-        inpt_visit tt
+        inpt_visit tt,
+        insure_admdvs ia
         WHERE
         e.hosp_code = t.hosp_code
         AND e.visit_id = t.visit_id
@@ -783,6 +796,7 @@
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         AND e.insure_price > 0
+        AND t.insuplc_admdvs = ia.admdvs_code
         <if test="isValidOneSettle == '1'.toString()">
         and ifnull(t.is_one_settle,'0') != '1'
         </if>
@@ -1186,35 +1200,37 @@
         medicineOrgCode,
         medTypeName,
         insuplcAdmdvs,
+        insuplcAdmdvsName,
         sum( psnNum ) AS psnNum,
-        sum( totalPrice ) AS totalPrice,
-        sum( portionPrice ) AS portionPrice,
-        sum( startingPrice ) AS startingPrice,
-        sum( insurePrice ) AS insurePrice,
-        sum( planAccountPrice ) AS planAccountPrice,
-        sum( planPrice ) AS planPrice,
-        sum( seriousPrice ) AS seriousPrice,
-        sum( civilPrice ) AS civilPrice,
-        sum( retirePrice ) AS retirePrice,
-        sum( personalPrice ) AS personalPrice,
-        sum( hospPrice ) AS hospPrice,
-        sum( restsPrice ) AS restsPrice,
-        sum( mafPay ) AS mafPay,
-        sum( planSumPrice ) AS planSumPrice,
-        sum( hospExemAmount ) AS hospExemAmount,
-        sum( planSumPay ) AS planSumPay,
-        sum( personPrice ) AS personPrice,
-        sum( thbPay ) AS thbPay,
-        sum( governmentPay ) AS governmentPay,
-        sum(allPortionPrice) as allPortionPrice,
-        sum(overSelfPrice) as overSelfPrice,
-        sum(preselfpayAmt) as preselfpayAmt,
-        sum(inscpScpAmt) as inscpScpAmt,
-        sum(poolPropSelfpay) as poolPropSelfpay
+        Round(sum( totalPrice ),2) AS totalPrice,
+        Round(sum( portionPrice ),2) AS portionPrice,
+        Round(sum( startingPrice ),2) AS startingPrice,
+        Round(sum( insurePrice ),2) AS insurePrice,
+        Round(sum( planAccountPrice ),2) AS planAccountPrice,
+        Round(sum( planPrice ),2) AS planPrice,
+        Round(sum( seriousPrice ),2) AS seriousPrice,
+        Round(sum( civilPrice ),2) AS civilPrice,
+        Round(sum( retirePrice ),2) AS retirePrice,
+        Round(sum( personalPrice ),2) AS personalPrice,
+        Round(sum( hospPrice ),2) AS hospPrice,
+        Round(sum( restsPrice ),2) AS restsPrice,
+        Round(sum( mafPay ),2) AS mafPay,
+        Round(sum( planSumPrice ),2) AS planSumPrice,
+        Round(sum( hospExemAmount ),2) AS hospExemAmount,
+        Round(sum( planSumPay ),2) AS planSumPay,
+        Round(sum( personPrice ),2) AS personPrice,
+        Round(sum( thbPay ),2) AS thbPay,
+        Round(sum( governmentPay ),2) AS governmentPay,
+        Round(sum(allPortionPrice),2) as allPortionPrice,
+        Round(sum(overSelfPrice),2) as overSelfPrice,
+        Round(sum(preselfpayAmt),2) as preselfpayAmt,
+        Round(sum(inscpScpAmt),2) as inscpScpAmt,
+        Round(sum(poolPropSelfpay),2) as poolPropSelfpay
         FROM
         (
         SELECT DISTINCT
         count( 1 ) AS psnNum,
+        count( c.aac002 ) AS psnCount,
         c.aka130_name AS medTypeName,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
@@ -1229,7 +1245,7 @@
         e.person_price AS personPrice,
         e.hosp_price AS hospPrice,
         e.rests_price AS restsPrice,
-        e.thb_pay AS thbPay,
+        ifnull(e.thb_pay ,0)AS thbPay,
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
         (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) +ifnull(e.hosp_exem_amount,0) + ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
@@ -1247,12 +1263,14 @@
         e.preselfpay_amt as preselfpayAmt,
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
+        ia.admdvs_name as insuplcAdmdvsName,
         t.insuplc_admdvs as insuplcAdmdvs
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
         insure_individual_basic c,
-        inpt_visit tt
+        inpt_visit tt,
+        insure_admdvs ia
         WHERE
         e.hosp_code = t.hosp_code
         AND e.visit_id = t.visit_id
@@ -1267,6 +1285,7 @@
         AND e.hosp_code = #{hospCode}
         AND t.is_one_settle = '1'
         AND e.visit_id = tt.id
+        AND t.insuplc_admdvs = ia.admdvs_code
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>

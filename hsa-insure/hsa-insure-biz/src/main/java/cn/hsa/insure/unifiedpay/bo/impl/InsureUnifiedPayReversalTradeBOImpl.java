@@ -9,22 +9,32 @@ import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.NumberToCN;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureDictDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayReversalTradeBO;
 import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.*;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DataTypeUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.HttpConnectUtil;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.MoneyUtils;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -73,6 +83,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     @Resource
     private NumberToCN numberToCN;
 
+    @Resource
+    private InsureDictDAO insureDictDAO;
 
     /**
      * 医保通一支付平台,冲正交易接口调用
@@ -567,6 +579,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         medisnInfMap.put("settleTitle", settleTitle);
         medisnInfMap.put("hospLv", hospLv);
         medisnInfMap.put("hospName", hospName);
+        medisnInfMap.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
         // 获取医保结算信息  调用医保接口
         Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
         Map<String, Object> setlInfoMap = MapUtils.get(data, "setlinfo"); // 结算信息明细
@@ -766,6 +779,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("medisnInfMap", medisnInfMap); // 结算单第一部分数据
         map.put("insuplcAdmdvs", insuplcAdmdvs);
         map.put("mdtrtareaAdmvs", mdtrtareaAdmvs);
+        Map<String,Object> insureIndividualVisitDTOMap = JSONObject.parseObject(JSON.toJSONString(map.get("insureIndividualVisitDTO")));
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTOMap);
         String json = JSONObject.toJSONString(map);
         System.out.println("----======" + json);
         return map;
@@ -1074,8 +1089,14 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         insureConfInfo.setCrteName(MapUtils.get(paraMap, "crteName"));
         insureConfInfo.setCrteId(MapUtils.get(paraMap, "crteId"));
+        insureConfInfo.setStartDate(MapUtils.get(paraMap, "startDate"));
+        insureConfInfo.setEndDate(MapUtils.get(paraMap, "endDate"));
         resultMap.put("resultList", resultList);
-        resultMap.put("baseInfo", insureConfInfo);
+        Map<String,Object> insureConfInfoMap = JSONObject.parseObject(JSON.toJSONString(insureConfInfo));
+        insureConfInfoMap.put("regCodeName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode()).get("admdvsName"));
+        insureConfInfoMap.put("cityName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 4) + "00").get("admdvsName"));
+        insureConfInfoMap.put("provinceName", insureDictDAO.queryOneAdmdvsInfo(insureConfInfo.getHospCode(), insureConfInfo.getRegCode().substring(0, 2) + "0000").get("admdvsName"));
+        resultMap.put("baseInfo", insureConfInfoMap);
         return resultMap;
     }
 

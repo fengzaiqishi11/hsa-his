@@ -14,7 +14,7 @@ import java.util.Map;
  * @desc
  **/
 @FeignClient(value = "hsa-outpt")
-public interface CareToMedicService {
+public interface CareToMedicApplyService {
     /**
      * @Menthod: queryPage()
      * @Desrciption: 根据条件分页查询养转医患者列表
@@ -24,7 +24,7 @@ public interface CareToMedicService {
      * @date 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/service/outpt/caretomedic/queryPage")
+    @PostMapping("/service/outpt/caretomedicapply/queryPage")
     WrapperResponse<PageDTO> queryPage(Map map);
 
 
@@ -36,7 +36,7 @@ public interface CareToMedicService {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<OutinInvoiceDO>
      **/
-    @PostMapping("/service/outpt/caretomedic/getMedicToCareInfoById")
+    @PostMapping("/service/outpt/caretomedicapply/getMedicToCareInfoById")
     WrapperResponse<MedicToCareDTO> getMedicToCareInfoById(Map map);
 
     /**
@@ -48,6 +48,6 @@ public interface CareToMedicService {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    @PostMapping("/service/outpt/caretomedic/updateMedicToCare")
+    @PostMapping("/service/outpt/caretomedicapply/updateMedicToCare")
     WrapperResponse<Boolean> updateMedicToCare(Map map);
 }

@@ -8,7 +8,7 @@ import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
  * @create 2022-02-28 10:29
  * @desc
  **/
-public interface CareToMedicBO {
+public interface CareToMedicApplyBO {
     /**
      * @Menthod: queryPage()
      * @Desrciption: 根据条件分页查询养转医患者列表

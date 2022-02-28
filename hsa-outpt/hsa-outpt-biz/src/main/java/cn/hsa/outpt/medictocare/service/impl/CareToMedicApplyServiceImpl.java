@@ -4,7 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
-import cn.hsa.module.outpt.medictocare.service.CareToMedicService;
+import cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +15,10 @@ import java.util.Map;
  * @create 2022-02-28 15:51
  * @desc
  **/
-@HsafRestPath("/service/outpt/caretomedic")
+@HsafRestPath("/service/outpt/caretomedicapply")
 @Slf4j
-@Service("CareToMedicService_provider")
-public class CareToMedicServiceImpl implements CareToMedicService {
+@Service("CareToMedicApplyService_provider")
+public class CareToMedicApplyServiceImpl implements CareToMedicApplyService {
     @Override
     public WrapperResponse<PageDTO> queryPage(Map map) {
         return null;

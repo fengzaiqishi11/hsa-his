@@ -1,4 +1,4 @@
-package cn.hsa.module.report.business.bo;
+package cn.hsa.module.report.business.bo.factory;
 
 import java.util.Map;
 

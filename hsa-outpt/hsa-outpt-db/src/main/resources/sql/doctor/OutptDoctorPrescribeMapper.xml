@@ -385,6 +385,9 @@
                 or a.cert_no like concat('%',#{keyword},'%')
                 or a.phone like concat('%',#{keyword},'%'))
             </if>
+            <if test="deptId != null and deptId != ''" >
+                and (b.dept_id = #{deptId} or a.dept_id = #{deptId} )
+            </if>
         </if>
 
         <!-- 已接诊 -->

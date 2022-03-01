@@ -10,8 +10,8 @@
        使用springProperty才可使用application.yml中的值 可以设置默认值
     -->
 
-    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-insure/"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-insure-generic"/>
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="/app/logs/hsa-insure"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-insure"/>
 
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -40,10 +40,57 @@
         </triggeringPolicy>
     </appender>
 
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天日志归档路径以及格式 -->
+            <fileNamePattern>${LOG_DIR}/${LOG_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.error.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_DIR}/${LOG_ERROR_NAME}.error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="FILE"/>
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
         </root>
     </springProfile>
@@ -51,8 +98,10 @@
     <!-- 其他环境日志级别为INFO -->
     <springProfile name="!local">
         <root level="INFO">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="STDOUT"/>
+            <!--<appender-ref ref="FILE"/>-->
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
+            <!--<appender-ref ref="STDOUT"/>-->
         </root>
     </springProfile>
 

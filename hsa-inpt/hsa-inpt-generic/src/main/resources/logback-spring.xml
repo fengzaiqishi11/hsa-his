@@ -10,8 +10,8 @@
        使用springProperty才可使用application.yml中的值 可以设置默认值
     -->
 
-    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-inpt/"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-inpt-generic"/>
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="/app/logs/hsa-inpt"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-inpt"/>
     <springProperty scope="context" name="LOG_SERVER_ADDRESS" source="logging.server.address" defaultValue="192.168.92.128"/>
     <springProperty scope="context" name="LOG_SERVER_PORT" source="logging.server.port" defaultValue="12201"/>
 
@@ -42,7 +42,7 @@
             </fullPatternLayout>
 
             <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
-            <staticField>app_name:msg_platform</staticField>
+            <staticField>app_name:has-inpt</staticField>
         </encoder>
     </appender>
     <!-- 控制台输出 -->
@@ -72,11 +72,59 @@
         </triggeringPolicy>
     </appender>
 
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天日志归档路径以及格式 -->
+            <fileNamePattern>${LOG_DIR}/${LOG_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.error.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_DIR}/${LOG_ERROR_NAME}.error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
             <appender-ref ref="FILE"/>
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
+            <appender-ref ref="GELF"/>
         </root>
     </springProfile>
 
@@ -84,7 +132,10 @@
     <springProfile name="!local">
         <root level="INFO">
             <appender-ref ref="FILE"/>
-            <appender-ref ref="STDOUT"/>
+            <!--<appender-ref ref="STDOUT"/>-->
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
+            <appender-ref ref="GELF"/>
         </root>
     </springProfile>
 

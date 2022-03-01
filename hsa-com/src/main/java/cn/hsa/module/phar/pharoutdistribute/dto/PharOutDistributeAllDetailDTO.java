@@ -48,5 +48,7 @@ public class PharOutDistributeAllDetailDTO extends PharOutDistributeAllDetailDO 
      * 发药药房id
      */
     private String pharId;
+    // 药品编码
+    private String code;
 
 }

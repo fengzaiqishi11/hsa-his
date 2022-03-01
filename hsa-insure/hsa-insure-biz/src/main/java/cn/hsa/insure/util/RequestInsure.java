@@ -415,6 +415,9 @@ public class RequestInsure {
     public Map<String,Object> sendMessage(String servers, String hospCode, Map<String, Object> param, String activityCode) throws Exception {
         KafkaConsumer<String, String> consumer = null;
         try {
+            // KAFKA医保
+            logger.info("*****开始【医保调用】KAFKA方法*****");
+            logger.info("【医保调用】入参：" + JSON.toJSONString(param));
             String producerTopic = hospCode + producerTopicKey;//生产者消息推送Topic
             String consumerTopic = hospCode + consumerTopicKey;//消费者消费信息Topic
             consumer = KafkaUtil.createConsumer(servers,consumerTopic);//消费处理结果消息
@@ -431,7 +434,10 @@ public class RequestInsure {
                         Map<String,Object> result = JSON.parseObject(value,HashMap.class);
                         if (activityCode.equals(result.get("activityCode"))) {
                             consumer.commitAsync();
+                            logger.info("【医保调用】KAFKA返参字符串：" + JSON.toJSONString(result));
+                            logger.info("*****结束【医保调用】KAFKA方法*****");
                             return result;
+
                         }
                     }
                 }

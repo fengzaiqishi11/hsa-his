@@ -19,12 +19,20 @@ import cn.hsa.module.insure.outpt.dao.InsureReversalTradeDAO;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.*;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DataTypeUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.HttpConnectUtil;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.MoneyUtils;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -33,7 +41,16 @@ import org.springframework.util.ObjectUtils;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -72,7 +89,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
     @Resource
     private NumberToCN numberToCN;
-
 
     /**
      * 医保通一支付平台,冲正交易接口调用
@@ -567,6 +583,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         medisnInfMap.put("settleTitle", settleTitle);
         medisnInfMap.put("hospLv", hospLv);
         medisnInfMap.put("hospName", hospName);
+        medisnInfMap.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
         // 获取医保结算信息  调用医保接口
         Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
         Map<String, Object> setlInfoMap = MapUtils.get(data, "setlinfo"); // 结算信息明细
@@ -766,6 +783,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("medisnInfMap", medisnInfMap); // 结算单第一部分数据
         map.put("insuplcAdmdvs", insuplcAdmdvs);
         map.put("mdtrtareaAdmvs", mdtrtareaAdmvs);
+        Map<String,Object> insureIndividualVisitDTOMap = JSONObject.parseObject(JSON.toJSONString(map.get("insureIndividualVisitDTO")));
+        map.put("insureIndividualVisitDTO",insureIndividualVisitDTOMap);
         String json = JSONObject.toJSONString(map);
         System.out.println("----======" + json);
         return map;
@@ -1074,8 +1093,10 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         insureConfInfo.setCrteName(MapUtils.get(paraMap, "crteName"));
         insureConfInfo.setCrteId(MapUtils.get(paraMap, "crteId"));
+        insureConfInfo.setStartDate(MapUtils.get(paraMap, "startDate"));
+        insureConfInfo.setEndDate(MapUtils.get(paraMap, "endDate"));
         resultMap.put("resultList", resultList);
-        resultMap.put("baseInfo", insureConfInfo);
+        resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
         return resultMap;
     }
 

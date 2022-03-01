@@ -555,4 +555,22 @@ public interface InptCostDAO {
     int updateCostIdBatch(List<InptCostDTO> inptCostDTOs);
 
     void newUpdateLastExeTime(MedicalAdviceDTO medicalAdviceDTO, Map<String, Date> adviceIdCostTime);
+    /**
+     * @Meth: querySurgeryOutptBackCostInfoPage
+     * @Description: 查询门诊手术补记账退费
+     * @Param: [map]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2022/2/21
+     */
+    List<Map<String, Object>> querySurgeryOutptBackCostInfoPage(Map<String, Object> map);
+    /**
+     * @Meth: querySurgeryInptBackCostInfoPage
+     * @Description: 查询住院补记账退费
+     * @Param: [map]
+     * @return: java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @Author: zhangguorui
+     * @Date: 2022/2/21
+     */
+    List<Map<String, Object>> querySurgeryInptBackCostInfoPage(Map<String, Object> map);
 }

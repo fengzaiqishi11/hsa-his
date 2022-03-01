@@ -49,7 +49,7 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String iatIds;
     // 医嘱开立时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date iat_time;
     //执行科室名称
     private String execDeptName;
@@ -115,38 +115,42 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String code; //录入人员工号
     private Date lastExecTime;//最近执行时间
     private String matchItemCode; // 医保匹配项目类型
-    private String hospDrugOrMaterialItemCode ; // 医院药品项目编码
+    private String hospDrugOrMaterialItemCode; // 医院药品项目编码
     private String isMatch; // 是否匹配
     private String isSs; // 是否手术
     private String sourceId;//来源ID
 
     private String preferentialTypeId;
-    private String isBackFee ; // 是否退费
+    private String isBackFee; // 是否退费
     private String queryStartDate; // 计费时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date stopTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String costStartTime; // 费用开始时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String costStopTime; // 费用结束时间
 
     private String deptName; // 科室名称
 
     private String medType; //医疗类型
 
-    private String feeDays ; //费用天数
+    private String feeDays; //费用天数
 
-    /** 病人类型 1:表示门诊，2：表示住院**/
+    /**
+     * 病人类型 1:表示门诊，2：表示住院
+     **/
     private String inptOrOutpt;
-    /** 门诊处方ID **/
-    private String adviceId ;
+    /**
+     * 门诊处方ID
+     **/
+    private String adviceId;
 
     // 查询婴儿关键字
     private String queryBaby;
@@ -209,4 +213,6 @@ public class InptCostDTO extends InptCostDO implements Serializable {
 
     // 经治医生名称
     private String jzDoctorName;
+
+
 }

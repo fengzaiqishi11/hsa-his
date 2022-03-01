@@ -8,6 +8,7 @@ import cn.hsa.module.phar.pharapply.dao.PharApplyDAO;
 import cn.hsa.module.phar.pharapply.dto.PharApplyDTO;
 import cn.hsa.module.phar.pharapply.entity.StroOutDetail;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
+import cn.hsa.module.stro.backstroconfirm.dao.BackStroConfirmDAO;
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stroin.dao.StroInDAO;
@@ -77,6 +78,8 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
     @Resource
     private PharApplyDAO pharApplyDAO;
 
+    @Resource
+    private BackStroConfirmDAO backStroConfirmDAO;
 
     /**
      * @Method getById
@@ -273,6 +276,10 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
      **/
     @Override
     public Boolean save(StroOutDTO stroOutDTO) {
+        // 校验接收单位是否有标识,出库到科室不做校验只对出库到药房做检验
+        if ("5".equals(stroOutDTO.getOutCode())){
+            checkOutStrock(stroOutDTO.getInStockId(),stroOutDTO.getHospCode(),stroOutDTO.getStroOutDetailDTOS());
+        }
         //计算零售总金额、购买总金额、拆零总数量
         if (!ListUtils.isEmpty(stroOutDTO.getStroOutDetailDTOS())) {
             List<StroOutDetailDTO> stroOutDetailDTOS = stroOutDTO.getStroOutDetailDTOS();
@@ -341,7 +348,55 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
             return true;
         }
     }
+    /**
+     * @Meth: checkOutStrock
+     * @Description: 保存之前校验，接受单位能否有权限接收所有项目
+     * @Param: []
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/2/17
+     */
+    public void checkOutStrock(String inStockId,String hospCode,List<StroOutDetailDTO> stroOutinDetailDTOS){
 
+        // 获得接收单位标识
+        String loginTypeIdentity = backStroConfirmDAO.queryDeptById(inStockId, hospCode);
+        if(StringUtils.isEmpty(loginTypeIdentity)) {
+            throw new AppException("接受科室未配置药房药库类别标识");
+        }
+        List<String> types = new ArrayList<>();
+
+        for (String loginType:loginTypeIdentity.split(",")) {
+            if (loginType.equals("2")) {//中成药
+                types.add("1");
+            } else if (loginType.equals("3")) {//中草药
+                types.add("2");
+            } else if (loginType.equals("1")) {//西药
+                types.add("0");
+            } else if(loginType.contains("4")){ // 藏药
+                types.add("3");
+            } else if (loginType.equals("5") || loginType.equals("6") || loginType.equals("7")) {//材料
+                types.add("material");
+            } else {
+                throw new AppException("没有该药房药库类别标识");
+            }
+        }
+        // 根据item_code进行分组,药品是1 材料是2
+        Map<String, List<StroOutDetailDTO>> itemlistMap = stroOutinDetailDTOS.stream().collect(Collectors.groupingBy(StroOutDetailDTO::getItemCode));
+        for (Map.Entry<String, List<StroOutDetailDTO>> itemMap : itemlistMap.entrySet()) {
+            String itemCode = itemMap.getKey();
+            List<StroOutDetailDTO> value = itemMap.getValue();
+            if ("2".equals(itemCode) && !types.contains("material")) { // 材料
+                throw new AppException("接受单位没有设置材料标识，不能退材料");
+            } else {
+                List<String> errorType = backStroConfirmDAO.queryDrug(types, value);
+                if (!ListUtils.isEmpty(errorType)) {
+                    throw new AppException("接受单位没有设置药品标识");
+                }
+            }
+        }
+
+
+    }
     /**
      * @Method queryStock
      * @Desrciption 查询出页面上选择药品/材料所需要的参数

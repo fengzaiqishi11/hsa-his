@@ -1,11 +1,13 @@
 package cn.hsa.module.outpt.medictocare.entity;
 
 import cn.hsa.base.PageDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -88,6 +90,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 期望入住时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date hopeInTime;
     /**
      * 申请人ID
@@ -100,6 +104,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 申请时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date applyTime;
     /**
      * 是否入住（SF）
@@ -116,6 +122,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 实际入住时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date realityInTime;
     /**
      * 医养申请状态（YYSQZT：0待处理、1已接收、2已拒绝）
@@ -136,6 +144,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 就诊时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date visitTime;
     /**
      * 备注
@@ -152,6 +162,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 
 }

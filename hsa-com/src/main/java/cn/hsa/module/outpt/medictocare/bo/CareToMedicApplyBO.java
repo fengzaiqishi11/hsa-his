@@ -3,6 +3,8 @@ package cn.hsa.module.outpt.medictocare.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 
+import java.util.Map;
+
 /**
  * @author powersi
  * @create 2022-02-28 10:29
@@ -18,7 +20,7 @@ public interface CareToMedicApplyBO {
      * @date 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    PageDTO queryPage(MedicToCareDTO medicToCareDTO);
+    PageDTO queryCareToMedicPage(MedicToCareDTO medicToCareDTO);
 
 
     /**
@@ -29,7 +31,7 @@ public interface CareToMedicApplyBO {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<OutinInvoiceDO>
      **/
-    MedicToCareDTO getCareToMedicInfoById(MedicToCareDTO medicToCareDTO);
+    Map<String, Object> getCareToMedicInfoById(MedicToCareDTO medicToCareDTO);
 
     /**
      * @Menthod: insertMedicToCare()
@@ -40,5 +42,5 @@ public interface CareToMedicApplyBO {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    Boolean updateCareToMedic(MedicToCareDTO medicToCareDTO);
+    Boolean updateCareToMedic(Map<String, Object> map);
 }

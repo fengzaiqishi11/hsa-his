@@ -40,7 +40,7 @@ public class ReportConfigurationDO extends PageDO implements Serializable {
     /**
      * 是否上传 0-否 1-是
      */
-    private Boolean isUpload;
+    private String isUpload;
     /**
      * 自定义配置
      */

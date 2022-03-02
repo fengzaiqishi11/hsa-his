@@ -70,4 +70,34 @@ public class ReportBaseDataBOImpl extends HsafBO implements ReportBaseDataBO {
         return MapUtils.isEmpty(admdvsMap) ? "" : admdvsMap.get("admdvsName");
     }
 
+    @Override
+    public Map<String, String> getSysCode(String hospCode, String code) {
+        return reloadSysCodeRedisData(hospCode, code);
+    }
+
+    @Override
+    public String getSysCodeName(String hospCode, String regCode, String code, String value) {
+        Map<String, String> dictMap = getSysCode(hospCode, code);
+        return MapUtils.isEmpty(dictMap) ? "" : dictMap.get(value);
+    }
+
+    private Map<String, String> reloadSysCodeRedisData(String hospCode, String code) {
+        String key = "sys_code_" + hospCode + "_" + code.toLowerCase();
+        if (redisUtils.hasKey(key)) {
+            return JSONObject.parseObject(redisUtils.get(key), Map.class);
+        }
+
+        Map map = new HashMap(2);
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        Map<String, String> dictMap = insureDictService_consumer.querySysCodeByCode(map).getData();
+
+        if (MapUtils.isEmpty(dictMap)) {
+            log.error("系统字典不存在，请配置处理！");
+            throw new RuntimeException("系统字典不存在，请配置处理！");
+        }
+        redisUtils.set(key, JSONObject.toJSONString(dictMap));
+        return dictMap;
+    }
+
 }

@@ -12,7 +12,7 @@ import java.util.Map;
 public interface ReportBaseDataBO {
 
     /**
-     * 获取医保字典名称
+     * 获取医保字典
      *
      * @param hospCode 医院编码
      * @param regCode  医保注册编码
@@ -40,5 +40,24 @@ public interface ReportBaseDataBO {
      * @return
      */
     String getAdmdvsName(String hospCode, String admdvsCode);
+
+    /**
+     * 获取系统字典
+     *
+     * @param hospCode 医院编码
+     * @param code     类型编码
+     * @return
+     */
+    Map<String, String> getSysCode(String hospCode, String code);
+
+    /**
+     * 获取系统字典名称
+     *
+     * @param hospCode 医院编码
+     * @param code     类型编码
+     * @param value    字典值
+     * @return
+     */
+    String getSysCodeName(String hospCode, String regCode, String code, String value);
 
 }

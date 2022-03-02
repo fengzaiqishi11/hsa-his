@@ -157,4 +157,12 @@ public interface InsureDictBO {
      */
     Map<String, String> queryOneAdmdvsInfo(Map map);
 
+    /**
+     * 查询系统字典
+     *
+     * @param map
+     * @return
+     */
+    Map<String, String> querySysCodeByCode(Map map);
+
 }

@@ -229,4 +229,14 @@
         where hosp_code = #{hospCode} AND admdvs_code = #{admdvsCode}
     </select>
 
+    <select id="querySysCodeByCode" resultType="java.util.HashMap">
+        SELECT a.name, a.value
+        from sys_code b
+                 join sys_code_detail a
+                      on b.code = a.c_code and a.hosp_code = b.hosp_code and a.is_valid = '1'
+        where b.is_valid = '1'
+          and b.hosp_code = #{hospCode}
+          AND b.code = #{code}
+    </select>
+
 </mapper>

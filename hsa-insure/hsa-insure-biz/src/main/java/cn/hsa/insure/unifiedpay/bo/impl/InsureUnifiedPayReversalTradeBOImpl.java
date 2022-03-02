@@ -666,7 +666,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             baseInfoMap.put("ytyjj", new BigDecimal(0.00)); // 应退预交金
         } else {
             BigDecimal price = BigDecimalUtils.subtract(totalAdvance, psnCashPayBigDecimal);
-            baseInfoMap.put("ytyjj", price); // 应交预交金
+            baseInfoMap.put("ytyjj", price.setScale(2)); // 应交预交金
             baseInfoMap.put("ytyjjCN", numberToCN.number2CNMontrayUnit(price)); // 应交预交金
             baseInfoMap.put("yjyjjCN", "零元"); // 应退预交金
             baseInfoMap.put("yjyjj", new BigDecimal(0.00)); // 应退预交金
@@ -713,6 +713,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             BigDecimal pastFeeFund = handlerFeeFund(setldetail);
             map.put("pastFeeFund", pastFeeFund); // 离休基金
             pastFeeMap = handlerSpecialPastFee(sumInfoMapList);
+            fourPartMap.put("pastFeeFund",pastFeeFund);
         }
 
         /**
@@ -767,24 +768,30 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         } else if (isRemote && !jxSettle) {
             settleTitle = "湖南省社会医疗保险异地就医住院医疗费用结算单";
             medisnInfMap.put("settleTitle", settleTitle);
+            map.put("oneSettle", false);
         } else if (snRemote && !jxSettle) {
             settleTitle = "湖南省省内异地住院医疗费用结算单";
             medisnInfMap.put("settleTitle", settleTitle);
+            map.put("oneSettle", false);
         } else if (jxSettle) {
             settleTitle = "江西省医疗保障定点机构医疗费用结算单";
             medisnInfMap.put("settleTitle", settleTitle);
+            map.put("oneSettle", false);
         } else {
             map.put("oneSettle", false); //  如果符合一站式结算要去，前端打印一站式结算单
         }
         map.put("jxSettle", jxSettle);
+        map.put("snRemote", snRemote);
         map.put("isHospital", isHospital);
         map.put("isRemote", isRemote);
         medisnInfMap.put("medisnCode", insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码
         map.put("medisnInfMap", medisnInfMap); // 结算单第一部分数据
         map.put("insuplcAdmdvs", insuplcAdmdvs);
         map.put("mdtrtareaAdmvs", mdtrtareaAdmvs);
-        Map<String,Object> insureIndividualVisitDTOMap = JSONObject.parseObject(JSON.toJSONString(map.get("insureIndividualVisitDTO")));
-        map.put("insureIndividualVisitDTO",insureIndividualVisitDTOMap);
+        if(map.get("insureIndividualVisitDTO") != null){
+            Map<String,Object> insureIndividualVisitDTOMap = JSONObject.parseObject(JSON.toJSONString(map.get("insureIndividualVisitDTO")));
+            map.put("insureIndividualVisitDTOMap",insureIndividualVisitDTOMap);
+        }
         String json = JSONObject.toJSONString(map);
         System.out.println("----======" + json);
         return map;
@@ -1631,7 +1638,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         map.put("setlTime", MapUtils.get(setlInfoMap, "setl_time")); // 报销时间
         map.put("brdy", MapUtils.get(setlInfoMap, "brdy")); // 出生年月
         map.put("aae140", insureIndividualVisitDTO.getAae140()); // 险种
-        map.put("totalAdvance", insureIndividualVisitDTO.getTotalAdvance()); // 累计预交金
+        map.put("totalAdvance", insureIndividualVisitDTO.getTotalAdvance().setScale(2)); // 累计预交金
 
         if (insureIndividualVisitDTO.getTotalAdvance() == null || BigDecimalUtils.isZero(insureIndividualVisitDTO.getTotalAdvance())) {
             map.put("totalAdvanceCN", "零元"); // 累计预交金

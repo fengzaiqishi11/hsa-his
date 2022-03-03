@@ -8091,4 +8091,89 @@
         </if>
     </select>
 
+    <select id="queryZyFeeIncomeList" resultType="java.util.Map">
+        select
+        ifnull(ics.reality_price, ifnull(B.reality_price, 0)) as realityPrice,
+        ifnull(B.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        t.patient_code as patientCode,
+        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ),'其他') as patientType
+        from
+        inpt_settle A
+        inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+        inner join inpt_cost_settle ics on B.id = ics.cost_id
+        inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.is_settle = '1'
+        and B.settle_code = '2'
+        and A.status_code = '0'
+        /*开始日期*/
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+    </select>
+
+    <select id="queryMzFeeIncomeList" resultType="java.util.Map">
+        select
+        ifnull(B.reality_price, 0) as realityPrice,
+        ifnull(B.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        t.patient_code as patientCode,
+        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ),'其他') as patientType
+        from
+        outpt_settle A
+        inner join outpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
+        inner join outpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.is_settle = '1'
+        and B.settle_code = '2'
+        and A.status_code = '0'
+        /*开始日期*/
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+    </select>
+
+    <select id="queryMzRegisterIncomeList" resultType="java.util.Map">
+        select
+        ifnull(t.reality_price, 0) as realityPrice,
+        ifnull(t.bfc_id,'0') as bfcId,
+        ifnull((select name from base_finance_classify bfc where bfc.id = t.bfc_id and bfc.hosp_code = #{hospCode}
+        ),'其他')
+        as bfcName,
+        v.patient_code as patientCode,
+        ifnull((select name from sys_code_detail sc where sc.`value` = v.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ),'其他') as patientType
+        from
+        outpt_register_settle A
+        inner join outpt_register B on A.register_id = B.id and A.hosp_code = B.hosp_code and B.is_cancel = '0'
+        inner join outpt_register_detail t on t.hosp_code = b.hosp_code and t.register_id = B.id
+        inner join outpt_visit v on v.hosp_code = B.hosp_code and v.id = B.visit_id
+        where A.hosp_code = #{hospCode} and A.status_code = '0'
+        /*开始日期*/
+        <if test="startDate != null and startDate !='' ">
+            and A.settle_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != '' ">
+            and A.settle_time &lt;=STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+    </select>
+
 </mapper>

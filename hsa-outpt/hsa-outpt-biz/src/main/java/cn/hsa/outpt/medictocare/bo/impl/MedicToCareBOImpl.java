@@ -36,7 +36,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
     /**
      * 调用的url
      */
-    @Value("${medictocare.url}")
+    @Value("${caretomedic.url}")
     private String url;
 
     

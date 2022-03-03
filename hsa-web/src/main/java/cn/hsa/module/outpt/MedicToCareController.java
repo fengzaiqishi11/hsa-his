@@ -104,4 +104,10 @@ public class MedicToCareController extends BaseController {
         map.put("hospCode",userDTO.getHospCode());
         return medicToCareService_consumer.getMedicToCareInfoById(map);
     }
+    @PostMapping("/updateMedicToCare")
+    public WrapperResponse<Boolean> updateMedicToCare(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO userDTO = getSession(req, res);
+        map.put("hospCode",userDTO.getHospCode());
+        return  medicToCareService_consumer.updateMedicToCare(map);
+    }
 }

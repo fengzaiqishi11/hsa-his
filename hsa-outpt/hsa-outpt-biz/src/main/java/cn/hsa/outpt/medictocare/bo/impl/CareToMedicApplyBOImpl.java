@@ -3,12 +3,18 @@ package cn.hsa.outpt.medictocare.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.outpt.medictocare.bo.CareToMedicApplyBO;
+import cn.hsa.module.outpt.medictocare.bo.MedicToCareBO;
 import cn.hsa.module.outpt.medictocare.dao.MedicToCareDAO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.util.HttpConnectUtil;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,7 +33,13 @@ import java.util.Map;
 public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO {
 
     @Resource
-    MedicToCareDAO medicToCareDAO;
+    private MedicToCareDAO medicToCareDAO;
+    /**
+     * 调用的url
+     */
+    @Value("${medictocare.url}")
+    private String url;
+
     @Override
     public PageDTO queryCareToMedicPage(MedicToCareDTO medicToCareDTO) {
         PageHelper.startPage(medicToCareDTO.getPageNo(),medicToCareDTO.getPageSize());
@@ -91,4 +103,25 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         return paramap;
     }
 
+    //使用HTTP调用接口
+    private Map<String,Object> commonSendInfo(Map<String, Object> visitInfo){
+        Map httpParam = new HashMap();
+        //发送的数据
+        httpParam.put("visitInfo",visitInfo);
+        String json = JSONObject.toJSONString(httpParam);
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(this.url, json);
+        if (StringUtils.isEmpty(resultStr)){
+            throw new RuntimeException("失败！");
+        }
+        //获取回参
+        Map<String, Object> m = (Map) JSON.parse(resultStr);
+        String resultCode = MapUtils.get(m,"code","");
+        if (StringUtils.isEmpty(resultCode)){
+            throw new RuntimeException("调用医养接口无响应!");
+        }
+        if (!"1".equals(resultCode)){
+            throw new RuntimeException("调用医养接口错误,原因："+MapUtils.get(m,"message",""));
+        }
+        return m;
+    }
 }

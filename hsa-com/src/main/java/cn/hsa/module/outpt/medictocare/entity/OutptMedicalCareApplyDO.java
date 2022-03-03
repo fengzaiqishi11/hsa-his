@@ -116,6 +116,10 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
      */
     private String houseBed;
     /**
+     * 转诊主诉
+     */
+    private String referralMainSuit;
+    /**
      * 护理级别（HLJB）
      */
     private String nusreTypeCode;

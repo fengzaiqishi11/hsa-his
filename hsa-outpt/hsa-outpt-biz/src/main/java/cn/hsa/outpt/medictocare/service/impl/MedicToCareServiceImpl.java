@@ -81,6 +81,6 @@ public class MedicToCareServiceImpl implements MedicToCareService {
 
     @Override
     public WrapperResponse<Boolean> updateMedicToCare(Map map) {
-        return null;
+        return WrapperResponse.success(medicToCareBO.updateMedicToCare(map));
     }
 }

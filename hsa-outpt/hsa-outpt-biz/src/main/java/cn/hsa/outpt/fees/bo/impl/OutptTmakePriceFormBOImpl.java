@@ -4238,6 +4238,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      **/
     @Override
     public Boolean updateCreditStatus(OutptSettleDTO outptSettleDTO){
+        outptSettleDAO.updateRegisterCreditStatus(outptSettleDTO);
        int count = outptSettleDAO.updateCreditStatus(outptSettleDTO);
        return count>0;
     }

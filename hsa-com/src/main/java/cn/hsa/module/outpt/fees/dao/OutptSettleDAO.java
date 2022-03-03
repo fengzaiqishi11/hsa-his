@@ -273,4 +273,15 @@ public interface OutptSettleDAO {
      **/
     int updateCreditStatus(OutptSettleDTO outptSettleDTO);
 
+    /**
+     * @Menthod: updateRegisterCreditStatus()
+     * @Desrciption: 更新挂号补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/3 15：46
+     * @Return: int
+     **/
+    int updateRegisterCreditStatus(OutptSettleDTO outptSettleDTO);
+
 }

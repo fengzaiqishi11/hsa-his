@@ -199,5 +199,8 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         private String bka006Name; // 病人类型
         private String visitCode; // 就诊方式
         private String personalNo; // 个人编号
+        private String type; // 类型： 1 门诊；0 挂号
+        private String printStatus;
+        private String registerId;
 
 }

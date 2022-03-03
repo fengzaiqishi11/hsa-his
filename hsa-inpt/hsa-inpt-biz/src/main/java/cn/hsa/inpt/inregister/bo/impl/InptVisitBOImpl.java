@@ -1503,7 +1503,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             advancePayDTO.setId(SnowflakeUtils.getId());
             advancePayDTO.setHospCode(inptVisitDTO.getHospCode());
             advancePayDTO.setVisitId(inptVisitDTO.getId());
-            advancePayDTO.setApOrderNo(getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.YJJ));
+            //advancePayDTO.setApOrderNo(getOrderNo(inptVisitDTO.getHospCode(), Constants.ORDERRULE.YJJ));
             advancePayDTO.setPrice(inptVisitDTO.getPrice());
             advancePayDTO.setIsSettle(Constants.SF.F);
             advancePayDTO.setStatusCode(Constants.ZTBZ.ZC);

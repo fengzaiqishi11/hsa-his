@@ -42,4 +42,32 @@ public class MedicalCareInterfServiceImpl extends HsafService implements Medical
     public WrapperResponse<Map<String, Object>> getVisitInfoRecord(Map<String, Object> map) {
         return WrapperResponse.success(medicalCareInterfBO.getVisitInfoRecord(map));
     }
+
+    /**
+     * @Menthod: insertCare2Medic
+     * @Desrciption: 插入养转医申请数据，调用本地插入医转养的申请接口
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:46
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> insertCare2Medic(Map<String, Object> map) {
+        return WrapperResponse.success(medicalCareInterfBO.insertCare2Medic(map));
+    }
+
+    /**
+     * @Menthod: updateApplyStatus
+     * @Desrciption: 更新医转养申请状态
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:48
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateApplyStatus(Map<String, Object> map) {
+        return WrapperResponse.success(medicalCareInterfBO.updateApplyStatus(map));
+    }
 }

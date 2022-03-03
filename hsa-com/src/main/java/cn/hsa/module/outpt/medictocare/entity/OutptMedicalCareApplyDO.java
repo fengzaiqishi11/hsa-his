@@ -72,6 +72,10 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
      */
     private String changeType;
     /**
+     * 养转医申请id
+     */
+    private String careToMedicId;
+    /**
      * 患者类别（1门诊、2住院）
      */
     private String visitType;

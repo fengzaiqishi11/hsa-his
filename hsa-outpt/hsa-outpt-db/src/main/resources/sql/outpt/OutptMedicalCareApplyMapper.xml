@@ -14,6 +14,7 @@
         <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
         <result property="changeType" column="change_type" jdbcType="VARCHAR"/>
+        <result property="careToMedicId" column="care_to_medic_id" jdbcType="VARCHAR"/>
         <result property="visitType" column="visit_type" jdbcType="VARCHAR"/>
         <result property="applyDeptId" column="apply_dept_id" jdbcType="VARCHAR"/>
         <result property="applyCompanyCode" column="apply_company_code" jdbcType="VARCHAR"/>
@@ -24,6 +25,7 @@
         <result property="applyTime" column="apply_time" jdbcType="TIMESTAMP"/>
         <result property="isHouse" column="is_house" jdbcType="VARCHAR"/>
         <result property="houseBed" column="house_bed" jdbcType="VARCHAR"/>
+        <result property="referralMainSuit" column="referral_main_suit" jdbcType="VARCHAR"/>
         <result property="nusreTypeCode" column="nusre_type_code" jdbcType="VARCHAR"/>
         <result property="realityInTime" column="reality_in_time" jdbcType="TIMESTAMP"/>
         <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
@@ -36,379 +38,331 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+    <insert id="insertMedicDate">
+        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
 
-<!--    &lt;!&ndash;查询单个&ndash;&gt;-->
-<!--    <select id="queryById" resultMap="OutptMedicalCareApplyMap">-->
-<!--        select-->
-<!--          id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time-->
-<!--        from outpt_medical_care_apply-->
-<!--        where id = #{id}-->
-<!--    </select>-->
+    </insert>
+    <insert id="insertOutPtInfo">
+        insert into outpt_visit
+        (
+            id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
+            birthday, marry_code, nation_code, cert_code, cert_no, phone, now_address, visit_no, visit_code, patient_code,
+            preferential_type_id, source_tj_code, source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+            insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
+            pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time,occupation_code,contact_name
+        )
+        values
+        (
+            #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
+            #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{nowAddress}, #{visitNo}, #{visitCode}, #{patientCode},
+            #{preferentialTypeId}, #{sourceTjCode}, #{sourceTjRemark}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+            #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
+            #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime},#{occupationCode},#{contactName}
+        )  on duplicate key update pym=#{pym};
+    </insert>
+    <select id="queryMZPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
+        SELECT  id as visitId,name,cert_no as certNo ,dept_id as deptId,dept_name as deptName,"1" as visitType
+        from outpt_visit
+        where 
+            hosp_code = #{hospCode}
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="visitStartTime != null and visitStartTime != ''">
+            and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{visitStartTime}
+        </if>
+        <if test="visitEndTime != null and visitEndTime != ''">
+            and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{visitEndTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
+        </if>
+        order by crte_time
+    </select>
+    <select id="queryZYPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
+        SELECT id as visitId,name ,cert_no as certNo ,in_dept_id as deptId,in_dept_name as deptName ,"2" as visitType
+        from inpt_visit
+        where
+            hosp_code = #{hospCode}
+        <if test="certNo != null and certNo != ''">
+            and cert_no = #{certNo}
+        </if>
+        <if test="name != null and name != ''">
+            and name = #{name}
+        </if>
+        <if test="visitStartTime != null">
+            and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{visitStartTime}
+        </if>
+        <if test="visitEndTime != null">
+            and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{visitEndTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
+        </if>
+        order by crte_time
+    </select>
+    <select id="queryVisitById" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
+        SELECT
+            a.id as visitId,
+            a.name,
+            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  genderCode,
+            a.age,
+            a.cert_no as certNo,
+            a.phone,
+            '1' as changeType,
+            a.dept_id as deptId,
+            a.dept_name as deptName
+        FROM outpt_visit a
+        where a.hosp_code = #{hospCode}
+          and a.id = #{visitId}
 
-<!--    &lt;!&ndash;查询指定行数据&ndash;&gt;-->
-<!--    <select id="queryAllByLimit" resultMap="OutptMedicalCareApplyMap">-->
-<!--        select-->
-<!--          id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time-->
-<!--        from outpt_medical_care_apply-->
-<!--        <where>-->
-<!--            <if test="id != null and id != ''">-->
-<!--                and id = #{id}-->
-<!--            </if>-->
-<!--            <if test="hospCode != null and hospCode != ''">-->
-<!--                and hosp_code = #{hospCode}-->
-<!--            </if>-->
-<!--            <if test="profileId != null and profileId != ''">-->
-<!--                and profile_id = #{profileId}-->
-<!--            </if>-->
-<!--            <if test="visitId != null and visitId != ''">-->
-<!--                and visit_id = #{visitId}-->
-<!--            </if>-->
-<!--            <if test="name != null and name != ''">-->
-<!--                and name = #{name}-->
-<!--            </if>-->
-<!--            <if test="genderCode != null and genderCode != ''">-->
-<!--                and gender_code = #{genderCode}-->
-<!--            </if>-->
-<!--            <if test="age != null">-->
-<!--                and age = #{age}-->
-<!--            </if>-->
-<!--            <if test="ageUnitCode != null and ageUnitCode != ''">-->
-<!--                and age_unit_code = #{ageUnitCode}-->
-<!--            </if>-->
-<!--            <if test="certNo != null and certNo != ''">-->
-<!--                and cert_no = #{certNo}-->
-<!--            </if>-->
-<!--            <if test="phone != null and phone != ''">-->
-<!--                and phone = #{phone}-->
-<!--            </if>-->
-<!--            <if test="changeType != null and changeType != ''">-->
-<!--                and change_type = #{changeType}-->
-<!--            </if>-->
-<!--            <if test="visitType != null and visitType != ''">-->
-<!--                and visit_type = #{visitType}-->
-<!--            </if>-->
-<!--            <if test="applyDeptId != null and applyDeptId != ''">-->
-<!--                and apply_dept_id = #{applyDeptId}-->
-<!--            </if>-->
-<!--            <if test="applyCompanyCode != null and applyCompanyCode != ''">-->
-<!--                and apply_company_code = #{applyCompanyCode}-->
-<!--            </if>-->
-<!--            <if test="applyCompanyName != null and applyCompanyName != ''">-->
-<!--                and apply_company_name = #{applyCompanyName}-->
-<!--            </if>-->
-<!--            <if test="hopeInTime != null">-->
-<!--                and hope_in_time = #{hopeInTime}-->
-<!--            </if>-->
-<!--            <if test="applyId != null and applyId != ''">-->
-<!--                and apply_id = #{applyId}-->
-<!--            </if>-->
-<!--            <if test="applyName != null and applyName != ''">-->
-<!--                and apply_name = #{applyName}-->
-<!--            </if>-->
-<!--            <if test="applyTime != null">-->
-<!--                and apply_time = #{applyTime}-->
-<!--            </if>-->
-<!--            <if test="isHouse != null and isHouse != ''">-->
-<!--                and is_house = #{isHouse}-->
-<!--            </if>-->
-<!--            <if test="houseBed != null and houseBed != ''">-->
-<!--                and house_bed = #{houseBed}-->
-<!--            </if>-->
-<!--            <if test="nusreTypeCode != null and nusreTypeCode != ''">-->
-<!--                and nusre_type_code = #{nusreTypeCode}-->
-<!--            </if>-->
-<!--            <if test="realityInTime != null">-->
-<!--                and reality_in_time = #{realityInTime}-->
-<!--            </if>-->
-<!--            <if test="statusCode != null and statusCode != ''">-->
-<!--                and status_code = #{statusCode}-->
-<!--            </if>-->
-<!--            <if test="visitDeptId != null and visitDeptId != ''">-->
-<!--                and visit_dept_id = #{visitDeptId}-->
-<!--            </if>-->
-<!--            <if test="visitDoctorId != null and visitDoctorId != ''">-->
-<!--                and visit_doctor_id = #{visitDoctorId}-->
-<!--            </if>-->
-<!--            <if test="visitDoctorName != null and visitDoctorName != ''">-->
-<!--                and visit_doctor_name = #{visitDoctorName}-->
-<!--            </if>-->
-<!--            <if test="visitTime != null">-->
-<!--                and visit_time = #{visitTime}-->
-<!--            </if>-->
-<!--            <if test="remark != null and remark != ''">-->
-<!--                and remark = #{remark}-->
-<!--            </if>-->
-<!--            <if test="crteId != null and crteId != ''">-->
-<!--                and crte_id = #{crteId}-->
-<!--            </if>-->
-<!--            <if test="crteName != null and crteName != ''">-->
-<!--                and crte_name = #{crteName}-->
-<!--            </if>-->
-<!--            <if test="crteTime != null">-->
-<!--                and crte_time = #{crteTime}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--        limit #{pageable.offset}, #{pageable.pageSize}-->
-<!--    </select>-->
+        union all
 
-<!--    &lt;!&ndash;统计总行数&ndash;&gt;-->
-<!--    <select id="count" resultType="java.lang.Long">-->
-<!--        select count(1)-->
-<!--        from outpt_medical_care_apply-->
-<!--        <where>-->
-<!--            <if test="id != null and id != ''">-->
-<!--                and id = #{id}-->
-<!--            </if>-->
-<!--            <if test="hospCode != null and hospCode != ''">-->
-<!--                and hosp_code = #{hospCode}-->
-<!--            </if>-->
-<!--            <if test="profileId != null and profileId != ''">-->
-<!--                and profile_id = #{profileId}-->
-<!--            </if>-->
-<!--            <if test="visitId != null and visitId != ''">-->
-<!--                and visit_id = #{visitId}-->
-<!--            </if>-->
-<!--            <if test="name != null and name != ''">-->
-<!--                and name = #{name}-->
-<!--            </if>-->
-<!--            <if test="genderCode != null and genderCode != ''">-->
-<!--                and gender_code = #{genderCode}-->
-<!--            </if>-->
-<!--            <if test="age != null">-->
-<!--                and age = #{age}-->
-<!--            </if>-->
-<!--            <if test="ageUnitCode != null and ageUnitCode != ''">-->
-<!--                and age_unit_code = #{ageUnitCode}-->
-<!--            </if>-->
-<!--            <if test="certNo != null and certNo != ''">-->
-<!--                and cert_no = #{certNo}-->
-<!--            </if>-->
-<!--            <if test="phone != null and phone != ''">-->
-<!--                and phone = #{phone}-->
-<!--            </if>-->
-<!--            <if test="changeType != null and changeType != ''">-->
-<!--                and change_type = #{changeType}-->
-<!--            </if>-->
-<!--            <if test="visitType != null and visitType != ''">-->
-<!--                and visit_type = #{visitType}-->
-<!--            </if>-->
-<!--            <if test="applyDeptId != null and applyDeptId != ''">-->
-<!--                and apply_dept_id = #{applyDeptId}-->
-<!--            </if>-->
-<!--            <if test="applyCompanyCode != null and applyCompanyCode != ''">-->
-<!--                and apply_company_code = #{applyCompanyCode}-->
-<!--            </if>-->
-<!--            <if test="applyCompanyName != null and applyCompanyName != ''">-->
-<!--                and apply_company_name = #{applyCompanyName}-->
-<!--            </if>-->
-<!--            <if test="hopeInTime != null">-->
-<!--                and hope_in_time = #{hopeInTime}-->
-<!--            </if>-->
-<!--            <if test="applyId != null and applyId != ''">-->
-<!--                and apply_id = #{applyId}-->
-<!--            </if>-->
-<!--            <if test="applyName != null and applyName != ''">-->
-<!--                and apply_name = #{applyName}-->
-<!--            </if>-->
-<!--            <if test="applyTime != null">-->
-<!--                and apply_time = #{applyTime}-->
-<!--            </if>-->
-<!--            <if test="isHouse != null and isHouse != ''">-->
-<!--                and is_house = #{isHouse}-->
-<!--            </if>-->
-<!--            <if test="houseBed != null and houseBed != ''">-->
-<!--                and house_bed = #{houseBed}-->
-<!--            </if>-->
-<!--            <if test="nusreTypeCode != null and nusreTypeCode != ''">-->
-<!--                and nusre_type_code = #{nusreTypeCode}-->
-<!--            </if>-->
-<!--            <if test="realityInTime != null">-->
-<!--                and reality_in_time = #{realityInTime}-->
-<!--            </if>-->
-<!--            <if test="statusCode != null and statusCode != ''">-->
-<!--                and status_code = #{statusCode}-->
-<!--            </if>-->
-<!--            <if test="visitDeptId != null and visitDeptId != ''">-->
-<!--                and visit_dept_id = #{visitDeptId}-->
-<!--            </if>-->
-<!--            <if test="visitDoctorId != null and visitDoctorId != ''">-->
-<!--                and visit_doctor_id = #{visitDoctorId}-->
-<!--            </if>-->
-<!--            <if test="visitDoctorName != null and visitDoctorName != ''">-->
-<!--                and visit_doctor_name = #{visitDoctorName}-->
-<!--            </if>-->
-<!--            <if test="visitTime != null">-->
-<!--                and visit_time = #{visitTime}-->
-<!--            </if>-->
-<!--            <if test="remark != null and remark != ''">-->
-<!--                and remark = #{remark}-->
-<!--            </if>-->
-<!--            <if test="crteId != null and crteId != ''">-->
-<!--                and crte_id = #{crteId}-->
-<!--            </if>-->
-<!--            <if test="crteName != null and crteName != ''">-->
-<!--                and crte_name = #{crteName}-->
-<!--            </if>-->
-<!--            <if test="crteTime != null">-->
-<!--                and crte_time = #{crteTime}-->
-<!--            </if>-->
-<!--        </where>-->
-<!--    </select>-->
+        SELECT
+            a.id as visitId,
+            a.name,
+            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  genderCode,
+            a.age,
+            a.cert_no,
+            a.phone,
+            '2' as changeType,
+            a.in_dept_id as deptId,
+            a.in_dept_name as deptName
+        FROM inpt_visit a
+        where a.hosp_code = #{hospCode}
+          and a.id = #{visitId}
+    </select>
+    <!--查询指定行数据-->
+    <select id="queryMedicToCareInfoPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
+        select
+        id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
+        from outpt_medical_care_apply
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="profileId != null and profileId != ''">
+                and profile_id = #{profileId}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="name != null and name != ''">
+                and name = #{name}
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                and gender_code = #{genderCode}
+            </if>
+            <if test="age != null">
+                and age = #{age}
+            </if>
+            <if test="referralMainSuit != null and referralMainSuit != ''">
+                and referral_main_suit = #{referralMainSuit}
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                and age_unit_code = #{ageUnitCode}
+            </if>
+            <if test="certNo != null and certNo != ''">
+                and cert_no = #{certNo}
+            </if>
+            <if test="phone != null and phone != ''">
+                and phone = #{phone}
+            </if>
+            <if test="changeType != null and changeType != ''">
+                and change_type = #{changeType}
+            </if>
+            <if test="visitType != null and visitType != ''">
+                and visit_type = #{visitType}
+            </if>
+            <if test="applyDeptId != null and applyDeptId != ''">
+                and apply_dept_id = #{applyDeptId}
+            </if>
+            <if test="applyCompanyCode != null and applyCompanyCode != ''">
+                and apply_company_code = #{applyCompanyCode}
+            </if>
+            <if test="applyCompanyName != null and applyCompanyName != ''">
+                and apply_company_name = #{applyCompanyName}
+            </if>
+            <if test="hopeInTime != null">
+                and hope_in_time = #{hopeInTime}
+            </if>
+            <if test="applyId != null and applyId != ''">
+                and apply_id = #{applyId}
+            </if>
+            <if test="applyName != null and applyName != ''">
+                and apply_name = #{applyName}
+            </if>
+            <if test="applyTime != null">
+                and apply_time = #{applyTime}
+            </if>
+            <if test="isHouse != null and isHouse != ''">
+                and is_house = #{isHouse}
+            </if>
+            <if test="houseBed != null and houseBed != ''">
+                and house_bed = #{houseBed}
+            </if>
+            <if test="nusreTypeCode != null and nusreTypeCode != ''">
+                and nusre_type_code = #{nusreTypeCode}
+            </if>
+            <if test="realityInTime != null">
+                and reality_in_time = #{realityInTime}
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                and status_code = #{statusCode}
+            </if>
+            <if test="visitDeptId != null and visitDeptId != ''">
+                and visit_dept_id = #{visitDeptId}
+            </if>
+            <if test="visitDoctorId != null and visitDoctorId != ''">
+                and visit_doctor_id = #{visitDoctorId}
+            </if>
+            <if test="visitDoctorName != null and visitDoctorName != ''">
+                and visit_doctor_name = #{visitDoctorName}
+            </if>
+            <if test="visitTime != null">
+                and visit_time = #{visitTime}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
+            </if>
+            <if test="visitStartTime != null">
+                and crte_time &gt;=#{visitStartTime}
+            </if>
+            <if test="visitEndTime != null">
+                and crte_time &lt;=#{visitEndTime}
+            </if>
+        </where>
+        order by apply_time
+    </select>
+    <select id="getMedicToCareInfoById" resultMap="OutptMedicalCareApplyMap">
+            select
+                id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, referral_main_suit, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
+            from outpt_medical_care_apply
+            where id = #{id}
+    </select>
 
-<!--    &lt;!&ndash;新增所有列&ndash;&gt;-->
-<!--    <insert id="insert" keyProperty="id" useGeneratedKeys="true">-->
-<!--        insert into outpt_medical_care_apply(hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)-->
-<!--        values (#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})-->
-<!--    </insert>-->
-
-<!--    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">-->
-<!--        insert into outpt_medical_care_apply(hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)-->
-<!--        values-->
-<!--        <foreach collection="entities" item="entity" separator=",">-->
-<!--        (#{entity.hospCode}, #{entity.profileId}, #{entity.visitId}, #{entity.name}, #{entity.genderCode}, #{entity.age}, #{entity.ageUnitCode}, #{entity.certNo}, #{entity.phone}, #{entity.changeType}, #{entity.visitType}, #{entity.applyDeptId}, #{entity.applyCompanyCode}, #{entity.applyCompanyName}, #{entity.hopeInTime}, #{entity.applyId}, #{entity.applyName}, #{entity.applyTime}, #{entity.isHouse}, #{entity.houseBed}, #{entity.nusreTypeCode}, #{entity.realityInTime}, #{entity.statusCode}, #{entity.visitDeptId}, #{entity.visitDoctorId}, #{entity.visitDoctorName}, #{entity.visitTime}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime})-->
-<!--        </foreach>-->
-<!--    </insert>-->
-
-<!--    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">-->
-<!--        insert into outpt_medical_care_apply(hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)-->
-<!--        values-->
-<!--        <foreach collection="entities" item="entity" separator=",">-->
-<!--            (#{entity.hospCode}, #{entity.profileId}, #{entity.visitId}, #{entity.name}, #{entity.genderCode}, #{entity.age}, #{entity.ageUnitCode}, #{entity.certNo}, #{entity.phone}, #{entity.changeType}, #{entity.visitType}, #{entity.applyDeptId}, #{entity.applyCompanyCode}, #{entity.applyCompanyName}, #{entity.hopeInTime}, #{entity.applyId}, #{entity.applyName}, #{entity.applyTime}, #{entity.isHouse}, #{entity.houseBed}, #{entity.nusreTypeCode}, #{entity.realityInTime}, #{entity.statusCode}, #{entity.visitDeptId}, #{entity.visitDoctorId}, #{entity.visitDoctorName}, #{entity.visitTime}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime})-->
-<!--        </foreach>-->
-<!--        on duplicate key update-->
-<!--        hosp_code = values(hosp_code),-->
-<!--        profile_id = values(profile_id),-->
-<!--        visit_id = values(visit_id),-->
-<!--        name = values(name),-->
-<!--        gender_code = values(gender_code),-->
-<!--        age = values(age),-->
-<!--        age_unit_code = values(age_unit_code),-->
-<!--        cert_no = values(cert_no),-->
-<!--        phone = values(phone),-->
-<!--        change_type = values(change_type),-->
-<!--        visit_type = values(visit_type),-->
-<!--        apply_dept_id = values(apply_dept_id),-->
-<!--        apply_company_code = values(apply_company_code),-->
-<!--        apply_company_name = values(apply_company_name),-->
-<!--        hope_in_time = values(hope_in_time),-->
-<!--        apply_id = values(apply_id),-->
-<!--        apply_name = values(apply_name),-->
-<!--        apply_time = values(apply_time),-->
-<!--        is_house = values(is_house),-->
-<!--        house_bed = values(house_bed),-->
-<!--        nusre_type_code = values(nusre_type_code),-->
-<!--        reality_in_time = values(reality_in_time),-->
-<!--        status_code = values(status_code),-->
-<!--        visit_dept_id = values(visit_dept_id),-->
-<!--        visit_doctor_id = values(visit_doctor_id),-->
-<!--        visit_doctor_name = values(visit_doctor_name),-->
-<!--        visit_time = values(visit_time),-->
-<!--        remark = values(remark),-->
-<!--        crte_id = values(crte_id),-->
-<!--        crte_name = values(crte_name),-->
-<!--        crte_time = values(crte_time)-->
-<!--    </insert>-->
-
-<!--    &lt;!&ndash;通过主键修改数据&ndash;&gt;-->
-<!--    <update id="update">-->
-<!--        update outpt_medical_care_apply-->
-<!--        <set>-->
-<!--            <if test="hospCode != null and hospCode != ''">-->
-<!--                hosp_code = #{hospCode},-->
-<!--            </if>-->
-<!--            <if test="profileId != null and profileId != ''">-->
-<!--                profile_id = #{profileId},-->
-<!--            </if>-->
-<!--            <if test="visitId != null and visitId != ''">-->
-<!--                visit_id = #{visitId},-->
-<!--            </if>-->
-<!--            <if test="name != null and name != ''">-->
-<!--                name = #{name},-->
-<!--            </if>-->
-<!--            <if test="genderCode != null and genderCode != ''">-->
-<!--                gender_code = #{genderCode},-->
-<!--            </if>-->
-<!--            <if test="age != null">-->
-<!--                age = #{age},-->
-<!--            </if>-->
-<!--            <if test="ageUnitCode != null and ageUnitCode != ''">-->
-<!--                age_unit_code = #{ageUnitCode},-->
-<!--            </if>-->
-<!--            <if test="certNo != null and certNo != ''">-->
-<!--                cert_no = #{certNo},-->
-<!--            </if>-->
-<!--            <if test="phone != null and phone != ''">-->
-<!--                phone = #{phone},-->
-<!--            </if>-->
-<!--            <if test="changeType != null and changeType != ''">-->
-<!--                change_type = #{changeType},-->
-<!--            </if>-->
-<!--            <if test="visitType != null and visitType != ''">-->
-<!--                visit_type = #{visitType},-->
-<!--            </if>-->
-<!--            <if test="applyDeptId != null and applyDeptId != ''">-->
-<!--                apply_dept_id = #{applyDeptId},-->
-<!--            </if>-->
-<!--            <if test="applyCompanyCode != null and applyCompanyCode != ''">-->
-<!--                apply_company_code = #{applyCompanyCode},-->
-<!--            </if>-->
-<!--            <if test="applyCompanyName != null and applyCompanyName != ''">-->
-<!--                apply_company_name = #{applyCompanyName},-->
-<!--            </if>-->
-<!--            <if test="hopeInTime != null">-->
-<!--                hope_in_time = #{hopeInTime},-->
-<!--            </if>-->
-<!--            <if test="applyId != null and applyId != ''">-->
-<!--                apply_id = #{applyId},-->
-<!--            </if>-->
-<!--            <if test="applyName != null and applyName != ''">-->
-<!--                apply_name = #{applyName},-->
-<!--            </if>-->
-<!--            <if test="applyTime != null">-->
-<!--                apply_time = #{applyTime},-->
-<!--            </if>-->
-<!--            <if test="isHouse != null and isHouse != ''">-->
-<!--                is_house = #{isHouse},-->
-<!--            </if>-->
-<!--            <if test="houseBed != null and houseBed != ''">-->
-<!--                house_bed = #{houseBed},-->
-<!--            </if>-->
-<!--            <if test="nusreTypeCode != null and nusreTypeCode != ''">-->
-<!--                nusre_type_code = #{nusreTypeCode},-->
-<!--            </if>-->
-<!--            <if test="realityInTime != null">-->
-<!--                reality_in_time = #{realityInTime},-->
-<!--            </if>-->
-<!--            <if test="statusCode != null and statusCode != ''">-->
-<!--                status_code = #{statusCode},-->
-<!--            </if>-->
-<!--            <if test="visitDeptId != null and visitDeptId != ''">-->
-<!--                visit_dept_id = #{visitDeptId},-->
-<!--            </if>-->
-<!--            <if test="visitDoctorId != null and visitDoctorId != ''">-->
-<!--                visit_doctor_id = #{visitDoctorId},-->
-<!--            </if>-->
-<!--            <if test="visitDoctorName != null and visitDoctorName != ''">-->
-<!--                visit_doctor_name = #{visitDoctorName},-->
-<!--            </if>-->
-<!--            <if test="visitTime != null">-->
-<!--                visit_time = #{visitTime},-->
-<!--            </if>-->
-<!--            <if test="remark != null and remark != ''">-->
-<!--                remark = #{remark},-->
-<!--            </if>-->
-<!--            <if test="crteId != null and crteId != ''">-->
-<!--                crte_id = #{crteId},-->
-<!--            </if>-->
-<!--            <if test="crteName != null and crteName != ''">-->
-<!--                crte_name = #{crteName},-->
-<!--            </if>-->
-<!--            <if test="crteTime != null">-->
-<!--                crte_time = #{crteTime},-->
-<!--            </if>-->
-<!--        </set>-->
-<!--        where id = #{id}-->
-<!--    </update>-->
+    <!--通过主键修改数据-->
+    <update id="updateMedicToCare">
+        update outpt_medical_care_apply
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                profile_id = #{profileId},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode},
+            </if>
+            <if test="age != null">
+                age = #{age},
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                age_unit_code = #{ageUnitCode},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no = #{certNo},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone},
+            </if>
+            <if test="changeType != null and changeType != ''">
+                change_type = #{changeType},
+            </if>
+            <if test="visitType != null and visitType != ''">
+                visit_type = #{visitType},
+            </if>
+            <if test="referralMainSuit != null and referralMainSuit != ''">
+                referral_main_suit = #{referralMainSuit},
+            </if>
+            <if test="applyDeptId != null and applyDeptId != ''">
+                apply_dept_id = #{applyDeptId},
+            </if>
+            <if test="applyCompanyCode != null and applyCompanyCode != ''">
+                apply_company_code = #{applyCompanyCode},
+            </if>
+            <if test="applyCompanyName != null and applyCompanyName != ''">
+                apply_company_name = #{applyCompanyName},
+            </if>
+            <if test="hopeInTime != null">
+                hope_in_time = #{hopeInTime},
+            </if>
+            <if test="applyId != null and applyId != ''">
+                apply_id = #{applyId},
+            </if>
+            <if test="applyName != null and applyName != ''">
+                apply_name = #{applyName},
+            </if>
+            <if test="applyTime != null">
+                apply_time = #{applyTime},
+            </if>
+            <if test="isHouse != null and isHouse != ''">
+                is_house = #{isHouse},
+            </if>
+            <if test="houseBed != null and houseBed != ''">
+                house_bed = #{houseBed},
+            </if>
+            <if test="nusreTypeCode != null and nusreTypeCode != ''">
+                nusre_type_code = #{nusreTypeCode},
+            </if>
+            <if test="realityInTime != null">
+                reality_in_time = #{realityInTime},
+            </if>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+            <if test="visitDeptId != null and visitDeptId != ''">
+                visit_dept_id = #{visitDeptId},
+            </if>
+            <if test="visitDoctorId != null and visitDoctorId != ''">
+                visit_doctor_id = #{visitDoctorId},
+            </if>
+            <if test="visitDoctorName != null and visitDoctorName != ''">
+                visit_doctor_name = #{visitDoctorName},
+            </if>
+            <if test="visitTime != null">
+                visit_time = #{visitTime},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{apply_id}
+    </update>
 
 <!--    &lt;!&ndash;通过主键删除&ndash;&gt;-->
 <!--    <delete id="deleteById">-->

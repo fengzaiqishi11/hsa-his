@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.medictocare.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 
+import java.util.Map;
 
 
 /**
@@ -31,7 +32,7 @@ public interface MedicToCareBO {
      * @Date: 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    PageDTO queryMedicToCareInfoPage(MedicToCareDTO medicToCareDTO);
+    PageDTO queryHospitalPatientInfoPage(MedicToCareDTO medicToCareDTO);
 
     /**
      * @Menthod getMedicToCareInfoById()
@@ -41,7 +42,7 @@ public interface MedicToCareBO {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<OutinInvoiceDO>
      **/
-    MedicToCareDTO getMedicToCareInfoById(MedicToCareDTO medicToCareDTO);
+    Map<String, Object>  getMedicToCareInfoById(Map<String, Object> map);
 
     /**
      * @Menthod: queryHospitalPatientInfoPage()
@@ -52,7 +53,7 @@ public interface MedicToCareBO {
      * @Date: 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    PageDTO queryHospitalPatientInfoPage(MedicToCareDTO medicToCareDTO);
+    PageDTO queryMedicToCareInfoPage(MedicToCareDTO medicToCareDTO);
     /**
      * @Menthod: insertMedicToCare()
      * @Desrciption: 医转养申请
@@ -72,5 +73,5 @@ public interface MedicToCareBO {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    Boolean updateMedicToCare(MedicToCareDTO medicToCareDTO);
+    Boolean updateMedicToCare(Map<String, Object> map);
 }

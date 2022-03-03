@@ -175,4 +175,13 @@ public interface InsureDictService {
      */
     WrapperResponse<Map<String, String>> queryOneAdmdvsInfo(Map map);
 
+    /**
+     * 查询系统字典
+     *
+     * @param map
+     * @return
+     */
+    WrapperResponse<Map<String, String>> querySysCodeByCode(Map map);
+
+
 }

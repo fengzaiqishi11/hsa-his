@@ -320,6 +320,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDTO.setHospCode(outptMedicalRecordDTO.getHospCode());
         outptVisitDTO.setIsFoodBorne(outptMedicalRecordDTO.getIsFoodBorne());
         outptDoctorPrescribeDAO.updateIsFoodBorne(outptVisitDTO);
+        buildMedicalRecordDiagnose(outptMedicalRecordDTO);
         //判断是否新增
         if(outptMedicalRecordDTO == null || StringUtils.isEmpty(outptMedicalRecordDTO.getId())){
             //获取主键
@@ -4119,5 +4120,78 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         sysParamMap.put("code", requestName); // 是否使用门诊中医症候
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysParamMap).getData();
         return sysParameterDTO;
+    }
+
+    public void buildMedicalRecordDiagnose(OutptMedicalRecordDTO outptMedicalRecordDTO){
+        // 门诊中医症候 lly 2022-3-03 start
+        SysParameterDTO sysParameterDTO = getSysParameterDTO(outptMedicalRecordDTO.getHospCode(),"IS_OPEN_MZZY");
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = new ArrayList<>();
+        if (sysParameterDTO!=null && "1".equals(sysParameterDTO.getValue())) {
+            // 中医疾病id
+            String tcmDiseaseIds = outptMedicalRecordDTO.getTcmDiseaseId();
+            // 中医症候id
+            String tcmSyndromesIds = outptMedicalRecordDTO.getTcmSyndromesId();
+            List<BaseDiseaseDTO> tcmSyndromesBaseDiseaseDTOS = null;
+            if (StringUtils.isNotEmpty(tcmDiseaseIds)) {
+                //获取诊断信息
+                OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
+                outptPrescribeDTO.setHospCode(outptMedicalRecordDTO.getHospCode());
+                outptPrescribeDTO.setVisitId(outptMedicalRecordDTO.getVisitId());
+                List<OutptDiagnoseDTO> yjzOutptDiagnoseDTOList = outptDoctorPrescribeDAO.getOutptDiagnose(outptPrescribeDTO);
+                // 获取中医诊断
+                BaseDiseaseDTO tcmBaseDiseaseDTO = new BaseDiseaseDTO();
+                tcmBaseDiseaseDTO.setHospCode(outptMedicalRecordDTO.getHospCode());
+                tcmBaseDiseaseDTO.setIds(Arrays.asList(tcmDiseaseIds.split(",")));
+                Map<String, Object> tcmMap = new HashMap<>();
+                tcmMap.put("hospCode", outptMedicalRecordDTO.getHospCode());
+                tcmMap.put("baseDiseaseDTO", tcmBaseDiseaseDTO);
+                List<BaseDiseaseDTO> tcmBaseDiseaseDTOS = baseDiseaseService_consumer.getDiseaseByIds(tcmMap);
+                // 获取中医症候
+                if (StringUtils.isNotEmpty(tcmSyndromesIds)) {
+                    BaseDiseaseDTO tcmSyndromesBaseDiseaseDTO = new BaseDiseaseDTO();
+                    tcmSyndromesBaseDiseaseDTO.setHospCode(outptMedicalRecordDTO.getHospCode());
+                    tcmSyndromesBaseDiseaseDTO.setIds(Arrays.asList(tcmSyndromesIds.split(",")));
+                    Map<String, Object> tcmSyndromesMap = new HashMap<>();
+                    tcmSyndromesMap.put("hospCode", outptMedicalRecordDTO.getHospCode());
+                    tcmSyndromesMap.put("baseDiseaseDTO", tcmSyndromesBaseDiseaseDTO);
+                    tcmSyndromesBaseDiseaseDTOS = baseDiseaseService_consumer.getDiseaseByIds(tcmSyndromesMap);
+                } else {
+                    tcmSyndromesBaseDiseaseDTOS = new ArrayList<>();
+                }
+                if (!ListUtils.isEmpty(tcmBaseDiseaseDTOS)) {
+                    for (int i = 0; i < tcmBaseDiseaseDTOS.size(); i++) {
+                        if (!ListUtils.isEmpty(yjzOutptDiagnoseDTOList)) {
+                            int finalI = i;
+                            List<OutptDiagnoseDTO> isMainList = yjzOutptDiagnoseDTOList.stream().filter(s -> tcmBaseDiseaseDTOS.get(finalI).getId().equals(s.getDiseaseId())).collect(Collectors.toList());
+                            //存在该诊断
+                            if (!ListUtils.isEmpty(isMainList)) {
+                                continue;
+                            }
+                        }
+                        OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+                        outptDiagnoseDTO.setDiseaseId(tcmBaseDiseaseDTOS.get(i).getId());
+                        outptDiagnoseDTO.setId(SnowflakeUtils.getId());
+                        outptDiagnoseDTO.setDiseaseName(tcmBaseDiseaseDTOS.get(i).getName());
+                        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZYZD);
+                        outptDiagnoseDTO.setIsMain(Constants.SF.F);
+                        //医院编码
+                        outptDiagnoseDTO.setHospCode(outptMedicalRecordDTO.getHospCode());
+                        //就诊ID
+                        outptDiagnoseDTO.setVisitId(outptMedicalRecordDTO.getVisitId());
+                        if (!ListUtils.isEmpty(tcmSyndromesBaseDiseaseDTOS)) {
+                            if (tcmSyndromesBaseDiseaseDTOS != null && tcmSyndromesBaseDiseaseDTOS.size() > i) {
+                                outptDiagnoseDTO.setTcmSyndromesId(tcmSyndromesBaseDiseaseDTOS.get(i).getId());
+                                outptDiagnoseDTO.setTcmSyndromesName(tcmSyndromesBaseDiseaseDTOS.get(i).getName());
+                            }
+                        }
+                        outptDiagnoseDTOList.add(outptDiagnoseDTO);
+                    }
+                }
+            }
+            if (outptDiagnoseDTOList!=null&&outptDiagnoseDTOList.size()>0) {
+                outptDoctorPrescribeDAO.insertDiagnose(outptDiagnoseDTOList);
+            }
+           // 门诊中医症候 lly 2022-3-03 end
+        }
     }
 }

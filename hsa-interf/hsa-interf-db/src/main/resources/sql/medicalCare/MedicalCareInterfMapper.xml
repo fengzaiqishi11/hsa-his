@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.medicalCare.dao.MedicalCareInterfDAO">
+
+    <!--根据就诊id查询就诊信息-->
+    <select id="queryVisitById" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        SELECT
+            a.id,
+            a.name,
+            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  gender_code,
+            a.age,
+            a.cert_no,
+            a.phone,
+            '1' as change_type,
+            a.dept_id
+        FROM outpt_visit a
+        where a.hosp_code = #{hospCode}
+          and a.id = #{medical_info_id}
+
+        union all
+
+        SELECT
+            a.id,
+            a.name,
+            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  gender_code,
+            a.age,
+            a.cert_no,
+            a.phone,
+            '1' as change_type,
+            a.in_dept_id as dept_id
+        FROM inpt_visit a
+        where a.hosp_code = #{hospCode}
+          and a.id = #{medical_info_id}
+    </select>
+
+    <!--根据就诊id查询诊断信息-->
+    <select id="queryDiagnoseByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO">
+        SELECT
+            b.name as disease_name,
+            (SELECT name from sys_code_detail s where a.hosp_code = b.hosp_code and s.is_valid = '1' and s.c_code = 'ZDLX' and a.type_code = s.value) as type_code,
+            a.crte_time,
+            (case a.is_main when '1' then '是' else '否' end) as is_main
+        FROM outpt_diagnose a
+        LEFT JOIN base_disease b on a.hosp_code = b.hosp_code and a.disease_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+          AND a.visit_id = #{medical_info_id}
+
+        union all
+
+        SELECT
+            b.name as disease_name,
+            (SELECT name from sys_code_detail s where a.hosp_code = b.hosp_code and s.is_valid = '1' and s.c_code = 'ZDLX' and a.type_code = s.value) as type_code,
+            a.crte_time,
+            (case a.is_main when '1' then '是' else '否' end) as is_main
+        FROM inpt_diagnose a
+        LEFT JOIN base_disease b on a.hosp_code = b.hosp_code and a.disease_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+          AND a.visit_id = #{medical_info_id}
+    </select>
+
+    <!--根据就诊id查询医嘱信息-->
+    <select id="queryAdviceByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        SELECT
+            a.id,
+            a.visit_id,
+            (case a.is_long when '0' then '长期' when '1' then '临时' else '' end) as is_long,
+            a.long_start_time,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'XMLB' and a.item_code = s.value) as item_code,
+            a.item_name,
+            a.spec,
+            a.dosage,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'JLDW' and a.dosage_unit_code = s.value) as dosage_unit_code,
+            a.num,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'DW' and a.unit_code = s.value) as unit_code,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'YF' and a.usage_code = s.value) as usage_code,
+            (select name from base_rate br where a.hosp_code = br.hosp_code and br.is_valid = '1' and a.rate_id = br.id) as rate_name,
+            a.use_days,
+            a.remark,
+            (case a.is_skin when '1' then '是' when '0' then '否' else '' end) as is_skin,
+            a.crte_name,
+            a.stop_time
+        FROM inpt_advice a
+        WHERE a.hosp_code = #{hospCode}
+          AND a.visit_id = #{medical_info_id}
+
+        union all
+
+        SELECT
+            a.id,
+            a.visit_id,
+            '' as is_long,
+            b.crte_time as long_start_time,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'XMLB' and a.item_code = s.value) as item_code,
+            a.item_name,
+            a.spec,
+            a.dosage,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'JLDW' and a.dosage_unit_code = s.value) as dosage_unit_code,
+            a.num,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'DW' and a.num_unit_code = s.value) as unit_code,
+            (SELECT name from sys_code_detail s where a.hosp_code = s.hosp_code and s.is_valid = '1' and s.c_code = 'YF' and a.usage_code = s.value) as usage_code,
+            (select name from base_rate br where a.hosp_code = br.hosp_code and br.is_valid = '1' and a.rate_id = br.id) as rate_name,
+            a.use_days,
+            a.remark,
+            (case a.is_skin when '1' then '是' when '0' then '否' else '' end) as is_skin,
+            b.crte_name,
+            '' as stop_time
+        FROM outpt_prescribe_detail a
+        LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        WHERE a.hosp_code = #{hospCode}
+          AND a.visit_id = #{medical_info_id}
+    </select>
+</mapper>

@@ -8,6 +8,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
@@ -16,6 +17,7 @@ import cn.hsa.module.outpt.outinInvoice.entity.OutinInvoiceDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -758,5 +760,67 @@ public class OutptTmakePriceFormController extends BaseController {
         SysUserDTO userDTO = getSession(req, res) ;
         param.put("hospCode" ,userDTO.getHospCode());
         return outptTmakePriceFormService_consumer.queryOutptPrescribeCostList(param);
+    }
+
+    /**
+     * @Menthod: queryCreditCharge()
+     * @Desrciption: 挂账查询
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/28 11:56
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    @GetMapping("/queryCreditCharge")
+    public WrapperResponse<PageDTO> queryCreditCharge(OutptSettleDTO outptSettleDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptSettleDTO.setHospCode(userDTO.getHospCode());
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode",userDTO.getHospCode());
+        paramMap.put("outptSettleDTO",outptSettleDTO);
+        return outptTmakePriceFormService_consumer.queryCreditCharge(paramMap);
+    }
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:38
+     * @Return: WrapperResponse<Boolean>
+     **/
+    @PostMapping("/updateCreditStatus")
+    public WrapperResponse<Boolean> updateCreditStatus(@RequestBody OutptSettleDTO outptSettleDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptSettleDTO.setHospCode(userDTO.getHospCode());
+        outptSettleDTO.setBackPayId(userDTO.getId());
+        outptSettleDTO.setBackPayName(userDTO.getName());
+        outptSettleDTO.setBackPayTime(DateUtils.getNow());
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode",userDTO.getHospCode());
+        paramMap.put("outptSettleDTO",outptSettleDTO);
+        return outptTmakePriceFormService_consumer.updateCreditStatus(paramMap);
+    }
+
+    /**
+     * @Menthod: saveCreditInvoicePrint()
+     * @Desrciption: 挂账发票打印
+     * @Param: OutinInvoiceDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/2 10：39
+     * @Return: Boolean
+     **/
+    @PostMapping("/updateCreditQueryInovicePrint")
+    public WrapperResponse<Boolean> updateCreditQueryInovicePrint(@RequestBody OutinInvoiceDTO outinInvoiceDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outinInvoiceDTO.setHospCode(userDTO.getHospCode());
+        outinInvoiceDTO.setUseId(userDTO.getId());
+        outinInvoiceDTO.setUseName(userDTO.getName());
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode",userDTO.getHospCode());
+        paramMap.put("outinInvoiceDTO",outinInvoiceDTO);
+        return outptTmakePriceFormService_consumer.updateCreditQueryInovicePrint(paramMap);
     }
 }

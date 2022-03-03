@@ -28,6 +28,7 @@
 		<result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
 		<result property="recordTimeCode" column="record_time_code" jdbcType="VARCHAR"/>
 		<result property="validTime" column="valid_time" jdbcType="INTEGER"/>
+		<result property="insureTypeCode" column="insure_type_code" jdbcType="VARCHAR"/>
 	</resultMap>
 	
 	<!--查询全员分类单个-->
@@ -36,7 +37,7 @@
           id, hosp_code, code, name, up_code, page_print_code, type_code, seq, doc_code, gender_code, pym, wbm, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time, record_time_code,
 		  (select count(id) from emr_classify where up_code = a.code  and dept_id is null and hosp_code = #{hospCode}) as son,
 		  (select count(id) from emr_classify_template where classify_code = #{code} and dept_id is null and hosp_code = #{hospCode}) as tempHtml,
-		  valid_time
+		  valid_time,insure_type_code
         from emr_classify as a
         where (id = #{id} or code = #{code}) and dept_id is null and hosp_code = #{hospCode}
     </select>
@@ -133,8 +134,8 @@
 	
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into emr_classify(id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm, seq, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time, record_time_code,valid_time)
-        values (#{id}, #{hospCode}, #{code}, #{name}, #{upCode}, #{pagePrintCode}, #{typeCode}, #{docCode}, #{genderCode}, #{pym}, #{wbm}, #{seq}, #{isDelNullline}, #{isCommon}, #{isEnd}, #{isValid}, #{isUnique}, #{isPagePrint}, #{isAudit}, #{isHosp}, #{deptId}, #{crteId}, #{crteName}, #{crteTime}, #{recordTimeCode},#{validTime})
+        insert into emr_classify(id, hosp_code, code, name, up_code, page_print_code, type_code, doc_code, gender_code, pym, wbm, seq, is_del_nullline, is_common, is_end, is_valid, is_unique, is_page_print, is_audit, is_hosp, dept_id, crte_id, crte_name, crte_time, record_time_code,valid_time,insure_type_code)
+        values (#{id}, #{hospCode}, #{code}, #{name}, #{upCode}, #{pagePrintCode}, #{typeCode}, #{docCode}, #{genderCode}, #{pym}, #{wbm}, #{seq}, #{isDelNullline}, #{isCommon}, #{isEnd}, #{isValid}, #{isUnique}, #{isPagePrint}, #{isAudit}, #{isHosp}, #{deptId}, #{crteId}, #{crteName}, #{crteTime}, #{recordTimeCode},#{validTime},#{insureTypeCode})
     </insert>
 	
 	<select id="getMaxCode" resultMap="EmrClassifyMap">
@@ -252,6 +253,7 @@
 				record_time_code = #{recordTimeCode},
 			</if>
 				valid_time = #{validTime},
+			    insure_type_code =#{insureTypeCode},
 		</set>
 		where id = #{id} and hosp_code = #{hospCode}
 	</update>

@@ -368,4 +368,40 @@ public interface OutptTmakePriceFormService {
      * @Return  WrapperResponse<List<OutptCostDTO>>
      **/
     WrapperResponse<List<OutptCostDTO>> queryOutptPrescribeCostList(Map map);
+
+    /**
+     * @Menthod: queryCreditCharge()
+     * @Desrciption: 挂账查询
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/28 11:56
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    @GetMapping("/servcie/outpt/tmakePriceForm/queryCreditCharge")
+    WrapperResponse<PageDTO> queryCreditCharge(Map paramMap);
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:15
+     * @Return: Boolean
+     **/
+    @PostMapping("/servcie/outpt/tmakePriceForm/updateCreditStatus")
+    WrapperResponse<Boolean> updateCreditStatus(Map paramMap);
+
+    /**
+     * @Menthod: saveCreditInvoicePrint()
+     * @Desrciption: 挂账发票打印
+     * @Param: OutinInvoiceDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/2 10：39
+     * @Return: Boolean
+     **/
+    @PostMapping("/servcie/outpt/tmakePriceForm/updateCreditQueryInovicePrint")
+    WrapperResponse<Boolean> updateCreditQueryInovicePrint(Map paramMap);
 }

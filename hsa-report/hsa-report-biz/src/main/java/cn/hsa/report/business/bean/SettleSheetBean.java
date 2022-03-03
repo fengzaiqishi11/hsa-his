@@ -79,6 +79,7 @@ public class SettleSheetBean extends GeneralTemplateBean  {
         if (MapUtils.isNotEmpty(param)) {
             String info1 = (String) param.get("feeMapList");
             String jxSettle = (String) param.get("jxSettle");
+            String oneSettle = (String) param.get("oneSettle");
             String hospCode = (String) param.get("hospCode");
             String regCode = (String) param.get("mdtrtareaAdmvs");
             List<Map<String, Object>> feeMapList = new ArrayList<>();
@@ -89,7 +90,7 @@ public class SettleSheetBean extends GeneralTemplateBean  {
                     feeMapList.add(JSONObject.parseObject(obj.toString(), Map.class));
                 }
             }
-            if(jxSettle.equals("true")){
+            if(jxSettle.equals("true") || oneSettle.equals("true")){
                 for(Map feeMap:feeMapList){
                     if(feeMap.get("medChrgitmType") != null){
                         feeMap.put("medChrgitmTypeName",reportBaseDataBO.getInsureDictName(hospCode,regCode,"MED_CHRGITM_TYPE",feeMap.get("medChrgitmType").toString()));

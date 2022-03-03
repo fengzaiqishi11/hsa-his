@@ -14,7 +14,7 @@ import org.springframework.context.annotation.PropertySource;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  **/
 @Profile("local")
-@Configuration
+//@Configuration
 @PropertySource(value = "classpath:config/cache/cache.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:config/db/db.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:config/fsstore/fsstore.properties", ignoreResourceNotFound = true)

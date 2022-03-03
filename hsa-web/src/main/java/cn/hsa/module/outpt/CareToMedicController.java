@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,6 +74,9 @@ public class CareToMedicController extends BaseController {
     public WrapperResponse<Boolean> updateCareToMedic(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO userDTO = getSession(req, res);
         map.put("hospCode",userDTO.getHospCode());
+        map.put("crteId",userDTO.getId());
+        map.put("crteName",userDTO.getName());
+        map.put("crteTime",new Date());
         return  careToMedicApplyService_consumer.updateCareToMedic(map);
     }
 

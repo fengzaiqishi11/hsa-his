@@ -14,6 +14,7 @@
         <result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
         <result property="phone" column="phone" jdbcType="VARCHAR"/>
         <result property="changeType" column="change_type" jdbcType="VARCHAR"/>
+        <result property="careToMedicId" column="care_to_medic_id" jdbcType="VARCHAR"/>
         <result property="visitType" column="visit_type" jdbcType="VARCHAR"/>
         <result property="applyDeptId" column="apply_dept_id" jdbcType="VARCHAR"/>
         <result property="applyCompanyCode" column="apply_company_code" jdbcType="VARCHAR"/>
@@ -38,8 +39,8 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
     <insert id="insertMedicDate">
-        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
 
     </insert>
     <select id="queryMZPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">

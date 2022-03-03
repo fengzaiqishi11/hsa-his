@@ -6,10 +6,15 @@ import cn.hsa.module.outpt.medictocare.bo.MedicToCareBO;
 import cn.hsa.module.outpt.medictocare.dao.MedicToCareDAO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.util.HttpConnectUtil;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -28,7 +33,13 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
 
     @Resource
     private MedicToCareDAO medicToCareDAO;
+    /**
+     * 调用的url
+     */
+    @Value("${medictocare.url}")
+    private String url;
 
+    
     @Override
     public PageDTO queryPage(MedicToCareDTO medicToCareDTO) {
         PageHelper.startPage(medicToCareDTO.getPageNo(),medicToCareDTO.getPageSize());
@@ -85,13 +96,14 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         }
         //补充数据,患者信息数据
         medicToCareDTO = this.replenishInfo(medicToCareDTO);
-        Map<String, Object> visitInfo = new HashMap<>();
-        this.handeleVisit(visitInfo, medicToCareDTO);
         //插入本地表
         medicToCareDAO.insertMedicDate(medicToCareDTO);
         //调用API
-        //todo 调用api传输
-
+        if("1".equals(medicToCareDTO.getChangeType())){
+            Map<String, Object> visitInfo = new HashMap<>();
+            this.handeleVisit(visitInfo, medicToCareDTO);
+            this.commonSendInfo(visitInfo);
+        }
         return true;
     }
 
@@ -103,8 +115,10 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
     //补充数据
     private MedicToCareDTO replenishInfo(MedicToCareDTO medicToCareDTO){
         MedicToCareDTO  medicToCareDTO1 = medicToCareDAO.queryVisitById(medicToCareDTO);
-        if (medicToCareDTO1 == null) {
-            throw new RuntimeException("未查询到相关就诊信息");
+        if("2".equals(medicToCareDTO.getChangeType())){
+            if (medicToCareDTO1 == null) {
+                throw new RuntimeException("未查询到相关就诊信息");
+            }
         }
         //todo填充实体类
         medicToCareDTO.setStatusCode("0");
@@ -143,5 +157,26 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         visitInfo.put("applicant",medicToCareDTO.getCrteName());
     }
 
+    //使用HTTP调用接口
+    private Map<String,Object> commonSendInfo(Map<String, Object> visitInfo){
+        Map httpParam = new HashMap();
+        //发送的数据
+        httpParam.put("visitInfo",visitInfo);
+        String json = JSONObject.toJSONString(httpParam);
+        String resultStr = HttpConnectUtil.unifiedPayPostUtil(this.url, json);
+        if (StringUtils.isEmpty(resultStr)){
+            throw new RuntimeException("失败！");
+        }
+        //获取回参
+        Map<String, Object> m = (Map) JSON.parse(resultStr);
+        String resultCode = MapUtils.get(m,"code","");
+        if (StringUtils.isEmpty(resultCode)){
+            throw new RuntimeException("调用医养接口无响应!");
+        }
+        if (!"1".equals(resultCode)){
+            throw new RuntimeException("调用医养接口错误,原因："+MapUtils.get(m,"message",""));
+        }
+        return m;
+    }
 
 }

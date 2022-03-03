@@ -46,5 +46,6 @@ public interface CareToMedicApplyService {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    WrapperResponse<Boolean> updateMedicToCare(Map map);
+    @PostMapping("/service/outpt/careToMedic/updateCareToMedic")
+    WrapperResponse<Boolean> updateCareToMedic(Map map);
 }

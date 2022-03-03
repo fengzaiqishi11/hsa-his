@@ -699,4 +699,14 @@ public class PatientCostLedgerServiceImpl extends HsafService implements Patient
   public WrapperResponse<Map<String,Object>> queryHosptialInComeListTitle(Map map){
     return WrapperResponse.success(patientCostLedgerBO.queryHosptialInComeListTitle(map));
   }
+
+  @Override
+  public WrapperResponse<List<Map<String, Object>>> queryZyFeeIncomeList(Map map) {
+    return WrapperResponse.success(patientCostLedgerBO.queryZyFeeIncomeList(map));
+  }
+
+  @Override
+  public WrapperResponse<List<Map<String, Object>>> queryMzFeeIncomeList(Map map) {
+    return WrapperResponse.success(patientCostLedgerBO.queryMzFeeIncomeList(map));
+  }
 }

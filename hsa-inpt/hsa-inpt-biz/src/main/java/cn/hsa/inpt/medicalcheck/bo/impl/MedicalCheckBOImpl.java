@@ -236,7 +236,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(dipIp)) {
             throw new AppException("DIP的IP地址没进行配置");
         }
-        sb.append(" http://"+dipIp+"/drg_medical_web/drgGroupThird/drg_dagns/list.action");
+        sb.append(" http://"+dipIp+"/drg_web/drgGroupThird/drg_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -340,7 +340,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(dipIp)) {
             throw new AppException("DRG的IP地址没进行配置");
         }
-        sb.append(" http://" + dipIp + "/drg_medical_web/drgGroupThird/dip_dagns/list.action");
+        sb.append(" http://" + dipIp + "/drg_web/drgGroupThird/dip_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");

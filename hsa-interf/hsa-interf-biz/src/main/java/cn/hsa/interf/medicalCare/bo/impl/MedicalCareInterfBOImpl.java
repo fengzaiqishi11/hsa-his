@@ -11,14 +11,12 @@ import cn.hsa.module.outpt.medictocare.service.MedicToCareService;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.interf.medicalCare.bo.impl
@@ -77,6 +75,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         result.put("visitInfo", visitInfo);
         result.put("zdInfo", zdInfo);
         result.put("yzInfo", yzInfo);
+        log.debug("医养接口-就诊信息返参===" + JSON.toJSONString(result));
         return result;
     }
 
@@ -95,6 +94,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         // 将养转医申请过来的数据封装成本地医转养对象
         this.handeleLocalApplyInfo(map, medicToCareDTO);
         map.put("medicToCareDTO", medicToCareDTO);
+        log.debug("医养接口-养转医申请接口入参===" + JSON.toJSONString(map));
         return medicToCareService_consumer.insertMedicToCare(map).getData();
     }
 
@@ -112,10 +112,10 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         medicToCareDTO.setCareToMedicId(MapUtils.get(map, "apply_id")); // 养转医申请ID
         medicToCareDTO.setApplyDeptId(MapUtils.get(map, "clinic_dept")); // 申请科室id
         medicToCareDTO.setApplyCompanyCode(MapUtils.get(map, "referral_org")); //申请入住机构编码
-        medicToCareDTO.setHopeInTime(MapUtils.get(map, "expect_referral_date")); // 期望入住日期
+        medicToCareDTO.setHopeInTime(DateUtils.parse(MapUtils.get(map, "expect_referral_date"), DateUtils.Y_M_D)); // 期望入住日期
         medicToCareDTO.setApplyId(MapUtils.get(map, "applicant")); // 申请人id
         medicToCareDTO.setApplyName(MapUtils.get(map, "applicant")); // 申请人姓名
-        medicToCareDTO.setApplyTime(MapUtils.get(map, "apply_date")); // 申请时间
+        medicToCareDTO.setApplyTime(DateUtils.parse(MapUtils.get(map, "apply_date"), DateUtils.Y_M_D)); // 申请时间
         medicToCareDTO.setReferralMainSuit(MapUtils.get(map, "referral_main_suit")); // 转诊主诉
         medicToCareDTO.setNusreTypeCode(MapUtils.get(map, "nursing_level")); // 护理级别
         medicToCareDTO.setStatusCode(Constants.YYSQZT.YSQ); // 医养申请状态
@@ -146,9 +146,10 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         String statusCode = MapUtils.get(data, "statusCode");
         if (Constants.YYSQZT.YJZ.equals(statusCode)) throw new RuntimeException("该申请已经处理了，请勿重复处理！");
         if (Constants.YYSQZT.YJJ.equals(statusCode)) throw new RuntimeException("该申请已经拒绝了，请重新申请！");
-        param.put("statusCode", MapUtils.get(map, "apply_status")); // 状态
-        param.put("realityInTime", MapUtils.get(map, "handle_date")); // 处理日期、实际入住时间
+        param.put("statusCode", String.valueOf(MapUtils.get(map, "apply_status"))); // 状态
+        param.put("realityInTime", DateUtils.parse(MapUtils.get(map, "handle_date"), DateUtils.Y_M_D)); // 处理日期、实际入住时间
         param.put("remark", MapUtils.get(map, "remark")); // 备注
+        log.debug("医养接口-医转养申请处理接口入参===" + JSON.toJSONString(param));
         return medicToCareService_consumer.updateMedicToCare(param).getData();
     }
 

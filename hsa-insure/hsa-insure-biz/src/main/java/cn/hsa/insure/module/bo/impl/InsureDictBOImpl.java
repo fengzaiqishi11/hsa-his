@@ -323,4 +323,9 @@ class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         return insureDictDAO.queryOneAdmdvsInfo(MapUtils.get(map, "hospCode"), MapUtils.get(map, "admdvsCode"));
     }
 
+    @Override
+    public Map<String, String> querySysCodeByCode(Map map) {
+        List<Map<String, Object>> mapList = insureDictDAO.querySysCodeByCode(MapUtils.get(map, "hospCode"), MapUtils.get(map, "code"));
+        return mapList.stream().collect(Collectors.toMap(s -> s.get("value").toString(), s -> s.get("name").toString(), (s1, s2) -> s1));
+    }
 }

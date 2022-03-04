@@ -568,6 +568,7 @@ public interface Constants {
         public static final String MJY = "4"; //麻、精一
         public static final String JE = "5"; //精二
         public static final String GZ = "6"; //贵重
+        public static final String KFKPT = "7"; //普通（口服）
     }
 
     /**
@@ -1213,5 +1214,14 @@ public interface Constants {
         public static final String WJS = "0";// 未结算
         public static final String SS = "1";// 试算
         public static final String YJS = "2";// 已结算
+    }
+
+    /**
+     * 医养申请状态
+     */
+    class YYSQZT {
+        public static final String YSQ = "0";// 已申请，待处理
+        public static final String YJZ = "1";// 已接诊
+        public static final String YJJ = "2";// 已拒绝
     }
 }

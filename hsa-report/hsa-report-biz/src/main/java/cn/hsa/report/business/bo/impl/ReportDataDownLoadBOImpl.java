@@ -9,10 +9,7 @@ import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
-import cn.hsa.util.ConverUtils;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -85,7 +82,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
 
-        if (!configuration.getIsUpload()) {
+        if (Constants.SF.F.equals(configuration.getIsUpload())) {
             return new ReportReturnDataDTO(null, str);
         }
 

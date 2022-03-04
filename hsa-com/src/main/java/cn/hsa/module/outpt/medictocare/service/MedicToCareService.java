@@ -2,9 +2,9 @@ package cn.hsa.module.outpt.medictocare.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+
 
 import java.util.Map;
 
@@ -24,7 +24,7 @@ public interface MedicToCareService {
      * @date 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/service/outpt/medictocare/queryPage")
+    @PostMapping("/service/outpt/medicToCare/queryPage")
     WrapperResponse<PageDTO> queryPage(Map map);
     /**
      * @Menthod: queryMedicToCareInfoPage()
@@ -35,7 +35,6 @@ public interface MedicToCareService {
      * @Date: 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/service/outpt/medictocare/queryMedicToCareInfoPage")
     WrapperResponse<PageDTO> queryMedicToCareInfoPage(Map map);
     /**
      * @Menthod getMedicToCareInfoById()
@@ -45,8 +44,7 @@ public interface MedicToCareService {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<MedicToCareDTO>
      **/
-    @PostMapping("/service/outpt/medictocare/getMedicToCareInfoById")
-    WrapperResponse<MedicToCareDTO> getMedicToCareInfoById(Map map);
+    WrapperResponse<Map<String, Object>> getMedicToCareInfoById(Map<String, Object> map);
     /**
      * @Menthod: queryHospitalPatientInfoPage()
      * @Desrciption: 分页查询出医院病人信息表
@@ -56,7 +54,6 @@ public interface MedicToCareService {
      * @Date: 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/service/outpt/medictocare/queryHospitalPatientInfoPage")
     WrapperResponse<PageDTO> queryHospitalPatientInfoPage(Map map);
     /**
      * @Menthod: insertMedicToCare()
@@ -67,7 +64,6 @@ public interface MedicToCareService {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    @PostMapping("/service/outpt/medictocare/insertMedicToCare")
     WrapperResponse<Boolean> insertMedicToCare(Map map);
     /**
      * @Menthod: insertMedicToCare()
@@ -78,6 +74,5 @@ public interface MedicToCareService {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    @PostMapping("/service/outpt/medictocare/updateMedicToCare")
     WrapperResponse<Boolean> updateMedicToCare(Map map);
 }

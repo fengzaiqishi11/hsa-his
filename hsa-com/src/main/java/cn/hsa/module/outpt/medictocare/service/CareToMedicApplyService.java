@@ -24,8 +24,7 @@ public interface CareToMedicApplyService {
      * @date 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/service/outpt/caretomedicapply/queryPage")
-    WrapperResponse<PageDTO> queryPage(Map map);
+    WrapperResponse<PageDTO> queryCareToMedicPage(Map map);
 
 
     /**
@@ -36,8 +35,7 @@ public interface CareToMedicApplyService {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<OutinInvoiceDO>
      **/
-    @PostMapping("/service/outpt/caretomedicapply/getMedicToCareInfoById")
-    WrapperResponse<MedicToCareDTO> getMedicToCareInfoById(Map map);
+    WrapperResponse<Map<String, Object>> getMedicToCareInfoById(Map map);
 
     /**
      * @Menthod: insertMedicToCare()
@@ -48,6 +46,6 @@ public interface CareToMedicApplyService {
      * @Date: 2022/2/28 9:38
      * @Return: Boolean
      **/
-    @PostMapping("/service/outpt/caretomedicapply/updateMedicToCare")
-    WrapperResponse<Boolean> updateMedicToCare(Map map);
+    @PostMapping("/service/outpt/careToMedic/updateCareToMedic")
+    WrapperResponse<Boolean> updateCareToMedic(Map map);
 }

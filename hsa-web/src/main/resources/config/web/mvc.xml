@@ -62,7 +62,7 @@
     </aop:config>
 
     <!--  HSAF统一日志记录  -->
-    <bean id="hsafLogHandler" class="cn.hsa.hsaf.core.log.HsafLogHandler"/>
+    <bean id="hsafLogHandler" class="cn.hsa.base.HsafLogHandlers"/>
     <aop:config>
         <aop:aspect id="aspect" ref="hsafLogHandler" order="10000">
             <aop:pointcut expression="execution(public * cn.hsa..*Controller.*(..))" id="controller"/>

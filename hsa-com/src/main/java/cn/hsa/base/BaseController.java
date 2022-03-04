@@ -195,7 +195,7 @@ public class BaseController extends HsafController {
         // 2、生产者/消费者是否配置
         // 3、nacos是否启动
         if (ex instanceof RpcException) {
-            return WrapperResponse.error(-1, "远程服务访问失败：请检查服务是否正常", null);
+            return WrapperResponse.error(-1, "远程服务访问失败：请检查服务是否正常,"+ex.getMessage(), null);
         }
 
         // 运行时异常
@@ -206,12 +206,12 @@ public class BaseController extends HsafController {
             // 1、网络是否不稳定
             // 2、数据库服务是否正常
             if (errMsg.contains("CommunicationsException") && errMsg.contains("Communications link failure")) {
-                return WrapperResponse.error(-1, "访问数据库超时：请检查服务是否正常", null);
+                return WrapperResponse.error(-1, "访问数据库超时：请检查服务是否正常,"+ex.getMessage(), null);
             }
 
             // SQL错误
             else  if (errMsg.contains("BadSqlGrammarException") && errMsg.contains("MySQLSyntaxErrorException")) {
-                return WrapperResponse.error(-1, "访问数据库异常：请检查SQL是否正常", null);
+                return WrapperResponse.error(-1, "访问数据库异常：请检查SQL是否正常,"+ex.getMessage(), null);
             }else {
                 return WrapperResponse.error(-1, errMsg, null);
             }

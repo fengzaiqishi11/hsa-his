@@ -560,5 +560,30 @@ public interface PatientCostLedgerService {
    **/
   @PostMapping("/service/outpt/statement/queryHosptialInComeListTitle")
   WrapperResponse<Map<String,Object>> queryHosptialInComeListTitle(Map map);
+
+  /**
+   * 住院费用收入统计报表
+   *
+   * @param map
+   * @Menthod queryZyFeeIncomeList
+   * @Author liuzhuoting
+   * @Date 2022/3/3 08:54
+   * @return java.util.List<java.lang.Map>
+   **/
+  @PostMapping("/service/outpt/statement/queryZyFeeIncomeList")
+  WrapperResponse<List<Map<String, Object>>> queryZyFeeIncomeList(Map map);
+
+  /**
+   * 门诊费用收入统计报表
+   *
+   * @param map
+   * @Menthod queryMzFeeIncomeList
+   * @Author liuzhuoting
+   * @Date 2022/3/3 08:54
+   * @return java.util.List<java.lang.Map>
+   **/
+  @PostMapping("/service/outpt/statement/queryMzFeeIncomeList")
+  WrapperResponse<List<Map<String, Object>>> queryMzFeeIncomeList(Map map);
+
 }
 

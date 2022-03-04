@@ -568,6 +568,7 @@ public interface Constants {
         public static final String MJY = "4"; //麻、精一
         public static final String JE = "5"; //精二
         public static final String GZ = "6"; //贵重
+        public static final String KFKPT = "7"; //普通（口服）
     }
 
     /**

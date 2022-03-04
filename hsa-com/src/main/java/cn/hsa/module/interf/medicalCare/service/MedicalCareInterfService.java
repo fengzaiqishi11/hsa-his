@@ -3,6 +3,8 @@ package cn.hsa.module.interf.medicalCare.service;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 
@@ -28,6 +30,30 @@ public interface MedicalCareInterfService {
      * @Date: 2022-02-28 11:57
      * @Return:
      **/
-    @GetMapping("/service/interf/medicalCare/getVisitInfoRecord")
-    WrapperResponse<Map<String, Object>> getVisitInfoRecord(Map<String, Object> map);
+    @PostMapping("/service/interf/medicalCare/getVisitInfoRecord")
+    WrapperResponse<Map<String, Object>> getVisitInfoRecord(@RequestBody Map<String, Object> map);
+
+    /**
+     * @Menthod: insertCare2Medic
+     * @Desrciption: 插入养转医申请数据，调用本地插入医转养的申请接口
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:46
+     * @Return:
+     **/
+    @PostMapping("/service/interf/medicalCare/insertCare2Medic")
+    WrapperResponse<Boolean> insertCare2Medic(@RequestBody Map<String, Object> map);
+
+    /**
+     * @Menthod: updateApplyStatus
+     * @Desrciption: 更新医转养申请状态
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:48
+     * @Return:
+     **/
+    @PostMapping("/service/interf/medicalCare/updateApplyStatus")
+    WrapperResponse<Boolean> updateApplyStatus(@RequestBody Map<String, Object> map);
 }

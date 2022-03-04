@@ -34,5 +34,8 @@
     <dubbo:reference id="outptTriageVisitService_consumer" interface="cn.hsa.module.outpt.triage.service.OutptTriageVisitService" check="false" />
     <!-- 门诊收费服务 -->
     <dubbo:reference id="outptTmakePriceFormService_consumer" interface="cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService" check="false" />
+
+    <!--本地医养服务-->
+    <dubbo:reference id="medicToCareService_consumer" interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" check="false" />
 </beans>
 

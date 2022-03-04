@@ -5,13 +5,10 @@ import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.medicalCare.service.MedicalCareInterfService;
 import cn.hsa.util.MapUtils;
-import com.alibaba.fastjson.JSON;
-import kafka.utils.Json;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.security.NoSuchAlgorithmException;
@@ -48,10 +45,10 @@ public class MedicalCareInterfController extends BaseController {
      * @Date: 2022-02-28 11:57
      * @Return:
      **/
-    @GetMapping("/getVisitInfoRecord")
-    public WrapperResponse<Map<String, Object>> getVisitInfoRecord(Map<String, Object> map) {
+    @PostMapping("/getVisitInfoRecord")
+    public WrapperResponse<Map<String, Object>> getVisitInfoRecord(@RequestBody Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        Optional.ofNullable(MapUtils.get(map, "hospCode")).orElseThrow(() -> new RuntimeException("未传入医院编码"));
+        Optional.ofNullable(hospCode).orElseThrow(() -> new RuntimeException("未传入医院编码"));
         try {
             hospCode = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(hospCode.getBytes()), PRIVATE_KEY);
         } catch (Exception e) {
@@ -61,6 +58,56 @@ public class MedicalCareInterfController extends BaseController {
         Optional.ofNullable(visitId).orElseThrow(() -> new RuntimeException("未传入就诊人就诊id"));
         map.put("hospCode", hospCode);
         return medicalCareInterfService_consumer.getVisitInfoRecord(map);
+    }
+
+    /**
+     * @Menthod: insertCare2Medic
+     * @Desrciption: 插入养转医申请数据，调用本地插入医转养的申请接口
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:46
+     * @Return:
+     **/
+    @PostMapping("/insertCare2Medic")
+    public WrapperResponse<Boolean> insertCare2Medic(@RequestBody Map<String, Object> map) {
+        if (map.isEmpty()) throw new RuntimeException("未传入参数");
+        String hospCode = MapUtils.get(map, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new RuntimeException("未传入医院编码");
+        }
+        try {
+            hospCode = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(hospCode.getBytes()), PRIVATE_KEY);
+        } catch (Exception e) {
+            throw new RuntimeException("签名入参解密错误，请联系管理员！" + e.getMessage());
+        }
+        map.put("hospCode", hospCode);
+        return medicalCareInterfService_consumer.insertCare2Medic(map);
+    }
+
+    /**
+     * @Menthod: updateApplyStatus
+     * @Desrciption: 更新医转养申请状态
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:48
+     * @Return:
+     **/
+    @PostMapping("/updateApplyStatus")
+    public WrapperResponse<Boolean> updateApplyStatus(@RequestBody Map<String, Object> map) {
+        if (map.isEmpty()) throw new RuntimeException("未传入参数");
+        String hospCode = MapUtils.get(map, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new RuntimeException("未传入医院编码");
+        }
+        try {
+            hospCode = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(hospCode.getBytes()), PRIVATE_KEY);
+        } catch (Exception e) {
+            throw new RuntimeException("签名入参解密错误，请联系管理员！" + e.getMessage());
+        }
+        map.put("hospCode", hospCode);
+        return medicalCareInterfService_consumer.updateApplyStatus(map);
     }
 
     public static void main1(String[] args) {

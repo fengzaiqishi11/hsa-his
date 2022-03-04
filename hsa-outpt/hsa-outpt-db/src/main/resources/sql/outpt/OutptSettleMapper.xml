@@ -975,10 +975,11 @@
 
     <!--挂账查询-->
     <select id="queryCreditCharge" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        select * from (
         SELECT
         a.id,
         a.status_code,
-        a.settle_no,
+        a.settle_no as settleNo,
         b.name,
         b.gender_code,
         b.age,
@@ -995,16 +996,24 @@
         ifnull(a.credit_price, 0) as creditPrice,
         a.is_settle,
         a.crte_name,
-        a.settle_time,
+        a.settle_time as settleTime,
         a.card_price as cardPrice,
-        (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code) as preferentialName,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
-        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf,
-        ifnull(a.credit_is_pay,0) as creditIsPay,a.back_pay_time as backPayTime, a.back_pay_id as backPayId, a.back_pay_name as backPayName,
+        (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code)
+        as preferentialName,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '1' ) xjzf,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '2' ) skzf,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '3' ) zpzf,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '4' ) zzzf,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '5' ) wxzf,
+        (select ifnull(sum(price),0) price from outpt_pay pay where a.id = pay.settle_id and a.hosp_code = pay.hosp_code
+        and pay.pay_code = '6' ) zfbzf,
+        ifnull(a.credit_is_pay,0) as creditIsPay,a.back_pay_time as backPayTime, a.back_pay_id as backPayId,
+        a.back_pay_name as backPayName,
         b.id as visitId, case when b.patient_code>0 then '医保病人' else '自费病人' end as bka006Name,
         ifnull((select GROUP_CONCAT(b.name) as payCode
         from outpt_pay a
@@ -1016,7 +1025,10 @@
         and a.hosp_code = #{hospCode} GROUP BY a.settle_id),'现金') as payCode,
         b.visit_code as visitCode,
         b.visit_no as visitNo,
-        '-' as personalNo
+        '-' as personalNo,
+        '1' as type,
+        '' as printStatus,
+        '' as registerId
         FROM
         outpt_settle a JOIN outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
         <!--存在就诊表里的就诊医生与费用表医生不一致，导致过滤的数据不正确，医生过滤修改成费用表医生 add luoyong 2021.10.4-->
@@ -1034,10 +1046,10 @@
         </if>
         <!--补缴时间-->
         <if test="startBackTime != null and startBackTime != ''">
-            and a.settle_time &gt;= #{startBackTime}
+            and a.back_pay_time &gt;= #{startBackTime}
         </if>
         <if test="endBackTime != null and endBackTime != ''">
-            and a.settle_time &lt;= #{endBackTime}
+            and a.back_pay_time &lt;= #{endBackTime}
         </if>
         <if test="chargeId != null and chargeId != ''">
             and a.crte_id = #{chargeId}
@@ -1056,12 +1068,109 @@
                 and a.credit_is_pay = #{creditIsPay}
             </if>
         </if>
-        group by a.id
-        order by a.settle_no desc, a.settle_time desc
+        union all
+        select
+        a.id,
+        a.status_code,
+        opr.register_no as settleNo,
+        b.name,
+        b.gender_code,
+        b.age,
+        b.age_unit_code,
+        b.patient_code,
+        b.dept_name,
+        b.doctor_name,
+        a.total_price,
+        a.reality_price,
+        a.total_price as self_price,
+        0 as mi_price,
+        0 as trunc_price,
+        0 as acct_pay,
+        ifnull(a.credit_price, 0) as creditPrice,
+        '1' as isSettle,
+        a.crte_name,
+        a.crte_time as settleTime,
+        a.card_price as cardPrice,
+        (select name from base_preferential_type bp where bp.id = b.preferential_type_id and bp.hosp_code = b.hosp_code) as preferentialName,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '1' ) xjzf,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '2' ) skzf,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '3' ) zpzf,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '4' ) zzzf,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '5' ) wxzf,
+        (select ifnull(sum(price),0) price from outpt_register_pay pay where a.id = pay.rs_id and a.hosp_code = pay.hosp_code and pay.pay_code = '6' ) zfbzf,
+        ifnull(a.credit_is_pay,0) as creditIsPay,a.back_pay_time as backPayTime, a.back_pay_id as backPayId, a.back_pay_name as backPayName,
+        b.id as visitId, case when ifnull(b.patient_code,0)>0 then '医保病人' else '自费病人' end as bka006Name,
+        ifnull((select GROUP_CONCAT(b.name) as payCode
+        from outpt_pay a
+        join sys_code_detail b
+        on b.value = a.pay_code
+        and b.hosp_code =#{hospCode}
+        and b.c_code ='ZFFS'
+        where a.settle_id = #{settleId}
+        and a.hosp_code = #{hospCode} GROUP BY a.settle_id),'现金') as payCode,
+        b.visit_code as visitCode,
+        b.visit_no as visitNo,
+        '-' as personalNo,
+        '0' as type,
+        case when a.bill_no is not null and a.bill_no !='' then '1' else '0' end as printStatus,
+        opr.id as registerId
+        from outpt_register opr
+        left join outpt_register_settle a on opr.hosp_code = a.hosp_code and opr.id=a.register_id
+        inner join outpt_visit b on opr.hosp_code =  b.hosp_code and opr.visit_id = b.id
+        WHERE a.hosp_code = #{hospCode} and a.credit_price > 0
+        and a.credit_price is not null and a.credit_price !='' and a.status_code ='0'
+        <if test="keyword != null and keyword != ''">
+            and ( b.name LIKE CONCAT('%',#{keyword},'%') or a.order_no = #{keyword} )
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and a.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and a.crte_time &lt;= #{endTime}
+        </if>
+        <!--补缴时间-->
+        <if test="startBackTime != null and startBackTime != ''">
+            and a.back_pay_time &gt;= #{startBackTime}
+        </if>
+        <if test="endBackTime != null and endBackTime != ''">
+            and a.back_pay_time &lt;= #{endBackTime}
+        </if>
+        <if test="chargeId != null and chargeId != ''">
+            and a.crte_id = #{chargeId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and b.doctor_id = #{doctorId}
+        </if>
+        <if test="patientCode != null and patientCode != ''">
+            and b.patient_code = #{patientCode}
+        </if>
+        <if test="creditIsPay !=null and creditIsPay !=''">
+            <if test="creditIsPay =='0'.toString()">
+                and (a.credit_is_pay = #{creditIsPay} or a.credit_is_pay is null or a.credit_is_pay = '')
+            </if>
+            <if test="creditIsPay =='1'.toString()">
+                and a.credit_is_pay = #{creditIsPay}
+            </if>
+        </if>
+        ) tab
+        group by tab.id
+        order by tab.settleNo desc, tab.settleTime desc
     </select>
 
     <update id="updateCreditStatus" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
        update outpt_settle
+       set credit_is_pay='1',
+       back_pay_time = #{backPayTime},
+       back_pay_id = #{backPayId},
+       back_pay_name = #{backPayName}
+       where hosp_code =#{hospCode}
+       <if test="settleIds != null and settleIds != ''" >
+       and find_in_set(id,#{settleIds})
+       </if>
+    </update>
+
+    <update id="updateRegisterCreditStatus" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+       update outpt_register_settle
        set credit_is_pay='1',
        back_pay_time = #{backPayTime},
        back_pay_id = #{backPayId},

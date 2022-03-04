@@ -23,4 +23,26 @@ public interface MedicalCareInterfBO {
      * @Return:
      **/
     Map<String, Object> getVisitInfoRecord(Map<String, Object> map);
+
+    /**
+     * @Menthod: insertCare2Medic
+     * @Desrciption: 插入养转医申请数据，调用本地插入医转养的申请接口
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:46
+     * @Return:
+     **/
+    Boolean insertCare2Medic(Map<String, Object> map);
+
+    /**
+     * @Menthod: updateApplyStatus
+     * @Desrciption: 更新医转养申请状态
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-02 10:48
+     * @Return:
+     **/
+    Boolean updateApplyStatus(Map<String, Object> map);
 }

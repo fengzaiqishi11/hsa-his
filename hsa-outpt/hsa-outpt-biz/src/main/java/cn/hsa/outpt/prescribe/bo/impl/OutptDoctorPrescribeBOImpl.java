@@ -879,11 +879,21 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 prescribeTypeCode = Constants.CFLX.EK;
             }
         }
+        Map<String, String> macfKFKParameter = this.getParameterValue(outptPrescribeDTO.getHospCode() , new String[]{"MZCF_KFK"});
+        String mzcfKFK = null;
+        if (!macfKFKParameter.isEmpty() && !"".equals(MapUtils.get(macfKFKParameter, "MZCF_KFK"))) {
+            mzcfKFK = "," + MapUtils.get(macfKFKParameter, "MZCF_KFK") + ",";
+        }
         for(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO : outptPrescribeDetailsDTOList){
             //医院编码
             outptPrescribeDetailsDTO.setHospCode(outptPrescribeDTO.getHospCode());
             //数据校验
             this.validCfParam(outptPrescribeDetailsDTO);
+
+            if (mzcfKFK != null && mzcfKFK.contains(outptPrescribeDetailsDTO.getUsageCode())) {
+                outptPrescribeDetailsDTO.setPhCode(Constants.CFLX.KFKPT);   //  用于处方分单时，哪些用法分到口服卡上
+            }
+
             cfBoolean = false;
             //判断是否儿科和急诊
             if(StringUtils.isNotEmpty(prescribeTypeCode)){

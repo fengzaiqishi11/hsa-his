@@ -1,4 +1,4 @@
-package cn.hsa.interf.medicalCare.service.ipml;
+package cn.hsa.interf.medicalCare.service.impl;
 
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;

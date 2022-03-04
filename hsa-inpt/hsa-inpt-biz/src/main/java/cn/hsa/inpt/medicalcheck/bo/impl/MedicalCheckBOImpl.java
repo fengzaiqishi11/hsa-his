@@ -82,14 +82,15 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (null == inptAdviceDTOList.get(0)) {
             throw new AppException("医嘱集合为空");
         }
-        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP"});
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
         String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
         if (StringUtils.isEmpty(drgIp)) {
             throw new AppException("DRG的IP地址没进行配置");
         }
         param.put("url", "http://" + drgIp + "/drg_web/api/call.action");
         str.put("function_id", "apiHnsService1001"); // 接口功能号
-        str.put("hospital_id", hospCode); // 机构ID
+        str.put("hospital_id", hospitalId); // 机构ID
         str.put("scene_type", "1"); // 场景类型，1：医嘱预审接口
         str.put("visit_id", inptAdviceDTOList.get(0).getVisitId());// 就诊ID
         str.put("dept_id", inptAdviceDTOList.get(0).getInDeptId());// 所属科室ID
@@ -169,14 +170,15 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (null == adviceList.get(0)) {
             throw new AppException("医嘱集合为空");
         }
-        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP"});
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
         String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
         if (StringUtils.isEmpty(drgIp)) {
             throw new AppException("DRG的IP地址没进行配置");
         }
         param.put("url", "http://" + drgIp + "/drg_web/api/call.action");
         str.put("function_id", "apiHnsService1001");
-        str.put("hospital_id", hospCode);
+        str.put("hospital_id", hospitalId);
         str.put("scene_type", "1");
         str.put("visit_id", inptCostDTOS.get(0).getVisitId());
         str.put("dept_id", inptCostDTOS.get(0).getInDeptId());
@@ -229,7 +231,12 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<BaseDiseaseDTO> diseaseByIds = baseDiseaseService.getDiseaseByIds(diseaseMap);
         Map<String, BaseDiseaseDTO> collect = diseaseByIds.stream().collect(Collectors.toMap(BaseDiseaseDTO::getId, Function.identity(), (key1, key2) -> key2));
         StringBuffer sb = new StringBuffer();
-        sb.append(" http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_dagns/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipIp)) {
+            throw new AppException("DIP的IP地址没进行配置");
+        }
+        sb.append(" http://"+dipIp+"/drg_medical_web/drgGroupThird/drg_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -328,7 +335,12 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<BaseDiseaseDTO> diseaseByIds = baseDiseaseService.getDiseaseByIds(diseaseMap);
         Map<String, BaseDiseaseDTO> collect = diseaseByIds.stream().collect(Collectors.toMap(BaseDiseaseDTO::getId, Function.identity(), (key1, key2) -> key2));
         StringBuffer sb = new StringBuffer();
-        sb.append(" http://172.18.21.70:8080/drg_medical_web/drgGroupThird/dip_dagns/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        sb.append(" http://" + dipIp + "/drg_medical_web/drgGroupThird/dip_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -473,7 +485,12 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     public Map getBeforeDIP(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipip = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipip)) {
+            throw new AppException("DIP的IP地址没进行配置");
+        }
+        sb.append("http://" + dipip + "/drg_medical_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");
@@ -505,8 +522,9 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> param = new HashMap<String, Object>();
-        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP"});
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
         String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
         if (StringUtils.isEmpty(drgIp)) {
             throw new AppException("DRG的IP地址没进行配置");
         }
@@ -514,7 +532,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, Object> str = new HashMap<String, Object>();
         Map returnMap = new HashMap();
         str.put("function_id", "apiHnsService1001");
-        str.put("hospital_id", hospCode);
+        str.put("hospital_id", hospitalId);
         str.put("scene_type", "6");
         str.put("visit_id", inptVisitDTO.getVisitId());
         String json = JSONObject.toJSONString(str);

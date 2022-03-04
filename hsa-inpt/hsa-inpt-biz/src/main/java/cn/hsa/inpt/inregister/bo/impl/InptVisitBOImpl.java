@@ -1426,6 +1426,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         //设置病案号/住院档案号
         inptVisitDTO.setInProfile(extend.getInProfile());
 
+        //设置档案中的住院次数到就诊表中 update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表
+        inptVisitDTO.setTotalInCount(extend.getTotalIn());
+
         //设置个人档案ID
         inptVisitDTO.setProfileId(extend.getId());
 

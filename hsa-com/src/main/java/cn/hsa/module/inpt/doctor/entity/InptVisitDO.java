@@ -388,4 +388,6 @@ public class InptVisitDO extends PageDO implements Serializable {
     private BigDecimal guaranteeBalance;
 
     private Integer totalInDays; // 住院天数
+
+    private Integer totalInCount; // 住院次数
 }

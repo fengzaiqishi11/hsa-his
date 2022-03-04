@@ -1407,6 +1407,7 @@
         t.bfc_id ,
         t.bfc_name ,
         t.item_code ,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,
@@ -1437,6 +1438,7 @@
         t.bfc_id ,
         t.bfc_name ,
         t.item_code ,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,
@@ -1526,6 +1528,7 @@
         t.bfc_id ,
         t.bfc_name,
         t.item_code,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,
@@ -1551,6 +1554,7 @@
         t.bfc_id ,
         t.bfc_name,
         t.item_code,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,
@@ -1593,6 +1597,12 @@
             b.bfc_id ,
             e.name as bfc_name,
             b.item_code ,
+            (case
+                when b.item_code = '1' then (SELECT code from base_drug bd where bd.hosp_code = b.hosp_code and bd.id = b.item_id)
+                when b.item_code = '2' then (SELECT code from base_material bm where bm.hosp_code = b.hosp_code and bm.id = b.item_id)
+                when b.item_code = '3' then (SELECT code from base_item bi where bi.hosp_code = b.hosp_code and bi.id = b.item_id)
+                when b.item_code = '4' then (SELECT code from base_advice ba where ba.hosp_code = b.hosp_code and ba.id = b.item_id)
+            END ) as bianma,
             b.item_name,
             b.spec,
             b.total_num_unit_code AS num_unit_code,
@@ -1671,6 +1681,12 @@
             b.bfc_id ,
             e.name as bfc_name,
             b.item_code ,
+            (case
+                when b.item_code = '1' then (SELECT code from base_drug bd where bd.hosp_code = b.hosp_code and bd.id = b.item_id)
+                when b.item_code = '2' then (SELECT code from base_material bm where bm.hosp_code = b.hosp_code and bm.id = b.item_id)
+                when b.item_code = '3' then (SELECT code from base_item bi where bi.hosp_code = b.hosp_code and bi.id = b.item_id)
+                when b.item_code = '4' then (SELECT code from base_advice ba where ba.hosp_code = b.hosp_code and ba.id = b.item_id)
+            END ) as bianma,
             b.item_name,
             b.spec,
             b.num_unit_code,
@@ -1727,6 +1743,12 @@
             b.bfc_id ,
             e.name as bfc_name,
             b.item_code ,
+            (case
+                when b.item_code = '1' then (SELECT code from base_drug bd where bd.hosp_code = b.hosp_code and bd.id = b.item_id)
+                when b.item_code = '2' then (SELECT code from base_material bm where bm.hosp_code = b.hosp_code and bm.id = b.item_id)
+                when b.item_code = '3' then (SELECT code from base_item bi where bi.hosp_code = b.hosp_code and bi.id = b.item_id)
+                when b.item_code = '4' then (SELECT code from base_advice ba where ba.hosp_code = b.hosp_code and ba.id = b.item_id)
+            END ) as bianma,
             b.item_name,
             b.spec,
             b.unit_code,
@@ -1787,6 +1809,7 @@
         t.item_id,
         t.bfc_name ,
         t.item_code ,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,
@@ -1825,6 +1848,7 @@
         group by t.item_id,
         t.bfc_name,
         t.item_code,
+        t.bianma,
         t.item_name,
         t.spec,
         t.num_unit_code,

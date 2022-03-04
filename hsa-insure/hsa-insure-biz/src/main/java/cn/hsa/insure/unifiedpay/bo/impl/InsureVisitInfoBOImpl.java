@@ -118,7 +118,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			visitMap.put("mdtrt_cert_type",mdtrtCertType);  // 就诊凭证类型  传值03
 			visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
 			visitMap.put("card_sn", insureIndividualBasicDTO.getCardIden()); // 传值社保卡识别码
-			visitMap.put("psn_cert_type", "1");  //1
+			visitMap.put("psn_cert_type", "01");  //1
 			visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
 			visitMap.put("certno", insureIndividualBasicDTO.getAac002()); // 传值证件号码
 		}

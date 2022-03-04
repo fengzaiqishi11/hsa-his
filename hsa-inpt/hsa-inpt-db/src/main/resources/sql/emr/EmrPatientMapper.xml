@@ -347,7 +347,13 @@
             from sys_user a right join sys_user_system b on a.code = b.user_code and a.hosp_code = b.hosp_code
             where a.id = #{crteId} and a.hosp_code = #{hospCode}) u,
         sys_user_system sy
-        where s.code = sy.user_code and sy.dept_code = u.dept_code and s.hosp_code = u.hosp_code and s.work_type_code &lt; u.work_type_code
+        where s.code = sy.user_code and sy.dept_code = u.dept_code and s.hosp_code = u.hosp_code
+        <if test="allowEdit == '2'.toString()">
+            and s.work_type_code &lt; u.work_type_code
+        </if>
+        <if test="allowEdit == '1'.toString()">
+            and s.work_type_code &lt;= u.work_type_code
+        </if>
     </select>
 
     <!-- 根据用户id查询用户信息 -->

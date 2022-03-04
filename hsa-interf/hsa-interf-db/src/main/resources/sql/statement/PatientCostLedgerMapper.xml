@@ -8098,7 +8098,7 @@
         ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
         ),'其他')
         as bfcName,
-        t.patient_code as patientCode,
+        ifnull(t.patient_code, '-1') as patientCode,
         ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from
@@ -8128,7 +8128,7 @@
         ifnull((select name from base_finance_classify bfc where bfc.id = B.bfc_id and bfc.hosp_code = #{hospCode}
         ),'其他')
         as bfcName,
-        t.patient_code as patientCode,
+        ifnull(t.patient_code, '-1') as patientCode,
         ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from
@@ -8157,7 +8157,7 @@
         ifnull((select name from base_finance_classify bfc where bfc.id = t.bfc_id and bfc.hosp_code = #{hospCode}
         ),'其他')
         as bfcName,
-        v.patient_code as patientCode,
+        ifnull(v.patient_code, '-1') as patientCode,
         ifnull((select name from sys_code_detail sc where sc.`value` = v.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from

@@ -268,4 +268,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
     // 发票前缀
     private String prefix;
+
+    // 医养转诊类别（1.医转养，2.养转医）
+    private String changeType;
 }

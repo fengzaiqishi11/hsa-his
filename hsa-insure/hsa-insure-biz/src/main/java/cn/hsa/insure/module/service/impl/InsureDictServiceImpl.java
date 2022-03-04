@@ -225,4 +225,20 @@ public class InsureDictServiceImpl extends HsafService implements InsureDictServ
     public WrapperResponse<List<Map<String,Object>>> queryAdmdvsInfo(Map map) {
         return WrapperResponse.success(insureDictBO.queryAdmdvsInfo(map));
     }
+
+    @Override
+    public WrapperResponse<Map<String, String>> queryDictByCode(Map map) {
+        return WrapperResponse.success(insureDictBO.queryDictByCode(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, String>> queryOneAdmdvsInfo(Map map) {
+        return WrapperResponse.success(insureDictBO.queryOneAdmdvsInfo(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, String>> querySysCodeByCode(Map map) {
+        return WrapperResponse.success(insureDictBO.querySysCodeByCode(map));
+    }
+
 }

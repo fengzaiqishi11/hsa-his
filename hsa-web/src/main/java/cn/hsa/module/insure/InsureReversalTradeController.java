@@ -5,11 +5,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.outpt.dto.InsureReversalTradeDTO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
-import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
-import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
-import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,9 +45,6 @@ public class InsureReversalTradeController extends BaseController {
 
     @Resource
     private InsureUnifiedPayReversalTradeService insureUnifiedPayReversalTradeService_consumer;
-
-    @Resource
-    private ReportDataDownLoadService reportDataDownLoadService_consumer;
 
     /**冲正交易查询
     * @Method queryReversalTradePage
@@ -331,30 +325,6 @@ public class InsureReversalTradeController extends BaseController {
         paraMap.put("crteName",sysUserDTO.getName());
         WrapperResponse<Map<String,Object>> resultMap = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(paraMap);
         return resultMap;
-    }
-
-    /**
-     * @Method querySumDeclareInfoPrints
-     * @Desrciption 清算申报合计报表打印
-     * @param paraMap
-     * @Author liuhuiming
-     * @Date   2022/2/21 09:01
-     * @Return
-     **/
-    @GetMapping("/querySumDeclareInfoPrints")
-    public WrapperResponse<ReportReturnDataDTO> querySumDeclareInfoPrints(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        paraMap.put("hospCode", sysUserDTO.getHospCode());
-        paraMap.put("crteId", sysUserDTO.getId());
-        paraMap.put("crteName", sysUserDTO.getName());
-        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(paraMap);
-        result.getData().put("hospCode", sysUserDTO.getHospCode());
-        result.getData().put("crterId", sysUserDTO.getId());
-        result.getData().put("crterName", sysUserDTO.getName());
-        result.getData().put("declaraType", MapUtils.get(paraMap, "declaraType"));
-        result.getData().put("businessType", "settleDeclareSheetProcess");
-        WrapperResponse<ReportReturnDataDTO> resultDTO = reportDataDownLoadService_consumer.saveBuild(result.getData());
-        return resultDTO;
     }
 
     /**

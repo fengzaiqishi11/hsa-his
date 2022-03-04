@@ -9,12 +9,7 @@ import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
-import cn.hsa.report.business.bo.impl.factory.ReportBusinessFactory;
-import cn.hsa.report.business.bo.impl.factory.ReportBusinessProcess;
-import cn.hsa.util.ConverUtils;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -59,14 +54,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     @Autowired
     private ReportFileRecordDAO reportFileRecordDAO;
 
-    @Autowired
-    private ReportBusinessFactory reportBusinessFactory;
-
     @Override
     public ReportReturnDataDTO saveBuild(Map map) {
-        ReportBusinessProcess reportBusinessProcess = reportBusinessFactory.getReportBusinessProcess(map.get("businessType").toString());
-        map = reportBusinessProcess.getReportDataMap(map);
-
         String hospCode = map.get("hospCode").toString();
         String tempCode = map.get("tempCode").toString();
         String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? hospCode : map.get("fileName").toString();
@@ -75,11 +64,25 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         // 自定义配置
         Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
         map.put("customConfig", customConfigMap);
-
-        String rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath);
+        String rUrl;
+        switch ((String) customConfigMap.get("fileFormat")) {
+            case "pdf":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/pdf/show");
+                break;
+            case "xls":
+            case "xlsx":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/excel");
+                break;
+            case "doc":
+            case "docx":
+                rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/word");
+                break;
+            default:
+                throw new RuntimeException("暂不支持该返回数据类型");
+        }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
 
-        if (!configuration.getIsUpload()) {
+        if (Constants.SF.F.equals(configuration.getIsUpload())) {
             return new ReportReturnDataDTO(null, str);
         }
 
@@ -105,8 +108,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 record.setTempCode(configuration.getTempCode());
                 record.setFileName(fileName);
                 record.setFileAddress(fsEntity.getKeyId());
-                record.setCrterId(map.get("crterId").toString());
-                record.setCrterName(map.get("crterName").toString());
+                record.setCrterId(map.get("crteId").toString());
+                record.setCrterName(map.get("crteName").toString());
                 record.setCrteTime(DateUtils.getNow());
                 reportFileRecordDAO.insert(record);
             }

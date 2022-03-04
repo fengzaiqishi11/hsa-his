@@ -1,5 +1,6 @@
 package cn.hsa.report.business.bean;
 
+import cn.hsa.module.report.business.bo.ReportBaseDataBO;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
@@ -8,6 +9,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -28,6 +30,9 @@ import java.util.Map;
 @Slf4j
 public class SettleDeclareSheetBean extends GeneralTemplateBean {
 
+    @Autowired
+    private ReportBaseDataBO reportBaseDataBO;
+
     /**
      * 申报单信息
      */
@@ -37,11 +42,18 @@ public class SettleDeclareSheetBean extends GeneralTemplateBean {
             String customConfigStr = (String) param.get("customConfig");
             String baseInfoStr = (String) param.get("baseInfo");
             Map baseInfo = JSONObject.parseObject(baseInfoStr, Map.class);
+            String hospCode = baseInfo.get("hospCode").toString();
+            String regCode = baseInfo.get("regCode").toString();
+
             Map customConfig = JSONObject.parseObject(customConfigStr, Map.class);
             String titleTmp = customConfig.get("title").toString();
-            String titleTop = baseInfo.get("regCode").toString().contains("9900") ? baseInfo.get("regCode").toString() : baseInfo.get("cityName").toString() + baseInfo.get("provinceName").toString();
+            String regName = reportBaseDataBO.getAdmdvsName(hospCode, regCode);
+            String cityName = reportBaseDataBO.getAdmdvsName(hospCode, regCode.substring(0, 4) + "00");
+            String provinceName = reportBaseDataBO.getAdmdvsName(hospCode, regCode.substring(0, 2) + "0000");
+            String titleTop = regCode.contains("9900") ? regName : provinceName + cityName;
             info.put("title", titleTmp.replace("$", titleTop));
             info.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
+            info.put("crteName", param.get("crterName"));
             List<Map<String, Object>> list = new ArrayList<>();
             list.add(info);
             return list;

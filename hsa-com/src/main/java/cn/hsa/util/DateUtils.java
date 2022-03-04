@@ -472,10 +472,10 @@ public class DateUtils {
      * @param time
      * @return
      */
-    public static String getDateStr(Long time) {
+    public static String getDateStr(Long time, String format) {
         Date date2 = new Date();
         date2.setTime(time);
-        return format(date2,Y_M_DH_M_S);
+        return format(date2, format);
     }
 
     /**

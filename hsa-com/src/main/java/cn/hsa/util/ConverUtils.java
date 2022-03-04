@@ -9,8 +9,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -98,13 +100,14 @@ public class ConverUtils {
         return output.toByteArray();
     }
 
-    public static String getUrl(Map<String, Object> params, String fileName, String port, String contextPath) {
+    public static String getUrl(Map<String, Object> params, String fileName, String port, String contextPath, String businessPath) {
         //拼接报表设计器，获取对应的模板文件的url地址
         StringBuffer url = new StringBuffer();
         url.append("http://127.0.0.1:");
         url.append(port);
         url.append(contextPath);
-        url.append("/ureport/pdf/show");
+        url.append("/ureport");
+        url.append(businessPath);
         url.append("?_u=file:");
         url.append(fileName);
         // 添加url参数,这里的参数是为了获取模板数据需要
@@ -128,7 +131,7 @@ public class ConverUtils {
     public static String getParamsToString(Map<String, Object> params) {
         StringBuffer param = new StringBuffer();
         int i = 0;
-        Object value;
+        String value;
         for (String key : params.keySet()) {
             if (i != 0) {
                 param.append("&");
@@ -138,9 +141,13 @@ public class ConverUtils {
             } else if (params.get(key) instanceof List) {
                 value = JSONArray.toJSONString(params.get(key));
             } else {
-                value = params.get(key);
+                value = params.get(key).toString();
             }
-            param.append(key).append("=").append(value);
+            try {
+                param.append(key).append("=").append(URLEncoder.encode(value, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("入参编码失败:" + e.getMessage());
+            }
             i++;
         }
         return param.toString();

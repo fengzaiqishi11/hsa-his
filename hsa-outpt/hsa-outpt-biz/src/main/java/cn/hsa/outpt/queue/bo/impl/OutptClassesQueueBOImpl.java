@@ -108,6 +108,19 @@ public class OutptClassesQueueBOImpl implements OutptClassesQueueBO {
         if (dlrqDate.getTime() < now.getTime()) {
             throw new AppException("班次队列日期不能小于当前日期！");
         }
+//        Map parmMap = new HashMap();
+//        parmMap.put("hospCode", outptClassesQueueDto.getHospCode());
+//        parmMap.put("cyId", outptClassesQueueDto.getCyId());
+//        parmMap.put("csId", outptClassesQueueDto.getCsId());
+//        parmMap.put("weeks", DateUtils.getWeeksDayOfName());
+//        //校验排班类别是否存在，如果不校验排班类别 outpt_classes_queue -> cc_id会为空。
+//        Map<String,Object> classesQueueMap =  outptClassesQueueDao.queryClassifyClassesByCyAndCs(tem);
+//        if (classesQueueMap == null ) {
+//            throw new AppException("请在挂号排班类别里面提前配置对应班次!");
+//        }
+//
+//        outptClassesQueueDto.setCcId((String)classesQueueMap.get("id"));
+
         List<OutptDoctorQueueDto> doctorList = outptClassesQueueDto.getDoctorQueueList();
         if(StringUtils.isEmpty(outptClassesQueueDto.getId())){ //新增
             checkBcdl(tem);
@@ -182,6 +195,7 @@ public class OutptClassesQueueBOImpl implements OutptClassesQueueBO {
             param.put("queueDate",outptClassesQueueDto.getQueueDateTem());
             param.put("classId",outptClassesQueueDto.getCsId());
             param.put("doctorIdList",doctorIdList);
+            param.put("id",outptClassesQueueDto.getId());
             // 校验医生当天是否存在队列之中
             List<Map<String,Object>> doctorQueueExistList = outptClassesQueueDao.queryDoctorQueueOfTodayByClassifyIdDoctorId(param);
             if(!ListUtils.isEmpty(doctorQueueExistList)) {
@@ -550,7 +564,7 @@ public class OutptClassesQueueBOImpl implements OutptClassesQueueBO {
         m.put("triage_id",MapUtils.get(map,"triage_id"));
         m.put("triage_code",MapUtils.get(map,"triage_code"));
         m.put("register_num", register_num);
-        m.put("gen_code","");
+        m.put("gen_code","1");
         m.put("dept_id",MapUtils.get(map, "dept_id"));
         m.put("is_valid","1");
         m.put("crte_time",new Date());

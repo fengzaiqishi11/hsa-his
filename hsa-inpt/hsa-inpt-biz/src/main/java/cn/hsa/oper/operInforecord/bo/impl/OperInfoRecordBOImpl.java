@@ -260,18 +260,18 @@ public class OperInfoRecordBOImpl extends HsafBO implements OperInfoRecordBO {
     @Override
     public PageDTO queryOperInfoRecordList(OperInfoRecordDTO operInfoRecordDTO) {
         List<OperInfoRecordDTO> operInfoRecordDTOS;
-        PageHelper.startPage(operInfoRecordDTO.getPageNo(),operInfoRecordDTO.getPageSize());
-        if(StringUtils.isEmpty(operInfoRecordDTO.getOperInquiry())){
-            //operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
-            /*增加icd9名称*/
-            //operInfoRecordDTOS = getBaseDiseaseInfo(operInfoRecordDTOS,operInfoRecordDTO);
+        PageHelper.startPage(operInfoRecordDTO.getPageNo(), operInfoRecordDTO.getPageSize());
+        if (Constants.VISITTYPE.OUTPT.equals(operInfoRecordDTO.getInptOrOutpt())){ // 门诊病人
+            operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordOutpt(operInfoRecordDTO);
 
-            operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordBasic(operInfoRecordDTO);
-        }else{
+        }else if (Constants.VISITTYPE.INPT.equals(operInfoRecordDTO.getInptOrOutpt())){// 住院病人
+            operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordInpt(operInfoRecordDTO);
+
+        }else{  // 查询全部
             operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordBasic(operInfoRecordDTO);
         }
         /*增加科室名称*/
-        operInfoRecordDTOS = getDeptInfo(operInfoRecordDTOS,operInfoRecordDTO);
+        operInfoRecordDTOS = getDeptInfo(operInfoRecordDTOS, operInfoRecordDTO);
 
         return PageDTO.of(operInfoRecordDTOS);
     }

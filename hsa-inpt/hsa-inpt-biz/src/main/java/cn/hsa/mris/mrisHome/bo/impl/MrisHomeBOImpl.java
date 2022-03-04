@@ -1477,12 +1477,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
 
         // 住院次数获取(未获取，默认1次)
-        int inCnt = mrisHomeDAO.getInCnt(mrisBaseInfoDTO);
+        /*int inCnt = mrisHomeDAO.getInCnt(mrisBaseInfoDTO);
         if (inCnt == 0) {
             inCnt = 1;
-        }
+        }*/
 
-        mrisBaseInfoDTO.setInCnt(inCnt);
+        // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表，病案首页直接去就诊表中的住院次数
+//        mrisBaseInfoDTO.setInCnt(inCnt);
         mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getInNo());
 
         // 获取医疗机构名称与医疗机构编码

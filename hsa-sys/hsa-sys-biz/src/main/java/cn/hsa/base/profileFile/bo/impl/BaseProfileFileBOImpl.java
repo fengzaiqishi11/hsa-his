@@ -180,7 +180,10 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                     param.setPreferentialTypeId(profileFileDTO.getPreferentialTypeId());
                 }
                 //门诊
-                param.setTotalOut(profileFileDTO.getTotalOut() == null ? 1 : profileFileDTO.getTotalOut() + 1);
+                // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表
+                int totalOut = profileFileDTO.getTotalOut() == null ? 1 : profileFileDTO.getTotalOut() + 1;
+                param.setTotalOut(totalOut);
+                profileFileDTO.setTotalOut(totalOut);
                 param.setOutptLastVisitTime(DateUtils.getNow());
                 baseProfileFileDAO.update(param);
             } else if ("1".equals(outptProfileFileDTO.getType()) && StringUtils.isNotEmpty(outptProfileFileDTO.getType())){
@@ -192,7 +195,10 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                     param.setPreferentialTypeId(profileFileDTO.getPreferentialTypeId());
                 }
                 //住院
-                param.setTotalIn(profileFileDTO.getTotalIn() == null ? 1 : profileFileDTO.getTotalIn() + 1);
+                // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表
+                int totalIn = profileFileDTO.getTotalIn() == null ? 1 : profileFileDTO.getTotalIn() + 1;
+                param.setTotalIn(totalIn);
+                profileFileDTO.setTotalIn(totalIn);
                 param.setInptLastVisitTime(DateUtils.getNow());
                 baseProfileFileDAO.update(param);
             } else {

@@ -65,7 +65,7 @@ public class InsureItfBOImpl {
             if (!resultMap.get("infcode").equals("0")) {
                 String errMsg = (String) resultMap.get("err_msg");
 
-                logger.error("流水号-{},医保业务功能号 {}-{}, 失败结果:{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), result);
+//                logger.error("流水号-{},医保业务功能号 {}-{}, 失败结果:{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), result);
                 params.put("resultStr",errMsg == null ? "null": errMsg.length() > 5000 ? errMsg.substring(0,4500):errMsg);
 //                insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
                 throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE,new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(),resultMap.get("err_msg")});
@@ -75,10 +75,10 @@ public class InsureItfBOImpl {
 //            insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
             return resultMap;
         } catch (Exception e) {
-            logger.error("流水号-{},医保业务功能号 {}-{}, 错误异常信息:{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), e);
+//            logger.error("流水号-{},医保业务功能号 {}-{}, 错误异常信息:{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), e);
             //调接口后，请求失败插入医保人员信息获取日志
             params.put("resultStr",e.getMessage()== null ? "null": e.getMessage().length() > 5000 ? e.getMessage().substring(0,4500):e.getMessage());
-            throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),e.getMessage()});
+            throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),e});
         }finally {
             insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
         }

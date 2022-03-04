@@ -173,4 +173,12 @@
             and c.is_technology_ok = #{isOk}
         </if>
     </select>
+    <select id="getParameterValue" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select  a.id, a.hosp_code hospCode, a.name, a.code, a.remark, a.pym, a.wbm, a.value
+        from sys_parameter a
+        where  a.hosp_code = #{hospCode}  and code in
+        <foreach item="code" collection="code" separator="," open="(" close=")" index="">
+            #{code}
+        </foreach>
+    </select>
 </mapper>

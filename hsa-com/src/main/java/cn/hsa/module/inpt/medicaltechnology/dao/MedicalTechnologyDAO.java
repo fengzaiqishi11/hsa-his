@@ -3,6 +3,7 @@ package cn.hsa.module.inpt.medicaltechnology.dao;
 import cn.hsa.base.PageDO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -44,4 +45,6 @@ public interface MedicalTechnologyDAO {
 	 * @Return
 	 */
 	int getConfirmCost(InptVisitDTO inptVisitDTO);
+
+    List<SysParameterDTO> getParameterValue(@Param("hospCode") String hospCode, @Param("code") String[] code);
 }

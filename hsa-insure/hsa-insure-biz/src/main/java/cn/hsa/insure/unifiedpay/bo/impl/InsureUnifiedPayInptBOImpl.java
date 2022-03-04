@@ -1,5 +1,8 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
+import cn.hsa.enums.HsaSrvEnum;
+import cn.hsa.exception.BizRtException;
+import cn.hsa.exception.InsureExecCodesEnum;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -116,7 +119,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureCostParam.put("feeEndDate", feeEndDate);// 是否中途结算
         List<Map<String,Object>> insureCostList =  insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
         if(ListUtils.isEmpty(insureCostList)) {
-            throw new AppException("没有可以上传的医保费用数据！");
+            throw new BizRtException(InsureExecCodesEnum.IN_HOSP_FEE_DATA_EMPTY,new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),visitId});
         }
 
         // 查询有退费且未上传的的费数据

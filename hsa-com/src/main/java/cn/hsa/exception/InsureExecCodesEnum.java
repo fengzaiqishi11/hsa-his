@@ -7,8 +7,12 @@ package cn.hsa.exception;
 
 public enum InsureExecCodesEnum implements BizExcCodes {
 
+    INSURE_RETURN_DATA_EMPTY(-1, SYS_MSG_OUT+"{1}返回数据为空"),
 
-    UN_DECLARE(-1, SYS_MSG_INNER + "{0}还未进行申报");
+    INSUR_SYS_FAILURE(-1, OTHER_SYS_ERR_MSG+"{1}"),
+
+    IN_HOSP_FEE_DATA_EMPTY(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！");
+
     /**
      * 100000-1000019 基础异常码
 

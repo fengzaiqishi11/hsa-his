@@ -239,7 +239,18 @@ public class HsafLogHandlers {
 
     }
 
-    private static void doAfterReturning(Object ret, LogInfo logInfo) {
+    private static void doAfterControllerReturning(Object ret, LogInfo logInfo) {
+        if (ret != null && ret.getClass().isAssignableFrom(WrapperResponse.class)) {
+            logInfo.setCode(((WrapperResponse) ret).getCode());
+            logger.debug(JSONObject.toJSONString(ret));
+        }
+
+        logger.debug("====[response data]====");
+        logger.info(logInfo.getLogString());
+        MDC.remove("traceID");
+    }
+
+    private static void doAfterServiceReturning(Object ret, LogInfo logInfo) {
         if (ret != null && ret.getClass().isAssignableFrom(WrapperResponse.class)) {
             logInfo.setCode(((WrapperResponse) ret).getCode());
             logger.debug(JSONObject.toJSONString(ret));
@@ -259,7 +270,7 @@ public class HsafLogHandlers {
                 return;
             }
 
-            doAfterReturning(ret, logInfo);
+            doAfterControllerReturning(ret, logInfo);
         } catch (Exception var3) {
             logger.error("HsafLogHandler.doControllerAfterReturning.exception", var3);
         }
@@ -279,7 +290,7 @@ public class HsafLogHandlers {
                 return;
             }
 
-            doAfterReturning(ret, logInfo);
+            doAfterServiceReturning(ret, logInfo);
         } catch (Exception var3) {
             logger.error("HsafLogHandler.doServiceAfterReturning.exception", var3);
         }
@@ -343,6 +354,7 @@ public class HsafLogHandlers {
      **/
     public String gettraceID() {
         String trace_id = RpcContext.getContext().getAttachment("trace_id");
+//        String trace_id = MDC.get("traceID");
         if (StringUtils.isEmpty(trace_id)) {
             trace_id = generateTraceID();
         } else {

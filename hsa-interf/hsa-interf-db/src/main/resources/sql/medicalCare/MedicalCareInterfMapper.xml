@@ -103,7 +103,7 @@
             a.remark,
             (case a.is_skin when '1' then '是' when '0' then '否' else '' end) as is_skin,
             b.crte_name,
-            '' as stop_time
+            null as stop_time
         FROM outpt_prescribe_detail a
         LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
         WHERE a.hosp_code = #{hospCode}

@@ -709,7 +709,16 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 		map.put("hospCode", emrPatientDTO.getHospCode());
 		map.put("code", "BL_EDIT_ISSS");
 		SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+		Map<String, Object> editMap = new HashMap<>();
+		editMap.put("hospCode", emrPatientDTO.getHospCode());
+		editMap.put("code", "BL_EQUATIVE_EDIT");
+		SysParameterDTO editSysDto = sysParameterService_consumer.getParameterByCode(editMap).getData();
 		EmrPatientDTO temp = emrPatientDAO.getEmrPatientDTO(emrPatientDTO);
+		if (editSysDto!=null&&StringUtils.isNotEmpty(editSysDto.getValue()) && "1".equals(editSysDto.getValue())){
+			temp.setAllowEdit("1");
+		}else {
+			temp.setAllowEdit("2");
+		}
 		// 如果配置为不需要送审就能编辑
 		if (sys != null && StringUtils.isNotEmpty(sys.getValue()) && "2".equals(sys.getValue())) {
 			List<SysUserDTO> list = emrPatientDAO.getDeptUsers(temp);

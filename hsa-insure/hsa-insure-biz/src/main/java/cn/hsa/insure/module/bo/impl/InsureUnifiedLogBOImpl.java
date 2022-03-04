@@ -88,8 +88,8 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
         String paramMapJson = MapUtils.get(map,"paramMapJson");
         String medisCode = MapUtils.get(map,"medisCode");
         String resultStr = MapUtils.get(map,"resultStr");
-        Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-        String resultCode = MapUtils.get(m,"infcode","");
+//        Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
+        String resultCode = MapUtils.get(map,"infcode","");
         TransactionStatus status = null;
         boolean functionLog = false;
         try {
@@ -112,7 +112,7 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             insureFunctionDO.setCrteTime(DateUtils.getNow());
             insureFunctionDO.setCrteName(crteName);
             if(!"0".equals(resultCode)){
-                insureFunctionDO.setErrorMsg(MapUtils.get(m,"err_msg"));
+                insureFunctionDO.setErrorMsg("调用失败");
             }else{
                 insureFunctionDO.setErrorMsg("调用成功");
             }

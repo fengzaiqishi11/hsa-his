@@ -51,7 +51,7 @@ public class HsafExceptionFilter   implements Filter {
     private void isException(Invoker<?> invoker,Result appResponse ){
         if (appResponse.hasException() && GenericService.class != invoker.getInterface()) {
             Throwable exception = appResponse.getException();
-            logger.error("系统存在异常信息~");
+//            logger.error("系统存在异常信息~");
             logger.error( RpcContext.getContext().getRemoteHost() + ". service: " + invoker.getInterface().getName() +", exception: " + exception.getClass().getName() + ": " + exception.getMessage(), exception);
             if (exception instanceof RuntimeException || !(exception instanceof Exception)) {
                 setException(appResponse,exception);

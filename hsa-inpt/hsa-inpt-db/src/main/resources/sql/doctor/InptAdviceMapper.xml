@@ -263,10 +263,11 @@
         join (
         SELECT
         '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
-        FROM
-        inpt_consultation_apply ss
+        FROM inpt_consultation_apply ss
+        join inpt_advice ia on ss.hosp_code = ia.hosp_code and ss.advice_id = ia.id
         WHERE ss.hosp_code = #{hospCode}
         and ss.consul_state = '1'
+        and ia.is_check = '1'
         AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
         GROUP BY ss.visit_id, ss.hosp_code
         ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id

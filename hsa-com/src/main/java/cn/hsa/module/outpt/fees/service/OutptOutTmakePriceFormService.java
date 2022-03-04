@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.fees.dto.OutptPayDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.Map;
@@ -136,5 +137,6 @@ public interface OutptOutTmakePriceFormService {
      **/
     WrapperResponse<OutptPayDTO> getPayInfoByParams(Map<String,Object> map);
 
+    @PostMapping(value = "/service/outpt/outTmakePriceForm/saveBackCostWithOutpt")
     WrapperResponse<Boolean> saveBackCostWithOutpt(Map<String,Object> map);
 }

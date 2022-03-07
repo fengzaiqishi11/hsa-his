@@ -133,5 +133,9 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     @JsonFormat(pattern = "yyyy-MM-dd")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date oprnOprtDate;
+    // 手术前诊断
+    private String operDiseaseBefore;
+    //手术后诊断
+    private String operDiseaseAfter;
 
 }

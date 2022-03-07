@@ -566,7 +566,7 @@ public class EmrPatientController extends BaseController {
 	}
 
 	/**
-	 * @Description: 上传
+	 * @Description:  电子病历上传医保
 	 * @Param:
 	 * @Author: liuliyun
 	 * @Email: liyun.liu@powersi.com.cn

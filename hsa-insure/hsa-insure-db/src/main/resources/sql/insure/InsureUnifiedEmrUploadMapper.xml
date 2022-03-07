@@ -5,6 +5,9 @@
         update mris_base_info set is_upload_insure ='1'
         where  hosp_code =#{hospCode} and id =#{id}
     </update>
+    <update id="updateEmrPatientFlag">
+        update emr_patient set emr_insure_upload ='1' where hosp_code =#{hospCode} and visit_id =#{id}
+    </update>
     <select id="selectDiseinfo" resultType="java.util.Map">
 
         select mid.id,
@@ -28,6 +31,7 @@
     </select>
     <select id="selectOperInfo" resultType="java.util.Map">
         select columns_num  as oprn_oprt_sn,
+               moi.id,
                moi.oper_disease_name          as oprn_oprt_name,
                moi.oper_disease_icd9,
                moi.oper_time                  as oprn_oprt_date,

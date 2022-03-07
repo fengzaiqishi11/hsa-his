@@ -472,6 +472,27 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
      *是否上传医保
      */
     private String isInsureUpload;
-
+    // 科室国家代码
+    private String deptNationCode;
+    //  主治医生国家医生码
+    private String zzPracCertiNo;
+    //  经治医生国家医生码
+    private String jzPracCertiNo;
+    //  经管医生国家医生码
+    private String zgPracCertiNo;
+    //  门诊医生国家医生码
+    private String outptPracCertiNo;
+    // 责任护士
+    private String respPracCertiNo;
+    // 出院科室国家码
+    private String outptNationCode;
+    // 科室编码
+    private String inDeptCode;
+    // 入院情况
+    private String inSituationName;
+    // 医保疾病名称
+    private String insureIllnessName;
+    // 医保疾病编码
+    private String insureIllnessCode;
 
 }

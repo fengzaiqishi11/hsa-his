@@ -1436,6 +1436,10 @@
         where hosp_code = #{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
         and state ='0'
     </select>
+    <select id="queryInsureSettle" resultType="java.lang.Integer">
+        select count(id) from insure_individual_settle
+        where hosp_code = #{hospCode} and visit_id =#{visitId} and medicalRegNo =#{medicalRegNo} and state ='0'
+    </select>
 
     <!-- 修改数据 -->
     <update id="updateByInsureSettleId" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">

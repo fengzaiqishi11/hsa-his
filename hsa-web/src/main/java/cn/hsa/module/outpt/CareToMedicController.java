@@ -25,7 +25,7 @@ import java.util.Map;
  * @desc
  **/
 @RestController
-@RequestMapping("/web/outpt/CareToMedic")
+@RequestMapping("/web/outpt/careToMedic")
 @Slf4j
 public class CareToMedicController extends BaseController {
     @Resource

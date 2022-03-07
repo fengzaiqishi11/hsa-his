@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.outpt.medictocare.dao.OutptMedicalCareConfigurationDAO">
+
+    <resultMap type="cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO" id="OutptMedicalCareConfigurationMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="hospName" column="hosp_name" jdbcType="VARCHAR"/>
+        <result property="orgCode" column="org_code" jdbcType="VARCHAR"/>
+        <result property="orgName" column="org_name" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="OutptMedicalCareConfigurationMap">
+        select
+            id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time
+        from outpt_medical_care_configuration
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="OutptMedicalCareConfigurationMap">
+        select
+        id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time
+        from outpt_medical_care_configuration
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="hospName != null and hospName != ''">
+                and hosp_name = #{hospName}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                and org_code = #{orgCode}
+            </if>
+            <if test="orgName != null and orgName != ''">
+                and org_name = #{orgName}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from outpt_medical_care_configuration
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="hospName != null and hospName != ''">
+                and hosp_name = #{hospName}
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                and org_code = #{orgCode}
+            </if>
+            <if test="orgName != null and orgName != ''">
+                and org_name = #{orgName}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insertConfiguration" keyProperty="" useGeneratedKeys="true">
+        insert into outpt_medical_care_configuration(id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{hospName}, #{orgCode}, #{orgName}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="" useGeneratedKeys="true">
+        insert into outpt_medical_care_configuration(id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.hospName}, #{entity.orgCode}, #{entity.orgName}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="" useGeneratedKeys="true">
+        insert into outpt_medical_care_configuration(id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.hospName}, #{entity.orgCode}, #{entity.orgName}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime})
+        </foreach>
+        on duplicate key update
+        id = values(id),
+        hosp_code = values(hosp_code),
+        hosp_name = values(hosp_name),
+        org_code = values(org_code),
+        org_name = values(org_name),
+        remark = values(remark),
+        crte_id = values(crte_id),
+        crte_name = values(crte_name),
+        crte_time = values(crte_time)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="updateConfiguration">
+        update outpt_medical_care_configuration
+        <set>
+            <if test="id != null and id != ''">
+                id = #{id},
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="hospName != null and hospName != ''">
+                hosp_name = #{hospName},
+            </if>
+            <if test="orgCode != null and orgCode != ''">
+                org_code = #{orgCode},
+            </if>
+            <if test="orgName != null and orgName != ''">
+                org_name = #{orgName},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where  id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from outpt_medical_care_configuration where  id= #{id}
+    </delete>
+
+</mapper>
+

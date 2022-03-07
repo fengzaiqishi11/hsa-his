@@ -890,7 +890,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             //数据校验
             this.validCfParam(outptPrescribeDetailsDTO);
 
-            if (mzcfKFK != null && mzcfKFK.contains(outptPrescribeDetailsDTO.getUsageCode())) {
+            if (mzcfKFK != null && mzcfKFK.contains("," + outptPrescribeDetailsDTO.getUsageCode() + ",")) {
                 outptPrescribeDetailsDTO.setPhCode(Constants.CFLX.KFKPT);   //  用于处方分单时，哪些用法分到口服卡上
             }
 

@@ -65,7 +65,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
         map.put("customConfig", customConfigMap);
         String rUrl;
-        switch ((String) customConfigMap.get("fileFormat")) {
+        String fileFormat = (String) customConfigMap.get("fileFormat");
+        switch (fileFormat) {
             case "pdf":
                 rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/pdf/show");
                 break;
@@ -83,7 +84,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
 
         if (Constants.SF.F.equals(configuration.getIsUpload())) {
-            return new ReportReturnDataDTO(null, str);
+            return new ReportReturnDataDTO(null, fileName, fileFormat, str);
         }
 
         FSEntity fsEntity = new FSEntity();
@@ -116,7 +117,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         } catch (Exception e) {
             log.error("上传文件失败", e);
         }
-        return getReturnData(configuration.getReturnDataType(), fsEntity.getKeyId(), str, url + fsEntity.getKeyId());
+        return getReturnData(configuration.getReturnDataType(), fsEntity.getKeyId(), str, url + fsEntity.getKeyId(), fileName, fileFormat);
     }
 
     @Override
@@ -129,8 +130,10 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         return result;
     }
 
-    private ReportReturnDataDTO getReturnData(String returnDataType, String key, String base64, String rUrl) {
+    private ReportReturnDataDTO getReturnData(String returnDataType, String key, String base64, String rUrl, String fileName, String fileFormat) {
         ReportReturnDataDTO returnData = new ReportReturnDataDTO();
+        returnData.setFileName(fileName);
+        returnData.setFileFormat(fileFormat);
         returnData.setKey(key);
         switch (returnDataType) {
             case "1":

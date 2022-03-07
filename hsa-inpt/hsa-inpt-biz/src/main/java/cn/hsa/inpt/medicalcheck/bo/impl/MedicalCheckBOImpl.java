@@ -338,7 +338,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
         String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
         if (StringUtils.isEmpty(dipIp)) {
-            throw new AppException("DRG的IP地址没进行配置");
+            throw new AppException("DIP的IP地址没进行配置");
         }
         sb.append(" http://" + dipIp + "/drg_web/drgGroupThird/dip_dagns/list.action");
         sb.append("?xm=");
@@ -490,7 +490,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(dipip)) {
             throw new AppException("DIP的IP地址没进行配置");
         }
-        sb.append("http://" + dipip + "/drg_medical_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
+        sb.append("http://" + dipip + "/drg_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");

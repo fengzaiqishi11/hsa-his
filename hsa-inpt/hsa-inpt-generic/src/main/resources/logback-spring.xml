@@ -10,7 +10,7 @@
        使用springProperty才可使用application.yml中的值 可以设置默认值
     -->
 
-    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="/app/logs/hsa-inpt"/>
+    <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-inpt/"/>
     <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-inpt"/>
     <springProperty scope="context" name="LOG_SERVER_ADDRESS" source="logging.server.address" defaultValue="192.168.92.128"/>
     <springProperty scope="context" name="LOG_SERVER_PORT" source="logging.server.port" defaultValue="12201"/>

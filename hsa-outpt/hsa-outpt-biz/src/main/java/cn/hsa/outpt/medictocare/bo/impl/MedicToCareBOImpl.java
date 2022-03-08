@@ -7,6 +7,7 @@ import cn.hsa.module.outpt.medictocare.bo.MedicToCareBO;
 import cn.hsa.module.outpt.medictocare.dao.MedicToCareDAO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.HttpConnectUtil;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -97,6 +98,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         if(StringUtils.isEmpty(medicToCareDTO.getApplyCompanyCode())){
             throw new RuntimeException("未传入申请机构编码");
         }
+        medicToCareDTO.setStatusCode(Constants.YYSQZT.YSQ);
         //调用API
         if("1".equals(medicToCareDTO.getChangeType())){
             Map<String, Object> visitInfo = new HashMap<>();

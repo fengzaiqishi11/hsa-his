@@ -1057,7 +1057,7 @@
 		a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
 		a.crte_id,a.crte_name,
 		a.crte_time,a.signature_path, a.doctor_intro,a.is_guide,a.is_anaesthesia,
-		b.name as deptName
+		b.name as deptName, b.id as deptId
 		from sys_user a
 		left join base_dept b on a.dept_code = b.code and a.hosp_code = b.hosp_code
 		<where>

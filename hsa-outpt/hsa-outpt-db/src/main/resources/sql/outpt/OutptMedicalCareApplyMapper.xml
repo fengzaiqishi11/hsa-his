@@ -27,6 +27,8 @@
         <result property="houseBed" column="house_bed" jdbcType="VARCHAR"/>
         <result property="referralMainSuit" column="referral_main_suit" jdbcType="VARCHAR"/>
         <result property="nusreTypeCode" column="nusre_type_code" jdbcType="VARCHAR"/>
+        <result property="diseaseId" column="disease_id" jdbcType="VARCHAR"/>
+        <result property="diseaseName" column="disease_name" jdbcType="VARCHAR"/>
         <result property="realityInTime" column="reality_in_time" jdbcType="TIMESTAMP"/>
         <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
         <result property="visitDeptId" column="visit_dept_id" jdbcType="VARCHAR"/>
@@ -39,8 +41,8 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
     <insert id="insertMedicDate">
-        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,disease_id, disease_name,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{diseaseId}, #{diseaseName}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
 
     </insert>
     <insert id="insertOutPtInfo">
@@ -62,48 +64,51 @@
         )  on duplicate key update pym=#{pym};
     </insert>
     <select id="queryMZPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
-        SELECT  id as visitId,name,cert_no as certNo ,dept_id as deptId,dept_name as deptName,"1" as visitType
-        from outpt_visit
-        where 
-            hosp_code = #{hospCode}
+        SELECT a.id as visitId,a.visit_no as visitNo,a.name, a.cert_no as certNo ,a.dept_id as visitDeptId,a.dept_name as deptName, '1' as visitType,
+               a.profile_id, a.gender_code,a.age,a.age_unit_code, a.phone,a.doctor_id as visitDoctorId, a.doctor_name as visitDoctorName, a.visit_time,
+               b.disease_id, (select bd.name from base_disease bd where b.disease_id = bd.id and b.hosp_code = bd.hosp_code) as diseaseName
+        from outpt_visit a
+        join outpt_diagnose b on a.id = b.visit_id and a.hosp_code = b.hosp_code and b.is_main = '1'
+        where a.hosp_code = #{hospCode}
         <if test="certNo != null and certNo != ''">
-            and cert_no = #{certNo}
+            and a.cert_no = #{certNo}
         </if>
         <if test="name != null and name != ''">
-            and name = #{name}
+            and a.name = #{name}
         </if>
-        <if test="visitStartTime != null and visitStartTime != ''">
-            and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{visitStartTime}
+        <if test="startDate != null">
+            and date(a.visit_time) &gt;=#{startDate}
         </if>
-        <if test="visitEndTime != null and visitEndTime != ''">
-            and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{visitEndTime}
+        <if test="endDate != null">
+            and date(a.visit_time) &lt;=#{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
+            and (a.name like concat('%',#{keyword},'%') or a.cert_no = #{keyword})
         </if>
-        order by crte_time
+        order by a.visit_time desc
     </select>
     <select id="queryZYPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
-        SELECT id as visitId,name ,cert_no as certNo ,in_dept_id as deptId,in_dept_name as deptName ,"2" as visitType
-        from inpt_visit
-        where
-            hosp_code = #{hospCode}
+        SELECT a.id as visitId,a.in_no as visitNo, a.name ,a.cert_no as certNo ,a.in_dept_id as visitDeptId,a.in_dept_name as deptName , '2' as visitType,
+               a.profile_id,a.gender_code,a.age,a.age_unit_code,a.phone,a.zz_doctor_id as visitDoctorId,a.zz_doctor_name as visitDoctorName, a.in_time as visitTime,
+               a.in_disease_id as diseaseId, (select bd.name from base_disease bd where a.in_disease_id = bd.id and a.hosp_code = bd.hosp_code) as diseaseName
+        from inpt_visit a
+        where a.hosp_code = #{hospCode}
         <if test="certNo != null and certNo != ''">
-            and cert_no = #{certNo}
+            and a.cert_no = #{certNo}
         </if>
         <if test="name != null and name != ''">
-            and name = #{name}
+            and a.name = #{name}
         </if>
-        <if test="visitStartTime != null">
-            and DATE_FORMAT(crte_time,'%Y-%m-%d') &gt;=#{visitStartTime}
+        <if test="startDate != null">
+            and date(a.in_time) &gt;=#{startDate}
         </if>
-        <if test="visitEndTime != null">
-            and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt;=#{visitEndTime}
+        <if test="endDate != null">
+            and date(a.in_time) &lt;=#{endDate}
         </if>
         <if test="keyword != null and keyword != ''">
-            and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
+            and (a.name like concat('%',#{keyword},'%') or a.cert_no = #{keyword})
         </if>
-        order by crte_time
+        order by a.in_time desc
     </select>
     <select id="queryVisitById" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
         SELECT
@@ -139,9 +144,15 @@
     <!--查询指定行数据-->
     <select id="queryMedicToCareInfoPage" resultType="cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO">
         select
-        id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
-        from outpt_medical_care_apply
+            id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type,
+            care_to_medic_id, visit_type, apply_dept_id, (select bd.name from base_dept bd where apply_dept_id = bd.id and hosp_code = bd.hosp_code) as applyDeptName,
+            apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, referral_main_suit,nusre_type_code, disease_id,
+            disease_name, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
+        from outpt_medical_care_apply a
         <where>
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%', #{keyword} , '%') or cert_no = #{keyword})
+            </if>
             <if test="id != null and id != ''">
                 and id = #{id}
             </if>
@@ -211,6 +222,12 @@
             <if test="nusreTypeCode != null and nusreTypeCode != ''">
                 and nusre_type_code = #{nusreTypeCode}
             </if>
+            <if test="diseaseId != null and diseaseId != ''">
+                disease_id = #{diseaseId},
+            </if>
+            <if test="diseaseName != null and diseaseName != ''">
+                disease_name = #{diseaseName},
+            </if>
             <if test="realityInTime != null">
                 and reality_in_time = #{realityInTime}
             </if>
@@ -251,12 +268,16 @@
                 and crte_time &lt;=#{visitEndTime}
             </if>
         </where>
-        order by apply_time
+        order by apply_time desc
     </select>
     <select id="getMedicToCareInfoById" resultType="java.util.Map">
             select
-                id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, referral_main_suit, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
-            from outpt_medical_care_apply
+                id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id,
+                visit_type, apply_dept_id, (select bd.name from base_dept bd where apply_dept_id = bd.id and hosp_code = bd.hosp_code) as applyDeptName,
+                apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house,
+                house_bed, referral_main_suit, nusre_type_code, disease_id, disease_name, reality_in_time, status_code, visit_dept_id, visit_doctor_id,
+                visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time, if(house_bed is null, '0', '1') is_in
+            from outpt_medical_care_apply a
             where id = #{id}
     </select>
 
@@ -330,6 +351,12 @@
             <if test="nusreTypeCode != null and nusreTypeCode != ''">
                 nusre_type_code = #{nusreTypeCode},
             </if>
+            <if test="diseaseId != null and diseaseId != ''">
+                disease_id = #{diseaseId},
+            </if>
+            <if test="diseaseName != null and diseaseName != ''">
+                disease_name = #{diseaseName},
+            </if>
             <if test="realityInTime != null">
                 reality_in_time = #{realityInTime},
             </if>
@@ -363,11 +390,6 @@
         </set>
         where id = #{id}
     </update>
-
-<!--    &lt;!&ndash;通过主键删除&ndash;&gt;-->
-<!--    <delete id="deleteById">-->
-<!--        delete from outpt_medical_care_apply where id = #{id}-->
-<!--    </delete>-->
 
 </mapper>
 

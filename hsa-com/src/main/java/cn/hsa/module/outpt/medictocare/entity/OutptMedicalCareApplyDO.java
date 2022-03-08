@@ -128,6 +128,14 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
      */
     private String nusreTypeCode;
     /**
+     * 主诊断疾病id
+     */
+    private String diseaseId;
+    /**
+     * 主诊断疾病名
+     */
+    private String diseaseName;
+    /**
      * 实际入住时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")

@@ -1,6 +1,7 @@
 package cn.hsa.outpt.medictocare.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
@@ -17,6 +18,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -40,7 +42,7 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     /**
      * 调用的url
      */
-    @Value("${medictocare.url}")
+    @Value("${caretomedic.url}")
     private String url;
     /**
      * 本地建档服务
@@ -53,6 +55,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     @Resource
     private BaseOrderRuleService baseOrderRuleService_consumer;
 
+    private final String publicKey ="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCa+uU4fxL5Kc8u8gjeSBr5G0jKV0b8Qlo0i5sfh9kCpyNNxa7Oh/WjySZwvcIifKXz3M7Be9eJ4nYQgsxQvnOnS1zCZosce9gKAmnIafjAnxP2TU5rP7qLxmSvAY6Dk6xstr9sI6L5ZqIrDOw/gN32R6UHXtbx5NcKpnrVnb2p7wIDAQAB";
+
     @Override
     public PageDTO queryCareToMedicPage(MedicToCareDTO medicToCareDTO) {
         PageHelper.startPage(medicToCareDTO.getPageNo(),medicToCareDTO.getPageSize());
@@ -61,9 +65,9 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     }
 
     @Override
-    public Map<String, Object> getCareToMedicInfoById(MedicToCareDTO medicToCareDTO) {
-        String id = medicToCareDTO.getId();
-        return medicToCareDAO.getMedicToCareInfoById(id);
+    public Map<String, Object> getCareToMedicInfoById(Map map) {
+            String id = MapUtils.get(map,"id");
+            return medicToCareDAO.getMedicToCareInfoById(id);
     }
     /**
      * @Menthod: insertMedicToCare()
@@ -107,12 +111,19 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     }
 
     private OutptVisitDTO setOutptVisitDTO(Map map) {
-        OutptVisitDTO outptVisitDTO = null;
+        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         //需要回写就诊id
         outptVisitDTO.setId(SnowflakeUtils.getId());
         map.put("visitId",outptVisitDTO.getId());
         outptVisitDTO.setHospCode(MapUtils.get(map,"hospCode"));
-//        档案ID是否生成待定,与档案有关的待定
+        outptVisitDTO.setName(MapUtils.get(map,"name"));
+        outptVisitDTO.setGenderCode(MapUtils.get(map,"genderCode"));
+        outptVisitDTO.setAge(MapUtils.get(map,"age"));
+        outptVisitDTO.setAgeUnitCode(MapUtils.get(map,"ageUnitCode","1"));
+        outptVisitDTO.setCertNo(MapUtils.get(map,"certNo"));
+        outptVisitDTO.setCertCode("01");
+        outptVisitDTO.setPhone(MapUtils.get(map,"phone"));
+        //        档案ID是否生成待定,与档案有关的待定
         //是否需要建档案
         if(StringUtils.isNotEmpty(outptVisitDTO.getCertNo()) || Constants.ZJLB.QT.equals(outptVisitDTO.getCertCode())) {
             OutptProfileFileDTO opf = this.getFprFileId(outptVisitDTO);
@@ -121,13 +132,6 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
             //档案号
             outptVisitDTO.setOutProfile(opf.getOutProfile());
         }
-        outptVisitDTO.setName(MapUtils.get(map,"name"));
-        outptVisitDTO.setGenderCode(MapUtils.get(map,"genderCode"));
-        outptVisitDTO.setAge(MapUtils.get(map,"age"));
-        outptVisitDTO.setAgeUnitCode(MapUtils.get(map,"ageUnitCode"));
-        outptVisitDTO.setCertNo(MapUtils.get(map,"certNo"));
-        outptVisitDTO.setCertCode("01");
-        outptVisitDTO.setPhone(MapUtils.get(map,"phone"));
         //根据规则生成就诊号
         outptVisitDTO.setVisitNo(this.getOrderNo(MapUtils.get(map,"hospCode"), Constants.ORDERRULE.JZH));
         outptVisitDTO.setVisitCode("01");
@@ -137,8 +141,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         outptVisitDTO.setDoctorId(MapUtils.get(map,"visitDoctorId"));
         outptVisitDTO.setDoctorName(MapUtils.get(map,"visitDoctorName"));
         outptVisitDTO.setDeptId(MapUtils.get(map,"visitDeptId"));
-        outptVisitDTO.setDeptName(MapUtils.get(map,"deptName"));
-        outptVisitDTO.setVisitTime(MapUtils.get(map,"visitTime"));
+        outptVisitDTO.setDeptName(MapUtils.get(map,"visitDeptName"));
+        outptVisitDTO.setVisitTime(DateUtils.parse(MapUtils.get(map,"visitTime"),"yyyy-MM-dd HH:mm:ss"));
         outptVisitDTO.setRemark(MapUtils.get(map,"remark"));
         //未就诊状态
         outptVisitDTO.setIsVisit("0");
@@ -151,30 +155,43 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     //获取就诊确认信息接口
     private Map sendInfo(Map<String, Object> map){
         Map<String, Object> paramap = new HashMap<>();
-        paramap.put("apply_id",MapUtils.get(map,"apply_id"));
-        paramap.put("apply_status",MapUtils.get(map,"statusCode"));
+        String hospCode = MapUtils.get(map, "hospCode");
+        //todo 需要获取值，暂时写死
+        String orgID = "1001";
+        try {
+            hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
+            orgID = RSAUtil.encryptByPublicKey(orgID.getBytes(),this.publicKey);
+        } catch (Exception e) {
+            throw new RuntimeException("签名加参解密错误，请联系管理员！" + e.getMessage());
+        }
+        paramap.put("orgId",orgID);
+        paramap.put("hospCode",hospCode);
+        //前端传
+        paramap.put("apply_id",MapUtils.get(map,"careToMedicId"));
+        paramap.put("apply_status",Integer.valueOf(MapUtils.get(map,"statusCode")));
         paramap.put("affirm_date",new Date());
         paramap.put("remark",MapUtils.get(map,"remark"));
         return paramap;
     }
 
     //使用HTTP调用接口
-    private Map<String,Object> commonSendInfo(Map<String, Object> visitInfo){
-        Map httpParam = new HashMap();
-        //发送的数据
-        httpParam.put("visitInfo",visitInfo);
-        String json = JSONObject.toJSONString(httpParam);
+    private Map<String,Object> commonSendInfo(Map<String, Object> date){
+//        Map httpParam = new HashMap();
+//        //发送的数据
+//        httpParam.put("visitInfo",visitInfo);
+        String json = JSONObject.toJSONString(date);
+        log.debug("推送养转医接口回调入参：" + JSONObject.toJSONString(date));
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(this.url, json);
         if (StringUtils.isEmpty(resultStr)){
             throw new RuntimeException("失败！");
         }
         //获取回参
         Map<String, Object> m = (Map) JSON.parse(resultStr);
-        String resultCode = MapUtils.get(m,"code","");
+        String resultCode = String.valueOf(MapUtils.get(m,"code",""));
         if (StringUtils.isEmpty(resultCode)){
             throw new RuntimeException("调用医养接口无响应!");
         }
-        if (!"1".equals(resultCode)){
+        if (!"0".equals(resultCode)){
             throw new RuntimeException("调用医养接口错误,原因："+MapUtils.get(m,"message",""));
         }
         return m;

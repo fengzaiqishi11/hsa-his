@@ -90,4 +90,137 @@
         select visit_id, item_id from outpt_cost where visit_id = #{visitId} and back_num is null
         and settle_code = '2' and hosp_code = #{hospCode}
     </select>
+
+    <select id="queryVisitByPhys" resultType="java.lang.Integer">
+        select count(1)
+        from outpt_visit
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <update id="updateVisitByPhys">
+        update
+            outpt_visit
+        <set >
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                profile_id = #{profileId,jdbcType=VARCHAR},
+            </if>
+            <if test="outProfile != null and outProfile != ''">
+                out_profile = #{outProfile,jdbcType=VARCHAR},
+            </if>
+            <if test="registerId != null and registerId != ''">
+                register_id = #{registerId,jdbcType=VARCHAR},
+            </if>
+            <if test="registerNo != null and registerNo != ''">
+                register_no = #{registerNo,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null and name != ''">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="genderCode != null and genderCode != ''">
+                gender_code = #{genderCode,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                age = #{age,jdbcType=INTEGER},
+            </if>
+            <if test="ageUnitCode != null and ageUnitCode != ''">
+                age_unit_code = #{ageUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="birthday != null">
+                birthday = #{birthday,jdbcType=TIMESTAMP},
+            </if>
+            <if test="marryCode != null and marryCode != ''">
+                marry_code = #{marryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="nationCode != null and nationCode != ''">
+                nation_code = #{nationCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certCode != null and certCode != ''">
+                cert_code = #{certCode,jdbcType=VARCHAR},
+            </if>
+            <if test="certNo != null and certNo != ''">
+                cert_no = #{certNo,jdbcType=VARCHAR},
+            </if>
+            <if test="phone != null and phone != ''">
+                phone = #{phone,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="visitCode != null and visitCode != ''">
+                visit_code = #{visitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="patientCode != null and patientCode != ''">
+                patient_code = #{patientCode,jdbcType=VARCHAR},
+            </if>
+            <if test="preferentialTypeId != null and preferentialTypeId != ''">
+                preferential_type_id = #{preferentialTypeId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureCode != null and insureCode != ''">
+                insure_code = #{insureCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureOrgCode != null and insureOrgCode != ''">
+                insure_org_code = #{insureOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureNo != null and insureNo != ''">
+                insure_no = #{insureNo,jdbcType=VARCHAR},
+            </if>
+            <if test="insureBizCode != null and insureBizCode != ''">
+                insure_biz_code = #{insureBizCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insureTreatCode != null and insureTreatCode != ''">
+                insure_treat_code = #{insureTreatCode,jdbcType=VARCHAR},
+            </if>
+            <if test="insurePatientId != null and insurePatientId != ''">
+                insure_patient_id = #{insurePatientId,jdbcType=VARCHAR},
+            </if>
+            <if test="insureRemark != null and insureRemark != ''">
+                insure_remark = #{insureRemark,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorId != null and doctorId != ''">
+                doctor_id = #{doctorId,jdbcType=VARCHAR},
+            </if>
+            <if test="doctorName != null and doctorName != ''">
+                doctor_name = #{doctorName,jdbcType=VARCHAR},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                dept_id = #{deptId,jdbcType=VARCHAR},
+            </if>
+            <if test="deptName != null and deptName != ''">
+                dept_name = #{deptName,jdbcType=VARCHAR},
+            </if>
+            <if test="visitTime != null">
+                visit_time = #{visitTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="pym != null and pym != ''">
+                pym = #{pym,jdbcType=VARCHAR},
+            </if>
+            <if test="wbm != null and wbm != ''">
+                wbm = #{wbm,jdbcType=VARCHAR},
+            </if>
+            <if test="isVisit != null and isVisit != ''">
+                is_visit = #{isVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="isFirstVisit != null and isFirstVisit != ''">
+                is_first_visit = #{isFirstVisit,jdbcType=VARCHAR},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId,jdbcType=VARCHAR},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName,jdbcType=VARCHAR},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code =#{hospCode}
+    </update>
+
 </mapper>

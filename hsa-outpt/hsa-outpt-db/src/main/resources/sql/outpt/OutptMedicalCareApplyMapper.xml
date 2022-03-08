@@ -107,7 +107,7 @@
         SELECT
             a.id as visitId,
             a.name,
-            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  genderCode,
+            a.gender_code as  genderCode,
             a.age,
             a.cert_no as certNo,
             a.phone,
@@ -123,7 +123,7 @@
         SELECT
             a.id as visitId,
             a.name,
-            (case a.gender_code when  '1' then '男' when '2' then '女' else '' end) as  genderCode,
+            a.gender_code as  genderCode,
             a.age,
             a.cert_no,
             a.phone,
@@ -254,7 +254,7 @@
         </where>
         order by apply_time
     </select>
-    <select id="getMedicToCareInfoById" resultMap="OutptMedicalCareApplyMap">
+    <select id="getMedicToCareInfoById" resultType="java.util.Map">
             select
                 id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, referral_main_suit, nusre_type_code, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time
             from outpt_medical_care_apply
@@ -362,7 +362,7 @@
                 crte_time = #{crteTime},
             </if>
         </set>
-        where id = #{apply_id}
+        where id = #{id}
     </update>
 
 <!--    &lt;!&ndash;通过主键删除&ndash;&gt;-->

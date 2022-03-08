@@ -130,8 +130,8 @@ public class OutptMedicalCareApplyDO extends PageDO implements Serializable {
     /**
      * 实际入住时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date realityInTime;
     /**
      * 医养申请状态（YYSQZT：0待处理、1已接收、2已拒绝）

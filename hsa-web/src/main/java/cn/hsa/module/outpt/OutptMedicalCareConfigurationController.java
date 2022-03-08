@@ -72,4 +72,13 @@ public class OutptMedicalCareConfigurationController extends BaseController {
         return outptMedicalCareConfigurationService_consumer.updateConfiguration(map);
     }
 
+    @PostMapping("/queryById")
+    public WrapperResponse<OutptMedicalCareConfigurationDTO> queryById(@RequestBody OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO userDTO = getSession(req, res);
+        Map<String, Object> map  = new HashMap<>();
+        map.put("outptMedicalCareConfigurationDTO",outptMedicalCareConfigurationDTO);
+        map.put("hospCode",userDTO.getHospCode());
+        return outptMedicalCareConfigurationService_consumer.queryById(map);
+    }
+
 }

@@ -1,5 +1,6 @@
 package cn.hsa.module.outpt.medictocare.dao;
 
+import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
 import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param
      * @return 实例对象
      */
-    OutptMedicalCareConfigurationDO queryById(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    OutptMedicalCareConfigurationDTO queryById(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
     /**
      * 查询指定行数据
@@ -25,7 +26,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param
      * @return 对象列表
      */
-    List<OutptMedicalCareConfigurationDO> queryAllByLimit(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    List<OutptMedicalCareConfigurationDTO> queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
     /**
      * 统计总行数
@@ -33,7 +34,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param outptMedicalCareConfiguration 查询条件
      * @return 总行数
      */
-    long count(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    long count(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
     /**
      * 新增数据
@@ -41,7 +42,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param outptMedicalCareConfiguration 实例对象
      * @return 影响行数
      */
-    int insertConfiguration(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    int insertConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
     /**
      * 批量新增数据（MyBatis原生foreach方法）
@@ -49,7 +50,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param entities List<OutptMedicalCareConfiguration> 实例对象列表
      * @return 影响行数
      */
-    int insertBatch(@Param("entities") List<OutptMedicalCareConfigurationDO> entities);
+    int insertBatch(@Param("entities") List<OutptMedicalCareConfigurationDTO> entities);
 
     /**
      * 批量新增或按主键更新数据（MyBatis原生foreach方法）
@@ -58,7 +59,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @return 影响行数
      * @throws org.springframework.jdbc.BadSqlGrammarException 入参是空List的时候会抛SQL语句错误的异常，请自行校验入参
      */
-    int insertOrUpdateBatch(@Param("entities") List<OutptMedicalCareConfigurationDO> entities);
+    int insertOrUpdateBatch(@Param("entities") List<OutptMedicalCareConfigurationDTO> entities);
 
     /**
      * 修改数据
@@ -66,7 +67,7 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param outptMedicalCareConfiguration 实例对象
      * @return 影响行数
      */
-    int updateConfiguration(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    int updateConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
     /**
      * 通过主键删除数据
@@ -74,6 +75,6 @@ public interface OutptMedicalCareConfigurationDAO{
      * @param
      * @return 影响行数
      */
-    int deleteById(OutptMedicalCareConfigurationDO outptMedicalCareConfiguration);
+    int deleteById(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 
 }

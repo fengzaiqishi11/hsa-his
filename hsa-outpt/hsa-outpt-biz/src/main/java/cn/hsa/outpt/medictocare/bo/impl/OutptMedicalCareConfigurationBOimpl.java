@@ -25,6 +25,11 @@ public class OutptMedicalCareConfigurationBOimpl implements OutptMedicalCareConf
     private OutptMedicalCareConfigurationDAO outptMedicalCareConfigurationDAO;
 
     @Override
+    public OutptMedicalCareConfigurationDTO queryById(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+        return outptMedicalCareConfigurationDAO.queryById(outptMedicalCareConfigurationDO);
+    }
+
+    @Override
     public PageDTO queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
         PageHelper.startPage(outptMedicalCareConfigurationDO.getPageNo(),outptMedicalCareConfigurationDO.getPageSize());
         return PageDTO.of(outptMedicalCareConfigurationDAO.queryAllByLimit(outptMedicalCareConfigurationDO));

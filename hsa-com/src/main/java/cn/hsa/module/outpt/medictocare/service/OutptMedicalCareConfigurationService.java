@@ -15,6 +15,7 @@ import java.util.Map;
  **/
 @FeignClient(value = "hsa-outpt")
 public interface OutptMedicalCareConfigurationService {
+    WrapperResponse<OutptMedicalCareConfigurationDTO> queryById(Map map);
     /**
      * @author yuelong.chen
      * @create 2022-03-07 14:32

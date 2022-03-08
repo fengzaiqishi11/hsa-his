@@ -76,4 +76,5 @@
     <!-- 医养接口-->
     <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" ref="medicToCareService_provider"/>
     <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService" ref="careToMedicApplyService_provider"/>
+    <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService" ref="outptMedicalCareConfigurationService_provider"/>
 </beans>

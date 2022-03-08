@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -103,7 +104,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         medicToCareDTO.setId(SnowflakeUtils.getId()); // 主键
         medicToCareDTO.setHospCode(MapUtils.get(map, "hospCode")); // 医院编码
         medicToCareDTO.setName(MapUtils.get(map, "name")); // 姓名
-        medicToCareDTO.setGenderCode("男".equals(MapUtils.get(map, "sex")) ? "1" : "2"); // 性别
+        medicToCareDTO.setGenderCode(MapUtils.get(map, "sex")); // 性别
         medicToCareDTO.setAge(MapUtils.get(map, "age")); // 年龄
         medicToCareDTO.setAgeUnitCode("1"); // 年龄单位
         medicToCareDTO.setCertNo(MapUtils.get(map, "id_no")); // 证件号码
@@ -146,7 +147,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         String statusCode = MapUtils.get(data, "statusCode");
         if (Constants.YYSQZT.YJZ.equals(statusCode)) throw new RuntimeException("该申请已经处理了，请勿重复处理！");
         if (Constants.YYSQZT.YJJ.equals(statusCode)) throw new RuntimeException("该申请已经拒绝了，请重新申请！");
-        param.put("statusCode", String.valueOf(MapUtils.get(map, "apply_status"))); // 状态
+        param.put("statusCode", MapUtils.get(map, "apply_status")); // 状态
         param.put("realityInTime", DateUtils.parse(MapUtils.get(map, "handle_date"), DateUtils.Y_M_D)); // 处理日期、实际入住时间
         param.put("remark", MapUtils.get(map, "remark")); // 备注
         log.debug("医养接口-医转养申请处理接口入参===" + JSON.toJSONString(param));
@@ -186,7 +187,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
                 map.put("itemCode", adviceDTO.getItemCode());
                 map.put("itemName", adviceDTO.getItemName());
                 map.put("spec", adviceDTO.getSpec());
-                map.put("dosage", adviceDTO.getDosage() + adviceDTO.getDosageUnitCode());
+                map.put("dosage", adviceDTO.getDosage() == null ? adviceDTO.getDosage() : (adviceDTO.getDosage() + adviceDTO.getDosageUnitCode()));
                 map.put("num", adviceDTO.getNum() + adviceDTO.getUnitCode());
                 map.put("usageCode", adviceDTO.getUsageCode());
                 map.put("rateName", adviceDTO.getRateName());

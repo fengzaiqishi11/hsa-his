@@ -6,6 +6,7 @@ import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
 import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,4 +29,6 @@ public interface OutptMedicalCareConfigurationService {
     WrapperResponse<Boolean> deleteById(Map<String, Object> map);
 
     WrapperResponse<Boolean> updateConfiguration(Map<String, Object> map);
+
+    WrapperResponse<List<OutptMedicalCareConfigurationDTO>> queryConfigation(Map<String, Object> map);
 }

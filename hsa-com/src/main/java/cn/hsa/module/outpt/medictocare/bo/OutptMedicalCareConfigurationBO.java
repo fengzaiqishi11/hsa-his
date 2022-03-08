@@ -4,6 +4,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
 import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
 
+import java.util.List;
+
 /**
  * @author powersi
  * @create 2022-03-07 14:32
@@ -40,4 +42,6 @@ public interface OutptMedicalCareConfigurationBO {
      * @desc 修改数据
      **/
     Boolean updateConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+
+    List<OutptMedicalCareConfigurationDTO> queryConfigation(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration);
 }

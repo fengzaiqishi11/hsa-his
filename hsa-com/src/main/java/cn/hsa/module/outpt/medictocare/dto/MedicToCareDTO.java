@@ -70,4 +70,8 @@ public class MedicToCareDTO extends OutptMedicalCareApplyDO {
      * 门诊/住院就诊号
      */
     private String visitNo;
+    /**
+     * 申请科室名称
+     */
+    private String applyDeptName;
 }

@@ -483,4 +483,27 @@ public interface PatientCostLedgerBO {
    * @Return map
    **/
   Map queryHosptialInComeListTitle(Map<String, Object> paraMap);
+
+  /**
+   * 住院费用收入统计报表
+   *
+   * @param paraMap
+   * @Menthod queryZyFeeIncomeList
+   * @Author liuzhuoting
+   * @Date 2022/3/3 08:54
+   * @Return List<Map < String, Object>>
+   **/
+  List<Map<String, Object>> queryZyFeeIncomeList(Map<String, Object> paraMap);
+
+  /**
+   * 门诊费用收入统计报表
+   *
+   * @param paraMap
+   * @Menthod queryMzFeeIncomeList
+   * @Author liuzhuoting
+   * @Date 2022/3/3 08:54
+   * @Return List<Map < String, Object>>
+   **/
+  List<Map<String, Object>> queryMzFeeIncomeList(Map<String, Object> paraMap);
+
 }

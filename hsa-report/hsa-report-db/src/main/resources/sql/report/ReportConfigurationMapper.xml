@@ -28,6 +28,15 @@
         select
         <include refid="Base_Column_List"/>
         from report_configuration
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and (temp_code like concat('%',#{keyword},'%')
+                or temp_name like concat('%',#{keyword},'%'))
+            </if>
+            <if test="returnDataType != null and returnDataType != ''">
+                and return_data_type = #{returnDataType}
+            </if>
+        </where>
         order by crte_time desc
     </select>
 
@@ -56,7 +65,7 @@
             <if test="customConfig != null">
                 custom_config = #{customConfig},
             </if>
-            <if test="tempName != null">
+            <if test="updtTime != null">
                 updt_time = #{updtTime},
             </if>
         </set>

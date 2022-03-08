@@ -158,4 +158,30 @@ public interface InsureDictService {
      * @Return
      **/
     WrapperResponse<List<Map<String,Object>>> queryAdmdvsInfo(Map map);
+
+    /**
+     * 查询医保字典
+     *
+     * @param map
+     * @return
+     */
+    WrapperResponse<Map<String, String>> queryDictByCode(Map map);
+
+    /**
+     * 查询医保地区划
+     *
+     * @param map
+     * @return
+     */
+    WrapperResponse<Map<String, String>> queryOneAdmdvsInfo(Map map);
+
+    /**
+     * 查询系统字典
+     *
+     * @param map
+     * @return
+     */
+    WrapperResponse<Map<String, String>> querySysCodeByCode(Map map);
+
+
 }

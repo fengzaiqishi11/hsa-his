@@ -12,20 +12,23 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureDictDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
-import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.entity.InsureDictDO;
 import cn.hsa.module.insure.module.entity.InsureDiseaseDO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.*;
+import cn.hsa.util.Constants;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import groovy.util.logging.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -120,7 +123,7 @@ class InsureDictBOImpl extends HsafBO implements InsureDictBO {
      * @Desrciption 下载码表信息
      * @param insureDictDTO 请求参数
      * @Author Ou·Mr
-     * @Date 2020/12/23 21:50 
+     * @Date 2020/12/23 21:50
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
      */
     @Override
@@ -303,5 +306,26 @@ class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         String hospCode = MapUtils.get(map,"hospCode");
         List<Map<String, Object>> list = insureDictDAO.queryAdmdvsInfo(hospCode);
         return list;
+    }
+
+    @Override
+    public Map<String, String> queryDictByCode(Map map) {
+        InsureDictDTO insureDictDTO = new InsureDictDTO();
+        insureDictDTO.setHospCode(MapUtils.get(map, "hospCode"));
+        insureDictDTO.setInsureRegCode(MapUtils.get(map, "insureRegCode"));
+        insureDictDTO.setCode(MapUtils.get(map, "code"));
+        List<InsureDictDTO> dictDTOList = insureDictDAO.queryDictByCode(insureDictDTO);
+        return dictDTOList.stream().collect(Collectors.toMap(InsureDictDTO::getValue, InsureDictDTO::getName, (k1, k2) -> k2));
+    }
+
+    @Override
+    public Map<String, String> queryOneAdmdvsInfo(Map map) {
+        return insureDictDAO.queryOneAdmdvsInfo(MapUtils.get(map, "hospCode"), MapUtils.get(map, "admdvsCode"));
+    }
+
+    @Override
+    public Map<String, String> querySysCodeByCode(Map map) {
+        List<Map<String, Object>> mapList = insureDictDAO.querySysCodeByCode(MapUtils.get(map, "hospCode"), MapUtils.get(map, "code"));
+        return mapList.stream().collect(Collectors.toMap(s -> s.get("value").toString(), s -> s.get("name").toString(), (s1, s2) -> s1));
     }
 }

@@ -4227,6 +4227,18 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         return returnMap;
     }
 
+    @Override
+    public List<Map<String, Object>> queryZyFeeIncomeList(Map<String, Object> paraMap) {
+        return patientCostLedgerDAO.queryZyFeeIncomeList(paraMap);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryMzFeeIncomeList(Map<String, Object> paraMap) {
+        List<Map<String, Object>> mzFeeList = new ArrayList<>();
+        mzFeeList.addAll(patientCostLedgerDAO.queryMzFeeIncomeList(paraMap));
+        mzFeeList.addAll(patientCostLedgerDAO.queryMzRegisterIncomeList(paraMap));
+        return mzFeeList;
+    }
 
     /**
      * @Menthod summerInHosptialGroupByPatientCode

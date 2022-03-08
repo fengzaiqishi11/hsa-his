@@ -126,7 +126,7 @@ public class HsafLogHandlers {
     private void doBefore(LogInfo logInfo) {
         logger.debug("====[request data]====");
         logger.debug(logInfo.toString());
-        logger.debug(logInfo.getLogString());
+        logger.info(logInfo.getLogString());
         logContextHolder.set(logInfo);
         HsafContextHolder.getContext().addProperty("_logContext", this.generateLogContext(logInfo));
     }
@@ -160,36 +160,52 @@ public class HsafLogHandlers {
     }
 
     private LogInfo getLogInfo4Service() {
-        LogInfo logInfo = (LogInfo) logContextHolder.get();
+
+        LogInfo logInfo = (LogInfo)logContextHolder.get();
         if (logInfo != null) {
             return logInfo;
         } else {
-            LogContext logContext = (LogContext) HsafContextHolder.getContext().getProperty("_logContext");
-            String trace_id = gettraceID();
-
-            if (logContext != null) {
-                logInfo = new LogInfo();
-                logInfo.setTraceID(trace_id);
-                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-                if (attributes != null) {
-                    logInfo.setCallFrom("HsafRestPathController");
-                } else {
-                    logInfo.setCallFrom("rpc");
-                }
-            }
-
-            if (logInfo == null) {
-                logInfo = new LogInfo();
-                if (StringUtils.isEmpty(trace_id)) {
-                    logInfo.setTraceID(this.generateTraceID());
-                } else {
-                    logInfo.setTraceID(trace_id);
-                }
+            logInfo = new LogInfo();
+            logInfo.setTraceID(this.generateTraceID());
+            ServletRequestAttributes attributes = (ServletRequestAttributes)RequestContextHolder.getRequestAttributes();
+            if (attributes != null) {
                 logInfo.setCallFrom("HsafRestPathController");
+            } else {
+                logInfo.setCallFrom("rpc");
             }
-
             return logInfo;
         }
+
+//        LogInfo logInfo = (LogInfo) logContextHolder.get();
+//        if (logInfo != null) {
+//            return logInfo;
+//        } else {
+//            LogContext logContext = (LogContext) HsafContextHolder.getContext().getProperty("_logContext");
+//            String trace_id = gettraceID();
+//
+//            if (logContext != null) {
+//                logInfo = new LogInfo();
+//                logInfo.setTraceID(trace_id);
+//                ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//                if (attributes != null) {
+//                    logInfo.setCallFrom("HsafRestPathController");
+//                } else {
+//                    logInfo.setCallFrom("rpc");
+//                }
+//            }
+//
+//            if (logInfo == null) {
+//                logInfo = new LogInfo();
+//                if (StringUtils.isEmpty(trace_id)) {
+//                    logInfo.setTraceID(this.generateTraceID());
+//                } else {
+//                    logInfo.setTraceID(trace_id);
+//                }
+//                logInfo.setCallFrom("HsafRestPathController");
+//            }
+//
+//            return logInfo;
+//        }
     }
 
     public void doServiceBefore(JoinPoint joinPoint) {
@@ -223,7 +239,18 @@ public class HsafLogHandlers {
 
     }
 
-    private static void doAfterReturning(Object ret, LogInfo logInfo) {
+    private static void doAfterControllerReturning(Object ret, LogInfo logInfo) {
+        if (ret != null && ret.getClass().isAssignableFrom(WrapperResponse.class)) {
+            logInfo.setCode(((WrapperResponse) ret).getCode());
+            logger.debug(JSONObject.toJSONString(ret));
+        }
+
+        logger.debug("====[response data]====");
+        logger.info(logInfo.getLogString());
+        MDC.remove("traceID");
+    }
+
+    private static void doAfterServiceReturning(Object ret, LogInfo logInfo) {
         if (ret != null && ret.getClass().isAssignableFrom(WrapperResponse.class)) {
             logInfo.setCode(((WrapperResponse) ret).getCode());
             logger.debug(JSONObject.toJSONString(ret));
@@ -243,7 +270,7 @@ public class HsafLogHandlers {
                 return;
             }
 
-            doAfterReturning(ret, logInfo);
+            doAfterControllerReturning(ret, logInfo);
         } catch (Exception var3) {
             logger.error("HsafLogHandler.doControllerAfterReturning.exception", var3);
         }
@@ -263,7 +290,7 @@ public class HsafLogHandlers {
                 return;
             }
 
-            doAfterReturning(ret, logInfo);
+            doAfterServiceReturning(ret, logInfo);
         } catch (Exception var3) {
             logger.error("HsafLogHandler.doServiceAfterReturning.exception", var3);
         }
@@ -327,6 +354,7 @@ public class HsafLogHandlers {
      **/
     public String gettraceID() {
         String trace_id = RpcContext.getContext().getAttachment("trace_id");
+//        String trace_id = MDC.get("traceID");
         if (StringUtils.isEmpty(trace_id)) {
             trace_id = generateTraceID();
         } else {

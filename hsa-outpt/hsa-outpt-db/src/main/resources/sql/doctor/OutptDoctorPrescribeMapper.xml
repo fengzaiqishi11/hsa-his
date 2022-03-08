@@ -385,6 +385,9 @@
                 or a.cert_no like concat('%',#{keyword},'%')
                 or a.phone like concat('%',#{keyword},'%'))
             </if>
+            <if test="deptId != null and deptId != ''" >
+                and (b.dept_id = #{deptId} or a.dept_id = #{deptId} )
+            </if>
         </if>
 
         <!-- 已接诊 -->
@@ -1856,9 +1859,9 @@
     <!--  获取门诊病历诊断信息 -->
     <select id="getOutptMedicalRecordDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select
-            a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, c.name diseaseName
+            a.id, a.hosp_code hospCode, c.id diseaseId, a.visit_id visitId, c.name diseaseName
         from  outpt_medical_record a
-                  left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
+                  left join base_disease c on find_in_set(c.id, a.disease_id) and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
 

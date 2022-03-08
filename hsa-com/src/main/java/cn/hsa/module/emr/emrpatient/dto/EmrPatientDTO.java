@@ -56,4 +56,6 @@ public class EmrPatientDTO extends EmrPatientDO implements Serializable {
 	private String deptType;  // 当前病人是门诊病人or住院病人， 1：门诊 2：住院
 	// liuliyun 20210623
 	private Integer validTime; // 电子病历创建时效性
+
+	private String allowEdit; // 编辑 ：1 允许同级编辑；2 只能上级编辑
 }

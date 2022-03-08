@@ -1,12 +1,15 @@
 package cn.hsa.util;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import sun.misc.BASE64Encoder;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -97,13 +100,14 @@ public class ConverUtils {
         return output.toByteArray();
     }
 
-    public static String getUrl(Map<String, Object> params, String fileName, String port, String contextPath) {
+    public static String getUrl(Map<String, Object> params, String fileName, String port, String contextPath, String businessPath) {
         //拼接报表设计器，获取对应的模板文件的url地址
         StringBuffer url = new StringBuffer();
         url.append("http://127.0.0.1:");
         url.append(port);
         url.append(contextPath);
-        url.append("/ureport/pdf/show");
+        url.append("/ureport");
+        url.append(businessPath);
         url.append("?_u=file:");
         url.append(fileName);
         // 添加url参数,这里的参数是为了获取模板数据需要
@@ -141,8 +145,8 @@ public class ConverUtils {
             }
             try {
                 param.append(key).append("=").append(URLEncoder.encode(value, "UTF-8"));
-            }catch ( UnsupportedEncodingException e){
-
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException("入参编码失败:" + e.getMessage());
             }
             i++;
         }

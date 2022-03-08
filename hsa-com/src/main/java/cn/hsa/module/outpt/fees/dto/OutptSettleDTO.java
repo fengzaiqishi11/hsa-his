@@ -180,4 +180,27 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         // 退费费用id
         private List<String> costIdList;
 
+        /**
+         * 收费开始日期
+         */
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+        private String startBackTime;
+        /**
+         * 收费结束日期
+         */
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+        private String endBackTime;
+        // 结算id集合
+        private String settleIds;
+
+        private String payCode; //支付方式
+        private String bka006Name; // 病人类型
+        private String visitCode; // 就诊方式
+        private String personalNo; // 个人编号
+        private String type; // 类型： 1 门诊；0 挂号
+        private String printStatus;
+        private String registerId;
+
 }

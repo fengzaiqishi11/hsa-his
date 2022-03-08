@@ -3,7 +3,7 @@ package cn.hsa.report.business.service.impl;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.report.business.bo.ReportBusinessBO;
+import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
 import cn.hsa.module.report.business.bo.ReportDataDownLoadBO;
 import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;

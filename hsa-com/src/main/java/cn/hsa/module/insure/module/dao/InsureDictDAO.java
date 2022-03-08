@@ -175,6 +175,15 @@ public interface InsureDictDAO {
     /**
      * 查询单个医保地区划
      **/
-    Map<String, Object> queryOneAdmdvsInfo(@Param("hospCode") String hospCode, @Param("admdvsCode") String admdvsCode);
+    Map<String, String> queryOneAdmdvsInfo(@Param("hospCode") String hospCode, @Param("admdvsCode") String admdvsCode);
+
+    /**
+     * 查询系统字典
+     *
+     * @param hospCode 医院编码
+     * @param code     字典编码
+     * @return
+     */
+    List<Map<String, Object>> querySysCodeByCode(@Param("hospCode") String hospCode, @Param("code") String code);
 
 }

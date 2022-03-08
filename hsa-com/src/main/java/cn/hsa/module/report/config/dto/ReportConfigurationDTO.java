@@ -16,6 +16,8 @@ import java.util.List;
 @Data
 public class ReportConfigurationDTO extends ReportConfigurationDO implements Serializable {
 
+    private String keyword;
+
     private List<String> ids;
 
 }

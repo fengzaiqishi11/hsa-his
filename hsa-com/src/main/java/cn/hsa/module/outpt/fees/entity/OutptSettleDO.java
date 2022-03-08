@@ -93,5 +93,14 @@ public class OutptSettleDO extends PageDO implements Serializable {
 
         // 挂账金额
         private BigDecimal creditPrice;
+        private String creditIsPay; // 是否补缴
+        //补缴时间
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        private Date backPayTime;
+        // 补缴人id
+        private String backPayId;
+        // 补缴人姓名
+        private String backPayName;
 
 }

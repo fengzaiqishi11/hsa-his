@@ -20,11 +20,11 @@ public interface OutptMedicalCareConfigurationService {
      * @create 2022-03-07 14:32
      * @desc分页查询匹配养老院数据
      **/
-    WrapperResponse<PageDTO> queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+    WrapperResponse<PageDTO> queryAllByLimit(Map map);
 
-    WrapperResponse<Boolean> insertConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+    WrapperResponse<Boolean> insertConfiguration(Map map);
 
-    WrapperResponse<Boolean> deleteById(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+    WrapperResponse<Boolean> deleteById(Map<String, Object> map);
 
-    WrapperResponse<Boolean> updateConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+    WrapperResponse<Boolean> updateConfiguration(Map<String, Object> map);
 }

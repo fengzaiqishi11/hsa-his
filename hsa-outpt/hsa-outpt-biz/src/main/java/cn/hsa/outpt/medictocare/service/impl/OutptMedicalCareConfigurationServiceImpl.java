@@ -7,11 +7,13 @@ import cn.hsa.module.outpt.medictocare.bo.OutptMedicalCareConfigurationBO;
 import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
 import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
 import cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService;
+import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * @author powersi
@@ -26,22 +28,26 @@ public class OutptMedicalCareConfigurationServiceImpl implements OutptMedicalCar
     @Resource
     private OutptMedicalCareConfigurationBO outptMedicalCareConfigurationBO;
     @Override
-    public WrapperResponse<PageDTO> queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+    public WrapperResponse<PageDTO> queryAllByLimit(Map map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
         return WrapperResponse.success(outptMedicalCareConfigurationBO.queryAllByLimit(outptMedicalCareConfigurationDO));
     }
 
     @Override
-    public WrapperResponse<Boolean> insertConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+    public WrapperResponse<Boolean> insertConfiguration(Map map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
         return WrapperResponse.success(outptMedicalCareConfigurationBO.insertConfiguration(outptMedicalCareConfigurationDO));
     }
 
     @Override
-    public WrapperResponse<Boolean> deleteById(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+    public WrapperResponse<Boolean> deleteById(Map<String, Object> map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
         return WrapperResponse.success(outptMedicalCareConfigurationBO.deleteById(outptMedicalCareConfigurationDO));
     }
 
     @Override
-    public WrapperResponse<Boolean> updateConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+    public WrapperResponse<Boolean> updateConfiguration(Map<String, Object> map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
         return WrapperResponse.success(outptMedicalCareConfigurationBO.updateConfiguration(outptMedicalCareConfigurationDO));
     }
 }

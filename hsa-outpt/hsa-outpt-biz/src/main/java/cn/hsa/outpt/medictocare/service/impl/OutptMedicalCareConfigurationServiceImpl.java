@@ -13,6 +13,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +28,13 @@ public class OutptMedicalCareConfigurationServiceImpl implements OutptMedicalCar
 
     @Resource
     private OutptMedicalCareConfigurationBO outptMedicalCareConfigurationBO;
+
+    @Override
+    public WrapperResponse<OutptMedicalCareConfigurationDTO> queryById(Map map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
+        return WrapperResponse.success(outptMedicalCareConfigurationBO.queryById(outptMedicalCareConfigurationDO));
+    }
+
     @Override
     public WrapperResponse<PageDTO> queryAllByLimit(Map map) {
         OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
@@ -50,4 +58,12 @@ public class OutptMedicalCareConfigurationServiceImpl implements OutptMedicalCar
         OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
         return WrapperResponse.success(outptMedicalCareConfigurationBO.updateConfiguration(outptMedicalCareConfigurationDO));
     }
+
+    @Override
+    public WrapperResponse<List<OutptMedicalCareConfigurationDTO>> queryConfigation(Map<String, Object> map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
+        return WrapperResponse.success(outptMedicalCareConfigurationBO.queryConfigation(outptMedicalCareConfigurationDO));
+    }
+
+
 }

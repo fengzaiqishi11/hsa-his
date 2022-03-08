@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author powersi
@@ -23,6 +24,11 @@ public class OutptMedicalCareConfigurationBOimpl implements OutptMedicalCareConf
 
     @Resource
     private OutptMedicalCareConfigurationDAO outptMedicalCareConfigurationDAO;
+
+    @Override
+    public OutptMedicalCareConfigurationDTO queryById(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
+        return outptMedicalCareConfigurationDAO.queryById(outptMedicalCareConfigurationDO);
+    }
 
     @Override
     public PageDTO queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
@@ -43,5 +49,10 @@ public class OutptMedicalCareConfigurationBOimpl implements OutptMedicalCareConf
     @Override
     public Boolean updateConfiguration(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO) {
         return outptMedicalCareConfigurationDAO.updateConfiguration(outptMedicalCareConfigurationDO)>0;
+    }
+
+    @Override
+    public List<OutptMedicalCareConfigurationDTO> queryConfigation(OutptMedicalCareConfigurationDTO outptMedicalCareConfiguration) {
+        return outptMedicalCareConfigurationDAO.queryAllByLimit(outptMedicalCareConfiguration);
     }
 }

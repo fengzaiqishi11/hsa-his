@@ -15,7 +15,7 @@
     </resultMap>
 
     <!--查询单个-->
-    <select id="queryById" resultMap="OutptMedicalCareConfigurationMap">
+    <select id="queryById" resultType="cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO">
         select
             id, hosp_code, hosp_name, org_code, org_name, remark, crte_id, crte_name, crte_time
         from outpt_medical_care_configuration
@@ -92,6 +92,7 @@
             </if>
         </where>
     </select>
+
 
     <!--新增所有列-->
     <insert id="insertConfiguration" keyProperty="" useGeneratedKeys="true">

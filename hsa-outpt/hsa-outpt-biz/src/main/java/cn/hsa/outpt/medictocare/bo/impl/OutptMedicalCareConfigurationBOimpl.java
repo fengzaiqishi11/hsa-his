@@ -5,6 +5,7 @@ import cn.hsa.module.outpt.medictocare.bo.OutptMedicalCareConfigurationBO;
 import cn.hsa.module.outpt.medictocare.dao.OutptMedicalCareConfigurationDAO;
 import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
 import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
+import cn.hsa.util.SnowflakeUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

@@ -26,6 +26,9 @@ import java.util.Date;
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class MedicToCareDTO extends OutptMedicalCareApplyDO {
+
+    private static final long serialVersionUID = 454897645885296912L;
+
     /**
      * 就诊时间
      */
@@ -38,6 +41,19 @@ public class MedicToCareDTO extends OutptMedicalCareApplyDO {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date visitEndTime;
+
+    /**
+     * 就诊时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
+    /**
+     * 就诊时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
     /**
      * 医院就诊科室id
      */
@@ -50,4 +66,8 @@ public class MedicToCareDTO extends OutptMedicalCareApplyDO {
      * 关键字
      */
     private String keyword;
+    /**
+     * 门诊/住院就诊号
+     */
+    private String visitNo;
 }

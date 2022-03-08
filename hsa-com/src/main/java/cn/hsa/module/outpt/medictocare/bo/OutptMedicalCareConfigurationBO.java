@@ -15,6 +15,12 @@ public interface OutptMedicalCareConfigurationBO {
      * @create 2022-03-07 14:32
      * @desc分页查询匹配养老院数据
      **/
+    OutptMedicalCareConfigurationDTO queryById(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
+    /**
+     * @author yuelong.chen
+     * @create 2022-03-07 14:32
+     * @desc分页查询匹配养老院数据
+     **/
     PageDTO queryAllByLimit(OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO);
     /**
      * @author yuelong.chen

@@ -27,6 +27,13 @@ public class OutptMedicalCareConfigurationServiceImpl implements OutptMedicalCar
 
     @Resource
     private OutptMedicalCareConfigurationBO outptMedicalCareConfigurationBO;
+
+    @Override
+    public WrapperResponse<OutptMedicalCareConfigurationDTO> queryById(Map map) {
+        OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");
+        return WrapperResponse.success(outptMedicalCareConfigurationBO.queryById(outptMedicalCareConfigurationDO));
+    }
+
     @Override
     public WrapperResponse<PageDTO> queryAllByLimit(Map map) {
         OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDO = MapUtils.get(map,"outptMedicalCareConfigurationDTO");

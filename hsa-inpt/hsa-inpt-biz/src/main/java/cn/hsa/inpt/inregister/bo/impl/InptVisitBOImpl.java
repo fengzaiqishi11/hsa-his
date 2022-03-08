@@ -955,6 +955,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureInptRegisterDTO.setInNo(inptVisitDto.getInNo());
         insureInptRegisterDTO.setDoctorId(inptVisitDto.getJzDoctorId());
         insureInptRegisterDTO.setUserCode(inptVisitDTO.getUserCode());
+        insureInptRegisterDTO.setCardIden(insureIndividualBasicDTO.getCardIden());
 
         // 湖南省医保必填
         insureInptRegisterDTO.setAae036(inptVisitDto.getInTime()); // 经办时间

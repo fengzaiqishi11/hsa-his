@@ -485,37 +485,62 @@
 
     <select id="queryEmrPatientDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO"
             parameterType="java.util.Map">
-        select ind.id, ind.type_code, ind.crte_time,ind.crte_name, bd.name as diseaseName, bd.type_code, bd.code as icd10,ind.is_main,
-               (select jz_doctor_name from inpt_visit iv where iv.id = ind.visit_id and iv.hosp_code = ind.hosp_code)  jzDoctorName
-        from inpt_diagnose ind
-                 left join base_disease bd on ind.disease_id = bd.id and ind.hosp_code = bd.hosp_code
-        where ind.hosp_code=#{hospCode}
-          and ind.visit_id = #{visitId}
-        order by ind.crte_time desc
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
+               a.is_main isMain, b.name diseaseName,b.code diseaseCode,a.crte_time
+                ,c.in_dept_name inDeptName,c.in_dept_id inDeptId,a.crte_id zzDoctorId,c.crte_name zzDoctorName,
+               (select su.prac_certi_no from sys_user su where su.hosp_code = c.hosp_code and su.id = c.zz_doctor_id ) as pracCertiNo,
+               iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName
+        from inpt_diagnose a
+                 join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+                 join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
+                 join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
+                and iim.is_trans ='1' and iim.is_match ='1'
+        where  a.visit_id = #{id} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+        <if test="diagnoseList != null and diagnoseList.size() > 0">
+            and a.type_code in
+            <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
     </select>
-
     <!--HIS数据抽取 获取手术信息-->
-    <select id="queryEmrOperRecordInfo" parameterType="java.util.Map" resultType="cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO">
-        select * from oper_info_record where hosp_code = #{hospCode} and visit_id = #{visitId}
+    <select id="queryEmrOperRecordInfo" parameterType="java.util.Map"
+            resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+            oir.id, baby_id, in_no, advice_id, name, gender_code, age,
+            age_unit_code, blood_code, dept_id, oper_dept_id, bed_id, bed_name, oper_disease_id,
+            oper_disease_icd9, oper_disease_name, in_disease_id, in_disease_name, in_disease_icd10,
+            doctor_id, doctor_name, assistant_id1, assistant_name1, assistant_id2, assistant_name2,
+            assistant_id3, assistant_name3, special_request, content, oper_Type, audit_id,
+            audit_name, audit_time, audit_remark, oper_plan_time, oper_room_Id, oper_room_name,
+            xh_nurse_id, xh_nurse_name, qx_nurse_id, qx_nurse_name, ana_code, ana_id1,
+            ana_name1, ana_id2, ana_name2, ana_id3, ana_name3, oir.oper_end_time, notched_code,
+            heal_code, oper_time_hour, status_code, is_cost, total_price, cost_time,
+            cost_id, cost_name,
+            oir.crte_time, `rank`, ward_id
+        from oper_info_record oir
+        where oir.hosp_code = #{hospCode} and oir.visit_id = #{visitId}
     </select>
 
     <!--病程记录-->
     <select id="queryEmrCourseInfo" parameterType="java.util.Map" resultType="cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO">
-        select * from emr_patient_record a
-        left join emr_classify_template b on a.classify_template_id =b.id and a.hosp_code = b.hosp_code
-        LEFT JOIN emr_classify c on b.classify_code = c.`code` and b.hosp_code =c.hosp_code
-        where a.hosp_code = #{hospCode}
-        and a.visit_id = #{visitId}
-        and c.name like '首次病程记录%'
-        and b.dept_id =#{deptId}
-        and c.dept_id =#{deptId}
-        and c.is_valid ='1'
-        limit 1
-    </select>
-
-    <!-- 根据就诊ID查询住院病人基本信息 -->
-    <select id="getEmrInptVisit" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select v.* from inpt_visit v where v.id = #{visitId} and v.hosp_code = #{hospCode}
+        SELECT
+            k.id,
+            a.emr_json,
+            c.NAME,
+            k.dept_id
+        FROM
+            emr_patient k
+                JOIN emr_patient_record a ON k.patient_record_id = a.id
+                JOIN emr_classify_template b ON a.classify_template_id = b.id
+                AND a.hosp_code = b.hosp_code
+                JOIN emr_classify c ON b.classify_code = c.`code`
+                AND b.hosp_code = c.hosp_code
+        WHERE
+            a.hosp_code = #{hospCode}
+          AND a.visit_id = #{visitId}
+          AND c.NAME LIKE '首次病程记录%'
+          AND c.is_valid = '1'
     </select>
 
     <!--出院记录-->
@@ -642,17 +667,24 @@
 
     <select id="queryHisEmrJosnInfo" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
-            b.emr_json emrJson,
-            c.classify_code classifyCode,
-            ( SELECT NAME FROM emr_classify WHERE CODE = ( SELECT up_code FROM emr_classify WHERE CODE = c.classify_code LIMIT 1 ) LIMIT 1 ) AS classifyName
+            k.id as id,
+            a.emr_json as emrJson,
+            c.name as name,
+            k.dept_id as deptId,
+            c.insure_type_code insureTypeCode,
+            a.crte_time crteTime,
+            k.record_time recordTime
         FROM
-            emr_patient a
-            LEFT JOIN emr_patient_record b ON a.patient_record_id = b.id
-            LEFT JOIN emr_classify_template c ON b.classify_template_id = c.id
+            emr_patient k
+                JOIN emr_patient_record a ON k.patient_record_id = a.id
+                JOIN emr_classify_template b ON a.classify_template_id = b.id
+                AND a.hosp_code = b.hosp_code
+                JOIN emr_classify c ON b.classify_code = c.`code`
+                AND b.hosp_code = c.hosp_code
         WHERE
             a.hosp_code = #{hospCode}
           AND a.visit_id = #{visitId}
-          AND a.patient_record_id IS NOT NULL
+          AND c.is_valid = '1'
     </select>
 
 </mapper>

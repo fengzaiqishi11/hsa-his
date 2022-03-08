@@ -3,8 +3,12 @@ package cn.hsa.report.business.bo.impl.factory;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.statement.service.PatientCostLedgerService;
 import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
+import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
+import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
+import com.alibaba.fastjson.JSON;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,25 +32,42 @@ public class HospitalIncomeSheetBOImpl implements ReportBusinessBO {
     @Resource
     private PatientCostLedgerService patientCostLedgerService_consumer;
 
+    @Autowired
+    private ReportConfigurationDAO reportConfigurationDAO;
+
     @Override
     public Map getReportDataMap(Map map) {
+        String hospCode = map.get("hospCode").toString();
+        String tempCode = "his_iptopt_feeIncome_0001";
+        ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, tempCode);
+        String customConfigStr = configuration.getCustomConfig().replace("\\", "").replace("\"{", "{").replace("}\"", "}");
+        // 自定义配置
+        Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
+        String titleTmp = customConfigMap.get("title").toString();
+
         List<Map<String, Object>> feeItemList;
+        String title;
         if (Constants.VISITTYPE.INPT.equals(map.get("businessSources"))) {
             WrapperResponse<List<Map<String, Object>>> zyResult = patientCostLedgerService_consumer.queryZyFeeIncomeList(map);
             feeItemList = mergeFeeItemList(zyResult.getData());
+            title = titleTmp.replace("$", "住院");
         } else if (Constants.VISITTYPE.OUTPT.equals(map.get("businessSources"))) {
             WrapperResponse<List<Map<String, Object>>> mzResult = patientCostLedgerService_consumer.queryMzFeeIncomeList(map);
             feeItemList = mergeFeeItemList(mzResult.getData());
+            title = titleTmp.replace("$", "门诊");
         } else {
             WrapperResponse<List<Map<String, Object>>> zyResult = patientCostLedgerService_consumer.queryZyFeeIncomeList(map);
             WrapperResponse<List<Map<String, Object>>> mzResult = patientCostLedgerService_consumer.queryMzFeeIncomeList(map);
             feeItemList = mergeFeeItemList(ListUtils.union(zyResult.getData(), mzResult.getData()));
+            title = titleTmp.replace("$", "全院");
         }
         if (ListUtils.isEmpty(feeItemList)) {
             throw new RuntimeException("收入统计无数据，请重新时间范围！");
         }
+        map.put("title", title);
+        map.put("fileName", title);
         map.put("feeItemList", feeItemList);
-        map.put("tempCode", "his_iptopt_feeIncome_0001");
+        map.put("tempCode", tempCode);
         return map;
     }
 

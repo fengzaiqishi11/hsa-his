@@ -31,7 +31,7 @@ public interface CareToMedicApplyBO {
      * @Date   2022/2/28 9:38
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<OutinInvoiceDO>
      **/
-    Map<String, Object> getCareToMedicInfoById(MedicToCareDTO medicToCareDTO);
+    Map<String, Object> getCareToMedicInfoById(Map map);
 
     /**
      * @Menthod: insertMedicToCare()

@@ -68,6 +68,7 @@ public class MedicToCareController extends BaseController {
         medicToCareDTO.setCrteName(userDTO.getName());
         medicToCareDTO.setCrteTime(new Date());
         Map map = new HashMap();
+
         map.put("hospCode",userDTO.getHospCode());
         map.put("medicToCareDTO",medicToCareDTO);
         return medicToCareService_consumer.insertMedicToCare(map);

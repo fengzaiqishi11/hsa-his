@@ -67,7 +67,7 @@ public class ReportDataDownLoadController extends BaseController {
         map.put("crteName", sysUserDTO.getName());
         WrapperResponse<ReportReturnDataDTO>  result = reportDataDownLoadService_consumer.saveBuild(map);
         ReportReturnDataDTO data = result.getData();
-        res.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(data.getFileName() + ".pdf", "UTF-8"));
+        res.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(data.getFileName() + "." + data.getFileFormat(), "UTF-8"));
         res.setContentType("application" + "/" + data.getFileFormat());
         OutputStream out = null;
         try {

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,6 +71,25 @@ public class OutptMedicalCareConfigurationController extends BaseController {
         map.put("outptMedicalCareConfigurationDTO",outptMedicalCareConfigurationDTO);
         map.put("hospCode",userDTO.getHospCode());
         return outptMedicalCareConfigurationService_consumer.updateConfiguration(map);
+    }
+
+    @PostMapping("/queryById")
+    public WrapperResponse<OutptMedicalCareConfigurationDTO> queryById(@RequestBody OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO userDTO = getSession(req, res);
+        Map<String, Object> map  = new HashMap<>();
+        map.put("outptMedicalCareConfigurationDTO",outptMedicalCareConfigurationDTO);
+        map.put("hospCode",userDTO.getHospCode());
+        return outptMedicalCareConfigurationService_consumer.queryById(map);
+    }
+
+    @PostMapping("/queryConfigation")
+    public WrapperResponse<List<OutptMedicalCareConfigurationDTO>> queryConfigation(@RequestBody OutptMedicalCareConfigurationDTO outptMedicalCareConfigurationDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO userDTO = getSession(req, res);
+        Map<String, Object> map  = new HashMap<>();
+        outptMedicalCareConfigurationDTO.setHospCode(userDTO.getHospCode());
+        map.put("outptMedicalCareConfigurationDTO",outptMedicalCareConfigurationDTO);
+        map.put("hospCode",userDTO.getHospCode());
+        return outptMedicalCareConfigurationService_consumer.queryConfigation(map);
     }
 
 }

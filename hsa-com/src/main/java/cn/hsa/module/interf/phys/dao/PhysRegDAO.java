@@ -71,4 +71,18 @@ public interface PhysRegDAO {
      * @Date: 2021-12-06
      */
     List<OutptCostDTO> queryCostPhys(OutptCostDTO outptCostDTO);
+
+    /**
+     * 查询是否存在该体检者的登记信息
+     * @param outptVisitDTO
+     * @return
+     */
+    int queryVisitByPhys(OutptVisitDTO outptVisitDTO);
+
+    /**
+     * 修改体检者的登记信息
+     * @param outptVisitDTO
+     * @return
+     */
+    int updateVisitByPhys(OutptVisitDTO outptVisitDTO);
 }

@@ -567,11 +567,17 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     @Override
     public Map getBeforeRecord(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+        String hospCode = MapUtils.get(map, "hospCode");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_quality/list.action");
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        sb.append("http://"+drgIp+"/drg_web/drgGroupThird/drg_quality/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getId());
-
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");

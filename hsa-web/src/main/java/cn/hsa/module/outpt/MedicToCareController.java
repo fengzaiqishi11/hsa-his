@@ -60,6 +60,7 @@ public class MedicToCareController extends BaseController {
     public WrapperResponse<Boolean> insertMedicToCare(@RequestBody MedicToCareDTO medicToCareDTO,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO userDTO = getSession(req, res) ;
         medicToCareDTO.setHospCode(userDTO.getHospCode());
+        medicToCareDTO.setApplyDeptId(userDTO.getLoginBaseDeptDTO().getId());
         medicToCareDTO.setId(SnowflakeUtils.getId());
         medicToCareDTO.setApplyId(userDTO.getId());
         medicToCareDTO.setApplyName(userDTO.getName());

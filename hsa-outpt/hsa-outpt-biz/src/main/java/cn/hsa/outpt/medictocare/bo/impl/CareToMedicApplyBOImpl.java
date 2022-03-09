@@ -11,6 +11,8 @@ import cn.hsa.module.outpt.medictocare.bo.CareToMedicApplyBO;
 import cn.hsa.module.outpt.medictocare.bo.MedicToCareBO;
 import cn.hsa.module.outpt.medictocare.dao.MedicToCareDAO;
 import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
+import cn.hsa.module.outpt.prescribe.bo.OutptDoctorPrescribeBO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.*;
 import cn.hutool.core.util.BooleanUtil;
@@ -39,6 +41,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
 
     @Resource
     private MedicToCareDAO medicToCareDAO;
+    @Resource
+    private OutptDoctorPrescribeBO outptDoctorPrescribeBO;
     /**
      * 调用的url
      */
@@ -91,9 +95,12 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         if("1".equals(MapUtils.get(map,"statusCode"))){
             //1.接受申请
             //填充就诊信息
-            OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(map);
+//            OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(map);
+            //调用直接就诊接口
+            OutptRegisterDTO outptRegisterDTO = this.setoutptRegisterDTO(map);
+            outptDoctorPrescribeBO.saveDirectVisit(outptRegisterDTO);
             //插入就诊表
-            medicToCareDAO.insertOutPtInfo(outptVisitDTO);
+//            medicToCareDAO.insertOutPtInfo(outptVisitDTO);
             //填充就诊确认信息接口
             paramap = this.sendInfo(map);
         }else if("2".equals(MapUtils.get(map,"statusCode"))){
@@ -108,6 +115,33 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         //插入本地
         medicToCareDAO.updateMedicToCare(map);
         return true;
+    }
+
+    private OutptRegisterDTO setoutptRegisterDTO(Map map){
+        OutptRegisterDTO outptRegisterDTO = new OutptRegisterDTO();
+        //医院编码
+        outptRegisterDTO.setHospCode(MapUtils.get(map,"hospCode"));
+        //登录部门ID
+        outptRegisterDTO.setDeptId(MapUtils.get(map,"visitDeptId"));
+        outptRegisterDTO.setDeptName(MapUtils.get(map,"visitDeptName"));
+        //医生ID
+        outptRegisterDTO.setDoctorId(MapUtils.get(map,"visitDoctorId"));
+        //医生
+        outptRegisterDTO.setDoctorName(MapUtils.get(map,"visitDoctorName"));
+        outptRegisterDTO.setCrteId(MapUtils.get(map,"crteId"));
+        outptRegisterDTO.setCrteName(MapUtils.get(map,"crteName"));
+        outptRegisterDTO.setCrteTime(MapUtils.get(map,"crteTime"));
+        outptRegisterDTO.setPatientCode("0");
+        outptRegisterDTO.setName(MapUtils.get(map,"name"));
+        outptRegisterDTO.setGenderCode(MapUtils.get(map,"genderCode"));
+        outptRegisterDTO.setAgeUnitCode(MapUtils.get(map,"ageUnitCode","1"));
+        outptRegisterDTO.setAge(MapUtils.get(map,"age"));
+        outptRegisterDTO.setCertNo(MapUtils.get(map,"certNo"));
+        outptRegisterDTO.setCertCode("01");
+        outptRegisterDTO.setPhone(MapUtils.get(map,"phone"));
+        outptRegisterDTO.setVisitCode("01");
+        outptRegisterDTO.setPreferentialTypeId(MapUtils.get(map,"preferentialTypeId"));
+        return outptRegisterDTO;
     }
 
     private OutptVisitDTO setOutptVisitDTO(Map map) {
@@ -142,7 +176,7 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         outptVisitDTO.setDoctorName(MapUtils.get(map,"visitDoctorName"));
         outptVisitDTO.setDeptId(MapUtils.get(map,"visitDeptId"));
         outptVisitDTO.setDeptName(MapUtils.get(map,"visitDeptName"));
-        outptVisitDTO.setVisitTime(DateUtils.parse(MapUtils.get(map,"visitTime"),"yyyy-MM-dd HH:mm:ss"));
+//        outptVisitDTO.setVisitTime(DateUtils.parse(MapUtils.get(map,"visitTime"),"yyyy-MM-dd HH:mm:ss"));
         outptVisitDTO.setRemark(MapUtils.get(map,"remark"));
         //未就诊状态
         outptVisitDTO.setIsVisit("0");

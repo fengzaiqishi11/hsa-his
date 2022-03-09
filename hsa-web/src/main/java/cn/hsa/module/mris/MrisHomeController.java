@@ -147,7 +147,17 @@ public class MrisHomeController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.upMrisForDRG(map));
     }
-
+    @PutMapping(value = "/upMrisForDIP")
+    public WrapperResponse<Map<String, Object>> upMrisForDIP(@RequestBody String visitId, HttpServletRequest req, HttpServletResponse res){
+        if (StringUtils.isEmpty(visitId)) {
+            throw new AppException("参数错误：未获取到患者就诊ID，请刷新重试");
+        }
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("visitId",visitId);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return WrapperResponse.success(mrisHomeService_consumer.upMrisForDIP(map));
+    }
     /**
      * @Method: updateMrisBaseInfo
      * @Description: 修改病案基本信息

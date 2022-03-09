@@ -264,4 +264,6 @@ public interface MrisHomeBO {
      * @Return
      */
     List<MrisDiagnoseDO> queryAllDiagnose(InptVisitDTO inptVisitDTO);
+
+    Map<String, Object> upMrisForDIP(Map<String, Object> map);
 }

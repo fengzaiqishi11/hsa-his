@@ -355,7 +355,7 @@
         otv.is_call as isCanCall,
         case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
         from outpt_visit a
-        join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+        left join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
         left join outpt_diagnose c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.is_main = '1' and ifnull(c.disease_id,'') != ''
         left join base_disease d on c.disease_id = d.id and c.hosp_code = d.hosp_code
         left join sys_parameter e on e.code = 'MZYS_EKCFNL' and a.hosp_code = e.hosp_code

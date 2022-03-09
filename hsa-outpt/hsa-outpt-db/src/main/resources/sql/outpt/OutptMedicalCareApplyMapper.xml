@@ -275,8 +275,8 @@
                 id, hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id,
                 visit_type, apply_dept_id, (select bd.name from base_dept bd where apply_dept_id = bd.id and hosp_code = bd.hosp_code) as applyDeptName,
                 apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house,
-                house_bed, referral_main_suit, nusre_type_code, disease_id, disease_name, reality_in_time, status_code, visit_dept_id, visit_doctor_id,
-                visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time, if(house_bed is null, '0', '1') is_in
+                house_bed, referral_main_suit, nusre_type_code, disease_id, disease_name, reality_in_time, status_code, visit_dept_id,  (SELECT name from  base_dept where visit_dept_id = id )visit_dept_name,visit_doctor_id,
+                (SELECT name from  sys_user where visit_doctor_id = id ) visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time, if(house_bed is null, '0', '1') is_in
             from outpt_medical_care_apply a
             where id = #{id}
     </select>

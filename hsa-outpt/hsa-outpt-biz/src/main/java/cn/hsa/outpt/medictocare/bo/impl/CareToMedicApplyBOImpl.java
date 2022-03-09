@@ -71,7 +71,10 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     @Override
     public Map<String, Object> getCareToMedicInfoById(Map map) {
             String id = MapUtils.get(map,"id");
-            return medicToCareDAO.getMedicToCareInfoById(id);
+            Map<String, Object> re =  medicToCareDAO.getMedicToCareInfoById(id);
+//            re.put("visit_time",DateUtils.format((Date) re.get("visit_time"),DateUtils.Y_M_DH_M_S));
+//            re.put("hope_in_time",DateUtils.format((Date) re.get("hope_in_time"),DateUtils.Y_M_DH_M_S));
+            return re;
     }
     /**
      * @Menthod: insertMedicToCare()

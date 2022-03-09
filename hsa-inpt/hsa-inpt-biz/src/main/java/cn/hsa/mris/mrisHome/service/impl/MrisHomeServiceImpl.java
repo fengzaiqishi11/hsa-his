@@ -248,7 +248,10 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
         return mrisHomeBO.upMrisForDRG(map);
     }
-
+    @Override
+    public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
+        return mrisHomeBO.upMrisForDIP(map);
+    }
     /**
      * @Method: updateMrisTurnDept
      * @Description: 修改病案转科信息

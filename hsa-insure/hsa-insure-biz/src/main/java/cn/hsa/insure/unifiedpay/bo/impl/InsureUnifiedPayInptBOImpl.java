@@ -1457,14 +1457,20 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String mdtrtCertType = inptVisitDTO.getInsureIndividualBasicDTO().getBka895();
         if("06".equals(mdtrtCertType) || "03".equals(mdtrtCertType)){
             mdtrtinfoMap.put("mdtrt_cert_type", "03");//inptVisitDTO.getCertCode());//	就诊凭证类型
-        }else{
-            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);//inptVisitDTO.getCertCode());//	就诊凭证类型
-        }
-        if(!StringUtils.isEmpty(inptVisitDTO.getInsureIndividualBasicDTO().getAac002())){
-            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());// inptVisitDTO.getCertNo());//	就诊凭证编号
-        }
-        else{
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
+        }
+//        else{
+//            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);//inptVisitDTO.getCertCode());//	就诊凭证类型
+//        }
+//        if(!StringUtils.isEmpty(inptVisitDTO.getInsureIndividualBasicDTO().getAac002())){
+//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());// inptVisitDTO.getCertNo());//	就诊凭证编号
+//        }
+//        else{
+//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
+//        }
+        if("02".equals(mdtrtCertType)) {
+            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
+            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());
         }
         if("01".equals(mdtrtCertType)) {
             mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
@@ -1559,7 +1565,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         mdtrtinfoMap.put("ttp_resp", "0");//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", "0");//	合并结算标志
         mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
-        mdtrtinfoMap.put("cert_type", "1");//	证件类型（跨省异地必传）
+        mdtrtinfoMap.put("cert_type", "01");//	证件类型（跨省异地必传）
         mdtrtinfoMap.put("certno", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());//	证件号码（跨省异地必传）
         mdtrtinfoMap.put("hcard_basinfo", insureInptRegisterDTO.getHcardBasinfo());//	证件号码（广州读卡就医必传）
         mdtrtinfoMap.put("hcard_chkinfo", insureInptRegisterDTO.getHcardChkinfo());//	证件号码（广州读卡就医必传）
@@ -1685,7 +1691,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 for (String s : collect) {
                     stringBuilder.append(s).append(",");
                 }
-                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
+//                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
             }
         }
     }

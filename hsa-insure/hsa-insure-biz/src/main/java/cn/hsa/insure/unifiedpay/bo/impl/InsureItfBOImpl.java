@@ -66,7 +66,11 @@ public class InsureItfBOImpl {
         } catch (Exception e) {
             //调接口后，请求失败插入医保人员信息获取日志
             params.put("resultStr",e.getMessage()== null ? "null": e.getMessage().length() > 5000 ? e.getMessage().substring(0,4500):e.getMessage());
-            throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),msgId, functionEnum.getDesc(), functionEnum.getCode(), e});
+            if(e instanceof BizRtException){
+                throw e;
+            }else{
+                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),msgId, functionEnum.getDesc(), functionEnum.getCode(), e});
+            }
         }finally {
             insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
         }

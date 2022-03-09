@@ -25,6 +25,10 @@ import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +55,9 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
 
     @Value("${fsstore.url}")
     private String url;
+
+    @Value("${nginx.url}")
+    private String nginxUrl;
 
     @Value("${fsstore.bucket}")
     private String bucket;
@@ -91,57 +98,89 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 throw new RuntimeException("暂不支持该返回数据类型");
         }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
-        if (StringUtils.isNotEmpty(str) && ("png".equals(fileFormat) || "jpg".equals(fileFormat))) {
-            try {
-                Integer dpi = (Integer) customConfigMap.get("dpi");
-                if (dpi == null) {
-                    dpi = 200;
+        if (StringUtils.isEmpty(str)) {
+            throw new RuntimeException("报表服务生成报表文件失败");
+        }
+
+        String returnDataType = configuration.getReturnDataType();
+        String fileUrl = null;
+        String keyId = null;
+        switch (returnDataType) {
+            case "1":
+                try {
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] byteArr = decoder.decodeBuffer(str);
+                    InputStream inputStream = new ByteArrayInputStream(byteArr);
+                    fileName = fileName + "." + customConfigMap.get("fileFormat");
+                    keyId = "pdf"+File.pathSeparator+fileName;
+                    if (Constants.SF.F.equals(configuration.getIsUpload())) {
+                        fileUrl = nginxUrl;
+                        createLocalFile(fileUrl,keyId,inputStream);
+                    }else{
+                        fileUrl = url;
+                        keyId = uploadFile(fileName,map,configuration,inputStream);
+                    }
+                }catch (Exception e) {
+                    log.error("上传文件失败", e);
                 }
-                BASE64Decoder decoder = new BASE64Decoder();
-                List<byte[]> list = PdfToImageUtil.pdfToImage(decoder.decodeBuffer(str), fileFormat, dpi);
-                // 对字节数组Base64编码
-                BASE64Encoder encoder = new BASE64Encoder();
-                // 返回Base64编码过的字节数组字符串 暂只支持一页转换
-                str = encoder.encode(list.get(0));
-            } catch (Exception e) {
-                throw new RuntimeException("pdf转图片，转换失败");
-            }
+            case "2":
+                if (StringUtils.isNotEmpty(str) && ("png".equals(fileFormat) || "jpg".equals(fileFormat))) {
+                    try {
+                        Integer dpi = (Integer) customConfigMap.get("dpi");
+                        if (dpi == null) {
+                            dpi = 200;
+                        }
+                        BASE64Decoder decoder = new BASE64Decoder();
+                        List<byte[]> list = PdfToImageUtil.pdfToImage(decoder.decodeBuffer(str), fileFormat, dpi);
+                        // 对字节数组Base64编码
+                        BASE64Encoder encoder = new BASE64Encoder();
+                        // 返回Base64编码过的字节数组字符串 暂只支持一页转换
+                        str = encoder.encode(list.get(0));
+                    } catch (Exception e) {
+                        throw new RuntimeException("pdf转图片，转换失败");
+                    }
+                }
+            default:
+                break;
         }
-        if (Constants.SF.F.equals(configuration.getIsUpload())) {
-            return new ReportReturnDataDTO(null, fileName, fileFormat, str);
-        }
+        return getReturnData(configuration.getReturnDataType(), keyId, str, fileUrl + keyId, fileName, fileFormat);
+    }
 
+    private String uploadFile(String fileName, Map map,ReportConfigurationDTO configuration,InputStream inputStream) throws Exception{
         FSEntity fsEntity = new FSEntity();
-        try {
-            if (StringUtils.isNotEmpty(str)) {
-                BASE64Decoder decoder = new BASE64Decoder();
-                byte[] byteArr = decoder.decodeBuffer(str);
-                InputStream inputStream = new ByteArrayInputStream(byteArr);
-                fileName = fileName + "." + customConfigMap.get("fileFormat");
-                log.debug("文件名:{}", fileName);
+        log.debug("文件名:{}", fileName);
+        fsEntity.setInputstream(inputStream);
+        fsEntity.setName(fileName);
+        fsEntity.setSize(inputStream.available());
+        fsEntity.setContentType(FilenameUtils.getExtension(fileName));
+        fsEntity = fsManager.putObject(bucket, fsEntity);
+        String keyId = fsEntity.getKeyId();
+        ReportFileRecordDTO record = new ReportFileRecordDTO();
+        record.setId(SnowflakeUtils.getId());
+        record.setHospCode(configuration.getHospCode());
+        record.setTempCode(configuration.getTempCode());
+        record.setFileName(fileName);
+        record.setFileAddress(fsEntity.getKeyId());
+        record.setCrterId(map.get("crteId").toString());
+        record.setCrterName(map.get("crteName").toString());
+        record.setCrteTime(DateUtils.getNow());
+        reportFileRecordDAO.insert(record);
+        return keyId;
+    }
 
-                fsEntity = new FSEntity();
-                fsEntity.setInputstream(inputStream);
-                fsEntity.setName(fileName);
-                fsEntity.setSize(inputStream.available());
-                fsEntity.setContentType(FilenameUtils.getExtension(fileName));
-                fsEntity = fsManager.putObject(bucket, fsEntity);
-
-                ReportFileRecordDTO record = new ReportFileRecordDTO();
-                record.setId(SnowflakeUtils.getId());
-                record.setHospCode(configuration.getHospCode());
-                record.setTempCode(configuration.getTempCode());
-                record.setFileName(fileName);
-                record.setFileAddress(fsEntity.getKeyId());
-                record.setCrterId(map.get("crteId").toString());
-                record.setCrterName(map.get("crteName").toString());
-                record.setCrteTime(DateUtils.getNow());
-                reportFileRecordDAO.insert(record);
-            }
-        } catch (Exception e) {
-            log.error("上传文件失败", e);
+    private void createLocalFile(String fileUrl, String keyId, InputStream inputStream) throws Exception {
+        //本地写文件到 nginx代理目录
+        File file =new File(fileUrl+keyId);
+        if(!file.exists()){
+            file.mkdirs();
         }
-        return getReturnData(configuration.getReturnDataType(), fsEntity.getKeyId(), str, url + fsEntity.getKeyId(), fileName, fileFormat);
+        FileOutputStream fos = new FileOutputStream(file);
+        byte[] bytes = new byte[1024];
+        int byteCount;
+        while((byteCount = inputStream.read(bytes)) != -1){
+            fos.write(bytes,0,byteCount);
+        }
+        fos.close();
     }
 
     @Override

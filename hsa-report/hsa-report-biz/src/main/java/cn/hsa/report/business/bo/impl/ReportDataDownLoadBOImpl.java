@@ -9,7 +9,12 @@ import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
-import cn.hsa.util.*;
+import cn.hsa.util.Constants;
+import cn.hsa.util.ConverUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.PdfToImageUtil;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -17,9 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +74,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         String rUrl;
         String fileFormat = (String) customConfigMap.get("fileFormat");
         switch (fileFormat) {
+            case "png":
+            case "jpg":
             case "pdf":
                 rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/pdf/show");
                 break;
@@ -82,7 +91,22 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 throw new RuntimeException("暂不支持该返回数据类型");
         }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
-
+        if (StringUtils.isNotEmpty(str) && ("png".equals(fileFormat) || "jpg".equals(fileFormat))) {
+            try {
+                Integer dpi = (Integer) customConfigMap.get("dpi");
+                if (dpi == null) {
+                    dpi = 200;
+                }
+                BASE64Decoder decoder = new BASE64Decoder();
+                List<byte[]> list = PdfToImageUtil.pdfToImage(decoder.decodeBuffer(str), fileFormat, dpi);
+                // 对字节数组Base64编码
+                BASE64Encoder encoder = new BASE64Encoder();
+                // 返回Base64编码过的字节数组字符串 暂只支持一页转换
+                str = encoder.encode(list.get(0));
+            } catch (Exception e) {
+                throw new RuntimeException("pdf转图片，转换失败");
+            }
+        }
         if (Constants.SF.F.equals(configuration.getIsUpload())) {
             return new ReportReturnDataDTO(null, fileName, fileFormat, str);
         }

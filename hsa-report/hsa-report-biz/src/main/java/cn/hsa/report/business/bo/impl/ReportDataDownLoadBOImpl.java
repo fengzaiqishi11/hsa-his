@@ -112,7 +112,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                     BASE64Decoder decoder = new BASE64Decoder();
                     byte[] byteArr = decoder.decodeBuffer(str);
                     InputStream inputStream = new ByteArrayInputStream(byteArr);
-                    fileName = fileName + "." + customConfigMap.get("fileFormat");
+                    fileName = "/pdf"+File.separator+fileName + "." + customConfigMap.get("fileFormat");
                     keyId = fileName;
                     if (Constants.SF.F.equals(configuration.getIsUpload())) {
                         fileUrl = nginxUrl;

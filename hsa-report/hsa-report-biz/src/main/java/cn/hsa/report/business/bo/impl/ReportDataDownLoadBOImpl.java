@@ -171,7 +171,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
 
     private void createLocalFile(String fileUrl, String keyId, InputStream inputStream) throws Exception {
         //本地写文件到 nginx代理目录
-        File file =new File(fileUrl+File.separator+keyId);
+        File file =new File(fileUrl+keyId);
         if(!file.getParentFile().exists()){
             file.mkdirs();
         }

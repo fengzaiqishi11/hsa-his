@@ -1566,7 +1566,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
                         // 部分退且已经发药
                         if (!isAllOut) {

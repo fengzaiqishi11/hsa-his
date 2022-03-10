@@ -2167,7 +2167,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 }
             }
         }
-
+        localOrdinaryOutptList.addAll(localSpecialOutptList);
+        localOrdinaryOutptList.addAll(localOrdinaryInptList);
+        paraMap.put("list", localOrdinaryOutptList);
         // 特药、没啥好统计的，肯定查不出数据
         resultMap.put("paraMap", paraMap);
         return resultMap;

@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -62,12 +63,12 @@ public class ReportDataDownLoadController extends BaseController {
     public void download(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("crterId", sysUserDTO.getId());
-        map.put("crterName", sysUserDTO.getName());
-        WrapperResponse<ReportReturnDataDTO> result = reportDataDownLoadService.saveBuild(map);
+        map.put("crteId", sysUserDTO.getId());
+        map.put("crteName", sysUserDTO.getName());
+        WrapperResponse<ReportReturnDataDTO>  result = reportDataDownLoadService.saveBuild(map);
         ReportReturnDataDTO data = result.getData();
-        res.setHeader("Content-Disposition", "attachment;filename=FileName.pdf");
-        res.setContentType("application/pdf");
+        res.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(data.getFileName() + "." + data.getFileFormat(), "UTF-8"));
+        res.setContentType("application" + "/" + data.getFileFormat());
         OutputStream out = null;
         try {
             BASE64Decoder decoder = new BASE64Decoder();

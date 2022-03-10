@@ -60,6 +60,7 @@ public class MedicToCareController extends BaseController {
     public WrapperResponse<Boolean> insertMedicToCare(@RequestBody MedicToCareDTO medicToCareDTO,HttpServletRequest req, HttpServletResponse res){
         SysUserDTO userDTO = getSession(req, res) ;
         medicToCareDTO.setHospCode(userDTO.getHospCode());
+        medicToCareDTO.setApplyDeptId(userDTO.getLoginBaseDeptDTO().getId());
         medicToCareDTO.setId(SnowflakeUtils.getId());
         medicToCareDTO.setApplyId(userDTO.getId());
         medicToCareDTO.setApplyName(userDTO.getName());
@@ -68,6 +69,7 @@ public class MedicToCareController extends BaseController {
         medicToCareDTO.setCrteName(userDTO.getName());
         medicToCareDTO.setCrteTime(new Date());
         Map map = new HashMap();
+
         map.put("hospCode",userDTO.getHospCode());
         map.put("medicToCareDTO",medicToCareDTO);
         return medicToCareService_consumer.insertMedicToCare(map);

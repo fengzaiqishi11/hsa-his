@@ -182,6 +182,17 @@ public class SysUserController extends BaseController {
         map.put("sysUserDTO",sysUserDTO);
         return sysUserService_consumer.queryPage(map);
     }
+    @PostMapping("/queryDeptUser")
+    public WrapperResponse<PageDTO> queryDeptUser(@RequestBody SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res)
+    {
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+        //封装参数
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTOSession.getHospCode());
+        map.put("sysUserDTO",sysUserDTO);
+        return sysUserService_consumer.queryDeptUser(map);
+    }
 
     /**
      * @Method save

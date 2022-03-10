@@ -30,18 +30,8 @@ public class HospitalIncomeSheetBean extends GeneralTemplateBean {
     public List<Map<String, Object>> getBaseInfo(String dsName, String datasetName, Map<String, Object> param) {
         if (MapUtils.isNotEmpty(param)) {
             Map info = new HashMap(2);
-            String customConfigStr = (String) param.get("customConfig");
-
-            Map customConfig = JSONObject.parseObject(customConfigStr, Map.class);
-            String titleTmp = customConfig.get("title").toString();
             info.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
-            if (Constants.VISITTYPE.INPT.equals(param.get("businessSources"))) {
-                info.put("title", titleTmp.replace("$", "住院"));
-            } else if (Constants.VISITTYPE.OUTPT.equals(param.get("businessSources"))) {
-                info.put("title", titleTmp.replace("$", "门诊"));
-            } else {
-                info.put("title", titleTmp.replace("$", "全院"));
-            }
+            info.put("title", param.get("title"));
             info.put("crteName", param.get("crteName"));
             info.put("startDate", param.get("startDate"));
             info.put("endDate", param.get("endDate"));

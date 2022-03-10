@@ -291,4 +291,6 @@ public interface SysUserDAO {
      * @Date: 2022-02-17
      */
     Boolean updateIsGuide(SysUserDTO sysUserDTO);
+
+    List<SysUserDTO> queryDeptUser(SysUserDTO sysUserDTO);
 }

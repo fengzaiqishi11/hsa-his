@@ -236,7 +236,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(dipIp)) {
             throw new AppException("DIP的IP地址没进行配置");
         }
-        sb.append(" http://"+dipIp+"/drg_medical_web/drgGroupThird/drg_dagns/list.action");
+        sb.append(" http://"+dipIp+"/drg_web/drgGroupThird/drg_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -338,9 +338,9 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
         String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
         if (StringUtils.isEmpty(dipIp)) {
-            throw new AppException("DRG的IP地址没进行配置");
+            throw new AppException("DIP的IP地址没进行配置");
         }
-        sb.append(" http://" + dipIp + "/drg_medical_web/drgGroupThird/dip_dagns/list.action");
+        sb.append(" http://" + dipIp + "/drg_web/drgGroupThird/dip_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -456,7 +456,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(drgIp)) {
             throw new AppException("DRG的IP地址没进行配置");
         }
-        sb.append("http://" + drgIp + "/drg_medical_web/drgGroupThird/drg_paper/list.action");
+        sb.append("http://" + drgIp + "/drg_web/drgGroupThird/drg_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");
@@ -490,7 +490,8 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         if (StringUtils.isEmpty(dipip)) {
             throw new AppException("DIP的IP地址没进行配置");
         }
-        sb.append("http://" + dipip + "/drg_medical_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
+        // http://172.18.23.18:8080/drg_web/drgGroupThird/dig_paper/list.action
+        sb.append("http://" + dipip + "/drg_web/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");
@@ -567,11 +568,17 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     @Override
     public Map getBeforeRecord(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+        String hospCode = MapUtils.get(map, "hospCode");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_quality/list.action");
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        sb.append("http://"+drgIp+"/drg_web/drgGroupThird/drg_quality/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getId());
-
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");

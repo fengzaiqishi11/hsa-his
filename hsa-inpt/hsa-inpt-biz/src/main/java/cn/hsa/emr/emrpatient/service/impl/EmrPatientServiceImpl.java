@@ -373,11 +373,11 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 	}
 
 	/**
-	 * @Description: 查询患者住院次数及visitId
+	 * @Description:  电子病历上传医保
 	 * @Param:
 	 * @Author: liuliyun
 	 * @Email: liyun.liu@powersi.com.cn
-	 * @Date 2021/7/3 15:27
+	 * @Date 2021/7/6 15:27
 	 * @Return
 	 */
 	@Override

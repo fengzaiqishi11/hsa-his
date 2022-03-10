@@ -9,7 +9,12 @@ import cn.hsa.module.report.config.dao.ReportConfigurationDAO;
 import cn.hsa.module.report.config.dto.ReportConfigurationDTO;
 import cn.hsa.module.report.record.dao.ReportFileRecordDAO;
 import cn.hsa.module.report.record.dto.ReportFileRecordDTO;
-import cn.hsa.util.*;
+import cn.hsa.util.Constants;
+import cn.hsa.util.ConverUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.PdfToImageUtil;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -17,9 +22,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,6 +57,9 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     @Value("${fsstore.url}")
     private String url;
 
+    @Value("${nginx.url}")
+    private String nginxUrl;
+
     @Value("${fsstore.bucket}")
     private String bucket;
 
@@ -65,7 +80,10 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);
         map.put("customConfig", customConfigMap);
         String rUrl;
-        switch ((String) customConfigMap.get("fileFormat")) {
+        String fileFormat = (String) customConfigMap.get("fileFormat");
+        switch (fileFormat) {
+            case "png":
+            case "jpg":
             case "pdf":
                 rUrl = ConverUtils.getUrl(null, configuration.getTempName(), port, contextPath, "/pdf/show");
                 break;
@@ -81,42 +99,92 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                 throw new RuntimeException("暂不支持该返回数据类型");
         }
         String str = ConverUtils.netSourceToBase64(rUrl, "POST", ConverUtils.getParamsToString(map));
-
-        if (Constants.SF.F.equals(configuration.getIsUpload())) {
-            return new ReportReturnDataDTO(null, str);
+        if (StringUtils.isEmpty(str)) {
+            throw new RuntimeException("报表服务生成报表文件失败");
         }
 
+        String returnDataType = configuration.getReturnDataType();
+        String fileUrl = null;
+        String keyId = null;
+        switch (returnDataType) {
+            case "1":
+                try {
+                    BASE64Decoder decoder = new BASE64Decoder();
+                    byte[] byteArr = decoder.decodeBuffer(str);
+                    InputStream inputStream = new ByteArrayInputStream(byteArr);
+                    fileName = "/pdf"+File.separator+fileName + "." + customConfigMap.get("fileFormat");
+                    keyId = fileName;
+                    if (Constants.SF.F.equals(configuration.getIsUpload())) {
+                        fileUrl = nginxUrl;
+                        createLocalFile(fileUrl,keyId,inputStream);
+                    }else{
+                        fileUrl = url;
+                        keyId = uploadFile(fileName,map,configuration,inputStream);
+                    }
+                }catch (Exception e) {
+                    log.error("上传文件失败", e);
+                }
+            case "2":
+                if (StringUtils.isNotEmpty(str) && ("png".equals(fileFormat) || "jpg".equals(fileFormat))) {
+                    try {
+                        Integer dpi = (Integer) customConfigMap.get("dpi");
+                        if (dpi == null) {
+                            dpi = 200;
+                        }
+                        BASE64Decoder decoder = new BASE64Decoder();
+                        List<byte[]> list = PdfToImageUtil.pdfToImage(decoder.decodeBuffer(str), fileFormat, dpi);
+                        // 对字节数组Base64编码
+                        BASE64Encoder encoder = new BASE64Encoder();
+                        // 返回Base64编码过的字节数组字符串 暂只支持一页转换
+                        str = encoder.encode(list.get(0));
+                    } catch (Exception e) {
+                        throw new RuntimeException("pdf转图片，转换失败");
+                    }
+                }
+            default:
+                break;
+        }
+        return getReturnData(configuration.getReturnDataType(), keyId, str, fileUrl + keyId, fileName, fileFormat);
+    }
+
+    private String uploadFile(String fileName, Map map,ReportConfigurationDTO configuration,InputStream inputStream) throws Exception{
         FSEntity fsEntity = new FSEntity();
-        try {
-            if (StringUtils.isNotEmpty(str)) {
-                BASE64Decoder decoder = new BASE64Decoder();
-                byte[] byteArr = decoder.decodeBuffer(str);
-                InputStream inputStream = new ByteArrayInputStream(byteArr);
-                fileName = fileName + "." + customConfigMap.get("fileFormat");
-                log.debug("文件名:{}", fileName);
+        log.debug("文件名:{}", fileName);
+        fsEntity.setInputstream(inputStream);
+        fsEntity.setName(fileName);
+        fsEntity.setSize(inputStream.available());
+        fsEntity.setContentType(FilenameUtils.getExtension(fileName));
+        fsEntity = fsManager.putObject(bucket, fsEntity);
+        String keyId = fsEntity.getKeyId();
+        ReportFileRecordDTO record = new ReportFileRecordDTO();
+        record.setId(SnowflakeUtils.getId());
+        record.setHospCode(configuration.getHospCode());
+        record.setTempCode(configuration.getTempCode());
+        record.setFileName(fileName);
+        record.setFileAddress(fsEntity.getKeyId());
+        record.setCrterId(map.get("crteId").toString());
+        record.setCrterName(map.get("crteName").toString());
+        record.setCrteTime(DateUtils.getNow());
+        reportFileRecordDAO.insert(record);
+        return keyId;
+    }
 
-                fsEntity = new FSEntity();
-                fsEntity.setInputstream(inputStream);
-                fsEntity.setName(fileName);
-                fsEntity.setSize(inputStream.available());
-                fsEntity.setContentType(FilenameUtils.getExtension(fileName));
-                fsEntity = fsManager.putObject(bucket, fsEntity);
-
-                ReportFileRecordDTO record = new ReportFileRecordDTO();
-                record.setId(SnowflakeUtils.getId());
-                record.setHospCode(configuration.getHospCode());
-                record.setTempCode(configuration.getTempCode());
-                record.setFileName(fileName);
-                record.setFileAddress(fsEntity.getKeyId());
-                record.setCrterId(map.get("crteId").toString());
-                record.setCrterName(map.get("crteName").toString());
-                record.setCrteTime(DateUtils.getNow());
-                reportFileRecordDAO.insert(record);
-            }
-        } catch (Exception e) {
-            log.error("上传文件失败", e);
+    private void createLocalFile(String fileUrl, String keyId, InputStream inputStream) throws Exception {
+        //本地写文件到 nginx代理目录
+        File file =new File(fileUrl+File.separator+keyId);
+        if(!file.getParentFile().exists()){
+            file.mkdirs();
         }
-        return getReturnData(configuration.getReturnDataType(), fsEntity.getKeyId(), str, url + fsEntity.getKeyId());
+        if(!file.exists()){
+            file.createNewFile();
+        }
+        FileOutputStream fos = new FileOutputStream(file);
+        byte[] bytes = new byte[1024];
+        int byteCount;
+        while((byteCount = inputStream.read(bytes)) != -1){
+            fos.write(bytes,0,byteCount);
+        }
+        fos.close();
     }
 
     @Override
@@ -129,8 +197,10 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         return result;
     }
 
-    private ReportReturnDataDTO getReturnData(String returnDataType, String key, String base64, String rUrl) {
+    private ReportReturnDataDTO getReturnData(String returnDataType, String key, String base64, String rUrl, String fileName, String fileFormat) {
         ReportReturnDataDTO returnData = new ReportReturnDataDTO();
+        returnData.setFileName(fileName);
+        returnData.setFileFormat(fileFormat);
         returnData.setKey(key);
         switch (returnDataType) {
             case "1":

@@ -33,7 +33,7 @@ public class CareToMedicApplyServiceImpl implements CareToMedicApplyService {
 
     @Override
     public WrapperResponse<Map<String, Object>> getMedicToCareInfoById(Map map) {
-        return WrapperResponse.success(careToMedicApplyBO.getCareToMedicInfoById(MapUtils.get(map,"medicToCareDTO")));
+        return WrapperResponse.success(careToMedicApplyBO.getCareToMedicInfoById(map));
     }
 
     @Override

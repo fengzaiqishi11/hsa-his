@@ -1086,6 +1086,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 paraMap.put("isHospital", Constants.SF.F);
                 resultList = insureReversalTradeDAO.queryOutptSumDeclareInfosPage(paraMap);
             case Constants.SBLX.YZS: // 一站式
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
             default:
                 break;
@@ -1910,6 +1911,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 resultList.removeAll(Collections.singleton(null));
                 return PageDTO.of(resultList);
             case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 resultList = insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap);
                 resultList.removeAll(Collections.singleton(null));
                 return PageDTO.of(resultList);
@@ -1990,6 +1992,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 resultList.removeAll(Collections.singleton(null));
                 return PageDTO.of(resultList);
             case Constants.SBLX.YZS: // 一站式
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
                 resultList.removeAll(Collections.singleton(null));
                 return PageDTO.of(resultList);
@@ -2164,7 +2167,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 }
             }
         }
-
+        localOrdinaryOutptList.addAll(localSpecialOutptList);
+        localOrdinaryOutptList.addAll(localOrdinaryInptList);
+        paraMap.put("list", localOrdinaryOutptList);
         // 特药、没啥好统计的，肯定查不出数据
         resultMap.put("paraMap", paraMap);
         return resultMap;

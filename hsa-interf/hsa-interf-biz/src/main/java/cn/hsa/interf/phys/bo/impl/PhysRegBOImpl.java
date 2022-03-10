@@ -69,7 +69,13 @@ public class PhysRegBOImpl extends HsafBO implements PhysRegBO {
         outptVisitDTO.setIsPhys("1");
         // 设置就诊时间
         outptVisitDTO.setVisitTime(DateUtils.getNow());
-        int result = physRegDAO.addVisitByPhys(outptVisitDTO);
+        int result=0;
+        // 存在体检者登记记录则修改否则新增
+        if (physRegDAO.queryVisitByPhys(outptVisitDTO) > 0){
+            result = physRegDAO.updateVisitByPhys(outptVisitDTO);
+        }else{
+            result = physRegDAO.addVisitByPhys(outptVisitDTO);
+        }
         return result > 0;
     }
     /**

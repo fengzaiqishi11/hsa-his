@@ -1202,12 +1202,13 @@ public interface Constants {
     }
 
     public static class BLLX{
-        public static final String YYJL = "入院记录";
-        public static final String BCJL = "病程记录";
-        public static final String SSJL = "手术记录";
-        public static final String SWJL = "死亡记录";
-        public static final String BQQJ = "病情抢救";
-        public static final String CYXJ = "出院小结";
+        public static final String YYJL = "adminfo";
+        public static final String BCJL = "coursrinfo";
+        public static final String SSJL = "oprninfo";
+        public static final String SWJL = "dieinfo";
+        public static final String BQQJ = "rescinfo";
+        public static final String CYXJ = "dscginfo";
+        public static final String HLJLD = "nurseinfo";
     }
 
     class SETTLECODE {

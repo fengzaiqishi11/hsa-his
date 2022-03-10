@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -111,8 +112,8 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
                     BASE64Decoder decoder = new BASE64Decoder();
                     byte[] byteArr = decoder.decodeBuffer(str);
                     InputStream inputStream = new ByteArrayInputStream(byteArr);
-                    fileName = fileName + "." + customConfigMap.get("fileFormat");
-                    keyId = "pdf"+File.pathSeparator+fileName;
+                    fileName = "/pdf"+File.separator+fileName + "." + customConfigMap.get("fileFormat");
+                    keyId = fileName;
                     if (Constants.SF.F.equals(configuration.getIsUpload())) {
                         fileUrl = nginxUrl;
                         createLocalFile(fileUrl,keyId,inputStream);
@@ -170,9 +171,12 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
 
     private void createLocalFile(String fileUrl, String keyId, InputStream inputStream) throws Exception {
         //本地写文件到 nginx代理目录
-        File file =new File(fileUrl+keyId);
-        if(!file.exists()){
+        File file =new File(fileUrl+File.separator+keyId);
+        if(!file.getParentFile().exists()){
             file.mkdirs();
+        }
+        if(!file.exists()){
+            file.createNewFile();
         }
         FileOutputStream fos = new FileOutputStream(file);
         byte[] bytes = new byte[1024];

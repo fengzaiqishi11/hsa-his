@@ -1,9 +1,12 @@
-package cn.hsa.insure.unifiedpay.util;
+package cn.hsa.insure.unifiedpay.util.psninfo;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+<<<<<<< HEAD:hsa-insure/hsa-insure-biz/src/main/java/cn/hsa/insure/unifiedpay/util/PsnInfoReqUtil.java
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.StringUtils;
+=======
+>>>>>>> updstream/develop:hsa-insure/hsa-insure-biz/src/main/java/cn/hsa/insure/unifiedpay/util/psninfo/PsnInfoReqUtil.java
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @ClassName PsnInfoReqDTO
+ * @ClassName PsnInfoReqUtil
  * @Deacription 人员信息获取-1101
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure1101")
+@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1101)
 public class PsnInfoReqUtil<T> implements BaseReqUtil<T> {
 
     @Override

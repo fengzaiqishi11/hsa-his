@@ -4,7 +4,7 @@ import java.util.Map;
 
 /**
  * @ClassName BaseReqUtil
- * @Deacription 新医保公共入参工具
+ * @Deacription 公共入参工具(新医保、江西医保、海南医保。。。)
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0

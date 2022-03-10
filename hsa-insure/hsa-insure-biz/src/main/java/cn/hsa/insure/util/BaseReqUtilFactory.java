@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @ClassName BaseReqUtilFactory
- * @Deacription 公共入参工厂类
+ * @Deacription 公共入参工厂类(新医保、江西医保、海南医保。。。)
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0

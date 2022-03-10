@@ -167,9 +167,6 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
             }
         }
         // DRG医嘱预审接口
-        if (null == adviceList.get(0)) {
-            throw new AppException("医嘱集合为空");
-        }
         Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
         String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
         String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");

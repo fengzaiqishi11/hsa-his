@@ -4,22 +4,18 @@ import cn.hsa.enums.FunctionEnum;
 import cn.hsa.enums.HsaSrvEnum;
 import cn.hsa.exception.BizRtException;
 import cn.hsa.exception.InsureExecCodesEnum;
-import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
-import cn.hsa.util.Constants;
 import cn.hsa.util.HttpConnectUtil;
-import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
-import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -36,13 +32,17 @@ public class InsureItfBOImpl {
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
 
+    @Autowired
+    private BaseReqUtilFactory baseReqUtilFactory;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public Map<String, Object> executeInsur(String msgId, String url, FunctionEnum functionEnum, String request, Map<String, Object> params) throws BizRtException {
         //请求医保接口日志记录
         logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), request);
         //参数校验,规则校验和请求初始化
-
+//        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + functionEnum.getCode());
+//        String json = reqUtil.initRequest(request);
         try {
            String result = HttpConnectUtil.unifiedPayPostUtil(url, request);
 

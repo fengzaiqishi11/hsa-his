@@ -2,9 +2,12 @@ package cn.hsa.insure.unifiedpay.util.otherinfo;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,8 +24,13 @@ public class InsurDictReqUtil<T> implements BaseReqUtil<T> {
     public String initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
-        checkRequest(map);
-        return paramJson;
+
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("type", MapUtils.get(map, "type"));
+        dataMap.put("date", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_DH_M_S));
+
+        checkRequest(dataMap);
+        return JSON.toJSONString(dataMap);
     }
 
     @Override

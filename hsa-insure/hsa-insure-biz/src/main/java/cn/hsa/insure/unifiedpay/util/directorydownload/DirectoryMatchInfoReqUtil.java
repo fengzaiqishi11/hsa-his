@@ -6,16 +6,13 @@ import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
-import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @ClassName DirectoryMatchInfoReq
+ * @ClassName DirectoryMatchInfoReqUtil
  * @Deacription 医药机构目录匹配信息查询-1317
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33

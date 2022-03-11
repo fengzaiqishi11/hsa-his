@@ -1,4 +1,4 @@
-package cn.hsa.insure.unifiedpay.util.inptsettle;
+package cn.hsa.insure.unifiedpay.util.inventory;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * @ClassName InptCostCostUploadReqUtil
- * @Deacription 住院费用明细上传-2301
+ * @ClassName InventoryCheckUploadReqUtil
+ * @Deacription 商品盘存上传-3501
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure" + Constant.UnifiedPay.INPT.UP_2301)
-public class InptCostCostUploadReqUtil<T> implements BaseReqUtil<T> {
+@Service("newInsure" + Constant.UnifiedPay.KCGL.UP_3501)
+public class InventoryCheckUploadReqUtil<T> implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {

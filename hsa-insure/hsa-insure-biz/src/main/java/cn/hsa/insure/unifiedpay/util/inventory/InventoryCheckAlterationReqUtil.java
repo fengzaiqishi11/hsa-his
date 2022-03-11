@@ -1,4 +1,4 @@
-package cn.hsa.insure.unifiedpay.util.directorydownload;
+package cn.hsa.insure.unifiedpay.util.inventory;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * @ClassName DirectoryMatchInfoReqUtil
- * @Deacription 医药机构目录匹配信息查询-1317
+ * @ClassName InventoryCheckAlterationReqUtil
+ * @Deacription 商品库存变更-3502
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1317)
-public class DirectoryMatchInfoReqUtil<T> implements BaseReqUtil<T> {
+@Service("newInsure" + Constant.UnifiedPay.KCGL.UP_3502)
+public class InventoryCheckAlterationReqUtil<T> implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {

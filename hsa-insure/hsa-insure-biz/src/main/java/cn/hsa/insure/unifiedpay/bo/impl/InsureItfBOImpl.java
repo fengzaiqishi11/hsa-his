@@ -6,13 +6,14 @@ import cn.hsa.exception.BizRtException;
 import cn.hsa.exception.InsureExecCodesEnum;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.util.HttpConnectUtil;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,18 +32,46 @@ public class InsureItfBOImpl {
 
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
-
-    @Autowired
+    @Resource
     private BaseReqUtilFactory baseReqUtilFactory;
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Map<String, Object> executeInsur(String msgId, String url, FunctionEnum functionEnum, String request, Map<String, Object> params) throws BizRtException {
-        //请求医保接口日志记录
-        logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), request);
+    public Map<String, Object> executeInsur(FunctionEnum functionEnum, Map<String, Object> params) throws BizRtException {
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(params.get("hospCode").toString());
+        if (params.get("orgCode") != null) {
+            insureConfigurationDTO.setOrgCode(params.get("orgCode").toString());
+        }
+        if (params.get("configCode") != null) {
+            insureConfigurationDTO.setCode(params.get("configCode").toString());
+        }
+        if (params.get("configRegCode") != null) {
+            insureConfigurationDTO.setRegCode(params.get("configRegCode").toString());
+        }
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        // 定点医药机构编号
+        params.put("medisCode", insureConfigurationDTO.getOrgCode());
+        // 医保中心编码
+        params.put("regCode", insureConfigurationDTO.getRegCode());
+        // 就医地医保区划
+        params.put("mdtrtareaAdmvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        // 交易编号
+        params.put("infno", functionEnum.getCode());
+        params.put("msgId", msgId);
+        params.put("msgInfo", functionEnum.getCode());
+        params.put("msgName", functionEnum.getDesc());
+
         //参数校验,规则校验和请求初始化
-//        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + functionEnum.getCode());
-//        String json = reqUtil.initRequest(request);
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + functionEnum.getCode());
+        String dataJson = reqUtil.initRequest(params);
+        params.put("paramMapJson", dataJson);
+        //请求医保接口日志记录
+        logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), dataJson);
         try {
            String result = HttpConnectUtil.unifiedPayPostUtil(url, request);
 

@@ -1,8 +1,8 @@
 package cn.hsa.insure.unifiedpay.util.psninfo;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
-import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -15,14 +15,13 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1101)
-public class PsnInfoReqUtil<T> implements BaseReqUtil<T> {
+public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
+        Map map = (Map) param;
         checkRequest(map);
-        return paramJson;
+        return getInsurCommonParam(map);
     }
 
     @Override

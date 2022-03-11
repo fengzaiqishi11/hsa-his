@@ -1,10 +1,11 @@
 package cn.hsa.insure.unifiedpay.util.outptsettle;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
-import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -15,19 +16,34 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.OUTPT.UP_2201)
-public class OutptRegReqUtil<T> implements BaseReqUtil<T> {
+public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
+        Map map = (Map) param;
         checkRequest(map);
-        return paramJson;
+        Map<String, Object> inputMap = new HashMap<>(2);
+        inputMap.put("data", map.get("dataMap"));
+        inputMap.put("agnterinfo", initAgnterinfoMap());
+        map.put("input", inputMap);
+        return getInsurCommonParam(map);
     }
 
     @Override
     public boolean checkRequest(Map param) {
         return true;
+    }
+
+    private Map<String, Object> initAgnterinfoMap() {
+        Map<String, Object> agnterinfoMap = new HashMap<>(7);
+        agnterinfoMap.put("agnter_name", "");
+        agnterinfoMap.put("agnter_rlts", "");
+        agnterinfoMap.put("agnter_cert_type", "");
+        agnterinfoMap.put("agnter_certno", "");
+        agnterinfoMap.put("agnter_tel", "");
+        agnterinfoMap.put("agnter_addr", "");
+        agnterinfoMap.put("agnter_photo", "");
+        return agnterinfoMap;
     }
 
 }

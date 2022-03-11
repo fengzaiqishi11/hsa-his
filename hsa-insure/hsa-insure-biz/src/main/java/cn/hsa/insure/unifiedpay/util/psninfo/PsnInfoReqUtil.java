@@ -6,6 +6,8 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
+
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,7 +21,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1101)
-public class PsnInfoReqUtil<T> implements BaseReqUtil<T> {
+public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {
@@ -53,7 +55,7 @@ public class PsnInfoReqUtil<T> implements BaseReqUtil<T> {
         }
 
         checkRequest(httpParam);
-        return JSON.toJSONString(httpParam);
+        return getInsurCommonParam(map);
     }
 
     @Override

@@ -37,11 +37,8 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("saveLisResult")
     public Boolean saveLisResult(@RequestBody List<MedicalApplyDTO> medicalApplyDTO){
-
         Map map = new HashMap<>();
-//        map.put("hospCode",hospCode);
         map.put("medicalApplyDTO", medicalApplyDTO);
-
         return lisResultService.saveLisResult(map);
     }
 
@@ -130,11 +127,6 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("queryDept")
     public Map queryDept(@RequestBody Map map){
-
-//        map.put("hospCode",hospCode);
-//        map.put("crteName", userName);
-//        map.put("crteId",userId);
-
         return lisResultService.queryAdvice(map);
 
     }
@@ -148,11 +140,6 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("queryUser")
     public Map queryUser(@RequestBody Map map){
-
-//        map.put("hospCode",hospCode);
-//        map.put("crteName", userName);
-//        map.put("crteId",userId);
-
         return lisResultService.queryAdvice(map);
 
     }

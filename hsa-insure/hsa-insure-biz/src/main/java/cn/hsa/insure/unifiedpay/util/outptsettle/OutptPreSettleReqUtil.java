@@ -1,4 +1,4 @@
-package cn.hsa.insure.unifiedpay.util.directorydownload;
+package cn.hsa.insure.unifiedpay.util.outptsettle;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
@@ -8,14 +8,14 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 
 /**
- * @ClassName DirectoryMatchInfoReqUtil
- * @Deacription 医药机构目录匹配信息查询-1317
+ * @ClassName OutptPreSettleReqUtil
+ * @Deacription 门诊预结算-2206
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1317)
-public class DirectoryMatchInfoReqUtil<T> implements BaseReqUtil<T> {
+@Service("newInsure" + Constant.UnifiedPay.OUTPT.UP_2206)
+public class OutptPreSettleReqUtil<T> implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {

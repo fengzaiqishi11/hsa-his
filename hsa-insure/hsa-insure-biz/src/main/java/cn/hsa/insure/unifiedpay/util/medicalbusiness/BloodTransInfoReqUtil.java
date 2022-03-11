@@ -1,24 +1,21 @@
-package cn.hsa.insure.unifiedpay.util.inptregister;
+package cn.hsa.insure.unifiedpay.util.medicalbusiness;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
-import lombok.Data;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
- * @ClassName InHospRevocationReqUtil
- * @Deacription 入院办理撤销-2404
+ * @ClassName BloodTransInfoReqUtil
+ * @Deacription 输血信息上传-4601
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_2404)
-public class InHospRevocationReqUtil<T> implements BaseReqUtil<T> {
+@Service("newInsure" + Constant.UnifiedPay.INPT.UP_4601)
+public class BloodTransInfoReqUtil<T> implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {
@@ -34,4 +31,3 @@ public class InHospRevocationReqUtil<T> implements BaseReqUtil<T> {
     }
 
 }
-

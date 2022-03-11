@@ -2,9 +2,11 @@ package cn.hsa.insure.unifiedpay.util.fixmedinsInfo;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,8 +23,13 @@ public class FixmedinsInfoReqUtil<T> implements BaseReqUtil<T> {
     public String initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
-        checkRequest(map);
-        return paramJson;
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("fixmedins_type", MapUtils.get(map, "insureServiceType"));
+        dataMap.put("fixmedins_name", MapUtils.get(map, "medinsName"));
+        dataMap.put("fixmedins_code", MapUtils.get(map, "medinsCode"));
+
+        checkRequest(dataMap);
+        return JSON.toJSONString(dataMap);
     }
 
     @Override

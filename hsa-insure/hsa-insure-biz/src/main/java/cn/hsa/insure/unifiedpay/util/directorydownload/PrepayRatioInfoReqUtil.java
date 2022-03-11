@@ -2,12 +2,14 @@ package cn.hsa.insure.unifiedpay.util.directorydownload;
 
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,8 +26,41 @@ public class PrepayRatioInfoReqUtil<T> implements BaseReqUtil<T> {
     public String initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
-        checkRequest(map);
-        return paramJson;
+
+        Map<String, Object> paramMap = new HashMap<>(14);
+
+        // 查询时间点
+        paramMap.put("query_date", "");
+        // 医保目录编码
+        paramMap.put("hilist_code", MapUtils.get(map, "hilistCode"));
+        //医保目录自付比例人员类别
+        paramMap.put("selfpay_prop_psn_type", "");
+        // 目录自付比例类别
+        paramMap.put("selfpay_prop_type", "");
+
+        //参保机构医保区划
+        paramMap.put("insu_admdvs", "");
+        // 开始日期
+        paramMap.put("begndate", null);
+        // 结束日期
+        paramMap.put("enddate", null);
+        // 有效标志
+        paramMap.put("vali_flag", "1");
+        // 唯一记录号
+        paramMap.put("rid", "");
+        // 表名
+        paramMap.put("tabname", null);
+        // 统筹区
+        paramMap.put("poolarea_no", "");
+        // 更新时间
+        paramMap.put("updt_time", MapUtils.get(map, "updtTime"));
+        // 当前页数
+        paramMap.put("page_num", MapUtils.get(map, "pageNum"));
+        // 本页数据量
+        paramMap.put("page_size", MapUtils.get(map, "pageSize"));
+
+        checkRequest(paramMap);
+        return JSON.toJSONString(paramMap);
     }
 
     @Override

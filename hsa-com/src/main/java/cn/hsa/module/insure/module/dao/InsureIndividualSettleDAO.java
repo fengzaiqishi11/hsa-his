@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualFundDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import org.apache.ibatis.annotations.Param;
@@ -221,5 +222,16 @@ public interface InsureIndividualSettleDAO {
      * @Return
      */
     InsureIndividualSettleDTO selectInsureIndividualSettleById(Map<String, Object> map);
+
+    /**
+     * @Method
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/2/23 9:41
+     * @Return
+    **/
+    int queryInsureSettle(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }
 

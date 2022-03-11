@@ -422,6 +422,38 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         String result = HttpConnectUtil.doPost(paramMap);
         dataMap.put("result", result);
+        dataMap.put("url", url);
+
+
+        return dataMap;
+    }
+    // 整理病案首页数据，上传drg
+    @Override
+    public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));
+        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));
+        Map<String, Object> paramMap = new HashMap<>();
+
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "BA_DIP");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String url = "http://172.18.22.8:8080/drg_web/drgGroupThird/dipGroupAndQuality.action";
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
+            url = sysParameterDTO.getValue();
+        } else {
+            throw new AppException("请在系统参数中配置病案上传dip时，dip地址  例：BA_DIP: url");
+        }
+
+        paramMap.put("url", url);
+        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        String result = HttpConnectUtil.doPost(paramMap);
+        dataMap.put("result", result);
+        dataMap.put("url", url);
+
 
         return dataMap;
     }

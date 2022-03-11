@@ -470,5 +470,7 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     void updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
+
+    InptVisitDTO selectInptVisit(Map<String, Object> map);
 }
 

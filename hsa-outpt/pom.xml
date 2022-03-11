@@ -19,8 +19,8 @@
         <module>hsa-outpt-biz</module>
         <module>hsa-outpt-db</module>
         <module>hsa-outpt-generic</module>
-        <module>hsa-outpt-tencent</module>
-        <module>hsa-outpt-ali</module>
+<!--        <module>hsa-outpt-tencent</module>-->
+<!--        <module>hsa-outpt-ali</module>-->
     </modules>
 
     <dependencies>

@@ -54,6 +54,8 @@ public interface SysUserBO {
      **/
     PageDTO queryPage(SysUserDTO sysUserDTO);
 
+    PageDTO queryDeptUser(SysUserDTO sysUserDTO);
+
     /**
      * @Method updateSysUser
      * @Desrciption 修改用户系统关系

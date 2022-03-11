@@ -3,6 +3,7 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
@@ -26,7 +27,15 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import cn.hsa.util.*;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DataTypeUtils;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.HttpConnectUtil;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -38,7 +47,11 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -72,6 +85,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService;
+    @Resource
+    private InsureItfBOImpl insureItfBO;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
@@ -1237,34 +1252,16 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     public InsureIndividualVisitDTO UP_2201(Map<String, Object> map) {
         String hospCode = map.get("hospCode").toString();
         String visitId = map.get("visitId").toString();
-        Map<String, Object> httpMap = new HashMap<>();
-        Map<String, Object> agnterinfoMap = new HashMap<>(7);
-        Map<String, Object> dataMap = new HashMap<>(11);
-        Map<String, Object> objectMap = new HashMap<>();
+        Map<String, Object> dataMap = new HashMap<>(16);
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗机构编码;
-        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode());
-        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-        String functionCode = Constant.UnifiedPay.OUTPT.UP_2201;
-        String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
-        httpMap.put("infno", functionCode);//交易编号
-        httpMap.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());//参保地医保区划
-        String medisCode = insureConfigurationDTO.getOrgCode();
-        httpMap.put("medins_code", medisCode);//定点医药机构编号
-        httpMap.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-        httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
-        httpMap.put("msgid", omsgId);
-
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());   // 人员编号
         dataMap.put("insutype", insureIndividualVisitDTO.getAae140());  // 险种类型
         dataMap.put("begntime", DateUtils.format(insureIndividualVisitDTO.getVisitTime(), DateUtils.Y_M_DH_M_S)); // 开始时间
         dataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType()); // 就诊凭证类型
         dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());  // 就诊凭证编号
         dataMap.put("ipt_otp_no", insureIndividualVisitDTO.getVisitNo()); // 住院/门诊号
-        if(StringUtils.isEmpty(insureIndividualVisitDTO.getPracCertiNo())){
-            throw  new AppException("该"+insureIndividualVisitDTO.getDoctorName()+"医生的医师编码没有维护,请先去用户管理里面维护");
+        if (StringUtils.isEmpty(insureIndividualVisitDTO.getPracCertiNo())) {
+            throw new AppException("该" + insureIndividualVisitDTO.getDoctorName() + "医生的医师编码没有维护,请先去用户管理里面维护");
         }
         dataMap.put("atddr_no", insureIndividualVisitDTO.getPracCertiNo()); // 医师编码
         dataMap.put("dr_name", insureIndividualVisitDTO.getDoctorName()); // 医师姓名
@@ -1285,44 +1282,16 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         deptMap.put("baseDeptDTO", baseDeptDTO);
         baseDeptDTO = baseDeptService_consumer.getById(deptMap).getData();
         dataMap.put("caty", baseDeptDTO.getTypeCode()); // 科别
-        objectMap.put("data", dataMap);
 
-        agnterinfoMap.put("agnter_name", "");
-        agnterinfoMap.put("agnter_rlts", "");
-        agnterinfoMap.put("agnter_cert_type", "");
-        agnterinfoMap.put("agnter_certno", "");
-        agnterinfoMap.put("agnter_tel", "");
-        agnterinfoMap.put("agnter_addr", "");
-        agnterinfoMap.put("agnter_photo", "");
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.putAll(map);
+        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs()); // 参保地医保区划
+        paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
+        paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("dataMap", dataMap);
+        paramMap.put("isHospital", Constants.SF.F);
+        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG, paramMap);
 
-        objectMap.put("agnterinfo", agnterinfoMap);
-        httpMap.put("input", objectMap);
-        String dataJson = JSONObject.toJSONString(httpMap);
-        logger.info("医保统一支付平台门诊挂号入参:" + dataJson);
-        String url = insureConfigurationDTO.getUrl();
-        String resultStr = HttpConnectUtil.unifiedPayPostUtil(url, dataJson);
-        map.put("medisCode",medisCode);
-        map.put("visitId",visitId);
-        map.put("msgId",omsgId);
-        map.put("msgInfo",functionCode);
-        map.put("msgName","门诊医保登记");
-        map.put("isHospital",Constants.SF.F) ;
-        map.put("paramMapJson",dataJson);
-        map.put("resultStr",resultStr);
-        insureUnifiedLogService_consumer.insertInsureFunctionLog(map).getData();
-
-
-        logger.info("医保统一支付平台门诊挂号回参:" + resultStr);
-        if (StringUtils.isEmpty(resultStr)) {
-            throw new AppException("无法访问统一支付平台");
-        }
-        Map<String, Object> resultMap = JSONObject.parseObject(resultStr, Map.class);
-        if ("999".equals(MapUtils.get(resultMap, "code"))) {
-            throw new AppException((String) resultMap.get("msg"));
-        }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
-            throw new AppException((String) resultMap.get("err_msg"));
-        }
         /**
          * 处理门诊挂号的回参
          */

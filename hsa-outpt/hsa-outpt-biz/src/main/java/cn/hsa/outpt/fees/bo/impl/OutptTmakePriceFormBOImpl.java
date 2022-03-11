@@ -740,8 +740,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 outptCostDTO.setCrteName(outptVisitDTO.getCrteName());//创建人姓名
                 outptCostDTO.setCrteTime(new Date());//创建时间
                 outptCostDTO.setOneSettleId(OneSettleId);
-                outptCostDTO.setTotalPrice(outptCostDTO.getTotalPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
-                outptCostDTO.setRealityPrice(outptCostDTO.getRealityPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+//                outptCostDTO.setTotalPrice(outptCostDTO.getTotalPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+//                outptCostDTO.setRealityPrice(outptCostDTO.getRealityPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+                // 总金额 = 总数量 * 单价    再保留两位小数
+                outptCostDTO.setTotalPrice(BigDecimalUtils.multiply(outptCostDTO.getTotalNum(), outptCostDTO.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP)));
+               //  优惠后金额 = 总数量 * 单价 - 优惠金额   再保留两位小数
+                outptCostDTO.setRealityPrice(BigDecimalUtils.subtract(BigDecimalUtils.multiply(outptCostDTO.getTotalNum(), outptCostDTO.getPrice()), outptCostDTO.getPreferentialPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 costList.add(outptCostDTO);
             } else {
                 //处方费用信息

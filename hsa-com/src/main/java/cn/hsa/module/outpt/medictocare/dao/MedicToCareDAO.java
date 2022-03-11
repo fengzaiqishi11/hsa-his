@@ -30,4 +30,6 @@ public interface MedicToCareDAO {
     Boolean updateMedicToCare(Map<String, Object> map);
 
     void insertOutPtInfo(OutptVisitDTO outptVisitDTO);
+
+    String queryOrgCode(String hospCode);
 }

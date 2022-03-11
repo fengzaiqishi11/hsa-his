@@ -522,5 +522,6 @@
     <!-- 医养接口-->
     <dubbo:reference id="medicToCareService_consumer" interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" check="false"/>
     <dubbo:reference id="careToMedicApplyService_consumer" interface="cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService" check="false"/>
+    <dubbo:reference id="outptMedicalCareConfigurationService_consumer" interface="cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService" check="false"/>
 </beans>
 

@@ -19,8 +19,8 @@
         <module>hsa-center-biz</module>
         <module>hsa-center-db</module>
         <module>hsa-center-generic</module>
-        <module>hsa-center-tencent</module>
-        <module>hsa-center-ali</module>
+<!--        <module>hsa-center-tencent</module>-->
+<!--        <module>hsa-center-ali</module>-->
     </modules>
 
     <dependencies>

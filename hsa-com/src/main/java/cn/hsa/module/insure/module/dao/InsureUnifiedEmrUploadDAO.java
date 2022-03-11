@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.module.dao;
 
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import org.springframework.stereotype.Component;
 
@@ -50,4 +51,15 @@ public interface InsureUnifiedEmrUploadDAO {
      * @Return
     **/
     void updateEmrBaseInfo(MrisBaseInfoDTO mrisBaseInfoDTO);
+    
+    /**
+     * @Method updateEmrPatientFlag
+     * @Desrciption  更新电子病历上传标识
+     * @Param 
+     * 
+     * @Author fuhui
+     * @Date   2022/3/4 10:21 
+     * @Return 
+    **/
+    void updateEmrPatientFlag(InptVisitDTO inptVisitDTO);
 }

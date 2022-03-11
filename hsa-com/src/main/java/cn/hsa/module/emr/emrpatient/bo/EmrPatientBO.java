@@ -264,6 +264,14 @@ public interface EmrPatientBO {
 	 */
 	List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO);
 
+	/**
+	 * @Description:  电子病历上传医保
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com.cn
+	 * @Date 2021/7/6 15:27
+	 * @Return
+	 */
 	Boolean uploadEmrInfo(InptVisitDTO inptVisitDTO);
 
 	Boolean insertEmrPrint(EmrPatientPrintDO emrPatientPrintDO);

@@ -19,8 +19,8 @@
         <module>hsa-interf-biz</module>
         <module>hsa-interf-db</module>
         <module>hsa-interf-generic</module>
-        <module>hsa-interf-tencent</module>
-        <module>hsa-interf-ali</module>
+<!--        <module>hsa-interf-tencent</module>-->
+<!--        <module>hsa-interf-ali</module>-->
     </modules>
 
     <dependencies>

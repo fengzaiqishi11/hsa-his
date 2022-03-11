@@ -280,6 +280,9 @@
             from outpt_medical_care_apply a
             where id = #{id}
     </select>
+    <select id="queryOrgCode" resultType="java.lang.String">
+        SELECT value FROM sys_code_detail where c_code = 'ORG_CODE' AND hosp_code = #{hospCode}
+    </select>
 
     <!--通过主键修改数据-->
     <update id="updateMedicToCare">

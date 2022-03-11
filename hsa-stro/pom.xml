@@ -20,8 +20,8 @@
         <module>hsa-stro-biz</module>
         <module>hsa-stro-db</module>
         <module>hsa-stro-generic</module>
-        <module>hsa-stro-tencent</module>
-        <module>hsa-stro-ali</module>
+<!--        <module>hsa-stro-tencent</module>-->
+<!--        <module>hsa-stro-ali</module>-->
     </modules>
 
     <dependencies>

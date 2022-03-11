@@ -81,6 +81,11 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
         return WrapperResponse.success(sysUserBO.queryPage(MapUtils.get(map,"sysUserDTO")));
     }
 
+    @Override
+    public WrapperResponse<PageDTO> queryDeptUser(Map map) {
+        return WrapperResponse.success(sysUserBO.queryDeptUser(MapUtils.get(map,"sysUserDTO")));
+    }
+
     /**
      * @Method save
      * @Desrciption 修改、新增人员信息

@@ -250,4 +250,38 @@ public interface OutptSettleDAO {
      * @Return
      */
     int deleteInsureCost(Map<String, String> map);
+
+    /**
+     * @Menthod: queryCreditCharge()
+     * @Desrciption: 挂账查询
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/28 11:12
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    List<OutptSettleDTO> queryCreditCharge(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:15
+     * @Return: int
+     **/
+    int updateCreditStatus(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: updateRegisterCreditStatus()
+     * @Desrciption: 更新挂号补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/3 15：46
+     * @Return: int
+     **/
+    int updateRegisterCreditStatus(OutptSettleDTO outptSettleDTO);
+
 }

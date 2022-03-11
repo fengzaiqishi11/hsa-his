@@ -39,6 +39,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,14 +93,14 @@ public class LogAopController extends BaseController {
             }
             return result;
         } catch (Throwable e) {
-            logger.info(e.getMessage());
+//            logger.info(e.getMessage());
             try {
                  // TODO 2020-12-24 注释  yzb 检查现场性能测试  出现异常，则记录异常信息。
                 // saveErrorLog(proceedingJoinPoint, e);
             } catch (Throwable e2) {
-                logger.info(e2.getMessage());
+//                logger.info(e2.getMessage());
             }finally {
-                throw new AppException(e.getMessage());
+                throw e;
              }
 //            return WrapperResponse.error(-1,e.getMessage(),null);
         }
@@ -287,10 +288,10 @@ public class LogAopController extends BaseController {
             hisCzLog.setHospCode(hospCode);
 
             hisCzLog.setTraceId(traceID);
-            Map map = new HashMap();
-            map.put("hospCode", hisCzLog.getHospCode());
-            map.put("hisLogInfoCzDTO", hisCzLog);
-            hisLogInfoCzService_consumer.saveLogCz(map);
+//            Map map = new HashMap();
+//            map.put("hospCode", hisCzLog.getHospCode());
+//            map.put("hisLogInfoCzDTO", hisCzLog);
+//            hisLogInfoCzService_consumer.saveLogCz(map);
         } catch (Exception e) {
             e.printStackTrace();
         }

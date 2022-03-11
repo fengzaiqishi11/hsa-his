@@ -131,4 +131,10 @@ public class EmrClassifyDO extends PageDO implements Serializable {
      * 电子病历时效性(小时)
      */
     private Integer validTime;
+
+    /**
+     * liuliyun 2022/03/01 09:08
+     * 医保节点（YBJD）
+     */
+    private String insureTypeCode;
 }

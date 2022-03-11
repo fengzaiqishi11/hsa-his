@@ -38,6 +38,10 @@ public class ReportConfigurationDO extends PageDO implements Serializable {
      */
     private String returnDataType;
     /**
+     * 是否上传 0-否 1-是
+     */
+    private String isUpload;
+    /**
      * 自定义配置
      */
     private String customConfig;

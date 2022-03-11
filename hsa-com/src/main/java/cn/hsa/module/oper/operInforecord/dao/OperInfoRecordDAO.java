@@ -31,4 +31,15 @@ public interface OperInfoRecordDAO {
     List<InptCostDTO> queryOperCostByVisitId(Map<String, Object> paramMap);
 
     int updateOperStatusBatch(@Param("operList") List<OperInfoRecordDTO> applyUnScheduledList);
+
+    List<OperInfoRecordDTO> queryOperInfoRecordInpt(OperInfoRecordDTO operInfoRecordDTO);
+    /**
+     * @Meth: queryOperInfoRecordOutpt
+     * @Description: 获取门诊病人
+     * @Param: [operInfoRecordDTO]
+     * @return: java.util.List<cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO>
+     * @Author: zhangguorui
+     * @Date: 2022/2/21
+     */
+    List<OperInfoRecordDTO> queryOperInfoRecordOutpt(OperInfoRecordDTO operInfoRecordDTO);
 }

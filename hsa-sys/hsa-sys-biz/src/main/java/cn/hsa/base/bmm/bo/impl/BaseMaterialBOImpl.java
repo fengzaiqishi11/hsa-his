@@ -13,18 +13,20 @@ import cn.hsa.module.base.bmm.bo.BaseMaterialBO;
 import cn.hsa.module.base.bmm.dao.BaseMaterialDAO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.base.bp.dao.BaseProductDAO;
+import cn.hsa.module.base.bp.dto.BaseProductDTO;
+import cn.hsa.module.base.modify.dao.BaseModifyTraceDAO;
+import cn.hsa.module.base.modify.dto.BaseModifyTraceDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureItemMatchService;
-import cn.hsa.module.base.bp.dao.BaseProductDAO;
-import cn.hsa.module.base.bp.dto.BaseProductDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -93,6 +94,9 @@ public class BaseMaterialBOImpl extends HsafBO implements BaseMaterialBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private BaseModifyTraceDAO baseModifyTraceDAO;
     /**
     * @Menthod getById
      * @Desrciption 根据主键Id，医院编码等参数查询材料信息
@@ -210,6 +214,8 @@ public class BaseMaterialBOImpl extends HsafBO implements BaseMaterialBO {
          */
         //根据厂家名称，查询是否存在生产厂家
         List<BaseProductDTO> dtoList = baseProductDAO.getByName(baseMaterialDTO);
+
+        BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
         if(StringUtils.isEmpty(baseMaterialDTO.getProdCode())){
             if (ListUtils.isEmpty(dtoList)){
                 //不存在则新增一条厂家信息
@@ -265,11 +271,26 @@ public class BaseMaterialBOImpl extends HsafBO implements BaseMaterialBO {
             if(null == baseMaterialDTO.getIsValid() ){
                 baseMaterialDTO.setIsValid(Constants.SF.S);
             }
+
+            // 材料修改，写入异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseMaterialDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_material");
+            baseModifyTraceDTO.setUpdtId(baseMaterialDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseMaterialDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", "-");
+            conentMap.put("after", baseMaterialDTO);
+            baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
+
             int insert = this.baseMaterialDAO.insert(baseMaterialDTO);
             // 存入缓存
 //            cacheOperate(baseMaterialDTO,null,true);
             return insert > 0;
         }else {
+            BaseMaterialDTO oldMat = baseMaterialDAO.getById(baseMaterialDTO);
             BaseAdviceDetailDTO baseAdviceDetailDTO = new BaseAdviceDetailDTO();
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
             //回写材料名称
@@ -295,6 +316,20 @@ public class BaseMaterialBOImpl extends HsafBO implements BaseMaterialBO {
             if(Constants.SF.S.equals(baseMaterialDTO.getIsValid())){
 //                cacheOperate(baseMaterialDTO,null,true);
             }
+
+            // 材料异动记录 写入异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseMaterialDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_material");
+            baseModifyTraceDTO.setUpdtId(baseMaterialDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseMaterialDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", oldMat);
+            conentMap.put("after", baseMaterialDTO);
+            String jsonObject= JSONObject.toJSONString(conentMap);
+            baseModifyTraceDTO.setUpdtConent(jsonObject);
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
             return update > 0;
         }
     }

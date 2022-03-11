@@ -358,4 +358,29 @@ public interface OutptTmakePriceFormBO {
      * @Return OutptCostDTO
      **/
     List<OutptCostDTO> queryOutptPrescribeCostList(Map map);
+
+
+    PageDTO queryCreditCharge(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:15
+     * @Return: Boolean
+     **/
+    Boolean updateCreditStatus(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: saveCreditInvoicePrint()
+     * @Desrciption: 挂账发票打印
+     * @Param: OutinInvoiceDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/2 10：39
+     * @Return: Boolean
+     **/
+    Boolean updateCreditQueryInovicePrint(OutinInvoiceDTO OutinInvoiceDTO);
 }

@@ -740,8 +740,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 outptCostDTO.setCrteName(outptVisitDTO.getCrteName());//创建人姓名
                 outptCostDTO.setCrteTime(new Date());//创建时间
                 outptCostDTO.setOneSettleId(OneSettleId);
-                outptCostDTO.setTotalPrice(outptCostDTO.getTotalPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
-                outptCostDTO.setRealityPrice(outptCostDTO.getRealityPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+//                outptCostDTO.setTotalPrice(outptCostDTO.getTotalPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+//                outptCostDTO.setRealityPrice(outptCostDTO.getRealityPrice().setScale(2, BigDecimal.ROUND_HALF_UP));
+                // 总金额 = 总数量 * 单价    再保留两位小数
+                outptCostDTO.setTotalPrice(BigDecimalUtils.multiply(outptCostDTO.getTotalNum(), outptCostDTO.getPrice().setScale(2, BigDecimal.ROUND_HALF_UP)));
+               //  优惠后金额 = 总数量 * 单价 - 优惠金额   再保留两位小数
+                outptCostDTO.setRealityPrice(BigDecimalUtils.subtract(BigDecimalUtils.multiply(outptCostDTO.getTotalNum(), outptCostDTO.getPrice()), outptCostDTO.getPreferentialPrice()).setScale(2, BigDecimal.ROUND_HALF_UP));
                 costList.add(outptCostDTO);
             } else {
                 //处方费用信息
@@ -4194,5 +4198,156 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         if (!"0".equals(code)) {
             throw new AppException((String) resultObj.get("message"));
         }
+    }
+
+    /**
+     * @Menthod: queryCreditCharge()
+     * @Desrciption: 挂账查询
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/28 11:37
+     * @Return: cn.hsa.sys.PageDTO
+     **/
+    @Override
+    public PageDTO queryCreditCharge(OutptSettleDTO outptSettleDTO) {
+        //校验时间格式
+        String startTime = outptSettleDTO.getStartTime();
+        String endTime = outptSettleDTO.getEndTime();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            sdf.parse(startTime);
+        } catch (Exception e) {
+            outptSettleDTO.setStartTime("");
+        }
+        try {
+            sdf.parse(endTime);
+        } catch (Exception e) {
+            outptSettleDTO.setEndTime("");
+        }
+        //分页查询
+        PageHelper.startPage(outptSettleDTO.getPageNo(), outptSettleDTO.getPageSize());
+        List<OutptSettleDTO> outptSettleDTOS = outptSettleDAO.queryCreditCharge(outptSettleDTO);
+        return PageDTO.of(outptSettleDTOS);
+    }
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:15
+     * @Return: int
+     **/
+    @Override
+    public Boolean updateCreditStatus(OutptSettleDTO outptSettleDTO){
+        outptSettleDAO.updateRegisterCreditStatus(outptSettleDTO);
+       int count = outptSettleDAO.updateCreditStatus(outptSettleDTO);
+       return count>0;
+    }
+
+    /**
+     * @param
+     * @Description 挂账发票打印
+     * @author: liuliyun
+     * @date: 2022/3/2
+     * @return: java.lang.String
+     **/
+    @Override
+    public Boolean updateCreditQueryInovicePrint(OutinInvoiceDTO outinInvoiceDTO) {
+        OutptSettleDTO outptSettleDTO =new OutptSettleDTO();
+        outptSettleDTO.setHospCode(outinInvoiceDTO.getHospCode());
+        outptSettleDTO.setId(outinInvoiceDTO.getSettleId());
+        outptSettleDTO.setVisitId(outinInvoiceDTO.getVisitId());
+        List<OutptSettleInvoiceDTO> pjList = outptSettleInvoiceDAO.getSetteleInvoiceByParams(outptSettleDTO);
+        if (pjList!=null&&pjList.size()>0){
+            for (OutptSettleInvoiceDTO outptSettleInvoiceDTO: pjList){
+                if (StringUtils.isNotEmpty(outptSettleInvoiceDTO.getInvoiceId())){
+                    throw new AppException("该病人发票已打，如需补打请去补打重打页面");
+                }
+            }
+        }
+        OutinInvoiceDO selectEntity = outinInvoiceDAO.getOutinInvoiceById(outinInvoiceDTO);
+        // 获取当前登录人的最新的发票号段
+        int num = 0;
+        if (selectEntity == null || selectEntity.getNum() == 0) {
+            // 查询是否有新的在用发票
+            OutinInvoiceDTO selectDto = new OutinInvoiceDTO();
+            selectDto.setHospCode(outinInvoiceDTO.getHospCode());
+            selectDto.setUseId(outinInvoiceDTO.getUseId());
+            selectDto.setReceiveId(outinInvoiceDTO.getReceiveId());
+            selectDto.setStatusCode(Constants.PJSYZT.ZY);
+
+            List<String> strList = new ArrayList();
+            strList.add(Constants.PJLX.TY);
+            strList.add(Constants.PJLX.MZ);
+            strList.add(Constants.PJLX.MZTY);
+            selectDto.setTypeCodeList(strList);
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("code", "FPHB_FS");
+            map.put("hospCode", outinInvoiceDTO.getHospCode());
+            WrapperResponse<SysParameterDTO> wr = sysParameterService.getParameterByCode(map);
+
+            selectDto.setType(wr.getData().getValue());
+            List list = outinInvoiceDAO.getInvoiceList(selectDto);
+            if (ListUtils.isEmpty(list)) {
+                throw new AppException("当前类型发票已用完，请重新领用发票");
+            }
+
+            if (list.size() > 1) {
+                throw new AppException("出现多个在用号段的发票，请联系管理员");
+            }
+            selectEntity = (OutinInvoiceDO) list.get(0);
+
+            if (selectEntity.getNum() == 0) {
+                throw new AppException("出现数量为0的在用发票，请联系管理员");
+            }
+        }
+        //  当前号码
+        String currNo = selectEntity.getCurrNo();
+
+        //  终止号码
+        String endNo = selectEntity.getEndNo();
+        outinInvoiceDTO.setId(selectEntity.getId());
+        // 获取需要打印多少张票据
+        int pjSize = pjList.size();
+        // 当前号码
+        Integer currNoInt = Integer.valueOf(currNo);
+        // 结束号码
+        Integer endNoInt = Integer.valueOf(endNo);
+
+        if (pjSize + currNoInt > endNoInt + 1) {
+            throw new AppException("门诊结算-发票打印:发票打印失败,当前需要打印[" + pjSize + "],目前发票票据数量不足,请进行重打补打操作!");
+        }
+
+        List<OutptSettleInvoiceDTO> invoiceDTOList = new ArrayList<>();
+
+        //  循环使用票据
+        for (OutptSettleInvoiceDTO outptSettleInvoiceDTO : pjList) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            outinInvoiceDTO.setCurrNo(String.valueOf(currNoInt));
+            outinInvoiceDTO.setDqCurrNo(currNo);
+            map.put("hospCode", outinInvoiceDTO.getHospCode());
+            map.put("outinInvoiceDTO", outinInvoiceDTO);
+            // 执行使用发票
+            OutinInvoiceDetailDO outinInvoiceDetailDO = outinInvoiceService.updateInvoiceStatus(map).getData();
+            outptSettleInvoiceDTO.setInvoiceId(outinInvoiceDetailDO.getInvoiceId());
+            outptSettleInvoiceDTO.setInvoiceDetailId(outinInvoiceDetailDO.getId());//发票明细id
+            outptSettleInvoiceDTO.setInvoiceNo(String.valueOf(outinInvoiceDetailDO.getInvoiceNo()));//发票号码
+            outptSettleInvoiceDTO.setPrintNum(1);
+            outptSettleInvoiceDTO.setPrintTime(new Date());
+            outptSettleInvoiceDTO.setHospCode(outinInvoiceDetailDO.getHospCode());
+            // 发票使用后修改票据表信息
+            invoiceDTOList.add(outptSettleInvoiceDTO);
+            currNoInt++;
+        }
+
+        // 回写票据表数据.
+        if (!invoiceDTOList.isEmpty()) {
+            outptSettleInvoiceDAO.updateOutptSettleInvoicesBypj(invoiceDTOList);
+        }
+        return  true;
     }
 }

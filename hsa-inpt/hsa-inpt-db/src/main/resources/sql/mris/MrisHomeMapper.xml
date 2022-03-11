@@ -909,7 +909,7 @@
             a.out_dept_name as outDeptName,
             timestampdiff(day,a.in_time,a.out_time) as inDays,
             -- icd_version 疾病版本（疾病分类名称）
-            ifnull((select code from base_disease where id = a.out_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
+            ifnull((select code from base_disease where id = a.outpt_disease_id and hosp_code = #{hospCode} limit 1),'') as diseaseIcd10,
             a.out_disease_name as  diseaseName,
             -- bl_icd10 病理诊断
             -- turn_org_name 转院机构
@@ -935,7 +935,12 @@
             bf.native_address as nativeAdress,
             code_9.remark as payWayCode,
             a.outpt_doctor_id as outptDoctorId,
-            a.outpt_doctor_name as outptDoctorName
+            a.outpt_doctor_name as outptDoctorName,
+            a.contact_name as contactName,
+            a.contact_rela_code as contactRelaCode,
+            a.contact_address as contactAddress,
+            a.contact_phone as contactPhone,
+            a.total_in_count as inCnt
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

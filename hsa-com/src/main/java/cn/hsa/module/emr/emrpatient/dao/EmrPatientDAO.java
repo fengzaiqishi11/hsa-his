@@ -12,6 +12,7 @@ import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -338,13 +339,30 @@ public interface EmrPatientDAO {
 
 	List<OutptVisitDTO> getPatientOutHospVisitId(OutptVisitDTO outptVisitDTO);
 
+	/**
+	 * @Method queryEmrPatientDiagnose
+	 * @Desrciption  查询出住院诊断信息
+	 * @Param
+	 *
+	 * @Author fuhui
+	 * @Date   2022/2/23 10:21
+	 * @Return
+	**/
 	List<InptDiagnoseDTO> queryEmrPatientDiagnose(Map map);
 
-	List<OperInfoRecordDO> queryEmrOperRecordInfo(Map map);
+	/**
+	 * @Method queryEmrOperRecordInfo
+	 * @Desrciption  查询出住院手术信息
+	 * @Param
+	 *
+	 * @Author fuhui
+	 * @Date   2022/2/23 10:22
+	 * @Return
+	**/
+	List<OperInfoRecordDTO> queryEmrOperRecordInfo(Map map);
 
 	EmrPatientRecordDTO queryEmrCourseInfo(Map map);
 
-	InptVisitDTO getEmrInptVisit(EmrPatientDTO emrPatientDTO);
 
 	EmrPatientRecordDTO queryEmrOutInfo(Map map);
 

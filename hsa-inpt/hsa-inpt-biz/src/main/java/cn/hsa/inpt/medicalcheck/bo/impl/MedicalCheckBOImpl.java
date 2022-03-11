@@ -1,6 +1,7 @@
 package cn.hsa.inpt.medicalcheck.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
@@ -10,6 +11,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptDiagnoseDO;
 import cn.hsa.module.inpt.medicalcheck.bo.MedicalCheckBO;
 import cn.hsa.module.inpt.medicaltechnology.dao.MedicalTechnologyDAO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +53,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, Object> param = new HashMap<String, Object>();
         Map<String, Object> str = new HashMap<String, Object>();
         List<String> adviceList = new ArrayList<String>();
+        String hospCode = MapUtils.get(map, "hospCode");
         List<InptAdviceDTO> inptAdviceDTOList = MapUtils.get(map, "inptAdviceDTOList");
 
         List<Map<String, String>> costList = new ArrayList<>();
@@ -75,28 +78,37 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
             }
             costList.add(costMap);
         }
-
-        param.put("url", "http://172.18.21.70:8702/kbs-rule-api/api/call.action");
-        str.put("function_id", "apiHnsService1001");
-        str.put("hospital_id", "30004");
-        str.put("scene_type", "1");
-        str.put("visit_id", inptAdviceDTOList.get(0).getVisitId());
-        str.put("dept_id", inptAdviceDTOList.get(0).getInDeptId());
-        str.put("violations_monitor", adviceList);
-        str.put("charge_details", costList);
+        // DRG医嘱预审接口
+        if (null == inptAdviceDTOList.get(0)) {
+            throw new AppException("医嘱集合为空");
+        }
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        param.put("url", "http://" + drgIp + "/drg_web/api/call.action");
+        str.put("function_id", "apiHnsService1001"); // 接口功能号
+        str.put("hospital_id", hospitalId); // 机构ID
+        str.put("scene_type", "1"); // 场景类型，1：医嘱预审接口
+        str.put("visit_id", inptAdviceDTOList.get(0).getVisitId());// 就诊ID
+        str.put("dept_id", inptAdviceDTOList.get(0).getInDeptId());// 所属科室ID
+        str.put("violations_monitor", adviceList);// 医嘱集合
+        str.put("charge_details", costList);// 费用集合
         String json = JSONObject.toJSONString(str);
         param.put("param", json);
         String result = HttpConnectUtil.doPost(param);
         Map resultMap = new HashMap();
         try {
             Map xmlMap = XMLUtil.parseXmlToMap(result);
-            if(xmlMap.get("return_code").equals("1")){
+            if (xmlMap.get("return_code").equals("1")) {
                 resultMap = xmlMap;
-                resultMap.put("success",1);
+                resultMap.put("success", 1);
             } else {
-                resultMap.put("success",0);
+                resultMap.put("success", 0);
             }
-            resultMap.put("param",json);
+            resultMap.put("param", json);
         } catch (DocumentException e) {
             e.printStackTrace();
         }
@@ -104,9 +116,28 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         return resultMap;
     }
 
+    /**
+     * 获取系统参数
+     *
+     * @param hospCode
+     * @param code
+     * @return
+     */
+    public Map<String, String> getParameterValue(String hospCode, String[] code) {
+        List<SysParameterDTO> list = medicalTechnologyDAO.getParameterValue(hospCode, code);
+        Map<String, String> retMap = new HashMap<>();
+        if (!MapUtils.isEmpty(list)) {
+            for (SysParameterDTO hit : list) {
+                retMap.put(hit.getCode(), hit.getValue());
+            }
+        }
+        return retMap;
+    }
+
     @Override
     public Map getBeforeCheckAdd(Map<String, Object> map) {
         Map<String, Object> param = new HashMap<String, Object>();
+        String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> str = new HashMap<String, Object>();
         List<String> adviceList = new ArrayList<String>();
         List<InptCostDTO> inptCostDTOS = MapUtils.get(map, "inptCostDTOS");
@@ -135,11 +166,18 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
                 costMap.put("items_category", inptCostDTO.getItemCode());
             }
         }
-        param.put("url", "http://172.18.21.70:8702/kbs-rule-api/api/call.action");
+        // DRG医嘱预审接口
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        param.put("url", "http://" + drgIp + "/drg_web/api/call.action");
         str.put("function_id", "apiHnsService1001");
-        str.put("hospital_id", "30004");
+        str.put("hospital_id", hospitalId);
         str.put("scene_type", "1");
-        str.put("visit_id",inptCostDTOS.get(0).getVisitId());
+        str.put("visit_id", inptCostDTOS.get(0).getVisitId());
         str.put("dept_id", inptCostDTOS.get(0).getInDeptId());
         str.put("violations_monitor", adviceList);
         str.put("charge_details", costList);
@@ -149,13 +187,13 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map resultMap = new HashMap();
         try {
             Map xmlMap = XMLUtil.parseXmlToMap(result);
-            if(xmlMap.get("return_code").equals("1")){
+            if (xmlMap.get("return_code").equals("1")) {
                 resultMap = xmlMap;
-                resultMap.put("success",1);
+                resultMap.put("success", 1);
             } else {
-                resultMap.put("success",0);
+                resultMap.put("success", 0);
             }
-            resultMap.put("param",json);
+            resultMap.put("param", json);
         } catch (DocumentException e) {
             e.printStackTrace();
         }
@@ -176,7 +214,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
      * @Return
      **/
     @Override
-    public Map getDagns(Map<String, Object> map){
+    public Map getDagns(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         List<InptDiagnoseDTO> inptDiagnoseDTOS = MapUtils.get(map, "inptDiagnoseDTOS");
         // 需要去疾病表查询具体的ICD10,前端传过来
@@ -190,7 +228,12 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<BaseDiseaseDTO> diseaseByIds = baseDiseaseService.getDiseaseByIds(diseaseMap);
         Map<String, BaseDiseaseDTO> collect = diseaseByIds.stream().collect(Collectors.toMap(BaseDiseaseDTO::getId, Function.identity(), (key1, key2) -> key2));
         StringBuffer sb = new StringBuffer();
-        sb.append(" http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_dagns/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipIp)) {
+            throw new AppException("DIP的IP地址没进行配置");
+        }
+        sb.append(" http://"+dipIp+"/drg_web/drgGroupThird/drg_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -262,7 +305,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
             } else {
                 i++;
                 sb.append("&");
-                sb.append("jbdm"+i+"=");
+                sb.append("jbdm" + i + "=");
                 sb.append(collect.get(inptDiagnoseDTO.getDiseaseId()).getNationCode());
             }
         }
@@ -275,7 +318,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     }
 
     @Override
-    public Map getDagnsDIP(Map<String, Object> map){
+    public Map getDagnsDIP(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         List<InptDiagnoseDTO> inptDiagnoseDTOS = MapUtils.get(map, "inptDiagnoseDTOS");
         // 需要去疾病表查询具体的ICD10,前端传过来
@@ -289,7 +332,12 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<BaseDiseaseDTO> diseaseByIds = baseDiseaseService.getDiseaseByIds(diseaseMap);
         Map<String, BaseDiseaseDTO> collect = diseaseByIds.stream().collect(Collectors.toMap(BaseDiseaseDTO::getId, Function.identity(), (key1, key2) -> key2));
         StringBuffer sb = new StringBuffer();
-        sb.append(" http://172.18.21.70:8080/drg_medical_web/drgGroupThird/dip_dagns/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipIp = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipIp)) {
+            throw new AppException("DIP的IP地址没进行配置");
+        }
+        sb.append(" http://" + dipIp + "/drg_web/drgGroupThird/dip_dagns/list.action");
         sb.append("?xm=");
         sb.append(inptVisitDTO.getName());
         sb.append("&");
@@ -361,7 +409,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
             } else {
                 i++;
                 sb.append("&");
-                sb.append("jbdm"+i+"=");
+                sb.append("jbdm" + i + "=");
                 sb.append(collect.get(inptDiagnoseDTO.getDiseaseId()).getNationCode());
             }
         }
@@ -398,8 +446,14 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     @Override
     public Map getBeforeDRG(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+        String hospCode = MapUtils.get(map, "hospCode");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_paper/list.action");
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        sb.append("http://" + drgIp + "/drg_web/drgGroupThird/drg_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");
@@ -409,7 +463,6 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         sb.append("doctor_id=");
         sb.append(map.get("doctorId"));
         String URL = sb.toString();
-//        String html = HttpConnectUtil.doGet(URL);
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
         resultMap.put("html", URL);
@@ -429,7 +482,13 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     public Map getBeforeDIP(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/html/js/pages/biz/drgGroupThird/dip_paper/list.action");
+        Map<String, String> mapParameter = this.getParameterValue((String) map.get("hospCode"), new String[]{"DIPIP"});
+        String dipip = MapUtils.getVS(mapParameter, "DIPIP", "");
+        if (StringUtils.isEmpty(dipip)) {
+            throw new AppException("DIP的IP地址没进行配置");
+        }
+        // http://172.18.23.18:8080/drg_web/drgGroupThird/dig_paper/list.action
+        sb.append("http://" + dipip + "/drg_web/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
         sb.append("&");
@@ -459,13 +518,19 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     @Override
     public Map getBeforeOutHosp(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+        String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> param = new HashMap<String, Object>();
-        param.put("url", "http://172.18.70.105:8702/kbs-rule-api/api/call.action");
-
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        param.put("url", "http://" + drgIp + "/drg_web/api/call.action");
         Map<String, Object> str = new HashMap<String, Object>();
         Map returnMap = new HashMap();
         str.put("function_id", "apiHnsService1001");
-        str.put("hospital_id", "30004");
+        str.put("hospital_id", hospitalId);
         str.put("scene_type", "6");
         str.put("visit_id", inptVisitDTO.getVisitId());
         String json = JSONObject.toJSONString(str);
@@ -474,13 +539,13 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map resultMap = new HashMap();
         try {
             Map xmlMap = XMLUtil.parseXmlToMap(result);
-            if(xmlMap.get("return_code").equals("1")){
+            if (xmlMap.get("return_code").equals("1")) {
                 resultMap = xmlMap;
-                resultMap.put("success",1);
+                resultMap.put("success", 1);
             } else {
-                resultMap.put("success",0);
+                resultMap.put("success", 0);
             }
-            resultMap.put("param",json);
+            resultMap.put("param", json);
         } catch (DocumentException e) {
             e.printStackTrace();
         }
@@ -500,11 +565,17 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
     @Override
     public Map getBeforeRecord(Map<String, Object> map) {
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+        String hospCode = MapUtils.get(map, "hospCode");
         StringBuffer sb = new StringBuffer();
-        sb.append("http://172.18.21.70:8080/drg_medical_web/drgGroupThird/drg_quality/list.action");
+        Map<String, String> mapParameter = this.getParameterValue(hospCode, new String[]{"DRGIP","HOSPCODE"});
+        String drgIp = MapUtils.getVS(mapParameter, "DRGIP", "");
+        String hospitalId = MapUtils.getVS(mapParameter, "HOSPCODE", "");
+        if (StringUtils.isEmpty(drgIp)) {
+            throw new AppException("DRG的IP地址没进行配置");
+        }
+        sb.append("http://"+drgIp+"/drg_web/drgGroupThird/drg_quality/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getId());
-
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
@@ -539,14 +610,14 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         }
     }
 
-    public static String doPost(Map<String,Object> param){
+    public static String doPost(Map<String, Object> param) {
         String URL = MapUtils.get(param, "url");
         String paramStr = MapUtils.get(param, "param");
         OutputStreamWriter out = null;
         BufferedReader in = null;
         StringBuilder result = new StringBuilder();
         HttpURLConnection conn = null;
-        try{
+        try {
             URL url = new URL(URL);
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
@@ -566,28 +637,28 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
             printout.flush();
             printout.close();
             //取得输入流，并使用Reader读取
-            if (200 == conn.getResponseCode()){
+            if (200 == conn.getResponseCode()) {
                 in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
                 String line;
-                while ((line = in.readLine()) != null){
+                while ((line = in.readLine()) != null) {
                     result.append(line);
                 }
-            }else{
+            } else {
                 throw new RuntimeException("调用接口失败。");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException("调用接口异常。");
-        }finally {
-            try{
-                if(out != null){
+        } finally {
+            try {
+                if (out != null) {
                     out.close();
                 }
-                if(in != null){
+                if (in != null) {
                     in.close();
                 }
-            }catch (IOException ioe){
+            } catch (IOException ioe) {
                 ioe.printStackTrace();
-            }finally {
+            } finally {
                 return result.toString();
             }
         }

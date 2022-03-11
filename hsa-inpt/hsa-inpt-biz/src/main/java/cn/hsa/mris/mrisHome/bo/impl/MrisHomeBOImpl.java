@@ -422,6 +422,38 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         String result = HttpConnectUtil.doPost(paramMap);
         dataMap.put("result", result);
+        dataMap.put("url", url);
+
+
+        return dataMap;
+    }
+    // 整理病案首页数据，上传drg
+    @Override
+    public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));
+        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));
+        Map<String, Object> paramMap = new HashMap<>();
+
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "BA_DIP");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String url = "http://172.18.22.8:8080/drg_web/drgGroupThird/dipGroupAndQuality.action";
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
+            url = sysParameterDTO.getValue();
+        } else {
+            throw new AppException("请在系统参数中配置病案上传dip时，dip地址  例：BA_DIP: url");
+        }
+
+        paramMap.put("url", url);
+        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        String result = HttpConnectUtil.doPost(paramMap);
+        dataMap.put("result", result);
+        dataMap.put("url", url);
+
 
         return dataMap;
     }
@@ -1417,6 +1449,32 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName()); // 联系人姓名
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone()); // 联系人电话
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode()); // 联系人地址
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress()); // 联系人地址
+        // 年龄单位为岁
+        if ("1".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            mrisBaseInfoDTO.setAge(mrisBaseInfoDTO.getAge());
+        }else if ("2".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为月
+            mrisBaseInfoDTO.setBabyAgeMonth(mrisBaseInfoDTO.getAge());
+            mrisBaseInfoDTO.setAge("0");
+        } else if ("3".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为周
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge()) * 7) / (float)DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }else if ("4".equals(mrisBaseInfoDTO.getAgeUnitCode())){
+            // 年龄单位为天
+            if (StringUtils.isNotEmpty(mrisBaseInfoDTO.getAge())&&!"0".equals(mrisBaseInfoDTO.getAge())) {
+                float month = (Float.parseFloat(mrisBaseInfoDTO.getAge())) /(float) DateUtils.getDayOfMonth();
+                mrisBaseInfoDTO.setBabyAgeMonth(month + "");
+            }
+            mrisBaseInfoDTO.setAge("0");
+        }
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
@@ -1451,12 +1509,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
 
         // 住院次数获取(未获取，默认1次)
-        int inCnt = mrisHomeDAO.getInCnt(mrisBaseInfoDTO);
+        /*int inCnt = mrisHomeDAO.getInCnt(mrisBaseInfoDTO);
         if (inCnt == 0) {
             inCnt = 1;
-        }
+        }*/
 
-        mrisBaseInfoDTO.setInCnt(inCnt);
+        // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表，病案首页直接去就诊表中的住院次数
+//        mrisBaseInfoDTO.setInCnt(inCnt);
         mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getInNo());
 
         // 获取医疗机构名称与医疗机构编码

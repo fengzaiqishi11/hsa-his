@@ -309,4 +309,7 @@ public interface MrisHomeService {
      */
     @GetMapping("/service/mris/mrisHome/getTableConfig")
     WrapperResponse<Map> getTableConfig(Map map) throws Exception;
+
+    @PutMapping("/service/mris/mrisHome/upMrisForDIP")
+    Map<String, Object> upMrisForDIP(Map<String, Object> map);
 }

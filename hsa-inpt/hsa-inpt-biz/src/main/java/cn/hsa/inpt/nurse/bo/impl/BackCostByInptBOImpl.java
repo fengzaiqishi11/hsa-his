@@ -109,7 +109,17 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
      **/
     @Override
     public PageDTO querySurgeryBackCostInfoPage(Map<String, Object> map) {
-        List<Map<String,Object>> outptBackCostList = inptCostDAO.querySurgeryBackCostInfoPage(map);
+        InptCostDTO inptCostDTO = MapUtils.get(map, "inptCostDTO");
+        String inptOrOutpt = inptCostDTO.getInptOrOutpt();
+        List<Map<String,Object>> outptBackCostList;
+        if (Constants.VISITTYPE.OUTPT.equals(inptOrOutpt)) {// 门诊病人费用,只会查出手术补记账的费用
+            outptBackCostList = inptCostDAO.querySurgeryOutptBackCostInfoPage(map);
+        } else if (Constants.VISITTYPE.INPT.equals(inptOrOutpt)) { // 住院病人的费用,只会查手术记账的费用
+            outptBackCostList = inptCostDAO.querySurgeryInptBackCostInfoPage(map);
+        } else {
+            outptBackCostList = inptCostDAO.querySurgeryBackCostInfoPage(map);
+        }
+
 
         return PageDTO.of(outptBackCostList);
     }

@@ -11,6 +11,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -197,4 +198,13 @@ public interface OutptVisitDAO {
      * @Return
      */
     void updateOutptVisitCodeByid(OutptVisitDTO outptVisitDTO);
+    /**
+     * @Meth: deleteCostByIds
+     * @Description: 批量删除费用
+     * @Param: [hospCode, costIds]
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/2/24
+     */
+    void deleteCostByIds(@Param("hospCode") String hospCode, @Param("costIds") List<String> costIds);
 }

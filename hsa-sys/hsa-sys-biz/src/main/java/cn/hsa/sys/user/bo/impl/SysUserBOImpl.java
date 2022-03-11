@@ -142,6 +142,20 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         return PageDTO.of(sysUserDTOS);
     }
 
+    @Override
+    public PageDTO queryDeptUser(SysUserDTO sysUserDTO) {
+
+        PageHelper.startPage(sysUserDTO.getPageNo(), sysUserDTO.getPageSize());
+        List<SysUserDTO> sysUserDTOS = this.sysUserDAO.queryDeptUser(sysUserDTO);
+        if (!ListUtils.isEmpty(sysUserDTOS)) {
+            for (int i = 0; i <sysUserDTOS.size() ; i++) {
+                SysUserDTO byId = getById(sysUserDTOS.get(i));
+                sysUserDTOS.set(i,byId);
+            }
+        }
+        return PageDTO.of(sysUserDTOS);
+    }
+
     /**
      * @Method save
      * @Desrciption 新增/编辑

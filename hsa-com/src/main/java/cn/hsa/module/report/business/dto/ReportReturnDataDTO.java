@@ -20,8 +20,27 @@ public class ReportReturnDataDTO implements Serializable {
     private String key;
 
     /**
+     * 文件名
+     */
+    private String fileName;
+
+    /**
+     * 文件格式
+     */
+    private String fileFormat;
+
+    /**
      * 返回数据
      */
     private String returnData;
 
+    public ReportReturnDataDTO() {
+    }
+
+    public ReportReturnDataDTO(String key, String fileName, String fileFormat, String returnData) {
+        this.key = key;
+        this.fileName = fileName;
+        this.fileFormat = fileFormat;
+        this.returnData = returnData;
+    }
 }

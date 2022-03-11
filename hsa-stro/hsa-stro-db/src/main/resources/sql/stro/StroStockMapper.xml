@@ -768,8 +768,8 @@
     <select id="queryStockByBatchAll" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
       select a.hosp_code, a.biz_id, a.item_code, a.item_id, a.item_name,a.batch_no,a.unit_code,
         a.split_unit_code, a.split_ratio,sum(a.num) num,
-        max(a.buy_price) as buy_price,max(a.sell_price) as sell_price, round((sum(a.num) * max(a.buy_price)),4) as buy_price_all,
-        round((sum(a.num) * max(a.sell_price)),4) as sell_price_all,max(a.expiry_date) as expiry_date,
+        max(a.buy_price) as buy_price,max(a.sell_price) as sell_price, round(sum(a.num * a.buy_price),4) as buy_price_all,
+        round(sum(a.num * a.sell_price),4) as sell_price_all,max(a.expiry_date) as expiry_date,
         sum(a.split_num) as split_num, max(a.split_price) as split_price,
         (case a.item_code when '1' then b.spec when '2' then d.spec end ) spec,
         (case a.item_code when '1' then b.code when '2' then d.code end ) code,

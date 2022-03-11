@@ -133,4 +133,6 @@ public interface OutptOutTmakePriceFormBO {
      * @Return:
      */
     OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO);
+
+    Boolean saveBackCostWithOutpt(Map<String, Object> map);
 }

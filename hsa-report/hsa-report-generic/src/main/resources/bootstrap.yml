@@ -21,19 +21,17 @@ spring:
         group: dev
         enabled: false
         encode: UTF-8
-        server-addr: 172.18.21.249:8848
-#        server-addr: 127.0.0.1:8848
+        server-addr: 127.0.0.1:8848
 dubbo:
   registry:
-    address: nacos://172.18.21.249:8848
-#    address: nacos://127.0.0.1:8848
+    address: nacos://127.0.0.1:8848
   consumer:
     timeout: 600000
   application:
     name: hsa-report
   protocol:
     name: dubbo
-    port: 29010
+    port: 29015
   provider:
     threads: 1000
 

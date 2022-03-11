@@ -73,4 +73,8 @@
 
     <!--一卡通异动-->
     <dubbo:service interface="cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService" ref="baseCardRechargeChangeService_provider"/>
+    <!-- 医养接口-->
+    <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" ref="medicToCareService_provider"/>
+    <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService" ref="careToMedicApplyService_provider"/>
+    <dubbo:service interface="cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService" ref="outptMedicalCareConfigurationService_provider"/>
 </beans>

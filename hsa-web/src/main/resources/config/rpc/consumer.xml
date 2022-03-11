@@ -518,6 +518,10 @@
 
     <!-- 报表管理子系统 -> 模板配置 -->
     <dubbo:reference id="reportConfigurationService_consumer" interface="cn.hsa.module.report.config.service.ReportConfigurationService" check="false"/>
-
+    <dubbo:reference id="reportDataDownLoadService_consumer" interface="cn.hsa.module.report.business.service.ReportDataDownLoadService" check="false"/>
+    <!-- 医养接口-->
+    <dubbo:reference id="medicToCareService_consumer" interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" check="false"/>
+    <dubbo:reference id="careToMedicApplyService_consumer" interface="cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService" check="false"/>
+    <dubbo:reference id="outptMedicalCareConfigurationService_consumer" interface="cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService" check="false"/>
 </beans>
 

@@ -138,7 +138,30 @@ public class MapUtils {
 
         isEmptyErr(map.get(key), "The param " + key + " is null or empty!");
     }
-
+    /**
+     * @Method getEmptyErr
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/17 14:34
+     * @Return
+     **/
+    public static  <T> T checkEmptyErr(Map map, Object key, String errMsg) {
+        if (!map.containsKey(key)) {
+            throw new RuntimeException(errMsg);
+        }
+        Object obj = MapUtils.get(map, key);
+        if(obj ==null){
+            throw new RuntimeException(errMsg);
+        }
+        if(obj instanceof  String){
+            if(StringUtils.isEmpty((String) obj)){
+                throw new RuntimeException(errMsg);
+            }
+        }
+        return (T) map.get(key);
+    }
     public static <T> T isEmptyErr(Object obj, String errMsg) {
         if (isEmpty(obj)) {
             throw new RuntimeException(errMsg);

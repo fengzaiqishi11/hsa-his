@@ -1,5 +1,6 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
+import cn.hsa.enums.FunctionEnum;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
@@ -50,6 +51,8 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 	private InsureUnifiedLogService insureUnifiedLogService_consumer;
 	@Resource
 	private SysParameterService sysParameterService_consumer;
+	@Resource
+	private InsureItfBOImpl insureItfBO;
 
 	/**
 	 * @Description: 获取人员信息
@@ -163,10 +166,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		inputMap.put("msgid", omsgId);
 		String url = insureConfigurationDTO.getUrl();
 		String json = JSONObject.toJSONString(inputMap);
-		logger.info("统一支付平台获取人员信息 [1101] 入参====>");
-		logger.info(json);
-		// 调用统一支付平台接口
-		String result = HttpConnectUtil.unifiedPayPostUtil(url, json);
+
 		params.put("medisCode",medisCode);
 		params.put("msgId",omsgId);
 		params.put("msgInfo",functionCode);
@@ -177,19 +177,26 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			params.put("isHospital",Constants.SF.S) ;
 		}
 		params.put("paramMapJson",json);
-		params.put("resultStr",result);
-		insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
 
-		logger.info("统一支付平台获取人员信息 [1101] 回参<====");
-		logger.info(result);
-		if(StringUtils.isEmpty(result)){
-			throw new AppException("无法访问医保统一支付平台");
-		}
-		Map<String, Object> resultMap = JSON.parseObject(result);
+		Map<String, Object> resultMap = insureItfBO.executeInsur(omsgId,url, FunctionEnum.INSUR_BASE_INFO,json,params);
+//		logger.info("统一支付平台获取人员信息 [1101] 入参====>");
+//		logger.info(json);
+//		// 调用统一支付平台接口
+//		String result = HttpConnectUtil.unifiedPayPostUtil(url, json);
+//
+//		params.put("resultStr",result);
+//		insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
 
-		if (!resultMap.get("infcode").equals("0")) {
-			throw new AppException("调用统一支付平台出错" + resultMap.get("err_msg"));
-		}
+//		logger.info("统一支付平台获取人员信息 [1101] 回参<====");
+//		logger.info(result);
+//		if(StringUtils.isEmpty(result)){
+//			throw new AppException("无法访问医保统一支付平台");
+//		}
+//		Map<String, Object> resultMap = JSON.parseObject(result);
+//
+//		if (!resultMap.get("infcode").equals("0")) {
+//			throw new AppException("调用统一支付平台出错" + resultMap.get("err_msg"));
+//		}
 		// 14: 门慢门特
 		List<Map<String,Object>> mapList = null;
 		Map<String, Object> tempMap = new HashMap<>();

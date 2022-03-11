@@ -458,4 +458,49 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
         return WrapperResponse.success(outptTmakePriceFormBO.queryOutptPrescribeCostList(map));
     }
 
+    /**
+     * @Menthod: queryCreditCharge()
+     * @Desrciption: 挂账查询
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/2/28 11:54
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    @Override
+    public WrapperResponse<PageDTO> queryCreditCharge(Map paramMap) {
+        PageDTO pageDTO = outptTmakePriceFormBO.queryCreditCharge(MapUtils.get(paramMap,"outptSettleDTO"));
+        return WrapperResponse.success(pageDTO);
+    }
+
+    /**
+     * @Menthod: updateCreditStatus()
+     * @Desrciption: 更新补缴状态
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/1 11:38
+     * @Return: WrapperResponse<Boolean>
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateCreditStatus(Map paramMap) {
+        Boolean status = outptTmakePriceFormBO.updateCreditStatus(MapUtils.get(paramMap,"outptSettleDTO"));
+        return WrapperResponse.success(status);
+    }
+
+    /**
+     * @Menthod: saveCreditInvoicePrint()
+     * @Desrciption: 挂账发票打印
+     * @Param: OutinInvoiceDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/3/2 10：39
+     * @Return: Boolean
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateCreditQueryInovicePrint(Map paramMap) {
+        Boolean status = outptTmakePriceFormBO.updateCreditQueryInovicePrint(MapUtils.get(paramMap,"outinInvoiceDTO"));
+        return WrapperResponse.success(status);
+    }
+
 }

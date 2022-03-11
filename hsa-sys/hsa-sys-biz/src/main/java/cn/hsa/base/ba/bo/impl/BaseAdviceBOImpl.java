@@ -11,10 +11,13 @@ import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.base.modify.dao.BaseModifyTraceDAO;
+import cn.hsa.module.base.modify.dto.BaseModifyTraceDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
+import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -60,6 +63,9 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
 
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private BaseModifyTraceDAO baseModifyTraceDAO;
 
     /**
      * @param baseAdviceDTO 主键ID 等参数
@@ -173,6 +179,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
      **/
     @Override
     public boolean insert(BaseAdviceDTO baseAdviceDTO) {
+        BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
         baseAdviceDTO.setId(SnowflakeUtils.getId());
         baseAdviceDTO.setCrteTime(DateUtils.getNow());
         // 根据单据规则生成医嘱编码
@@ -222,11 +229,34 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             baseAdviceDetailDAO.insert(baseAdviceDetailDTOList);
             //存入缓存
 //            cacheDetailOperate(baseAdviceDetailDTOList,baseAdviceDTO.getHospCode(),true);
+            // 医嘱修改，写入异动记录
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseAdviceDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_advice_detail");
+            baseModifyTraceDTO.setUpdtId(baseAdviceDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseAdviceDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", "-");
+            conentMap.put("after", baseAdviceDetailDTOList);
+            baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
         }
         baseAdviceDTO.setPrice(totalPriceAdvice);
         int insert = this.baseAdviceDAO.insert(baseAdviceDTO);
         // 存入缓存
 //        cacheOperate(baseAdviceDTO,null,true);
+        // 医嘱修改，写入异动记录
+        baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+        baseModifyTraceDTO.setHospCode(baseAdviceDTO.getHospCode());
+        baseModifyTraceDTO.setTableName("base_advice");
+        baseModifyTraceDTO.setUpdtId(baseAdviceDTO.getCrteId());
+        baseModifyTraceDTO.setUpdtName(baseAdviceDTO.getCrteName());
+        Map<String, Object> conentMap = new HashMap<>();
+        conentMap.put("before", "-");
+        conentMap.put("after", baseAdviceDetailDTOList);
+        baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+        baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
         return insert > 0;
     }
 
@@ -240,6 +270,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
      **/
     @Override
     public boolean update(BaseAdviceDTO baseAdviceDTO) {
+        BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
+        BaseAdviceDTO oldAdvice = baseAdviceDAO.getById(baseAdviceDTO);
         //要修改或者插入的列信息（医嘱详细）
         List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = baseAdviceDTO.getBaseAdviceDetailDTOList();
 
@@ -310,13 +342,23 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
 //                cacheDetailOperate(allList,bad.getHospCode(),true);
             }
 
-
             if (!ListUtils.isEmpty(insertList)) {
                 baseAdviceDetailDAO.insert(insertList);
             }
             if (!ListUtils.isEmpty(updateList)) {
                 baseAdviceDetailDAO.update(updateList);
             }
+
+            baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+            baseModifyTraceDTO.setHospCode(baseAdviceDTO.getHospCode());
+            baseModifyTraceDTO.setTableName("base_advice_detail");
+            baseModifyTraceDTO.setUpdtId(baseAdviceDTO.getCrteId());
+            baseModifyTraceDTO.setUpdtName(baseAdviceDTO.getCrteName());
+            Map<String, Object> conentMap = new HashMap<>();
+            conentMap.put("before", insertList);
+            conentMap.put("after", baseAdviceDetailDTOList);
+            baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+            baseModifyTraceDAO.insert(baseModifyTraceDTO);
         }
 
         // 要删除的数据(医嘱详细)
@@ -343,6 +385,19 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             baseAdviceDTO.setIds(null);
 //            cacheOperate(baseAdviceDTO,null,true);
         }
+
+        // 医嘱修改，写入异动记录
+        baseModifyTraceDTO.setId(SnowflakeUtils.getId());
+        baseModifyTraceDTO.setHospCode(baseAdviceDTO.getHospCode());
+        baseModifyTraceDTO.setTableName("base_advice");
+        baseModifyTraceDTO.setUpdtId(baseAdviceDTO.getCrteId());
+        baseModifyTraceDTO.setUpdtName(baseAdviceDTO.getCrteName());
+        Map<String, Object> conentMap = new HashMap<>();
+        conentMap.put("before", oldAdvice);
+        conentMap.put("after", baseAdviceDetailDTOList);
+        baseModifyTraceDTO.setUpdtConent(JSONObject.toJSONString(conentMap));
+        baseModifyTraceDAO.insert(baseModifyTraceDTO);
+
         return update > 0;
     }
 

@@ -58,6 +58,11 @@ public interface SysUserService {
     @GetMapping("/queryPage")
     WrapperResponse<PageDTO> queryPage(Map map);
 
+
+    @PostMapping("/queryDeptUser")
+    WrapperResponse<PageDTO> queryDeptUser(Map map);
+
+
     /**
      * @Method save
      * @Desrciption 修改、新增人员信息

@@ -155,5 +155,14 @@ public class OutptMedicalRecordDO extends PageDO implements Serializable {
     private Date crteTime;
 
     private String remarke;
+    /**
+     * 中医症候id
+     */
+    private String tcmSyndromesId;
+
+    /**
+     * 中医诊断id
+     */
+    private String tcmDiseaseId;
 
 }

@@ -93,5 +93,10 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
      */
     private Map<String, Object> singlePatInfo;
     private List<String> diagnoseList;
+    private String tcmDiseaseId; // 中医诊断Id
+    private String tcmDiseaseName; // 中医诊断名称
+    private String tcmSyndromesId; // 中医症候id
+    private String tcmSyndromesName; // 中医症候名称
+    private String diagnoseType; // 诊断类型: 0 西医; 1 中医
 }
 

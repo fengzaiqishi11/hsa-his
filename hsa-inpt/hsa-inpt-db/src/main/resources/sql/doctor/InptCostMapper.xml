@@ -2069,6 +2069,149 @@
         and ir_id =#{receiveId} and ird_id =#{id}
     </select>
 
+    <select id="querySurgeryOutptBackCostInfoPage" resultType="java.util.Map">
+        SELECT
+        oc.id,oc.hosp_code,oc.visit_id,'' baby_id,'' iat_id,'' iatd_group_no,''
+        iatd_seq_no,'' advice_exec_id,oc.source_code,oc.source_id,oc.old_cost_id,
+        oc.source_dept_id,oc.dept_id,oc.bfc_id,oc.item_code,oc.item_id,oc.item_name,
+        oc.price,
+        oc.num,
+        oc.spec,
+        oc.prep_code,
+        oc.dosage,
+        oc.dosage_unit_code,
+        oc.usage_code,
+        oc.rate_id,
+        '' speed_code,
+        oc.use_days,
+        oc.num_unit_code as total_num_unit_code ,
+        oc.total_num,
+        oc.num_unit_code,
+        oc.herb_note_code,
+        oc.use_code,
+        oc.herb_num,
+        oc.total_price,
+        oc.preferential_price,
+        oc.reality_price,
+        oc.back_num,
+        oc.doctor_id,
+        oc.doctor_name,
+        oc.dept_id,
+        oc.phar_id,
+        oc.is_dist,
+        '' is_give,
+        '' back_code,
+        oc.is_technology_ok is_ok,
+        oc.technology_ok_id ok_id,
+        oc.technology_ok_name ok_name,
+        oc.technology_ok_time ok_time,
+        oc.settle_code,
+        oc.settle_id,
+        '' is_check,
+        '' check_id,
+        '' check_name,
+        null check_time,
+        oc.doctor_id AS zz_doctor_id,
+        oc.doctor_name AS zz_doctor_name,
+        oc.doctor_id  AS jz_doctor_id,
+        oc.doctor_name AS jz_doctor_name,
+        oc.doctor_id AS zg_doctor_id,
+        oc.doctor_name AS zg_doctor_name,
+        oc.crte_id exec_id,
+        oc.crte_name exec_name,
+        oc.crte_time exec_time,
+        oc.exec_dept_id,
+        null plan_exec_time,
+        oc.status_code,
+        '' is_cost,
+        oc.crte_time  cost_time,
+        oc.crte_id,
+        oc.crte_name,
+        crte_time,
+        oc.distribute_all_detail_id,
+        ( SELECT pt.NAME FROM base_dept pt WHERE pt.hosp_code = oc.hosp_code AND pt.id = oc.exec_dept_id ) execDeptName,
+        ( ifnull( oc.back_num, 0 ) * oc.price ) backAmount,
+        ( SELECT fy.NAME FROM base_finance_classify fy WHERE fy.hosp_code = oc.hosp_code AND fy.id = oc.bfc_id ) bfcName,
+        '' is_wait
+        FROM
+        outpt_cost oc
+        WHERE
+        oc.hosp_code =  #{hospCode}
+
+        <if test="id != null and id !=''">
+            and oc.id = #{id}
+        </if>
+        <if test="ids != null and ids.size() >0">
+            and oc.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and oc.visit_id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and oc.status_code = #{statusCode}
+        </if>
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and oc.source_dept_id = #{sourceDeptId}
+        </if>
+        <if test="sourceCode != null and sourceCode !=''">
+            and oc.source_code = #{sourceCode}
+        </if>
+
+        ORDER BY
+        status_code ASC,
+        source_code ASC,
+        crte_time DESC
+    </select>
+    <select id="querySurgeryInptBackCostInfoPage" resultType="java.util.Map">
+        select
+        st.id, st.hosp_code, st.visit_id, st.baby_id, st.iat_id, st.iatd_group_no, st.iatd_seq_no, st.advice_exec_id, st.source_code, st.source_id, st.old_cost_id, st.source_dept_id, st.in_dept_id, st.bfc_id, st.item_code, st.item_id, st.item_name, st.price, st.num, st.spec, st.prep_code, st.dosage, st.dosage_unit_code, st.usage_code, st.rate_id, st.speed_code,
+        st.use_days, st.num_unit_code, st.total_num, st.total_num_unit_code, st.herb_note_code, st.use_code, st.herb_num, st.total_price, st.preferential_price, st.reality_price, st.back_num, st.doctor_id, st.doctor_name, st.dept_id, st.phar_id, st.is_dist, st.is_give, st.back_code, st.is_ok, st.ok_id, st.ok_name, st.ok_time,
+        st.settle_code, st.settle_id, st.is_check, st.check_id, st.check_name, st.check_time, st.zz_doctor_id, st.zz_doctor_name, st.jz_doctor_id, st.jz_doctor_name, st.zg_doctor_id, st.zg_doctor_name,
+        st.exec_id, st.exec_name, st.exec_time, st.exec_dept_id, st.plan_exec_time, st.status_code, is_cost, cost_time, st.crte_id, st.crte_name, crte_time,st.distribute_all_detail_id,
+        (select pt.name from base_dept pt where pt.hosp_code = st.hosp_code and pt.id = st.exec_dept_id) execDeptName,
+        (ifnull(st.back_num,0) * st.price) backAmount,
+        (select fy.name from base_finance_classify fy where fy.hosp_code = st.hosp_code and fy.id = st.bfc_id) bfcName,st.is_wait
+        from inpt_cost st
+        where st.hosp_code = #{hospCode}
+        <if test="id != null and id !=''">
+            and st.id = #{id}
+        </if>
+        <if test="ids != null and ids.size() >0">
+            and st.id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and st.visit_id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and st.status_code = #{statusCode}
+        </if>
+        <if test="sourceDeptId != null and sourceDeptId !=''">
+            and st.source_dept_id = #{sourceDeptId}
+        </if>
+        <if test="sourceCode != null and sourceCode !=''">
+            and st.source_code = #{sourceCode}
+        </if>
+        <if test="queryStartDate != null and queryStartDate !=''">
+            and (DATE_FORMAT(st.cost_time,'%Y-%m-%d'))= #{queryStartDate}
+        </if>
+        <if test="itemCode != null and itemCode !=''">
+            and st.item_code =#{itemCode}
+        </if>
+        <if test="itemName != null and itemName !=''">
+            and st.item_name like concat('%',#{itemName,jdbcType=VARCHAR},'%')
+        </if>
+        ORDER BY
+        status_code ASC,
+        source_code ASC,
+        crte_time DESC
+    </select>
+
     <update id="updatePharInDistributeDetailOrg">
         update phar_in_distribute_detail
         set num =#{num},total_price =#{totalPrice},split_num = #{splitNum}

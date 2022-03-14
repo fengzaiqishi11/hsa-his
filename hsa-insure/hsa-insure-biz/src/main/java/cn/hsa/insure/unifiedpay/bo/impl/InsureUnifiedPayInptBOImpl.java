@@ -865,12 +865,19 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());// 人员编号
         dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型
         dataMap.put("mdtrt_cert_no",insureIndividualVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        if("03".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+            dataMap.put("card_sn",insureIndividualVisitDTO.getCardIden()); // 卡识别码
+        }
         String isReadCard = MapUtils.get(map,"isReadCard");
         String bka895 = MapUtils.get(map,"bka895");
         String bka896 = MapUtils.get(map,"bka896");
+        String cardIden = MapUtils.get(map,"cardIden");
         if (Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)) {
             dataMap.put("mdtrt_cert_type",bka895);// 就诊凭证类型
             dataMap.put("mdtrt_cert_no",bka896); // 就诊凭证编号
+            if("03".equals(bka895)){
+                dataMap.put("card_sn",cardIden); // 就诊凭证编号
+            }
         }
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMap.get("costStr").toString()));

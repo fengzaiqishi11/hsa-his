@@ -284,10 +284,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         for (Map om : list) {
             innerList = new ArrayList<>();
             for (Map<String, Object> im : list3202) {
-                if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) &&
-                        MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))) {
-                    innerList.add(im);
+                if("369900".equals(MapUtils.get(map, "insureRegCode"))){
+                    if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) ) {
+                        innerList.add(im);
+                    }
+                }else{
+                    if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) &&
+                            MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))) {
+                        innerList.add(im);
+                    }
                 }
+
             }
             om.put("detailList", innerList);
             om.put("stmt_begndate", MapUtils.get(map, "startDate"));

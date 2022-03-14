@@ -486,12 +486,6 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         sb.append("http://" + drgIp + "/drg_web/drgGroupThird/drg_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
-        sb.append("&");
-        sb.append("dept_code=");
-        sb.append(map.get("deptCode"));
-        sb.append("&");
-        sb.append("doctor_id=");
-        sb.append(map.get("doctorId"));
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
@@ -520,13 +514,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         // http://172.18.23.18:8080/drg_web/drgGroupThird/dig_paper/list.action
         sb.append("http://" + dipip + "/drg_web/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
-        sb.append(inptVisitDTO.getVisitId());
-        sb.append("&");
-        sb.append("dept_code=");
-        sb.append(map.get("deptCode"));
-        sb.append("&");
-        sb.append("doctor_id=");
-        sb.append(map.get("doctorId"));
+        sb.append(inptVisitDTO.getVisitId());// 住院号
         String URL = sb.toString();
 //        String html = HttpConnectUtil.doGet(URL);
         Map resultMap = new HashMap();

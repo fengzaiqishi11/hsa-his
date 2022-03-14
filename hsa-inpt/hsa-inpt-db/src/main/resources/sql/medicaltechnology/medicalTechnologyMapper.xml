@@ -181,4 +181,8 @@
             #{code}
         </foreach>
     </select>
+    <select id="getVisitDTOById" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select id,in_no as inNo
+         from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
+    </select>
 </mapper>

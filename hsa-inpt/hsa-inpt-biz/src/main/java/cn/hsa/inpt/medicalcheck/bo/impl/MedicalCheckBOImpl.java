@@ -11,6 +11,8 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptDiagnoseDO;
 import cn.hsa.module.inpt.medicalcheck.bo.MedicalCheckBO;
 import cn.hsa.module.inpt.medicaltechnology.dao.MedicalTechnologyDAO;
+import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
@@ -47,6 +49,8 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
 
     @Resource
     private MedicalTechnologyDAO medicalTechnologyDAO;
+    @Resource
+    private OperInfoRecordDAO operInfoRecordDAO;
 
     @Override
     public Map getBeforeCheckAdvice(Map<String, Object> map) {
@@ -309,7 +313,20 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
                 sb.append(collect.get(inptDiagnoseDTO.getDiseaseId()).getNationCode());
             }
         }
-
+        OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
+        operInfoRecordDTO.setHospCode(inptVisitDTO.getHospCode());
+        operInfoRecordDTO.setVisitId(inptVisitDTO.getId());
+        List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
+        i =1;
+        for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+            sb.append("&");
+            sb.append("ssjczbm"+i+"=");
+            sb.append(operInfoRecord.getOperDiseaseIcd9());
+            sb.append("&");
+            sb.append("ssjczmc"+i+"=");
+            sb.append(operInfoRecord.getOperDiseaseName());
+            i++;
+        }
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
@@ -413,7 +430,20 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
                 sb.append(collect.get(inptDiagnoseDTO.getDiseaseId()).getNationCode());
             }
         }
-
+        OperInfoRecordDTO operInfoRecordDTO = new OperInfoRecordDTO();
+        operInfoRecordDTO.setHospCode(inptVisitDTO.getHospCode());
+        operInfoRecordDTO.setVisitId(inptVisitDTO.getId());
+        List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
+        i =1;
+        for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+            sb.append("&");
+            sb.append("ssjczbm"+i+"=");
+            sb.append(operInfoRecord.getOperDiseaseIcd9());
+            sb.append("&");
+            sb.append("ssjczbm"+i+"=");
+            sb.append(operInfoRecord.getOperDiseaseName());
+            i++;
+        }
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
@@ -456,12 +486,6 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         sb.append("http://" + drgIp + "/drg_web/drgGroupThird/drg_paper/list.action");
         sb.append("?visit_id=");
         sb.append(inptVisitDTO.getVisitId());
-        sb.append("&");
-        sb.append("dept_code=");
-        sb.append(map.get("deptCode"));
-        sb.append("&");
-        sb.append("doctor_id=");
-        sb.append(map.get("doctorId"));
         String URL = sb.toString();
         Map resultMap = new HashMap();
         resultMap.put("success", "1");
@@ -490,13 +514,7 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         // http://172.18.23.18:8080/drg_web/drgGroupThird/dig_paper/list.action
         sb.append("http://" + dipip + "/drg_web/drgGroupThird/dip_paper/list.action");
         sb.append("?visit_id=");
-        sb.append(inptVisitDTO.getVisitId());
-        sb.append("&");
-        sb.append("dept_code=");
-        sb.append(map.get("deptCode"));
-        sb.append("&");
-        sb.append("doctor_id=");
-        sb.append(map.get("doctorId"));
+        sb.append(inptVisitDTO.getVisitId());// 住院号
         String URL = sb.toString();
 //        String html = HttpConnectUtil.doGet(URL);
         Map resultMap = new HashMap();

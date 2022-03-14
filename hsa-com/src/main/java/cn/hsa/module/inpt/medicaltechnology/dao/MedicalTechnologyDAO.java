@@ -47,4 +47,6 @@ public interface MedicalTechnologyDAO {
 	int getConfirmCost(InptVisitDTO inptVisitDTO);
 
     List<SysParameterDTO> getParameterValue(@Param("hospCode") String hospCode, @Param("code") String[] code);
+
+    InptVisitDTO getVisitDTOById(InptVisitDTO inptVisitDTO);
 }

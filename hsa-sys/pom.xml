@@ -19,8 +19,8 @@
         <module>hsa-sys-biz</module>
         <module>hsa-sys-db</module>
         <module>hsa-sys-generic</module>
-        <module>hsa-sys-tencent</module>
-        <module>hsa-sys-ali</module>
+<!--        <module>hsa-sys-tencent</module>-->
+<!--        <module>hsa-sys-ali</module>-->
     </modules>
 
     <dependencies>

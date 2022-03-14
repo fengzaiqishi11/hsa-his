@@ -950,7 +950,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());

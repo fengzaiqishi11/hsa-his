@@ -1,8 +1,8 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
-import cn.hsa.enums.FunctionEnum;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
@@ -12,8 +12,11 @@ import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.*;
-import com.alibaba.fastjson.JSON;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +70,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		InsureConfigurationDTO dto = new InsureConfigurationDTO();
 		dto.setHospCode((String) params.get("hospCode"));
 		InsureIndividualBasicDTO insureIndividualBasicDTO = (InsureIndividualBasicDTO) params.get("insureIndividualBasicDTO");
-		String regCode = null;
+		String regCode;
 		if (insureIndividualBasicDTO != null) {
 			regCode = insureIndividualBasicDTO.getInsureRegCode();
 		} else {
@@ -81,11 +84,6 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		if (insureConfigurationDTO == null) {
 			throw new AppException("未查询到就诊地医保区划");
 		}
-		Map<String, Object> inputMap = new HashMap<>();
-		Map<String, Object> dataMap = new HashMap<>();
-		String functionCode = "1101";
-		inputMap.put("infno", functionCode);  // 交易编号
-		inputMap.put("medins_code",  insureConfigurationDTO.getOrgCode()); // 医疗机构编码
 		Map<String, Object> visitMap = new HashMap<>();
 		String mdtrtCertType = insureIndividualBasicDTO.getBka895();
 		//  电子凭证 - 需根据各市政策需要选择性传值 add 2021-06-16 by liaojiguang QrCodePolicy
@@ -147,10 +145,6 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		String medType = insureIndividualBasicDTO.getAka130();
 		visitMap.put("med_type", medType);
 		visitMap.put("med_mdtrt_type", insureIndividualBasicDTO.getBka006());
-		dataMap.put("data", visitMap);
-		inputMap.put("input", dataMap);  // 入参具体数据
-		inputMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());  // 就医地医保区划
-		inputMap.put("insur_code", insureConfigurationDTO.getRegCode());  // 医保中心编码
 		/*if("03".equals(mdtrtCertType)){
 			if(StringUtils.isEmpty(insureIndividualBasicDTO.getInsuplc_admdvs())){
 				inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
@@ -160,25 +154,18 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		}else{
 			inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
 		}*/
-		inputMap.put("insuplc_admdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); //参保地医保区划分
 
-		String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
-		inputMap.put("msgid", omsgId);
-		String url = insureConfigurationDTO.getUrl();
-		String json = JSONObject.toJSONString(inputMap);
-
-		params.put("medisCode",medisCode);
-		params.put("msgId",omsgId);
-		params.put("msgInfo",functionCode);
-		params.put("msgName","医保个人信息获取");
+		Map<String, Object> paramMap = new HashMap<>();
+		paramMap.putAll(params);
+		paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
+		paramMap.put("configRegCode", regCode);
+		paramMap.put("dataMap", visitMap);
 		if (Constants.SF.F.equals(MapUtils.get(params,"isHospital"))) {
 			params.put("isHospital",Constants.SF.F) ;
 		}else{
 			params.put("isHospital",Constants.SF.S) ;
 		}
-		params.put("paramMapJson",json);
-
-		Map<String, Object> resultMap = insureItfBO.executeInsur(omsgId,url, FunctionEnum.INSUR_BASE_INFO,json,params);
+		Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, paramMap);
 //		logger.info("统一支付平台获取人员信息 [1101] 入参====>");
 //		logger.info(json);
 //		// 调用统一支付平台接口

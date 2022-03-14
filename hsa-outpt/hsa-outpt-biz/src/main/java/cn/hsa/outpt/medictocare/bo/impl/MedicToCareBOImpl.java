@@ -161,7 +161,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
     //补充数据,患者信息数据
     private void handeleVisit(Map<String, Object> visitInfo, MedicToCareDTO medicToCareDTO) {
         String hospCode = medicToCareDTO.getHospCode();
-        String orgId = "1001";
+        String orgId = medicToCareDTO.getApplyCompanyCode();
         try {
             hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
             orgId = RSAUtil.encryptByPublicKey(orgId.getBytes(),this.publicKey);

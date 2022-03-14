@@ -20,8 +20,8 @@
         <module>hsa-inpt-biz</module>
         <module>hsa-inpt-db</module>
         <module>hsa-inpt-generic</module>
-        <module>hsa-inpt-tencent</module>
-        <module>hsa-inpt-ali</module>
+<!--        <module>hsa-inpt-tencent</module>-->
+<!--        <module>hsa-inpt-ali</module>-->
     </modules>
 
     <dependencies>

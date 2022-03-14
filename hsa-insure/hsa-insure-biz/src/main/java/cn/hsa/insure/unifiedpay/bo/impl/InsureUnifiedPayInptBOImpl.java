@@ -875,7 +875,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if (Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)) {
             dataMap.put("mdtrt_cert_type",bka895);// 就诊凭证类型
             dataMap.put("mdtrt_cert_no",bka896); // 就诊凭证编号
-            dataMap.put("card_sn",cardIden); // 就诊凭证编号
+            if("03".equals(bka895)){
+                dataMap.put("card_sn",cardIden); // 就诊凭证编号
+            }
         }
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMap.get("costStr").toString()));

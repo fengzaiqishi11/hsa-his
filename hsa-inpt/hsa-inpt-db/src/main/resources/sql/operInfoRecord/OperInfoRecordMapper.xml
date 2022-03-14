@@ -288,7 +288,7 @@
             resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
         select
         a.id, a.hosp_code, a.visit_id, a.baby_id, a.in_no, a.advice_id, a.name, a.gender_code, a.age, a.age_unit_code, a.blood_code, a.dept_id, a.oper_dept_id, a.bed_id, a.bed_name,
-        a.oper_disease_id, a.oper_disease_icd9, a.oper_disease_name, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.doctor_id, a.doctor_name,
+        a.oper_disease_id, ifnull((select code from base_disease c where c.name =a.oper_disease_name and c.hosp_code =#{hospCode} limit 1),a.oper_disease_icd9) as oper_disease_icd9, a.oper_disease_name, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.doctor_id, a.doctor_name,
         a.assistant_id1, a.assistant_name1, a.assistant_id2, a.assistant_name2, a.assistant_id3, a.assistant_name3, a.special_request, a.content,
         a.audit_id, a.audit_name, a.audit_time, a.audit_remark,  a.oper_plan_time,
         a.oper_room_Id, a.oper_room_name, a.xh_nurse_id, a.xh_nurse_name,

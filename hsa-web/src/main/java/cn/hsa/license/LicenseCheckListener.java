@@ -1,15 +1,17 @@
 package cn.hsa.license;
 
-import com.powersi.common.utils.StringUtils;
 import lombok.SneakyThrows;
+import org.eclipse.jetty.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.net.MalformedURLException;
 
 /**
@@ -21,7 +23,7 @@ import java.net.MalformedURLException;
  */
 @Component
 public class LicenseCheckListener implements ApplicationListener<ContextRefreshedEvent> {
-	private Logger logger = LoggerFactory.getLogger("upay_client_start");
+	private Logger logger = LoggerFactory.getLogger(getClass());
     /**
      * 证书subject
      */
@@ -62,22 +64,20 @@ public class LicenseCheckListener implements ApplicationListener<ContextRefreshe
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         //root application context 没有parent
-        ApplicationContext context = event.getApplicationContext().getParent();
-        if(context == null){
-            if(StringUtils.isNotBlank(licensePath)){
-            	logger.info("类加载的根路径:"+this.getClass().getResource("/").getPath());
-                logger.info("++++++++ 开始安装证书 ++++++++");
+        if(StringUtil.isNotBlank(licensePath)){
+            logger.info("类加载的根路径:"+this.getClass().getResource("/").getPath());
+            logger.info("++++++++ 开始安装证书 ++++++++");
 
-                LicenseVerifyParam param = getParam();
-                LicenseVerify licenseVerify = new LicenseVerify();
-                //安装证书
-                licenseVerify.install(param);
+            LicenseVerifyParam param = getParam();
+            LicenseVerify licenseVerify = new LicenseVerify();
+            //安装证书
+            licenseVerify.install(param);
 
-                logger.info("++++++++ 证书安装结束 ++++++++");
-            } else {
-            	 throw new RuntimeException("++++++++ 证书配置错误 ++++++++");
-            }
+            logger.info("++++++++ 证书安装结束 ++++++++");
+        } else {
+             throw new RuntimeException("++++++++ 证书配置错误 ++++++++");
         }
+
     }
 
     public LicenseVerifyParam getParam() throws MalformedURLException {

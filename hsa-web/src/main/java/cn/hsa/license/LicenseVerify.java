@@ -1,6 +1,6 @@
 package cn.hsa.license;
 
-import com.powersi.common.utils.DateUtils;
+import cn.hsa.util.DateUtils;
 import de.schlichtherle.license.CipherParam;
 import de.schlichtherle.license.DefaultCipherParam;
 import de.schlichtherle.license.DefaultLicenseParam;
@@ -100,7 +100,7 @@ public class LicenseVerify {
             //如果是 过期,提醒十天后停止服务
             if(e.getMessage().contains("exc.licenseHasExpired")){
                 Date notAfter = LicenseManagerHolder.getDate(null);
-                int diff = DateUtils.differentDays(notAfter,DateUtils.getNowDate());
+                int diff = DateUtils.differentDays(notAfter,DateUtils.getNow());
                 if(diff < licenseValidTime){
                     logger.info(MessageFormat.format("证书已过期，证书有效期：{0} 止。您还可以临时使用 {1} 天，请及时更新证书。",format.format(notAfter), String.valueOf(licenseValidTime-diff)));
                     licenseValid = 1;

@@ -34,6 +34,7 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(16);
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
+
         // 人员编号
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         // 险种类型
@@ -44,6 +45,15 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         dataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
         // 就诊凭证编号
         dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());
+        // 传值社保卡识别码
+        dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden());
+        dataMap.put("psn_cert_type", "1");
+        // 传值证件号码
+        dataMap.put("certno", insureIndividualVisitDTO.getAac002());
+        // 人员类别
+        dataMap.put("psn_type", insureIndividualVisitDTO.getBka035());
+        // 姓名
+        dataMap.put("psn_name", insureIndividualVisitDTO.getAac003());
         // 住院/门诊号
         dataMap.put("ipt_otp_no", insureIndividualVisitDTO.getVisitNo());
         // 医师编码
@@ -54,16 +64,6 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         dataMap.put("dept_code", insureIndividualVisitDTO.getVisitDrptId());
         // 科室名称
         dataMap.put("dept_name", insureIndividualVisitDTO.getVisitDrptName());
-        // 传值社保卡识别码
-        dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden());
-        dataMap.put("psn_cert_type", "1");
-        // 传值证件号码
-        dataMap.put("certno", insureIndividualVisitDTO.getAac002());
-        // 读卡就诊基本信息
-        dataMap.put("hcardBasinfo", insureIndividualVisitDTO.getHcardBasinfo());
-        // 读卡就诊校验信息
-        dataMap.put("hcardChkinfo", insureIndividualVisitDTO.getHcardChkinfo());
-
         String hospCode = MapUtils.get(map, "hospCode");
         Map deptMap = new HashMap(2);
         deptMap.put("hospCode", hospCode);
@@ -77,10 +77,7 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         // 校验参数
         checkRequest(dataMap);
         // 组装参数
-        Map<String, Object> inputMap = new HashMap<>(2);
-        inputMap.put("data", dataMap);
-        inputMap.put("agnterinfo", initAgnterinfoMap());
-        map.put("input", inputMap);
+        map.put("dataMap", dataMap);
         return getInsurCommonParam(map);
     }
 
@@ -91,18 +88,6 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
             throw new BizRtException(-1, "该" + MapUtils.get(param, "dr_name") + "医生的医师编码没有维护,请先去用户管理里面维护");
         }
         return true;
-    }
-
-    private Map<String, Object> initAgnterinfoMap() {
-        Map<String, Object> agnterinfoMap = new HashMap<>(7);
-        agnterinfoMap.put("agnter_name", "");
-        agnterinfoMap.put("agnter_rlts", "");
-        agnterinfoMap.put("agnter_cert_type", "");
-        agnterinfoMap.put("agnter_certno", "");
-        agnterinfoMap.put("agnter_tel", "");
-        agnterinfoMap.put("agnter_addr", "");
-        agnterinfoMap.put("agnter_photo", "");
-        return agnterinfoMap;
     }
 
 }

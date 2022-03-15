@@ -145,6 +145,8 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
 //        medicToCareDTO.setGenderCode("男".equals(medicToCareDTO1.getGenderCode())?"1":"女".equals(medicToCareDTO1.getGenderCode())?"2":"");
         //性别（XB）
         medicToCareDTO.setGenderCode(medicToCareDTO1.getGenderCode());
+//        是否入住等待就诊回写is_house
+        medicToCareDTO.setIsHouse("0");
         //年龄
         medicToCareDTO.setAge(medicToCareDTO1.getAge());
         //年龄单位（NLDW）
@@ -189,7 +191,6 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         visitInfo.put("remark",StringUtils.isEmpty(medicToCareDTO.getRemark())?"":medicToCareDTO.getRemark());
         //是否入住（SF）
         visitInfo.put("whether_checkin",StringUtils.isEmpty(medicToCareDTO.getIsHouse())?"1":medicToCareDTO.getIsHouse());
-        medicToCareDTO.setIsHouse(MapUtils.get(visitInfo,"whether_checkin"));
         //实际入住时间
         visitInfo.put("checkin_data",medicToCareDTO.getRealityInTime());
 //        visitInfo.put("checkin_date",medicToCareDTO.getHopeInTime());

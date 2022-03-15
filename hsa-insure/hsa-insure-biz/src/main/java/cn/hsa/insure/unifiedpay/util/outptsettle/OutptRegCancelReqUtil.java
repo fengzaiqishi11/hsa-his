@@ -5,7 +5,6 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.util.MapUtils;
-import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,21 +22,15 @@ public class OutptRegCancelReqUtil<T> extends InsureCommonUtil implements BaseRe
 
     @Override
     public String initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
-
-        Map<String, Object> dataMap = new HashMap<>();
+        Map map = (Map) param;
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
-        // 就诊ID
-        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        Map<String, Object> dataMap = new HashMap<>(3);
         // 人员编号
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        // 就诊ID
+        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         // 住院/门诊号
         dataMap.put("ipt_otp_no", insureIndividualVisitDTO.getVisitNo());
-        // 就诊凭证号
-        dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());
-        // 就诊类型
-        dataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType());
         // 校验参数
         checkRequest(dataMap);
         map.put("dataMap", dataMap);

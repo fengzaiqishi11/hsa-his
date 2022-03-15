@@ -924,7 +924,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("medins_diag_code","");// 医疗机构疾病诊断
         dataMap.put("medins_first_asist_diag","");// 医疗机构第一副诊断
         dataMap.put("medins_secd_asist_diag","");// 医疗机构第二副诊断
-        dataMap.put("card_sn","");//卡识别码
+//        dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
         dataMap.put("mdtrt_mode","0");// 就诊方式
         dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息

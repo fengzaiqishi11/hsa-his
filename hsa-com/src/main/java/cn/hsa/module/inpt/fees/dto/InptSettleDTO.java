@@ -130,4 +130,9 @@ public class InptSettleDTO extends InptSettleDO implements Serializable {
          * 出院时间
          */
         private String outTime;
+
+        /**
+         * 身份证号码
+         */
+        private String certNo;
 }

@@ -525,6 +525,7 @@
         e.jz_doctor_name,-- 经治医生
         e.zg_doctor_name,-- 主管医生
         e.out_time as outTime,
+        e.cert_no as certNo,
         ifnull(f.hosp_exem_amount, 0.00) as hospExemAmount,
         ifnull(a.credit_price, 0) as creditPrice
         FROM

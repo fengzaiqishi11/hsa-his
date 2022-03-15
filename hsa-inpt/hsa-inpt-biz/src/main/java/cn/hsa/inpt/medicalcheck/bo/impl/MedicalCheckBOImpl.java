@@ -319,6 +319,10 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
         i =1;
         for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+            if(StringUtils.isEmpty(operInfoRecord.getOperDiseaseIcd9()) || StringUtils.isEmpty(operInfoRecord.getOperDiseaseName())){
+                continue;
+            }
+
             sb.append("&");
             sb.append("ssjczbm"+i+"=");
             sb.append(operInfoRecord.getOperDiseaseIcd9());
@@ -436,6 +440,11 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
         i =1;
         for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+
+            if(StringUtils.isEmpty(operInfoRecord.getOperDiseaseIcd9()) || StringUtils.isEmpty(operInfoRecord.getOperDiseaseName())){
+                continue;
+            }
+
             sb.append("&");
             sb.append("ssjczbm"+i+"=");
             sb.append(operInfoRecord.getOperDiseaseIcd9());

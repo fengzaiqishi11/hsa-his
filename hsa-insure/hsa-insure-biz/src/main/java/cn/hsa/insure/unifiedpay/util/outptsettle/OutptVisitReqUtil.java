@@ -45,7 +45,7 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         dataMap.put("diseinfo", initMapList(map));
         // 校验参数
         checkRequest(dataMap);
-        map.put("dataMap", dataMap);
+        map.put("input", dataMap);
         return getInsurCommonParam(map);
     }
 
@@ -58,45 +58,36 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
         JSONArray jsonArray = MapUtils.get(map, "jsonArray");
         // 封装患者信息
-        Map<String, Object> patientInfo = new HashMap<>(13);
-        // 就诊id Y
+        Map<String, Object> patientInfo = new HashMap<>(10);
+        // 就诊id
         patientInfo.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
-        // 人员编号 Y
+        // 人员编号
         patientInfo.put("psn_no", insureIndividualVisitDTO.getAac001());
-        // TODO 医疗类别 Y
+        // 医疗类别
         patientInfo.put("med_type", insureIndividualVisitDTO.getAka130());
-        // 开始时间 Y
+        // 开始时间
         patientInfo.put("begntime", DateUtils.format(insureIndividualVisitDTO.getVisitTime(), DateUtils.Y_M_DH_M_S));
         // TODO 主要病情
         patientInfo.put("main_cond_dscr", "");
-        // TODO 计划生育手术类别
-        patientInfo.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());
-        // TODO 计划生育手术或生育日期
-        patientInfo.put("birctrl_matn_date", insureIndividualVisitDTO.getBirctrlMatnDate());
-        // TODO 生育类别
-        patientInfo.put("matn_type", insureIndividualVisitDTO.getMatnType());
-        // TODO 孕周数
-        patientInfo.put("geso_val", "");
-        // TODO 是否第三方责任申请
-        patientInfo.put("ttp_resp", "");
-        // TODO 是否第三方责任申请
-        patientInfo.put("expi_gestation_nub_of_m", "");
-
         if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
-            // TODO 病种编号
+            // 病种编号
             patientInfo.put("dise_code", jsonArray.getJSONObject(0).get("insureIllnessCode"));
-            // add by ljg 病种编号
+            // 病种编号
             patientInfo.put("dise_codg", jsonArray.getJSONObject(0).get("insureIllnessCode"));
-            // TODO 病种名称
+            //病种名称
             patientInfo.put("dise_name", jsonArray.getJSONObject(0).get("insureIllnessName"));
         } else {
-            // TODO 病种编号
+            // 病种编号
             patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006());
-            // add by ljg 病种编号
+            // 病种编号
             patientInfo.put("dise_codg", insureIndividualVisitDTO.getBka006());
-            // TODO 病种名称
+            // 病种名称
             patientInfo.put("dise_name", insureIndividualVisitDTO.getBka006Name());
         }
+        // 计划生育手术类别
+        patientInfo.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());
+        // 计划生育手术或生育日期
+        patientInfo.put("birctrl_matn_date", insureIndividualVisitDTO.getBirctrlMatnDate());
         return patientInfo;
     }
 
@@ -116,39 +107,38 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         commonHandlerDisease(diagnoseDTOList, data);
         // 封装诊断信
         for (int i = 0; i < diagnoseDTOList.size(); i++) {
-            Map<String, Object> diagnoseMap = new HashMap<>();
-            // TODO 诊断类别
+            Map<String, Object> diagnoseMap = new HashMap<>(10);
+            // 诊断类别
             diagnoseMap.put("diag_type", data.get(i).getTypeCode());
-            // TODO 诊断排序号
+            // 诊断排序号
             diagnoseMap.put("diag_srt_no", i + 1);
-            //  诊断代码
+            // 诊断代码
             diagnoseMap.put("diag_code", diagnoseDTOList.get(i).getInsureInllnessCode());
-            //  诊断名称
+            // 诊断名称
             diagnoseMap.put("diag_name", diagnoseDTOList.get(i).getInsureInllnessName());
-            //  诊断科室
+            // 诊断科室
             diagnoseMap.put("diag_dept", diagnoseDTOList.get(i).getInDeptName());
             if ("1".equals(diagnoseDTOList.get(i).getIsMain())) {
-                diagnoseMap.put("maindiag_flag", "1");
-                // TODO 诊断类别
+                // 诊断类别
                 diagnoseMap.put("diag_type", "1");
             }
             if (StringUtils.isEmpty(diagnoseDTOList.get(i).getPracCertiNo())) {
-                //  诊断医生编码
+                // 诊断医生编码
                 diagnoseMap.put("dise_dor_no", doctorId);
             } else {
-                //  诊断医生编码
+                // 诊断医生编码
                 diagnoseMap.put("dise_dor_no", diagnoseDTOList.get(i).getPracCertiNo());
             }
             if (StringUtils.isEmpty(diagnoseDTOList.get(i).getZzDoctorName())) {
-                //  诊断医生编码
+                // 诊断医生编码
                 diagnoseMap.put("dise_dor_name", doctorName);
             } else {
                 // 诊断医生姓名
                 diagnoseMap.put("dise_dor_name", diagnoseDTOList.get(i).getZzDoctorName());
             }
-            //  诊断时间
+            // 诊断时间
             diagnoseMap.put("diag_time", DateUtils.format(diagnoseDTOList.get(i).getCrteTime(), DateUtils.Y_M_DH_M_S));
-            // TODO 有效标志
+            // 有效标志
             diagnoseMap.put("vali_flag", Constants.SF.S);
             mapList.add(diagnoseMap);
         }

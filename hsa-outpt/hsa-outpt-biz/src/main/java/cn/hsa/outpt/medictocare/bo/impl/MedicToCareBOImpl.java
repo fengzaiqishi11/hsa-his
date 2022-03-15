@@ -189,6 +189,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         visitInfo.put("remark",StringUtils.isEmpty(medicToCareDTO.getRemark())?"":medicToCareDTO.getRemark());
         //是否入住（SF）
         visitInfo.put("whether_checkin",StringUtils.isEmpty(medicToCareDTO.getIsHouse())?"1":medicToCareDTO.getIsHouse());
+        medicToCareDTO.setIsHouse(MapUtils.get(visitInfo,"whether_checkin"));
         //实际入住时间
         visitInfo.put("checkin_data",medicToCareDTO.getRealityInTime());
 //        visitInfo.put("checkin_date",medicToCareDTO.getHopeInTime());

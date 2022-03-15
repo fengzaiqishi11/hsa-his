@@ -30,6 +30,8 @@ public class InsureCommonUtil {
         // 就医地医保区划
         httpMap.put("mdtrtarea_admvs", map.get("mdtrtareaAdmvs"));
         httpMap.put("msgid", map.get("msgId"));
+        httpMap.put("opter", map.get("opter"));
+        httpMap.put("opter_name", map.get("opter_name"));
         httpMap.put("input", MapUtils.isEmpty(map.get("input")) ? getInputMap(map) : map.get("input"));
         return JSONObject.toJSONString(httpMap);
     }

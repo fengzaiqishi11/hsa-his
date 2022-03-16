@@ -951,6 +951,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             dataMap.put("endtime",""); // 业务结束时间
         }
 
+        // 证件类型
+        dataMap.put("psn_cert_type",inptVisitDTO.getCertCode());
+        dataMap.put("certno",insureIndividualVisitDTO.getAac002());// 就诊方式
+        dataMap.put("psn_name",inptVisitDTO.getName());// 持卡就诊基本信息
+        dataMap.put("psn_type",insureIndividualVisitDTO.getBka035());
+
+
         String redisKey = new StringBuilder().append(hospCode).append("-").append(functionCode).append("-")
                 .append(visitId).append("-").append(psnNo).toString();
         if(redisUtils.hasKey(redisKey)){

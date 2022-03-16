@@ -145,6 +145,11 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, Object> str = new HashMap<String, Object>();
         List<String> adviceList = new ArrayList<String>();
         List<InptCostDTO> inptCostDTOS = MapUtils.get(map, "inptCostDTOS");
+
+        if(ListUtils.isEmpty(inptCostDTOS)){
+            throw new AppException("未获取到相关费用信息!");
+        }
+
         List<Map<String, String>> costList = new ArrayList<>();
         for (InptCostDTO inptCostDTO : inptCostDTOS) {
             if (StringUtils.isEmpty(inptCostDTO.getVisitId())) {

@@ -65,8 +65,8 @@ public class HospitalIncomeSheetBOImpl implements ReportBusinessBO {
             throw new RuntimeException("收入统计无数据，请重新时间范围！");
         }
         map.put("title", title);
-        map.put("fileName", title);
-        map.put("feeItemList", tempCode+hospCode+map.get("crteId"));
+        map.put("fileName", tempCode+hospCode+map.get("crteId"));//
+        map.put("feeItemList", feeItemList);
         map.put("tempCode", tempCode);
         return map;
     }

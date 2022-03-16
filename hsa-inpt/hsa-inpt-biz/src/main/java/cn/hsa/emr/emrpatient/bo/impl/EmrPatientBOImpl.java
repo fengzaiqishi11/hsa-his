@@ -727,7 +727,13 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         }
         // 如果配置为不需要送审就能编辑
         if (sys != null && StringUtils.isNotEmpty(sys.getValue()) && "2".equals(sys.getValue())) {
-            List<SysUserDTO> list = emrPatientDAO.getDeptUsers(temp);
+            List<SysUserDTO> list =null;
+            if (editSysDto!=null&&StringUtils.isNotEmpty(editSysDto.getValue()) && "1".equals(editSysDto.getValue())) {
+                list = emrPatientDAO.getDeptUsers(temp);
+            }else {
+                list = emrPatientDAO.getDiffDeptUsers(temp);
+            }
+            //List<SysUserDTO> list = emrPatientDAO.getDeptUsers(temp);
             if (list != null && list.size() > 0) {
                 // 1、查询病历是否归档
                 EmrArchiveLoggingDTO emrArchiveLoggingDTO = new EmrArchiveLoggingDTO();

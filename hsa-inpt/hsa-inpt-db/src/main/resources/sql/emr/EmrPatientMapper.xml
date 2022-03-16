@@ -356,6 +356,15 @@
         </if>
     </select>
 
+    <select id="getDiffDeptUsers" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
+        SELECT s.id, s.code,s.name FROM sys_user s,
+        (select b.dept_code, a.work_type_code, a.hosp_code
+        from sys_user a right join sys_user_system b on a.code = b.user_code and a.hosp_code = b.hosp_code
+        where a.id = #{crteId} and a.hosp_code = #{hospCode}) u,
+        sys_user_system sy
+        where s.code = sy.user_code and s.hosp_code = u.hosp_code and s.work_type_code &lt;= u.work_type_code
+    </select>
+
     <!-- 根据用户id查询用户信息 -->
     <select id="getSysUserDTO" resultType="cn.hsa.module.sys.user.dto.SysUserDTO">
         select * from sys_user where id = #{userId} and hosp_code = #{hospCode}

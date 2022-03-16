@@ -1,0 +1,6 @@
+FROM java:8
+RUN groupadd --gid 5000 app &&  useradd --home-dir /home/app --create-home --uid 5000 --gid 5000  app
+USER app
+WORKDIR /
+ADD /hsa-interf.jar /
+ENTRYPOINT ["java","-jar","/hsa-interf.jar"]

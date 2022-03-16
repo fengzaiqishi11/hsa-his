@@ -1,0 +1,26 @@
+version: '3'
+services:
+# 定时任务
+  hsa-cron:
+    image: image-xxl-job-executor:1.0
+    container_name: cont-hsa-cron
+    ports:
+      - "8902:8902"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=nginx:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://nginx:8848
+    networks:
+     custom_net:
+      ipv4_address: 172.21.0.101
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

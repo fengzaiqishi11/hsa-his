@@ -46,7 +46,7 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     /**
      * 调用的url
      */
-    @Value("${caretomedic.url}")
+    @Value("${caretomedic.url:powersi.com}")
     private String url;
     /**
      * 本地建档服务

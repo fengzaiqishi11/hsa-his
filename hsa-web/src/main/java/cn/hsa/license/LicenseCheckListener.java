@@ -71,7 +71,7 @@ public class LicenseCheckListener implements ApplicationListener<ContextRefreshe
             LicenseVerifyParam param = getParam();
             LicenseVerify licenseVerify = new LicenseVerify();
             //安装证书
-            licenseVerify.install(param);
+//            licenseVerify.install(param);
 
             logger.info("++++++++ 证书安装结束 ++++++++");
         } else {

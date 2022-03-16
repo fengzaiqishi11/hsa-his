@@ -1,0 +1,25 @@
+version: '3'
+services:
+# 定时任务后台管理
+  xxl-job-admin:
+    image: image-xxl-job-admin:1.0
+    container_name: cont-xxl-job-admin
+    ports:
+      - "8901:8901"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.datasource.url=jdbc:mysql://172.18.100.103:3306/xxl-job?Unicode=true&characterEncoding=UTF-8
+      - spring.datasource.username=root
+      - spring.datasource.password=root$$123
+    networks:
+      - custom_net
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

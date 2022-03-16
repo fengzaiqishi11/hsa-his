@@ -1,0 +1,90 @@
+version: '3'
+services:
+  # nacos-server服务注册与发现，配置中心服务
+  docker-nacos-1:
+    image: nacos/nacos-server:latest
+    container_name: nacos-server-1
+    hostname: docker-nacos-1
+    ports:
+      - "8860:8848"
+    restart: always
+    volumes:
+      - /app/logs/nacos1/:/home/nacos/logs
+    networks:
+      - custom_net
+    environment:
+      PREFER_HOST_MODE: hostname #如果支 持主机名可以使用hostname,否则使用ip，默认也是ip
+      NACOS_SERVERS: docker-nacos-1:8848 docker-nacos-2:8848 docker-nacos-3:8848
+      MYSQL_SERVICE_HOST: 172.18.100.103 #mysql配置，Master为主节点，Slave为从节点
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: Powersi$$123 
+      TIME_ZONE: Asia/Shanghai
+  docker-nacos-2:
+    image: nacos/nacos-server:latest
+    container_name: nacos-server-2
+    hostname: docker-nacos-2
+    ports:
+      - "8861:8848"
+    restart: always
+    volumes:
+      - /app/logs/nacos2/:/home/nacos/logs
+    networks:
+      - custom_net
+    environment:
+      PREFER_HOST_MODE: hostname #如果支 持主机名可以使用hostname,否则使用ip，默认也是ip
+      NACOS_SERVERS: docker-nacos-1:8848 docker-nacos-2:8848 docker-nacos-3:8848
+      MYSQL_SERVICE_HOST: 172.18.100.103 #mysql配置，Master为主节点，Slave为从节点
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: Powersi$$123
+      TIME_ZONE: Asia/Shanghai
+  docker-nacos-3:
+    image: nacos/nacos-server:latest
+    container_name: nacos-server-3
+    hostname: docker-nacos-3
+    ports:
+       - "8862:8848"
+    restart: always
+    environment:
+      PREFER_HOST_MODE: hostname #如果支持主机名可以使用hostname,否则使用ip，默认也是ip
+      NACOS_SERVERS: docker-nacos-1:8848 docker-nacos-2:8848 docker-nacos-3:8848
+      MYSQL_SERVICE_HOST: 172.18.100.103 #mysql配置，Ma ster为主节点，Slave为从节点
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_DB_NAME: nacos
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: Powersi$$123
+      TIME_ZONE: Asia/Shanghai
+    volumes:
+      - /app/logs/nacos3/:/home/nacos/logs
+    networks:
+      - custom_net
+   
+  nginx:
+    restart: always
+    image: 18684929379/nginx
+    container_name: nginx_1.17_nacos
+    ports:
+      - 8848:8848
+    networks:
+      - custom_net
+    volumes:
+      - /app/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /app/logs/nginx/:/var/log/nginx
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 65535
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1g"
+ 
+
+networks:
+  custom_net:
+    external:
+      name: app_net

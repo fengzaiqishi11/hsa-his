@@ -1,0 +1,27 @@
+version: '3'
+services:
+  # nacos-server服务注册与发现，配置中心服务
+  hsa-center:
+    image: image-hsa-center:1.0
+    container_name: cont-hsa-center
+    ports:
+      - "9001:9001"
+      - "29001:29001"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=nginx:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://nginx:8848
+    networks:
+     custom_net:
+      ipv4_address: 172.21.0.5
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/
+
+networks:
+  custom_net:
+    external:
+      name: app_net

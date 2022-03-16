@@ -202,6 +202,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         returnData.setFileName(fileName);
         returnData.setFileFormat(fileFormat);
         returnData.setKey(key);
+        returnData.setReturnDataType(returnDataType);
         switch (returnDataType) {
             case "1":
                 returnData.setReturnData(rUrl);

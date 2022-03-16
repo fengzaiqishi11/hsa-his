@@ -66,7 +66,7 @@ public class HospitalIncomeSheetBOImpl implements ReportBusinessBO {
         }
         map.put("title", title);
         map.put("fileName", title);
-        map.put("feeItemList", feeItemList);
+        map.put("feeItemList", tempCode+hospCode+map.get("crteId"));
         map.put("tempCode", tempCode);
         return map;
     }

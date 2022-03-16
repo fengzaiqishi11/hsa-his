@@ -50,11 +50,13 @@ public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUt
         // 卡识别码
         settleMap.put("card_sn", insureIndividualVisitDTO.getCardIden());
         // 证件类型
-        settleMap.put("psn_cert_type", "1");
+        settleMap.put("psn_cert_type", "01");
         // 身份证号
         settleMap.put("certno", insureIndividualVisitDTO.getAac002());
         // 人员类别
         settleMap.put("psn_type", insureIndividualVisitDTO.getBka035());
+        // 姓名
+        settleMap.put("psn_name", insureIndividualVisitDTO.getAac003());
         // 医疗类别
         settleMap.put("med_type", insureIndividualVisitDTO.getAka130());
         DecimalFormat df1 = new DecimalFormat("0.00");

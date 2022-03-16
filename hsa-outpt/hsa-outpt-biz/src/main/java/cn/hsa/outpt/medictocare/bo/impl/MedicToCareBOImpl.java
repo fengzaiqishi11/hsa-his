@@ -39,7 +39,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
     /**
      * 调用的url
      */
-    @Value("${medictocare.url}")
+    @Value("${medictocare.url:powersi.com}")
     private String url;
 
     private final String publicKey ="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCa+uU4fxL5Kc8u8gjeSBr5G0jKV0b8Qlo0i5sfh9kCpyNNxa7Oh/WjySZwvcIifKXz3M7Be9eJ4nYQgsxQvnOnS1zCZosce9gKAmnIafjAnxP2TU5rP7qLxmSvAY6Dk6xstr9sI6L5ZqIrDOw/gN32R6UHXtbx5NcKpnrVnb2p7wIDAQAB";
@@ -145,6 +145,8 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
 //        medicToCareDTO.setGenderCode("男".equals(medicToCareDTO1.getGenderCode())?"1":"女".equals(medicToCareDTO1.getGenderCode())?"2":"");
         //性别（XB）
         medicToCareDTO.setGenderCode(medicToCareDTO1.getGenderCode());
+//        是否入住等待就诊回写is_house
+        medicToCareDTO.setIsHouse("0");
         //年龄
         medicToCareDTO.setAge(medicToCareDTO1.getAge());
         //年龄单位（NLDW）
@@ -161,7 +163,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
     //补充数据,患者信息数据
     private void handeleVisit(Map<String, Object> visitInfo, MedicToCareDTO medicToCareDTO) {
         String hospCode = medicToCareDTO.getHospCode();
-        String orgId = "1001";
+        String orgId = medicToCareDTO.getApplyCompanyCode();
         try {
             hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
             orgId = RSAUtil.encryptByPublicKey(orgId.getBytes(),this.publicKey);

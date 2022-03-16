@@ -865,12 +865,19 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());// 人员编号
         dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型
         dataMap.put("mdtrt_cert_no",insureIndividualVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        if("03".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+            dataMap.put("card_sn",insureIndividualVisitDTO.getCardIden()); // 卡识别码
+        }
         String isReadCard = MapUtils.get(map,"isReadCard");
         String bka895 = MapUtils.get(map,"bka895");
         String bka896 = MapUtils.get(map,"bka896");
+        String cardIden = MapUtils.get(map,"cardIden");
         if (Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)) {
             dataMap.put("mdtrt_cert_type",bka895);// 就诊凭证类型
             dataMap.put("mdtrt_cert_no",bka896); // 就诊凭证编号
+            if("03".equals(bka895)){
+                dataMap.put("card_sn",cardIden); // 就诊凭证编号
+            }
         }
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMap.get("costStr").toString()));
@@ -917,7 +924,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("medins_diag_code","");// 医疗机构疾病诊断
         dataMap.put("medins_first_asist_diag","");// 医疗机构第一副诊断
         dataMap.put("medins_secd_asist_diag","");// 医疗机构第二副诊断
-        dataMap.put("card_sn","");//卡识别码
+//        dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
         dataMap.put("mdtrt_mode","0");// 就诊方式
         dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息
@@ -943,6 +950,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             dataMap.put("begntime",""); // 业务开始时间
             dataMap.put("endtime",""); // 业务结束时间
         }
+
+        // 证件类型
+        dataMap.put("psn_cert_type",inptVisitDTO.getCertCode());
+        dataMap.put("certno",insureIndividualVisitDTO.getAac002());// 就诊方式
+        dataMap.put("psn_name",inptVisitDTO.getName());// 持卡就诊基本信息
+        dataMap.put("psn_type",insureIndividualVisitDTO.getBka035());
+
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append(functionCode).append("-")
                 .append(visitId).append("-").append(psnNo).toString();

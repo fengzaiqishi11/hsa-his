@@ -46,7 +46,7 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     /**
      * 调用的url
      */
-    @Value("${caretomedic.url}")
+    @Value("${caretomedic.url:powersi.com}")
     private String url;
     /**
      * 本地建档服务
@@ -193,8 +193,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     private Map sendInfo(Map<String, Object> map){
         Map<String, Object> paramap = new HashMap<>();
         String hospCode = MapUtils.get(map, "hospCode");
-        //todo 需要获取值，暂时写死
-        String orgID = "1001";
+        //todo需要获取值，暂时写死SELECT `value` FROM sys_code_detail where c_code = 'ORG_CODE'
+        String orgID = medicToCareDAO.queryOrgCode(hospCode);
         try {
             hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
             orgID = RSAUtil.encryptByPublicKey(orgID.getBytes(),this.publicKey);

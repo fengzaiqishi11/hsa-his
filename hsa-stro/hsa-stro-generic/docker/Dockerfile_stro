@@ -1,0 +1,7 @@
+FROM java:8
+RUN groupadd --gid 5000 app &&  useradd --home-dir /home/app --create-home --uid 5000 --gid 5000  app
+USER app
+WORKDIR /
+ADD /hsa-stro.jar /
+EXPOSE 19007
+ENTRYPOINT ["java","-Xms1024m","-Xmx2048m","-XX:+UseG1GC","-XX:SurvivorRatio=3","-XX:CMSInitiatingOccupancyFraction=70","-XX:+HeapDumpOnOutOfMemoryError","-XX:HeapDumpPath=/logs/hsa-stro","-XX:+PrintGCDetails","-XX:+PrintGCTimeStamps","-XX:+UseGCLogFileRotation","-XX:NumberOfGCLogFiles=10","-XX:GCLogFileSize=10M","-Xloggc:/logs/hsa-stro/gc.log","-jar","/hsa-stro.jar"]

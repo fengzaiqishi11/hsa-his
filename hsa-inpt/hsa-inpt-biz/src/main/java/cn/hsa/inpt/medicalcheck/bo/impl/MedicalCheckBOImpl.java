@@ -145,6 +145,11 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         Map<String, Object> str = new HashMap<String, Object>();
         List<String> adviceList = new ArrayList<String>();
         List<InptCostDTO> inptCostDTOS = MapUtils.get(map, "inptCostDTOS");
+
+        if(ListUtils.isEmpty(inptCostDTOS)){
+            throw new AppException("未获取到相关费用信息!");
+        }
+
         List<Map<String, String>> costList = new ArrayList<>();
         for (InptCostDTO inptCostDTO : inptCostDTOS) {
             if (StringUtils.isEmpty(inptCostDTO.getVisitId())) {
@@ -319,6 +324,10 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
         i =1;
         for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+            if(StringUtils.isEmpty(operInfoRecord.getOperDiseaseIcd9()) || StringUtils.isEmpty(operInfoRecord.getOperDiseaseName())){
+                continue;
+            }
+
             sb.append("&");
             sb.append("ssjczbm"+i+"=");
             sb.append(operInfoRecord.getOperDiseaseIcd9());
@@ -436,6 +445,11 @@ public class MedicalCheckBOImpl extends HsafBO implements MedicalCheckBO {
         List<OperInfoRecordDTO> operInfoRecordDTOS = operInfoRecordDAO.queryOperInfoRecordList(operInfoRecordDTO);
         i =1;
         for (OperInfoRecordDTO operInfoRecord : operInfoRecordDTOS) {
+
+            if(StringUtils.isEmpty(operInfoRecord.getOperDiseaseIcd9()) || StringUtils.isEmpty(operInfoRecord.getOperDiseaseName())){
+                continue;
+            }
+
             sb.append("&");
             sb.append("ssjczbm"+i+"=");
             sb.append(operInfoRecord.getOperDiseaseIcd9());

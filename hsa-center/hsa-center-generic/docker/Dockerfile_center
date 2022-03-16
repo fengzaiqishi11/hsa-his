@@ -1,0 +1,7 @@
+FROM java:8
+RUN groupadd --gid 5000 app &&  useradd --home-dir /home/app --create-home --uid 5000 --gid 5000  app
+USER app
+WORKDIR /
+ADD /hsa-center.jar /
+EXPOSE 19001
+ENTRYPOINT ["java","-Xms1024m","-Xmx1024m","-XX:+HeapDumpOnOutOfMemoryError","-XX:HeapDumpPath=/logs/hsa-center","-jar","/hsa-center.jar"]

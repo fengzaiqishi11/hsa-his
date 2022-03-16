@@ -3,6 +3,7 @@ package cn.hsa.filter;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hutool.core.net.NetUtil;
 import com.alibaba.csb.utils.IPUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -28,13 +30,14 @@ import java.util.regex.Pattern;
  * @Author: luonianxin
  * @Date: 2021-10-25
  */
+@Configuration
 @Slf4j
 public class RequestParamFilter  extends OncePerRequestFilter {
 
     /** 请求白名单集合 **/
     private static final List<String> excludeList = new ArrayList<>();
 
-    static String reg = "(?:')|(?:--)|(/\\*(?:.|[\\n\\r])*?\\*/)|"
+    static final String reg = "(?:')|(?:--)|(/\\*(?:.|[\\n\\r])*?\\*/)|"
             + "(\\b(select|update|and|or|delete|insert|trancate|char|like|show|table|database|into|substr|ascii|declare|exec|count|master|into|drop|execute)\\b)";
 
     public RequestParamFilter(){
@@ -85,7 +88,7 @@ public class RequestParamFilter  extends OncePerRequestFilter {
      * @return 校验匹配结果
      */
     private boolean isParameterValid(HttpServletRequest request){
-        JSONObject bodyParams = getRequestBodyParam(request);
+        String bodyParams = getRequestBodyParam(request);
         if(bodyParams != null) {
             String bodyParamsString = bodyParams.toString();
             Matcher matcher = sqlPattern.matcher(bodyParamsString);
@@ -109,16 +112,16 @@ public class RequestParamFilter  extends OncePerRequestFilter {
     }
 
 
-    private JSONObject getRequestBodyParam(HttpServletRequest servletRequest){
-        JSONObject params = null;
+    private String getRequestBodyParam(HttpServletRequest servletRequest){
+        String params = null;
         try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(servletRequest.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(servletRequest.getInputStream(), StandardCharsets.UTF_8));
             String inptStr = null;
             StringBuilder sb = new StringBuilder();
 
             while((inptStr = reader.readLine()) != null)
                 sb.append(inptStr);
-            params = JSONObject.parseObject(sb.toString());
+            params = JSON.toJSONString(sb.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

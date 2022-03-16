@@ -83,7 +83,7 @@
                 start_date = #{startDate},
                 end_date = #{endDate},
             encrypt_end_date = #{encryptEndDate},
-            encrypt_start_date = #{encrypt_start_date}
+            encrypt_start_date = #{encryptStartDate}
         </set>
         where id = #{id}
     </update>

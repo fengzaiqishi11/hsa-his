@@ -147,6 +147,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			xzMap.put("bka035", insuinfoMap.get("psn_type"));  // 人员类别
 			list.get(0).put("bka008",MapUtils.get(insuinfoMap,"emp_name"));
 			list.get(0).put("aae140",MapUtils.get(insuinfoMap,"insutype"));
+			list.get(0).put("bka035",MapUtils.get(insuinfoMap,"psn_type"));
 			xzMap.put("bka008", insuinfoMap.get("emp_name"));  // 单位名称
 			xzMap.put("aae140", insuinfoMap.get("insutype"));  // 险种类型
 			xzMap.put("cvlserv_flag", insuinfoMap.get("cvlserv_flag"));  // 公务员标志

@@ -425,11 +425,22 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         individualSettleDTO.setState(Constants.SF.F);
         individualSettleDTO.setSettleState(Constants.SF.S);
         individualSettleDTO = insureIndividualSettleDAO.selectInsureSettInfo(individualSettleDTO);
+
+        map.put("msgName","结算信息查询");
+        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
+        map.put("visitId",visitId);
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            resultMap  = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
+        }catch (Exception e){
+
+        }
+        outptMap = MapUtils.get(resultMap, "output");
         /**
-         * 省外医保  接口无数据返回。只能查询本地保存的费用数据
+         * 社保卡登记患者  接口无数据返回 时 查询本地保存的费用数据
          */
 //        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
-        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType())) && StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
+        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType())) && StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay) && !outptMap.containsKey("setlinfo")) {
             Map<String, Object> setlinfoMap = insureIndividualSettleDAO.querySettleForMap(map);
             if(MapUtils.isEmpty(setlinfoMap)){
                 throw  new AppException("根据就诊id,结算id查询医保信息为空");
@@ -477,11 +488,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             map.put("outptMap", outptMap);
         }
         else {
-            map.put("msgName","结算信息查询");
-            map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
-            map.put("visitId",visitId);
-            Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
-            outptMap = MapUtils.get(resultMap, "output");
+
             Map<String,Object> setlinfo = MapUtils.get(outptMap,"setlinfo");
             InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
             insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());

@@ -72,8 +72,9 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     @Override
     public ReportReturnDataDTO saveBuild(Map map) {
         String hospCode = map.get("hospCode").toString();
+        String crteId = map.get("crteId").toString();
         String tempCode = map.get("tempCode").toString();
-        String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? hospCode : map.get("fileName").toString();
+        String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? tempCode+hospCode+crteId : map.get("fileName").toString();
         ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, tempCode);
         String customConfigStr = configuration.getCustomConfig().replace("\\", "").replace("\"{", "{").replace("}\"", "}");
         // 自定义配置
@@ -202,6 +203,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         returnData.setFileName(fileName);
         returnData.setFileFormat(fileFormat);
         returnData.setKey(key);
+        returnData.setReturnDataType(returnDataType);
         switch (returnDataType) {
             case "1":
                 returnData.setReturnData(rUrl);

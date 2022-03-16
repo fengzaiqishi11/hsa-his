@@ -429,7 +429,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","结算信息查询");
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
         map.put("visitId",visitId);
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            resultMap  = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
+        }catch (Exception e){
+
+        }
         outptMap = MapUtils.get(resultMap, "output");
         /**
          * 社保卡登记患者  接口无数据返回 时 查询本地保存的费用数据

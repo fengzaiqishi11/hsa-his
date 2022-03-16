@@ -1139,7 +1139,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("opspDiagCaty",  null); // 门诊慢特病诊断科别 *******
             setlinfo.put("admCaty", MapUtils.get(baseInfoMap,"inDeptNatinCode")); // 入院科别
         }
-        setlinfo.put("iptMedTpe", null); // 住院医疗类型
+        setlinfo.put("iptMedTpe", "1"); // 住院医疗类型
         setlinfo.put("admWay", MapUtils.getMapVS(mriBaseInfo,"in_way",MapUtils.get(baseInfoMap,"adm_way"))); // 入院途径 *******
         setlinfo.put("trtType", "1"); // 治疗类别
         setlinfo.put("admTime", MapUtils.get(baseInfoMap,"inTime")); // 入院时间 *******
@@ -1266,7 +1266,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hiPaymtd", "3"); // 医保支付方式  // 默认是按病种分值
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
-        setlinfo.put("medinsFillDept", hospName); // 医疗机构填报部门
+        setlinfo.put("medinsFillDept", ""); // 医疗机构填报部门 默认为空
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap,"feeCrteTime")); // 医疗机构填报人
         return setlinfo;
     }

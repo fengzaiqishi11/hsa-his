@@ -148,7 +148,8 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         if (Constants.YYSQZT.YJZ.equals(statusCode)) throw new RuntimeException("该申请已经处理了，请勿重复处理！");
         if (Constants.YYSQZT.YJJ.equals(statusCode)) throw new RuntimeException("该申请已经拒绝了，请重新申请！");
         param.put("statusCode", MapUtils.get(map, "apply_status")); // 状态
-        if("1".equals(String.valueOf(MapUtils.get(map, "apply_status")))){
+        Object apply_status = MapUtils.get(map, "apply_status");
+        if("1".equals(String.valueOf(apply_status))){
             param.put("isHouse","1");
         }else {
             param.put("isHouse","0");

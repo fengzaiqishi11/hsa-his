@@ -1266,7 +1266,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hiPaymtd", "3"); // 医保支付方式  // 默认是按病种分值
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
-        setlinfo.put("medinsFillDept", ""); // 医疗机构填报部门 默认为空
+        setlinfo.put("medinsFillDept", "医保科"); // 医疗机构填报部门 默认为 医保科
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap,"feeCrteTime")); // 医疗机构填报人
         return setlinfo;
     }

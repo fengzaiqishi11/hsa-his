@@ -56,11 +56,6 @@ public abstract class SettleSheetProcess {
 
     private final String CHRGITM_LV_03 = "03";
 
-    @Resource
-    private InsureIndividualVisitService insureIndividualVisitService_consumer;
-
-    @Resource
-    private InsureUnifiedBaseService insureUnifiedBaseService;
 
     @Autowired
     private ReportConfigurationDAO reportConfigurationDAO;
@@ -156,7 +151,8 @@ public abstract class SettleSheetProcess {
         map.put("hospCode",insureIndividualVisitDTO.getHospCode());
         map.put("insureSettleId",insureIndividualVisitDTO.getHospCode());
 
-        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+//        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+        Map<String, Object> data = new HashMap<>();
         SettleInfoResDTO settleInfo = new SettleInfoResDTO();
         settleInfo = (SettleInfoResDTO) data.get("setlinfo");
         List<SettleInfoDetailResDTO> settleInfoDetail = (List<SettleInfoDetailResDTO>) data.get("setldetail");
@@ -173,7 +169,8 @@ public abstract class SettleSheetProcess {
                 Map<String, Object> map = new HashMap<>();
                 map.put("hospCode",baseInfo.getHospCode());
                 map.put("insureSettleId",baseInfo.getSetlId());
-                Map<String, Object> settleMap = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+//                Map<String, Object> settleMap = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+                Map<String, Object> settleMap = new HashMap<>();
                 settleCommonInfoDTO.setSettleInfo((SettleInfoResDTO) settleMap.get("setlinfo"));
                 settleCommonInfoDTO.setSettleInfoDetail((List<SettleInfoDetailResDTO>) settleMap.get("setldetail"));
                 break;

@@ -584,6 +584,7 @@ public interface Constant {
             public static final String AM = "04"; // 澳门证件类型
             public static final String XG = "05"; // 香港证件类型
             public static final String BDSBK = "06"; // 本地社保卡
+            public static final String GAT = "17"; // 港澳台
 
         }
 

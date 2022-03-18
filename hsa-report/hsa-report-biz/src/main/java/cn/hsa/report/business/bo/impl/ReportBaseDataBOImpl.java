@@ -93,7 +93,7 @@ public class ReportBaseDataBOImpl extends HsafBO implements ReportBaseDataBO {
         Map<String, String> dictMap = insureDictService_consumer.querySysCodeByCode(map).getData();
 
         if (MapUtils.isEmpty(dictMap)) {
-            log.error("系统字典不存在，请配置处理！");
+            log.error("系统{}字典不存在，请配置处理！",code);
             throw new RuntimeException("系统字典不存在，请配置处理！");
         }
         redisUtils.set(key, JSONObject.toJSONString(dictMap));

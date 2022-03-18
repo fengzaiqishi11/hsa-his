@@ -1116,6 +1116,100 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
     }
 
     /**
+     * @param paraMap
+     * @Method querySumDeclareInfos
+     * @Desrciption 清算申报合计报表打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> querySumDeclareInfos(Map<String, Object> paraMap) {
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Map<String, Object> resultMap = new HashMap<>();
+        String declaraType = MapUtils.get(paraMap, "declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                resultList = insureReversalTradeDAO.querySumDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.F);
+                resultList = insureReversalTradeDAO.querySumDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                resultList = insureReversalTradeDAO.querySumDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.YZS: // 一站式
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.S);
+                resultList = insureReversalTradeDAO.queryYZSSumDeclareInfosPage(paraMap);
+                break;
+            default:
+                break;
+        }
+
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+        resultMap.put("resultList", resultList);
+        resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
+        return resultMap;
+    }
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报明细报表打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @Override
+    public  Map<String, Object> queryDeclareInfosPrint(Map<String, Object> paraMap) {
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String declaraType = MapUtils.get(paraMap, "declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民（非一站式住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.F);
+                resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
+                break;
+            case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.S);
+                resultList = insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap);
+            default:
+                break;
+
+        }
+        if(resultList !=null && resultList.size() > 0){
+            //增加序号
+            int index =1;
+            for(Map map:resultList){
+                map.put("index",index);
+                index++;
+            }
+        }
+        resultMap.put("result",resultList);
+
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+        resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
+
+        return resultMap;
+    }
+
+    /**
      * @Method handlerFeeFund
      * @Desrciption 离休结算单：计算离休基金
      * @Param
@@ -2180,6 +2274,21 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         // 特药、没啥好统计的，肯定查不出数据
         resultMap.put("paraMap", paraMap);
         return resultMap;
+    }
+
+    private InsureConfigurationDTO queryInsureIndividualConfig(Map paraMap){
+        InsureConfigurationDTO insureConfInfo = new InsureConfigurationDTO();
+        insureConfInfo.setHospCode(MapUtils.get(paraMap, "hospCode"));
+        insureConfInfo.setRegCode(MapUtils.get(paraMap, "insureRegCode"));
+        insureConfInfo = insureConfigurationDAO.queryInsureIndividualConfig(insureConfInfo);
+        if (insureConfInfo == null) {
+            throw new AppException("未查询到医保机构");
+        }
+        insureConfInfo.setCrteName(MapUtils.get(paraMap, "crteName"));
+        insureConfInfo.setCrteId(MapUtils.get(paraMap, "crteId"));
+        insureConfInfo.setStartDate(MapUtils.get(paraMap, "startDate"));
+        insureConfInfo.setEndDate(MapUtils.get(paraMap, "endDate"));
+        return insureConfInfo;
     }
 
 

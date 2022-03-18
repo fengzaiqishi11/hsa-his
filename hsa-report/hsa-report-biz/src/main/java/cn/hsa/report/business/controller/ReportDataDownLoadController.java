@@ -42,7 +42,7 @@ public class ReportDataDownLoadController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("crterId", sysUserDTO.getId());
-        map.put("crterName", sysUserDTO.getName());
+        map.put("crteName", sysUserDTO.getName());
         return reportDataDownLoadService.saveBuild(map);
     }
 

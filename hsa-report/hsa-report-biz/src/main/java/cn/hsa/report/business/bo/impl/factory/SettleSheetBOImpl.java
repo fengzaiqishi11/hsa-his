@@ -1,12 +1,24 @@
 package cn.hsa.report.business.bo.impl.factory;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
+import cn.hsa.report.business.bean.SettleSheetBaseInfoDTO;
+import cn.hsa.report.business.bo.impl.factory.settle.SettleSheetFactory;
+import cn.hsa.report.business.bo.impl.factory.settle.SettleSheetProcess;
+import cn.hsa.report.business.bo.impl.factory.settle.SettleSheetTypeEnum;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName SettleSheetProcess
@@ -20,6 +32,8 @@ public class SettleSheetBOImpl implements ReportBusinessBO {
 
     @Resource
     private InsureUnifiedPayReversalTradeService insureUnifiedPayReversalTradeService_consumer;
+    @Autowired
+    SettleSheetFactory settleSheetFactory;
 
     @Override
     public Map getReportDataMap(Map map) {
@@ -47,6 +61,9 @@ public class SettleSheetBOImpl implements ReportBusinessBO {
             map.put("tempCode", "his_insur_settle_0004");
         }
         return map;
+
+//        SettleSheetProcess settleSheetProcess = settleSheetFactory.getSettleSheetProcess(SettleSheetTypeEnum.getProcess((String) map.get("tempCode")));
+//        settleSheetProcess.downLoadSettleInfo(map);
     }
 
 }

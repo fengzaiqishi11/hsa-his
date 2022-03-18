@@ -1014,6 +1014,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String,Object> setlinfo = new HashMap<>();
         Map<String,Object> baseInfoMap = handerBaseInfo(map);
         Map<String,Object> mriBaseInfo = handerMriBaseInfo(map);
+
+        for (String key : setlinfoMap.keySet()) {
+            if ("-".equals(MapUtils.get(setlinfoMap, key))) {
+                setlinfoMap.put(key,"");
+            }
+        }
+        for (String key : baseInfoMap.keySet()) {
+            if ("-".equals(MapUtils.get(baseInfoMap, key))) {
+                baseInfoMap.put(key,"");
+            }
+        }
+        for (String key : mriBaseInfo.keySet()) {
+            if ("-".equals(MapUtils.get(mriBaseInfo, key))) {
+                mriBaseInfo.put(key,"");
+            }
+        }
+
         String hospName =MapUtils.get(map,"hospName");
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");

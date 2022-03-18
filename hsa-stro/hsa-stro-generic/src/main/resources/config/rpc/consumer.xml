@@ -43,4 +43,6 @@
     <dubbo:reference id="sysCodeService_consumer" interface="cn.hsa.module.sys.code.service.SysCodeService" check="false" />
     <!--校验库存-->
     <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer" check="false"/>
+    <!--月度进销存-->
+    <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false"/>
 </beans>

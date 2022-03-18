@@ -84,8 +84,8 @@ public abstract class SettleSheetProcess {
         String hospCode = MapUtils.get(map, "hospCode");
         baseInfo.setSetlId(insureSettleId);
         baseInfo.setHospCode(hospCode);
-        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(map);
-
+//        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(map);
+        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
         _initBaseInfo(baseInfo,insureIndividualVisitDTO);
 
         ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, (String) map.get("tempCode"));

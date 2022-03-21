@@ -1825,6 +1825,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 Map<String, String> payinfo = (Map<String, String>) insureOutptResult.get("payinfo");
                 List<Map<String, Object>> setldetailList = MapUtils.get(payinfo, "setldetailList");
                 insureSettleId = MapUtils.get(payinfo,"setl_id"); // 结算id
+                String balanceValue = MapUtils.get(payinfo,"INSURE_ACCT_PAY_PARAM");  // 海南地区开启个账参数判断
+                String acctUsedFlag= MapUtils.get(payinfo,"acct_used_flag"); // 是否使用个人账户标志
+                BigDecimal personalPrice =
+                        BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(payinfo,"akb066")));
                 if (!ListUtils.isEmpty(setldetailList)) {
                     InsureIndividualFundDTO insureIndividualFundDTO = null;
                     List<InsureIndividualFundDTO> fundDTOList = new ArrayList<>();
@@ -1907,6 +1911,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 individualSettleDO.setClrWay(clrWay);
                 individualSettleDO.setClrType(clrType);
                 individualSettleDO.setClrOptins(clrOptins);
+                if(Constants.SF.S.equals(balanceValue) && Constants.SF.S.equals(acctUsedFlag) ){
+                    individualSettleDO.setPersonalPrice(personalPrice);
+                }
                 //  更新医保结算表的结算信息
                 Map<String,Object> updateMap  = new HashMap<>();
                 updateMap.put("hospCode",hospCode);

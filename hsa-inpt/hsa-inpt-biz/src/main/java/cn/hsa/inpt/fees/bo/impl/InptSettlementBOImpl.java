@@ -1252,6 +1252,12 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             String clrType = MapUtils.get(insureInptResult, "clr_type");
             BigDecimal hospExemAmount = MapUtils.get(insureInptResult, "hospExemAmount");
             Object acctPayObject = MapUtils.get(insureInptResult, "acct_pay");
+
+            String balanceValue = MapUtils.get(insureInptResult,"INSURE_ACCT_PAY_PARAM");  // 海南地区开启个账参数判断
+            String acctUsedFlag= MapUtils.get(insureInptResult,"acct_used_flag"); // 是否使用个人账户标志
+            BigDecimal personalPrice =
+                    BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(insureInptResult,"akb066")));
+
             BigDecimal acctPay = null;
             if(acctPayObject == null){
                 acctPay = new BigDecimal(0.00);
@@ -1331,6 +1337,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             individualSettleDO.setOinfno(oinfno);
             individualSettleDO.setHospExemAmount(hospExemAmount);
             individualSettleDO.setOmsgid(omsgid);
+
             Map<String, Object> map = new HashMap<>();
             map.put("hospCode", hospCode);
             map.put("insureIndividualSettleDO", individualSettleDO);
@@ -1354,6 +1361,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             individualSettleDO.setClrWay(clrWay);
             individualSettleDO.setClrType(clrType);
             individualSettleDO.setClrOptins(clrOptins);
+            if(Constants.SF.S.equals(balanceValue) && Constants.SF.S.equals(acctUsedFlag) ){
+                individualSettleDO.setPersonalPrice(personalPrice);
+            }
             insureIndividualSettleService.updateByPrimaryKeySelective(map); // 更新结算信息
             map.put("medicalRegNo",medicalRegNo);
             map.put("id",visitId);

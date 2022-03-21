@@ -152,6 +152,45 @@ public class InsureUnifiedBaseController extends BaseController {
     }
 
     /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3个人账户扣减
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    @GetMapping("/queryBalanceCountDecrease")
+    public WrapperResponse<Map<String,Object>> queryBalanceCountDecrease (@RequestParam Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime", DateUtils.getNow());
+        map.put("crteName",sysUserDTO.getName());
+        return insureUnifiedBaseService_consumer.queryBalanceCountDecrease(map);
+    }
+
+    /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3账户余额信息查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    @GetMapping("/queryBalanceCount")
+    public WrapperResponse<Map<String,Object>> queryBalanceCount (@RequestParam Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime", DateUtils.getNow());
+        map.put("crteName",sysUserDTO.getName());
+        return insureUnifiedBaseService_consumer.queryBalanceCount(map);
+    }
+
+
+    /**
      * @Method queryFeeDetailInfo
      * @Desrciption 费用明细查询
      * @Param

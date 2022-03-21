@@ -41,8 +41,8 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
     <insert id="insertMedicDate">
-        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,disease_id, disease_name,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{diseaseId}, #{diseaseName}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+        insert into outpt_medical_care_apply(id,hosp_code, org_code,profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,disease_id, disease_name,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode},#{orgCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{diseaseId}, #{diseaseName}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
 
     </insert>
     <insert id="insertOutPtInfo">
@@ -288,7 +288,7 @@
             where id = #{id}
     </select>
     <select id="queryOrgCode" resultType="java.lang.String">
-        SELECT value FROM sys_code_detail where c_code = 'ORG_CODE' AND hosp_code = #{hospCode}
+        select org_code orgID from outpt_medical_care_apply where id = #{id} and hosp_code = #{hospCode}
     </select>
 
     <!--通过主键修改数据-->

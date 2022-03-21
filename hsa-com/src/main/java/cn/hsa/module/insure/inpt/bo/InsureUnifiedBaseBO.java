@@ -333,4 +333,26 @@ public interface InsureUnifiedBaseBO {
      * @Return
      */
     Map<String,Object> checkOneSettle(Map<String, Object> map);
+
+    /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3个人账户扣减
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    Map<String,Object>  queryBalanceCountDecrease(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method queryBalanceCount
+     * @Desrciption 6.3.1.3账户余额信息查询
+     * @Param
+     * @Author fuhui
+     * @Date 2022/3/15 15:33
+     * @Return
+     */
+    Map<String,Object>  queryBalanceCount(Map<String, Object> map);
 }

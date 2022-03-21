@@ -92,4 +92,7 @@ public class StroInvoicingDTO extends StroInvoicingDO implements Serializable {
 
     private List<StroStockDetailDTO> stroStockDetailDTOS;
     private String prodName;//生产厂家
+
+    //医保编码
+    private String nationCode;
 }

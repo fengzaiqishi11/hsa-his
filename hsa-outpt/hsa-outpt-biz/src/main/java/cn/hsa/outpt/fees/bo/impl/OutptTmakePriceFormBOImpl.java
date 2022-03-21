@@ -998,7 +998,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 unifiedPayMap.put("batchNo",MapUtils.get(stringObjectMap,"batchNo"));
                 List<Map<String, Object>> costDOList = MapUtils.get(stringObjectMap, "insureCostList");
                 unifiedPayMap.put("costList", costDOList);
-                trialMap = insureUnifiedPayOutptService_consumer.insureOutptSettleAccountIn(unifiedPayMap);
+                trialMap = insureUnifiedPayOutptService_consumer.UP_2206(unifiedPayMap);
             } catch (Exception e) {
                 unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                 updateCancelFeeSubmit(unifiedPayMap);
@@ -3837,7 +3837,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureVisitParam.put("hospCode",hospCode);
         insureVisitParam.put("insureSettleId","1");  //作为sql条件判断 删除医保结算id不为空的数据
         if(!"1".equals(MapUtils.get(map,"isError"))){
-            Boolean aBoolean = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+            Boolean aBoolean = insureUnifiedPayOutptService_consumer.UP_2205(map).getData();
             if(true == aBoolean){
                 insureIndividualCostService_consumer.deleteOutptInsureCost(insureVisitParam);
             }
@@ -4123,7 +4123,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("insureCostList",insureCostList);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         map.put("batchNo",batchNo);
-        Boolean aBoolean = insureUnifiedPayOutptService_consumer.updateFeeSubmit(map).getData();
+        Boolean aBoolean = insureUnifiedPayOutptService_consumer.UP_2204(map).getData();
         return map;
     }
 

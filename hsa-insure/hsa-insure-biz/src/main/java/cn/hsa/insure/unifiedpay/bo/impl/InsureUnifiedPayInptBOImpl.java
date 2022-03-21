@@ -1266,7 +1266,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> UP_2305(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**

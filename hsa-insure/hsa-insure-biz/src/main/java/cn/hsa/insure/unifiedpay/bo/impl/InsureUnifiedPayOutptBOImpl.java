@@ -620,6 +620,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
                 OutptVisitDTO outptVisitDTO = MapUtils.get(unifiedPayMap, "outptVisitDTO");
                 settleDataMap.put("acct_used_flag",outptVisitDTO.getIsUseAccount());
+                settleDataMap.put("regCode",insureConfigurationDTO.getRegCode());
                 acctPayMap = handlerAcctPayBalance(settleDataMap);
             }
             settleDataMap.put("action", "settle");

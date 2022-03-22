@@ -1014,6 +1014,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         settleDataMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
                         settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
                         settleDataMap.put("acct_used_flag",insureAccoutFlag);
+                        settleDataMap.put("regCode",insureConfigurationDTO.getRegCode());
                         acctPayMap = handlerAcctPayBalance(settleDataMap);
                     }
                     settleDataMap.put("action","settle");

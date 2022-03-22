@@ -1313,7 +1313,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> UP_2305(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -1752,7 +1752,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 for (String s : collect) {
                     stringBuilder.append(s).append(",");
                 }
-//                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
+                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
             }
         }
     }

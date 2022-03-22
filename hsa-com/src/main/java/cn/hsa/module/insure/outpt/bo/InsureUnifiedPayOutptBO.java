@@ -87,7 +87,7 @@ public interface InsureUnifiedPayOutptBO {
 	 * @Date 2021/3/3 16:38
 	 * @Return
 	 */
-	Boolean insertOutptUnifiedFee(Map<String, Object> map);
+	Boolean UP_2204(Map<String, Object> map);
 
 	/**
 	 * @param map
@@ -144,25 +144,4 @@ public interface InsureUnifiedPayOutptBO {
 	 **/
     Map<String, Object> UP4302(Map<String, Object> map);
 
-	/**
-	 * @Method handlerInsurePatientSum
-	 * @Desrciption  结算之前,保存个人累计信息
-	 * @Param
-	 *
-	 * @Author fuhui
-	 * @Date   2021/12/14 16:13
-	 * @Return
-	 **/
-    boolean insertPatientSumInfo(Map<String, Object> map);
-
-	/**
-	 * @Method updateInsureCost
-	 * @Desrciption  费用传输以后：更新医保的反参数据
-	 * @Param
-	 *
-	 * @Author fuhui
-	 * @Date   2021/5/21 8:35
-	 * @Return
-	 **/
-    boolean insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> map,List<Map<String, Object>> list);
 }

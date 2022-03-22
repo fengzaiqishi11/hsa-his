@@ -1395,7 +1395,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             insureUnifiedPayParam.put("visitId", inptVisitDTO.getId());
             if (!StringUtils.isEmpty(insureSettleId)) {
                 // 出院结算取消
-                insureUnifiedPayInptService_consumer.editCancelInptSettle(insureUnifiedPayParam);
+                insureUnifiedPayInptService_consumer.UP_2305(insureUnifiedPayParam);
             }
 //            // 出院登记撤销
 //            insureUnifiedPayInptService_consumer.UP_2405(insureUnifiedPayParam);

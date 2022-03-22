@@ -1005,8 +1005,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 Map <String,Object> setlinfoDataMap = (Map<String, Object>) outMap.get("setlinfo");
                 Map<String,Object> acctPayMap = null;
                 if("settle".equals(action)) {
-                    map.put("code","HN_INSURE_ACCT_PAY");
-                    SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
+                    Map<String,Object> paramAcctMap = new HashMap<>();
+                    paramMap.put("code","HN_INSURE_ACCT_PAY");
+                    paramMap.put("hospCode",hospCode);
+                    SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramMap).getData();
                     if(data !=null && Constants.SF.S.equals(data.getValue())){
                         settleDataMap.put("visitId",insureIndividualVisitDTO.getVisitId());
                         settleDataMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());

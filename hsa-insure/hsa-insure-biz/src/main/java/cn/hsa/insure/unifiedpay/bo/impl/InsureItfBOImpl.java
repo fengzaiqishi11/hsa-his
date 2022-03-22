@@ -77,7 +77,7 @@ public class InsureItfBOImpl {
             if (StringUtils.isEmpty(result)) {
                 params.put("resultStr", "null");
                 params.put("infcode", "null");
-                throw new BizRtException(InsureExecCodesEnum.INSURE_RETURN_DATA_EMPTY, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), functionEnum.getDesc()});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(),result});
             }
             Map<String, Object> resultMap = JSON.parseObject(result);
             params.put("infcode", resultMap.get("infcode"));
@@ -85,7 +85,7 @@ public class InsureItfBOImpl {
                 String errMsg = (String) resultMap.get("err_msg");
 
                 params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
             }
             logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), result);
             params.put("resultStr", result == null ? "null" : result.length() > 5000 ? result.substring(0, 4500) : result);
@@ -96,7 +96,7 @@ public class InsureItfBOImpl {
             if (e instanceof BizRtException) {
                 throw e;
             } else {
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), e});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), e});
             }
         } finally {
             insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();

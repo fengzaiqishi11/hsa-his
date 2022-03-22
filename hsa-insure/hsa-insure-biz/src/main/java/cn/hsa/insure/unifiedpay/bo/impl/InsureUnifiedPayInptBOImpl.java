@@ -1,11 +1,13 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.enums.HsaSrvEnum;
+import cn.hsa.exception.BizExcCodes;
 import cn.hsa.exception.BizRtException;
 import cn.hsa.exception.InsureExecCodesEnum;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
@@ -81,6 +83,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService;
+
+    @Resource
+    private InsureItfBOImpl insureItfBO;
 
     /**
      * @param map
@@ -1408,18 +1413,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String hospCode = MapUtils.get(map,"hospCode");
         InsureInptRegisterDTO insureInptRegisterDTO = (InsureInptRegisterDTO) map.get("insureInptRegisterDTO");
         if(insureInptRegisterDTO == null){
-            throw new RuntimeException("调用统一支付平台失败,未获取到住院登记信息!");
+//            throw new RuntimeException("调用统一支付平台失败,未获取到住院登记信息!");
+            throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"住院登记信息"});
         }
-        InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisitDTO");
-        map.put("crteId",inptVisitDTO.getCrteId());
-        map.put("crteName",inptVisitDTO.getCrteName());
-        String visitId = inptVisitDTO.getId();
-        if(insureInptRegisterDTO == null){
-            throw new RuntimeException("调用统一支付平台失败,未获取到住院就诊信息!");
+        InptVisitDTO  inptVisitDTO = (InptVisitDTO) map.get("inptVisitDTO");
+        if(inptVisitDTO == null){
+//            throw new RuntimeException("调用统一支付平台失败,未获取到住院就诊信息!");
+            throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"住院就诊信息"});
         }
-        String aac001 =  insureInptRegisterDTO.getAac001();
-        InsureConfigurationDTO dto = new InsureConfigurationDTO();
-        dto.setHospCode(inptVisitDTO.getHospCode());
         InsureIndividualBasicDTO insureIndividualBasicDTO = inptVisitDTO.getInsureIndividualBasicDTO();
         String regCode = null;
         if (insureIndividualBasicDTO != null) {
@@ -1428,18 +1429,52 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             regCode = inptVisitDTO.getHospCode();
         }
         if (StringUtils.isEmpty(regCode)) {
-            throw new AppException("获取患者医保信息时没有拿到指定医保机构注册编码，请联系管理员");
+//            throw new AppException("获取患者医保信息时没有拿到指定医保机构注册编码，请联系管理员");
+            throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"医保机构注册编码"});
         }
-        dto.setRegCode(regCode);
-        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(dto);
-
-        if (insureConfigurationDTO == null) {
-            throw new AppException("未查询到就诊地医保区划");
-        }
+//        InsureConfigurationDTO dto = new InsureConfigurationDTO();
+//        dto.setHospCode(inptVisitDTO.getHospCode());
+//        dto.setRegCode(regCode);
+//        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(dto);
+//
+//        if (insureConfigurationDTO == null) {
+////            throw new AppException("未查询到就诊地医保区划");
+//            throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"医保配置信息"});
+//        }
 
         if(StringUtils.isEmpty(inptVisitDTO.getZzDoctorId()) || StringUtils.isEmpty(inptVisitDTO.getZzDoctorName())){
-            throw  new AppException("该患者没有主治医生,请先安床");
+//            throw  new AppException("该患者没有主治医生,请先安床");
+            throw new BizRtException(InsureExecCodesEnum.ATDDR_NO_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),inptVisitDTO.getId()});
         }
+        List<String> diagnoseList = Stream.of("101","102","201","202","203").collect(Collectors.toList());
+        inptVisitDTO.setDiagnoseList(diagnoseList);
+//        map.put("inptVisitDTO",inptVisitDTO);
+        List<InptDiagnoseDTO> data = doctorAdviceService_consumer.getInptDiagnose(map).getData();
+        if(ListUtils.isEmpty(data)) {
+//            throw new AppException("该患者没有开诊断信息");
+            throw new BizRtException(InsureExecCodesEnum.IN_HOSP_DIAG_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),inptVisitDTO.getId()});
+        }
+
+        List<InptDiagnoseDTO> inptDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(map).getData();
+        commonHandlerDisease(inptDiagnoseDTOList,data,"2401");
+
+        // 调用统一支付平台接口
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.putAll(map);
+        paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
+        // 参保地医保区划
+        paramMap.put("orgCode", insureIndividualBasicDTO.getMedicineOrgCode());
+        paramMap.put("configCode", insureIndividualBasicDTO.getMedicineOrgCode());
+        paramMap.put("configRegCode", insureIndividualBasicDTO.getInsureRegCode());
+        paramMap.put("isHospital", Constants.SF.S);
+
+        insureItfBO.executeInsur(FunctionEnum.INSUR_IN, paramMap);
+
+        map.put("crteId",inptVisitDTO.getCrteId());
+        map.put("crteName",inptVisitDTO.getCrteName());
+        String visitId = inptVisitDTO.getId();
+
+        String aac001 =  insureInptRegisterDTO.getAac001();
 
         //入院诊断信息参数diseinfoList
         List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
@@ -1448,14 +1483,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String orgCode =insureConfigurationDTO.getOrgCode();
         String insureOrgCode = insureConfigurationDTO.getRegCode();
         inptVisitDTO.setInsureRegCode(insureOrgCode);
-        List<String> diagnoseList = Stream.of("101","102","201","202","203").collect(Collectors.toList());
-        inptVisitDTO.setVisitId(visitId);
-        inptVisitDTO.setDiagnoseList(diagnoseList);
-        map.put("inptVisitDTO",inptVisitDTO);
-        List<InptDiagnoseDTO> data = doctorAdviceService_consumer.getInptDiagnose(map).getData();
-        if(ListUtils.isEmpty(data)) {
-            throw new AppException("该患者没有开诊断信息");
-        }
+
         //入院诊断信息参数diseinfoMap
         Map<String, Object> diseinfoMap =null;
         /**
@@ -1463,8 +1491,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
          * 1.需要判断是否开了诊断
          * 2.开了的诊断是否已经匹配
          */
-        List<InptDiagnoseDTO> inptDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(map).getData();
-        commonHandlerDisease(inptDiagnoseDTOList,data,"2401");
+
         for(int i=0;i<inptDiagnoseDTOList.size();i++){
             diseinfoMap = new HashMap<>();
             diseinfoMap.put("psn_no", insureInptRegisterDTO.getAac001());//	人员编号
@@ -1648,6 +1675,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         agnterinfoMap.put("agnter_photo", null);//	代办人照片
 
 
+
+
         //input信息参数inputMap
         Map<String, Object> inputMap = new HashMap<>();
         inputMap.put("mdtrtinfo", mdtrtinfoMap);
@@ -1752,7 +1781,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 for (String s : collect) {
                     stringBuilder.append(s).append(",");
                 }
-//                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
+                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
             }
         }
     }

@@ -9,9 +9,16 @@ public enum InsureExecCodesEnum implements BizExcCodes {
 
     INSURE_RETURN_DATA_EMPTY(-1, SYS_MSG_OUT+"{1}返回数据为空"),
 
-    INSUR_SYS_FAILURE(-1, OTHER_SYS_ERR_MSG+"流水号-{1},医保业务功能号 {2}-{3}, 错误异常信息:{4}"),
+    INSURE_REQUEST_DATA_EMPTY(-1, SYS_MSG_OUT+"{1}参数为空"),
+
+    INSUR_INTF_FAILURE(-1, OTHER_SYS_ERR_MSG+"流水号-{1},医保业务功能号 {2}-{3}, 错误异常信息:{4}"),
+
+    ATDDR_NO_EMPTY(-1, SYS_MSG_INNER+"住院就诊号{1}的主治医生编码为空,请先安床"),
+
+    IN_HOSP_DIAG_EMPTY(-1, SYS_MSG_INNER+"住院就诊号{1}的诊断为空"),
 
     IN_HOSP_FEE_DATA_EMPTY(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！");
+
 
     /**
      * 100000-1000019 基础异常码

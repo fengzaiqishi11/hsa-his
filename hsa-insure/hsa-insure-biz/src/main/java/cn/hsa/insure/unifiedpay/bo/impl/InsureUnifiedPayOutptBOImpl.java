@@ -925,6 +925,12 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+
+        //TODO 判断是新医保 还是工伤医保
+        //参数校验,规则校验和请求初始化
+//        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_REG.getCode());
+//        String dataJson = reqUtil.initRequest(paramMap);
+//        params.put("paramMapJson", dataJson);
         // 调用统一支付平台接口
         Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG, paramMap);
         /**

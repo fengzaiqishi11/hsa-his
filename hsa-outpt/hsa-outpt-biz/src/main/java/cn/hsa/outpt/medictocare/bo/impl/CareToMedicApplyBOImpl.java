@@ -193,8 +193,9 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     private Map sendInfo(Map<String, Object> map){
         Map<String, Object> paramap = new HashMap<>();
         String hospCode = MapUtils.get(map, "hospCode");
+        String id = MapUtils.get(map, "id");
         //todo需要获取值，暂时写死SELECT `value` FROM sys_code_detail where c_code = 'ORG_CODE'
-        String orgID = medicToCareDAO.queryOrgCode(hospCode);
+        String orgID = medicToCareDAO.queryOrgCode(hospCode,id);
         try {
             hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
             orgID = RSAUtil.encryptByPublicKey(orgID.getBytes(),this.publicKey);

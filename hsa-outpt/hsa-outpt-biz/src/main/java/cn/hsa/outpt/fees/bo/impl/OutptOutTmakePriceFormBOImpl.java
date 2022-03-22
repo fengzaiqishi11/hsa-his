@@ -437,7 +437,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 System.out.println("==========================resultMap:" + resultMap.toString());
                 Map<String,Object> cancelReturnData =  MapUtils.get(resultMap,"output");
                 Map<String,Object> setlInfoMap = MapUtils.get(cancelReturnData,"setlinfo");
-                Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+                Boolean data = insureUnifiedPayOutptService_consumer.UP_2205(map).getData();
                 if(data){
                     MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
                     insureIndividualCostService_consumer.deleteOutptInsureCost(map);

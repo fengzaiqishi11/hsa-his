@@ -207,6 +207,11 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
      */
     @Override
     public Boolean updateDisease(InsureDiseaseMatchDTO insureDiseaseDTO) {
+        BaseDiseaseDTO baseDiseaseDTO =new BaseDiseaseDTO();
+        baseDiseaseDTO.setId(insureDiseaseDTO.getHospIllnessId());
+        baseDiseaseDTO.setHospCode(insureDiseaseDTO.getHospCode());
+        baseDiseaseDTO.setIsMatch(insureDiseaseDTO.getIsMatch());
+        insureDiseaseMatchDAO.updateBaseDisease(baseDiseaseDTO);
         return insureDiseaseMatchDAO.updateDisease(insureDiseaseDTO);
     }
 

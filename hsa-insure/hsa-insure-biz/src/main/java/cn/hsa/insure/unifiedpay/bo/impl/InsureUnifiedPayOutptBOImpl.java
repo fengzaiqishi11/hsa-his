@@ -145,7 +145,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public Boolean insertOutptUnifiedFee(Map<String, Object> unifiedPayMap) {
+    public Boolean UP_2204(Map<String, Object> unifiedPayMap) {
         String hospCode = unifiedPayMap.get("hospCode").toString();
         InsureIndividualVisitDTO insureIndividualVisitDTO = null;
         /**
@@ -399,7 +399,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      * @Date 2021/5/21 8:35
      * @Return
      **/
-    public boolean insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap, List<Map<String, Object>> list) {
+    private boolean insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> unifiedPayMap, List<Map<String, Object>> list) {
         String batchNo = MapUtils.get(unifiedPayMap, "batchNo").toString();
         String hospCode = MapUtils.get(unifiedPayMap, "hospCode");
         String visitId = MapUtils.get(unifiedPayMap, "visitId");
@@ -493,7 +493,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      * @Date 2021/10/23 14:27
      * @Return
      */
-    public boolean insertPatientSumInfo(Map<String, Object> map) {
+    private boolean insertPatientSumInfo(Map<String, Object> map) {
         String crteName = MapUtils.get(map, "crteName"); //  创建人姓名
         String crteId = MapUtils.get(map, "crteId"); // 创建人id
         String visitId = MapUtils.get(map, "visitId"); // 就诊id

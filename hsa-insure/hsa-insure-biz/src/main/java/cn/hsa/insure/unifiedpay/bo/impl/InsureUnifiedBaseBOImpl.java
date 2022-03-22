@@ -356,7 +356,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5369, paramMap,map);
-        List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         Map<String, Object> resultDataMap = new HashMap<>();
         resultDataMap.put("outptMap", outptMap);
         return resultDataMap;
@@ -384,7 +384,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","账户余额信息查询");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode,
                 orgCode, Constant.UnifiedPay.REGISTER.UP_5368, paramMap,map);
-        List<Map<String, Object>> outptMap = MapUtils.get(resultMap, "output");
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         Map<String, Object> resultDataMap = new HashMap<>();
         resultDataMap.put("outptMap", outptMap);
         return resultDataMap;

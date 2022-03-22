@@ -1,14 +1,18 @@
 package cn.hsa.insure.unifiedpay.util.inptregister;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
+import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRegisterDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -16,12 +20,14 @@ import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName InptRegisterReqUtil
@@ -31,10 +37,12 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_2401)
-public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
+public class InptRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Resource
-    private DoctorAdviceService doctorAdviceService_consumer;
+    private InsureIndividualVisitDAO insureIndividualVisitDAO;
+    @Resource
+    private InsureIndividualCostDAO insureIndividualCostDAO;
 
     @Override
     public String initRequest(T param) {
@@ -44,6 +52,24 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         List<InptDiagnoseDTO> inptDiagnoseDTOList = MapUtils.get(map, "inptDiagnoseDTOList");
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
 
+        List<InptDiagnoseDTO> list = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO ->
+                Constants.SF.S.equals(inptDiagnoseDTO.getIsMain())).collect(Collectors.toList());
+
+        String dscg_maindiag_code = list.get(0).getInsureInllnessCode();
+        String dscg_maindiag_name = list.get(0).getInsureInllnessName();;
+
+        Map<String, Object> inputMap = new HashMap<>();
+        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureInptRegisterDTO, inptVisitDTO, dscg_maindiag_code, dscg_maindiag_name));
+        inputMap.put("diseinfo", initDiseinfoList(insureInptRegisterDTO,inptDiagnoseDTOList,inptVisitDTO));
+        inputMap.put("agnterinfo", initAgnterinfoMap());
+
+        checkRequest(map);
+        map.put("input", inputMap);
+        return getInsurCommonParam(map);
+    }
+
+    private Object initMdtrtinfoMap(InsureInptRegisterDTO insureInptRegisterDTO,InptVisitDTO inptVisitDTO,String dscg_maindiag_code, String dscg_maindiag_name) {
+
         //就诊信息参数mdtrtinfo
         Map<String, Object> mdtrtinfoMap = new HashMap<>();
         mdtrtinfoMap.put("ipt_otp_no", insureInptRegisterDTO.getInNo());//	住院/门诊号
@@ -52,8 +78,8 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         mdtrtinfoMap.put("coner_name", insureInptRegisterDTO.getAae004());//	联系人姓名
         mdtrtinfoMap.put("tel", insureInptRegisterDTO.getAae005());//	联系电话
         InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
-        insureIndividualVisitDTO.setHospCode(hospCode);
-        insureIndividualVisitDTO.setVisitId(visitId);
+        insureIndividualVisitDTO.setHospCode(inptVisitDTO.getHospCode());
+        insureIndividualVisitDTO.setVisitId(inptVisitDTO.getVisitId());
         insureIndividualVisitDTO = insureIndividualVisitDAO.selectIsHalfSettleInfo(insureIndividualVisitDTO);
         // 如果是中途结算，且中途结算次数大于0 则入院开始时间取中途结算的结算时间
         if(insureIndividualVisitDTO !=null && "1".equals(insureIndividualVisitDTO.getIsHalfSettle()) && insureIndividualVisitDTO.getSettleCount() > 0){
@@ -77,16 +103,8 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         if("06".equals(mdtrtCertType) || "03".equals(mdtrtCertType)){
             mdtrtinfoMap.put("mdtrt_cert_type", "03");//inptVisitDTO.getCertCode());//	就诊凭证类型
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
+            mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
         }
-//        else{
-//            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);//inptVisitDTO.getCertCode());//	就诊凭证类型
-//        }
-//        if(!StringUtils.isEmpty(inptVisitDTO.getInsureIndividualBasicDTO().getAac002())){
-//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());// inptVisitDTO.getCertNo());//	就诊凭证编号
-//        }
-//        else{
-//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
-//        }
         if("02".equals(mdtrtCertType)) {
             mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
             mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());
@@ -147,7 +165,7 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         mdtrtinfoMap.put("birctrl_matn_date", null);//	计划生育手术或生育日期
         mdtrtinfoMap.put("dise_type_code", null);//	病种类型
         mdtrtinfoMap.put("insuplc_admdvs", inptVisitDTO.getInsureIndividualBasicDTO().getInsuplc_admdvs());//	医保中心编码
-        mdtrtinfoMap.put("medins_code", orgCode);//	医疗机构编码
+        mdtrtinfoMap.put("medins_code", inptVisitDTO.getInsureIndividualBasicDTO().getMedicineOrgCode());//	医疗机构编码
         mdtrtinfoMap.put("psn_type", null);//	人员类别
         mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	业务类型
         mdtrtinfoMap.put("med_mdtrr_type", inptVisitDTO.getInsureTreatCode());//	待遇类型
@@ -195,34 +213,10 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         // 证件类型
         mdtrtinfoMap.put("psn_cert_type",inptVisitDTO.getCertCode());
 
-        //入院诊断信息参数diseinfoMap
-        Map<String, Object> diseinfoMap =null;
+        return mdtrtinfoMap;
+    }
 
-        for(int i=0;i<inptDiagnoseDTOList.size();i++){
-            diseinfoMap = new HashMap<>();
-            diseinfoMap.put("psn_no", insureInptRegisterDTO.getAac001());//	人员编号
-            diseinfoMap.put("diag_type", "1");//	诊断类别
-            diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
-            if("1".equals(inptDiagnoseDTOList.get(i).getIsMain())){
-                dscg_maindiag_code = inptDiagnoseDTOList.get(i).getInsureInllnessCode();
-                dscg_maindiag_name = inptDiagnoseDTOList.get(i).getInsureInllnessName();
-            }
-            diseinfoMap.put("diag_srt_no", i);//	诊断排序号
-            diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
-            diseinfoMap.put("diag_name", inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
-            diseinfoMap.put("adm_cond", null);//	入院病情
-            diseinfoMap.put("diag_dept", inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
-            diseinfoMap.put("dise_dor_no",  inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
-            diseinfoMap.put("dise_dor_name",  inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
-            diseinfoMap.put("diag_time",  DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
-            diseinfoMap.put("medins_diag_code",orgCode);//	医疗机构诊断编码
-            diseinfoList.add(diseinfoMap);
-
-        }
-
-
-        Map map = JSON.parseObject(paramJson, Map.class);
-
+    private Object initAgnterinfoMap() {
         //代办人信息参数agnterinfo
         Map<String, Object> agnterinfoMap = new HashMap<>();
 
@@ -233,9 +227,31 @@ public class InptRegisterReqUtil<T> implements BaseReqUtil<T> {
         agnterinfoMap.put("agnter_tel", null);//	代办人联系电话
         agnterinfoMap.put("agnter_addr", null);//	代办人联系地址
         agnterinfoMap.put("agnter_photo", null);//	代办人照片
+        return agnterinfoMap;
+    }
 
-        checkRequest(map);
-        return paramJson;
+    private Object initDiseinfoList(InsureInptRegisterDTO insureInptRegisterDTO,List<InptDiagnoseDTO> inptDiagnoseDTOList,InptVisitDTO inptVisitDTO) {
+        //入院诊断信息参数diseinfoMap
+        Map<String, Object> diseinfoMap =null;
+        List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
+        for(int i=0;i<inptDiagnoseDTOList.size();i++){
+            diseinfoMap = new HashMap<>();
+            diseinfoMap.put("psn_no", insureInptRegisterDTO.getAac001());//	人员编号
+            diseinfoMap.put("diag_type", "1");//	诊断类别
+            diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
+            diseinfoMap.put("diag_srt_no", i);//	诊断排序号
+            diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
+            diseinfoMap.put("diag_name", inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+            diseinfoMap.put("adm_cond", null);//	入院病情
+            diseinfoMap.put("diag_dept", inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
+            diseinfoMap.put("dise_dor_no",  inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
+            diseinfoMap.put("dise_dor_name",  inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
+            diseinfoMap.put("diag_time",  DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+            diseinfoMap.put("medins_diag_code",inptVisitDTO.getInsureIndividualBasicDTO().getMedicineOrgCode());//	医疗机构编码
+            diseinfoList.add(diseinfoMap);
+
+        }
+        return diseinfoList;
     }
 
     @Override

@@ -1413,12 +1413,10 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         String hospCode = MapUtils.get(map,"hospCode");
         InsureInptRegisterDTO insureInptRegisterDTO = (InsureInptRegisterDTO) map.get("insureInptRegisterDTO");
         if(insureInptRegisterDTO == null){
-//            throw new RuntimeException("调用统一支付平台失败,未获取到住院登记信息!");
             throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"住院登记信息"});
         }
         InptVisitDTO  inptVisitDTO = (InptVisitDTO) map.get("inptVisitDTO");
         if(inptVisitDTO == null){
-//            throw new RuntimeException("调用统一支付平台失败,未获取到住院就诊信息!");
             throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"住院就诊信息"});
         }
         InsureIndividualBasicDTO insureIndividualBasicDTO = inptVisitDTO.getInsureIndividualBasicDTO();
@@ -1429,29 +1427,16 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             regCode = inptVisitDTO.getHospCode();
         }
         if (StringUtils.isEmpty(regCode)) {
-//            throw new AppException("获取患者医保信息时没有拿到指定医保机构注册编码，请联系管理员");
             throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"医保机构注册编码"});
         }
-//        InsureConfigurationDTO dto = new InsureConfigurationDTO();
-//        dto.setHospCode(inptVisitDTO.getHospCode());
-//        dto.setRegCode(regCode);
-//        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(dto);
-//
-//        if (insureConfigurationDTO == null) {
-////            throw new AppException("未查询到就诊地医保区划");
-//            throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"医保配置信息"});
-//        }
 
         if(StringUtils.isEmpty(inptVisitDTO.getZzDoctorId()) || StringUtils.isEmpty(inptVisitDTO.getZzDoctorName())){
-//            throw  new AppException("该患者没有主治医生,请先安床");
             throw new BizRtException(InsureExecCodesEnum.ATDDR_NO_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),inptVisitDTO.getId()});
         }
         List<String> diagnoseList = Stream.of("101","102","201","202","203").collect(Collectors.toList());
         inptVisitDTO.setDiagnoseList(diagnoseList);
-//        map.put("inptVisitDTO",inptVisitDTO);
         List<InptDiagnoseDTO> data = doctorAdviceService_consumer.getInptDiagnose(map).getData();
         if(ListUtils.isEmpty(data)) {
-//            throw new AppException("该患者没有开诊断信息");
             throw new BizRtException(InsureExecCodesEnum.IN_HOSP_DIAG_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),inptVisitDTO.getId()});
         }
 
@@ -1467,277 +1452,28 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("configCode", insureIndividualBasicDTO.getMedicineOrgCode());
         paramMap.put("configRegCode", insureIndividualBasicDTO.getInsureRegCode());
         paramMap.put("isHospital", Constants.SF.S);
-
-        insureItfBO.executeInsur(FunctionEnum.INSUR_IN, paramMap);
-
-        map.put("crteId",inptVisitDTO.getCrteId());
-        map.put("crteName",inptVisitDTO.getCrteName());
-        String visitId = inptVisitDTO.getId();
-
-        String aac001 =  insureInptRegisterDTO.getAac001();
-
-        //入院诊断信息参数diseinfoList
-        List<Map<String, Object>> diseinfoList = new ArrayList<Map<String, Object>>();
-        String dscg_maindiag_code = null;
-        String dscg_maindiag_name = null;
-        String orgCode =insureConfigurationDTO.getOrgCode();
-        String insureOrgCode = insureConfigurationDTO.getRegCode();
-        inptVisitDTO.setInsureRegCode(insureOrgCode);
-
-        //入院诊断信息参数diseinfoMap
-        Map<String, Object> diseinfoMap =null;
-        /**
-         * 做医保入院登记办理的时候
-         * 1.需要判断是否开了诊断
-         * 2.开了的诊断是否已经匹配
-         */
-
-        for(int i=0;i<inptDiagnoseDTOList.size();i++){
-            diseinfoMap = new HashMap<>();
-            diseinfoMap.put("psn_no", insureInptRegisterDTO.getAac001());//	人员编号
-            diseinfoMap.put("diag_type", "1");//	诊断类别
-            diseinfoMap.put("maindiag_flag", inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
-            if("1".equals(inptDiagnoseDTOList.get(i).getIsMain())){
-                dscg_maindiag_code = inptDiagnoseDTOList.get(i).getInsureInllnessCode();
-                dscg_maindiag_name = inptDiagnoseDTOList.get(i).getInsureInllnessName();
-            }
-            diseinfoMap.put("diag_srt_no", i);//	诊断排序号
-            diseinfoMap.put("diag_code", inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
-            diseinfoMap.put("diag_name", inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
-            diseinfoMap.put("adm_cond", null);//	入院病情
-            diseinfoMap.put("diag_dept", inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
-            diseinfoMap.put("dise_dor_no",  inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
-            diseinfoMap.put("dise_dor_name",  inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
-            diseinfoMap.put("diag_time",  DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
-            diseinfoMap.put("medins_diag_code",orgCode);//	医疗机构诊断编码
-            diseinfoList.add(diseinfoMap);
-
-        }
-        //就诊信息参数mdtrtinfo
-        Map<String, Object> mdtrtinfoMap = new HashMap<>();
-        mdtrtinfoMap.put("ipt_otp_no", insureInptRegisterDTO.getInNo());//	住院/门诊号
-        mdtrtinfoMap.put("psn_no", aac001);//	人员编号
-        mdtrtinfoMap.put("insutype", inptVisitDTO.getInsureIndividualBasicDTO().getAae140()); // // TODO	险种类型
-        mdtrtinfoMap.put("coner_name", insureInptRegisterDTO.getAae004());//	联系人姓名
-        mdtrtinfoMap.put("tel", insureInptRegisterDTO.getAae005());//	联系电话
-        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
-        insureIndividualVisitDTO.setHospCode(hospCode);
-        insureIndividualVisitDTO.setVisitId(visitId);
-        insureIndividualVisitDTO = insureIndividualVisitDAO.selectIsHalfSettleInfo(insureIndividualVisitDTO);
-        // 如果是中途结算，且中途结算次数大于0 则入院开始时间取中途结算的结算时间
-        if(insureIndividualVisitDTO !=null && "1".equals(insureIndividualVisitDTO.getIsHalfSettle()) && insureIndividualVisitDTO.getSettleCount() > 0){
-            insureIndividualVisitDTO.setInsureSettleId("1");
-            InsureIndividualCostDTO insureIndividualCostDTO = insureIndividualCostDAO.selectHalfTransmitFee(insureIndividualVisitDTO);
-            if(insureIndividualCostDTO !=null && insureIndividualCostDTO.getFeeEndTime() !=null){
-                Date feeEndTime =  insureIndividualCostDTO.getFeeEndTime();
-                Calendar calendar = new GregorianCalendar();
-                calendar.setTime(feeEndTime);
-                calendar.add(Calendar.DATE,1);
-                feeEndTime =calendar.getTime();
-                mdtrtinfoMap.put("begntime", DateUtils.format(feeEndTime,DateUtils.Y_M_DH_M_S));//	开始时间
-            }else{
-                mdtrtinfoMap.put("begntime", DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_DH_M_S));//	开始时间
-            }
-        }
-        else{
-            mdtrtinfoMap.put("begntime", DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_DH_M_S));//	开始时间
-        }
-        String mdtrtCertType = inptVisitDTO.getInsureIndividualBasicDTO().getBka895();
-        if("06".equals(mdtrtCertType) || "03".equals(mdtrtCertType)){
-            mdtrtinfoMap.put("mdtrt_cert_type", "03");//inptVisitDTO.getCertCode());//	就诊凭证类型
-            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
-        }
-//        else{
-//            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);//inptVisitDTO.getCertCode());//	就诊凭证类型
-//        }
-//        if(!StringUtils.isEmpty(inptVisitDTO.getInsureIndividualBasicDTO().getAac002())){
-//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());// inptVisitDTO.getCertNo());//	就诊凭证编号
-//        }
-//        else{
-//            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());// inptVisitDTO.getCertNo());//	就诊凭证编号
-//        }
-        if("02".equals(mdtrtCertType)) {
-            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
-            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());
-        }
-        if("01".equals(mdtrtCertType)) {
-            mdtrtinfoMap.put("mdtrt_cert_type", mdtrtCertType);
-            mdtrtinfoMap.put("mdtrt_cert_no", inptVisitDTO.getInsureIndividualBasicDTO().getBka896());
-        }
-        mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	医疗类别
-        mdtrtinfoMap.put("ipt_no", inptVisitDTO.getInNo());//	住院号
-        mdtrtinfoMap.put("medrcdno", null);//	病历号
-        if(StringUtils.isEmpty(inptVisitDTO.getPracCertiNo())){
-            throw  new AppException("该【"+inptVisitDTO.getZzDoctorName()+"】医生的医师编码没有维护,请先去用户管理里面维护");
-        }
-        mdtrtinfoMap.put("atddr_no", inptVisitDTO.getPracCertiNo());//inptVisitDTO.getZzDoctorId());//	主治医生编码
-        mdtrtinfoMap.put("chfpdr_name",inptVisitDTO.getZzDoctorName());//inptVisitDTO.getZzDoctorName());//	主治医师姓名
-        mdtrtinfoMap.put("adm_diag_dscr", dscg_maindiag_name);//	入院诊断描述
-        mdtrtinfoMap.put("adm_dept_codg", inptVisitDTO.getInDeptId());//	入院科室编码
-        mdtrtinfoMap.put("adm_dept_name", inptVisitDTO.getInDeptName());//	入院科室名称
-        mdtrtinfoMap.put("adm_bed", inptVisitDTO.getBedName());//	入院床位
-        mdtrtinfoMap.put("dscg_maindiag_code", dscg_maindiag_code);//	住院主诊断代码
-        mdtrtinfoMap.put("dscg_maindiag_name", dscg_maindiag_name);//	住院主诊断名称
-        mdtrtinfoMap.put("main_cond_dscr", dscg_maindiag_name);//	主要病情描述
-        String diseCode = inptVisitDTO.getInsureIndividualBasicDTO().getBka006();
-        String diseCodeName = inptVisitDTO.getInsureIndividualBasicDTO().getBka006Name();
-        if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
-            mdtrtinfoMap.put("dise_code", "");//	病种编码
-        }else{
-            mdtrtinfoMap.put("dise_code", diseCode);//	病种编码
-        }
-        if(StringUtils.isEmpty(diseCodeName) || "null".equals(diseCodeName)){
-            mdtrtinfoMap.put("dise_name", "");//	病种名称
-        }else{
-            mdtrtinfoMap.put("dise_name", diseCodeName);//	病种名称
-        }
-
-        mdtrtinfoMap.put("oprn_oprt_code", null);//	手术操作代码
-        mdtrtinfoMap.put("oprn_oprt_name", null);//	手术操作名称
-        mdtrtinfoMap.put("fpsc_no", null);//	计划生育服务证号
-        if("52".equals(insureInptRegisterDTO.getAka130())){
-            mdtrtinfoMap.put("matn_type", "1");//	生育类别
-            if(inptVisitDTO.getAge().compareTo(23) ==1){
-                mdtrtinfoMap.put("latechb_flag", "1");//	晚育标志
-            }else{
-                mdtrtinfoMap.put("latechb_flag", "0");//	晚育标志
-            }
-            mdtrtinfoMap.put("pret_flag", "0");//	早产标志
-        }
-        else{
-            mdtrtinfoMap.put("matn_type", null);//	生育类别
-            mdtrtinfoMap.put("latechb_flag", null);//	晚育标志
-            mdtrtinfoMap.put("pret_flag", null);//	早产标志
-        }
-        mdtrtinfoMap.put("birctrl_type", null);//	计划生育手术类别
-        mdtrtinfoMap.put("geso_val", null);//	孕周数
-        mdtrtinfoMap.put("fetts", null);//	胎次
-        mdtrtinfoMap.put("fetus_cnt", null);//	胎儿数
-        mdtrtinfoMap.put("birctrl_matn_date", null);//	计划生育手术或生育日期
-        mdtrtinfoMap.put("dise_type_code", null);//	病种类型
-        mdtrtinfoMap.put("insuplc_admdvs", inptVisitDTO.getInsureIndividualBasicDTO().getInsuplc_admdvs());//	医保中心编码
-        mdtrtinfoMap.put("medins_code", orgCode);//	医疗机构编码
-        mdtrtinfoMap.put("psn_type", null);//	人员类别
-        mdtrtinfoMap.put("med_type", inptVisitDTO.getInsureBizCode());//	业务类型
-        mdtrtinfoMap.put("med_mdtrr_type", inptVisitDTO.getInsureTreatCode());//	待遇类型
-        mdtrtinfoMap.put("opt_time",DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_DH_M_S));//	入院登记时间
-        mdtrtinfoMap.put("opter", insureInptRegisterDTO.getBka015());//	登记人员工号
-        mdtrtinfoMap.put("opter_name", insureInptRegisterDTO.getAae011());    //登记人姓名
-        mdtrtinfoMap.put("adm_way", inptVisitDTO.getInModeCode());//	入院方式
-        mdtrtinfoMap.put("serial_apply", null);//	业务申请序列号
-        mdtrtinfoMap.put("relt_medins_code", null);//	关联医疗机构编码
-        mdtrtinfoMap.put("relt_serial_n", null);//	关联就医登记号
-        mdtrtinfoMap.put("adm_sumtms", inptVisitDTO.getTotalIn());//	本年住院次数
-        mdtrtinfoMap.put("wardarea_no", inptVisitDTO.getInWardId());//	入院病区编号
-        mdtrtinfoMap.put("wardarea_name", null);//	入院病区名称
-        mdtrtinfoMap.put("bed_type", null);// 	床位类型
-        mdtrtinfoMap.put("prep_pay", null);//	预付款总额
-        mdtrtinfoMap.put("hosp_adm_diag", null);//	入院诊断(医疗机构)
-        mdtrtinfoMap.put("area_no", null);//	区/县
-        mdtrtinfoMap.put("emp_no", null);//	单位电脑号
-        mdtrtinfoMap.put("emp_code", null);//	单位管理码
-        mdtrtinfoMap.put("emp_type", null);//	单位类型
-        mdtrtinfoMap.put("name", inptVisitDTO.getName());//	姓名
-        mdtrtinfoMap.put("gend", inptVisitDTO.getGenderCode());//	性别
-        mdtrtinfoMap.put("brdy", DateUtils.format(inptVisitDTO.getBirthday(),DateUtils.Y_M_DH_M_S));//	出生日期
-        mdtrtinfoMap.put("aim_type", null);//	补助类型
-        mdtrtinfoMap.put("coner_adr", inptVisitDTO.getContactAddress());//	联系地址
-        mdtrtinfoMap.put("admdv", null);//	人员所属中心
-        mdtrtinfoMap.put("cvlserv_lv", insureInptRegisterDTO.getBac001());//	公务员级别
-        mdtrtinfoMap.put("emp_name", null);//	单位名称
-        mdtrtinfoMap.put("dise_cond_sev", inptVisitDTO.getCriticalValueCode());//	病情严重程度
-        mdtrtinfoMap.put("clnc_flag", null);//	临床试验标志
-        mdtrtinfoMap.put("er_flag", "0");//	急诊标志
-        mdtrtinfoMap.put("advpay", "0");//	预付款
-        mdtrtinfoMap.put("repeat_ipt_flag", "0");//	重复住院标志
-        mdtrtinfoMap.put("ttp_resp", "0");//	是否第三方责任标志
-        mdtrtinfoMap.put("merg_setl_flag", "0");//	合并结算标志
-        mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）
-        mdtrtinfoMap.put("cert_type", "01");//	证件类型（跨省异地必传）
-        mdtrtinfoMap.put("certno", inptVisitDTO.getInsureIndividualBasicDTO().getAac002());//	证件号码（跨省异地必传）
-        mdtrtinfoMap.put("hcard_basinfo", insureInptRegisterDTO.getHcardBasinfo());//	证件号码（广州读卡就医必传）
-        mdtrtinfoMap.put("hcard_chkinfo", insureInptRegisterDTO.getHcardChkinfo());//	证件号码（广州读卡就医必传）
-        // 人员姓名
-        mdtrtinfoMap.put("psn_name",inptVisitDTO.getName());
-        // 人员类别
-        mdtrtinfoMap.put("psn_type",inptVisitDTO.getInsureIndividualBasicDTO().getBka035());
-        // 证件类型
-        mdtrtinfoMap.put("psn_cert_type",inptVisitDTO.getCertCode());
-        //代办人信息参数agnterinfo
-        Map<String, Object> agnterinfoMap = new HashMap<>();
-
-        agnterinfoMap.put("agnter_name", null);//	代办人姓名
-        agnterinfoMap.put("agnter_rlts", null);//	代办人关系
-        agnterinfoMap.put("agnter_cert_type", null);//	代办人证件类型
-        agnterinfoMap.put("agnter_certno", null);//	代办人证件号码
-        agnterinfoMap.put("agnter_tel", null);//	代办人联系电话
-        agnterinfoMap.put("agnter_addr", null);//	代办人联系地址
-        agnterinfoMap.put("agnter_photo", null);//	代办人照片
+        String omsgId = StringUtils.createMsgId(insureIndividualBasicDTO.getMedicineOrgCode());
+        paramMap.put("msgId", omsgId);
 
 
-
-
-        //input信息参数inputMap
-        Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("mdtrtinfo", mdtrtinfoMap);
-        inputMap.put("agnterinfo", agnterinfoMap);
-        inputMap.put("diseinfo", diseinfoList);
-
-        String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
-        String functionCode = Constant.UnifiedPay.REGISTER.UP_2401;
-        Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("input", inputMap);
-        paramMap.put("insuplc_admdvs",inptVisitDTO.getInsureIndividualBasicDTO().getInsuplc_admdvs());//参保地医保区划
-        String medisCode = insureConfigurationDTO.getOrgCode();
-        paramMap.put("medins_code", medisCode);//定点医药机构编号
-        paramMap.put("infno",functionCode);//交易编号(功能号)
-        paramMap.put("msgid",omsgId);
-        paramMap.put("mdtrtarea_admvs",inptVisitDTO.getInsureOrgCode());// 就医地医保区划
-        paramMap.put("insur_code",inptVisitDTO.getInsureOrgCode()); // 医保中心编码
         String redisKey = new StringBuilder().append(hospCode).append("-").append("2401").append("-").
-                append(visitId).append("-").append(aac001).toString();
-        System.out.println("医保入院登记------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
-        System.out.println();
+                append(inptVisitDTO.getId()).append("-").append(insureInptRegisterDTO.getAac001()).toString();
+        logger.info("医保入院登记------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
         try {
             if(redisUtils.hasKey(redisKey)){
                 throw new AppException("该患者正在办理医保入院登记操作,请稍后再试");
+//                throw new BizRtException(InsureExecCodesEnum.INSURE_REQUEST_DATA_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"住院就诊信息"});
             }
             redisUtils.set(redisKey,redisKey,30);
-            String paramMapJson = JSON.toJSONString(paramMap) ;
-            logger.info("医保统一支付平台入院办理入参:" + paramMapJson);
-            String resultStr =  HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), paramMapJson);
 
-            map.put("medisCode",medisCode);
-            map.put("visitId",visitId);
-            map.put("msgId",omsgId);
-            map.put("msgInfo",functionCode);
-            map.put("msgName","医保入院登记");
-            map.put("isHospital",Constants.SF.S) ;
-            map.put("paramMapJson",paramMapJson);
-            map.put("resultStr",resultStr);
-            insureUnifiedLogService_consumer.insertInsureFunctionLog(map);
-
-            logger.info("医保统一支付平台入院办理回参:" + resultStr);
-            if (StringUtils.isEmpty(resultStr)){
-                throw new RuntimeException("调用统一支付平台无响应!");
-            }
-
-            Map<String, Object> m = JSONObject.parseObject(resultStr, Map.class);
-            String resultCode = MapUtils.get(m,"infcode","");
-            if (StringUtils.isEmpty(resultCode)){
-                throw new RuntimeException("调用统一支付平台无响应!");
-            }
-            if (!"0".equals(resultCode)){
-                throw new RuntimeException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
-            }
-            Map<String, Object> outptMap = (Map<String, Object>) m.get("output");
-            Map<String, Object> resultMap = (Map<String, Object>) outptMap.get("result");
-            resultMap.put("aaz217",resultMap.get("mdtrt_id"));
+            Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_IN, paramMap);
+            Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
+            Map<String, Object> resultDataMap = (Map<String, Object>) outptMap.get("result");
+            resultMap.put("aaz217",resultDataMap.get("mdtrt_id"));
             resultMap.put("omsgid",omsgId);
-            resultMap.put("oinfno",functionCode);
+            resultMap.put("oinfno",FunctionEnum.INSUR_IN.getCode());
             return resultMap;
-        }
-        finally {
+        } finally {
             redisUtils.del(redisKey);
         }
     }
@@ -1826,8 +1562,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         List<InptDiagnoseDTO> data = doctorAdviceService_consumer.getInptDiagnose(map).getData();
         if(ListUtils.isEmpty(data)) {
-            throw new AppException("该患者没有开诊断信息");
+//            throw new AppException("该患者没有开诊断信息");
+            throw new BizRtException(InsureExecCodesEnum.IN_HOSP_DIAG_EMPTY, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),inptVisitDTO.getId()});
         }
+
+
         List<InptDiagnoseDTO> inptDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(map).getData();
         commonHandlerDisease(inptDiagnoseDTOList,data,"2402");
         for(int i=0;i<inptDiagnoseDTOList.size();i++) {

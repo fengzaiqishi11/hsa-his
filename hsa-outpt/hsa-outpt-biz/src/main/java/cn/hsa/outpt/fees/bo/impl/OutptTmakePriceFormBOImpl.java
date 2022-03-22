@@ -955,7 +955,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         Map<String, Object> outptCostUploadAndTrialParam = new HashMap<String, Object>();
         outptCostUploadAndTrialParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
         outptCostUploadAndTrialParam.put("hospName", outptVisitDTO.getHospName());//医院名称
-        outptCostUploadAndTrialParam.put("insureRegCode", info.get("regCode"));//医保机构编码
+        outptCostUploadAndTrialParam.put("insureRegCode", insureIndividualVisitById.getInsureOrgCode());//医保机构编码
         outptCostUploadAndTrialParam.put("visitId", id);//门诊就诊id
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
 
@@ -1116,8 +1116,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setState(Constants.ZTBZ.ZC);//状态标志,0正常，2冲红，1，被冲红
         insureIndividualSettleDO.setSettleState(Constants.YBJSZT.SS);//医保结算状态;0试算，1结算
         insureIndividualSettleDO.setCostbatch(null);//费用批次
-        insureIndividualSettleDO.setAka130(info.get("aka130"));//业务类型
-        insureIndividualSettleDO.setBka006(info.get("bka006"));//待遇类型
+        insureIndividualSettleDO.setAka130(insureIndividualVisitById.getAka130());//业务类型
+        insureIndividualSettleDO.setBka006(insureIndividualVisitById.getBka006());//待遇类型
         insureIndividualSettleDO.setInjuryBorthSn(null);//业务申请号,门诊特病，工伤，生育
         insureIndividualSettleDO.setIsAccount(BigDecimalUtils.isZero(akb066) ? Constants.SF.F : Constants.SF.S);//当前结算是否使用个人账户;0是，1否
         insureIndividualSettleDO.setRemark(null);//备注

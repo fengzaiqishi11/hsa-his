@@ -47,7 +47,7 @@ public class InptRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqU
     @Override
     public String initRequest(T param) {
         Map map = (Map) param;
-        Map<String, Object> dataMap = new HashMap<>(16);
+        Map<String, Object> dataMap = new HashMap<>(3);
         InsureInptRegisterDTO insureInptRegisterDTO = MapUtils.get(map, "insureInptRegisterDTO");
         List<InptDiagnoseDTO> inptDiagnoseDTOList = MapUtils.get(map, "inptDiagnoseDTOList");
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
@@ -58,13 +58,12 @@ public class InptRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqU
         String dscg_maindiag_code = list.get(0).getInsureInllnessCode();
         String dscg_maindiag_name = list.get(0).getInsureInllnessName();;
 
-        Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureInptRegisterDTO, inptVisitDTO, dscg_maindiag_code, dscg_maindiag_name));
-        inputMap.put("diseinfo", initDiseinfoList(insureInptRegisterDTO,inptDiagnoseDTOList,inptVisitDTO));
-        inputMap.put("agnterinfo", initAgnterinfoMap());
+        dataMap.put("mdtrtinfo", initMdtrtinfoMap(insureInptRegisterDTO, inptVisitDTO, dscg_maindiag_code, dscg_maindiag_name));
+        dataMap.put("diseinfo", initDiseinfoList(insureInptRegisterDTO,inptDiagnoseDTOList,inptVisitDTO));
+        dataMap.put("agnterinfo", initAgnterinfoMap());
 
         checkRequest(map);
-        map.put("input", inputMap);
+        map.put("input", dataMap);
         return getInsurCommonParam(map);
     }
 

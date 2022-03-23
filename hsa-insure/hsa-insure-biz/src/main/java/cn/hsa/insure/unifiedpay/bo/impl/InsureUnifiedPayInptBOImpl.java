@@ -1646,67 +1646,27 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         map.put("crteId",inptVisitDTO.getCrteId());
         map.put("medicalRegNo",inptVisitDTO.getMedicalRegNo());
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(insureInptOutFeeDTO.getHospCode());
-        insureConfigurationDTO.setRegCode((String) insureInptOutFeeDTO.getInsureOrgCode());
-        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
-        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
-        //出院信息参数dscginfo
-        Map<String, Object> dataMap = new HashMap<>();
-        String medicalRegNo = insureInptOutFeeDTO.getAaz217();
         String psnNo = insureInptOutFeeDTO.getAac001();
-        dataMap.put("mdtrt_id",medicalRegNo);//	就诊ID
-        dataMap.put("psn_no",psnNo);//	人员编号
-        dataMap.put("medins_code",insureConfigurationDTO.getOrgCode());//	医疗机构编码
-        dataMap.put("serial_no",insureInptOutFeeDTO.getAaz217());//	就医登记号
-
-        //input信息参数inputMap
-        Map<String, Object> inputMap = new HashMap<String, Object>();
-        inputMap.put("data", dataMap);
 
         Map<String, Object> paramMap = new HashMap<>();
-        String omsgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
-        String functionCode = "2404";
-        paramMap.put("insuplc_admdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());//参保地医保区划
-        String medisCode = insureConfigurationDTO.getOrgCode();
-        paramMap.put("medins_code",medisCode);//定点医药机构编号
-        paramMap.put("infno",functionCode);//交易编号
-        paramMap.put("input", inputMap);
-        paramMap.put("msgid",omsgId);
-        paramMap.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());//参保地医保区划
-        paramMap.put("insur_code",insureConfigurationDTO.getRegCode());//中心编码
+        // 调用统一支付平台接口
+        paramMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        paramMap.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
+        // 参保地医保区划
+        paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
+        paramMap.put("configCode", insureIndividualVisitDTO.getMedicineOrgCode());
+        paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("isHospital", Constants.SF.S);
+
         String redisKey = new StringBuilder().append(hospCode).append("-").append("2404").append("-").append(visitId).append("-").append(psnNo).toString();
-        System.out.println("入院撤销------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
+        logger.info("入院撤销------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
         if(redisUtils.hasKey(redisKey)){
             throw new AppException("该患者正在办理入院撤销业务,请勿重复操作");
         }else{
             try {
                 redisUtils.set(redisKey,redisKey,20);
-                String paramJson = JSON.toJSONString(paramMap);
-                logger.info("统一支付平台取消入院登记入参:" + paramJson);
-                String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), paramJson);
-                logger.info("统一支付平台取消入院登记回参:" + resultStr);
-                map.put("medisCode",medisCode);
-                map.put("visitId",visitId);
-                map.put("msgId",omsgId);
-                map.put("msgInfo",functionCode);
-                map.put("msgName","取消医保入院登记");
-                map.put("isHospital",Constants.SF.S) ;
-                map.put("paramMapJson",paramJson);
-                map.put("resultStr",resultStr);
-                insureUnifiedLogService_consumer.insertInsureFunctionLog(map).getData();
-                if (StringUtils.isEmpty(resultStr)){
-                    throw new RuntimeException("调用统一支付平台无响应!");
-                }
-                Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-                String resultCode = MapUtils.get(m,"infcode","");
-                if (StringUtils.isEmpty(resultCode)){
-                    throw new RuntimeException("调用统一支付平台无响应!");
-                }
-                if (!"0".equals(resultCode)){
-                    throw new RuntimeException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
-                }
+                insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN_BACK, paramMap);
             }finally {
                 redisUtils.del(redisKey);
             }
@@ -1736,70 +1696,29 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         map.put("medicalRegNo",medicalRegNo);
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
         String visitId = insureIndividualVisitDTO.getVisitId();
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
-        insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
-        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-        medicalRegNo  = insureIndividualVisitDTO.getMedicalRegNo();
         String psnNo= insureIndividualVisitDTO.getAac001() ;
-        map.put("mdtrt_id",medicalRegNo);
-        map.put("psn_no",psnNo);
-        //出院信息参数dscginfo
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("mdtrt_id", medicalRegNo);//	就诊ID
-        dataMap.put("psn_no", psnNo);//	人员编号
 
-        //input信息参数inputMap
-        Map<String, Object> inputMap = new HashMap<String, Object>();
-        inputMap.put("data", dataMap);
-
-        Map<String, Object> paramMap = new HashMap<>();
-        String omsgId = StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode());
-        String functionCode = "2405";
-        paramMap.put("infno",functionCode);//交易编号
-        paramMap.put("insuplc_admdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());//参保地医保区划
-        paramMap.put("msgid",omsgId);
-        paramMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
-        String medisCode = insureIndividualVisitDTO.getMedicineOrgCode();
-        paramMap.put("medins_code", medisCode);//定点医药机构编号
-        paramMap.put("insur_code", insureConfigurationDTO.getRegCode()); // 医保中心编码
-        paramMap.put("input", inputMap);
-        String paramJson = JSON.toJSONString(paramMap);
-        logger.info("医保统一支付平台出院办理撤销入参" + paramJson);
         // 设置redis的键
         String redisKey = new StringBuilder().append(hospCode).append("-").append("2405").append("-").append(visitId).append("-").append(psnNo).toString();
-        System.out.println("出院办理撤销------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
+        logger.info("出院办理撤销------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
+
+        Map<String, Object> paramMap = new HashMap<>();
+        // 调用统一支付平台接口
+        paramMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+        // 参保地医保区划
+        paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
+        paramMap.put("configCode", insureIndividualVisitDTO.getMedicineOrgCode());
+        paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("isHospital", Constants.SF.S);
+
         // 判断键是否存在
         if(redisUtils.hasKey(redisKey)){
             throw new AppException("该患者正在别处出院办理撤销,请稍后");
-        }
-        else{
+        }else{
             try {
                 // 设置键
                 redisUtils.set(redisKey,medicalRegNo,60);
-                String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), paramJson);
-                logger.info("医保统一支付平台出院办理撤销回参" + resultStr);
-                map.put("medisCode",medisCode);
-                map.put("visitId",visitId);
-                map.put("msgId",omsgId);
-                map.put("msgInfo",functionCode);
-                map.put("msgName","医保出院办理撤销");
-                map.put("isHospital",Constants.SF.S) ;
-                map.put("paramMapJson",paramJson);
-                map.put("resultStr",resultStr);
-                insureUnifiedLogService_consumer.insertInsureFunctionLog(map);
-                if (StringUtils.isEmpty(resultStr)){
-                    throw new AppException("调用统一支付平台无响应!");
-                }
-                Map<String, Object> m = JSONObject.parseObject(resultStr, Map.class);
-                String resultCode = MapUtils.get(m,"infcode","");
-                if (StringUtils.isEmpty(resultCode)){
-                    throw new AppException("调用统一支付平台无响应!");
-                }
-                if (!"0".equals(resultCode)){
-                    throw new AppException("调用统一支付平台错误,原因："+MapUtils.get(m,"err_msg",""));
-                }
+                insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN_BACK, paramMap);
             }finally {
                 redisUtils.del(redisKey);
             }

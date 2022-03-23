@@ -202,7 +202,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         ReportReturnDataDTO returnData = new ReportReturnDataDTO();
         returnData.setFileName(fileName);
         returnData.setFileFormat(fileFormat);
-        returnData.setKey(key);
+        returnData.setKey("/hsa-web-external"+key);
         returnData.setReturnDataType(returnDataType);
         switch (returnDataType) {
             case "1":

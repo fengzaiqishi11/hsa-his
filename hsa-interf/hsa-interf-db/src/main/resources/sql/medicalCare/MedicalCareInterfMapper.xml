@@ -11,9 +11,10 @@
             a.age,
             a.cert_no,
             a.phone,
-            '1' as change_type,
+            b.change_type as change_type,
             a.dept_id
         FROM outpt_visit a
+        left join outpt_medical_care_apply b on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
           and a.id = #{medical_info_id}
 
@@ -26,9 +27,10 @@
             a.age,
             a.cert_no,
             a.phone,
-            '1' as change_type,
+            b.change_type as change_type,
             a.in_dept_id as dept_id
         FROM inpt_visit a
+        left join outpt_medical_care_apply b on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
           and a.id = #{medical_info_id}
     </select>

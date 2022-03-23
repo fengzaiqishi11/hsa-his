@@ -20,5 +20,5 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 public class StroInvoicingMonthlyDTO extends StroInvoicingMonthlyDO implements Serializable {
     private static final long serialVersionUID = -25487061965976799L;
-
+    private String monthly;
 }

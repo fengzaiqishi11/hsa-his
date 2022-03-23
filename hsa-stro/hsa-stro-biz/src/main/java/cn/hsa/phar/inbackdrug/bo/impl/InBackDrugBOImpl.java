@@ -68,7 +68,8 @@ public class InBackDrugBOImpl extends HsafBO implements InBackDrugBO {
 
     @Resource
     private InDistributeDrugDAO inDistributeDrugDAO;
-
+    @Resource
+    private RedisUtils redisUtils;
     /**
     * @Method returnDrugBeHospitalized
     * @Desrciption 住院退药
@@ -84,54 +85,63 @@ public class InBackDrugBOImpl extends HsafBO implements InBackDrugBO {
     **/
     @Override
     public Boolean updateInHospitalBackDrug(PharInWaitReceiveDTO pharInWaitReceiveDTO) {
-        if (Constants.COST_TYZT.TFYTY.equals(pharInWaitReceiveDTO.getBackCode())) {
-            throw new AppException("已退药不能再退药");
-        }
-        if(ListUtils.isEmpty(pharInWaitReceiveDTO.getIds()) && ListUtils.isEmpty(pharInWaitReceiveDTO.getItemIds())){
-            throw new AppException("参数不全,退药失败");
-        }
-        String hospCode = pharInWaitReceiveDTO.getHospCode();
-        //退药集合
-        List<PharInWaitReceiveDTO> returnReceiveList;
-        if(!ListUtils.isEmpty(pharInWaitReceiveDTO.getIds())) {
-            //按取药明细退药
-            returnReceiveList = pharInWaitReceiveDao.queryWaitReceiveByIds(pharInWaitReceiveDTO);
-        } else {
-            //按药品大类退药
-            returnReceiveList = pharInWaitReceiveDao.queryWaitReceiveByItemIds((pharInWaitReceiveDTO));
-        }
-        if(ListUtils.isEmpty(returnReceiveList)) {
-            throw new AppException("根据项目或者药品获取退药数据为空");
-        }
-        List<String> costList = new ArrayList<>();//费用id集合
-
-        //根据发药状态分类，后续处理
-        for(PharInWaitReceiveDTO waitReceiveDTO:returnReceiveList) {
-            if (Constants.COST_TYZT.TFYTY.equals(waitReceiveDTO.getBackCode())) {
+        String key = pharInWaitReceiveDTO.getHospCode() + pharInWaitReceiveDTO.getDeptId()+ "_UPDATEINHOSPITALBACKDRUG";
+        try{
+            // 住院退药加锁
+            if (redisUtils.setIfAbsent(key,key,600)){
+                throw new AppException("该科室正在退药");
+            }
+            if (Constants.COST_TYZT.TFYTY.equals(pharInWaitReceiveDTO.getBackCode())) {
                 throw new AppException("已退药不能再退药");
             }
-            if (Constants.COST_TYZT.TFBTY.equals(waitReceiveDTO.getBackCode())) {
-                throw new AppException("退费不需要退药不能退药");
+            if(ListUtils.isEmpty(pharInWaitReceiveDTO.getIds()) && ListUtils.isEmpty(pharInWaitReceiveDTO.getItemIds())){
+                throw new AppException("参数不全,退药失败");
             }
-            if (!Constants.LYZT.FY.equals(waitReceiveDTO.getStatusCode())) {
-                throw new AppException("住院发药状态错误,药品名称："+waitReceiveDTO.getItemName());
+            String hospCode = pharInWaitReceiveDTO.getHospCode();
+            //退药集合
+            List<PharInWaitReceiveDTO> returnReceiveList;
+            if(!ListUtils.isEmpty(pharInWaitReceiveDTO.getIds())) {
+                //按取药明细退药
+                returnReceiveList = pharInWaitReceiveDao.queryWaitReceiveByIds(pharInWaitReceiveDTO);
+            } else {
+                //按药品大类退药
+                returnReceiveList = pharInWaitReceiveDao.queryWaitReceiveByItemIds((pharInWaitReceiveDTO));
             }
-            costList.add(waitReceiveDTO.getCostId());
-        }
+            if(ListUtils.isEmpty(returnReceiveList)) {
+                throw new AppException("根据项目或者药品获取退药数据为空");
+            }
+            List<String> costList = new ArrayList<>();//费用id集合
 
-        //发药状态下退药
-        if(!ListUtils.isEmpty(returnReceiveList)) {
-            //住院发药数据操作
-            handleDistribute(pharInWaitReceiveDTO, returnReceiveList);
+            //根据发药状态分类，后续处理
+            for(PharInWaitReceiveDTO waitReceiveDTO:returnReceiveList) {
+                if (Constants.COST_TYZT.TFYTY.equals(waitReceiveDTO.getBackCode())) {
+                    throw new AppException("已退药不能再退药");
+                }
+                if (Constants.COST_TYZT.TFBTY.equals(waitReceiveDTO.getBackCode())) {
+                    throw new AppException("退费不需要退药不能退药");
+                }
+                if (!Constants.LYZT.FY.equals(waitReceiveDTO.getStatusCode())) {
+                    throw new AppException("住院发药状态错误,药品名称："+waitReceiveDTO.getItemName());
+                }
+                costList.add(waitReceiveDTO.getCostId());
+            }
+
+            //发药状态下退药
+            if(!ListUtils.isEmpty(returnReceiveList)) {
+                //住院发药数据操作
+                handleDistribute(pharInWaitReceiveDTO, returnReceiveList);
 //            List<PharInDistributeAllDetailDTO> backDistributeAllDetailDTOs = getBackDistributeAllDetailDTOs(pharInWaitReceiveDTO, returnReceiveList);
 //            if(ListUtils.isEmpty(backDistributeAllDetailDTOs)) {
 //              // 插入发药批次汇总负记录
 //              inDistributeDrugDAO.insertInDistributeAllDetail(backDistributeAllDetailDTOs);
 //            }
-        }
-        //处理退药的费用状态
-        if (!ListUtils.isEmpty(costList)) {
-            handleCost(hospCode, costList);
+            }
+            //处理退药的费用状态
+            if (!ListUtils.isEmpty(costList)) {
+                handleCost(hospCode, costList);
+            }
+        }finally {
+            redisUtils.del(key);
         }
         return true;
     }

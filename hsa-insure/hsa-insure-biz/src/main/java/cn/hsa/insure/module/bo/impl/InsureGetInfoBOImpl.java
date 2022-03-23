@@ -259,6 +259,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorg_opter",settleInfoDTO.getHosrgOpter()); // 医保机构经办人
         setlinfo.put("medins_fill_dept", settleInfoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medins_fill_psn", settleInfoDTO.getMedinsFillPsn()); // 医疗机构填报人
+        setlinfo.put("resp_nurs_code", settleInfoDTO.getZrNurseCode()); // 责任护士
         return setlinfo;
     }
 
@@ -1013,6 +1014,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String,Object> setlinfo = new HashMap<>();
         Map<String,Object> baseInfoMap = handerBaseInfo(map);
         Map<String,Object> mriBaseInfo = handerMriBaseInfo(map);
+
+        for (String key : setlinfoMap.keySet()) {
+            if ("-".equals(MapUtils.get(setlinfoMap, key))) {
+                setlinfoMap.put(key,"");
+            }
+        }
+        for (String key : baseInfoMap.keySet()) {
+            if ("-".equals(MapUtils.get(baseInfoMap, key))) {
+                baseInfoMap.put(key,"");
+            }
+        }
+        for (String key : mriBaseInfo.keySet()) {
+            if ("-".equals(MapUtils.get(mriBaseInfo, key))) {
+                mriBaseInfo.put(key,"");
+            }
+        }
+
         String hospName =MapUtils.get(map,"hospName");
         String hospCode = MapUtils.get(map,"hospCode");
         String visitId = MapUtils.get(map,"visitId");
@@ -1266,7 +1284,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hiPaymtd", "3"); // 医保支付方式  // 默认是按病种分值
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
-        setlinfo.put("medinsFillDept", ""); // 医疗机构填报部门 默认为空
+        setlinfo.put("medinsFillDept", "医保科"); // 医疗机构填报部门 默认为 医保科
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap,"feeCrteTime")); // 医疗机构填报人
         return setlinfo;
     }

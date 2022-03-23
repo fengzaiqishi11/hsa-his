@@ -441,4 +441,11 @@
         </if>
     </select>
 
+    <!--回写是否匹配状态-->
+    <update id="updateBaseDisease">
+        update base_disease
+             set is_match = #{isMatch}
+        where id = #{id} and hosp_code = #{hospCode}
+    </update>
+
 </mapper>

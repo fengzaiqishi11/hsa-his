@@ -166,4 +166,15 @@ public interface InsureDiseaseMatchDAO {
     List<Map<String, Object>> queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
 
     int deleteInsureDiseaseInfos(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
+
+    /**
+     * @param baseDiseaseDTO
+     * @Method updateBaseDisease
+     * @Desrciption 回写是否匹配状态到基础疾病信息表
+     * @Param baseDiseaseDTO
+     * @Author liuliyun
+     * @Date 2022/03/21
+     * @Return Boolean
+     */
+    int updateBaseDisease(BaseDiseaseDTO baseDiseaseDTO);
 }

@@ -894,7 +894,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         }
         map.put("batchNo",batchNo);
         map.put("isUniversity","true");
-        insureUnifiedPayOutptService_consumer.updateFeeSubmit(map).getData();
+        insureUnifiedPayOutptService_consumer.UP_2204(map).getData();
         StringBuffer stringBuffer = new StringBuffer();
         String feeKey = stringBuffer.append(hospCode).append(settleId).append("2204").toString();
         String feeKeyValue = insureIndividualVisitDTO.getMedicalRegNo()+"-"+batchNo+insureIndividualVisitDTO.getAac001();

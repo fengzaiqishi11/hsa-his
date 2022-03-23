@@ -37,6 +37,7 @@
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
         <result property="invoicingTargetId" column="invoicing_target_id" jdbcType="VARCHAR"/>
         <result property="invoicingTargetName" column="invoicing_target_name" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
     </resultMap>
 
 
@@ -53,6 +54,7 @@
         a.invoicing_target_name,round(ifnull((a.surplus_num*a.split_ratio),0),0) splitSurplusNum,
         (case a.item_code when '1' then c.spec when '2' then d.spec end ) spec,
         (case a.item_code when '1' then c.code when '2' then d.code end ) code,
+        (case a.item_code when '1' then c.nation_code when '2' then d.nation_code end ) nation_code,
         (case a.item_code when '1' then (select name from base_product where code = c.prod_code) when '2' then
         (select name from base_product where code = d.prod_code) end ) prodName,
         ifnull(a.new_price,0) new_price,

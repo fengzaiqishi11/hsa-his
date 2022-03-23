@@ -955,7 +955,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         Map<String, Object> outptCostUploadAndTrialParam = new HashMap<String, Object>();
         outptCostUploadAndTrialParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
         outptCostUploadAndTrialParam.put("hospName", outptVisitDTO.getHospName());//医院名称
-        outptCostUploadAndTrialParam.put("insureRegCode", info.get("regCode"));//医保机构编码
+        outptCostUploadAndTrialParam.put("insureRegCode", insureIndividualVisitById.getInsureOrgCode());//医保机构编码
         outptCostUploadAndTrialParam.put("visitId", id);//门诊就诊id
         outptCostUploadAndTrialParam.put("fees", outptCostDTOList);
 
@@ -998,7 +998,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 unifiedPayMap.put("batchNo",MapUtils.get(stringObjectMap,"batchNo"));
                 List<Map<String, Object>> costDOList = MapUtils.get(stringObjectMap, "insureCostList");
                 unifiedPayMap.put("costList", costDOList);
-                trialMap = insureUnifiedPayOutptService_consumer.insureOutptSettleAccountIn(unifiedPayMap);
+                trialMap = insureUnifiedPayOutptService_consumer.UP_2206(unifiedPayMap);
             } catch (Exception e) {
                 unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                 updateCancelFeeSubmit(unifiedPayMap);
@@ -1116,8 +1116,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setState(Constants.ZTBZ.ZC);//状态标志,0正常，2冲红，1，被冲红
         insureIndividualSettleDO.setSettleState(Constants.YBJSZT.SS);//医保结算状态;0试算，1结算
         insureIndividualSettleDO.setCostbatch(null);//费用批次
-        insureIndividualSettleDO.setAka130(info.get("aka130"));//业务类型
-        insureIndividualSettleDO.setBka006(info.get("bka006"));//待遇类型
+        insureIndividualSettleDO.setAka130(insureIndividualVisitById.getAka130());//业务类型
+        insureIndividualSettleDO.setBka006(insureIndividualVisitById.getBka006());//待遇类型
         insureIndividualSettleDO.setInjuryBorthSn(null);//业务申请号,门诊特病，工伤，生育
         insureIndividualSettleDO.setIsAccount(BigDecimalUtils.isZero(akb066) ? Constants.SF.F : Constants.SF.S);//当前结算是否使用个人账户;0是，1否
         insureIndividualSettleDO.setRemark(null);//备注
@@ -1825,6 +1825,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 Map<String, String> payinfo = (Map<String, String>) insureOutptResult.get("payinfo");
                 List<Map<String, Object>> setldetailList = MapUtils.get(payinfo, "setldetailList");
                 insureSettleId = MapUtils.get(payinfo,"setl_id"); // 结算id
+                String balanceValue = MapUtils.get(payinfo,"INSURE_ACCT_PAY_PARAM");  // 海南地区开启个账参数判断
+                String acctUsedFlag= MapUtils.get(payinfo,"acct_used_flag"); // 是否使用个人账户标志
+                BigDecimal personalPrice =
+                        BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(payinfo,"akb066")));
                 if (!ListUtils.isEmpty(setldetailList)) {
                     InsureIndividualFundDTO insureIndividualFundDTO = null;
                     List<InsureIndividualFundDTO> fundDTOList = new ArrayList<>();
@@ -1907,6 +1911,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 individualSettleDO.setClrWay(clrWay);
                 individualSettleDO.setClrType(clrType);
                 individualSettleDO.setClrOptins(clrOptins);
+                if(Constants.SF.S.equals(balanceValue) && Constants.SF.S.equals(acctUsedFlag) ){
+                    individualSettleDO.setPersonalPrice(personalPrice);
+                }
                 //  更新医保结算表的结算信息
                 Map<String,Object> updateMap  = new HashMap<>();
                 updateMap.put("hospCode",hospCode);
@@ -3837,7 +3844,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureVisitParam.put("hospCode",hospCode);
         insureVisitParam.put("insureSettleId","1");  //作为sql条件判断 删除医保结算id不为空的数据
         if(!"1".equals(MapUtils.get(map,"isError"))){
-            Boolean aBoolean = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+            Boolean aBoolean = insureUnifiedPayOutptService_consumer.UP_2205(map).getData();
             if(true == aBoolean){
                 insureIndividualCostService_consumer.deleteOutptInsureCost(insureVisitParam);
             }
@@ -4123,7 +4130,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("insureCostList",insureCostList);
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         map.put("batchNo",batchNo);
-        Boolean aBoolean = insureUnifiedPayOutptService_consumer.updateFeeSubmit(map).getData();
+        Boolean aBoolean = insureUnifiedPayOutptService_consumer.UP_2204(map).getData();
         return map;
     }
 

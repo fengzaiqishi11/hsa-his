@@ -328,6 +328,68 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return stringObjectMap;
     }
 
+    /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3个人账户扣减
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryBalanceCountDecrease (Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureSettleId = MapUtils.get(map, "insureSettleId");
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        if(StringUtils.isEmpty(insureSettleId)){
+            throw new AppException("未获取到医保结算id");
+        }
+        dataMap.put("setl_id", insureSettleId);
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
+        map.put("msgName","个人账户扣减");
+        map.put("visitId",insureIndividualVisitDTO.getVisitId());
+        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5369, paramMap,map);
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        resultDataMap.put("outptMap", outptMap);
+        return resultDataMap;
+    }
+
+    /**
+     * @param map
+     * @Method queryBalanceCount
+     * @Desrciption 6.3.1.3账户余额信息查询
+     * @Param
+     * @Author fuhui
+     * @Date 2022/3/15 15:33
+     * @Return
+     */
+    @Override
+    public Map<String, Object> queryBalanceCount(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String orgCode =  MapUtils.get(map, "orgCode");
+        insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, orgCode);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("certno", MapUtils.checkEmptyErr(map,"certno","证件号码不能为空"));
+        dataMap.put("psnCertType", MapUtils.checkEmptyErr(map,"psn_cert_type","人员证件类型不能为空"));
+        paramMap.put("data", dataMap);
+        map.put("msgName","账户余额信息查询");
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode,
+                orgCode, Constant.UnifiedPay.REGISTER.UP_5368, paramMap,map);
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        resultDataMap.put("outptMap", outptMap);
+        return resultDataMap;
+    }
+
 
     /**
      * @param

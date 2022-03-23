@@ -103,6 +103,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
     private void handeleLocalApplyInfo(Map<String, Object> map, MedicToCareDTO medicToCareDTO) {
         medicToCareDTO.setId(SnowflakeUtils.getId()); // 主键
         medicToCareDTO.setHospCode(MapUtils.get(map, "hospCode")); // 医院编码
+        medicToCareDTO.setOrgCode(MapUtils.get(map, "orgId")); // 医院编码
         medicToCareDTO.setName(MapUtils.get(map, "name")); // 姓名
         medicToCareDTO.setGenderCode(MapUtils.get(map, "sex")); // 性别
         medicToCareDTO.setAge(MapUtils.get(map, "age")); // 年龄

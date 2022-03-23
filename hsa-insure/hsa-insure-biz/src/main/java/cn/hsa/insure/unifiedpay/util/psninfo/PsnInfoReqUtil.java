@@ -103,6 +103,21 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
+        // 港澳台
+        else if (Constant.UnifiedPay.CKLX.GAT.equals(mdtrtCertType)) {
+            // 就诊凭证类型
+            visitMap.put("mdtrt_cert_type", mdtrtCertType);
+            // 传值证件号码
+            visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896());
+            // 传值证件号码
+            visitMap.put("card_sn", insureIndividualBasicDTO.getCardIden());
+            // 传值05 或 04
+            visitMap.put("psn_cert_type", insureIndividualBasicDTO.getBka895());
+            // 传值证件号码
+            visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+            // 传值姓名
+            visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
+        }
         // 其他证件
         else {
             // 就诊凭证类型  传值05

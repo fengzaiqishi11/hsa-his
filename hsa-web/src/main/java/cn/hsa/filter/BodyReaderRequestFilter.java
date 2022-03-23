@@ -18,7 +18,6 @@ import java.nio.charset.StandardCharsets;
  * @Author: luonianxin
  * @Date: 2021-10-25
  */
-@Configuration
 @Slf4j
 @Order(Integer.MIN_VALUE + 49)
 public class BodyReaderRequestFilter implements Filter {

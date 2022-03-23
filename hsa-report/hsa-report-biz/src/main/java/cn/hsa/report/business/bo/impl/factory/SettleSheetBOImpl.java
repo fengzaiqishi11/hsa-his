@@ -47,6 +47,9 @@ public class SettleSheetBOImpl implements ReportBusinessBO {
             map.put("tempCode", "his_insur_settle_0004");
         }
         return map;
+
+//        SettleSheetProcess settleSheetProcess = settleSheetFactory.getSettleSheetProcess(SettleSheetTypeEnum.getProcess((String) map.get("tempCode")));
+//        settleSheetProcess.downLoadSettleInfo(map);
     }
 
 }

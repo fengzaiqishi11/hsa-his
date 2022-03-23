@@ -442,4 +442,32 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
         return  WrapperResponse.success(insureUnifiedBaseBO.checkOneSettle(map));
     }
 
+    /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3个人账户扣减
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryBalanceCountDecrease(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.queryBalanceCountDecrease(map));
+    }
+
+    /**
+     * @param map
+     * @Method queryBalanceCount
+     * @Desrciption 6.3.1.3账户余额信息查询
+     * @Param
+     * @Author fuhui
+     * @Date 2022/3/15 15:33
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> queryBalanceCount(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.queryBalanceCount(map));
+    }
+
 }

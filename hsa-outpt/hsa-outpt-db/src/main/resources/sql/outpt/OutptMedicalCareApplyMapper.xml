@@ -287,8 +287,13 @@
             from outpt_medical_care_apply a
             where id = #{id}
     </select>
-    <select id="queryOrgCode" resultType="java.lang.String">
-        select org_code orgID from outpt_medical_care_apply where id = #{id} and hosp_code = #{hospCode}
+    <select id="queryOrgCode" resultType="java.util.Map">
+        select a.org_code orgID,
+               a.visit_id medical_info_id,
+               b.name clinic_dept
+        from outpt_medical_care_apply a
+        left join base_dept b on a.hosp_code = b.hosp_code and a.visit_dept_id = b.id
+        where a.id = #{id} and a.hosp_code = #{hospCode}
     </select>
 
     <!--通过主键修改数据-->

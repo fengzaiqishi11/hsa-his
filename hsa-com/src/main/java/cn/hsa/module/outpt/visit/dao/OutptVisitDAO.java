@@ -207,4 +207,6 @@ public interface OutptVisitDAO {
      * @Date: 2022/2/24
      */
     void deleteCostByIds(@Param("hospCode") String hospCode, @Param("costIds") List<String> costIds);
+
+    void updateCaretoMedic(Map map);
 }

@@ -59,4 +59,7 @@
     <dubbo:service interface="cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService" ref="pharOutReceiveDetailService_provider"/>
     <!--校验库存-->
     <dubbo:service interface="cn.hsa.module.stro.stock.service.CheckStockService" ref="checkStockService_provider"/>
+    <!--月度进销存-->
+    <dubbo:service interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" ref="stroInvoicingMonthlyService_provider"/>
+
 </beans>

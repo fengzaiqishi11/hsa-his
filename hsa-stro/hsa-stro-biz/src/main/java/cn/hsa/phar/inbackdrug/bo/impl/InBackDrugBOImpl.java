@@ -88,7 +88,7 @@ public class InBackDrugBOImpl extends HsafBO implements InBackDrugBO {
         String key = pharInWaitReceiveDTO.getHospCode() + pharInWaitReceiveDTO.getDeptId()+ "_UPDATEINHOSPITALBACKDRUG";
         try{
             // 住院退药加锁
-            if (redisUtils.setIfAbsent(key,key,600)){
+            if (!redisUtils.setIfAbsent(key,key,600)){
                 throw new AppException("该科室正在退药");
             }
             if (Constants.COST_TYZT.TFYTY.equals(pharInWaitReceiveDTO.getBackCode())) {

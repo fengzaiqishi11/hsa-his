@@ -168,8 +168,8 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         visitInfo.put("age", outptVisitDTO.getAge());
         visitInfo.put("certNo", outptVisitDTO.getCertNo());
         visitInfo.put("phone", outptVisitDTO.getPhone());
-        visitInfo.put("changeType", "1".equals(outptVisitDTO.getChangeType()) ? "医转养" : "养转医");
-        visitInfo.put("deptId", outptVisitDTO.getDeptId());
+        visitInfo.put("changeType", outptVisitDTO.getChangeType());
+        visitInfo.put("deptId", outptVisitDTO.getDeptName());
     }
     // 诊断信息
     private void handeleZd(List<Map<String, Object>> zdInfo, List<OutptDiagnoseDTO> diagnoseDTOS) {

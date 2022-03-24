@@ -7,10 +7,7 @@ import cn.hsa.module.outpt.medictocare.dto.MedicToCareDTO;
 import cn.hsa.module.outpt.medictocare.service.CareToMedicApplyService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -39,8 +36,17 @@ public class CareToMedicController extends BaseController {
      * @date 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/queryCareToMedicPage")
-    public WrapperResponse<PageDTO> queryCareToMedicPage(@RequestBody MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res) {
+//    @PostMapping("/queryCareToMedicPage")
+//    public WrapperResponse<PageDTO> queryCareToMedicPage(@RequestBody MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res) {
+//        SysUserDTO userDTO = getSession(req, res);
+//        medicToCareDTO.setHospCode(userDTO.getHospCode());
+//        Map map = new HashMap();
+//        map.put("hospCode",userDTO.getHospCode());
+//        map.put("medicToCareDTO",medicToCareDTO);
+//        return careToMedicApplyService_consumer.queryCareToMedicPage(map);
+//    }
+    @GetMapping("/queryCareToMedicPage")
+    public WrapperResponse<PageDTO> queryCareToMedicPage(MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO userDTO = getSession(req, res);
         medicToCareDTO.setHospCode(userDTO.getHospCode());
         Map map = new HashMap();

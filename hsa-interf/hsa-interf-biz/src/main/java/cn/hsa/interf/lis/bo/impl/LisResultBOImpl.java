@@ -215,10 +215,8 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public Map queryAdvice(Map map){
         List<Map> mapList = lisResultDAO.queryAdvice(map);
-
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }
@@ -236,7 +234,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }
@@ -254,7 +251,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }

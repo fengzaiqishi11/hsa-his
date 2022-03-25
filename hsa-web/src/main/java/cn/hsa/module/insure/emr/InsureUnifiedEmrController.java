@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -199,5 +200,17 @@ public class InsureUnifiedEmrController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrSync(map);
+    }
+
+    @ApiOperation(value = "导出")
+    @PostMapping("/export")
+    public void export(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res) {
+        try {
+            SysUserDTO sysUserDTO = getSession(req, res);
+            map.put("hospCode", sysUserDTO.getHospCode());
+            insureUnifiedEmrService_comsumer.export(req,map);
+        } catch (Exception e) {
+            log.error("导出报错", e);
+        }
     }
 }

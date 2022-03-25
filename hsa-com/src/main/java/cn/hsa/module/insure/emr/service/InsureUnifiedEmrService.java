@@ -3,6 +3,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -93,4 +94,6 @@ public interface InsureUnifiedEmrService {
      * @return
      */
     WrapperResponse updateInsureUnifiedEmrSync(Map<String, Object> map);
+
+    void export(HttpServletRequest req, Map<String, Object> map);
 }

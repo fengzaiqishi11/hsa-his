@@ -29,6 +29,13 @@ public interface InsureUnifiedEmrService {
      * @param map
      * @return
      */
+    WrapperResponse queryInsureUnifiedEmrDetail(Map<String, Object> map);
+
+    /**
+     *
+     * @param map
+     * @return
+     */
     WrapperResponse updateInsureUnifiedEmrAdminfo(Map<String, Object> map);
 
     /**

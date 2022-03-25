@@ -49,6 +49,21 @@ public class InsureUnifiedEmrController extends BaseController {
     }
 
     /**
+     * @Method queryInsureUnifiedEmrDetail
+     * @Desrciption  电子病历上传-患者详情查询
+     * @Param map
+     * @Author qiang.fan
+     * @Date   2022/3/25 10:03
+     * @Return
+     **/
+    @PostMapping("/queryInsureUnifiedEmrDetail")
+    public WrapperResponse queryInsureUnifiedEmrDetail(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return insureUnifiedEmrService_comsumer.queryInsureUnifiedEmrDetail(map);
+    }
+
+    /**
      * @Method updateInsureUnifiedEmrAdminfo
      * @Desrciption  电子病历上传-患者基本信息修改
      * @Param map

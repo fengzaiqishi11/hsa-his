@@ -2,6 +2,7 @@ package cn.hsa.report.business.bean;
 
 
 import cn.hsa.module.report.business.bo.ReportBaseDataBO;
+import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSONArray;
@@ -11,6 +12,8 @@ import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -42,6 +45,7 @@ public class SettleSheetBean extends GeneralTemplateBean  {
             String insuplcAdmdvsName = reportBaseDataBO.getAdmdvsName(hospCode,insuplcAdmdvs);
             infoMap.put("mdtrtareaAdmvsName",mdtrtareaAdmvsName);
             infoMap.put("insuplcAdmdvsName",insuplcAdmdvsName);
+            infoMap.put("crteName", param.get("crteName"));
 
             //时间处理
             if(infoMap.get("begntime") != null && infoMap.get("endtime") != null){
@@ -55,7 +59,8 @@ public class SettleSheetBean extends GeneralTemplateBean  {
             if(infoMap.get("medType") != null){
                 infoMap.put("medTypeName",reportBaseDataBO.getInsureDictName(hospCode,regCode,"MED_TYPE",infoMap.get("medType").toString()));
             }
-            if(infoMap.get("psnIdetType") != null){
+            infoMap.put("psnIdetTypeName","无");
+            if(infoMap.get("psnIdetType") != null && !"无".equals(infoMap.get("psnIdetType"))){
                 infoMap.put("psnIdetTypeName",reportBaseDataBO.getInsureDictName(hospCode,regCode,"MAT_IDET_CODE",infoMap.get("psnIdetType").toString()));
             }
             if(infoMap.get("aae140") != null){
@@ -79,22 +84,29 @@ public class SettleSheetBean extends GeneralTemplateBean  {
         if (MapUtils.isNotEmpty(param)) {
             String info1 = (String) param.get("feeMapList");
             String jxSettle = (String) param.get("jxSettle");
+            String gsSettle = (String) param.get("gsSettle");
             String oneSettle = (String) param.get("oneSettle");
             String hospCode = (String) param.get("hospCode");
             String regCode = (String) param.get("mdtrtareaAdmvs");
             List<Map<String, Object>> feeMapList = new ArrayList<>();
             List<Map<String, Object>> list = new ArrayList<>();
+            BigDecimal totalFee = new BigDecimal(0.00).setScale(2); // 总费用
             if (StringUtils.isNotEmpty(info1)) {
                 List<Object> objs = JSONArray.parseArray(info1);
                 for (Object obj : objs) {
                     feeMapList.add(JSONObject.parseObject(obj.toString(), Map.class));
                 }
             }
-            if(jxSettle.equals("true") || oneSettle.equals("true")){
+            for(Map feeMap:feeMapList){
+                totalFee = BigDecimalUtils.add(totalFee, new BigDecimal(feeMap.get("sumDetItemFeeSumamt").toString()).setScale(2));
+            }
+            if(jxSettle.equals("true") || oneSettle.equals("true") || gsSettle.equals("true")){
                 for(Map feeMap:feeMapList){
                     if(feeMap.get("medChrgitmType") != null){
                         feeMap.put("medChrgitmTypeName",reportBaseDataBO.getInsureDictName(hospCode,regCode,"MED_CHRGITM_TYPE",feeMap.get("medChrgitmType").toString()));
                     }
+                    BigDecimal sumProp = BigDecimalUtils.divide(new BigDecimal(feeMap.get("sumDetItemFeeSumamt").toString()).setScale(2),totalFee);
+                    feeMap.put("sumProp",BigDecimalUtils.multiply(sumProp,new BigDecimal(100.00)).setScale(2).toString()+"%");
                 }
                 return feeMapList;
             }

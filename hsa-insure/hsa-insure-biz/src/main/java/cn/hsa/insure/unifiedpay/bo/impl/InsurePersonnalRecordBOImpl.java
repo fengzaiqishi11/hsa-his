@@ -364,8 +364,12 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         paramMap.put("refl_date", DateUtils.format(insureInptRecordDTO.getReflDate(), DateUtils.Y_M_DH_M_S)); // 转院日期
         paramMap.put("refl_rea", insureInptRecordDTO.getReflRea()); // 转院原因
         paramMap.put("refl_opnn", insureInptRecordDTO.getReflOpnn()); // 转院意见
-        paramMap.put("begndate", DateUtils.format(insureInptRecordDTO.getBegndate(),DateUtils.Y_M_DH_M_S));  // 开始日期
-        paramMap.put("enddate", DateUtils.format(insureInptRecordDTO.getEnddate(),DateUtils.Y_M_DH_M_S));  // 结束日期
+        if(insureInptRecordDTO.getBegndate() != null){
+            paramMap.put("begndate", DateUtils.format(insureInptRecordDTO.getBegndate(),DateUtils.Y_M_DH_M_S));  // 开始日期
+        }
+        if(insureInptRecordDTO.getEnddate() != null){
+            paramMap.put("enddate", DateUtils.format(insureInptRecordDTO.getEnddate(),DateUtils.Y_M_DH_M_S));  // 结束日期
+        }
         Map<String, Object> dataMap = new HashMap<>(1);
         dataMap.put("refmedin", paramMap);
         Map<String,Object> logMap = new HashMap<>();

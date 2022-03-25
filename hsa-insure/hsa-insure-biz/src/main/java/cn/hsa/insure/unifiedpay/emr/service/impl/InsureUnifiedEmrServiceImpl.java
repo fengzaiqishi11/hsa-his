@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -85,5 +86,10 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
         //TODO 提供给电子病历系统，做数据初始化
         // 初始化 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         return null;
+    }
+
+    @Override
+    public void export(HttpServletRequest req, Map<String, Object> map) {
+
     }
 }

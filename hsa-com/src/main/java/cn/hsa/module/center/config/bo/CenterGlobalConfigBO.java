@@ -2,7 +2,9 @@ package cn.hsa.module.center.config.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -47,4 +49,7 @@ public interface CenterGlobalConfigBO {
    * @return
    */
   Map<String, Object> refreshGlobalConfig(CenterGlobalConfigDTO centerConfigDTO);
+
+  CenterParameterDTO getParameterByCode(String codeName);
+
 }

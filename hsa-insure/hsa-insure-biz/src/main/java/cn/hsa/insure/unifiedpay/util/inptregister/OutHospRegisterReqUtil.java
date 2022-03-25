@@ -41,10 +41,9 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
 
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
         List<InptDiagnoseDTO> inptDiagnoseDTOList = MapUtils.get(map, "inptDiagnoseDTOList");
-        InsureIndividualBasicDTO insureIndividualBasicDTO = MapUtils.get(map, "insureIndividualBasicDTO");
 
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO, insureIndividualBasicDTO));
+        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO));
         inputMap.put("diseinfo", initDiseinfoList(insureIndividualVisitDTO,inptDiagnoseDTOList));
 
         checkRequest(map);
@@ -98,12 +97,12 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         return diseinfoList;
     }
 
-    private Object initMdtrtinfoMap(InsureIndividualVisitDTO insureIndividualVisitDTO, InsureIndividualBasicDTO insureIndividualBasicDTO) {
+    private Object initMdtrtinfoMap(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         //出院信息参数dscginfo
         Map<String, Object> dscginfoMap = new HashMap<>();
         dscginfoMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());//	就诊ID
         dscginfoMap.put("psn_no", insureIndividualVisitDTO.getAac001());//	人员编号
-        dscginfoMap.put("insutype", insureIndividualBasicDTO.getAae140());//	险种类型
+        dscginfoMap.put("insutype", insureIndividualVisitDTO.getAae140());//	险种类型
 
         /**
          * 判断是否是中途结算，如果是中途结算的话  医保出院日期就取（住院费用传输的选择费用区间的结束日期）

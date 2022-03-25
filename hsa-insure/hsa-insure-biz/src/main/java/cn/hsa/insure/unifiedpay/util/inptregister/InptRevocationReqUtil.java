@@ -28,16 +28,11 @@ public class InptRevocationReqUtil<T> extends InsureCommonUtil implements BaseRe
     public String initRequest(T param) {
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(3);
-        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
         InsureInptOutFeeDTO insureInptOutFeeDTO = (InsureInptOutFeeDTO) map.get("insureInptOutFeeDTO");
         //	就诊ID
         dataMap.put("mdtrt_id",insureInptOutFeeDTO.getAaz217());
         //	人员编号
         dataMap.put("psn_no",insureInptOutFeeDTO.getAac001());
-        //	医疗机构编码
-        dataMap.put("medins_code",insureIndividualVisitDTO.getMedicineOrgCode());
-        //	就医登记号
-        dataMap.put("serial_no",insureInptOutFeeDTO.getAaz217());
 
         checkRequest(map);
         map.put("input", dataMap);

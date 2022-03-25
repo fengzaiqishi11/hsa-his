@@ -1,10 +1,16 @@
 package cn.hsa.insure.unifiedpay.util.inptsettle;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,14 +21,27 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.INPT.UP_2302)
-public class InptCostRevocationReqUtil<T> implements BaseReqUtil<T> {
+public class InptCostRevocationReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
     public String initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
+
+        Map map = (Map) param;
+
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+
+        Map<String, Object> dataMap = new HashMap<>(4);
+
+         //费用明细流水号
+        dataMap.put("feedetl_sn","0000");
+        // 就诊ID
+        dataMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());
+        // 个人编号
+        dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());
+
         checkRequest(map);
-        return paramJson;
+        map.put("input", dataMap);
+        return getInsurCommonParam(map);
     }
 
     @Override

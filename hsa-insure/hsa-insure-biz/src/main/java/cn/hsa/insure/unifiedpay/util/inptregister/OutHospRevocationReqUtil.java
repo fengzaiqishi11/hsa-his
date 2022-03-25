@@ -32,7 +32,7 @@ public class OutHospRevocationReqUtil<T> extends InsureCommonUtil implements Bas
         //	人员编号
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());
 
-        checkRequest(map);
+        checkRequest(dataMap);
         map.put("input", dataMap);
         return getInsurCommonParam(map);
     }

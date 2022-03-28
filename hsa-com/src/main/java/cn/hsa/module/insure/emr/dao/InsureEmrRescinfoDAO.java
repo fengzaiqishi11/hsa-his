@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.emr.dao;
 
 import cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,6 @@ public interface InsureEmrRescinfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrRescinfoDTO queryById(InsureEmrRescinfoDTO insureEmrRescinfoDTO);
+    InsureEmrRescinfoDTO queryById(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
 
 }

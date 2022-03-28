@@ -1,7 +1,6 @@
 package cn.hsa.insure.unifiedpay.emr.bo.impl;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
@@ -9,20 +8,27 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
 import cn.hsa.module.insure.emr.dao.InsureEmrAdminfoDAO;
-import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+
+import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.module.insure.emr.dao.*;
+import cn.hsa.module.insure.emr.dto.*;
+
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
+
+import java.util.List;
+
 
 /**
  * @ClassName InsureUnifiedEmrBOImpl
@@ -31,9 +37,29 @@ import java.util.Map;
  * @Date 2022/3/25 13:38
  * @Version 1.0
  **/
-
 @Component
-public class InsureUnifiedEmrBOImpl implements InsureUnifiedEmrBO {
+public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO {
+
+    @Autowired
+    private InsureEmrAdminfoDAO insureEmrAdminfoDAO;
+
+    @Autowired
+    private InsureEmrCoursrinfoDAO insureEmrCoursrinfoDAO;
+
+    @Autowired
+    private InsureEmrDieinfoDAO insureEmrDieinfoDAO;
+
+    @Autowired
+    private InsureEmrDiseinfoDAO insureEmrDiseinfoDAO;
+
+    @Autowired
+    private InsureEmrDscginfoDAO insureEmrDscginfoDAO;
+
+    @Autowired
+    private InsureEmrOprninfoDAO insureEmrOprninfoDAO;
+
+    @Autowired
+    private InsureEmrRescinfoDAO insureEmrRescinfoDAO;
 
     @Autowired
     private InsureEmrAdminfoDAO insureEmrAdminfoDAO;
@@ -53,6 +79,37 @@ public class InsureUnifiedEmrBOImpl implements InsureUnifiedEmrBO {
         PageHelper.startPage(insureEmrUnifiedDTO.getPageNo(), insureEmrUnifiedDTO.getPageSize());
         List<InsureEmrUnifiedDTO> resultList = insureEmrAdminfoDAO.queryInsureUnifiedEmrInfo(insureEmrUnifiedDTO);
         return PageDTO.of(resultList);
+    }
+
+    @Override
+    public InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        InsureEmrDetailDTO insureEmrDetailDTO = new InsureEmrDetailDTO();
+
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+
+        //入院记录
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrAdminfoDTO(insureEmrAdminfoDTO);
+        //病程记录
+        InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO = insureEmrCoursrinfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrCoursrinfoDTO(insureEmrCoursrinfoDTO);
+        //死亡记录
+        InsureEmrDieinfoDTO insureEmrDieinfoDTO = insureEmrDieinfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDieinfoDTO(insureEmrDieinfoDTO);
+        //诊断信息
+        InsureEmrDiseinfoDTO insureEmrDiseinfoDTO = insureEmrDiseinfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDiseinfoDTO(insureEmrDiseinfoDTO);
+        //出院记录
+        InsureEmrDscginfoDTO insureEmrDscginfoDTO = insureEmrDscginfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDscginfoDTO(insureEmrDscginfoDTO);
+        //手术记录
+        InsureEmrOprninfoDTO insureEmrOprninfoDTO = insureEmrOprninfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrOprninfoDTO(insureEmrOprninfoDTO);
+        //病情抢救记录
+        InsureEmrRescinfoDTO insureEmrRescinfoDTO = insureEmrRescinfoDAO.queryById(mdtrtSn, mdtrtId);
+        insureEmrDetailDTO.setInsureEmrRescinfoDTO(insureEmrRescinfoDTO);
+        return insureEmrDetailDTO;
     }
 
     @Override

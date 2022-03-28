@@ -1,6 +1,8 @@
 package cn.hsa.module.insure.emr.dao;
 
 import cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,18 @@ public interface InsureEmrAdminfoDAO  {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrAdminfoDTO queryById(InsureEmrAdminfoDTO insureEmrAdminfoDTO);
+    InsureEmrAdminfoDTO queryById(@Param("mdtrtSn")String mdtrtSn,@Param("mdtrtId")String mdtrtId);
+
+
+    /**
+     * @Menthod queryById()
+     * @Desrciption 电子病历上传-患者列表查询
+     * @Param
+     *1. InsureEmrCoursrinfoDTO  参数数据对象
+     * @Author liuhuiming
+     * @Date   2022/3/25 17:02
+     * @Return int
+     **/
+    List<InsureEmrUnifiedDTO> queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
 }

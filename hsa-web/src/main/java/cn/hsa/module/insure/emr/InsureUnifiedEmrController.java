@@ -3,6 +3,8 @@ package cn.hsa.module.insure.emr;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import io.swagger.annotations.ApiOperation;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -43,9 +46,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/queryInsureUnifiedEmrInfo")
-    public WrapperResponse<PageDTO> queryInsureUnifiedEmrInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<PageDTO> queryInsureUnifiedEmrInfo(@RequestBody InsureEmrUnifiedDTO insureEmrUnifiedDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map =new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
         return insureUnifiedEmrService_comsumer.queryInsureUnifiedEmrInfo(map);
     }
 
@@ -58,9 +63,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/queryInsureUnifiedEmrDetail")
-    public WrapperResponse queryInsureUnifiedEmrDetail(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrDetailDTO> queryInsureUnifiedEmrDetail(@RequestBody InsureEmrUnifiedDTO insureEmrUnifiedDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map =new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
         return insureUnifiedEmrService_comsumer.queryInsureUnifiedEmrDetail(map);
     }
 

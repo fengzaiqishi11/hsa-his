@@ -343,7 +343,7 @@ public interface InsureUnifiedBaseBO {
      * @Date   2022/3/15 15:33
      * @Return
      **/
-    Map<String,Object>  queryBalanceCountDecrease(Map<String, Object> map);
+    Map<String,Object>  updateBalanceCountDecrease(Map<String, Object> map);
 
     /**
      * @param map

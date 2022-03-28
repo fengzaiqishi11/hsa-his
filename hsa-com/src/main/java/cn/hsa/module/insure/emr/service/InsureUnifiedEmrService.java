@@ -94,7 +94,7 @@ public interface InsureUnifiedEmrService {
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrSync(Map<String, Object> map);
+    void updateInsureUnifiedEmrSync(Map<String, Object> map);
 
     void export(HttpServletRequest req, Map<String, Object> map);
 }

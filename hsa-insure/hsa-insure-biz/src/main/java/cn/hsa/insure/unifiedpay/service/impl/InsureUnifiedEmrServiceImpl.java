@@ -102,10 +102,10 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrSync(Map<String, Object> map) {
+    public void updateInsureUnifiedEmrSync(Map<String, Object> map) {
         //TODO 提供给电子病历系统，做数据初始化
         // 初始化 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
-        return insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"));
+        insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"));
     }
 
     @Override

@@ -5,7 +5,6 @@ import java.io.Serializable;
 
 import cn.hsa.base.PageDO;
 import lombok.Data;
-import com.baomidou.mybatisplus.annotation.*;
 
 /**
 * @ClassName InsureEmrDiseinfoDO

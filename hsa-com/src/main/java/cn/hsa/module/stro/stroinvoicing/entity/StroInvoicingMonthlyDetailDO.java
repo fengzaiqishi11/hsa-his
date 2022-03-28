@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * stro_invoicing_monthly
+ * stro_invoicing_monthly_detail
  * @author 
  */
 @Data
@@ -20,10 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
-    private static final long serialVersionUID = -25477061965976799L;
-
-
+public class StroInvoicingMonthlyDetailDO implements Serializable {
     /**
      * 主键
      */
@@ -49,15 +45,57 @@ public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
      */
     private String itemId;
 
-    /**
-     * 项目名称
-     */
     private String itemName;
+
+    /**
+     * 大单位数量（入库为正，出库为负）
+     */
+    private BigDecimal num;
 
     /**
      * 单位代码（DW）
      */
     private String unitCode;
+
+    /**
+     * 当前单位代码（DW）
+     */
+    private String currUnitCode;
+
+    /**
+     * 零售单价
+     */
+    private BigDecimal sellPrice;
+
+    /**
+     * 购进单价
+     */
+    private BigDecimal buyPrice;
+
+    /**
+     * 拆分比
+     */
+    private BigDecimal splitRatio;
+
+    /**
+     * 拆零单价
+     */
+    private BigDecimal splitPrice;
+
+    /**
+     * 拆零数量
+     */
+    private BigDecimal splitNum;
+
+    /**
+     * 拆零单位代码（DW）
+     */
+    private String splitUnitCode;
+
+    /**
+     * 本月期初数量
+     */
+    private BigDecimal upSurplusNum;
 
     /**
      * 本月期末数量
@@ -270,8 +308,9 @@ public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
     private BigDecimal inSalesNum;
 
     /**
-     * 更新时间
+     * 月度进销存主表id
      */
-    private Date updateTime;
+    private String monthlyId;
 
+    private static final long serialVersionUID = 1L;
 }

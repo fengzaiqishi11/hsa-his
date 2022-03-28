@@ -7,6 +7,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
@@ -30,7 +31,7 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
     private BaseDeptService baseDeptService_consumer;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(16);
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
@@ -78,6 +79,7 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         checkRequest(dataMap);
         // 组装参数
         map.put("dataMap", dataMap);
+        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2201);
         return getInsurCommonParam(map);
     }
 

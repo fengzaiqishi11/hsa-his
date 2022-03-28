@@ -4,10 +4,7 @@ import cn.hsa.enums.HsaSrvEnum;
 import cn.hsa.exception.BizRtException;
 import cn.hsa.exception.InsureExecCodesEnum;
 import cn.hsa.insure.enums.FunctionEnum;
-import cn.hsa.insure.util.BaseReqUtil;
-import cn.hsa.insure.util.BaseReqUtilFactory;
-import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.util.HttpConnectUtil;
 import cn.hsa.util.StringUtils;
@@ -17,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,48 +29,29 @@ public class InsureItfBOImpl {
 
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
-    @Resource
-    private BaseReqUtilFactory baseReqUtilFactory;
-    @Resource
-    private InsureConfigurationDAO insureConfigurationDAO;
+
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public Map<String, Object> executeInsur(FunctionEnum functionEnum, Map<String, Object> params) throws BizRtException {
-        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-        insureConfigurationDTO.setHospCode(params.get("hospCode").toString());
-        if (params.get("orgCode") != null) {
-            insureConfigurationDTO.setOrgCode(params.get("orgCode").toString());
-        }
-        if (params.get("configCode") != null) {
-            insureConfigurationDTO.setCode(params.get("configCode").toString());
-        }
-        if (params.get("configRegCode") != null) {
-            insureConfigurationDTO.setRegCode(params.get("configRegCode").toString());
-        }
-        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-
-        String msgId = params.get("msgId") != null ? params.get("msgId").toString() : StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+    public Map<String, Object> executeInsur(FunctionEnum functionEnum, InsureInterfaceParamDTO interfaceParamDTO) throws BizRtException {
+        Map<String, Object> params = new HashMap<>();
         // 定点医药机构编号
-        params.put("medisCode", insureConfigurationDTO.getOrgCode());
+        params.put("medisCode", interfaceParamDTO.getMedins_code());
         // 医保中心编码
-        params.put("regCode", insureConfigurationDTO.getRegCode());
+        params.put("regCode", interfaceParamDTO.getInsur_code());
         // 就医地医保区划
-        params.put("mdtrtareaAdmvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        params.put("mdtrtareaAdmvs", interfaceParamDTO.getMdtrtarea_admvs());
         // 交易编号
-        params.put("infno", functionEnum.getCode());
-        params.put("msgId", msgId);
+        params.put("infno", interfaceParamDTO.getInfno());
+        params.put("msgId", interfaceParamDTO.getMsgid());
         params.put("msgInfo", functionEnum.getCode());
         params.put("msgName", functionEnum.getDesc());
 
-        //参数校验,规则校验和请求初始化
-        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + functionEnum.getCode());
-        String dataJson = reqUtil.initRequest(params);
-        params.put("paramMapJson", dataJson);
+        params.put("paramMapJson", JSON.toJSONString(interfaceParamDTO));
         //请求医保接口日志记录
-        logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), dataJson);
+        logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), JSON.toJSONString(interfaceParamDTO));
         try {
-            String result = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
+            String result = HttpConnectUtil.unifiedPayPostUtil(interfaceParamDTO.getUrl(), JSON.toJSONString(interfaceParamDTO));
             params.put("resultStr", result);
             if (StringUtils.isEmpty(result)) {
                 params.put("resultStr", "null");
@@ -85,9 +64,9 @@ public class InsureItfBOImpl {
                 String errMsg = (String) resultMap.get("err_msg");
 
                 params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
             }
-            logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", msgId, functionEnum.getDesc(), functionEnum.getCode(), result);
+            logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), result);
             params.put("resultStr", result == null ? "null" : result.length() > 5000 ? result.substring(0, 4500) : result);
             return resultMap;
         } catch (Exception e) {
@@ -96,7 +75,7 @@ public class InsureItfBOImpl {
             if (e instanceof BizRtException) {
                 throw e;
             } else {
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), msgId, functionEnum.getDesc(), functionEnum.getCode(), e});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), e});
             }
         } finally {
             insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();

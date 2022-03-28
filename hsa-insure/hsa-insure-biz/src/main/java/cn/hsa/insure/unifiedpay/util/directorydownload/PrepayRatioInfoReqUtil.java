@@ -1,7 +1,9 @@
 package cn.hsa.insure.unifiedpay.util.directorydownload;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.annotation.JSONField;
@@ -20,10 +22,10 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1319)
-public class PrepayRatioInfoReqUtil<T> implements BaseReqUtil<T> {
+public class PrepayRatioInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
 
@@ -60,7 +62,8 @@ public class PrepayRatioInfoReqUtil<T> implements BaseReqUtil<T> {
         paramMap.put("page_size", MapUtils.get(map, "pageSize"));
 
         checkRequest(paramMap);
-        return JSON.toJSONString(paramMap);
+        map.put("infno",Constant.UnifiedPay.REGISTER.UP_1319);
+        return getInsurCommonParam(map);
     }
 
     @Override

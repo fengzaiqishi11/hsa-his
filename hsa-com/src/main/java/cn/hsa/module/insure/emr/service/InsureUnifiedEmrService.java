@@ -87,7 +87,7 @@ public interface InsureUnifiedEmrService {
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrUpload(Map<String, Object> map);
+    void updateInsureUnifiedEmrUpload(Map<String, Object> map);
 
     /**
      *

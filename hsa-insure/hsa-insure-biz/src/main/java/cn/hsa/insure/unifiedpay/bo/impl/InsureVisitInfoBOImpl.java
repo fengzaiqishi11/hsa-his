@@ -3,10 +3,13 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
@@ -57,6 +60,9 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 	@Resource
 	private InsureItfBOImpl insureItfBO;
 
+	@Resource
+	private BaseReqUtilFactory baseReqUtilFactory;
+
 	/**
 	 * @Description: 获取人员信息
 	 * @Param:
@@ -92,7 +98,11 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		}else{
 			params.put("isHospital",Constants.SF.S) ;
 		}
-		Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, paramMap);
+		//参数校验,规则校验和请求初始化
+		BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+		InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+
+		Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, interfaceParamDTO);
 
 		// 14: 门慢门特
 		List<Map<String,Object>> mapList = null;

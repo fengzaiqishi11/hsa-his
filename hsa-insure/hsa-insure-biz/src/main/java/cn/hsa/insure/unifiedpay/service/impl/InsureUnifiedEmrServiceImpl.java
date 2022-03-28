@@ -4,14 +4,19 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
+import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
+import lombok.extern.slf4j.Slf4j;
+
 import cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.util.MapUtils;
+
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,12 +27,15 @@ import java.util.Map;
  * @Version 1.0
  **/
 
+
+@Slf4j
 @HsafRestPath("/service/insure/insureUnifiedEmr")
 @Service("insureUnifiedEmrService_provider")
 public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
 
     @Resource
     private InsureUnifiedEmrBO insureUnifiedEmrBO;
+
 
     @Override
     public WrapperResponse<PageDTO> queryInsureUnifiedEmrInfo(Map<String, Object> map) {
@@ -86,18 +94,18 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrUpload(Map<String, Object> map) {
-        //TODO 根据 his就诊id，医保登记id，人员编号
+    public void updateInsureUnifiedEmrUpload(Map<String, Object> map) {
+        // 根据 his就诊id，医保登记id，人员编号
         // 查询 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         // 组装 报文 调用医保接口
-        return null;
+        insureUnifiedEmrBO.updateInsureUnifiedEmrUpload(MapUtils.get(map,"insureEmrUnifiedDTO"));
     }
 
     @Override
     public WrapperResponse updateInsureUnifiedEmrSync(Map<String, Object> map) {
         //TODO 提供给电子病历系统，做数据初始化
         // 初始化 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
-        return null;
+        return insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"));
     }
 
     @Override

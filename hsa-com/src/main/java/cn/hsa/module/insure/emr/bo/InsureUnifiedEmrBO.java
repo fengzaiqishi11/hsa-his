@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.emr.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
@@ -27,6 +28,9 @@ public interface InsureUnifiedEmrBO {
      **/
     PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
+
+    void updateInsureUnifiedEmrUpload(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
     /**
      * @Method queryInsureUnifiedEmrInfo
      * @Desrciption  电子病历上传-患者详情查询
@@ -36,4 +40,6 @@ public interface InsureUnifiedEmrBO {
      * @Return
      **/
     InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
+    WrapperResponse updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 }

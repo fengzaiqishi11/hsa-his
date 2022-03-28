@@ -69,4 +69,7 @@ public interface InsureEmrOprninfoDAO {
      **/
     InsureEmrOprninfoDTO queryById(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
 
+    void deleteByMap(Map<String, Object> map);
+
+    void insertList(List<InsureEmrOprninfoDTO> operationInfoList);
 }

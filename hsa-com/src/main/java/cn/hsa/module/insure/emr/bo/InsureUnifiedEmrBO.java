@@ -41,5 +41,5 @@ public interface InsureUnifiedEmrBO {
      **/
     InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
-    WrapperResponse updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+    void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 }

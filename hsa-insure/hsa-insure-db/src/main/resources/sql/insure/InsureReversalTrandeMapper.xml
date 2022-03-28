@@ -98,6 +98,8 @@
     <!--结算单查询-->
     <select id="queryDataWith5261" resultType="java.util.Map">
         SELECT
+        e.id,
+        e.settle_id,
         e.insure_reg_code AS insureRegCode,
         e.visit_id as visitId,
         t.medicine_org_code as medicineOrgCode,
@@ -115,6 +117,7 @@
         c.aac006 AS birthday,
         e.crte_time AS crteTime,
         t.visit_drpt_name as visitDrptName,
+        e.person_price as personPrice,
         e.total_price,
         e.crte_time
         FROM

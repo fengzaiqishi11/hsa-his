@@ -523,7 +523,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
         if (sysParameterDTO == null || StringUtils.isEmpty(sysParameterDTO.getValue())) {
             throw new AppException("请先配置系统参数HOSP_MEDICINS_INFO");
-        } else {
+        }
+        else {
             String value = sysParameterDTO.getValue();
             Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
             for (String key : stringObjectMap.keySet()) {

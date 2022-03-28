@@ -121,7 +121,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+    public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
         inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
@@ -130,23 +130,35 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
 //        Map<String, Object> map = getHisEmrJosnInfo(inptVisitDTO);
         Map<String, Object> map = new HashMap<>();
         commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
+        //TODO 先删除后新增
         // 入院信息
         InsureEmrAdminfoDTO insureEmrAdminfoDTO  = queryAdminfoInfo(map);
+        insureEmrAdminfoDAO.deleteByMap(map);
+        insureEmrAdminfoDAO.insert(insureEmrAdminfoDTO);
         // 诊断信息
         List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTO = queryDiagnoseInfo(map);
+        insureEmrDiseinfoDAO.deleteByMap(map);
+        insureEmrDiseinfoDAO.insertList(insureEmrDiseinfoDTO);
         // 病程记录信息
         List<InsureEmrCoursrinfoDTO> coursrinfoList = queryEmrCoursrInfo(map,inptVisitDTO);
+        insureEmrCoursrinfoDAO.deleteByMap(map);
+        insureEmrCoursrinfoDAO.insertList(coursrinfoList);
         // 手术信息
         List<InsureEmrOprninfoDTO> operationInfoList = queryEmrOperationInfo(map);
+        insureEmrOprninfoDAO.deleteByMap(map);
+        insureEmrOprninfoDAO.insertList(operationInfoList);
         // 病情抢救信息
         List<InsureEmrRescinfoDTO>  rescInfoList = queryEmrRescInfo(map,inptVisitDTO);
+        insureEmrRescinfoDAO.deleteByMap(map);
+        insureEmrRescinfoDAO.insertList(rescInfoList);
         // 死亡记录
         List<InsureEmrDieinfoDTO>  dieInfoList = queryEmrDieInfo(map,inptVisitDTO);
+        insureEmrDieinfoDAO.deleteByMap(map);
+        insureEmrDieinfoDAO.insertList(dieInfoList);
         // 出院小结
         List<InsureEmrDscginfoDTO> dscgoInfoList = queryEmrDscgoInfo(map,inptVisitDTO);
-
-        //TODO 先删除后新增
-        return null;
+        insureEmrDscginfoDAO.deleteByMap(map);
+        insureEmrDscginfoDAO.insertList(dscgoInfoList);
     }
 
     @Override

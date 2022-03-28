@@ -56,7 +56,7 @@ public class InsureUnifiedEmrBOImpl implements InsureUnifiedEmrBO {
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrUpload(Map<String, Object> map) {
+    public void updateInsureUnifiedEmrUpload(Map<String, Object> map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
 
         //1.组装参数上传，2.修改状态
@@ -74,7 +74,7 @@ public class InsureUnifiedEmrBOImpl implements InsureUnifiedEmrBO {
         insureItfBO.executeInsur(FunctionEnum.INSUR_EMR_UPLOAD, interfaceParamDTO);
 
         //TODO 2.修改状态
-        return null;
+        insureEmrAdminfoDAO.updateSelective(map);
     }
 
     /**

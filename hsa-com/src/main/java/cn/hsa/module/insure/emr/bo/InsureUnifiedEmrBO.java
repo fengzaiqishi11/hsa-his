@@ -27,5 +27,5 @@ public interface InsureUnifiedEmrBO {
      **/
     PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
-    WrapperResponse updateInsureUnifiedEmrUpload(Map<String, Object> map);
+    void updateInsureUnifiedEmrUpload(Map<String, Object> map);
 }

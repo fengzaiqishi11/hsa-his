@@ -1,9 +1,14 @@
 package cn.hsa.insure.unifiedpay.util;
 
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,23 +22,46 @@ import java.util.Map;
 @Component
 public class InsureCommonUtil {
 
-    public String getInsurCommonParam(Map map) {
-        Map<String, Object> httpMap = new HashMap<>(7);
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
+
+    public InsureInterfaceParamDTO getInsurCommonParam(Map map) {
+        InsureInterfaceParamDTO interfaceParamDTO = new InsureInterfaceParamDTO();
+
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(map.get("hospCode").toString());
+        if (map.get("orgCode") != null) {
+            insureConfigurationDTO.setOrgCode(map.get("orgCode").toString());
+        }
+        if (map.get("configCode") != null) {
+            insureConfigurationDTO.setCode(map.get("configCode").toString());
+        }
+        if (map.get("configRegCode") != null) {
+            insureConfigurationDTO.setRegCode(map.get("configRegCode").toString());
+        }
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
+        String msgId = map.get("msgId") != null ? map.get("msgId").toString() : StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+
         // 交易编号
-        httpMap.put("infno", map.get("infno"));
+        interfaceParamDTO.setInfno(MapUtils.get(map,"infno"));
         // 参保地医保区划
-        httpMap.put("insuplc_admdvs", map.get("insuplcAdmdvs"));
+        interfaceParamDTO.setInsuplc_admdvs(MapUtils.get(map,"insuplcAdmdvs"));
         // 定点医药机构编号
-        httpMap.put("medins_code", map.get("medisCode"));
+        interfaceParamDTO.setInsuplc_admdvs(MapUtils.get(map,"insuplcAdmdvs"));
         // 医保中心编码
-        httpMap.put("insur_code", map.get("regCode"));
+        interfaceParamDTO.setInsur_code(MapUtils.get(map,"regCode"));
         // 就医地医保区划
-        httpMap.put("mdtrtarea_admvs", map.get("mdtrtareaAdmvs"));
-        httpMap.put("msgid", map.get("msgId"));
-        httpMap.put("opter", map.get("opter"));
-        httpMap.put("opter_name", map.get("opter_name"));
-        httpMap.put("input", MapUtils.isEmpty(map.get("input")) ? getInputMap(map) : map.get("input"));
-        return JSONObject.toJSONString(httpMap);
+        interfaceParamDTO.setMdtrtarea_admvs(MapUtils.get(map,"mdtrtareaAdmvs"));
+
+        interfaceParamDTO.setMsgid(msgId);
+        interfaceParamDTO.setOpter(MapUtils.get(map,"opter"));
+        interfaceParamDTO.setOpter_name(MapUtils.get(map,"opter_name"));
+
+        interfaceParamDTO.setUrl(insureConfigurationDTO.getUrl());
+        String input = MapUtils.isEmpty(map.get("input")) ? String.valueOf(getInputMap(map)) : (String) map.get("input");
+        interfaceParamDTO.setInput(input);
+        return interfaceParamDTO;
     }
 
     private Map<String, Object> getInputMap(Map map) {

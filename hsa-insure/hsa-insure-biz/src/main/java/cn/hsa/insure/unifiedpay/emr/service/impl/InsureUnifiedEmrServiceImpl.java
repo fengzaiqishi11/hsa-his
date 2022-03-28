@@ -1,8 +1,12 @@
 package cn.hsa.insure.unifiedpay.emr.service.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
@@ -15,7 +19,12 @@ import java.util.Map;
  * @Version 1.0
  **/
 
+@Slf4j
+@HsafRestPath("/service/insure/insureUnifiedEmr")
+@Service("insureUnifiedEmrService_provider")
 public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
+
+    InsureUnifiedEmrBO insureUnifiedEmrBO;
 
     @Override
     public WrapperResponse<PageDTO> queryInsureUnifiedEmrInfo(Map<String, Object> map) {
@@ -78,7 +87,7 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
         //TODO 根据 his就诊id，医保登记id，人员编号
         // 查询 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         // 组装 报文 调用医保接口
-        return null;
+        return insureUnifiedEmrBO.updateInsureUnifiedEmrUpload(map);
     }
 
     @Override

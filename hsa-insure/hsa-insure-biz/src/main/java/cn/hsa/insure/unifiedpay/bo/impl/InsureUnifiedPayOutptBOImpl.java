@@ -4,6 +4,8 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
@@ -12,6 +14,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayOutptBO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
@@ -82,6 +85,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
     private InsureUnifiedBaseService insureUnifiedBaseService;
     @Resource
     private InsureItfBOImpl insureItfBO;
+    @Resource
+    private BaseReqUtilFactory baseReqUtilFactory;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
@@ -127,8 +132,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_VISIT, paramMap);
+        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_VISIT, interfaceParamDTO);
     }
 
 
@@ -553,8 +561,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_FEE_UPLOAD_BACK, paramMap);
+        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_FEE_UPLOAD_BACK, interfaceParamDTO);
         return true;
     }
 
@@ -602,8 +613,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         // 费用信息
         paramMap.put("costMapInfo", getInptTrialCostInfo(unifiedPayMap));
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        Map<String, Object> resultMap = insureItfBO.executeInsur(functionEnum, paramMap);
+        Map<String, Object> resultMap = insureItfBO.executeInsur(functionEnum, interfaceParamDTO);
         Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
         Map<String, Object> settleDataMap = (Map<String, Object>) outputMap.get("setlinfo");
         settleDataMap.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo());
@@ -928,8 +942,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG, paramMap);
+        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG, interfaceParamDTO);
         /**
          * 处理门诊挂号的回参
          */
@@ -964,8 +981,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG_CANCEL, paramMap);
+        insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_REG_CANCEL, interfaceParamDTO);
         return true;
     }
 
@@ -1002,8 +1022,11 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
         paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         // 调用统一支付平台接口
-        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_SETTLE_BACK, paramMap);
+        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.OUTPATIENT_SETTLE_BACK, interfaceParamDTO);
         resultMap.put("msgId", msgId);
         resultMap.put("funtionCode", FunctionEnum.OUTPATIENT_SETTLE_BACK.getCode());
         resultMap.put("mdtrtareaAdmvs", insureConfigurationDTO.getMdtrtareaAdmvs());

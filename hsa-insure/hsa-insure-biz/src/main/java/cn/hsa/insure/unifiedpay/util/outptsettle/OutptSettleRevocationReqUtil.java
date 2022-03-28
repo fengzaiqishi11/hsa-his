@@ -4,6 +4,7 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 public class OutptSettleRevocationReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
@@ -35,6 +36,7 @@ public class OutptSettleRevocationReqUtil<T> extends InsureCommonUtil implements
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         checkRequest(dataMap);
         map.put("dataMap", dataMap);
+        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2208);
         return getInsurCommonParam(map);
     }
 

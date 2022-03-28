@@ -5,6 +5,7 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
@@ -34,7 +35,7 @@ public class SettlementListReqUtil<T> extends InsureCommonUtil implements BaseRe
     private InsureGetInfoDAO insureGetInfoDAO;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         Map listMap = new HashMap();
@@ -55,6 +56,7 @@ public class SettlementListReqUtil<T> extends InsureCommonUtil implements BaseRe
 
         checkRequest(listMap);
         map.put("input", listMap);
+        map.put("infno",Constant.UnifiedPay.REGISTER.UP_4101);
         return getInsurCommonParam(map);
     }
 

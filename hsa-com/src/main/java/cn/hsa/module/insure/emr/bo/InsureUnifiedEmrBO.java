@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.emr.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
@@ -25,4 +26,6 @@ public interface InsureUnifiedEmrBO {
      * @Return
      **/
     PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
+    WrapperResponse updateInsureUnifiedEmrUpload(Map<String, Object> map);
 }

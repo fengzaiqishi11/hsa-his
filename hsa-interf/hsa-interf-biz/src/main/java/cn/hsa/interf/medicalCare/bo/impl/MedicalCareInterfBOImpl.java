@@ -117,7 +117,7 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         medicToCareDTO.setHopeInTime(DateUtils.parse(MapUtils.get(map, "expect_referral_date"), DateUtils.Y_M_D)); // 期望入住日期
         medicToCareDTO.setApplyId(MapUtils.get(map, "applicant")); // 申请人id
         medicToCareDTO.setApplyName(MapUtils.get(map, "applicant")); // 申请人姓名
-        medicToCareDTO.setApplyTime(DateUtils.parse(MapUtils.get(map, "apply_date"), DateUtils.Y_M_D)); // 申请时间
+        medicToCareDTO.setApplyTime(DateUtils.parse(MapUtils.get(map, "apply_date"), DateUtils.Y_M_DH_M_S)); // 申请时间
         medicToCareDTO.setReferralMainSuit(MapUtils.get(map, "referral_main_suit")); // 转诊主诉
         medicToCareDTO.setNusreTypeCode(MapUtils.get(map, "nursing_level")); // 护理级别
         medicToCareDTO.setStatusCode(Constants.YYSQZT.YSQ); // 医养申请状态
@@ -168,8 +168,8 @@ public class MedicalCareInterfBOImpl extends HsafBO implements MedicalCareInterf
         visitInfo.put("age", outptVisitDTO.getAge());
         visitInfo.put("certNo", outptVisitDTO.getCertNo());
         visitInfo.put("phone", outptVisitDTO.getPhone());
-        visitInfo.put("changeType", "1".equals(outptVisitDTO.getChangeType()) ? "医转养" : "养转医");
-        visitInfo.put("deptId", outptVisitDTO.getDeptId());
+        visitInfo.put("changeType", outptVisitDTO.getChangeType());
+        visitInfo.put("deptId", outptVisitDTO.getDeptName());
     }
     // 诊断信息
     private void handeleZd(List<Map<String, Object>> zdInfo, List<OutptDiagnoseDTO> diagnoseDTOS) {

@@ -31,5 +31,5 @@ public interface MedicToCareDAO {
 
     void insertOutPtInfo(OutptVisitDTO outptVisitDTO);
 
-    String queryOrgCode(String hospCode,String id);
+    Map<String, Object>  queryOrgCode(String hospCode,String id);
 }

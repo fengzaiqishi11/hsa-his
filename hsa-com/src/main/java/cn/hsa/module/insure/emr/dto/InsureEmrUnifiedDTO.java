@@ -125,4 +125,9 @@ public class InsureEmrUnifiedDTO extends PageDO implements Serializable {
      * 医保就诊id
      */
     private String mdtrtId;
+
+    /**
+     * 机构编码
+     */
+    private String hospCode;
 }

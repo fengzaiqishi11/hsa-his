@@ -29,7 +29,7 @@ public interface InsureUnifiedEmrBO {
     PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
 
-    void updateInsureUnifiedEmrUpload(Map<String, Object> map);
+    void updateInsureUnifiedEmrUpload(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
     /**
      * @Method queryInsureUnifiedEmrInfo
@@ -40,4 +40,6 @@ public interface InsureUnifiedEmrBO {
      * @Return
      **/
     InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
+    WrapperResponse updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 }

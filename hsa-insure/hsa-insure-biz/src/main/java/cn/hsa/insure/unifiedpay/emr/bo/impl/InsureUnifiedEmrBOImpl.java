@@ -1,16 +1,24 @@
 package cn.hsa.insure.unifiedpay.emr.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
 import cn.hsa.module.insure.emr.dao.InsureEmrAdminfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.HumpUnderlineUtils;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 
@@ -18,12 +26,15 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.insure.emr.dao.*;
 import cn.hsa.module.insure.emr.dto.*;
 
+import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,8 +121,40 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     }
 
     @Override
-    public void updateInsureUnifiedEmrUpload(Map<String, Object> map) {
-        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);
+    public WrapperResponse updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
+        inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
+
+        //TODO 业务端提供接口数据
+//        Map<String, Object> map = getHisEmrJosnInfo(inptVisitDTO);
+        Map<String, Object> map = new HashMap<>();
+        commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
+        // 入院信息
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO  = queryAdminfoInfo(map);
+        // 诊断信息
+        List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTO = queryDiagnoseInfo(map);
+        // 病程记录信息
+        List<InsureEmrCoursrinfoDTO> coursrinfoList = queryEmrCoursrInfo(map,inptVisitDTO);
+        // 手术信息
+        List<InsureEmrOprninfoDTO> operationInfoList = queryEmrOperationInfo(map);
+        // 病情抢救信息
+        List<InsureEmrRescinfoDTO>  rescInfoList = queryEmrRescInfo(map,inptVisitDTO);
+        // 死亡记录
+        List<InsureEmrDieinfoDTO>  dieInfoList = queryEmrDieInfo(map,inptVisitDTO);
+        // 出院小结
+        List<InsureEmrDscginfoDTO> dscgoInfoList = queryEmrDscgoInfo(map,inptVisitDTO);
+
+        //TODO 先删除后新增
+        return null;
+    }
+
+    @Override
+    public void updateInsureUnifiedEmrUpload(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+        String hospCode = insureEmrUnifiedDTO.getHospCode();
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(hospCode,mdtrtSn,mdtrtId);
 
         //1.组装参数上传，2.修改状态
         Map<String, Object> paramMap = new HashMap<>();
@@ -119,16 +162,25 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        paramMap.put("hospCode", hospCode);
+
+        InsureEmrDetailDTO insureEmrDetailDTO = queryInsureUnifiedEmrDetail(insureEmrUnifiedDTO);
+        paramMap.put("insureEmrDetailDTO", insureEmrDetailDTO);
+
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
-        interfaceParamDTO.setHospCode(MapUtils.get(map, "hospCode"));
+        interfaceParamDTO.setHospCode(hospCode);
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.INSUR_EMR_UPLOAD, interfaceParamDTO);
 
-        //TODO 2.修改状态
-        insureEmrAdminfoDAO.updateSelective(map);
+        //2.修改状态
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("mdtrtSn",mdtrtSn);
+        updateMap.put("mdtrtId",mdtrtId);
+        updateMap.put("status","2");
+        updateMap.put("uploadTime",new Date());
+        insureEmrAdminfoDAO.updateSelective(updateMap);
     }
 
     /**
@@ -140,18 +192,462 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
      * @Date   2021/2/14 10:57
      * @Return InsureIndividualVisitDTO
      **/
-    public  InsureIndividualVisitDTO commonGetVisitInfo(Map<String, Object> map){
-        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
-        String hospCode = (String) map.get("hospCode");//医院编码
-        String visitId = (String) map.get("visitId");//就诊id
+    public  InsureIndividualVisitDTO commonGetVisitInfo(String hospCode,String visitId,String medicalRegNo){
         Map<String, Object> insureVisitParam = new HashMap<String, Object>();
         insureVisitParam.put("id", visitId);
-        insureVisitParam.put("medicalRegNo",MapUtils.get(map,"medicalRegNo"));
+        insureVisitParam.put("medicalRegNo",medicalRegNo);
         insureVisitParam.put("hospCode", hospCode);
-        insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
         if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
             throw new AppException("未查找到医保就诊信息，请做医保登记。");
         }
         return insureIndividualVisitDTO;
+    }
+
+    /**
+     * @Method queryAdminfoInfo
+     * @Desrciption  医保统一支付平台：电子病历上传 入院信息
+     *          入院记录的部分信息：由于是护士填写的 所以需要从护理记录单抽取数据
+     * @Param map
+     *
+     * @Author liuliyun
+     * @Date   2021/8/21 10:59
+     * @Return
+     **/
+    private InsureEmrAdminfoDTO queryAdminfoInfo(Map<String, Object> map) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        InptVisitDTO inptVisit = MapUtils.get(map,"inptVisitDTO");
+        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
+        Map<String, Object> detailMap = new HashMap<>();
+        detailMap.put("mdtrt_sn",inptVisit.getId()); // 就医流水号
+        detailMap.put("mdtrt_id",medicalRegNo); // 医保就诊ID（医保必填）
+        detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(医保必填)
+        detailMap.put("mdtrtsn",inptVisit.getInNo()); // 住院号
+        detailMap.put("name",inptVisit.getName()); // 姓名
+        detailMap.put("gend",inptVisit.getGenderCode()); // 性别
+        detailMap.put("age",inptVisit.getAge()); // 年龄
+        detailMap.put("adm_rec_no",inptVisit.getInNo()); // 入院记录流水号
+        detailMap.put("wardarea_name",inptVisit.getWardName()); // 病区名称
+        detailMap.put("dept_code",inptVisit.getNationCode()); // 科室编码
+        detailMap.put("dept_name",inptVisit.getInDeptName()); // 科室名称
+        detailMap.put("bedno",inptVisit.getBedName()); // 病床号
+        detailMap.put("adm_time", DateUtils.format(inptVisit.getInTime(),DateUtils.Y_M_DH_M_S)); // 入院时间
+        String zgPracCertiNo =  inptVisit.getOutptPracCertiNo();
+        String outptDoctorName = inptVisit.getOutptDoctorName();
+        String zzPracCertiNo = inptVisit.getZzPracCertiNo();
+        String zzDoctorName = inptVisit.getZzDoctorName();
+        detailMap.put("chfpdr_code",zzPracCertiNo); // 主诊医师代码
+        detailMap.put("chfpdr_name",zzDoctorName); // 主诊医师姓名
+        if(StringUtils.isEmpty(outptDoctorName)){
+            detailMap.put("rec_doc_code",zgPracCertiNo); // 接诊医生编号
+            detailMap.put("rec_doc_name",zgPracCertiNo); // 接诊医生姓名
+        }else{
+            detailMap.put("rec_doc_code",zzPracCertiNo); // 接诊医生编号
+            detailMap.put("rec_doc_name",zzDoctorName); // 接诊医生姓名
+        }
+        detailMap.put("ipdr_code",inptVisit.getJzPracCertiNo()); // 住院医师编号
+        detailMap.put("ipdr_name",inptVisit.getJzDoctorName()); // 住院医师姓名
+        detailMap.put("chfdr_code",inptVisit.getZgPracCertiNo()); // 主任医师编号
+        detailMap.put("chfdr_name",inptVisit.getZgDoctorName()); // 主任医师姓名
+        detailMap.put("main_symp",inptVisit.getDiseaseName()); // 主要症状
+        detailMap.put("adm_rea",inptVisit.getInRemark()); // 入院原因
+        detailMap.put("adm_way",inptVisit.getInModeCode()); // 入院途径
+
+
+
+        MapUtils.isEmptyErr("illhis_stte_name","入院记录所属病历内容的病史陈述者姓名为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("illhis_stte_rltl","入院记录所属病历内容的陈述者与患者关系代码为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("stte_rele","入院记录所属病历内容的陈述内容是否可靠标识为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("chfcomp","入院记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("dise_now","入院记录所属病历内容的现病史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("hlcon","入院记录所属病历内容的健康状况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("dise_his","入院记录所属病历内容的疾病史（含外伤）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("ifet","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("ifet_his","入院记录所属病历内容的患者传染性标志为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("prev_vcnt","入院记录所属病历内容的传染病史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("oprn_his","入院记录所属病历内容的手术史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("bld_his","入院记录所属病历内容的输血史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("algs_his","入院记录所属病历内容的过敏史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("psn_his","入院记录所属病历内容的个人史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("mrg_his","入院记录所属病历内容的婚育史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("mena_his","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("fmhis","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_tprt","入院记录所属病历内容的家族史为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_pule","入院记录所属病历内容的体格检查 -- 脉率（次 /mi数字）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_vent_frqu","入院记录所属病历内容的体格检查--呼吸频率为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_systolic_pre","入院记录所属病历内容的体格检查 -- 收缩压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_dstl_pre","入院记录所属病历内容的体格检查 -- 舒张压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_height","入院记录所属病历内容的体格检查--身高（cm）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_wt","入院记录所属病历内容的体格检查--体重（kg）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_ordn_stas","入院记录所属病历内容的体格检查 -- 一般状况 检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_skin_musl","入院记录所属病历内容的体格检查 -- 皮肤和黏膜检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_spef_lymph","入院记录所属病历内容的体格检查 -- 全身浅表淋巴结检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_head","入院记录所属病历内容的体格检查 -- 头部及其器官检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_neck","入院记录所属病历内容的体格检查 -- 颈部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_chst","入院记录所属病历内容的体格检查 -- 胸部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_abd","入院记录所属病历内容的体格检查 -- 腹部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_finger_exam","入院记录所属病历内容的体格检查 -- 肛门指诊检查结果描述为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_spin","入院记录所属病历内容的体格检查 -- 脊柱检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("physexm_all_fors","入院记录所属病历内容的体格检查 -- 四肢检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("nersys","入院记录所属病历内容的体格检查 -- 神经系统检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("spcy_info","入院记录所属病历内容的专科情况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("asst_exam_rslt","入院记录所属病历内容的辅助检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("apgr","入院记录所属病历内容的评分值(Apgar)为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("diet_info","入院记录所属病历内容的饮食情况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("growth_deg","入院记录所属病历内容的发育程度为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("mtl_stas_norm","入院记录所属病历内容的精神状态正常标志为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("slep_info","入院记录所属病历内容的睡眠状况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("sp_info","入院记录所属病历内容的特殊情况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("mind_info","入院记录所属病历内容的心理状态为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("nurt","入院记录所属病历内容的营养状态为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("self_ablt","入院记录所属病历内容的自理能力为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("nurscare_obsv_item_name","入院记录所属病历内容的护理观察项目名称为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("nurscare_obsv_rslt","入院记录所属病历内容的护理观察结果为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("smoke","入院记录所属病历内容的吸烟标志为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("stop_smok_days","入院记录所属病历内容的停止吸烟天数为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("smok_info","入院记录所属病历内容的吸烟状况为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("smok_day","入院记录所属病历内容的日吸烟量（支）为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("drnk","入院记录所属病历内容的饮酒标志为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("drnk_frqu","入院记录所属病历内容的饮酒频率为空,请先确认好是否匹配好元素,或者是否填写");
+        MapUtils.isEmptyErr("drnk_day","入院记录所属病历内容的日饮酒量（mL）为空,请先确认好是否匹配好元素,或者是否填写");
+        detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
+        detailMap.put("vali_flag", Constants.SF.S); // 有效标志
+
+        detailMap.put("source", Constants.SF.S); // 有效标志
+        return HumpUnderlineUtils.underlineToHump(JSON.parseObject(JSON.toJSONString(detailMap)),InsureEmrAdminfoDTO.class);
+    }
+
+    /**
+     * @Method queryDiagnoseInfo
+     * @Desrciption 获取诊断信息
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 14:52
+     * @return*/
+    private List<InsureEmrDiseinfoDTO> queryDiagnoseInfo(Map<String, Object> map) {
+        List<InptDiagnoseDTO> diagnoseDTOS = MapUtils.get(map,"diagnoseDTOS");
+        Map<String, Object> diseinfoMap;
+        InptDiagnoseDTO diagnoseDTO ;
+        List<Map<String,Object>> diagnoseList = new ArrayList<>();
+        if(ListUtils.isEmpty(diagnoseDTOS)){
+            throw new AppException("未获取到住院诊断信息");
+        }
+        for(int i=0;i<diagnoseDTOS.size();i++){
+            diagnoseDTO=diagnoseDTOS.get(i);
+            diseinfoMap  = new HashMap<>();
+            String typeCode = diagnoseDTO.getTypeCode();
+            if("201".equals(typeCode)){
+                diseinfoMap.put("inout_diag_type","1");//	出入院诊断类别  1.代表入院诊断  2 代表出院诊断
+            }else{
+                diseinfoMap.put("inout_diag_type","2");//	出入院诊断类别  1.代表入院诊断  2 代表出院诊断
+            }
+            // 云his的入院，和出院是分别有一个主诊断 需要特殊处理
+            if("201".equals(typeCode) && Constants.SF.S.equals(diagnoseDTO.getIsMain())){
+                diseinfoMap.put("maindiag_flag", "0");//主诊断标志
+            }else{
+                diseinfoMap.put("maindiag_flag", diagnoseDTO.getIsMain());//主诊断标志
+            }
+            diseinfoMap.put("diag_seq",i+1);//	诊断序列号
+            diseinfoMap.put("diag_time",DateUtils.format(diagnoseDTO.getCrteTime(),DateUtils.Y_M_DH_M_S));//诊断时间
+            diseinfoMap.put("wm_diag_code",diagnoseDTO.getInsureInllnessName());//	西医诊断编码
+            diseinfoMap.put("wm_diag_name",diagnoseDTO.getInsureInllnessCode());//	西医诊断名称
+            diseinfoMap.put("tcm_dise_code","");//	中医病名代码
+            diseinfoMap.put("tcm_dise_name","");//	中医病名
+            diseinfoMap.put("tcmsymp_code","");//	中医证候代码
+            diseinfoMap.put("tcmsymp","");//	中医证候
+            diseinfoMap.put("vali_flag",Constants.SF.S);//	有效标志
+            diseinfoMap.put("source", "1"); // 有效标志
+            diagnoseList.add(diseinfoMap);
+        }
+        map.put("diagnoseList",diagnoseList);
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(diagnoseList)),InsureEmrDiseinfoDTO.class);
+    }
+
+    /**
+     * @Method queryOperationInfo
+     * @Desrciption 获取手术信息
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 15:39
+     * @return*/
+    private List<InsureEmrOprninfoDTO> queryEmrOperationInfo(Map<String, Object> map) {
+        List<OperInfoRecordDTO> operInfoRecordInfos = MapUtils.get(map,"operInfoRecordInfos");
+        OperInfoRecordDTO operInfoRecordDTO;
+        Map<String, Object> operInfoMap = null;
+        String rank ="";
+        List<Map<String,Object>> operationInfoList = new ArrayList<>();
+        if(!ListUtils.isEmpty(operInfoRecordInfos)){
+            for(int i=0;i<operInfoRecordInfos.size();i++){
+                operInfoRecordDTO=operInfoRecordInfos.get(i);
+                operInfoMap  = new HashMap<>();
+                operInfoMap.put("oprn_appy_id",operInfoRecordDTO.getId());//	手术申请单号
+                operInfoMap.put("oprn_seq",i);//	手术序列号
+                operInfoMap.put("blotype_abo",operInfoRecordDTO.getBloodCode());//	血型代码
+                operInfoMap.put("oprn_time",DateUtils.format(operInfoRecordDTO.getOperPlanTime(),DateUtils.Y_M_DH_M_S));//手术日期
+                operInfoMap.put("oprn_type_code","无"); // 手术分类代码
+                operInfoMap.put("oprn_type_name","无");//  手术分类名称
+                operInfoMap.put("bfpn_diag_code",""); //术前诊断代码
+                operInfoMap.put("bfpn_oprn_diag_name",operInfoRecordDTO.getOperDiseaseAfter()); //术前诊断名称
+                operInfoMap.put("bfpn_inhosp_ifet","");//	术前是否发生院内感染
+                operInfoMap.put("afpn_diag_code","");//	术后诊断代码
+                operInfoMap.put("afpn_diag_name",operInfoRecordDTO.getOperDiseaseAfter());//	术后诊断名称
+                operInfoMap.put("sinc_heal_lv",operInfoRecordDTO.getHealCode()); //手术切口愈合等级代码
+                operInfoMap.put("sinc_heal_lv_code",""); // 手术切口愈合等级
+                operInfoMap.put("back_oprn","");//	是否重返手术（明确定义）
+                operInfoMap.put("selv","");//	是否择期
+                operInfoMap.put("prev_abtl_medn","");//	是否预防使用抗菌药物
+                operInfoMap.put("abtl_medn_days","");//	预防使用抗菌药物天数
+                operInfoMap.put("oprn_oprt_code",operInfoRecordDTO.getOperDiseaseIcd9()); //手术操作代码
+                operInfoMap.put("oprn_oprt_name",operInfoRecordDTO.getOperDiseaseName()); //手术操作名称
+                if("1".equals(rank)){
+                    operInfoMap.put("oprn_lv_code","1"); //手术级别代码
+                    operInfoMap.put("oprn_lv_name","一级");//手术级别名称
+                }
+                else if("2".equals(rank)){
+                    operInfoMap.put("oprn_lv_code","2"); //手术级别代码
+                    operInfoMap.put("oprn_lv_name","二级手术");//手术级别名称
+                }
+                else if("3".equals(rank)){
+                    operInfoMap.put("oprn_lv_code","3"); //手术级别代码
+                    operInfoMap.put("oprn_lv_name","三级手术");//手术级别名称
+                }
+                else if("4".equals(rank)){
+                    operInfoMap.put("oprn_lv_code","4"); //手术级别代码
+                    operInfoMap.put("oprn_lv_name","四级手术");//手术级别名称
+                }
+                else{
+                    operInfoMap.put("oprn_lv_code","5"); //手术级别代码
+                    operInfoMap.put("oprn_lv_name","其他等级");//手术级别名称
+                }
+                operInfoMap.put("anst_mtd_code",operInfoRecordDTO.getAnaCode());//	麻醉-方法代码
+                operInfoMap.put("anst_mtd_name",operInfoRecordDTO.getAnaCode());//	麻醉-方法名称
+                operInfoMap.put("anst_lv_code","无");//	麻醉分级代码
+                operInfoMap.put("anst_lv_name","无");//	麻醉分级名称
+                operInfoMap.put("exe_anst_dept_code","无");//	麻醉执行科室代码
+                operInfoMap.put("exe_anst_dept_name","无");//	麻醉执行科室名称
+                operInfoMap.put("anst_efft","");// 麻醉效果
+                operInfoMap.put("oprn_begntime",operInfoRecordDTO.getCrteTime());//	手术开始时间
+                operInfoMap.put("oprn_endtime",operInfoRecordDTO.getOperEndTime());//	手术结束时间
+                operInfoMap.put("oprn_asps","");//	麻醉分级名称
+                operInfoMap.put("oprn_asps_ifet","");//	无菌手术是否感染
+                operInfoMap.put("afpn_info","");//	手术后情况
+                operInfoMap.put("oprn_merg","");//	是否手术合并症
+                operInfoMap.put("oprn_conc","");//	是否手术并发症
+                operInfoMap.put("oprn_anst_dept_code",operInfoRecordDTO.getOperDeptId());//	手术执行科室代码
+                operInfoMap.put("oprn_anst_dept_name",operInfoRecordDTO.getOperRoomName());//	手术执行科室名称
+                operInfoMap.put("palg_dise","");// 病理检查
+                operInfoMap.put("oth_med_dspo",""); //其他医学处置
+                operInfoMap.put("out_std_oprn_time",""); //是否超出手术时间
+                operInfoMap.put("oprn_oper_name",operInfoRecordDTO.getDoctorName());//	手术者姓名
+                operInfoMap.put("oprn_asit_name1",operInfoRecordDTO.getAssistantName1());//	助手I姓名
+                operInfoMap.put("oprn_asit_name2",operInfoRecordDTO.getAssistantName2());//	助手Ⅱ姓名
+                operInfoMap.put("anst_dr_name",operInfoRecordDTO.getAnaName1());// 麻醉医师姓名
+                operInfoMap.put("anst_asa_lv_code","");//麻醉ASA分级代码
+                operInfoMap.put("anst_asa_lv_name","");// 麻醉ASA分级名称
+                operInfoMap.put("anst_medn_code","");// 麻醉药物代码
+                operInfoMap.put("anst_medn_name",""); // 麻醉药物名称
+                operInfoMap.put("anst_medn_dos",""); // 麻醉药物剂量
+                operInfoMap.put("anst_dosunt","");// 计量单位
+                operInfoMap.put("anst_begntime",""); // 麻醉开始时间
+                operInfoMap.put("anst_endtime",""); // 麻醉结束时间
+                operInfoMap.put("anst_merg_symp_code",""); // 麻醉合并症代码
+                operInfoMap.put("anst_merg_symp",""); // 麻醉合并症名称
+                operInfoMap.put("anst_merg_symp_dscr",""); // 麻醉合并症描述
+                operInfoMap.put("pacu_begntime",""); // 入复苏室时间
+                operInfoMap.put("pacu_endtime",""); // 出复苏室时间
+                operInfoMap.put("oprn_selv",""); // 是否择期手术
+                operInfoMap.put("canc_oprn",""); // 是否择取消手术
+                operInfoMap.put("vali_flag",Constants.SF.S); //有效标志
+
+                operInfoMap.put("source", "1"); //
+                operationInfoList.add(operInfoMap);
+            }
+        }
+
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(operationInfoList)),InsureEmrOprninfoDTO.class);
+    }
+
+    /**
+     * @Method queryDiagnoseInfo
+     * @Desrciption 获取病程记录
+     * @Param
+     * @Author liuliyun
+     * @Date   2021/8/21 14:52
+     * @return*/
+    private List<InsureEmrCoursrinfoDTO> queryEmrCoursrInfo(Map<String, Object> map, InptVisitDTO inptVisitDTO) {
+        List<Map<String,Object>> emrCoReList  = MapUtils.get(map,"coursrinfo");
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        if(!ListUtils.isEmpty(emrCoReList)){
+            for(Map<String,Object> item : emrCoReList){
+                // 科室代码
+                item.put("dept",inptVisitDTO.getInDeptCode());
+                // 科室名称
+                item.put("dept_name",inptVisitDTO.getInDeptName());
+                // 病区名称
+                item.put("wardarea_name",inptVisitDTO.getWardName());
+                // 床位号
+                item.put("bedno",inptVisitDTO.getBedName());
+                MapUtils.checkEmptyErr(item,"dept","病程记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dept_name","病程记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"wardarea_name","病程记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"bedno","病程记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"chfcomp","病程记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"cas_ftur","病程记录所属病历内容的病例特点为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_evid","病程记录所属病历内容的诊断依据为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"prel_wm_diag_code","病程记录所属病历内容的初步诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"prel_tcm_dise_name","病程记录所属病历内容的初步诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"finl_wm_diag_code","病程记录所属病历内容的鉴别诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"finl_wm_diag_name","病程记录所属病历内容的鉴别诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_plan","病程记录所属病历内容的诊疗计划为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"ipdr_code","病程记录所属病历内容的住院医师编号为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"ipdr_name","病程记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"prnt_doc_name","病程记录所属病历内容的上级医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
+
+                item.put("source", "1"); //
+            }
+        }
+//        return resultList;
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(resultList)),InsureEmrCoursrinfoDTO.class);
+    }
+
+    /**
+     * @Method queryEmrRescInfo
+     * @Desrciption  医保统一支付平台：电子病历上传 病情抢救记录
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:05
+     * @Return
+     **/
+    private List<InsureEmrRescinfoDTO> queryEmrRescInfo(Map<String, Object> map, InptVisitDTO inptVisitDTO) {
+        List<Map<String,Object>> emrRescReList = MapUtils.get(map,"rescinfo");
+        if(!ListUtils.isEmpty(emrRescReList)){
+            for(Map<String,Object> item : emrRescReList){
+                // 科室代码
+                item.put("dept",inptVisitDTO.getInDeptCode());
+                // 科室名称
+                item.put("dept_name",inptVisitDTO.getInDeptName());
+                // 病区名称
+                item.put("wardarea_name",inptVisitDTO.getWardName());
+                // 床位号
+                item.put("bedno",inptVisitDTO.getBedName());
+                // 入院诊断名称
+                item.put("adm_dise",inptVisitDTO.getInsureIllnessName());
+                // 入院诊断编码
+                item.put("diag_code",inptVisitDTO.getInsureIllnessCode());
+                MapUtils.checkEmptyErr(item,"dept","病情抢救记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dept_name","病情抢救记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"wardarea_name","病情抢救记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"bedno","病情抢救记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"diag_name","病情抢救记录所属病历内容的诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"diag_code","病情抢救记录所属病历内容的诊断代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"cond_chg","病情抢救记录所属病历内容的病情变化情况为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"resc_mes","病情抢救记录所属病历内容的抢救措施为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"oprn_oprt_code","病情抢救记录所属病历内容的手术操作代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"oprn_oprt_name","病情抢救记录所属病历内容的手术操作名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"oprn_oper_part","病情抢救记录所属病历内容的手术及操作目标部位名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"itvt_name","病情抢救记录所属病历内容的介入物名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"oprt_mtd","病情抢救记录所属病历内容的操作方法为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"oprt_cnt","病情抢救记录所属病历内容的操作次数为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"resc_begntime","病情抢救记录所属病历内容的抢救开始日期时间为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"resc_endtime","病情抢救记录所属病历内容的抢救结束日期时间为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_item_name","病情抢救记录所属病历内容的检查/检验项目名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_ccls","病情抢救记录所属病历内容的检查/检验结果为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_ccls_qunt","病情抢救记录所属病历内容的检查/检验定量结果为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dise_ccls_code","病情抢救记录所属病历内容的检查/检验结果代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"mnan","病情抢救记录所属病历内容的注意事项为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"resc_psn_list","病情抢救记录所属病历内容的参加抢救人员名单为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"proftechttl_code","病情抢救记录所属病历内容的专业技术职务类别代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"doc_code","病情抢救记录所属病历内容的医师编号为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dr_name","病情抢救记录所属病历内容的医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
+
+                item.put("source", "1"); //
+            }
+        }
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(emrRescReList)),InsureEmrRescinfoDTO.class);
+    }
+
+    /**
+     * @Method queryEmrDieInfo
+     * @Desrciption  死亡记录
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:20
+     * @Return
+     **/
+    private List<InsureEmrDieinfoDTO> queryEmrDieInfo(Map<String, Object> map, InptVisitDTO inptVisitDTO) {
+        List<Map<String,Object>> emrDieReList = MapUtils.get(map,"dieinfo");
+        if(!ListUtils.isEmpty(emrDieReList)){
+            for(Map<String,Object> item : emrDieReList){
+                // 科室代码
+                item.put("dept",inptVisitDTO.getInDeptCode());
+                // 科室名称
+                item.put("dept_name",inptVisitDTO.getInDeptName());
+                // 病区名称
+                item.put("wardarea_name",inptVisitDTO.getWardName());
+                // 床位号
+                item.put("bedno",inptVisitDTO.getBedName());
+                // 入院时间
+                item.put("adm_time",DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_DH_M_S));
+                // 入院诊断编码
+                item.put("adm_dise",inptVisitDTO.getInsureIllnessCode());
+                // 入院情况
+                item.put("adm_info",inptVisitDTO.getInSituationName());
+                MapUtils.checkEmptyErr(item,"dept","死亡记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"dept_name","死亡记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"wardarea_name","死亡记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"bedno","死亡记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"adm_time","死亡记录所属病历内容的入院时间为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"adm_dise","死亡记录所属病历内容的入院诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"adm_info","死亡记录所属病历内容的入院情况为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"trt_proc_dscr","死亡记录所属病历内容的诊疗过程描述为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"die_time","死亡记录所属病历内容的死亡时间为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"die_drt_rea","死亡记录所属病历内容的直接死亡原因名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"die_drt_rea_code","死亡记录所属病历内容的直接死亡原因编码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"die_dise_name","死亡记录所属病历内容的死亡诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"die_diag_code","死亡记录所属病历内容的死亡诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"agre_corp_dset","死亡记录所属病历内容的家属是否同意尸体解剖标志为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"ipdr_name","死亡记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"chfpdr_name","死亡记录所属病历内容的主诊医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                MapUtils.checkEmptyErr(item,"chfdr_name","死亡记录所属病历内容的主任医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+                item.put("sign_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	签字日期时间
+                item.put("vali_flag",Constants.SF.S);//	是否有效
+
+                item.put("source", "1"); //
+            }
+        }
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(emrDieReList)),InsureEmrDieinfoDTO.class);
+    }
+
+    /**
+     * @Method queryEmrDscgoInfo
+     * @Desrciption  出院小结
+     * @Param map
+     * @Author liuliyun
+     * @Date   2021/8/21 17:35
+     * @Return
+     **/
+    private List<InsureEmrDscginfoDTO> queryEmrDscgoInfo(Map<String, Object> map, InptVisitDTO inptVisitDTO) {
+        List<Map<String,Object>> emrOutReList = MapUtils.get(map,"dscginfo");
+        if (!ListUtils.isEmpty(emrOutReList)){
+            for(Map<String,Object> item : emrOutReList){
+                // 出院日期
+                item.put("dscg_date",DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));
+                // 科别
+                item.put("caty",inptVisitDTO.getOutptNationCode());
+                // 出院诊断
+                item.put("dscg_dise_dscr",inptVisitDTO.getInsureIllnessCode());
+                //有效标志
+                item.put("vali_flag",Constants.SF.S);
+
+                item.put("source", "1"); //
+            }
+        }else{
+            throw new AppException("请检查是否书写电子病历内容:出院小结信息等");
+        }
+        return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(emrOutReList)),InsureEmrDscginfoDTO.class);
     }
 }

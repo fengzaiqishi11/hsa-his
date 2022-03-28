@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.emr.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +31,7 @@ public interface InsureUnifiedEmrService {
      * @param map
      * @return
      */
-    WrapperResponse queryInsureUnifiedEmrDetail(Map<String, Object> map);
+    WrapperResponse<InsureEmrDetailDTO> queryInsureUnifiedEmrDetail(Map<String, Object> map);
 
     /**
      *

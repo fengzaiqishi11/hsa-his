@@ -2,6 +2,8 @@ package cn.hsa.module.insure.emr.dao;
 
 
 import cn.hsa.module.insure.emr.dto.InsureEmrCoursrinfoDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -67,7 +69,7 @@ public interface InsureEmrCoursrinfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrCoursrinfoDTO queryById(InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO);
+    InsureEmrCoursrinfoDTO queryById(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
 
 
 }

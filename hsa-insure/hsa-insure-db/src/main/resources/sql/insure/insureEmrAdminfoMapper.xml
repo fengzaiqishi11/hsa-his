@@ -188,11 +188,46 @@
     hosp_code
   </sql>
 
-  <select id="queryById" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
+  <select id="queryById" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
   SELECT <include refid="Base_Column_List"/>
   FROM insure_emr_adminfo
-  where uuid = #{uuid}
+  where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId}
 </select>
+
+  <select id="queryInsureUnifiedEmrInfo" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO" resultType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO">
+    select t.visit_id, t.medical_reg_no as mdtrtId, t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
+    t.visit_time as visitTime, e.crte_time as crteTime, c.bka035_name as psnTypeName, c.aka130_name as medTypeName, a.upload_time as uploadTime
+    FROM
+    insure_individual_settle e
+    LEFT JOIN insure_individual_visit t ON e.hosp_code = t.hosp_code
+    AND e.visit_id = t.visit_id
+    LEFT JOIN insure_individual_basic c ON c.hosp_code = t.hosp_code
+    AND c.id = t.mib_id
+    left join insure_emr_adminfo a on a.mdtrt_sn = e.visit_id
+    <where>
+      <if test="visitDrptId != null and visitDrptId != '' ">
+        and t.visit_drpt_id = #{visitDrptId}
+      </if>
+      <if test="medType != null and medType != '' ">
+        and c.aka130 = #{medType}
+      </if>
+      <if test="visitNo != null and visitNo != '' ">
+        and t.visit_no = #{visitNo}
+      </if>
+      <if test="certno != null and certno != '' ">
+        and c.aac002 = #{certno}
+      </if>
+      <if test="uploadStatu != null and uploadStatu != '' ">
+        and a.statu = #{uploadStatu}
+      </if>
+      <if test="startTime != null and startTime != '' ">
+        and date(e.crte_time) &gt;= date(#{startTime})
+      </if>
+      <if test="endTime != null and endTime != ''">
+        and date(e.crte_time) &lt;= date(#{endTime})
+      </if>
+    </where>
+  </select>
 
   <select id="select" resultMap="BaseResultMap" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO" >
     <!--

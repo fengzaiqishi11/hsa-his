@@ -61,9 +61,6 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     @Autowired
     private InsureEmrRescinfoDAO insureEmrRescinfoDAO;
 
-    @Autowired
-    private InsureEmrAdminfoDAO insureEmrAdminfoDAO;
-
     @Resource
     private InsureItfBOImpl insureItfBO;
 

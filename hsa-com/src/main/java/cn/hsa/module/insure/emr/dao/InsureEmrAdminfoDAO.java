@@ -83,4 +83,5 @@ public interface InsureEmrAdminfoDAO  {
      **/
     List<InsureEmrUnifiedDTO> queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
+    void deleteByMap(Map map);
 }

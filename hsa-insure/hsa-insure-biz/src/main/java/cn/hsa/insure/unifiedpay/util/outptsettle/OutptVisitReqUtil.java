@@ -45,10 +45,21 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         dataMap.put("mdtrtinfo", initPatientInfo(map));
         dataMap.put("diseinfo", initMapList(map));
         // 校验参数
+        HashMap commParam = new HashMap();
+
         checkRequest(dataMap);
-        map.put("input", dataMap);
-        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2203);
-        return getInsurCommonParam(map);
+        commParam.put("input", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2203);
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

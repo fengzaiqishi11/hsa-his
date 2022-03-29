@@ -7,6 +7,7 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.util.HttpConnectUtil;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class InsureItfBOImpl {
 
     public Map<String, Object> executeInsur(FunctionEnum functionEnum, InsureInterfaceParamDTO interfaceParamDTO) throws BizRtException {
         Map<String, Object> params = new HashMap<>();
+        params.put("hospCode", interfaceParamDTO.getHospCode());
         // 定点医药机构编号
         params.put("medisCode", interfaceParamDTO.getMedins_code());
         // 医保中心编码
@@ -46,6 +48,11 @@ public class InsureItfBOImpl {
         params.put("msgId", interfaceParamDTO.getMsgid());
         params.put("msgInfo", functionEnum.getCode());
         params.put("msgName", functionEnum.getDesc());
+
+        params.put("crteId", interfaceParamDTO.getOpter());
+        params.put("crteName", interfaceParamDTO.getOpter_name());
+        params.put("visitId", interfaceParamDTO.getVisitId());
+        params.put("isHospital", interfaceParamDTO.getIsHospital());
 
         params.put("paramMapJson", JSON.toJSONString(interfaceParamDTO));
         //请求医保接口日志记录
@@ -59,12 +66,19 @@ public class InsureItfBOImpl {
                 throw new BizRtException(InsureExecCodesEnum.INSURE_RETURN_DATA_EMPTY, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), functionEnum.getDesc()});
             }
             Map<String, Object> resultMap = JSON.parseObject(result);
-            params.put("infcode", resultMap.get("infcode"));
-            if (!resultMap.get("infcode").equals("0")) {
-                String errMsg = (String) resultMap.get("err_msg");
-
+            //云助手系统内部错误处理
+            if(("999").equals(resultMap.get("code"))){
+                params.put("infcode", resultMap.get("code"));
+                String errMsg = (String) resultMap.get("msg");
                 params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("msg")});
+            }
+            params.put("infcode", resultMap.get("infcode"));
+            //云助手调用医保，医保返回错误处理
+            if (!("0").equals(resultMap.get("infcode"))) {
+                String errMsg = (String) resultMap.get("err_msg");
+                params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
+                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
             }
             logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), result);
             params.put("resultStr", result == null ? "null" : result.length() > 5000 ? result.substring(0, 4500) : result);

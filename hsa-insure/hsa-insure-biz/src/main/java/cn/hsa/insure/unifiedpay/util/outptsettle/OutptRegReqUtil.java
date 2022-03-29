@@ -75,12 +75,23 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         baseDeptDTO = baseDeptService_consumer.getById(deptMap).getData();
         // 科别
         dataMap.put("caty", baseDeptDTO.getTypeCode());
+
+        HashMap commParam = new HashMap();
         // 校验参数
         checkRequest(dataMap);
         // 组装参数
-        map.put("dataMap", dataMap);
-        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2201);
-        return getInsurCommonParam(map);
+        commParam.put("dataMap", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2201);
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

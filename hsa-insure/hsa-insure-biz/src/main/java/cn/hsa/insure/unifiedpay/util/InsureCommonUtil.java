@@ -5,6 +5,7 @@ import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -48,18 +49,18 @@ public class InsureCommonUtil {
         // 参保地医保区划
         interfaceParamDTO.setInsuplc_admdvs(MapUtils.get(map,"insuplcAdmdvs"));
         // 定点医药机构编号
-        interfaceParamDTO.setInsuplc_admdvs(MapUtils.get(map,"insuplcAdmdvs"));
+        interfaceParamDTO.setMedins_code(insureConfigurationDTO.getOrgCode());
         // 医保中心编码
-        interfaceParamDTO.setInsur_code(MapUtils.get(map,"regCode"));
+        interfaceParamDTO.setInsur_code(insureConfigurationDTO.getRegCode());
         // 就医地医保区划
-        interfaceParamDTO.setMdtrtarea_admvs(MapUtils.get(map,"mdtrtareaAdmvs"));
+        interfaceParamDTO.setMdtrtarea_admvs(insureConfigurationDTO.getMdtrtareaAdmvs());
 
         interfaceParamDTO.setMsgid(msgId);
         interfaceParamDTO.setOpter(MapUtils.get(map,"opter"));
         interfaceParamDTO.setOpter_name(MapUtils.get(map,"opter_name"));
 
         interfaceParamDTO.setUrl(insureConfigurationDTO.getUrl());
-        String input = MapUtils.isEmpty(map.get("input")) ? String.valueOf(getInputMap(map)) : (String) map.get("input");
+        String input = MapUtils.isEmpty(map.get("input")) ? JSON.toJSONString(getInputMap(map)) : JSON.toJSONString(map.get("input"));
         interfaceParamDTO.setInput(input);
         return interfaceParamDTO;
     }

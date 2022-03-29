@@ -34,10 +34,21 @@ public class OutptSettleRevocationReqUtil<T> extends InsureCommonUtil implements
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         // 人员编号
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+
+        HashMap commParam = new HashMap();
         checkRequest(dataMap);
-        map.put("dataMap", dataMap);
-        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2208);
-        return getInsurCommonParam(map);
+        commParam.put("dataMap", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2208);
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

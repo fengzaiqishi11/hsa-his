@@ -62,4 +62,6 @@ public class InsureInterfaceParamDTO implements Serializable {
 
     private String busi_cycle_no;
 
+    private String visitId;
+    private String isHospital;
 }

@@ -78,10 +78,22 @@ public class OutptPreSettleReqUtil<T> extends InsureCommonUtil implements BaseRe
         preSettleMap.put("insutype", insureIndividualVisitDTO.getAae140());
         // 公立医院改革标志
         preSettleMap.put("pub_hosp_rfom_flag", null);
+
+        HashMap commParam = new HashMap();
         checkRequest(preSettleMap);
-        map.put("dataMap", preSettleMap);
-        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2206);
-        return getInsurCommonParam(map);
+        commParam.put("dataMap", preSettleMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2206);
+
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

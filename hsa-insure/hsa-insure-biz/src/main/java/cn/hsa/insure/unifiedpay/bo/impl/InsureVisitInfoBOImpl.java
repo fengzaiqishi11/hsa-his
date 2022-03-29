@@ -91,16 +91,19 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.putAll(params);
-		paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
+		// 参保地医保区划
+		paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
 		paramMap.put("configRegCode", regCode);
-		if (Constants.SF.F.equals(MapUtils.get(params,"isHospital"))) {
-			params.put("isHospital",Constants.SF.F) ;
-		}else{
-			params.put("isHospital",Constants.SF.S) ;
-		}
 		//参数校验,规则校验和请求初始化
-		BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+		BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INSUR_BASE_INFO.getCode());
 		InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+		interfaceParamDTO.setHospCode((String) params.get("hospCode"));
+		if (Constants.SF.F.equals(MapUtils.get(params,"isHospital"))) {
+			interfaceParamDTO.setIsHospital(Constants.SF.F);
+		}else{
+			interfaceParamDTO.setIsHospital(Constants.SF.S);
+		}
+		interfaceParamDTO.setVisitId(insureIndividualBasicDTO.getVisitId());
 
 		Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, interfaceParamDTO);
 

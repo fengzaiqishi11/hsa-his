@@ -87,10 +87,22 @@ public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUt
         settleMap.put("inscp_scp_amt", "");
         // 公立医院改革标志
         settleMap.put("pub_hosp_rfom_flag", "");
+
+        HashMap commParam = new HashMap();
         checkRequest(settleMap);
-        map.put("dataMap", settleMap);
-        map.put("infno",Constant.UnifiedPay.OUTPT.UP_2207);
-        return getInsurCommonParam(map);
+
+        commParam.put("dataMap", settleMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2207);
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

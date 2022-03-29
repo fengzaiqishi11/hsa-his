@@ -133,9 +133,20 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
         checkRequest(visitMap);
-        map.put("dataMap", visitMap);
-        map.put("infno",Constant.UnifiedPay.REGISTER.UP_1101);
-        return getInsurCommonParam(map);
+        HashMap commParam = new HashMap();
+        commParam.put("dataMap", visitMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_1101);
+
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

@@ -121,42 +121,46 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     }
 
     @Override
-    public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+    public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO,Map<String, Object> emrMap) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
         inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
 
-        //TODO 业务端提供接口数据
-//        Map<String, Object> map = getHisEmrJosnInfo(inptVisitDTO);
-        Map<String, Object> map = new HashMap<>();
+
+
         commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
-        //TODO 先删除后新增
+        //先删除后新增
+        HashMap map = new HashMap();
+        // 数据来源
+        map.put("source", "1");
+        map.put("mdtrtId", insureEmrUnifiedDTO.getMdtrtId());
+        map.put("mdtrtSn", insureEmrUnifiedDTO.getVisitId());
         // 入院信息
-        InsureEmrAdminfoDTO insureEmrAdminfoDTO  = queryAdminfoInfo(map);
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO  = queryAdminfoInfo(emrMap);
         insureEmrAdminfoDAO.deleteByMap(map);
         insureEmrAdminfoDAO.insert(insureEmrAdminfoDTO);
         // 诊断信息
-        List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTO = queryDiagnoseInfo(map);
+        List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTO = queryDiagnoseInfo(emrMap);
         insureEmrDiseinfoDAO.deleteByMap(map);
         insureEmrDiseinfoDAO.insertList(insureEmrDiseinfoDTO);
         // 病程记录信息
-        List<InsureEmrCoursrinfoDTO> coursrinfoList = queryEmrCoursrInfo(map,inptVisitDTO);
+        List<InsureEmrCoursrinfoDTO> coursrinfoList = queryEmrCoursrInfo(emrMap,inptVisitDTO);
         insureEmrCoursrinfoDAO.deleteByMap(map);
         insureEmrCoursrinfoDAO.insertList(coursrinfoList);
         // 手术信息
-        List<InsureEmrOprninfoDTO> operationInfoList = queryEmrOperationInfo(map);
+        List<InsureEmrOprninfoDTO> operationInfoList = queryEmrOperationInfo(emrMap);
         insureEmrOprninfoDAO.deleteByMap(map);
         insureEmrOprninfoDAO.insertList(operationInfoList);
         // 病情抢救信息
-        List<InsureEmrRescinfoDTO>  rescInfoList = queryEmrRescInfo(map,inptVisitDTO);
+        List<InsureEmrRescinfoDTO>  rescInfoList = queryEmrRescInfo(emrMap,inptVisitDTO);
         insureEmrRescinfoDAO.deleteByMap(map);
         insureEmrRescinfoDAO.insertList(rescInfoList);
         // 死亡记录
-        List<InsureEmrDieinfoDTO>  dieInfoList = queryEmrDieInfo(map,inptVisitDTO);
+        List<InsureEmrDieinfoDTO>  dieInfoList = queryEmrDieInfo(emrMap,inptVisitDTO);
         insureEmrDieinfoDAO.deleteByMap(map);
         insureEmrDieinfoDAO.insertList(dieInfoList);
         // 出院小结
-        List<InsureEmrDscginfoDTO> dscgoInfoList = queryEmrDscgoInfo(map,inptVisitDTO);
+        List<InsureEmrDscginfoDTO> dscgoInfoList = queryEmrDscgoInfo(emrMap,inptVisitDTO);
         insureEmrDscginfoDAO.deleteByMap(map);
         insureEmrDscginfoDAO.insertList(dscgoInfoList);
     }
@@ -174,7 +178,6 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("hospCode", hospCode);
 
         InsureEmrDetailDTO insureEmrDetailDTO = queryInsureUnifiedEmrDetail(insureEmrUnifiedDTO);
         paramMap.put("insureEmrDetailDTO", insureEmrDetailDTO);
@@ -183,6 +186,8 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.S);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.INSUR_EMR_UPLOAD, interfaceParamDTO);
 
@@ -327,7 +332,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
         detailMap.put("vali_flag", Constants.SF.S); // 有效标志
 
-        detailMap.put("source", Constants.SF.S); // 有效标志
+        detailMap.put("source", "1"); // 数据来源
         return HumpUnderlineUtils.underlineToHump(JSON.parseObject(JSON.toJSONString(detailMap)),InsureEmrAdminfoDTO.class);
     }
 

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -104,8 +105,11 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
     @Override
     public void updateInsureUnifiedEmrSync(Map<String, Object> map) {
         //TODO 提供给电子病历系统，做数据初始化
+        //TODO 业务端提供接口数据
+//        Map<String, Object> map = getHisEmrJosnInfo(inptVisitDTO);
+        Map<String, Object> emrMap = new HashMap<>();
         // 初始化 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
-        insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"));
+        insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"),emrMap);
     }
 
     @Override

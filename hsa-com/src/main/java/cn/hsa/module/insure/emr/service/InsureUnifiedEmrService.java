@@ -1,7 +1,7 @@
 package cn.hsa.module.insure.emr.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
+import cn.hsa.module.insure.emr.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,49 +38,49 @@ public interface InsureUnifiedEmrService {
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrAdminfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrAdminfoDTO> updateInsureUnifiedEmrAdminfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrDiseinfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrDiseinfoDTO> updateInsureUnifiedEmrDiseinfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrCoursrinfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrCoursrinfoDTO> updateInsureUnifiedEmrCoursrinfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrOprninfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrOprninfoDTO> updateInsureUnifiedEmrOprninfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrRescinfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrRescinfoDTO> updateInsureUnifiedEmrRescinfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrDieinfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrDieinfoDTO> updateInsureUnifiedEmrDieinfo(Map<String, Object> map);
 
     /**
      *
      * @param map
      * @return
      */
-    WrapperResponse updateInsureUnifiedEmrDscginfo(Map<String, Object> map);
+    WrapperResponse<InsureEmrDscginfoDTO> updateInsureUnifiedEmrDscginfo(Map<String, Object> map);
 
     /**
      *

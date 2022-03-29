@@ -2,7 +2,6 @@ package cn.hsa.module.insure.emr.dao;
 
 
 import cn.hsa.module.insure.emr.dto.InsureEmrCoursrinfoDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -69,7 +68,18 @@ public interface InsureEmrCoursrinfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrCoursrinfoDTO queryById(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+    List<InsureEmrCoursrinfoDTO> queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+
+    /**
+     * @Menthod queryByUuid()
+     * @Desrciption 查询单条
+     * @Param
+     *1. uuid  参数数据对象
+     * @Author liuhuiming
+     * @Date   2022/3/25 17:02
+     * @Return
+     **/
+    InsureEmrCoursrinfoDTO queryByUuid(Long uuid);
 
 
     void deleteByMap(Map<String, Object> map);

@@ -15,30 +15,21 @@ import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.HumpUnderlineUtils;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.insure.emr.dao.*;
 import cn.hsa.module.insure.emr.dto.*;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -93,31 +84,151 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     public InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         InsureEmrDetailDTO insureEmrDetailDTO = new InsureEmrDetailDTO();
 
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
         String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
         String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
 
         //入院记录
-        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryById(mdtrtSn, mdtrtId);
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
         insureEmrDetailDTO.setInsureEmrAdminfoDTO(insureEmrAdminfoDTO);
         //病程记录
-        InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO = insureEmrCoursrinfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrCoursrinfoDTO(insureEmrCoursrinfoDTO);
+        List<InsureEmrCoursrinfoDTO> insureEmrCoursrinfoDTOList = insureEmrCoursrinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrCoursrinfoDTOList(insureEmrCoursrinfoDTOList);
         //死亡记录
-        InsureEmrDieinfoDTO insureEmrDieinfoDTO = insureEmrDieinfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrDieinfoDTO(insureEmrDieinfoDTO);
+        List<InsureEmrDieinfoDTO> insureEmrDieinfoDTOList = insureEmrDieinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDieinfoDTOList(insureEmrDieinfoDTOList);
         //诊断信息
-        InsureEmrDiseinfoDTO insureEmrDiseinfoDTO = insureEmrDiseinfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrDiseinfoDTO(insureEmrDiseinfoDTO);
+        List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTOList = insureEmrDiseinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDiseinfoDTOList(insureEmrDiseinfoDTOList);
         //出院记录
-        InsureEmrDscginfoDTO insureEmrDscginfoDTO = insureEmrDscginfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrDscginfoDTO(insureEmrDscginfoDTO);
+        List<InsureEmrDscginfoDTO> insureEmrDscginfoDTOList = insureEmrDscginfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrDscginfoDTOList(insureEmrDscginfoDTOList);
         //手术记录
-        InsureEmrOprninfoDTO insureEmrOprninfoDTO = insureEmrOprninfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrOprninfoDTO(insureEmrOprninfoDTO);
+        List<InsureEmrOprninfoDTO> insureEmrOprninfoDTOList = insureEmrOprninfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrOprninfoDTOList(insureEmrOprninfoDTOList);
         //病情抢救记录
-        InsureEmrRescinfoDTO insureEmrRescinfoDTO = insureEmrRescinfoDAO.queryById(mdtrtSn, mdtrtId);
-        insureEmrDetailDTO.setInsureEmrRescinfoDTO(insureEmrRescinfoDTO);
+        List<InsureEmrRescinfoDTO> insureEmrRescinfoDTOList = insureEmrRescinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        insureEmrDetailDTO.setInsureEmrRescinfoDTOList(insureEmrRescinfoDTOList);
+
         return insureEmrDetailDTO;
+    }
+
+    @Override
+    public InsureEmrAdminfoDTO updateInsureUnifiedEmrAdminfo(InsureEmrAdminfoDTO insureEmrAdminfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrAdminfoDTO insureEmrAdminfo = insureEmrAdminfoDAO.queryByUuid(insureEmrAdminfoDTO.getUuid());
+        if(insureEmrAdminfo == null){
+            if(insureEmrAdminfoDTO.getUuid() == null){
+                insureEmrAdminfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrAdminfoDAO.insert(insureEmrAdminfoDTO);
+        }else {
+            insureEmrAdminfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrAdminfoDTO)));
+        }
+        return  insureEmrAdminfoDTO;
+    }
+
+    @Override
+    public InsureEmrDiseinfoDTO updateInsureUnifiedEmrDiseinfo(InsureEmrDiseinfoDTO insureEmrDiseinfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrDiseinfoDTO insureEmrDiseinfoDTO1 = insureEmrDiseinfoDAO.queryByUuid(insureEmrDiseinfoDTO.getUuid());
+        if(insureEmrDiseinfoDTO1 == null){
+            if(insureEmrDiseinfoDTO.getUuid() == null){
+                insureEmrDiseinfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrDiseinfoDAO.insert(insureEmrDiseinfoDTO);
+        }else {
+            insureEmrDiseinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDiseinfoDTO)));
+        }
+        return  insureEmrDiseinfoDTO;
+    }
+
+    @Override
+    public InsureEmrCoursrinfoDTO updateInsureUnifiedEmrCoursrinfo(InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO1 = insureEmrCoursrinfoDAO.queryByUuid(insureEmrCoursrinfoDTO.getUuid());
+        if(insureEmrCoursrinfoDTO1 == null){
+            if(insureEmrCoursrinfoDTO.getUuid() == null){
+                insureEmrCoursrinfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrCoursrinfoDAO.insert(insureEmrCoursrinfoDTO);
+        }else {
+            insureEmrCoursrinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrCoursrinfoDTO)));
+        }
+        return  insureEmrCoursrinfoDTO;
+    }
+
+    @Override
+    public InsureEmrOprninfoDTO updateInsureUnifiedEmrOprninfo(InsureEmrOprninfoDTO insureEmrOprninfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrOprninfoDTO insureEmrOprninfoDTO1 = insureEmrOprninfoDAO.queryByUuid(insureEmrOprninfoDTO.getUuid());
+        if(insureEmrOprninfoDTO1 == null){
+            if(insureEmrOprninfoDTO.getUuid() == null){
+                insureEmrOprninfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrOprninfoDAO.insert(insureEmrOprninfoDTO);
+        }else {
+            insureEmrOprninfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrOprninfoDTO)));
+        }
+        return  insureEmrOprninfoDTO;
+    }
+
+    @Override
+    public InsureEmrRescinfoDTO updateInsureUnifiedEmrRescinfo(InsureEmrRescinfoDTO insureEmrRescinfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrRescinfoDTO insureEmrRescinfoDTO1 = insureEmrRescinfoDAO.queryByUuid(insureEmrRescinfoDTO.getUuid());
+        if(insureEmrRescinfoDTO1 == null){
+            if(insureEmrRescinfoDTO.getUuid() == null){
+                insureEmrRescinfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrRescinfoDAO.insert(insureEmrRescinfoDTO);
+        }else {
+            insureEmrRescinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrRescinfoDTO)));
+        }
+        return  insureEmrRescinfoDTO;
+    }
+
+    @Override
+    public InsureEmrDieinfoDTO updateInsureUnifiedEmrDieinfo(InsureEmrDieinfoDTO insureEmrDieinfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrDieinfoDTO insureEmrDieinfoDTO1 = insureEmrDieinfoDAO.queryByUuid(insureEmrDieinfoDTO.getUuid());
+        if(insureEmrDieinfoDTO1 == null){
+            if(insureEmrDieinfoDTO.getUuid() == null){
+                insureEmrDieinfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrDieinfoDAO.insert(insureEmrDieinfoDTO);
+        }else {
+            insureEmrDieinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDieinfoDTO)));
+        }
+        return  insureEmrDieinfoDTO;
+    }
+
+    @Override
+    public InsureEmrDscginfoDTO updateInsureUnifiedEmrDscginfo(InsureEmrDscginfoDTO insureEmrDscginfoDTO){
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureEmrDscginfoDTO insureEmrDscginfoDTO1 = insureEmrDscginfoDAO.queryByUuid(insureEmrDscginfoDTO.getUuid());
+        if(insureEmrDscginfoDTO1 == null){
+            if(insureEmrDscginfoDTO.getUuid() == null){
+                insureEmrDscginfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureEmrDscginfoDAO.insert(insureEmrDscginfoDTO);
+        }else {
+            insureEmrDscginfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDscginfoDTO)));
+        }
+        return  insureEmrDscginfoDTO;
+    }
+
+    @Override
+    public List<InsureEmrUnifiedDTO> export(InsureEmrUnifiedDTO insureEmrUnifiedDTO){
+        // 设置分页信息
+        PageHelper.startPage(insureEmrUnifiedDTO.getPageNo(), insureEmrUnifiedDTO.getPageSize());
+        List<InsureEmrUnifiedDTO> resultList = insureEmrAdminfoDAO.queryInsureUnifiedEmrInfo(insureEmrUnifiedDTO);
+        return resultList;
     }
 
     @Override

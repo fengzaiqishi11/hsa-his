@@ -69,7 +69,7 @@ public interface InsureEmrAdminfoDAO  {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrAdminfoDTO queryById(@Param("mdtrtSn")String mdtrtSn,@Param("mdtrtId")String mdtrtId);
+    InsureEmrAdminfoDTO queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn,@Param("mdtrtId")String mdtrtId);
 
 
     /**
@@ -82,6 +82,17 @@ public interface InsureEmrAdminfoDAO  {
      * @Return int
      **/
     List<InsureEmrUnifiedDTO> queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
+    /**
+     * @Menthod queryByUuid()
+     * @Desrciption 查询单条
+     * @Param
+     *1. insureEmrAdminfoDTO  参数数据对象
+     * @Author liuhuiming
+     * @Date   2022/3/25 17:02
+     * @Return int
+     **/
+    InsureEmrAdminfoDTO queryByUuid(Long uuid);
 
     void deleteByMap(Map map);
 }

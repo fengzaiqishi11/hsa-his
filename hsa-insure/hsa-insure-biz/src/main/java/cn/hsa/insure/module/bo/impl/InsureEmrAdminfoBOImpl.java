@@ -53,7 +53,7 @@ public class InsureEmrAdminfoBOImpl extends HsafBO implements InsureEmrAdminfoBO
 
      @Override
      public InsureEmrAdminfoDTO queryInsureEmrAdminfoById(InsureEmrAdminfoDTO insureEmrAdminfoDTO) {
-          return insureEmrAdminfoDAO.queryById(insureEmrAdminfoDTO.getMdtrtSn(),insureEmrAdminfoDTO.getMdtrtId());
+          return insureEmrAdminfoDAO.queryByUuid(insureEmrAdminfoDTO.getUuid());
      }
 
 }

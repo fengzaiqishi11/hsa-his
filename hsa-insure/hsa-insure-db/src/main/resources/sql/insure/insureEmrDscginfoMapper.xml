@@ -104,11 +104,17 @@
     oth_imp_info, vali_flag, source, create_time, update_time, hosp_code
   </sql>
 
-  <select id="queryById" resultType="cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO">
+  <select id="queryByMdtrtSn" resultType="cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO">
     SELECT <include refid="Base_Column_List"/>
     FROM insure_emr_dscginfo
     where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId}
   </select>
+
+    <select id="queryByUuid" resultType="cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO">
+        SELECT <include refid="Base_Column_List"/>
+        FROM insure_emr_dscginfo
+        where uuid = #{uuid}
+    </select>
 
   <select id="select" resultMap="BaseResultMap" parameterType="cn.hsa.module.insure.emr.entity.InsureEmrDscginfoDO" >
     <!--

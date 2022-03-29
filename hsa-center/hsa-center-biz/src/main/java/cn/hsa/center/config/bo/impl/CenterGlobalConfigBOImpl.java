@@ -2,9 +2,11 @@ package cn.hsa.center.config.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.config.bo.CenterGlobalConfigBO;
 import cn.hsa.module.center.config.dao.CenterGlobalConfigDAO;
 import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.RedisUtils;
@@ -102,5 +104,10 @@ public class CenterGlobalConfigBOImpl extends HsafBO implements CenterGlobalConf
         }
         redisUtils.hmset(Constants.REDISKEY.CENTER_GLOBAL_CONFIG_KEY,configInfo);
         return configInfo;
+    }
+
+    @Override
+    public CenterParameterDTO getParameterByCode(String codeName) {
+        return  centerGlobalConfigDAO.getParameterByCode(codeName);
     }
 }

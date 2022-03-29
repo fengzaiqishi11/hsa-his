@@ -601,6 +601,7 @@
                     FROM
                         oper_info_record d
                     WHERE
+                        d.hosp_code = t.hosp_code and
                         d.visit_id = t.id
                         AND d.status_code = '2'
                         AND d.oper_plan_time >= #{filter_date}

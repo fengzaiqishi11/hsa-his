@@ -41,7 +41,7 @@
             </fullPatternLayout>
 
             <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
-            <staticField>app_name:has-web</staticField>
+            <staticField>app_name:hsa-web</staticField>
         </encoder>
     </appender>
 
@@ -161,6 +161,9 @@
         </root>
         <logger name="druid.sql.Statement" level="debug" additivity="false">
             <appender-ref ref="SQL_INFO_FILE" />
+        </logger>
+        <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
+            <appender-ref ref="ROLLING_FILE"/>
         </logger>
     </springProfile>
 

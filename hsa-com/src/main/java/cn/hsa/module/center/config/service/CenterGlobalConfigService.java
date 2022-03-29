@@ -3,6 +3,7 @@ package cn.hsa.module.center.config.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,4 +47,10 @@ public interface CenterGlobalConfigService {
 
   WrapperResponse<CenterGlobalConfigDTO> getGlobalConfigById(String id);
 
+  /**
+   *  获取中心端系统参数
+   * @param  codeName
+   * @return
+   */
+  WrapperResponse<CenterParameterDTO> getParameterByCode(String codeName);
 }

@@ -1,0 +1,26 @@
+version: '3'
+services:
+# 门急诊模块启动函数 outpt
+  hsa-outpt:
+    image: image-hsa-outpt:1.0
+    container_name: cont-hsa-outpt
+    ports:
+      - "9004:9004"
+      - "29004:29004"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=nginx:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://nginx:8848
+    networks:
+      - custom_net
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

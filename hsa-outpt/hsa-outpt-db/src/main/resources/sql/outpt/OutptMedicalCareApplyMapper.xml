@@ -41,8 +41,8 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
     <insert id="insertMedicDate">
-        insert into outpt_medical_care_apply(id,hosp_code, profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,disease_id, disease_name,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{diseaseId}, #{diseaseName}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+        insert into outpt_medical_care_apply(id,hosp_code, org_code,profile_id, visit_id, name, gender_code, age, age_unit_code, cert_no, phone, change_type, care_to_medic_id, visit_type, apply_dept_id, apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house, house_bed, nusre_type_code,disease_id, disease_name,referral_main_suit, reality_in_time, status_code, visit_dept_id, visit_doctor_id, visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode},#{orgCode}, #{profileId}, #{visitId}, #{name}, #{genderCode}, #{age}, #{ageUnitCode}, #{certNo}, #{phone}, #{changeType}, #{careToMedicId}, #{visitType}, #{applyDeptId}, #{applyCompanyCode}, #{applyCompanyName}, #{hopeInTime}, #{applyId}, #{applyName}, #{applyTime}, #{isHouse}, #{houseBed}, #{nusreTypeCode}, #{diseaseId}, #{diseaseName}, #{referralMainSuit},#{realityInTime}, #{statusCode}, #{visitDeptId}, #{visitDoctorId}, #{visitDoctorName}, #{visitTime}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
 
     </insert>
     <insert id="insertOutPtInfo">
@@ -262,10 +262,16 @@
                 and (name like concat('%',#{keyword},'%') or cert_no like concat('%',#{keyword},'%'))
             </if>
             <if test="visitStartTime != null">
-                and crte_time &gt;=#{visitStartTime}
+                and apply_time &gt;=#{visitStartTime}
             </if>
             <if test="visitEndTime != null">
-                and crte_time &lt;=#{visitEndTime}
+                and apply_time &lt;=#{visitEndTime}
+            </if>
+            <if test="startDate != null">
+                and apply_time &gt;=#{startDate}
+            </if>
+            <if test="endDate != null">
+                and apply_time &lt;=#{endDate}
             </if>
         </where>
         order by apply_time desc
@@ -276,12 +282,18 @@
                 visit_type, apply_dept_id, (select bd.name from base_dept bd where apply_dept_id = bd.id and hosp_code = bd.hosp_code) as applyDeptName,
                 apply_company_code, apply_company_name, hope_in_time, apply_id, apply_name, apply_time, is_house,
                 house_bed, referral_main_suit, nusre_type_code, disease_id, disease_name, reality_in_time, status_code, visit_dept_id,  (SELECT name from  base_dept where visit_dept_id = id )visit_dept_name,visit_doctor_id,
-                (SELECT name from  sys_user where visit_doctor_id = id ) visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time, if(house_bed is null, '0', '1') is_in
+                (SELECT name from  sys_user where visit_doctor_id = id ) visit_doctor_name, visit_time, remark, crte_id, crte_name, crte_time, if(house_bed is null, '0', '1') is_in,
+                case when a.status_code = '1' then '1' else '0' end isVisit
             from outpt_medical_care_apply a
             where id = #{id}
     </select>
-    <select id="queryOrgCode" resultType="java.lang.String">
-        SELECT value FROM sys_code_detail where c_code = 'ORG_CODE' AND hosp_code = #{hospCode}
+    <select id="queryOrgCode" resultType="java.util.Map">
+        select a.org_code orgID,
+               a.visit_id medical_info_id,
+               b.name clinic_dept
+        from outpt_medical_care_apply a
+        left join base_dept b on a.hosp_code = b.hosp_code and a.visit_dept_id = b.id
+        where a.id = #{id} and a.hosp_code = #{hospCode}
     </select>
 
     <!--通过主键修改数据-->

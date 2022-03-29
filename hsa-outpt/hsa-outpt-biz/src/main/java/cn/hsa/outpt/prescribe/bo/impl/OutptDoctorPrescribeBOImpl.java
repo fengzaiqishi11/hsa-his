@@ -565,6 +565,15 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         outptVisitDAO.insert(outptVisitDTO);
         //插入挂号信息
         outptRegisterDAO.insert(outptRegisterDTO);
+        //回写医专养信息
+        if(StringUtils.isNotEmpty(outptRegisterDTO.getCareToMedicId())){
+            Map map = new HashMap();
+            map.put("visitId",outptVisitDTO.getId());
+            map.put("profileId",outptVisitDTO.getProfileId());
+            map.put("careToMedicId",outptRegisterDTO.getCareToMedicId());
+            map.put("deptId",outptVisitDTO.getDeptId());
+            outptVisitDAO.updateCaretoMedic(map);
+        }
         if(StringUtils.isNotEmpty(outptRegisterDTO.getRegDetailIds())){
             List<OutptRegisterDetailDto> outptRegisterDetailDtoList = setOutptRegisterDetailDto(outptRegisterDTO);
             if(!ListUtils.isEmpty(outptRegisterDetailDtoList)){
@@ -889,9 +898,11 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptPrescribeDetailsDTO.setHospCode(outptPrescribeDTO.getHospCode());
             //数据校验
             this.validCfParam(outptPrescribeDetailsDTO);
-
-            if (mzcfKFK != null && mzcfKFK.contains("," + outptPrescribeDetailsDTO.getUsageCode() + ",")) {
-                outptPrescribeDetailsDTO.setPhCode(Constants.CFLX.KFKPT);   //  用于处方分单时，哪些用法分到口服卡上
+            // 麻、精一、精二 为口服时，优先以麻、精一、精二分处方 lly 20220316
+            if(!Constants.CFLX.MJY.equals(outptPrescribeDetailsDTO.getPhCode())&&!Constants.CFLX.JE.equals(outptPrescribeDetailsDTO.getPhCode())) {
+                if (mzcfKFK != null && mzcfKFK.contains("," + outptPrescribeDetailsDTO.getUsageCode() + ",")) {
+                    outptPrescribeDetailsDTO.setPhCode(Constants.CFLX.KFKPT);   //  用于处方分单时，哪些用法分到口服卡上
+                }
             }
 
             cfBoolean = false;
@@ -3531,6 +3542,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         //材料判断
         if(StringUtils.isNotEmpty(outptPrescribeDetailsDTO.getItemCode()) && Constants.XMLB.CL.equals(outptPrescribeDetailsDTO.getItemCode())){
             BaseMaterialDTO baseMaterialDTO = outptDoctorPrescribeDAO.getBaseMaterial(outptPrescribeDetailsDTO);
+              //用量
+            if(outptPrescribeDetailsDTO.getNum() == null ||  StringUtils.isEmpty(outptPrescribeDetailsDTO.getNum().toString())){
+                outptPrescribeDetailsDTO.setNum(BigDecimal.valueOf(0));
+            }
             // 按小单位计算
             if(outptPrescribeDetailsDTO.getNumUnitCode().equals(baseMaterialDTO.getSplitUnitCode())){
                 retMap.put("price", baseMaterialDTO.getSplitPrice());              // 单价

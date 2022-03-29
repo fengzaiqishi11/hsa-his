@@ -47,6 +47,9 @@
         from outin_daily
         where
         hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and type_code =#{typeCode}
+        </if>
         and crte_id = #{crteId}
     </select>
 

@@ -70,4 +70,7 @@ public class InsureIndividualSettleDTO extends InsureIndividualSettleDO implemen
         private String bka035Name; // 人员类别名称
         private BigDecimal psnPartAmt ; // 个人负担总金额
         private BigDecimal hifdmPay;  // 伤残人员医疗保障基金（珠海医保新增回参字段）
+        private BigDecimal totalAdvance; // 预交金
+        private BigDecimal settleTakePrice; // 结算补收
+        private BigDecimal settleBackPrice; // 结算退款
 }

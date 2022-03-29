@@ -52,7 +52,7 @@ public class InsureItfBOImpl {
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
-        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        String msgId = params.get("msgId") != null ? params.get("msgId").toString() : StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
         // 定点医药机构编号
         params.put("medisCode", insureConfigurationDTO.getOrgCode());
         // 医保中心编码

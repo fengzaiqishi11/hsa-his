@@ -15,6 +15,7 @@ import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedPayInptBO;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
@@ -22,6 +23,7 @@ import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -76,6 +78,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
+
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService;
 
     /**
      * @param map
@@ -705,7 +710,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
     public boolean UP_2302(Map<String, Object> param) {
         String hospCode = param.get("hospCode").toString();
         InsureIndividualVisitDTO insureIndividualVisitDTO  = (InsureIndividualVisitDTO) param.get("insureIndividualVisitDTO");
-        List<InsureIndividualCostDTO> individualCostDTOList = (List<InsureIndividualCostDTO>) param.get("individualCostDTOList");
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
@@ -724,7 +728,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         httpParam.put("insur_code",insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());
 
-        List<Map<String,Object>> mapList = new ArrayList<>();
         Map<String, Object> objectMap = new HashMap<>();
         objectMap.put("feedetl_sn","0000");//费用明细流水号
         objectMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo()); // 就诊ID
@@ -819,33 +822,23 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         if(insureConfigurationDTO1.getPrimaryPrice() == null || ("0").equals(insureConfigurationDTO1.getPrimaryPrice())){
             throw new AppException("该病人医保费用未上传，请上传医保费用。");
         }
-
         String  insureAccoutFlag  =  inptVisitDTO.getIsUseAccount();
         Map<String,Object> paramMap = new HashMap<String,Object>();
         String omsgid = "" ;
         String functionCode = "";
-        if("settle".equals(map.get("action") == null ? "" :map.get("action").toString())) {
-            /**
-             * 公共入参
-             */
-            omsgid = StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode());
+        String action = MapUtils.get(map,"action");
+        if("settle".equals(action)) {
             functionCode ="2304";
             paramMap.put("infno",functionCode);  // 交易编号
-            paramMap.put("msgid",omsgid);
-
         }
         else{
-            /**
-             * 公共入参
-             */
             functionCode ="2303";
-            omsgid = StringUtils.createMsgId(insureIndividualVisitDTO.getMedicineOrgCode());
             paramMap.put("infno",functionCode);  // 交易编号
-            paramMap.put("msgid",omsgid);
-
         }
         paramMap.put("insuplc_admdvs",insureIndividualVisitDTO.getInsuplcAdmdvs()); //参保地医保区划分
         String medisCode = insureIndividualVisitDTO.getMedicineOrgCode();
+        omsgid = StringUtils.createMsgId(medisCode);
+        paramMap.put("msgid",omsgid);
         paramMap.put("medins_code",medisCode); //定点医药机构编号
         paramMap.put("insur_code",insureConfigurationDTO.getRegCode()); //医保中心编码
         paramMap.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs()); // 就医地医保区划
@@ -865,12 +858,19 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());// 人员编号
         dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型
         dataMap.put("mdtrt_cert_no",insureIndividualVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        if("03".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+            dataMap.put("card_sn",insureIndividualVisitDTO.getCardIden()); // 卡识别码
+        }
         String isReadCard = MapUtils.get(map,"isReadCard");
         String bka895 = MapUtils.get(map,"bka895");
         String bka896 = MapUtils.get(map,"bka896");
+        String cardIden = MapUtils.get(map,"cardIden");
         if (Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)) {
             dataMap.put("mdtrt_cert_type",bka895);// 就诊凭证类型
             dataMap.put("mdtrt_cert_no",bka896); // 就诊凭证编号
+            if("03".equals(bka895)){
+                dataMap.put("card_sn",cardIden); // 就诊凭证编号
+            }
         }
         DecimalFormat df1 = new DecimalFormat("0.00");
         String realityPrice = df1.format(BigDecimalUtils.convert(costMap.get("costStr").toString()));
@@ -917,7 +917,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         dataMap.put("medins_diag_code","");// 医疗机构疾病诊断
         dataMap.put("medins_first_asist_diag","");// 医疗机构第一副诊断
         dataMap.put("medins_secd_asist_diag","");// 医疗机构第二副诊断
-        dataMap.put("card_sn","");//卡识别码
+//        dataMap.put("card_sn","");//卡识别码
         dataMap.put("order_no","");// 医疗机构订单号或医疗机构就医序列号
         dataMap.put("mdtrt_mode","0");// 就诊方式
         dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());// 持卡就诊基本信息
@@ -925,7 +925,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         /**
          * 说明是结算
          */
-        if("settle".equals(map.get("action") == null ? "" :map.get("action").toString())){
+        if("settle".equals(action)){
             dataMap.put("elect_cert_token",""); // 医保电子凭证Token
             dataMap.put("certno",""); // 证件类型
             dataMap.put("elect_cert_token",""); // 身份证号
@@ -943,6 +943,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             dataMap.put("begntime",""); // 业务开始时间
             dataMap.put("endtime",""); // 业务结束时间
         }
+
+        // 证件类型
+        dataMap.put("psn_cert_type",inptVisitDTO.getCertCode());
+        dataMap.put("certno",insureIndividualVisitDTO.getAac002());// 就诊方式
+        dataMap.put("psn_name",inptVisitDTO.getName());// 持卡就诊基本信息
+        dataMap.put("psn_type",insureIndividualVisitDTO.getBka035());
+
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append(functionCode).append("-")
                 .append(visitId).append("-").append(psnNo).toString();
@@ -996,7 +1003,22 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
                 Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");
                 Map <String,Object> setlinfoDataMap = (Map<String, Object>) outMap.get("setlinfo");
-                if("settle".equals(map.get("action") == null ? "" :map.get("action").toString())) {
+                Map<String,Object> acctPayMap = null;
+                if("settle".equals(action)) {
+                    Map<String,Object> paramAcctMap = new HashMap<>();
+                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY"); // 此参数不需要配置
+                    paramAcctMap.put("hospCode",hospCode);
+                    SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramAcctMap).getData();
+                    if(data !=null && Constants.SF.S.equals(data.getValue())){
+                        settleDataMap.put("visitId",insureIndividualVisitDTO.getVisitId());
+                        settleDataMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
+                        settleDataMap.put("hospCode",hospCode);
+                        settleDataMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+                        settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
+                        settleDataMap.put("acct_used_flag",insureAccoutFlag);
+                        settleDataMap.put("orgCode",insureConfigurationDTO.getRegCode());
+                        acctPayMap = handlerAcctPayBalance(settleDataMap);
+                    }
                     settleDataMap.put("action","settle");
                     settleDataMap.put("omsgid",omsgid);
                     settleDataMap.put("oinfno",functionCode);
@@ -1011,11 +1033,37 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 settleDataMap.put("setlinfo",setlinfoDataMap);
                 settleDataMap.put("crteId",inptVisitDTO.getCrteId());
                 settleDataMap.put("crteName",inptVisitDTO.getCrteName());
-                return  updateInptTrialSettleInfo(settleDataMap,hospCode,insureConfigurationDTO.getRegCode());
+                return  updateInptTrialSettleInfo(settleDataMap,hospCode,insureConfigurationDTO.getRegCode(),acctPayMap);
             }finally {
                 redisUtils.del(redisKey);
             }
         }
+    }
+
+    /**
+     * @Method handlerAcctPayBalance
+     * @Desrciption  处理海南地区：余额扣减问题
+     *          1.先根据结算反参的证件类型和证件号码查询是否还有余额
+     *          2.当余额大于0.00时 调用余额扣减接口
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/21 13:51
+     * @Return
+     **/
+    private Map<String, Object> handlerAcctPayBalance(Map<String, Object> settleDataMap) {
+        Map<String, Object> balanceMap = insureUnifiedBaseService.queryBalanceCount(settleDataMap).getData();
+        Map<String,Object> resultMap  =  MapUtils.get(balanceMap,"result");
+        Map<String,Object> balanceDataMap = null;
+        Object balance = MapUtils.get(resultMap, "balance");
+        String string = DataTypeUtils.dataToNumString(balance);
+        BigDecimal decimal = BigDecimalUtils.convert(string);
+        if(BigDecimalUtils.greaterZero(decimal)){
+            settleDataMap.put("insureSettleId",MapUtils.get(settleDataMap,"setl_id"));
+            Map<String, Object> dataMap = insureUnifiedBaseService.updateBalanceCountDecrease(settleDataMap).getData();
+            balanceDataMap = MapUtils.get(dataMap,"result");
+        }
+        return balanceDataMap;
     }
 
     /**
@@ -1049,8 +1097,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      * @Date   2021/2/15 21:08
      * @Return
      **/
-    public Map<String,String> updateInptTrialSettleInfo(Map<String,Object> outDataMap,String hospCode,String regCode){
+    public Map<String,String> updateInptTrialSettleInfo(Map<String, Object> outDataMap, String hospCode,
+                                                        String regCode, Map<String, Object> acctPayMap){
+
+        String balanceValue = MapUtils.get(outDataMap,"INSURE_ACCT_PAY_PARAM");
+        String acctUsedFlag= MapUtils.get(outDataMap,"acct_used_flag");
         Map<String,String> paramMap = new HashMap<String,String>();
+        paramMap.put("balanceValue",balanceValue);
+        paramMap.put("acctUsedFlag",acctUsedFlag);
         Map sysParamMap = new HashMap<>();
         sysParamMap.put("hospCode", hospCode);
         sysParamMap.put("code", regCode);
@@ -1074,7 +1128,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("mafPay",outDataMap.get("maf_pay").toString());// 医疗救助基金支出
         paramMap.put("bka839",outDataMap.get("oth_pay").toString());//其他支付
         paramMap.put("psnPartAmt",outDataMap.get("psn_part_amt") ==null ?"":outDataMap.get("psn_part_amt").toString());// 个人负担总金额
-        paramMap.put("akb066",outDataMap.get("acct_pay").toString());// 个人账户支出
         paramMap.put("akb067",outDataMap.get("psn_cash_pay").toString()); // 个人现金支出
         paramMap.put("hospPrice",outDataMap.get("hosp_part_amt").toString());// 医院负担金额
         paramMap.put("balc",outDataMap.get("balc").toString());// 余额账户
@@ -1085,8 +1138,19 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         String bka832 = outDataMap.get("fund_pay_sumamt").toString(); // 基金支付总额
         // 湖南省的 fundPaySumamt 字段不包括个人账户支付部分，珠海医保fundPaySumamt 字段包括，所以需区分！
+
+        String acctPay ="";
+        if(Constants.SF.S.equals(balanceValue) && Constants.SF.S.equals(acctUsedFlag)){
+            if(!MapUtils.isEmpty(acctPayMap)){
+                acctPay  = DataTypeUtils.dataToNumString(MapUtils.get(acctPayMap,"enttAcctPay"));
+            }
+        }else{
+            acctPay = outDataMap.get("acct_pay").toString(); // 个人账户
+        }
+        paramMap.put("akb066",acctPay);// 个人账户支出
+
         if (Constant.UnifiedPay.calculation.HN.equals(calculation)) {
-            bka832 = BigDecimalUtils.add(outDataMap.get("acct_pay").toString(),bka832).toString();
+            bka832 = BigDecimalUtils.add(acctPay,bka832).toString();
         }
         paramMap.put("bka832",bka832);
 
@@ -1252,7 +1316,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
      *
      * @return*/
     @Override
-    public Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap) {
+    public Map<String,Object> UP_2305(Map<String,Object> insureUnifiedMap) {
         Map<String, Object> inptMap = new HashMap<>();
         String hospCode =  insureUnifiedMap.get("hospCode").toString();
         /**
@@ -1691,7 +1755,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 for (String s : collect) {
                     stringBuilder.append(s).append(",");
                 }
-//                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
+                throw new AppException("该患者开的"+stringBuilder+"还没有进行疾病匹配,请先做好匹配工作");
             }
         }
     }

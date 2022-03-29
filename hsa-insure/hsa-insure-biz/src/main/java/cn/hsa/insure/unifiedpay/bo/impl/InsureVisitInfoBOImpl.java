@@ -81,109 +81,19 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 		}
 		dto.setRegCode(regCode);
 		InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(dto);
-		if (insureConfigurationDTO == null) {
-			throw new AppException("未查询到就诊地医保区划");
-		}
-		Map<String, Object> visitMap = new HashMap<>();
-		String mdtrtCertType = insureIndividualBasicDTO.getBka895();
-		//  电子凭证 - 需根据各市政策需要选择性传值 add 2021-06-16 by liaojiguang QrCodePolicy
-		if(Constant.UnifiedPay.CKLX.DZPZ.equals(mdtrtCertType)) {
-			visitMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.DZPZ);  // 就诊凭证类型  传值01
-			visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-
-			// 查询电子凭证系统参数读卡政策，湖南省需要证件号码/类型/姓名
-			Map<String, Object> tempMap = new HashMap<>();
-			tempMap.put("hospCode", params.get("hospCode"));
-			tempMap.put("code", "QrCodePolicy");
-			SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(tempMap).getData();
-			String QrCodePolicy = sys.getValue();
-			if (Constant.UnifiedPay.QrCodePolicy.HN.equals(QrCodePolicy)) {
-				visitMap.put("psn_cert_type", insureIndividualBasicDTO.getPsnCertType());  // 证件类型
-				visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
-				visitMap.put("certno", insureIndividualBasicDTO.getAac002()); // 传值证件号码
-			}
-		}
-		// 身份证  本地社保卡 和省内异地社保卡
-		else if(Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType)  || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
-			visitMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.SFZ);  // 就诊凭证类型  传值02
-			if("null".equals(insureIndividualBasicDTO.getAac002())  || StringUtils.isEmpty(insureIndividualBasicDTO.getAac002()) ){
-				visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-			}else{
-				visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getAac002()); // 传值证件号码
-			}
-			visitMap.put("psn_name","null".equals(insureIndividualBasicDTO.getAac003())?"":insureIndividualBasicDTO.getAac003()); // 传值姓名，
-			visitMap.put("certno", "null".equals(insureIndividualBasicDTO.getAac002())?"":insureIndividualBasicDTO.getAac002()); // 传值证件号码
-		}
-		// 跨省异地读卡
-		else if(Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType)){
-			visitMap.put("mdtrt_cert_type",mdtrtCertType);  // 就诊凭证类型  传值03
-			visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-			visitMap.put("card_sn", insureIndividualBasicDTO.getCardIden()); // 传值社保卡识别码
-			visitMap.put("psn_cert_type", "01");  //1
-			visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
-			visitMap.put("certno", insureIndividualBasicDTO.getAac002()); // 传值证件号码
-		}
-		// 澳门证件类型  香港
-		else if(Constant.UnifiedPay.CKLX.AM.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.XG.equals(mdtrtCertType)){
-			visitMap.put("mdtrt_cert_type", mdtrtCertType);  // 就诊凭证类型
-			visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-			visitMap.put("card_sn", insureIndividualBasicDTO.getCardIden()); // 传值证件号码
-			visitMap.put("psn_cert_type", insureIndividualBasicDTO.getBka895());  // 传值05 或 04
-			visitMap.put("certno", insureIndividualBasicDTO.getAac002()); // 传值证件号码
-			visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
-		}
-		// 其他证件
-		else{
-			visitMap.put("mdtrt_cert_type",mdtrtCertType);  // 就诊凭证类型  传值05
-			visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-			visitMap.put("psn_cert_type", "99");  // 传值99
-			visitMap.put("certno", insureIndividualBasicDTO.getBka896()); // 传值证件号码
-			visitMap.put("psn_name", insureIndividualBasicDTO.getAac003()); // 传值姓名，
-		}
-		String medisCode = insureConfigurationDTO.getOrgCode();
-		visitMap.put("medins_code", medisCode);
 		String medType = insureIndividualBasicDTO.getAka130();
-		visitMap.put("med_type", medType);
-		visitMap.put("med_mdtrt_type", insureIndividualBasicDTO.getBka006());
-		/*if("03".equals(mdtrtCertType)){
-			if(StringUtils.isEmpty(insureIndividualBasicDTO.getInsuplc_admdvs())){
-				inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
-			}else{
-				inputMap.put("insuplc_admdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); //参保地医保区划分
-			}
-		}else{
-			inputMap.put("insuplc_admdvs", ""); //参保地医保区划分
-		}*/
 
 		Map<String, Object> paramMap = new HashMap<>();
 		paramMap.putAll(params);
 		paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs()); // 参保地医保区划
 		paramMap.put("configRegCode", regCode);
-		paramMap.put("dataMap", visitMap);
 		if (Constants.SF.F.equals(MapUtils.get(params,"isHospital"))) {
 			params.put("isHospital",Constants.SF.F) ;
 		}else{
 			params.put("isHospital",Constants.SF.S) ;
 		}
 		Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, paramMap);
-//		logger.info("统一支付平台获取人员信息 [1101] 入参====>");
-//		logger.info(json);
-//		// 调用统一支付平台接口
-//		String result = HttpConnectUtil.unifiedPayPostUtil(url, json);
-//
-//		params.put("resultStr",result);
-//		insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
 
-//		logger.info("统一支付平台获取人员信息 [1101] 回参<====");
-//		logger.info(result);
-//		if(StringUtils.isEmpty(result)){
-//			throw new AppException("无法访问医保统一支付平台");
-//		}
-//		Map<String, Object> resultMap = JSON.parseObject(result);
-//
-//		if (!resultMap.get("infcode").equals("0")) {
-//			throw new AppException("调用统一支付平台出错" + resultMap.get("err_msg"));
-//		}
 		// 14: 门慢门特
 		List<Map<String,Object>> mapList = null;
 		Map<String, Object> tempMap = new HashMap<>();
@@ -237,6 +147,7 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			xzMap.put("bka035", insuinfoMap.get("psn_type"));  // 人员类别
 			list.get(0).put("bka008",MapUtils.get(insuinfoMap,"emp_name"));
 			list.get(0).put("aae140",MapUtils.get(insuinfoMap,"insutype"));
+			list.get(0).put("bka035",MapUtils.get(insuinfoMap,"psn_type"));
 			xzMap.put("bka008", insuinfoMap.get("emp_name"));  // 单位名称
 			xzMap.put("aae140", insuinfoMap.get("insutype"));  // 险种类型
 			xzMap.put("cvlserv_flag", insuinfoMap.get("cvlserv_flag"));  // 公务员标志

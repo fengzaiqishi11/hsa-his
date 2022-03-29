@@ -34,13 +34,16 @@ public class ReportReturnDataDTO implements Serializable {
      */
     private String returnData;
 
+    private String returnDataType;
+
     public ReportReturnDataDTO() {
     }
 
-    public ReportReturnDataDTO(String key, String fileName, String fileFormat, String returnData) {
+    public ReportReturnDataDTO(String key, String fileName, String fileFormat, String returnData, String returnDataType) {
         this.key = key;
         this.fileName = fileName;
         this.fileFormat = fileFormat;
         this.returnData = returnData;
+        this.returnDataType = returnDataType;
     }
 }

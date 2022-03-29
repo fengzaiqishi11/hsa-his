@@ -5,6 +5,7 @@ import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stroin.dto.StroInDetailDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 
 import java.util.List;
 
@@ -240,4 +241,10 @@ public interface StroOutDAO {
      * @Date: 2021/12/14
      */
     List<StroOutDetailDTO> queryStroOutDetail(StroOutDetailDTO stroOutDetailDTO);
+
+    List<SysParameterDTO> getParameterValue(String hospCode, String[] code);
+
+    List<StroStockDetailDTO> queryDeatilById(StroOutDTO stroOutDTO);
+
+    Boolean updateBatchCheck(StroOutDTO stroOutDTO);
 }

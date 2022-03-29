@@ -40,17 +40,9 @@
                 <pattern>%d - [%thread] %-5level %logger{35} - %msg%n</pattern>
             </fullPatternLayout>
 
-            <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
-            <staticField>app_name:has-insure</staticField>
-        </encoder>
-    </appender>
 
-    <!-- 控制台输出 -->
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%message：日志消息，%n是换行符-->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n
-            </pattern>
+            <!-- 配置应用名称（服务名称），通过staticField标签可以自定义一些固定的日志字段 -->
+            <staticField>app_name:hsa-insure</staticField>
         </encoder>
     </appender>
 
@@ -117,6 +109,10 @@
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
         </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
     </appender>
 
     <!-- 开发环境日志级别为DEBUG -->
@@ -129,6 +125,10 @@
         </root>
         <logger name="druid.sql.Statement" level="debug" additivity="false">
             <appender-ref ref="STDOUT" />
+        </logger>
+        <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="GELF"/>
         </logger>
     </springProfile>
 
@@ -143,6 +143,9 @@
         </root>
         <logger name="druid.sql.Statement" level="debug" additivity="false">
             <appender-ref ref="SQL_INFO_FILE" />
+        </logger>
+        <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
+            <appender-ref ref="ROLLING_FILE"/>
         </logger>
     </springProfile>
 

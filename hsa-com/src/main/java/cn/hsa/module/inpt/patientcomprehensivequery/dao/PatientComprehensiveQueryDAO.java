@@ -4,10 +4,11 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
+import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO;
 import cn.hsa.module.mris.mrisHome.dto.InptBedChangeInfoDTO;
-import org.springframework.data.repository.query.Param;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -222,4 +223,8 @@ public interface PatientComprehensiveQueryDAO {
    *
    * @return*/
   List<Map<String, Object>> queryYWLX(String hospCode, List<String> codesList);
+
+  int updateInptVisitPreferential(Map<String, Object> map);
+
+  int updateInptCost(@Param("inptCostDOS") List<InptCostDO> inptCostDOS);
 }

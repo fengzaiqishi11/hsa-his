@@ -159,6 +159,8 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         medicToCareDTO.setPhone(medicToCareDTO1.getPhone());
         //转诊类别（ZZLB：1医转养、2养转医）
         medicToCareDTO.setChangeType("1");
+        //就诊科室
+        medicToCareDTO.setDeptName(medicToCareDTO1.getDeptName());
         return medicToCareDTO;
     }
 
@@ -182,7 +184,7 @@ public class MedicToCareBOImpl extends HsafBO implements MedicToCareBO {
         visitInfo.put("phone",medicToCareDTO.getPhone());
         //转诊类别（ZZLB：1医转养、2养转医）可以后端写死
         visitInfo.put("referral_category",medicToCareDTO.getChangeType());
-        visitInfo.put("dept",medicToCareDTO.getDeptId());
+        visitInfo.put("dept",medicToCareDTO.getDeptName());
 //        visitInfo.put("dept","12");
         //来源机构
         visitInfo.put("source_org",medicToCareDTO.getHospCode());

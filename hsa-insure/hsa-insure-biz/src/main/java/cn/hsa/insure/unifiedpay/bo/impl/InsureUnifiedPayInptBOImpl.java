@@ -910,7 +910,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 map.put("code","HN_INSURE_ACCT_PAY");
                 try{
                     Map<String,Object> paramAcctMap = new HashMap<>();
-                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY");
+                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY"); // 此参数不需要配置
                     paramAcctMap.put("hospCode",hospCode);
                     SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramAcctMap).getData();
 
@@ -1026,7 +1026,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         BigDecimal decimal = BigDecimalUtils.convert(string);
         if(BigDecimalUtils.greaterZero(decimal)){
             settleDataMap.put("insureSettleId",MapUtils.get(settleDataMap,"setl_id"));
-            Map<String, Object> dataMap = insureUnifiedBaseService.queryBalanceCountDecrease(settleDataMap).getData();
+            Map<String, Object> dataMap = insureUnifiedBaseService.updateBalanceCountDecrease(settleDataMap).getData();
             balanceDataMap = MapUtils.get(dataMap,"result");
         }
         return balanceDataMap;

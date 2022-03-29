@@ -3284,6 +3284,9 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
                     //向上取整
                     tzNum = BigDecimal.valueOf(Math.ceil(tzNum.doubleValue()));
+                } else if (!DateUtils.dateCompare(now,costTime)){
+                    //材料、项目、医嘱目录计算停嘱当天的费用数量
+                    tzNum = BigDecimal.valueOf(inptAdviceDTO.getEndExecNum()==null?0:inptAdviceDTO.getEndExecNum());
                 }
 
                 if (Constants.XMLB.YP.equals(costDTO.getItemCode()) || Constants.XMLB.CL.equals(costDTO.getItemCode())){

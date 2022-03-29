@@ -1225,4 +1225,13 @@ public interface Constants {
         public static final String YJZ = "1";// 已接诊
         public static final String YJJ = "2";// 已拒绝
     }
+
+    /**
+     * 优惠类别
+     */
+    class YHLB {
+        public static final String CWFL = "1";// 财务分类
+        public static final String YP = "2";// 药品
+        public static final String XM = "3";// 项目
+    }
 }

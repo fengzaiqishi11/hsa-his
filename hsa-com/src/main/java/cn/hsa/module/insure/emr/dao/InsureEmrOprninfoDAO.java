@@ -67,7 +67,18 @@ public interface InsureEmrOprninfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureEmrOprninfoDTO queryById(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+    List<InsureEmrOprninfoDTO> queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+
+    /**
+     * @Menthod queryByUuid()
+     * @Desrciption 查询单条
+     * @Param
+     *1. insureEmrAdminfoDTO  参数数据对象
+     * @Author liuhuiming
+     * @Date   2022/3/25 17:02
+     * @Return int
+     **/
+    InsureEmrOprninfoDTO queryByUuid(Long uuid);
 
     void deleteByMap(Map<String, Object> map);
 

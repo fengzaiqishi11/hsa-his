@@ -2,6 +2,7 @@ package cn.hsa.module.insure.emr.dto;
 
 
 import java.io.Serializable;
+import java.util.List;
 
 import cn.hsa.base.PageDO;
 import lombok.Data;
@@ -24,30 +25,30 @@ public class InsureEmrDetailDTO implements Serializable {
     /**
      * 病程记录
      */
-    private InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO;
+    private List<InsureEmrCoursrinfoDTO> insureEmrCoursrinfoDTOList;
 
     /**
      * 死亡记录
      */
-    private InsureEmrDieinfoDTO insureEmrDieinfoDTO;
+    private List<InsureEmrDieinfoDTO> insureEmrDieinfoDTOList;
 
     /**
      * 诊断信息
      */
-    private InsureEmrDiseinfoDTO insureEmrDiseinfoDTO;
+    private List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTOList;
 
     /**
      * 出院记录
      */
-    private InsureEmrDscginfoDTO insureEmrDscginfoDTO;
+    private List<InsureEmrDscginfoDTO> insureEmrDscginfoDTOList;
 
     /**
      * 手术记录
      */
-    private InsureEmrOprninfoDTO insureEmrOprninfoDTO;
+    private List<InsureEmrOprninfoDTO> insureEmrOprninfoDTOList;
 
     /**
      * 病情抢救记录
      */
-    private InsureEmrRescinfoDTO insureEmrRescinfoDTO;
+    private List<InsureEmrRescinfoDTO> insureEmrRescinfoDTOList;
 }

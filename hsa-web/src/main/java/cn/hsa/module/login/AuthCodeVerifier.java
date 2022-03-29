@@ -8,8 +8,15 @@ import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.StringUtils;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -17,6 +24,9 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AuthCodeVerifier{
+
+    private Logger log = LoggerFactory.getLogger(AuthCodeVerifier.class);
+
     /**
      *  系统参数查询服务
      */
@@ -30,15 +40,26 @@ public class AuthCodeVerifier{
         this.centerGlobalConfigService_consumer = service;
     }
 
+    // 设置缓存15分钟后过期
+    private Cache<String,CenterParameterDTO> cache = CacheBuilder.newBuilder()
+            .initialCapacity(5)
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .build();
+
     private volatile CenterParameterDTO verifyCodeParameter;
+
     /**
      *  校验验证码
      * @param authCodeSession 会话中存储的验证码
      * @param inptAuthCode 用户输入的验证码
      */
-    public void verifyAuthCode(String authCodeSession,String inptAuthCode){
+    public void verifyAuthCode(String authCodeSession,String inptAuthCode) {
         // 获取系统参数是否执行验证码校验逻辑
-        initCenterParameterDTO();
+        try{
+            initCenterParameterDTO();
+        }catch (ExecutionException e){
+            log.error("加载验证码参数出现错误：",e);
+        }
         // 跳过验证码验证逻辑
         if(verifyCodeParameter != null && Constants.SF.F.equals(verifyCodeParameter.getValue())) return;
 
@@ -60,18 +81,15 @@ public class AuthCodeVerifier{
     /**
      *  初始化中心端校验参数
      */
-    private void initCenterParameterDTO(){
-        if(null != centerGlobalConfigService_consumer)return;
-        synchronized (AuthCodeVerifier.class){
-            if (null == centerGlobalConfigService_consumer){
-                CenterParameterDTO result = getData(centerGlobalConfigService_consumer.getParameterByCode(isVerifyAuthCodeParameter));
-                if(null == result){
-                    // 初始化系统参数变量为空对象避免重复初始化;
-                    verifyCodeParameter = new CenterParameterDTO();
-                } else {
-                    verifyCodeParameter = result;
-                }
+    private void initCenterParameterDTO() throws ExecutionException {
+        verifyCodeParameter = cache.get(isVerifyAuthCodeParameter,()->{
+            CenterParameterDTO result = getData(centerGlobalConfigService_consumer.getParameterByCode(isVerifyAuthCodeParameter));
+            if(null == result){
+                // 初始化系统参数变量为空对象避免重复初始化;
+                result = new CenterParameterDTO();
             }
-        }
+            return result;
+        });
+
     }
 }

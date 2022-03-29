@@ -18,7 +18,8 @@ import java.nio.charset.StandardCharsets;
  * @Author: luonianxin
  * @Date: 2021-10-25
  */
-
+@Slf4j
+@Order(Integer.MIN_VALUE + 49)
 public class BodyReaderRequestFilter implements Filter {
 
     @Override
@@ -40,7 +41,8 @@ public class BodyReaderRequestFilter implements Filter {
 
     /***
      *  一个重写了getInputSteam()方法的包装类用于
-     *  解决获取InptStream后,Stream流失效导致Spring MVC解析@RequestBody对象报错
+     *  解决获取InptStream后,Stream流失效导致
+     *  Spring MVC解析@RequestBody对象报错
      *  参数体丢失的问题
      * @Author: luonianxin
      * @Date: 2021-10-25
@@ -49,7 +51,7 @@ public class BodyReaderRequestFilter implements Filter {
         private final String body;
 
         /**
-         * 包装原始http请求对象,
+         * 包装原始http请求对象, 注意读取流时使用的字符集要明确指定，否则就会出现中文乱码
          * @param request HttpServletRequest请求
          */
         public BodyReaderRequestWrapper(HttpServletRequest request) throws IOException{
@@ -73,13 +75,13 @@ public class BodyReaderRequestFilter implements Filter {
                     isr.close();
                 }
             }
-            sb.toString();
             body = sb.toString();
+            log.info("==requestBody==转换后内容为："+body);
         }
 
         @Override
         public BufferedReader getReader() throws IOException {
-            return new BufferedReader(new InputStreamReader(this.getInputStream()));
+            return new BufferedReader(new InputStreamReader(this.getInputStream(),StandardCharsets.UTF_8));
         }
 
         @Override

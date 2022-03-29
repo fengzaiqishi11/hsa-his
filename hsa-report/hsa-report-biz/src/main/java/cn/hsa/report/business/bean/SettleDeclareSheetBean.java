@@ -53,7 +53,7 @@ public class SettleDeclareSheetBean extends GeneralTemplateBean {
             String titleTop = regCode.contains("9900") ? regName : provinceName + cityName;
             info.put("title", titleTmp.replace("$", titleTop));
             info.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
-            info.put("crteName", param.get("crterName"));
+            info.put("crteName", param.get("crteName"));
             List<Map<String, Object>> list = new ArrayList<>();
             list.add(info);
             return list;

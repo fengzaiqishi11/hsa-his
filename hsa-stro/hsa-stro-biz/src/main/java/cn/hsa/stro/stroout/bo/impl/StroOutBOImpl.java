@@ -17,6 +17,7 @@ import cn.hsa.module.stro.stroout.bo.StroOutBO;
 import cn.hsa.module.stro.stroout.dao.StroOutDAO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.stro.storin.bo.impl.StroInBOImpl;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
@@ -220,8 +221,37 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
 
             stroOutDTO.setOkAuditCode("0");
             stroOutDAO.updateAuditCode(stroOutDTO);
+            // 是否自动审核出库到科室,默认自动审核
+            Map<String, String> aotuConfirmMap = this.getParameterValue(stroOutDTO.getHospCode(),
+                    new String[]{"AOTU_CONFIRM"});
+            // 1:自动审核，其他值不自动
+            String aotuConfirm = MapUtils.get(aotuConfirmMap, "AOTU_CONFIRM", "0");
+            if ("1".equals(aotuConfirm)){
+                if(!ListUtils.isEmpty(fourIds)) {
+                    // 查询科室入库确认的数据
+                    List<StroStockDetailDTO> stroStockDetailDTOS = queryStroOutDetailById(stroOutDTO,fourIds, stroOutDTO.getHospCode(), "4");
+                    // 科室入库确认
+                    handleStock(stroStockDetailDTOS,"20",stroOutDTO.getHospCode());
+                }
+                stroOutDTO.setOkAuditTime(DateUtils.getNow());
+                stroOutDTO.setOkAuditCode(Constants.SF.S);
+                stroOutDTO.setOrderNos(fourIds);
+                // 回写审核状态
+                return stroOutDAO.updateBatchCheck(stroOutDTO);
+            }
             return true;
         }
+    }
+
+    private Map<String, String> getParameterValue(String hospCode, String[] code) {
+        List<SysParameterDTO> list = stroOutDAO.getParameterValue(hospCode, code);
+        Map<String, String> retMap = new HashMap<>();
+        if (!MapUtils.isEmpty(list)) {
+            for (SysParameterDTO hit : list) {
+                retMap.put(hit.getCode(), hit.getValue());
+            }
+        }
+        return retMap;
     }
 
     /**
@@ -242,6 +272,30 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
           stroOutDTO1.setAuditName(stroOutDTO.getAuditName());
           stroStockDetailDTOList = this.stroOutDAO.queryStockByIds(stroOutDTO1);
         }
+        return stroStockDetailDTOList;
+    }
+    public List<StroStockDetailDTO> queryStroOutDetailById(StroOutDTO stroOutDTO1, List<String> ids, String hospCode, String type) {
+        StroOutDTO stroOutDTO = new StroOutDTO();
+        stroOutDTO.setOrderNos(ids);
+        stroOutDTO.setHospCode(hospCode);
+        stroOutDTO.setOutCode(type);
+        stroOutDTO.setOkAuditName(stroOutDTO1.getOkAuditName());
+        stroOutDTO.setOkAuditId(stroOutDTO1.getOkAuditName());
+        List<StroStockDetailDTO> stroStockDetailDTOList= stroOutDAO.queryDeatilById(stroOutDTO);
+        if(ListUtils.isEmpty(stroStockDetailDTOList)){
+            throw new AppException("要审核的的明细数据为空");
+        }
+        stroStockDetailDTOList.forEach(item->{
+            if(item.getSplitRatio() ==null ){
+                throw new AppException("拆分比为空");
+            }
+            else{
+                //算出购进拆零单价
+                item.setSplitBuyPrice(BigDecimalUtils.divide(item.getBuyPrice(),item.getSplitRatio()));
+                //算出售出拆零单价
+                item.setSplitSellPrice(BigDecimalUtils.divide(item.getSellPrice(),item.getSplitRatio()));
+            }
+        });
         return stroStockDetailDTOList;
     }
 

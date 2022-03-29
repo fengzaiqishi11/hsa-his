@@ -1,6 +1,7 @@
 package cn.hsa.module.center.config.dao;
 
 import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -51,4 +52,11 @@ public interface CenterGlobalConfigDAO {
    * @return  CenterGlobalConfigDTO 全局配置信息
    */
   CenterGlobalConfigDTO getGlobalConfigById(@Param("id") String id);
+
+  /**
+   *  根据参数代码查询系统参数
+   * @param code 参数代码
+   * @return
+   */
+  CenterParameterDTO getParameterByCode(String code);
 }

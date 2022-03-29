@@ -181,4 +181,25 @@ public interface InsureUnifiedPayReversalTradeService {
      * @Return
      **/
     WrapperResponse<Map<String, Object>> querySumDeclareInfoPrint(Map<String, Object> paraMap);
+
+    /**
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报合计报表打印
+     * @param paraMap
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    WrapperResponse<Map<String, Object>> querySumDeclareInfos(Map<String, Object> paraMap);
+
+    /**
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表打印
+     * @param paraMap
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @GetMapping("/service/insure/upOutptService/queryDeclareInfos")
+    WrapperResponse<Map<String, Object>> queryDeclareInfosPrint(Map<String, Object> paraMap);
 }

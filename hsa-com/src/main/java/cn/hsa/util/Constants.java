@@ -1237,4 +1237,13 @@ public interface Constants {
         public static final String JCSJXF = "3";// 基础数据下发
         public static final String QBWC = "4";// 全部完成
     }
+
+    /**
+     * 优惠类别
+     */
+    class YHLB {
+        public static final String CWFL = "1";// 财务分类
+        public static final String YP = "2";// 药品
+        public static final String XM = "3";// 项目
+    }
 }

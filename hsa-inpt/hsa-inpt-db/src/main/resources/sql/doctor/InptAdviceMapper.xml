@@ -1654,7 +1654,7 @@
     <select id="queryAdvicesByVisitId" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
         select b.id id,a.hosp_code hospCode,a.code code,a.technology_code technologyCode,a.container_code containerCode,a.specimen_code specimenCode
         from base_advice a join inpt_advice b on a.id=b.item_id
-        where a.is_valid='1' and b.item_code='4' and b.type_code = '3' and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and b.visit_id=#{visitId}
+        where a.is_valid='1' and b.item_code='4' and (b.type_code = '3' or b.type_code = '12') and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and b.visit_id=#{visitId}
         and (b.is_reject='0' or b.is_reject is null)
         and !(b.is_stop='1' and b.is_stop_check='1')
         <if test="adviceIds !=null and adviceIds.size()>0">

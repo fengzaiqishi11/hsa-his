@@ -1,0 +1,25 @@
+version: '3'
+services:   
+# 体检系统
+  hsa-sys:
+    image: image-hsa-phys:1.0
+    container_name: cont-hsa-phys
+    ports:
+      - "8899:8899"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=172.18.100.104:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://172.18.100.104:8848
+    networks:
+      - custom_net
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

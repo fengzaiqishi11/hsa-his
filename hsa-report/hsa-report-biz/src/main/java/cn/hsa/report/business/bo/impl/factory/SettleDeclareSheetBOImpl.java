@@ -27,7 +27,7 @@ public class SettleDeclareSheetBOImpl implements ReportBusinessBO {
     @Override
     public Map getReportDataMap(Map map) {
 
-        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(map);
+        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfos(map);
         map.putAll(result.getData());
         //打印日志
         log.error("获取到到数据为{}",map);

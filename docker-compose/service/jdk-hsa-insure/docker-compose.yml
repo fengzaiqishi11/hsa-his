@@ -1,0 +1,27 @@
+version: '3'
+services:
+# 医保管理模块启动函数
+  hsa-insure:
+    image: image-hsa-insure:1.0
+    #network_mode: "host" 
+    container_name: cont-hsa-insure
+    ports:
+      - "9010:9010"
+      - "29010:29010"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=172.18.100.104:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://172.18.100.104:8848
+    networks:
+      - custom_net
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

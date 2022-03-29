@@ -34,10 +34,15 @@
     <!--电子病历服务-->
     <dubbo:reference id="emrArchiveLoggingService_consumer" interface="cn.hsa.module.emr.emrarchivelogging.service.EmrArchiveLoggingService" check="false"/>
 
+    <!--电子病历质控服务-->
+    <dubbo:reference id="emrQualityAgingService_consumer" interface="cn.hsa.module.emr.emrquality.service.EmrQualityAgingService" check="false"/>
+
     <!--医嘱-->
     <dubbo:reference id="doctorAdviceService_consumer" interface="cn.hsa.module.inpt.doctor.service.DoctorAdviceService" check="false"/>
 
     <!--医保服务-->
     <dubbo:reference id="insureIndividualCostService_comsumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" retries="0" check="false" timeout="1200000" />
+    <!--月度进销存-->
+    <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false"/>
 
 </beans>

@@ -311,70 +311,68 @@
     -->
     update insure_emr_diseinfo
     <set >
-      <if test="record.uuid != null" >
-        uuid = #{record.uuid,jdbcType=BIGINT},
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=BIGINT},
       </if>
-      <if test="record.orgUuid != null" >
-        org_uuid = #{record.orgUuid,jdbcType=BIGINT},
+      <if test="orgUuid != null" >
+        org_uuid = #{orgUuid,jdbcType=BIGINT},
       </if>
-      <if test="record.mdtrtSn != null" >
-        mdtrt_sn = #{record.mdtrtSn,jdbcType=VARCHAR},
+      <if test="mdtrtSn != null" >
+        mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
       </if>
-      <if test="record.mdtrtId != null" >
-        mdtrt_id = #{record.mdtrtId,jdbcType=VARCHAR},
+      <if test="mdtrtId != null" >
+        mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
       </if>
-      <if test="record.psnNo != null" >
-        psn_no = #{record.psnNo,jdbcType=VARCHAR},
+      <if test="psnNo != null" >
+        psn_no = #{psnNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.inoutDiagType != null" >
-        inout_diag_type = #{record.inoutDiagType,jdbcType=VARCHAR},
+      <if test="inoutDiagType != null" >
+        inout_diag_type = #{inoutDiagType,jdbcType=VARCHAR},
       </if>
-      <if test="record.maindiagFlag != null" >
-        maindiag_flag = #{record.maindiagFlag,jdbcType=VARCHAR},
+      <if test="maindiagFlag != null" >
+        maindiag_flag = #{maindiagFlag,jdbcType=VARCHAR},
       </if>
-      <if test="record.diagSeq != null" >
-        diag_seq = #{record.diagSeq,jdbcType=INTEGER},
+      <if test="diagSeq != null" >
+        diag_seq = #{diagSeq,jdbcType=INTEGER},
       </if>
-      <if test="record.diagTime != null" >
-        diag_time = #{record.diagTime,jdbcType=TIMESTAMP},
+      <if test="diagTime != null" >
+        diag_time = #{diagTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.wmDiagCode != null" >
-        wm_diag_code = #{record.wmDiagCode,jdbcType=VARCHAR},
+      <if test="wmDiagCode != null" >
+        wm_diag_code = #{wmDiagCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.wmDiagName != null" >
-        wm_diag_name = #{record.wmDiagName,jdbcType=VARCHAR},
+      <if test="wmDiagName != null" >
+        wm_diag_name = #{wmDiagName,jdbcType=VARCHAR},
       </if>
-      <if test="record.tcmDiseCode != null" >
-        tcm_dise_code = #{record.tcmDiseCode,jdbcType=VARCHAR},
+      <if test="tcmDiseCode != null" >
+        tcm_dise_code = #{tcmDiseCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.tcmDiseName != null" >
-        tcm_dise_name = #{record.tcmDiseName,jdbcType=VARCHAR},
+      <if test="tcmDiseName != null" >
+        tcm_dise_name = #{tcmDiseName,jdbcType=VARCHAR},
       </if>
-      <if test="record.tcmsympCode != null" >
-        tcmsymp_code = #{record.tcmsympCode,jdbcType=VARCHAR},
+      <if test="tcmsympCode != null" >
+        tcmsymp_code = #{tcmsympCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.tcmsymp != null" >
-        tcmsymp = #{record.tcmsymp,jdbcType=VARCHAR},
+      <if test="tcmsymp != null" >
+        tcmsymp = #{tcmsymp,jdbcType=VARCHAR},
       </if>
-      <if test="record.valiFlag != null" >
-        vali_flag = #{record.valiFlag,jdbcType=VARCHAR},
+      <if test="valiFlag != null" >
+        vali_flag = #{valiFlag,jdbcType=VARCHAR},
       </if>
-      <if test="record.source != null" >
-        source = #{record.source,jdbcType=VARCHAR},
+      <if test="source != null" >
+        source = #{source,jdbcType=VARCHAR},
       </if>
-      <if test="record.createTime != null" >
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null" >
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.hospCode != null" >
-        hosp_code = #{record.hospCode,jdbcType=VARCHAR},
+      <if test="hospCode != null" >
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
+    where uuid = #{uuid}
   </update>
   <update id="updateByExample" parameterType="map" >
     <!--

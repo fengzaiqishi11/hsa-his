@@ -697,217 +697,215 @@
     -->
     update insure_emr_oprninfo
     <set >
-      <if test="record.uuid != null" >
-        uuid = #{record.uuid,jdbcType=BIGINT},
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=BIGINT},
       </if>
-      <if test="record.orgUuid != null" >
-        org_uuid = #{record.orgUuid,jdbcType=BIGINT},
+      <if test="orgUuid != null" >
+        org_uuid = #{orgUuid,jdbcType=BIGINT},
       </if>
-      <if test="record.mdtrtSn != null" >
-        mdtrt_sn = #{record.mdtrtSn,jdbcType=VARCHAR},
+      <if test="mdtrtSn != null" >
+        mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
       </if>
-      <if test="record.mdtrtId != null" >
-        mdtrt_id = #{record.mdtrtId,jdbcType=VARCHAR},
+      <if test="mdtrtId != null" >
+        mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
       </if>
-      <if test="record.psnNo != null" >
-        psn_no = #{record.psnNo,jdbcType=VARCHAR},
+      <if test="psnNo != null" >
+        psn_no = #{psnNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAppyId != null" >
-        oprn_appy_id = #{record.oprnAppyId,jdbcType=VARCHAR},
+      <if test="oprnAppyId != null" >
+        oprn_appy_id = #{oprnAppyId,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnSeq != null" >
-        oprn_seq = #{record.oprnSeq,jdbcType=VARCHAR},
+      <if test="oprnSeq != null" >
+        oprn_seq = #{oprnSeq,jdbcType=VARCHAR},
       </if>
-      <if test="record.blotypeAbo != null" >
-        blotype_abo = #{record.blotypeAbo,jdbcType=VARCHAR},
+      <if test="blotypeAbo != null" >
+        blotype_abo = #{blotypeAbo,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnTime != null" >
-        oprn_time = #{record.oprnTime,jdbcType=TIMESTAMP},
+      <if test="oprnTime != null" >
+        oprn_time = #{oprnTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.oprnTypeCode != null" >
-        oprn_type_code = #{record.oprnTypeCode,jdbcType=VARCHAR},
+      <if test="oprnTypeCode != null" >
+        oprn_type_code = #{oprnTypeCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnTypeName != null" >
-        oprn_type_name = #{record.oprnTypeName,jdbcType=VARCHAR},
+      <if test="oprnTypeName != null" >
+        oprn_type_name = #{oprnTypeName,jdbcType=VARCHAR},
       </if>
-      <if test="record.bfpnDiagCode != null" >
-        bfpn_diag_code = #{record.bfpnDiagCode,jdbcType=VARCHAR},
+      <if test="bfpnDiagCode != null" >
+        bfpn_diag_code = #{bfpnDiagCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.bfpnOprnDiagName != null" >
-        bfpn_oprn_diag_name = #{record.bfpnOprnDiagName,jdbcType=VARCHAR},
+      <if test="bfpnOprnDiagName != null" >
+        bfpn_oprn_diag_name = #{bfpnOprnDiagName,jdbcType=VARCHAR},
       </if>
-      <if test="record.bfpnInhospIfet != null" >
-        bfpn_inhosp_ifet = #{record.bfpnInhospIfet,jdbcType=VARCHAR},
+      <if test="bfpnInhospIfet != null" >
+        bfpn_inhosp_ifet = #{bfpnInhospIfet,jdbcType=VARCHAR},
       </if>
-      <if test="record.afpnDiagCode != null" >
-        afpn_diag_code = #{record.afpnDiagCode,jdbcType=VARCHAR},
+      <if test="afpnDiagCode != null" >
+        afpn_diag_code = #{afpnDiagCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.afpnDiagName != null" >
-        afpn_diag_name = #{record.afpnDiagName,jdbcType=VARCHAR},
+      <if test="afpnDiagName != null" >
+        afpn_diag_name = #{afpnDiagName,jdbcType=VARCHAR},
       </if>
-      <if test="record.sincHealLv != null" >
-        sinc_heal_lv = #{record.sincHealLv,jdbcType=VARCHAR},
+      <if test="sincHealLv != null" >
+        sinc_heal_lv = #{sincHealLv,jdbcType=VARCHAR},
       </if>
-      <if test="record.sincHealLvCode != null" >
-        sinc_heal_lv_code = #{record.sincHealLvCode,jdbcType=VARCHAR},
+      <if test="sincHealLvCode != null" >
+        sinc_heal_lv_code = #{sincHealLvCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.backOprn != null" >
-        back_oprn = #{record.backOprn,jdbcType=VARCHAR},
+      <if test="backOprn != null" >
+        back_oprn = #{backOprn,jdbcType=VARCHAR},
       </if>
-      <if test="record.selv != null" >
-        selv = #{record.selv,jdbcType=VARCHAR},
+      <if test="selv != null" >
+        selv = #{selv,jdbcType=VARCHAR},
       </if>
-      <if test="record.prevAbtlMedn != null" >
-        prev_abtl_medn = #{record.prevAbtlMedn,jdbcType=VARCHAR},
+      <if test="prevAbtlMedn != null" >
+        prev_abtl_medn = #{prevAbtlMedn,jdbcType=VARCHAR},
       </if>
-      <if test="record.abtlMednDays != null" >
-        abtl_medn_days = #{record.abtlMednDays,jdbcType=VARCHAR},
+      <if test="abtlMednDays != null" >
+        abtl_medn_days = #{abtlMednDays,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOprtCode != null" >
-        oprn_oprt_code = #{record.oprnOprtCode,jdbcType=VARCHAR},
+      <if test="oprnOprtCode != null" >
+        oprn_oprt_code = #{oprnOprtCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOprtName != null" >
-        oprn_oprt_name = #{record.oprnOprtName,jdbcType=VARCHAR},
+      <if test="oprnOprtName != null" >
+        oprn_oprt_name = #{oprnOprtName,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnLvCode != null" >
-        oprn_lv_code = #{record.oprnLvCode,jdbcType=VARCHAR},
+      <if test="oprnLvCode != null" >
+        oprn_lv_code = #{oprnLvCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnLvName != null" >
-        oprn_lv_name = #{record.oprnLvName,jdbcType=VARCHAR},
+      <if test="oprnLvName != null" >
+        oprn_lv_name = #{oprnLvName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMtdCode != null" >
-        anst_mtd_code = #{record.anstMtdCode,jdbcType=VARCHAR},
+      <if test="anstMtdCode != null" >
+        anst_mtd_code = #{anstMtdCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMtdName != null" >
-        anst_mtd_name = #{record.anstMtdName,jdbcType=VARCHAR},
+      <if test="anstMtdName != null" >
+        anst_mtd_name = #{anstMtdName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstLvCode != null" >
-        anst_lv_code = #{record.anstLvCode,jdbcType=VARCHAR},
+      <if test="anstLvCode != null" >
+        anst_lv_code = #{anstLvCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstLvName != null" >
-        anst_lv_name = #{record.anstLvName,jdbcType=VARCHAR},
+      <if test="anstLvName != null" >
+        anst_lv_name = #{anstLvName,jdbcType=VARCHAR},
       </if>
-      <if test="record.exeAnstDeptCode != null" >
-        exe_anst_dept_code = #{record.exeAnstDeptCode,jdbcType=VARCHAR},
+      <if test="exeAnstDeptCode != null" >
+        exe_anst_dept_code = #{exeAnstDeptCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.exeAnstDeptName != null" >
-        exe_anst_dept_name = #{record.exeAnstDeptName,jdbcType=VARCHAR},
+      <if test="exeAnstDeptName != null" >
+        exe_anst_dept_name = #{exeAnstDeptName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstEfft != null" >
-        anst_efft = #{record.anstEfft,jdbcType=VARCHAR},
+      <if test="anstEfft != null" >
+        anst_efft = #{anstEfft,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnBegntime != null" >
-        oprn_begntime = #{record.oprnBegntime,jdbcType=VARCHAR},
+      <if test="oprnBegntime != null" >
+        oprn_begntime = #{oprnBegntime,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnEndtime != null" >
-        oprn_endtime = #{record.oprnEndtime,jdbcType=VARCHAR},
+      <if test="oprnEndtime != null" >
+        oprn_endtime = #{oprnEndtime,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAsps != null" >
-        oprn_asps = #{record.oprnAsps,jdbcType=VARCHAR},
+      <if test="oprnAsps != null" >
+        oprn_asps = #{oprnAsps,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAspsIfet != null" >
-        oprn_asps_ifet = #{record.oprnAspsIfet,jdbcType=VARCHAR},
+      <if test="oprnAspsIfet != null" >
+        oprn_asps_ifet = #{oprnAspsIfet,jdbcType=VARCHAR},
       </if>
-      <if test="record.afpnInfo != null" >
-        afpn_info = #{record.afpnInfo,jdbcType=VARCHAR},
+      <if test="afpnInfo != null" >
+        afpn_info = #{afpnInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnMerg != null" >
-        oprn_merg = #{record.oprnMerg,jdbcType=VARCHAR},
+      <if test="oprnMerg != null" >
+        oprn_merg = #{oprnMerg,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnConc != null" >
-        oprn_conc = #{record.oprnConc,jdbcType=VARCHAR},
+      <if test="oprnConc != null" >
+        oprn_conc = #{oprnConc,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAnstDeptCode != null" >
-        oprn_anst_dept_code = #{record.oprnAnstDeptCode,jdbcType=VARCHAR},
+      <if test="oprnAnstDeptCode != null" >
+        oprn_anst_dept_code = #{oprnAnstDeptCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAnstDeptName != null" >
-        oprn_anst_dept_name = #{record.oprnAnstDeptName,jdbcType=VARCHAR},
+      <if test="oprnAnstDeptName != null" >
+        oprn_anst_dept_name = #{oprnAnstDeptName,jdbcType=VARCHAR},
       </if>
-      <if test="record.palgDise != null" >
-        palg_dise = #{record.palgDise,jdbcType=VARCHAR},
+      <if test="palgDise != null" >
+        palg_dise = #{palgDise,jdbcType=VARCHAR},
       </if>
-      <if test="record.othMedDspo != null" >
-        oth_med_dspo = #{record.othMedDspo,jdbcType=VARCHAR},
+      <if test="othMedDspo != null" >
+        oth_med_dspo = #{othMedDspo,jdbcType=VARCHAR},
       </if>
-      <if test="record.outStdOprnTime != null" >
-        out_std_oprn_time = #{record.outStdOprnTime,jdbcType=VARCHAR},
+      <if test="outStdOprnTime != null" >
+        out_std_oprn_time = #{outStdOprnTime,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOperName != null" >
-        oprn_oper_name = #{record.oprnOperName,jdbcType=VARCHAR},
+      <if test="oprnOperName != null" >
+        oprn_oper_name = #{oprnOperName,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAsitName1 != null" >
-        oprn_asit_name1 = #{record.oprnAsitName1,jdbcType=VARCHAR},
+      <if test="oprnAsitName1 != null" >
+        oprn_asit_name1 = #{oprnAsitName1,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnAsitName2 != null" >
-        oprn_asit_name2 = #{record.oprnAsitName2,jdbcType=VARCHAR},
+      <if test="oprnAsitName2 != null" >
+        oprn_asit_name2 = #{oprnAsitName2,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstDrName != null" >
-        anst_dr_name = #{record.anstDrName,jdbcType=VARCHAR},
+      <if test="anstDrName != null" >
+        anst_dr_name = #{anstDrName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstAsaLvCode != null" >
-        anst_asa_lv_code = #{record.anstAsaLvCode,jdbcType=VARCHAR},
+      <if test="anstAsaLvCode != null" >
+        anst_asa_lv_code = #{anstAsaLvCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstAsaLvName != null" >
-        anst_asa_lv_name = #{record.anstAsaLvName,jdbcType=VARCHAR},
+      <if test="anstAsaLvName != null" >
+        anst_asa_lv_name = #{anstAsaLvName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMednCode != null" >
-        anst_medn_code = #{record.anstMednCode,jdbcType=VARCHAR},
+      <if test="anstMednCode != null" >
+        anst_medn_code = #{anstMednCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMednName != null" >
-        anst_medn_name = #{record.anstMednName,jdbcType=VARCHAR},
+      <if test="anstMednName != null" >
+        anst_medn_name = #{anstMednName,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMednDos != null" >
-        anst_medn_dos = #{record.anstMednDos,jdbcType=VARCHAR},
+      <if test="anstMednDos != null" >
+        anst_medn_dos = #{anstMednDos,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstDosunt != null" >
-        anst_dosunt = #{record.anstDosunt,jdbcType=VARCHAR},
+      <if test="anstDosunt != null" >
+        anst_dosunt = #{anstDosunt,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstBegntime != null" >
-        anst_begntime = #{record.anstBegntime,jdbcType=VARCHAR},
+      <if test="anstBegntime != null" >
+        anst_begntime = #{anstBegntime,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstEndtime != null" >
-        anst_endtime = #{record.anstEndtime,jdbcType=VARCHAR},
+      <if test="anstEndtime != null" >
+        anst_endtime = #{anstEndtime,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMergSympCode != null" >
-        anst_merg_symp_code = #{record.anstMergSympCode,jdbcType=VARCHAR},
+      <if test="anstMergSympCode != null" >
+        anst_merg_symp_code = #{anstMergSympCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMergSymp != null" >
-        anst_merg_symp = #{record.anstMergSymp,jdbcType=VARCHAR},
+      <if test="anstMergSymp != null" >
+        anst_merg_symp = #{anstMergSymp,jdbcType=VARCHAR},
       </if>
-      <if test="record.anstMergSympDscr != null" >
-        anst_merg_symp_dscr = #{record.anstMergSympDscr,jdbcType=VARCHAR},
+      <if test="anstMergSympDscr != null" >
+        anst_merg_symp_dscr = #{anstMergSympDscr,jdbcType=VARCHAR},
       </if>
-      <if test="record.pacuBegntime != null" >
-        pacu_begntime = #{record.pacuBegntime,jdbcType=VARCHAR},
+      <if test="pacuBegntime != null" >
+        pacu_begntime = #{pacuBegntime,jdbcType=VARCHAR},
       </if>
-      <if test="record.pacuEndtime != null" >
-        pacu_endtime = #{record.pacuEndtime,jdbcType=VARCHAR},
+      <if test="pacuEndtime != null" >
+        pacu_endtime = #{pacuEndtime,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnSelv != null" >
-        oprn_selv = #{record.oprnSelv,jdbcType=VARCHAR},
+      <if test="oprnSelv != null" >
+        oprn_selv = #{oprnSelv,jdbcType=VARCHAR},
       </if>
-      <if test="record.cancOprn != null" >
-        canc_oprn = #{record.cancOprn,jdbcType=VARCHAR},
+      <if test="cancOprn != null" >
+        canc_oprn = #{cancOprn,jdbcType=VARCHAR},
       </if>
-      <if test="record.valiFlag != null" >
-        vali_flag = #{record.valiFlag,jdbcType=VARCHAR},
+      <if test="valiFlag != null" >
+        vali_flag = #{valiFlag,jdbcType=VARCHAR},
       </if>
-      <if test="record.source != null" >
-        source = #{record.source,jdbcType=VARCHAR},
+      <if test="source != null" >
+        source = #{source,jdbcType=VARCHAR},
       </if>
-      <if test="record.createTime != null" >
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null" >
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.hospCode != null" >
-        hosp_code = #{record.hospCode,jdbcType=VARCHAR},
+      <if test="hospCode != null" >
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
+    where uuid = #{uuid}
   </update>
   <update id="updateByExample" parameterType="map" >
     <!--

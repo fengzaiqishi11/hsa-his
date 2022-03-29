@@ -428,115 +428,113 @@
     -->
     update insure_emr_rescinfo
     <set >
-      <if test="record.uuid != null" >
-        uuid = #{record.uuid,jdbcType=BIGINT},
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=BIGINT},
       </if>
-      <if test="record.orgUuid != null" >
-        org_uuid = #{record.orgUuid,jdbcType=BIGINT},
+      <if test="orgUuid != null" >
+        org_uuid = #{orgUuid,jdbcType=BIGINT},
       </if>
-      <if test="record.mdtrtSn != null" >
-        mdtrt_sn = #{record.mdtrtSn,jdbcType=VARCHAR},
+      <if test="mdtrtSn != null" >
+        mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
       </if>
-      <if test="record.mdtrtId != null" >
-        mdtrt_id = #{record.mdtrtId,jdbcType=VARCHAR},
+      <if test="mdtrtId != null" >
+        mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
       </if>
-      <if test="record.psnNo != null" >
-        psn_no = #{record.psnNo,jdbcType=VARCHAR},
+      <if test="psnNo != null" >
+        psn_no = #{psnNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.dept != null" >
-        dept = #{record.dept,jdbcType=VARCHAR},
+      <if test="dept != null" >
+        dept = #{dept,jdbcType=VARCHAR},
       </if>
-      <if test="record.deptName != null" >
-        dept_name = #{record.deptName,jdbcType=VARCHAR},
+      <if test="deptName != null" >
+        dept_name = #{deptName,jdbcType=VARCHAR},
       </if>
-      <if test="record.wardareaName != null" >
-        wardarea_name = #{record.wardareaName,jdbcType=VARCHAR},
+      <if test="wardareaName != null" >
+        wardarea_name = #{wardareaName,jdbcType=VARCHAR},
       </if>
-      <if test="record.bedno != null" >
-        bedno = #{record.bedno,jdbcType=VARCHAR},
+      <if test="bedno != null" >
+        bedno = #{bedno,jdbcType=VARCHAR},
       </if>
-      <if test="record.diagName != null" >
-        diag_name = #{record.diagName,jdbcType=VARCHAR},
+      <if test="diagName != null" >
+        diag_name = #{diagName,jdbcType=VARCHAR},
       </if>
-      <if test="record.diagCode != null" >
-        diag_code = #{record.diagCode,jdbcType=VARCHAR},
+      <if test="diagCode != null" >
+        diag_code = #{diagCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.condChg != null" >
-        cond_chg = #{record.condChg,jdbcType=VARCHAR},
+      <if test="condChg != null" >
+        cond_chg = #{condChg,jdbcType=VARCHAR},
       </if>
-      <if test="record.rescMes != null" >
-        resc_mes = #{record.rescMes,jdbcType=VARCHAR},
+      <if test="rescMes != null" >
+        resc_mes = #{rescMes,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOprtCode != null" >
-        oprn_oprt_code = #{record.oprnOprtCode,jdbcType=VARCHAR},
+      <if test="oprnOprtCode != null" >
+        oprn_oprt_code = #{oprnOprtCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOprtName != null" >
-        oprn_oprt_name = #{record.oprnOprtName,jdbcType=VARCHAR},
+      <if test="oprnOprtName != null" >
+        oprn_oprt_name = #{oprnOprtName,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnOperPart != null" >
-        oprn_oper_part = #{record.oprnOperPart,jdbcType=VARCHAR},
+      <if test="oprnOperPart != null" >
+        oprn_oper_part = #{oprnOperPart,jdbcType=VARCHAR},
       </if>
-      <if test="record.itvtName != null" >
-        itvt_name = #{record.itvtName,jdbcType=VARCHAR},
+      <if test="itvtName != null" >
+        itvt_name = #{itvtName,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprtMtd != null" >
-        oprt_mtd = #{record.oprtMtd,jdbcType=VARCHAR},
+      <if test="oprtMtd != null" >
+        oprt_mtd = #{oprtMtd,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprtCnt != null" >
-        oprt_cnt = #{record.oprtCnt,jdbcType=INTEGER},
+      <if test="oprtCnt != null" >
+        oprt_cnt = #{oprtCnt,jdbcType=INTEGER},
       </if>
-      <if test="record.rescBegntime != null" >
-        resc_begntime = #{record.rescBegntime,jdbcType=DATE},
+      <if test="rescBegntime != null" >
+        resc_begntime = #{rescBegntime,jdbcType=DATE},
       </if>
-      <if test="record.rescEndtime != null" >
-        resc_endtime = #{record.rescEndtime,jdbcType=DATE},
+      <if test="rescEndtime != null" >
+        resc_endtime = #{rescEndtime,jdbcType=DATE},
       </if>
-      <if test="record.diseItemName != null" >
-        dise_item_name = #{record.diseItemName,jdbcType=VARCHAR},
+      <if test="diseItemName != null" >
+        dise_item_name = #{diseItemName,jdbcType=VARCHAR},
       </if>
-      <if test="record.diseCcls != null" >
-        dise_ccls = #{record.diseCcls,jdbcType=VARCHAR},
+      <if test="diseCcls != null" >
+        dise_ccls = #{diseCcls,jdbcType=VARCHAR},
       </if>
-      <if test="record.diseCclsQunt != null" >
-        dise_ccls_qunt = #{record.diseCclsQunt,jdbcType=DECIMAL},
+      <if test="diseCclsQunt != null" >
+        dise_ccls_qunt = #{diseCclsQunt,jdbcType=DECIMAL},
       </if>
-      <if test="record.diseCclsCode != null" >
-        dise_ccls_code = #{record.diseCclsCode,jdbcType=VARCHAR},
+      <if test="diseCclsCode != null" >
+        dise_ccls_code = #{diseCclsCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.mnan != null" >
-        mnan = #{record.mnan,jdbcType=VARCHAR},
+      <if test="mnan != null" >
+        mnan = #{mnan,jdbcType=VARCHAR},
       </if>
-      <if test="record.rescPsnList != null" >
-        resc_psn_list = #{record.rescPsnList,jdbcType=VARCHAR},
+      <if test="rescPsnList != null" >
+        resc_psn_list = #{rescPsnList,jdbcType=VARCHAR},
       </if>
-      <if test="record.proftechttlCode != null" >
-        proftechttl_code = #{record.proftechttlCode,jdbcType=VARCHAR},
+      <if test="proftechttlCode != null" >
+        proftechttl_code = #{proftechttlCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.docCode != null" >
-        doc_code = #{record.docCode,jdbcType=VARCHAR},
+      <if test="docCode != null" >
+        doc_code = #{docCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.drName != null" >
-        dr_name = #{record.drName,jdbcType=VARCHAR},
+      <if test="drName != null" >
+        dr_name = #{drName,jdbcType=VARCHAR},
       </if>
-      <if test="record.valiFlag != null" >
-        vali_flag = #{record.valiFlag,jdbcType=VARCHAR},
+      <if test="valiFlag != null" >
+        vali_flag = #{valiFlag,jdbcType=VARCHAR},
       </if>
-      <if test="record.source != null" >
-        source = #{record.source,jdbcType=VARCHAR},
+      <if test="source != null" >
+        source = #{source,jdbcType=VARCHAR},
       </if>
-      <if test="record.createTime != null" >
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null" >
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.hospCode != null" >
-        hosp_code = #{record.hospCode,jdbcType=VARCHAR},
+      <if test="hospCode != null" >
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
+    where uuid = #{uuid}
   </update>
   <update id="updateByExample" parameterType="map" >
     <!--

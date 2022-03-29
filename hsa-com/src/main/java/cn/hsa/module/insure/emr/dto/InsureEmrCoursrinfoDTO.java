@@ -55,7 +55,7 @@ public class InsureEmrCoursrinfoDTO extends InsureEmrCoursrinfoDO implements Ser
     /**
      * 记录日期时间
      */
-    private Date rcdTime;
+    private String rcdTime;
     /**
      * 主诉
      */
@@ -151,11 +151,11 @@ public class InsureEmrCoursrinfoDTO extends InsureEmrCoursrinfoDO implements Ser
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

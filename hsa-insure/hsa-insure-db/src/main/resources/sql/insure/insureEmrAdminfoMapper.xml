@@ -188,11 +188,17 @@
     hosp_code
   </sql>
 
-  <select id="queryById" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
+  <select id="queryByMdtrtSn" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
   SELECT <include refid="Base_Column_List"/>
   FROM insure_emr_adminfo
   where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId}
 </select>
+
+    <select id="queryByUuid" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
+        SELECT <include refid="Base_Column_List"/>
+        FROM insure_emr_adminfo
+        where uuid = #{uuid}
+    </select>
 
   <select id="queryInsureUnifiedEmrInfo" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO" resultType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO">
     select t.visit_id, t.medical_reg_no as mdtrtId, t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
@@ -306,7 +312,7 @@
       resp_nurs_name, vali_flag, statu, 
       source, create_time, update_time, 
       upload_time, hosp_code)
-    values (#{uuid,jdbcType=BIGINT}, #{mdtrtSn,jdbcType=VARCHAR}, #{mdtrtId,jdbcType=VARCHAR}, 
+    values (#{uuid,jdbcType=BIGINT}, #{visitId,jdbcType=VARCHAR}, #{mdtrtId,jdbcType=VARCHAR},
       #{psnNo,jdbcType=VARCHAR}, #{mdtrtsn,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{gend,jdbcType=VARCHAR}, #{age,jdbcType=DECIMAL}, #{admRecNo,jdbcType=VARCHAR}, 
       #{wardareaName,jdbcType=VARCHAR}, #{deptCode,jdbcType=VARCHAR}, #{deptName,jdbcType=VARCHAR}, 

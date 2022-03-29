@@ -3,8 +3,7 @@ package cn.hsa.module.insure.emr;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
-import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
+import cn.hsa.module.insure.emr.dto.*;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import io.swagger.annotations.ApiOperation;
@@ -80,9 +79,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrAdminfo")
-    public WrapperResponse updateInsureUnifiedEmrAdminfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrAdminfoDTO> updateInsureUnifiedEmrAdminfo(@RequestBody InsureEmrAdminfoDTO insureEmrAdminfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrAdminfoDTO",insureEmrAdminfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrAdminfo(map);
     }
 
@@ -95,9 +96,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrDiseinfo")
-    public WrapperResponse updateInsureUnifiedEmrDiseinfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrDiseinfoDTO> updateInsureUnifiedEmrDiseinfo(@RequestBody InsureEmrDiseinfoDTO insureEmrDiseinfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrDiseinfoDTO",insureEmrDiseinfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrDiseinfo(map);
     }
 
@@ -110,9 +113,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrCoursrinfo")
-    public WrapperResponse updateInsureUnifiedEmrCoursrinfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrCoursrinfoDTO> updateInsureUnifiedEmrCoursrinfo(@RequestBody InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrCoursrinfoDTO",insureEmrCoursrinfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrCoursrinfo(map);
     }
 
@@ -125,9 +130,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrOprninfo")
-    public WrapperResponse updateInsureUnifiedEmrOprninfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrOprninfoDTO> updateInsureUnifiedEmrOprninfo(@RequestBody InsureEmrOprninfoDTO insureEmrOprninfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrOprninfoDTO",insureEmrOprninfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrOprninfo(map);
     }
 
@@ -142,9 +149,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrRescinfo")
-    public WrapperResponse updateInsureUnifiedEmrRescinfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<InsureEmrRescinfoDTO> updateInsureUnifiedEmrRescinfo(@RequestBody InsureEmrRescinfoDTO insureEmrRescinfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrRescinfoDTO",insureEmrRescinfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrRescinfo(map);
     }
 
@@ -157,9 +166,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrDieinfo")
-    public WrapperResponse updateInsureUnifiedEmrDieinfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse updateInsureUnifiedEmrDieinfo(@RequestBody InsureEmrDieinfoDTO insureEmrDieinfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrDieinfoDTO",insureEmrDieinfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrDieinfo(map);
     }
 
@@ -172,9 +183,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrDscginfo")
-    public WrapperResponse updateInsureUnifiedEmrDscginfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse updateInsureUnifiedEmrDscginfo(@RequestBody InsureEmrDscginfoDTO insureEmrDscginfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureEmrDscginfoDTO",insureEmrDscginfoDTO);
         return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrDscginfo(map);
     }
 
@@ -192,7 +205,7 @@ public class InsureUnifiedEmrController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrUpload(map);
-        return WrapperResponse.success(null);
+        return WrapperResponse.success("上传成功");
     }
 
     /**
@@ -208,15 +221,17 @@ public class InsureUnifiedEmrController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrSync(map);
-        return WrapperResponse.success(null);
+        return WrapperResponse.success("同步成功");
     }
 
     @ApiOperation(value = "导出")
     @PostMapping("/export")
-    public void export(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res) {
+    public void export(@RequestBody InsureEmrUnifiedDTO insureEmrUnifiedDTO, HttpServletRequest req, HttpServletResponse res) {
         try {
             SysUserDTO sysUserDTO = getSession(req, res);
+            Map map =new HashMap<>();
             map.put("hospCode", sysUserDTO.getHospCode());
+            map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
             insureUnifiedEmrService_comsumer.export(req,map);
         } catch (Exception e) {
             log.error("导出报错", e);

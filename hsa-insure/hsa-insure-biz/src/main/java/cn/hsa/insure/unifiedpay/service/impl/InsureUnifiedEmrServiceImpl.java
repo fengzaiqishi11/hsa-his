@@ -7,8 +7,7 @@ import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import lombok.extern.slf4j.Slf4j;
 
-import cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO;
-import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
+import cn.hsa.module.insure.emr.dto.*;
 import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.util.MapUtils;
 
@@ -53,45 +52,45 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrAdminfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrAdminfoDTO> updateInsureUnifiedEmrAdminfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrAdminfo(MapUtils.get(map,"insureEmrAdminfoDTO")));
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrDiseinfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrDiseinfoDTO> updateInsureUnifiedEmrDiseinfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDiseinfo(MapUtils.get(map,"insureEmrDiseinfoDTO")));
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrCoursrinfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrCoursrinfoDTO> updateInsureUnifiedEmrCoursrinfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrCoursrinfo(MapUtils.get(map,"insureEmrCoursrinfoDTO")));
     }
 
     @Override
     public WrapperResponse updateInsureUnifiedEmrOprninfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrOprninfo(MapUtils.get(map,"insureEmrOprninfoDTO")));
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrRescinfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrRescinfoDTO> updateInsureUnifiedEmrRescinfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrRescinfo(MapUtils.get(map,"insureEmrRescinfoDTO")));
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrDieinfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrDieinfoDTO> updateInsureUnifiedEmrDieinfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDieinfo(MapUtils.get(map,"insureEmrDieinfoDTO")));
     }
 
     @Override
-    public WrapperResponse updateInsureUnifiedEmrDscginfo(Map<String, Object> map) {
+    public WrapperResponse<InsureEmrDscginfoDTO> updateInsureUnifiedEmrDscginfo(Map<String, Object> map) {
         //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
-        return null;
+        return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDscginfo(MapUtils.get(map,"insureEmrDscginfoDTO")));
     }
 
     @Override
@@ -114,6 +113,7 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
 
     @Override
     public void export(HttpServletRequest req, Map<String, Object> map) {
+        List<InsureEmrUnifiedDTO> list = insureUnifiedEmrBO.export(MapUtils.get(map,"insureEmrUnifiedDTO"));
 
     }
 }

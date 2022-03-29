@@ -32,17 +32,17 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         // 入院信息
         dataMap.put("adminfo", insureEmrDetailDTO.getInsureEmrAdminfoDTO());
         // 诊断信息
-        dataMap.put("diseinfo", insureEmrDetailDTO.getInsureEmrDiseinfoDTO());
+        dataMap.put("diseinfo", insureEmrDetailDTO.getInsureEmrDiseinfoDTOList());
         // 病程记录信息
-        dataMap.put("coursrinfo", insureEmrDetailDTO.getInsureEmrCoursrinfoDTO());
+        dataMap.put("coursrinfo", insureEmrDetailDTO.getInsureEmrCoursrinfoDTOList());
         // 手术信息
-        dataMap.put("oprninfo", insureEmrDetailDTO.getInsureEmrOprninfoDTO());
+        dataMap.put("oprninfo", insureEmrDetailDTO.getInsureEmrOprninfoDTOList());
         // 抢救记录信息
-        dataMap.put("rescinfo", insureEmrDetailDTO.getInsureEmrRescinfoDTO());
+        dataMap.put("rescinfo", insureEmrDetailDTO.getInsureEmrRescinfoDTOList());
         // 死亡信息
-        dataMap.put("dieinfo", insureEmrDetailDTO.getInsureEmrDiseinfoDTO());
+        dataMap.put("dieinfo", insureEmrDetailDTO.getInsureEmrDiseinfoDTOList());
         // 出院小结信息
-        dataMap.put("dscginfo", insureEmrDetailDTO.getInsureEmrDscginfoDTO());
+        dataMap.put("dscginfo", insureEmrDetailDTO.getInsureEmrDscginfoDTOList());
 
         HashMap commParam = new HashMap();
         checkRequest(dataMap);

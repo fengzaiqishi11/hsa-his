@@ -2,6 +2,7 @@ package cn.hsa.module.center.datasource.dao;
 
 import cn.hsa.module.center.datasource.dto.CenterDatasourceDTO;
 import cn.hsa.module.center.datasource.entity.CenterDatasourceDO;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.sync.dto.CenterSyncDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -148,4 +149,6 @@ public interface CenterDatasourceDAO {
      * @Date: 2022-02-17
      */
     List<CenterDatasourceDTO> findHospitalCenterDataSource();
+
+    void addDataUser(CenterHospitalDTO centerHospitalDTO);
 }

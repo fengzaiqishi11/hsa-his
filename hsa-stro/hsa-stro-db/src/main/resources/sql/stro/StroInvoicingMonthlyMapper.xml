@@ -8,7 +8,16 @@
     <result column="item_code" jdbcType="VARCHAR" property="itemCode" />
     <result column="item_id" jdbcType="VARCHAR" property="itemId" />
     <result column="item_name" jdbcType="VARCHAR" property="itemName" />
+    <result column="num" jdbcType="DECIMAL" property="num" />
     <result column="unit_code" jdbcType="VARCHAR" property="unitCode" />
+    <result column="curr_unit_code" jdbcType="VARCHAR" property="currUnitCode" />
+    <result column="sell_price" jdbcType="DECIMAL" property="sellPrice" />
+    <result column="buy_price" jdbcType="DECIMAL" property="buyPrice" />
+    <result column="split_ratio" jdbcType="DECIMAL" property="splitRatio" />
+    <result column="split_price" jdbcType="DECIMAL" property="splitPrice" />
+    <result column="split_num" jdbcType="DECIMAL" property="splitNum" />
+    <result column="split_unit_code" jdbcType="VARCHAR" property="splitUnitCode" />
+    <result column="up_surplus_num" jdbcType="DECIMAL" property="upSurplusNum" />
     <result column="surplus_num" jdbcType="DECIMAL" property="surplusNum" />
     <result column="up_buy_price_all" jdbcType="DECIMAL" property="upBuyPriceAll" />
     <result column="buy_price_all" jdbcType="DECIMAL" property="buyPriceAll" />
@@ -51,160 +60,91 @@
     <result column="in_sales_buy_price_all" jdbcType="DECIMAL" property="inSalesBuyPriceAll" />
     <result column="in_sales_price_all" jdbcType="DECIMAL" property="inSalesPriceAll" />
     <result column="in_sales_num" jdbcType="DECIMAL" property="inSalesNum" />
-    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="stro_phar" jdbcType="VARCHAR" property="stroPhar" />
+    <result column="modify_time" jdbcType="TIMESTAMP" property="modifyTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, hosp_code, biz_id, item_code, item_id, item_name, unit_code, surplus_num, up_buy_price_all, 
-    buy_price_all, up_sell_price_all, sell_price_all, crte_time, new_price, new_split_price, 
-    stro_in_num, stro_in_num_price_all, return_supl_num, return_supl_price_all, stro_to_dept_num, 
-    stro_to_dept_price_all, stro_to_phar_num, stro_to_phar_price_all, report_losses_num, 
-    report_losses_price_all, phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all, 
-    adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all, 
-    take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all, return_supl_buy_price_all, 
-    stro_to_dept_buy_price_all, stro_to_phar_buy_price_all, report_losses_buy_price_all, 
-    phar_return_stro_buy_price_all, adjust_profit_buy_price_all, adjust_loss_buy_price_all, 
-    take_strock_subtract_buy_price_all, take_strock_add_buy_price_all, out_sales_num, 
-    out_sales_price_all, out_sales_buy_price_all, in_sales_buy_price_all, in_sales_price_all, 
-    in_sales_num, update_time
+    id, hosp_code, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code,
+    sell_price, buy_price, split_ratio, split_price, split_num, split_unit_code, up_surplus_num,
+    surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all,
+    crte_time, new_price, new_split_price, stro_in_num, stro_in_num_price_all, return_supl_num,
+    return_supl_price_all, stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
+    stro_to_phar_price_all, report_losses_num, report_losses_price_all, phar_return_stro_num,
+    phar_return_stro_price_all, adjust_profit_price_all, adjust_loss_price_all, take_strock_subtract_num,
+    take_strock_subtract_price_all, take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all,
+    return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
+    report_losses_buy_price_all, phar_return_stro_buy_price_all, adjust_profit_buy_price_all,
+    adjust_loss_buy_price_all, take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
+    out_sales_num, out_sales_price_all, out_sales_buy_price_all, in_sales_buy_price_all,
+    in_sales_price_all, in_sales_num, stro_phar, modify_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
-    select 
+    select
     <include refid="Base_Column_List" />
     from stro_invoicing_monthly
-    where id = #{id,jdbcType=VARCHAR}
+    where id = #{item.id}
   </select>
-  <select id="getAllStroInvoicingByDate"
-          resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
+  <select id="queryAllByDate" resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     SELECT
-    a.item_id itemId,
-    a.hosp_code hospCode,
-    a.biz_id bizId,
-    /*itemCode暂时不加，先看看查询的性能*/
-    max(a.item_name) itemName,
-    max(a.unit_code) unitCode,
-    (select b.name from base_dept b where b.id = max(a.biz_id) and b.hosp_code = #{hospCode}) deptName,
-    /*上期零售价格*/
-    ifnull((select d.up_sell_price_all/d.up_surplus_num from stro_invoicing d where d.item_id = a.item_id and d.id = min(a.id)),0)upSellPrice,
-    /*零售价格*/
-    (select d.sell_price from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPrice,
-    /*数量*/
-    (select d.surplus_num from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) surplusNum,
-    /*零售总金额*/
-    (select d.sell_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPriceAll,
-    /*上期数量*/
-    (select d.up_surplus_num from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)) upNum,
-    /*上期零售总金额*/
-    ifnull((select d.up_sell_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upSellPriceAll,
-    /*直接入库零售总金额*/
-    sum(if( a.outin_code='2',a.sell_price * a.num,0)) stroInNumPriceAll,
-    /*直接入库数量*/
-    sum(if( a.outin_code='2',a.num,0)) stroInNum,
-    /*退供应商零售总金额*/
-    sum(if( a.outin_code='3',a.sell_price * a.num,0)) returnSuplPriceAll,
-    /*退供应商数量*/
-    sum(if( a.outin_code='3',a.num,0))  returnSuplPriceNum,
-    /*出库到科室零售总金额*/
-    sum(if( a.outin_code='4',a.sell_price * a.num,0)) stroToDeptPriAll,
-    /*出库到科室数量*/
-    sum(if( a.outin_code='4',a.num,0)) stroToDeptPriNum,
-    /*采购计划零售总金额*/
-    sum(if( a.outin_code='5',a.sell_price * a.num,0)) stroToPharPriAll,
-    /*采购计划数量*/
-    sum(if( a.outin_code='5',a.num,0)) stroToPharPriNum,
-    /*报损零售总金额*/
-    sum(if( a.outin_code='8',a.sell_price * a.num,0)) reportLossesPriAll,
-    /*报损数量*/
-    sum(if( a.outin_code='8',a.num,0)) reportLossesNum,
-    /*药房退库零售总金额*/
-    sum(if( a.outin_code='21',a.sell_price * a.num,0)) pharReturnStroPriAll,
-    /*药房退库数量*/
-    sum(if( a.outin_code='21',a.num,0)) pharReturnStroNum,
-    /*调盈零售总金额*/
-    sum(if( a.outin_code='24' and a.sell_price_all > a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriAll,
-    /*调亏零售总金额*/
-    sum(if( a.outin_code='24' and a.sell_price_all > a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0)) adjustLossPriAll,
-    sum(if( a.outin_code='7' and a.num &lt; 0,a.sell_price * a.num,0)) takeStockSubtractPriAll,/*盘亏零售总金额*/
-    sum(if( a.outin_code='7' and a.num &lt; 0,a.num,0)) takeStockSubtractNum,/*盘亏数量*/
-    sum(if( a.outin_code='7' and a.num > 0,a.sell_price * a.num,0)) takeStockAddPriAll,/*药房退库数量*/
-    sum(if( a.outin_code='7' and a.num > 0, a.num,0)) takeStockAddNum,/*药房退库数量*/
-    /*按购进价*/
-    ifnull((select d.up_buy_price_all/d.up_surplus_num from stro_invoicing d where d.item_id = a.item_id and d.id = min(a.id)),0)upBuyPrice,
-    (select d.buy_price from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,
-    (select d.buy_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,
-    ifnull((select d.up_buy_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll,
-    sum(if( a.outin_code='2',a.buy_price * a.num,0)) stroInNumBuyPriceAll,
-    sum(if( a.outin_code='3',a.buy_price * a.num,0)) returnSuplBuyPriceAll,
-    sum(if( a.outin_code='4',a.buy_price * a.num,0)) stroToDeptBuyPriAll,
-    sum(if( a.outin_code='5',a.buy_price * a.num,0)) stroToPharBuyPriAll,
-    sum(if( a.outin_code='8',a.buy_price * a.num,0)) reportLossesBuyPriAll,
-    sum(if( a.outin_code='21',a.buy_price * a.num,0)) pharReturnStroBuyPriAll,
-    sum(if( a.outin_code='24' and a.buy_price_all &gt; a.up_buy_price_all,a.buy_price_all - a.up_buy_price_all,0)) adjustProfitBuyPriAll,
-    sum(if( a.outin_code='24' and a.buy_price_all &lt;  a.up_buy_price_all, a.buy_price_all - a.up_buy_price_all,0)) adjustLossBuyPriAll,
-    sum(if( a.outin_code='7' and a.num &lt; 0,a.buy_price * a.num,0)) takeStockSubtractBuyPriAll,
-    sum(if( a.outin_code='7' and a.num &gt;  0,a.buy_price * a.num,0)) takeStockAddBuyPriAll
-
-     from stro_invoicing a
-    left join stro_stock si on a.item_id = si.item_id
-    where a.hosp_code = #{hospCode}
-		and a.hosp_code = si.hosp_code
-		and DATE_FORMAT(a.crte_time,'%Y-%m-%d') >= #{today}
-		     and a.outin_code in ('2','3','4','5','7','8','21','24')
-    group by a.item_id,a.biz_id
+    itemId,bizId,DATE_FORMAT(crte_time,'%Y-%m') as crteTime,stroPhar,id,hospCode
+    from stro_invoicing_monthly where hosp_code = #{item.hospCode} and DATE_FORMAT(crte_time,'%Y-%m') = DATE_FORMAT(#{item.crteTime},'%Y-%m')
+    GROUP BY item_id,biz_id,crte_time,stroPhar
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly
-    where id = #{id,jdbcType=VARCHAR}
+    where id = #{item.id}
   </delete>
-  <insert id="insert" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDO">
-    insert into stro_invoicing_monthly (id, hosp_code, biz_id, 
-      item_code, item_id, item_name, 
-      unit_code, surplus_num, up_buy_price_all, 
-      buy_price_all, up_sell_price_all, sell_price_all, 
-      crte_time, new_price, new_split_price, 
-      stro_in_num, stro_in_num_price_all, return_supl_num, 
-      return_supl_price_all, stro_to_dept_num, stro_to_dept_price_all, 
-      stro_to_phar_num, stro_to_phar_price_all, report_losses_num, 
-      report_losses_price_all, phar_return_stro_num, 
-      phar_return_stro_price_all, adjust_profit_price_all, 
-      adjust_loss_price_all, take_strock_subtract_num, 
-      take_strock_subtract_price_all, take_strock_add_num, 
-      take_strock_add_price_all, stro_in_num_buy_price_all, 
-      return_supl_buy_price_all, stro_to_dept_buy_price_all, 
-      stro_to_phar_buy_price_all, report_losses_buy_price_all, 
-      phar_return_stro_buy_price_all, adjust_profit_buy_price_all, 
-      adjust_loss_buy_price_all, take_strock_subtract_buy_price_all, 
-      take_strock_add_buy_price_all, out_sales_num, 
-      out_sales_price_all, out_sales_buy_price_all, 
-      in_sales_buy_price_all, in_sales_price_all, in_sales_num, 
-      update_time)
-    values (#{id,jdbcType=VARCHAR}, #{hospCode,jdbcType=VARCHAR}, #{bizId,jdbcType=VARCHAR}, 
-      #{itemCode,jdbcType=VARCHAR}, #{itemId,jdbcType=VARCHAR}, #{itemName,jdbcType=VARCHAR}, 
-      #{unitCode,jdbcType=VARCHAR}, #{surplusNum,jdbcType=DECIMAL}, #{upBuyPriceAll,jdbcType=DECIMAL}, 
-      #{buyPriceAll,jdbcType=DECIMAL}, #{upSellPriceAll,jdbcType=DECIMAL}, #{sellPriceAll,jdbcType=DECIMAL}, 
-      #{crteTime,jdbcType=TIMESTAMP}, #{newPrice,jdbcType=DECIMAL}, #{newSplitPrice,jdbcType=DECIMAL}, 
-      #{stroInNum,jdbcType=DECIMAL}, #{stroInNumPriceAll,jdbcType=DECIMAL}, #{returnSuplNum,jdbcType=DECIMAL}, 
-      #{returnSuplPriceAll,jdbcType=DECIMAL}, #{stroToDeptNum,jdbcType=DECIMAL}, #{stroToDeptPriceAll,jdbcType=DECIMAL}, 
-      #{stroToPharNum,jdbcType=DECIMAL}, #{stroToPharPriceAll,jdbcType=DECIMAL}, #{reportLossesNum,jdbcType=DECIMAL}, 
-      #{reportLossesPriceAll,jdbcType=DECIMAL}, #{pharReturnStroNum,jdbcType=DECIMAL}, 
-      #{pharReturnStroPriceAll,jdbcType=DECIMAL}, #{adjustProfitPriceAll,jdbcType=DECIMAL}, 
-      #{adjustLossPriceAll,jdbcType=DECIMAL}, #{takeStrockSubtractNum,jdbcType=DECIMAL}, 
-      #{takeStrockSubtractPriceAll,jdbcType=DECIMAL}, #{takeStrockAddNum,jdbcType=DECIMAL}, 
-      #{takeStrockAddPriceAll,jdbcType=DECIMAL}, #{stroInNumBuyPriceAll,jdbcType=DECIMAL}, 
-      #{returnSuplBuyPriceAll,jdbcType=DECIMAL}, #{stroToDeptBuyPriceAll,jdbcType=DECIMAL}, 
-      #{stroToPharBuyPriceAll,jdbcType=DECIMAL}, #{reportLossesBuyPriceAll,jdbcType=DECIMAL}, 
-      #{pharReturnStroBuyPriceAll,jdbcType=DECIMAL}, #{adjustProfitBuyPriceAll,jdbcType=DECIMAL}, 
-      #{adjustLossBuyPriceAll,jdbcType=DECIMAL}, #{takeStrockSubtractBuyPriceAll,jdbcType=DECIMAL}, 
-      #{takeStrockAddBuyPriceAll,jdbcType=DECIMAL}, #{outSalesNum,jdbcType=DECIMAL}, 
-      #{outSalesPriceAll,jdbcType=DECIMAL}, #{outSalesBuyPriceAll,jdbcType=DECIMAL}, 
-      #{inSalesBuyPriceAll,jdbcType=DECIMAL}, #{inSalesPriceAll,jdbcType=DECIMAL}, #{inSalesNum,jdbcType=DECIMAL}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO" useGeneratedKeys="true">
+    insert into stro_invoicing_monthly (hosp_code, biz_id, item_code,
+      item_id, item_name, num,
+      unit_code, curr_unit_code, sell_price,
+      buy_price, split_ratio, split_price,
+      split_num, split_unit_code, up_surplus_num,
+      surplus_num, up_buy_price_all, buy_price_all,
+      up_sell_price_all, sell_price_all, crte_time,
+      new_price, new_split_price, stro_in_num,
+      stro_in_num_price_all, return_supl_num, return_supl_price_all,
+      stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
+      stro_to_phar_price_all, report_losses_num, report_losses_price_all,
+      phar_return_stro_num, phar_return_stro_price_all,
+      adjust_profit_price_all, adjust_loss_price_all,
+      take_strock_subtract_num, take_strock_subtract_price_all,
+      take_strock_add_num, take_strock_add_price_all,
+      stro_in_num_buy_price_all, return_supl_buy_price_all,
+      stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
+      report_losses_buy_price_all, phar_return_stro_buy_price_all,
+      adjust_profit_buy_price_all, adjust_loss_buy_price_all,
+      take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
+      out_sales_num, out_sales_price_all, out_sales_buy_price_all,
+      in_sales_buy_price_all, in_sales_price_all, in_sales_num,
+      stro_phar, modify_time)
+    values (#{item.hospCode}, #{item.bizId}, #{item.itemCode},
+      #{item.itemId}, #{item.itemName}, #{item.num},
+      #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
+      #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice},
+      #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum},
+      #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll},
+      #{item.upSellPriceAll}, #{item.sellPriceAll}, #{item.crteTime},
+      #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum},
+      #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll},
+      #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum},
+      #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll},
+      #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll},
+      #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll},
+      #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll},
+      #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll},
+      #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll},
+      #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll},
+      #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll},
+      #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll},
+      #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll},
+      #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
+      #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
+      #{item.stroPhar}, #{item.modifyTime})
   </insert>
-  <insert id="insertSelective" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDO">
+  <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO" useGeneratedKeys="true">
     insert into stro_invoicing_monthly
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        id,
-      </if>
       <if test="hospCode != null">
         hosp_code,
       </if>
@@ -220,8 +160,35 @@
       <if test="itemName != null">
         item_name,
       </if>
+      <if test="num != null">
+        num,
+      </if>
       <if test="unitCode != null">
         unit_code,
+      </if>
+      <if test="currUnitCode != null">
+        curr_unit_code,
+      </if>
+      <if test="sellPrice != null">
+        sell_price,
+      </if>
+      <if test="buyPrice != null">
+        buy_price,
+      </if>
+      <if test="splitRatio != null">
+        split_ratio,
+      </if>
+      <if test="splitPrice != null">
+        split_price,
+      </if>
+      <if test="splitNum != null">
+        split_num,
+      </if>
+      <if test="splitUnitCode != null">
+        split_unit_code,
+      </if>
+      <if test="upSurplusNum != null">
+        up_surplus_num,
       </if>
       <if test="surplusNum != null">
         surplus_num,
@@ -349,367 +316,488 @@
       <if test="inSalesNum != null">
         in_sales_num,
       </if>
-      <if test="updateTime != null">
-        update_time,
+      <if test="stroPhar != null">
+        stro_phar,
+      </if>
+      <if test="modifyTime != null">
+        modify_time,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="id != null">
-        #{id,jdbcType=VARCHAR},
-      </if>
       <if test="hospCode != null">
-        #{hospCode,jdbcType=VARCHAR},
+        #{item.hospCode},
       </if>
       <if test="bizId != null">
-        #{bizId,jdbcType=VARCHAR},
+        #{item.bizId},
       </if>
       <if test="itemCode != null">
-        #{itemCode,jdbcType=VARCHAR},
+        #{item.itemCode},
       </if>
       <if test="itemId != null">
-        #{itemId,jdbcType=VARCHAR},
+        #{item.itemId},
       </if>
       <if test="itemName != null">
-        #{itemName,jdbcType=VARCHAR},
+        #{item.itemName},
+      </if>
+      <if test="num != null">
+        #{item.num},
       </if>
       <if test="unitCode != null">
-        #{unitCode,jdbcType=VARCHAR},
+        #{item.unitCode},
+      </if>
+      <if test="currUnitCode != null">
+        #{item.currUnitCode},
+      </if>
+      <if test="sellPrice != null">
+        #{item.sellPrice},
+      </if>
+      <if test="buyPrice != null">
+        #{item.buyPrice},
+      </if>
+      <if test="splitRatio != null">
+        #{item.splitRatio},
+      </if>
+      <if test="splitPrice != null">
+        #{item.splitPrice},
+      </if>
+      <if test="splitNum != null">
+        #{item.splitNum},
+      </if>
+      <if test="splitUnitCode != null">
+        #{item.splitUnitCode},
+      </if>
+      <if test="upSurplusNum != null">
+        #{item.upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        #{surplusNum,jdbcType=DECIMAL},
+        #{item.surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        #{upBuyPriceAll,jdbcType=DECIMAL},
+        #{item.upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        #{buyPriceAll,jdbcType=DECIMAL},
+        #{item.buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        #{upSellPriceAll,jdbcType=DECIMAL},
+        #{item.upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        #{sellPriceAll,jdbcType=DECIMAL},
+        #{item.sellPriceAll},
       </if>
       <if test="crteTime != null">
-        #{crteTime,jdbcType=TIMESTAMP},
+        #{item.crteTime},
       </if>
       <if test="newPrice != null">
-        #{newPrice,jdbcType=DECIMAL},
+        #{item.newPrice},
       </if>
       <if test="newSplitPrice != null">
-        #{newSplitPrice,jdbcType=DECIMAL},
+        #{item.newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        #{stroInNum,jdbcType=DECIMAL},
+        #{item.stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        #{stroInNumPriceAll,jdbcType=DECIMAL},
+        #{item.stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        #{returnSuplNum,jdbcType=DECIMAL},
+        #{item.returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        #{returnSuplPriceAll,jdbcType=DECIMAL},
+        #{item.returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        #{stroToDeptNum,jdbcType=DECIMAL},
+        #{item.stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        #{stroToDeptPriceAll,jdbcType=DECIMAL},
+        #{item.stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        #{stroToPharNum,jdbcType=DECIMAL},
+        #{item.stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        #{stroToPharPriceAll,jdbcType=DECIMAL},
+        #{item.stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        #{reportLossesNum,jdbcType=DECIMAL},
+        #{item.reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        #{reportLossesPriceAll,jdbcType=DECIMAL},
+        #{item.reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        #{pharReturnStroNum,jdbcType=DECIMAL},
+        #{item.pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        #{pharReturnStroPriceAll,jdbcType=DECIMAL},
+        #{item.pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        #{adjustProfitPriceAll,jdbcType=DECIMAL},
+        #{item.adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        #{adjustLossPriceAll,jdbcType=DECIMAL},
+        #{item.adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        #{takeStrockSubtractNum,jdbcType=DECIMAL},
+        #{item.takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        #{takeStrockSubtractPriceAll,jdbcType=DECIMAL},
+        #{item.takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        #{takeStrockAddNum,jdbcType=DECIMAL},
+        #{item.takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        #{takeStrockAddPriceAll,jdbcType=DECIMAL},
+        #{item.takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        #{stroInNumBuyPriceAll,jdbcType=DECIMAL},
+        #{item.stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        #{returnSuplBuyPriceAll,jdbcType=DECIMAL},
+        #{item.returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        #{stroToDeptBuyPriceAll,jdbcType=DECIMAL},
+        #{item.stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        #{stroToPharBuyPriceAll,jdbcType=DECIMAL},
+        #{item.stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        #{reportLossesBuyPriceAll,jdbcType=DECIMAL},
+        #{item.reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        #{pharReturnStroBuyPriceAll,jdbcType=DECIMAL},
+        #{item.pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        #{adjustProfitBuyPriceAll,jdbcType=DECIMAL},
+        #{item.adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        #{adjustLossBuyPriceAll,jdbcType=DECIMAL},
+        #{item.adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        #{takeStrockSubtractBuyPriceAll,jdbcType=DECIMAL},
+        #{item.takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        #{takeStrockAddBuyPriceAll,jdbcType=DECIMAL},
+        #{item.takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        #{outSalesNum,jdbcType=DECIMAL},
+        #{item.outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        #{outSalesPriceAll,jdbcType=DECIMAL},
+        #{item.outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        #{outSalesBuyPriceAll,jdbcType=DECIMAL},
+        #{item.outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        #{inSalesBuyPriceAll,jdbcType=DECIMAL},
+        #{item.inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        #{inSalesPriceAll,jdbcType=DECIMAL},
+        #{item.inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        #{inSalesNum,jdbcType=DECIMAL},
+        #{item.inSalesNum},
       </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
+      <if test="stroPhar != null">
+        #{item.stroPhar},
+      </if>
+      <if test="modifyTime != null">
+        #{item.modifyTime},
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDO">
+  <insert id="insertBatch">
+   insert into stro_invoicing_monthly (id,hosp_code, biz_id, item_code,
+      item_id, item_name, num,
+      unit_code, curr_unit_code, sell_price,
+      buy_price, split_ratio, split_price,
+      split_num, split_unit_code, up_surplus_num,
+      surplus_num, up_buy_price_all, buy_price_all,
+      up_sell_price_all, sell_price_all, crte_time,
+      new_price, new_split_price, stro_in_num,
+      stro_in_num_price_all, return_supl_num, return_supl_price_all,
+      stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
+      stro_to_phar_price_all, report_losses_num, report_losses_price_all,
+      phar_return_stro_num, phar_return_stro_price_all,
+      adjust_profit_price_all, adjust_loss_price_all,
+      take_strock_subtract_num, take_strock_subtract_price_all,
+      take_strock_add_num, take_strock_add_price_all,
+      stro_in_num_buy_price_all, return_supl_buy_price_all,
+      stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
+      report_losses_buy_price_all, phar_return_stro_buy_price_all,
+      adjust_profit_buy_price_all, adjust_loss_buy_price_all,
+      take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
+      out_sales_num, out_sales_price_all, out_sales_buy_price_all,
+      in_sales_buy_price_all, in_sales_price_all, in_sales_num,
+      stro_phar, modify_time)
+    values 
+    <foreach collection="stroInvoicingMonthlyDTOS" item="item" open="(" separator="," close=")">
+      #{item.monthlyId},#{item.hospCode}, #{item.bizId}, #{item.itemCode},
+      #{item.itemId}, #{item.itemName}, #{item.num},
+      #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
+      #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice},
+      #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum},
+      #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll},
+      #{item.upSellPriceAll}, #{item.sellPriceAll}, DATE_FORMAT(#{item.crteTime},'%Y-%m-%d'),
+      #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum},
+      #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll},
+      #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum},
+      #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll},
+      #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll},
+      #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll},
+      #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll},
+      #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll},
+      #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll},
+      #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll},
+      #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll},
+      #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll},
+      #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll},
+      #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
+      #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
+      #{item.stroPhar}, #{item.modifyTime}
+    </foreach>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     update stro_invoicing_monthly
     <set>
       <if test="hospCode != null">
-        hosp_code = #{hospCode,jdbcType=VARCHAR},
+        hosp_code = #{item.hospCode},
       </if>
       <if test="bizId != null">
-        biz_id = #{bizId,jdbcType=VARCHAR},
+        biz_id = #{item.bizId},
       </if>
       <if test="itemCode != null">
-        item_code = #{itemCode,jdbcType=VARCHAR},
+        item_code = #{item.itemCode},
       </if>
       <if test="itemId != null">
-        item_id = #{itemId,jdbcType=VARCHAR},
+        item_id = #{item.itemId},
       </if>
       <if test="itemName != null">
-        item_name = #{itemName,jdbcType=VARCHAR},
+        item_name = #{item.itemName},
+      </if>
+      <if test="num != null">
+        num = #{item.num},
       </if>
       <if test="unitCode != null">
-        unit_code = #{unitCode,jdbcType=VARCHAR},
+        unit_code = #{item.unitCode},
+      </if>
+      <if test="currUnitCode != null">
+        curr_unit_code = #{item.currUnitCode},
+      </if>
+      <if test="sellPrice != null">
+        sell_price = #{item.sellPrice},
+      </if>
+      <if test="buyPrice != null">
+        buy_price = #{item.buyPrice},
+      </if>
+      <if test="splitRatio != null">
+        split_ratio = #{item.splitRatio},
+      </if>
+      <if test="splitPrice != null">
+        split_price = #{item.splitPrice},
+      </if>
+      <if test="splitNum != null">
+        split_num = #{item.splitNum},
+      </if>
+      <if test="splitUnitCode != null">
+        split_unit_code = #{item.splitUnitCode},
+      </if>
+      <if test="upSurplusNum != null">
+        up_surplus_num = #{item.upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        surplus_num = #{surplusNum,jdbcType=DECIMAL},
+        surplus_num = #{item.surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        up_buy_price_all = #{upBuyPriceAll,jdbcType=DECIMAL},
+        up_buy_price_all = #{item.upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        buy_price_all = #{buyPriceAll,jdbcType=DECIMAL},
+        buy_price_all = #{item.buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        up_sell_price_all = #{upSellPriceAll,jdbcType=DECIMAL},
+        up_sell_price_all = #{item.upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        sell_price_all = #{sellPriceAll,jdbcType=DECIMAL},
+        sell_price_all = #{item.sellPriceAll},
       </if>
       <if test="crteTime != null">
-        crte_time = #{crteTime,jdbcType=TIMESTAMP},
+        crte_time = #{item.crteTime},
       </if>
       <if test="newPrice != null">
-        new_price = #{newPrice,jdbcType=DECIMAL},
+        new_price = #{item.newPrice},
       </if>
       <if test="newSplitPrice != null">
-        new_split_price = #{newSplitPrice,jdbcType=DECIMAL},
+        new_split_price = #{item.newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        stro_in_num = #{stroInNum,jdbcType=DECIMAL},
+        stro_in_num = #{item.stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        stro_in_num_price_all = #{stroInNumPriceAll,jdbcType=DECIMAL},
+        stro_in_num_price_all = #{item.stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        return_supl_num = #{returnSuplNum,jdbcType=DECIMAL},
+        return_supl_num = #{item.returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        return_supl_price_all = #{returnSuplPriceAll,jdbcType=DECIMAL},
+        return_supl_price_all = #{item.returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        stro_to_dept_num = #{stroToDeptNum,jdbcType=DECIMAL},
+        stro_to_dept_num = #{item.stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        stro_to_dept_price_all = #{stroToDeptPriceAll,jdbcType=DECIMAL},
+        stro_to_dept_price_all = #{item.stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        stro_to_phar_num = #{stroToPharNum,jdbcType=DECIMAL},
+        stro_to_phar_num = #{item.stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        stro_to_phar_price_all = #{stroToPharPriceAll,jdbcType=DECIMAL},
+        stro_to_phar_price_all = #{item.stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        report_losses_num = #{reportLossesNum,jdbcType=DECIMAL},
+        report_losses_num = #{item.reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        report_losses_price_all = #{reportLossesPriceAll,jdbcType=DECIMAL},
+        report_losses_price_all = #{item.reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        phar_return_stro_num = #{pharReturnStroNum,jdbcType=DECIMAL},
+        phar_return_stro_num = #{item.pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        phar_return_stro_price_all = #{pharReturnStroPriceAll,jdbcType=DECIMAL},
+        phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        adjust_profit_price_all = #{adjustProfitPriceAll,jdbcType=DECIMAL},
+        adjust_profit_price_all = #{item.adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        adjust_loss_price_all = #{adjustLossPriceAll,jdbcType=DECIMAL},
+        adjust_loss_price_all = #{item.adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        take_strock_subtract_num = #{takeStrockSubtractNum,jdbcType=DECIMAL},
+        take_strock_subtract_num = #{item.takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        take_strock_subtract_price_all = #{takeStrockSubtractPriceAll,jdbcType=DECIMAL},
+        take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        take_strock_add_num = #{takeStrockAddNum,jdbcType=DECIMAL},
+        take_strock_add_num = #{item.takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        take_strock_add_price_all = #{takeStrockAddPriceAll,jdbcType=DECIMAL},
+        take_strock_add_price_all = #{item.takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        stro_in_num_buy_price_all = #{stroInNumBuyPriceAll,jdbcType=DECIMAL},
+        stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        return_supl_buy_price_all = #{returnSuplBuyPriceAll,jdbcType=DECIMAL},
+        return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll,jdbcType=DECIMAL},
+        stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll,jdbcType=DECIMAL},
+        stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        report_losses_buy_price_all = #{reportLossesBuyPriceAll,jdbcType=DECIMAL},
+        report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll,jdbcType=DECIMAL},
+        phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll,jdbcType=DECIMAL},
+        adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        adjust_loss_buy_price_all = #{adjustLossBuyPriceAll,jdbcType=DECIMAL},
+        adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll,jdbcType=DECIMAL},
+        take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll,jdbcType=DECIMAL},
+        take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        out_sales_num = #{outSalesNum,jdbcType=DECIMAL},
+        out_sales_num = #{item.outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        out_sales_price_all = #{outSalesPriceAll,jdbcType=DECIMAL},
+        out_sales_price_all = #{item.outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        out_sales_buy_price_all = #{outSalesBuyPriceAll,jdbcType=DECIMAL},
+        out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        in_sales_buy_price_all = #{inSalesBuyPriceAll,jdbcType=DECIMAL},
+        in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        in_sales_price_all = #{inSalesPriceAll,jdbcType=DECIMAL},
+        in_sales_price_all = #{item.inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        in_sales_num = #{inSalesNum,jdbcType=DECIMAL},
+        in_sales_num = #{item.inSalesNum},
       </if>
-      <if test="updateTime != null">
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      <if test="stroPhar != null">
+        stro_phar = #{item.stroPhar},
+      </if>
+      <if test="modifyTime != null">
+        modify_time = #{item.modifyTime},
       </if>
     </set>
-    where id = #{id,jdbcType=VARCHAR}
+    where id = #{item.id}
   </update>
-  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDO">
+  <update id="updateByPrimaryKey" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     update stro_invoicing_monthly
-    set hosp_code = #{hospCode,jdbcType=VARCHAR},
-      biz_id = #{bizId,jdbcType=VARCHAR},
-      item_code = #{itemCode,jdbcType=VARCHAR},
-      item_id = #{itemId,jdbcType=VARCHAR},
-      item_name = #{itemName,jdbcType=VARCHAR},
-      unit_code = #{unitCode,jdbcType=VARCHAR},
-      surplus_num = #{surplusNum,jdbcType=DECIMAL},
-      up_buy_price_all = #{upBuyPriceAll,jdbcType=DECIMAL},
-      buy_price_all = #{buyPriceAll,jdbcType=DECIMAL},
-      up_sell_price_all = #{upSellPriceAll,jdbcType=DECIMAL},
-      sell_price_all = #{sellPriceAll,jdbcType=DECIMAL},
-      crte_time = #{crteTime,jdbcType=TIMESTAMP},
-      new_price = #{newPrice,jdbcType=DECIMAL},
-      new_split_price = #{newSplitPrice,jdbcType=DECIMAL},
-      stro_in_num = #{stroInNum,jdbcType=DECIMAL},
-      stro_in_num_price_all = #{stroInNumPriceAll,jdbcType=DECIMAL},
-      return_supl_num = #{returnSuplNum,jdbcType=DECIMAL},
-      return_supl_price_all = #{returnSuplPriceAll,jdbcType=DECIMAL},
-      stro_to_dept_num = #{stroToDeptNum,jdbcType=DECIMAL},
-      stro_to_dept_price_all = #{stroToDeptPriceAll,jdbcType=DECIMAL},
-      stro_to_phar_num = #{stroToPharNum,jdbcType=DECIMAL},
-      stro_to_phar_price_all = #{stroToPharPriceAll,jdbcType=DECIMAL},
-      report_losses_num = #{reportLossesNum,jdbcType=DECIMAL},
-      report_losses_price_all = #{reportLossesPriceAll,jdbcType=DECIMAL},
-      phar_return_stro_num = #{pharReturnStroNum,jdbcType=DECIMAL},
-      phar_return_stro_price_all = #{pharReturnStroPriceAll,jdbcType=DECIMAL},
-      adjust_profit_price_all = #{adjustProfitPriceAll,jdbcType=DECIMAL},
-      adjust_loss_price_all = #{adjustLossPriceAll,jdbcType=DECIMAL},
-      take_strock_subtract_num = #{takeStrockSubtractNum,jdbcType=DECIMAL},
-      take_strock_subtract_price_all = #{takeStrockSubtractPriceAll,jdbcType=DECIMAL},
-      take_strock_add_num = #{takeStrockAddNum,jdbcType=DECIMAL},
-      take_strock_add_price_all = #{takeStrockAddPriceAll,jdbcType=DECIMAL},
-      stro_in_num_buy_price_all = #{stroInNumBuyPriceAll,jdbcType=DECIMAL},
-      return_supl_buy_price_all = #{returnSuplBuyPriceAll,jdbcType=DECIMAL},
-      stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll,jdbcType=DECIMAL},
-      stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll,jdbcType=DECIMAL},
-      report_losses_buy_price_all = #{reportLossesBuyPriceAll,jdbcType=DECIMAL},
-      phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll,jdbcType=DECIMAL},
-      adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll,jdbcType=DECIMAL},
-      adjust_loss_buy_price_all = #{adjustLossBuyPriceAll,jdbcType=DECIMAL},
-      take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll,jdbcType=DECIMAL},
-      take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll,jdbcType=DECIMAL},
-      out_sales_num = #{outSalesNum,jdbcType=DECIMAL},
-      out_sales_price_all = #{outSalesPriceAll,jdbcType=DECIMAL},
-      out_sales_buy_price_all = #{outSalesBuyPriceAll,jdbcType=DECIMAL},
-      in_sales_buy_price_all = #{inSalesBuyPriceAll,jdbcType=DECIMAL},
-      in_sales_price_all = #{inSalesPriceAll,jdbcType=DECIMAL},
-      in_sales_num = #{inSalesNum,jdbcType=DECIMAL},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
-    where id = #{id,jdbcType=VARCHAR}
+    set hosp_code = #{item.hospCode},
+      biz_id = #{item.bizId},
+      item_code = #{item.itemCode},
+      item_id = #{item.itemId},
+      item_name = #{item.itemName},
+      num = #{item.num},
+      unit_code = #{item.unitCode},
+      curr_unit_code = #{item.currUnitCode},
+      sell_price = #{item.sellPrice},
+      buy_price = #{item.buyPrice},
+      split_ratio = #{item.splitRatio},
+      split_price = #{item.splitPrice},
+      split_num = #{item.splitNum},
+      split_unit_code = #{item.splitUnitCode},
+      up_surplus_num = #{item.upSurplusNum},
+      surplus_num = #{item.surplusNum},
+      up_buy_price_all = #{item.upBuyPriceAll},
+      buy_price_all = #{item.buyPriceAll},
+      up_sell_price_all = #{item.upSellPriceAll},
+      sell_price_all = #{item.sellPriceAll},
+      crte_time = #{item.crteTime},
+      new_price = #{item.newPrice},
+      new_split_price = #{item.newSplitPrice},
+      stro_in_num = #{item.stroInNum},
+      stro_in_num_price_all = #{item.stroInNumPriceAll},
+      return_supl_num = #{item.returnSuplNum},
+      return_supl_price_all = #{item.returnSuplPriceAll},
+      stro_to_dept_num = #{item.stroToDeptNum},
+      stro_to_dept_price_all = #{item.stroToDeptPriceAll},
+      stro_to_phar_num = #{item.stroToPharNum},
+      stro_to_phar_price_all = #{item.stroToPharPriceAll},
+      report_losses_num = #{item.reportLossesNum},
+      report_losses_price_all = #{item.reportLossesPriceAll},
+      phar_return_stro_num = #{item.pharReturnStroNum},
+      phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
+      adjust_profit_price_all = #{item.adjustProfitPriceAll},
+      adjust_loss_price_all = #{item.adjustLossPriceAll},
+      take_strock_subtract_num = #{item.takeStrockSubtractNum},
+      take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
+      take_strock_add_num = #{item.takeStrockAddNum},
+      take_strock_add_price_all = #{item.takeStrockAddPriceAll},
+      stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
+      return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
+      stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
+      stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
+      report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
+      phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
+      adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
+      adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
+      take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
+      take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
+      out_sales_num = #{item.outSalesNum},
+      out_sales_price_all = #{item.outSalesPriceAll},
+      out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
+      in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
+      in_sales_price_all = #{item.inSalesPriceAll},
+      in_sales_num = #{item.inSalesNum},
+      stro_phar = #{item.stroPhar},
+      modify_time = #{item.modifyTime}
+    where id = #{item.id}
   </update>
 </mapper>

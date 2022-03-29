@@ -311,6 +311,9 @@ public class StroInvoicingMonthlyDetailDO implements Serializable {
      * 月度进销存主表id
      */
     private String monthlyId;
-
+    /**
+     * 是药房还是药库的进销存（1：药库，2：药房）
+     */
+    private String stroPhar;
     private static final long serialVersionUID = 1L;
 }

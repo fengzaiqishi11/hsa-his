@@ -58,4 +58,23 @@ public interface StroInvoicingMonthlyDetailDAO {
      */
     List<StroInvoicingMonthlyDetailDTO> getAllPharStroInvoicingByDate(StroInvoicingMonthlyDetailDTO
                                                                               stroInvoicingMonthlyDetailDTO);
+    /**
+     * @Meth: getRecentlyStroPharInvoicingByDate
+     * @Description: 查询药房最近一次进销存的数据
+     * @Param: [pharInvoicingMonthlyDetailDTO]
+     * @return: java.util.List<cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2022/3/29
+     */
+    List<StroInvoicingMonthlyDetailDTO> getRecentlyStroPharInvoicingByDate(StroInvoicingMonthlyDetailDTO
+                                                                                   pharInvoicingMonthlyDetailDTO);
+    /**
+     * @Meth: insertBatch
+     * @Description: 插入明细表
+     * @Param: [stroInvoicingDetails]
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/3/29
+     */
+    void insertBatch(List<StroInvoicingMonthlyDetailDTO> stroInvoicingDetails);
 }

@@ -26,4 +26,6 @@ public class StroInvoicingMonthlyDetailDTO extends StroInvoicingMonthlyDetailDO 
     private Date date;
     // itemids
     private List<String> itemIds;
+    private Date modifyTime;
+
 }

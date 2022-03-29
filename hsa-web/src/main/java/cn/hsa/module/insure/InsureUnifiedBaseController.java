@@ -160,14 +160,14 @@ public class InsureUnifiedBaseController extends BaseController {
      * @Date   2022/3/15 15:33
      * @Return
      **/
-    @GetMapping("/queryBalanceCountDecrease")
-    public WrapperResponse<Map<String,Object>> queryBalanceCountDecrease (@RequestParam Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+    @GetMapping("/updateBalanceCountDecrease")
+    public WrapperResponse<Map<String,Object>> updateBalanceCountDecrease (@RequestParam Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("crteId",sysUserDTO.getCrteId());
         map.put("crteTime", DateUtils.getNow());
         map.put("crteName",sysUserDTO.getName());
-        return insureUnifiedBaseService_consumer.queryBalanceCountDecrease(map);
+        return insureUnifiedBaseService_consumer.updateBalanceCountDecrease(map);
     }
 
     /**

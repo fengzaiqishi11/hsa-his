@@ -17,6 +17,7 @@
         left join outpt_medical_care_apply b on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
           and a.id = #{medical_info_id}
+        and (b.id = #{apply_id} or b.care_to_medic_id = #{apply_id})
 
         union all
 
@@ -33,6 +34,7 @@
         left join outpt_medical_care_apply b on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
           and a.id = #{medical_info_id}
+          and (b.id = #{apply_id} or b.care_to_medic_id = #{apply_id})
     </select>
 
     <!--根据就诊id查询诊断信息-->

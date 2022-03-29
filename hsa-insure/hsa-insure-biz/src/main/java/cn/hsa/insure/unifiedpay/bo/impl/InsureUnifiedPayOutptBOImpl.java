@@ -622,7 +622,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
                 OutptVisitDTO outptVisitDTO = MapUtils.get(unifiedPayMap, "outptVisitDTO");
                 settleDataMap.put("acct_used_flag",outptVisitDTO.getIsUseAccount());
-                settleDataMap.put("regCode",insureConfigurationDTO.getRegCode());
+                settleDataMap.put("orgCode",insureConfigurationDTO.getRegCode());
                 acctPayMap = handlerAcctPayBalance(settleDataMap);
             }
             settleDataMap.put("action", "settle");
@@ -659,7 +659,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         BigDecimal decimal = BigDecimalUtils.convert(string);
         if(BigDecimalUtils.greaterZero(decimal)){
             settleDataMap.put("insureSettleId",MapUtils.get(settleDataMap,"setl_id"));
-            Map<String, Object> dataMap = insureUnifiedBaseService.queryBalanceCountDecrease(settleDataMap).getData();
+            Map<String, Object> dataMap = insureUnifiedBaseService.updateBalanceCountDecrease(settleDataMap).getData();
             balanceDataMap = MapUtils.get(dataMap,"result");
         }
         return balanceDataMap;

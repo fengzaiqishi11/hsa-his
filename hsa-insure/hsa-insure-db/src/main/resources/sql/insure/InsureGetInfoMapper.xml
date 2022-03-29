@@ -618,7 +618,7 @@
                                      setl_begn_date,
                                      setl_en_date, psn_selfpay, psn_ownpay, acct_pay, psn_cashpay, hi_paymtd, hsorg,
                                      hsorg_opter, medins_fill_dept, medins_fill_psn,
-                                     crte_id, crte_name, crte_time, zr_nurseName, zr_nurseCode, mdtrt_id,
+                                     crte_id, crte_name, crte_time, zr_nurse_name, zr_nurse_code, mdtrt_id,
                                      opt_tcm_dise_code,
                                      opt_wm_dise_code)
         values (#{id}, #{hospCode}, #{visitId}, #{insureSettleId}, #{settleNo},
@@ -1361,20 +1361,13 @@
           and insure_settle_id = #{insureSettleId}
     </select>
     <select id="selectOprninfo" resultType="java.util.Map">
-        select id,
-               hosp_code,
-               visit_id,
-               medical_reg_no,
-               insure_settle_id,
-               oprn_oprt_type,
-               oprn_oprt_name,
-               oprn_oprt_code,
-               oprn_oprt_date,
-               anst_way,
-               oper_dr_name,
-               oper_dr_code,
-               anst_dr_name,
-               anst_dr_code
+        select id, hosp_code, visit_id, medical_reg_no, insure_settle_id,
+               oprn_oprt_type, oprn_oprt_name, oprn_oprt_code, date_format(oprn_oprt_date,'%Y-%m-%d %H:%i:%s') as oprn_oprt_date,
+               anst_way, oper_dr_name, oper_dr_code, anst_dr_name,
+               anst_dr_code, oprn_oprt_start_time,
+               date_format(oprn_oprt_end_time,'%Y-%m-%d %H:%i:%s') oprn_oprt_end_time,
+               date_format(anst_dr_start_time,'%Y-%m-%d %H:%i:%s')  anst_dr_start_time,
+               date_format(anst_dr_end_time,'%Y-%m-%d %H:%i:%s')  anst_dr_end_time
         from insure_oprninfo
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -1413,10 +1406,24 @@
         order by maindiag_flag desc
     </select>
     <select id="selectBaseSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
-        select a.*
-        from insure_setl_info a
-        WHERE a.visit_id = #{visitId}
-          and a.hosp_code = #{hospCode}
+        select id, visit_id, insure_settle_id, settle_no, fixmedins_name, fixmedins_code,
+               (select value from insure_dict where code = 'HI_SETL_LV' and name = hi_setl_lv limit 1) hi_setl_lv ,
+               hi_no, medcasno, dcla_time, psn_name, gend, brdy, age, ntly, neb_age,
+               naty, patn_cert_type, certno, prfs, curr_addr, emp_name, emp_addr, emp_tel, poscode,
+               coner_name, patn_rlts, coner_addr, coner_tel, hi_type, insuplc, sp_psn_type, nwb_adm_type,
+               nwb_bir_wt, nwb_adm_wt, opsp_diag_caty, opsp_mdtrt_date, ipt_med_type, adm_way, trt_type,
+               adm_time, adm_caty, refldept_dept, dscg_time, dscg_caty, act_ipt_days, opt_wm_dise, wm_disw_code,
+               opt_tcm_dise, tcm_dise_code, diag_code_cnt, oprn_oprt_code_cnt, vent_used_dura,
+               pwcry_bfadmcoma_dura, pwcry_afadmcoma_dura, bld_cat, bld_amt, bld_unt, spga_nurscare_days,
+               lv1_nurscare_days, scd_nurscare_days, lv3_nursecare_days, dscg_way, acp_medins_name,
+               acp_optins_code, bill_code, bill_no, biz_sn, days_rinp_flag_31, days_rinp_pup_31,
+               chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay,
+               acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn,
+               crte_id, crte_name, crte_time, setl_list_id, zr_nurse_name, zr_nurse_code,
+               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code
+        from insure_setl_info
+        WHERE visit_id = #{visitId}
+          and hosp_code = #{hospCode}
           and insure_settle_id = #{insureSettleId}
     </select>
     <select id="selectInptBillNo" resultType="java.util.Map">

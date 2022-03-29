@@ -1225,4 +1225,25 @@ public interface Constants {
         public static final String YJZ = "1";// 已接诊
         public static final String YJJ = "2";// 已拒绝
     }
+
+
+    /**
+     * 医院同步状态
+     */
+    class YYTBZT {
+        public static final String CJYY = "0";// 创建医院
+        public static final String CJSJK= "1";// 创建数据库
+        public static final String PPSJY = "2";// 匹配数据源
+        public static final String JCSJXF = "3";// 基础数据下发
+        public static final String QBWC = "4";// 全部完成
+    }
+
+    /**
+     * 优惠类别
+     */
+    class YHLB {
+        public static final String CWFL = "1";// 财务分类
+        public static final String YP = "2";// 药品
+        public static final String XM = "3";// 项目
+    }
 }

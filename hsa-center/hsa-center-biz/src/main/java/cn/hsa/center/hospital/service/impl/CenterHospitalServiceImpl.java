@@ -6,6 +6,8 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.hospital.bo.CenterHospitalBO;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -126,5 +128,61 @@ public class CenterHospitalServiceImpl extends HsafService implements CenterHosp
     @Override
     public WrapperResponse<Boolean> update(CenterHospitalDTO centerHospitalDTO) {
         return WrapperResponse.success(centerHospitalBO.update(centerHospitalDTO));
+    }
+
+    /**
+     * @param centerSyncFlowDto
+     * @Menthod queryCenterSyncFlows()
+     * @Desrciption 查询某一医院同步信息
+     * @Param [1. CenterHospitalDTO]
+     * @Author zhangxuan
+     * @Date 2022/3/21 14:45
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     */
+    @Override
+    public WrapperResponse<List<CenterSyncFlowDto>> queryCenterSyncFlows(CenterSyncFlowDto centerSyncFlowDto) {
+        return WrapperResponse.success(centerHospitalBO.queryCenterSyncFlows(centerSyncFlowDto));
+    }
+
+    /**
+     * @param centerHospitalDTO
+     * @Menthod auditHosp()
+     * @Desrciption 审核医院
+     * @Param 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date 2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     */
+    @Override
+    public WrapperResponse<Boolean> updateAudit(CenterHospitalDTO centerHospitalDTO) {
+        return WrapperResponse.success(centerHospitalBO.updateAudit(centerHospitalDTO));
+    }
+
+    /**
+     * @param centerRootDatabaseBO
+     * @Menthod updateRootBase()
+     * @Desrciption 修改root权限配置数据源
+     * @Param 1.[centerRootDatabaseBO] 修改root权限配置数据源
+     * @Author pengbo
+     * @Date 2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     */
+    @Override
+    public WrapperResponse<Boolean> updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
+        return WrapperResponse.success(centerHospitalBO.updateRootBase(centerRootDatabaseBO));
+    }
+
+    /**
+     * @param centerRootDatabaseBO
+     * @Menthod findRootBase()
+     * @Desrciption 查询root权限配置数据源
+     * @Param 1.[centerRootDatabaseBO] 查询root权限配置数据源
+     * @Author pengbo
+     * @Date 2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     */
+    @Override
+    public WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
+        return WrapperResponse.success(centerHospitalBO.findRootBase(centerRootDatabaseBO));
     }
 }

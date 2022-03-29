@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -277,6 +278,6 @@ public interface InsureIndividualSettleDAO {
      * @Date   2022/3/25 15:33
      * @Return
     **/
-    InptVisitDTO selectTotalAdvance(Map<String, Object> map);
+    BigDecimal selectTotalAdvance(Map<String, Object> map);
 }
 

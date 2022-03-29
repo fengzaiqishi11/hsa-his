@@ -27,4 +27,6 @@ public class CenterHospitalDTO extends CenterHospitalDO implements Serializable 
     private String keyword;
     private String start_time;
     private String end_time ;
+
+    private String dataName ;
 }

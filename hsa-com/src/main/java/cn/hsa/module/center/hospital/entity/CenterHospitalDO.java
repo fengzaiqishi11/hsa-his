@@ -138,6 +138,16 @@ public class CenterHospitalDO extends PageDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endDate;
+
+    /**
+     * 审核标志
+     */
+    private String auditFlag;
+    /**
+     * 审核意见
+     */
+    private String auditMsg;
+
     /**
      * 是否有效
      */

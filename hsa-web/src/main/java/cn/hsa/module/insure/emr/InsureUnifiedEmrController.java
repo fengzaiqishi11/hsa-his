@@ -191,7 +191,8 @@ public class InsureUnifiedEmrController extends BaseController {
     public WrapperResponse updateInsureUnifiedEmrUpload(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
-        return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrUpload(map);
+        insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrUpload(map);
+        return WrapperResponse.success(null);
     }
 
     /**
@@ -206,7 +207,8 @@ public class InsureUnifiedEmrController extends BaseController {
     public WrapperResponse updateInsureUnifiedEmrSync(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
-        return insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrSync(map);
+        insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrSync(map);
+        return WrapperResponse.success(null);
     }
 
     @ApiOperation(value = "导出")

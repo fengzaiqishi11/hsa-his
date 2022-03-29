@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * @Author: luonianxin
  * @Date: 2021-10-25
  */
-@Configuration
+
 @Slf4j
 public class RequestParamFilter  extends OncePerRequestFilter {
 

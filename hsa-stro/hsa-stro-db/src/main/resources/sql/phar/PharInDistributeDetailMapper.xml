@@ -49,7 +49,36 @@
 
     <!--批量查询-->
     <select id="queryPharInDistributeDetails" resultMap="PharInDistributeDetailMap">
-        select a.*
+        select a.id,
+               a.hosp_code,
+               a.distribute_id,
+               a.ir_id,
+               a.ird_id,
+               a.advice_id,
+               a.group_no,
+               a.visit_id,
+               a.baby_id,
+               a.item_id,
+               a.item_code,
+               a.item_name,
+               a.num,
+               a.price,
+               a.unit_code,
+               a.spec,
+               a.dosage,
+               a.dosage_unit_code,
+               a.total_price,
+               a.split_ratio,
+               a.split_unit_code,
+               a.split_num,
+               a.split_price,
+               a.chinese_drug_num,
+               a.usage_code,
+               a.curr_unit_code,
+               a.crte_id,
+               a.crte_name,
+               a.crte_time,
+               a.old_dist_id
         from phar_in_distribute_detail a
         join phar_in_receive_detail b on a.hosp_code=b.hosp_code and a.ir_id=b.receive_id and a.ird_id=b.id
         join phar_in_wait_receive c on a.hosp_code=c.hosp_code and c.old_wr_id=b.wr_id
@@ -251,7 +280,36 @@
 
     <!--批量查询-->
     <select id="queryPharInDistributeAllDetailDTO" resultType="cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeAllDetailDTO">
-      select a.*
+      select 	a.id,
+                a.hosp_code,
+                a.distribute_id,
+                a.ir_id,
+                a.ird_id,
+                a.advice_id,
+                a.group_no,
+                a.visit_id,
+                a.baby_id,
+                a.item_id,
+                a.item_code,
+                a.item_name,
+                a.num,
+                a.price,
+                a.unit_code,
+                a.spec,
+                a.dosage,
+                a.dosage_unit_code,
+                a.total_price,
+                a.split_ratio,
+                a.split_unit_code,
+                a.split_num,
+                a.split_price,
+                a.chinese_drug_num,
+                a.usage_code,
+                a.curr_unit_code,
+                a.crte_id,
+                a.crte_name,
+                a.crte_time,
+                a.old_dist_id
       from phar_in_distribute_all_detail a
       join phar_in_receive_detail b on a.hosp_code=b.hosp_code and a.ir_id=b.receive_id and a.ird_id=b.id
       join phar_in_wait_receive c on a.hosp_code=c.hosp_code and c.old_wr_id=b.wr_id

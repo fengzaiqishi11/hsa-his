@@ -83,8 +83,8 @@ public class MedicToCareController extends BaseController {
      * @Date: 2022/2/28 9:38
      * @Return: cn.hsa.base.PageDTO
      **/
-    @PostMapping("/queryMedicToCareInfoPage")
-    public WrapperResponse<PageDTO>  queryMedicToCareInfoPage(@RequestBody MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res){
+    @GetMapping("/queryMedicToCareInfoPage")
+    public WrapperResponse<PageDTO>  queryMedicToCareInfoPage(MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO userDTO = getSession(req, res);
         medicToCareDTO.setHospCode(userDTO.getHospCode());
         Map map = new HashMap();
@@ -92,6 +92,15 @@ public class MedicToCareController extends BaseController {
         map.put("medicToCareDTO",medicToCareDTO);
         return medicToCareService_consumer.queryMedicToCareInfoPage(map);
     }
+//    @PostMapping("/queryMedicToCareInfoPage")
+//    public WrapperResponse<PageDTO>  queryMedicToCareInfoPage(@RequestBody MedicToCareDTO medicToCareDTO, HttpServletRequest req, HttpServletResponse res){
+//        SysUserDTO userDTO = getSession(req, res);
+//        medicToCareDTO.setHospCode(userDTO.getHospCode());
+//        Map map = new HashMap();
+//        map.put("hospCode",userDTO.getHospCode());
+//        map.put("medicToCareDTO",medicToCareDTO);
+//        return medicToCareService_consumer.queryMedicToCareInfoPage(map);
+//    }
     /**
      * @Menthod getMedicToCareInfoById()
      * @Desrciption   根据主键id查询申请明细详细信息

@@ -8,6 +8,8 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
@@ -83,6 +85,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
     @Resource
     private InsureItfBOImpl insureItfBO;
+
+    @Resource
+    private BaseReqUtilFactory baseReqUtilFactory;
 
     /**
      * @param map
@@ -721,11 +726,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        String hospCode = param.get("hospCode").toString();
-        paramMap.put("hospCode", hospCode);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_FEE_UPLOAD_BACK.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(param.get("hospCode").toString());
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
 
-        insureItfBO.executeInsur(FunctionEnum.INPATIENT_FEE_UPLOAD_BACK, paramMap);
+        insureItfBO.executeInsur(FunctionEnum.INPATIENT_FEE_UPLOAD_BACK, interfaceParamDTO);
         return true;
     }
 
@@ -795,8 +803,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        paramMap.put("hospCode", hospCode);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_PRE_SETTLE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
 
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append(2303).append("-")
@@ -805,7 +817,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 throw new AppException("该患者正在办理医保住院试算业务");
         }else{
             try {
-                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_PRE_SETTLE, paramMap);
+                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_PRE_SETTLE, interfaceParamDTO);
                 Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
                 Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");
                 Map <String,Object> setlinfoDataMap = (Map<String, Object>) outMap.get("setlinfo");
@@ -874,11 +886,13 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-
-        paramMap.put("isHospital", Constants.SF.S);
-        paramMap.put("msgId", omsgid);
-        paramMap.put("hospCode", hospCode);
-
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_SETTLE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        interfaceParamDTO.setMsgid(omsgid);
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append(2304).append("-")
                 .append(visitId).append("-").append(psnNo).toString();
@@ -887,7 +901,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 throw new AppException("该患者正在办理医保住院结算业务");
         }else{
             try {
-                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_SETTLE, paramMap);
+                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_SETTLE, interfaceParamDTO);
                 Map<String,Object> outMap = (Map<String, Object>) resultMap.get("output");
                 Map <String,Object> settleDataMap = (Map<String, Object>) outMap.get("setlinfo");
                 Map <String,Object> setlinfoDataMap = (Map<String, Object>) outMap.get("setlinfo");
@@ -895,14 +909,20 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
                 map.put("code","HN_INSURE_ACCT_PAY");
                 try{
-                    SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
+                    Map<String,Object> paramAcctMap = new HashMap<>();
+                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY");
+                    paramAcctMap.put("hospCode",hospCode);
+                    SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramAcctMap).getData();
+
                     if(data !=null && Constants.SF.S.equals(data.getValue())){
                         settleDataMap.put("visitId",insureIndividualVisitDTO.getVisitId());
                         settleDataMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
                         settleDataMap.put("hospCode",hospCode);
                         settleDataMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
                         settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
+
                         settleDataMap.put("acct_used_flag",inptVisitDTO.getIsUseAccount());
+                        settleDataMap.put("regCode",insureIndividualVisitDTO.getInsureRegCode());
                         acctPayMap = handlerAcctPayBalance(settleDataMap);
                     }
                 }catch (Exception e){
@@ -961,9 +981,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        paramMap.put("hospCode", hospCode);
-        paramMap.put("msgId", msgId);
+
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_SETTLE_BACK.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        interfaceParamDTO.setMsgid(msgId);
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append(2305).append("-")
                 .append(visitId).append("-").append(psnNo).toString();
@@ -971,7 +996,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("该患者正在办理医保住院取消结算业务");
         }else{
             try {
-                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_SETTLE_BACK, paramMap);
+                Map<String,Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_SETTLE_BACK, interfaceParamDTO);
                 resultMap.put("msgId",msgId);
                 resultMap.put("infno",infno);
                 return resultMap;
@@ -1287,10 +1312,15 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualBasicDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualBasicDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualBasicDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
         String omsgId = StringUtils.createMsgId(insureIndividualBasicDTO.getMedicineOrgCode());
-        paramMap.put("msgId", omsgId);
 
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_IN.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(inptVisitDTO.getId());
+        interfaceParamDTO.setMsgid(omsgId);
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append("2401").append("-").
                 append(inptVisitDTO.getId()).append("-").append(insureInptRegisterDTO.getAac001()).toString();
@@ -1301,7 +1331,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             }
             redisUtils.set(redisKey,redisKey,30);
 
-            Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN, paramMap);
+            Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN, interfaceParamDTO);
             Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
             Map<String, Object> resultDataMap = (Map<String, Object>) outptMap.get("result");
             resultMap.put("aaz217",resultDataMap.get("mdtrt_id"));
@@ -1403,8 +1433,16 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        insureItfBO.executeInsur(FunctionEnum.INPATIENT_OUT, paramMap);
+
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_OUT.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(inptVisitDTO.getId());
+
+
+        insureItfBO.executeInsur(FunctionEnum.INPATIENT_OUT, interfaceParamDTO);
         return null;
     }
 
@@ -1447,8 +1485,15 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        insureItfBO.executeInsur(FunctionEnum.INPATIENT_UPDATE, paramMap);
+
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_UPDATE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(inptVisitDTO.getId());
+
+        insureItfBO.executeInsur(FunctionEnum.INPATIENT_UPDATE, interfaceParamDTO);
 
         return true;
     }
@@ -1477,17 +1522,19 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         String psnNo = insureInptOutFeeDTO.getAac001();
 
-        Map<String, Object> paramMap = new HashMap<>();
         // 调用统一支付平台接口
+        Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
-
-        // 参保地医保区划
-        paramMap.put("insureInptOutFeeDTO",insureInptOutFeeDTO);
-        paramMap.put("hospCode", hospCode);
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureOrgCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
+
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_IN_BACK.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(inptVisitDTO.getId());
 
         String redisKey = new StringBuilder().append(hospCode).append("-").append("2404").append("-").append(visitId).append("-").append(psnNo).toString();
         logger.info("入院撤销------------------"+redisKey+"---------" + redisUtils.hasKey(redisKey));
@@ -1496,7 +1543,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         }else{
             try {
                 redisUtils.set(redisKey,redisKey,20);
-                insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN_BACK, paramMap);
+                insureItfBO.executeInsur(FunctionEnum.INPATIENT_IN_BACK, interfaceParamDTO);
             }finally {
                 redisUtils.del(redisKey);
             }
@@ -1539,8 +1586,14 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("isHospital", Constants.SF.S);
-        paramMap.put("hospCode", hospCode);
+
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_OUT_BACK.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setVisitId(visitId);
+
         // 判断键是否存在
         if(redisUtils.hasKey(redisKey)){
             throw new AppException("该患者正在别处出院办理撤销,请稍后");
@@ -1548,7 +1601,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             try {
                 // 设置键
                 redisUtils.set(redisKey,medicalRegNo,60);
-                insureItfBO.executeInsur(FunctionEnum.INPATIENT_OUT_BACK, paramMap);
+                insureItfBO.executeInsur(FunctionEnum.INPATIENT_OUT_BACK, interfaceParamDTO);
             }finally {
                 redisUtils.del(redisKey);
             }

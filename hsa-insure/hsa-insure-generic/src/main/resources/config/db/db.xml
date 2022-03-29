@@ -115,6 +115,8 @@
             <tx:method name="update*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
             <tx:method name="edit*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
             <tx:method name="set*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
+
+            <tx:method name="UP*" propagation="REQUIRED" rollback-for="java.lang.Exception"/>
             <!-- 其他 -->
             <tx:method name="*" read-only="true"/>
         </tx:attributes>

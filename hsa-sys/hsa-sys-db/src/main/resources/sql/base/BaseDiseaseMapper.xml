@@ -23,6 +23,7 @@
 		<result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
 		<result property="crbInterval" column="infectious_interval_days" jdbcType="INTEGER"/>
 		<result property="seqNo" column="seq_no" jdbcType="INTEGER"/>
+		<result property="isMatch" column="is_match" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<!--删除疾病规则-->
@@ -49,7 +50,7 @@
 	<select id="queryPage" resultMap="BaseDiseaseMap">
 		select
 		id, hosp_code, type_code, code, attach_code, name, usual_name, nation_code, nation_name, is_add, pym, wbm, is_valid, crte_id,
-		crte_name, crte_time,ifnull(seq_no,14836248) as seq_no
+		crte_name, crte_time,ifnull(seq_no,14836248) as seq_no,is_match
 		from base_disease
 		<where>
 			hosp_code = #{hospCode}

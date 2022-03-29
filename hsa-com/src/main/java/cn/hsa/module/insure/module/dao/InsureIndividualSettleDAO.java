@@ -2,6 +2,7 @@ package cn.hsa.module.insure.module.dao;
 
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualFundDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
@@ -233,5 +234,49 @@ public interface InsureIndividualSettleDAO {
      * @Return
     **/
     int queryInsureSettle(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * @Method updateEntityAcctPay
+     * @Desrciption  更新扣减后医保结算表的个人账户金额
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/23 16:30
+     * @Return
+    **/
+    void updateEntityAcctPay(InsureIndividualSettleDTO individualSettleDTO);
+
+    /**
+     * @Method updateOutptSettleAcctPay
+     * @Desrciption  更新住院信息表
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/23 16:39
+     * @Return
+    **/
+    void updateInptSettleAcctPay(InsureIndividualSettleDTO individualSettleDTO);
+
+    /**
+     * @Method updateOutptSettleAcctPay
+     * @Desrciption  更新门诊结算信息表
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/23 16:39
+     * @Return
+    **/
+    void updateOutptSettleAcctPay(InsureIndividualSettleDTO individualSettleDTO);
+
+    /**
+     * @Method selectTotalAdvance
+     * @Desrciption  查询预交金金额
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2022/3/25 15:33
+     * @Return
+    **/
+    InptVisitDTO selectTotalAdvance(Map<String, Object> map);
 }
 

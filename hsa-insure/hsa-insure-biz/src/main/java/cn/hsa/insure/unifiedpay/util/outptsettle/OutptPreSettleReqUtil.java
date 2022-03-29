@@ -51,7 +51,7 @@ public class OutptPreSettleReqUtil<T> extends InsureCommonUtil implements BaseRe
         // 卡识别码
         preSettleMap.put("card_sn", insureIndividualVisitDTO.getCardIden());
         // 证件类型
-        preSettleMap.put("psn_cert_type", "1");
+        preSettleMap.put("psn_cert_type", "01");
         // 身份证号
         preSettleMap.put("certno", insureIndividualVisitDTO.getAac002());
         // 人员类别

@@ -261,15 +261,19 @@ FROM
     </update>
 
     <select id="queryAdvice" resultType="java.util.Map">
-        select * from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode}
+        select id,hosp_code,code,name,type_code,price,unit_code,container_code,specimen_code,is_cost
+        from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode} and is_valid = '1'
     </select>
 
     <select id="queryDept" resultType="java.util.Map">
-        select * from base_dept where hosp_code = #{hospCode}
+        select id,hosp_code,code,name,intro,place,remark
+        from base_dept where hosp_code = #{hospCode} and is_valid = '1'
     </select>
 
     <select id="queryUser" resultType="java.util.Map">
-        select * from sys_user where hosp_code = #{hospCode}
+        select id,hosp_code,dept_code,code,is_in_job,name,age,gender_code,
+               introduce,speciality,email,phone
+        from sys_user where hosp_code = #{hospCode}
     </select>
 
 </mapper>

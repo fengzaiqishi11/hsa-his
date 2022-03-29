@@ -47,7 +47,7 @@ public class OutptRegReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         dataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());
         // 传值社保卡识别码
         dataMap.put("card_sn", insureIndividualVisitDTO.getCardIden());
-        dataMap.put("psn_cert_type", "1");
+        dataMap.put("psn_cert_type", "01");
         // 传值证件号码
         dataMap.put("certno", insureIndividualVisitDTO.getAac002());
         // 人员类别

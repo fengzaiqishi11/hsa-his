@@ -103,6 +103,7 @@
 		<result property="costNumbers" column="costNumbers" jdbcType="NUMERIC"/>
 		<result property="totalMergeCost" column="totalMergeCost" jdbcType="NUMERIC"/>
 		<result property="totalMergeBalance" column="totalMergeBalance" jdbcType="NUMERIC"/>
+		<result property="preferentialTypeName" column="preferential_type_name" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
@@ -134,7 +135,8 @@
 		  (select prac_certi_no from sys_user where id = a.outpt_doctor_id and a.hosp_code = a.hosp_code) as outptPracCertiNo ,
                (select su.prac_certi_no from sys_user su where su.hosp_code = a.hosp_code and su.id = a.zz_doctor_id ) as pracCertiNo,
 		(a.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id)) as totalMergeBalance,
-		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost
+		(select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = a.id) as totalMergeCost,
+        (select name from base_preferential_type bpt where a.hosp_code = bpt.hosp_code and a.preferential_type_id = bpt.id and bpt.is_valid = '1') as preferential_type_name
         from inpt_visit a
         where hosp_code = #{hospCode}
         and id = #{id}

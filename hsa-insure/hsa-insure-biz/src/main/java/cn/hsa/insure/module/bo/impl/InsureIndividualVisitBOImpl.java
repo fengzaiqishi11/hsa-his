@@ -353,7 +353,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             paramMap.put("outptVisitDTO", outptVisitDTO);
             outptVisitService_consumer.updateOutptVisit(outptVisitMap).getData();
             if (!"qrcode".equals(info.get("bka895"))) {
-                insureUnifiedPayOutptService.insureOutptVisitUpload(paramMap);
+                insureUnifiedPayOutptService.UP_2203(paramMap);
             }
         }
         return insureIndividualVisitDO;

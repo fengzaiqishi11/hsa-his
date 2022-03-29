@@ -969,18 +969,18 @@ public class OutinDailyBOImpl implements OutinDailyBO {
     @Override
     public boolean delete(OutinDailyDTO outinDailyDTO) {
         List<OutinDailyDTO> odList = outinDailyDAO.queryOutinDailyByDailyNo(outinDailyDTO);
-        OutinDailyDTO maxOutinDailyDTO = outinDailyDAO.queryOutinDailyByCreateId(outinDailyDTO);
-
         if (ListUtils.isEmpty(odList)) {
             throw new AppException("当前缴款记录不存在");
         }
+        outinDailyDTO.setTypeCode(odList.get(0).getTypeCode());
+        OutinDailyDTO maxOutinDailyDTO = outinDailyDAO.queryOutinDailyByCreateId(outinDailyDTO);
         odList.stream().forEach(od -> {
             if (Constants.SF.S.equals(od.getIsOk())) {
                 throw new AppException("当前缴款记录已确认，不能取消缴款");
             }
-//            if(DateUtils.dateCompare(maxOutinDailyDTO.getStartTime(), od.getEndTime())){
-//                throw new AppException("只能从最后一次缴款开始取消");
-//            }
+            if(DateUtils.dateCompare(od.getStartTime(), maxOutinDailyDTO.getStartTime())){
+                throw new AppException("只能从最后一次缴款开始取消");
+            }
         });
 
 

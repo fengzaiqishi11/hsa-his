@@ -28,7 +28,10 @@ public class SettleSheetBOImpl implements ReportBusinessBO {
         if ((boolean) map.get("jxSettle")) {
             //江西
             map.put("tempCode", "his_insur_settle_0006");
-        } else if ("1".equals(map.get("isHospital").toString()) && (Boolean.parseBoolean(map.get("isRemote").toString()) == true || Boolean.parseBoolean(map.get("snRemote").toString()) == true)) {
+        }else if((boolean) map.get("gsSettle")) {
+            //甘肃
+            map.put("tempCode", "his_insur_settle_0007");
+        }else if ("1".equals(map.get("isHospital").toString()) && (Boolean.parseBoolean(map.get("isRemote").toString()) == true || Boolean.parseBoolean(map.get("snRemote").toString()) == true)) {
             //异地就医
             map.put("tempCode", "his_insur_settle_0005");
         } else if ("1".equals(map.get("isHospital").toString()) && Boolean.parseBoolean(map.get("oneSettle").toString()) != true
@@ -47,6 +50,9 @@ public class SettleSheetBOImpl implements ReportBusinessBO {
             map.put("tempCode", "his_insur_settle_0004");
         }
         return map;
+
+//        SettleSheetProcess settleSheetProcess = settleSheetFactory.getSettleSheetProcess(SettleSheetTypeEnum.getProcess((String) map.get("tempCode")));
+//        settleSheetProcess.downLoadSettleInfo(map);
     }
 
 }

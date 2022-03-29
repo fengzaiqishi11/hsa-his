@@ -97,13 +97,9 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         Map<String, Object> paramap = new HashMap<>();
         if("1".equals(MapUtils.get(map,"statusCode"))){
             //1.接受申请
-            //填充就诊信息
-//            OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(map);
             //调用直接就诊接口
             OutptRegisterDTO outptRegisterDTO = this.setoutptRegisterDTO(map);
             outptDoctorPrescribeBO.saveDirectVisit(outptRegisterDTO);
-            //插入就诊表
-//            medicToCareDAO.insertOutPtInfo(outptVisitDTO);
             //填充就诊确认信息接口
             paramap = this.sendInfo(map);
         }else if("2".equals(MapUtils.get(map,"statusCode"))){
@@ -115,6 +111,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
         }
         //调用api推送
         this.commonSendInfo(paramap);
+        //转码
+        map.put("changeType","2");
         //插入本地
         medicToCareDAO.updateMedicToCare(map);
         return true;
@@ -122,6 +120,8 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
 
     private OutptRegisterDTO setoutptRegisterDTO(Map map){
         OutptRegisterDTO outptRegisterDTO = new OutptRegisterDTO();
+        //养转医标志
+        outptRegisterDTO.setCareToMedicId(MapUtils.get(map,"id"));
         //医院编码
         outptRegisterDTO.setHospCode(MapUtils.get(map,"hospCode"));
         //登录部门ID
@@ -193,8 +193,10 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
     private Map sendInfo(Map<String, Object> map){
         Map<String, Object> paramap = new HashMap<>();
         String hospCode = MapUtils.get(map, "hospCode");
+        String id = MapUtils.get(map, "id");
         //todo需要获取值，暂时写死SELECT `value` FROM sys_code_detail where c_code = 'ORG_CODE'
-        String orgID = medicToCareDAO.queryOrgCode(hospCode);
+        paramap = medicToCareDAO.queryOrgCode(hospCode,id);
+        String orgID = String.valueOf(paramap.get("orgID"));
         try {
             hospCode = RSAUtil.encryptByPublicKey(hospCode.getBytes(),this.publicKey);
             orgID = RSAUtil.encryptByPublicKey(orgID.getBytes(),this.publicKey);
@@ -213,11 +215,9 @@ public class CareToMedicApplyBOImpl extends HsafBO implements CareToMedicApplyBO
 
     //使用HTTP调用接口
     private Map<String,Object> commonSendInfo(Map<String, Object> date){
-//        Map httpParam = new HashMap();
 //        //发送的数据
-//        httpParam.put("visitInfo",visitInfo);
         String json = JSONObject.toJSONString(date);
-        log.debug("推送养转医接口回调入参：" + JSONObject.toJSONString(date));
+        log.info("推送养转医接口回调入参：" + JSONObject.toJSONString(date));
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(this.url, json);
         if (StringUtils.isEmpty(resultStr)){
             throw new RuntimeException("失败！");

@@ -21,7 +21,7 @@ public interface MedicToCareDAO {
 
     MedicToCareDTO queryVisitById(MedicToCareDTO medicToCareDTO);
 
-    void insertMedicDate(MedicToCareDTO medicToCareDTO);
+    int insertMedicDate(MedicToCareDTO medicToCareDTO);
 
     List<MedicToCareDTO> queryMedicToCareInfoPage(MedicToCareDTO medicToCareDTO);
 
@@ -31,5 +31,5 @@ public interface MedicToCareDAO {
 
     void insertOutPtInfo(OutptVisitDTO outptVisitDTO);
 
-    String queryOrgCode(String hospCode);
+    Map<String, Object>  queryOrgCode(String hospCode,String id);
 }

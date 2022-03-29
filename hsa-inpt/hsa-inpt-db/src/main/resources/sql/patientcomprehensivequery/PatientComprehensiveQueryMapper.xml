@@ -2,6 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="cn.hsa.module.inpt.patientcomprehensivequery.dao.PatientComprehensiveQueryDAO">
 
+    <update id="updateInptVisitPreferential" parameterType="java.util.Map">
+        update inpt_visit
+        set preferential_type_id = #{preferentialTypeId},
+            total_cost = #{totalcost},
+            total_balance = #{totalBalance}
+        where hosp_code = #{hospCode} and id = #{visitId}
+    </update>
+    <update id="updateInptCost" parameterType="java.util.List">
+        <foreach collection="inptCostDOS" item="item" separator=";">
+            update inpt_cost
+            set preferential_price = #{item.preferentialPrice},
+                reality_price = #{item.realityPrice}
+            where hosp_code =  #{item.hospCode} and id = #{item.id}
+        </foreach>
+    </update>
+
     <!-- 病人综合查询——医嘱信息汇总 杨家洪-->
     <select id="queryAdviceSummary" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select id, hosp_code, visit_id, baby_id, order_no, iat_id, iatd_group_no, iatd_group_seq_no,

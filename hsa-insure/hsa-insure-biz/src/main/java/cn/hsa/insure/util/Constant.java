@@ -584,6 +584,7 @@ public interface Constant {
             public static final String AM = "04"; // 澳门证件类型
             public static final String XG = "05"; // 香港证件类型
             public static final String BDSBK = "06"; // 本地社保卡
+            public static final String GAT = "17"; // 港澳台
 
         }
 
@@ -798,6 +799,9 @@ public interface Constant {
 
             public static final String UP_7101 = "7101"; // 电子处方上传
             public static final String UP_4701 = "4701"; // 电子病历上传
+
+            public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
+            public static final String UP_5368 = "5368"; // 账户余额信息查询
 
         }
 

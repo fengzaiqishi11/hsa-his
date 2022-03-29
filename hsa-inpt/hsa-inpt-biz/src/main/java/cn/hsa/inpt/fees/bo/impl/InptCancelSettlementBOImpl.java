@@ -423,7 +423,7 @@ public class InptCancelSettlementBOImpl extends HsafBO implements InptCancelSett
                     settleMap.put("insureIndividualCostDTO",insureIndividualCostDTO);
                     settleMap.put("hospCode",hospCode);
                     // 出院结算取消
-                   Map<String,Object> reMap =  insureUnifiedPayInptService_consumer.editCancelInptSettle(insureUnifiedMap);
+                   Map<String,Object> reMap =  insureUnifiedPayInptService_consumer.UP_2305(insureUnifiedMap);
                    Map<String,Object> outptMap = MapUtils.get(reMap,"output");
                    Map<String,Object> setlInfoMap = MapUtils.get(outptMap,"setlinfo");
                    if(!MapUtils.isEmpty(setlInfoMap)){

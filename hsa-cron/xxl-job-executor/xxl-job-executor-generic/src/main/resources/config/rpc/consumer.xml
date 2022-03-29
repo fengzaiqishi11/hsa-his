@@ -39,5 +39,7 @@
 
     <!--医保服务-->
     <dubbo:reference id="insureIndividualCostService_comsumer" interface="cn.hsa.module.insure.module.service.InsureIndividualCostService" retries="0" check="false" timeout="1200000" />
+    <!--月度进销存-->
+    <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false"/>
 
 </beans>

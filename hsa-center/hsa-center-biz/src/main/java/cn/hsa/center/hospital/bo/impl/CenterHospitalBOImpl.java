@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -274,7 +275,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     e.printStackTrace();
                     centerSyncFlowDto.setStatusCode("2");
                     centerSyncFlowDto.setMessage("新建医院数据库用户");
-                    throw new RuntimeException("新建医院数据库用户失败!");
+                    throw new RuntimeException("新建医院数据库用户失败，原因："+e.getMessage());
                 }finally {
 
                     centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -452,24 +453,49 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
         /**
          * 获取医院配置的数据库连接
          */
-        Connection connection = null;
+        Connection connection = null ;
+        PreparedStatement cmd = null ;
+        ResultSet resultSet = null ;
         try {
             connection = DBUtils.getConnection(centerRootDatabaseBO.getJdbcDriver(), centerRootDatabaseBO.getRootUrl(), centerRootDatabaseBO.getRootUser(),
                     centerRootDatabaseBO.getRootPassword());
             connection.setAutoCommit(false);
 
+            //判断数据库实例是否存在
+            cmd =  connection.prepareStatement("SELECT * FROM information_schema.SCHEMATA where SCHEMA_NAME='"+dataName+"'");
+            resultSet =  cmd.executeQuery();
+            if(resultSet.next()){
+                throw new AppException(dataName+"数据库实例已经存在!");
+            };
+            //创建数据库实例
             StringBuffer sql = new StringBuffer();
             sql.append("CREATE DATABASE "+dataName+" DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci");
-            PreparedStatement cmd =  connection.prepareStatement(sql.toString());
+            cmd =  connection.prepareStatement(sql.toString());
             cmd.execute();
             connection.commit();
         } catch (Exception e) {
             throw new AppException(e.getMessage());
         } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (resultSet != null) {
+                try {
+                    resultSet.close();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            if (cmd != null) {
+                try {
+                    cmd.close();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
     }

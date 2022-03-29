@@ -1447,6 +1447,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             outptVisitDTO.setReceiveName(outinInvoiceDTO.getReceiveName());
             outptVisitDTO.setPrefix(outinInvoiceDTO.getPrefix());
+            // 发票不分单返回发票号
+            outptVisitDTO.setInvoiceNo(outinInvoiceDTO.getCurrNo());
         } catch (Exception e) {
             throw e;
         } finally {

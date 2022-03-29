@@ -12,6 +12,7 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRegisterDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,7 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
     private InsureIndividualCostDAO insureIndividualCostDAO;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(2);
 
@@ -46,9 +47,21 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO));
         inputMap.put("diseinfo", initDiseinfoList(insureIndividualVisitDTO,inptDiagnoseDTOList));
 
+        HashMap commParam = new HashMap();
+
         checkRequest(map);
-        map.put("input", inputMap);
-        return getInsurCommonParam(map);
+        commParam.put("input", inputMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_2402);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
 
     }
 

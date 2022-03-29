@@ -7,6 +7,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInptOutFeeDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +26,7 @@ import java.util.Map;
 public class InptRevocationReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(3);
         InsureInptOutFeeDTO insureInptOutFeeDTO = (InsureInptOutFeeDTO) map.get("insureInptOutFeeDTO");
@@ -34,9 +35,19 @@ public class InptRevocationReqUtil<T> extends InsureCommonUtil implements BaseRe
         //	人员编号
         dataMap.put("psn_no",insureInptOutFeeDTO.getAac001());
 
-        checkRequest(map);
-        map.put("input", dataMap);
-        return getInsurCommonParam(map);
+        HashMap commParam = new HashMap();
+        checkRequest(dataMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_2404);
+        commParam.put("input", dataMap);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+        return getInsurCommonParam(commParam);
     }
 
     @Override

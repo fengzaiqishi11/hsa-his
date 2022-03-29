@@ -4,20 +4,16 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureInptRegisterDTO;
-import cn.hsa.util.Constants;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
-import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @ClassName InptAlterationReqUtil
@@ -30,23 +26,30 @@ import java.util.stream.Collectors;
 public class InptAlterationReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         Map<String, Object> dataMap = new HashMap<>(3);
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
         List<InptDiagnoseDTO> inptDiagnoseDTOList = MapUtils.get(map, "inptDiagnoseDTOList");
-//        InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
-
-        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
-        String psnNo= insureIndividualVisitDTO.getAac001();
 
         dataMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO));
         dataMap.put("diseinfo", initDiseinfoList(insureIndividualVisitDTO,inptDiagnoseDTOList));
         dataMap.put("agnterinfo", initAgnterinfoMap());
 
-        checkRequest(map);
-        map.put("input", dataMap);
-        return getInsurCommonParam(map);
+        HashMap commParam = new HashMap();
+        checkRequest(dataMap);
+        commParam.put("input", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_2403);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     private Object initDiseinfoList(InsureIndividualVisitDTO insureIndividualVisitDTO, List<InptDiagnoseDTO> inptDiagnoseDTOList) {

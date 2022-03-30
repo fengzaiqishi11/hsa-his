@@ -201,9 +201,12 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrUpload")
-    public WrapperResponse updateInsureUnifiedEmrUpload(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse updateInsureUnifiedEmrUpload(@RequestBody InsureEmrUnifiedDTO insureEmrUnifiedDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureEmrUnifiedDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
         insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrUpload(map);
         return WrapperResponse.success("上传成功");
     }

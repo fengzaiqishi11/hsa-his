@@ -77,6 +77,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
     private SysParameterService sysParameterService_consumer;
     /**
      * 云净接口入口
+     * 1
      * @param map
      * @return
      */

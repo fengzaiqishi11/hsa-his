@@ -1,6 +1,6 @@
 package cn.hsa.module.stro.stroinvoicing.dto;
 
-import cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDO;
+import cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,21 +11,21 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * @Class_name: StroInvoicingMonthlyDTO
+ * @Class_name: StroInvoicingMonthlyDetailDTO
  * @Describe:
  * @Author: zhangguorui
- * @Date: 2022/3/18 9:16
+ * @Date: 2022/3/28 11:10
  **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class StroInvoicingMonthlyDTO extends StroInvoicingMonthlyDO implements Serializable {
-    private static final long serialVersionUID = -25487061965976799L;
+public class StroInvoicingMonthlyDetailDTO extends StroInvoicingMonthlyDetailDO implements Serializable {
     private String monthly;
     // 当前时间
     private Date date;
-    private String monthlyId;
-    // 明细
-    List<StroInvoicingMonthlyDetailDTO> stroInvoicingDetails;
+    // itemids
+    private List<String> itemIds;
+    private Date modifyTime;
+
 }

@@ -10,6 +10,7 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.module.emr.emrpatient.service.EmrPatientService;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
@@ -75,6 +76,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     @Resource
     private InsureIndividualVisitDAO insureIndividualVisitDAO;
 
+    private EmrPatientService emrPatientService_consumer;
     @Override
     public PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         // 设置分页信息
@@ -262,7 +264,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
         inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
 
-        Map<String, Object> emrMap = new HashMap<>();
+        Map<String, Object> emrMap = emrPatientService_consumer.updateHisEmrJosnInfo(JSONObject.parseObject(JSON.toJSONString(inptVisitDTO)));
 
         commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
         //先删除后新增
@@ -378,6 +380,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         InptVisitDTO inptVisit = MapUtils.get(map,"inptVisitDTO");
         String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
         Map<String, Object> detailMap = new HashMap<>();
+        detailMap.putAll(map);
         detailMap.put("mdtrt_sn",inptVisit.getId()); // 就医流水号
         detailMap.put("mdtrt_id",medicalRegNo); // 医保就诊ID（医保必填）
         detailMap.put("psn_no",inptVisit.getInsureNo()); // 人员编号(医保必填)
@@ -414,63 +417,63 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
 
 
 
-        MapUtils.isEmptyErr("illhis_stte_name","入院记录所属病历内容的病史陈述者姓名为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("illhis_stte_rltl","入院记录所属病历内容的陈述者与患者关系代码为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("stte_rele","入院记录所属病历内容的陈述内容是否可靠标识为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("chfcomp","入院记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("dise_now","入院记录所属病历内容的现病史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("hlcon","入院记录所属病历内容的健康状况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("dise_his","入院记录所属病历内容的疾病史（含外伤）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("ifet","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("ifet_his","入院记录所属病历内容的患者传染性标志为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("prev_vcnt","入院记录所属病历内容的传染病史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("oprn_his","入院记录所属病历内容的手术史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("bld_his","入院记录所属病历内容的输血史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("algs_his","入院记录所属病历内容的过敏史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("psn_his","入院记录所属病历内容的个人史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("mrg_his","入院记录所属病历内容的婚育史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("mena_his","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("fmhis","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_tprt","入院记录所属病历内容的家族史为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_pule","入院记录所属病历内容的体格检查 -- 脉率（次 /mi数字）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_vent_frqu","入院记录所属病历内容的体格检查--呼吸频率为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_systolic_pre","入院记录所属病历内容的体格检查 -- 收缩压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_dstl_pre","入院记录所属病历内容的体格检查 -- 舒张压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_height","入院记录所属病历内容的体格检查--身高（cm）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_wt","入院记录所属病历内容的体格检查--体重（kg）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_ordn_stas","入院记录所属病历内容的体格检查 -- 一般状况 检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_skin_musl","入院记录所属病历内容的体格检查 -- 皮肤和黏膜检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_spef_lymph","入院记录所属病历内容的体格检查 -- 全身浅表淋巴结检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_head","入院记录所属病历内容的体格检查 -- 头部及其器官检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_neck","入院记录所属病历内容的体格检查 -- 颈部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_chst","入院记录所属病历内容的体格检查 -- 胸部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_abd","入院记录所属病历内容的体格检查 -- 腹部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_finger_exam","入院记录所属病历内容的体格检查 -- 肛门指诊检查结果描述为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_spin","入院记录所属病历内容的体格检查 -- 脊柱检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("physexm_all_fors","入院记录所属病历内容的体格检查 -- 四肢检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("nersys","入院记录所属病历内容的体格检查 -- 神经系统检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("spcy_info","入院记录所属病历内容的专科情况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("asst_exam_rslt","入院记录所属病历内容的辅助检查结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("apgr","入院记录所属病历内容的评分值(Apgar)为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("diet_info","入院记录所属病历内容的饮食情况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("growth_deg","入院记录所属病历内容的发育程度为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("mtl_stas_norm","入院记录所属病历内容的精神状态正常标志为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("slep_info","入院记录所属病历内容的睡眠状况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("sp_info","入院记录所属病历内容的特殊情况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("mind_info","入院记录所属病历内容的心理状态为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("nurt","入院记录所属病历内容的营养状态为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("self_ablt","入院记录所属病历内容的自理能力为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("nurscare_obsv_item_name","入院记录所属病历内容的护理观察项目名称为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("nurscare_obsv_rslt","入院记录所属病历内容的护理观察结果为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("smoke","入院记录所属病历内容的吸烟标志为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("stop_smok_days","入院记录所属病历内容的停止吸烟天数为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("smok_info","入院记录所属病历内容的吸烟状况为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("smok_day","入院记录所属病历内容的日吸烟量（支）为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("drnk","入院记录所属病历内容的饮酒标志为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("drnk_frqu","入院记录所属病历内容的饮酒频率为空,请先确认好是否匹配好元素,或者是否填写");
-        MapUtils.isEmptyErr("drnk_day","入院记录所属病历内容的日饮酒量（mL）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("illhis_stte_name","入院记录所属病历内容的病史陈述者姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("illhis_stte_rltl","入院记录所属病历内容的陈述者与患者关系代码为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("stte_rele","入院记录所属病历内容的陈述内容是否可靠标识为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("chfcomp","入院记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("dise_now","入院记录所属病历内容的现病史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("hlcon","入院记录所属病历内容的健康状况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("dise_his","入院记录所属病历内容的疾病史（含外伤）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("ifet","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("ifet_his","入院记录所属病历内容的患者传染性标志为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("prev_vcnt","入院记录所属病历内容的传染病史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("oprn_his","入院记录所属病历内容的手术史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("bld_his","入院记录所属病历内容的输血史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("algs_his","入院记录所属病历内容的过敏史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("psn_his","入院记录所属病历内容的个人史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("mrg_his","入院记录所属病历内容的婚育史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("mena_his","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("fmhis","入院记录所属病历内容的月经史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_tprt","入院记录所属病历内容的家族史为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_pule","入院记录所属病历内容的体格检查 -- 脉率（次 /mi数字）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_vent_frqu","入院记录所属病历内容的体格检查--呼吸频率为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_systolic_pre","入院记录所属病历内容的体格检查 -- 收缩压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_dstl_pre","入院记录所属病历内容的体格检查 -- 舒张压 （mmHg）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_height","入院记录所属病历内容的体格检查--身高（cm）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_wt","入院记录所属病历内容的体格检查--体重（kg）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_ordn_stas","入院记录所属病历内容的体格检查 -- 一般状况 检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_skin_musl","入院记录所属病历内容的体格检查 -- 皮肤和黏膜检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_spef_lymph","入院记录所属病历内容的体格检查 -- 全身浅表淋巴结检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_head","入院记录所属病历内容的体格检查 -- 头部及其器官检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_neck","入院记录所属病历内容的体格检查 -- 颈部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_chst","入院记录所属病历内容的体格检查 -- 胸部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_abd","入院记录所属病历内容的体格检查 -- 腹部检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_finger_exam","入院记录所属病历内容的体格检查 -- 肛门指诊检查结果描述为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_genital_area","入院记录所属病历内容的体格检查 -- 外生殖器检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_spin","入院记录所属病历内容的体格检查 -- 脊柱检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("physexm_all_fors","入院记录所属病历内容的体格检查 -- 四肢检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("nersys","入院记录所属病历内容的体格检查 -- 神经系统检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("spcy_info","入院记录所属病历内容的专科情况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("asst_exam_rslt","入院记录所属病历内容的辅助检查结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("apgr","入院记录所属病历内容的评分值(Apgar)为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("diet_info","入院记录所属病历内容的饮食情况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("growth_deg","入院记录所属病历内容的发育程度为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("mtl_stas_norm","入院记录所属病历内容的精神状态正常标志为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("slep_info","入院记录所属病历内容的睡眠状况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("sp_info","入院记录所属病历内容的特殊情况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("mind_info","入院记录所属病历内容的心理状态为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("nurt","入院记录所属病历内容的营养状态为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("self_ablt","入院记录所属病历内容的自理能力为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("nurscare_obsv_item_name","入院记录所属病历内容的护理观察项目名称为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("nurscare_obsv_rslt","入院记录所属病历内容的护理观察结果为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("smoke","入院记录所属病历内容的吸烟标志为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("stop_smok_days","入院记录所属病历内容的停止吸烟天数为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("smok_info","入院记录所属病历内容的吸烟状况为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("smok_day","入院记录所属病历内容的日吸烟量（支）为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("drnk","入院记录所属病历内容的饮酒标志为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("drnk_frqu","入院记录所属病历内容的饮酒频率为空,请先确认好是否匹配好元素,或者是否填写");
+//        MapUtils.isEmptyErr("drnk_day","入院记录所属病历内容的日饮酒量（mL）为空,请先确认好是否匹配好元素,或者是否填写");
         detailMap.put("resp_nurs_name",inptVisit.getRespNurseName()); // 责任护士姓名
         detailMap.put("vali_flag", Constants.SF.S); // 有效标志
 
@@ -648,23 +651,23 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
                 item.put("wardarea_name",inptVisitDTO.getWardName());
                 // 床位号
                 item.put("bedno",inptVisitDTO.getBedName());
-                MapUtils.checkEmptyErr(item,"dept","病程记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dept_name","病程记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"wardarea_name","病程记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"bedno","病程记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"chfcomp","病程记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"cas_ftur","病程记录所属病历内容的病例特点为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_evid","病程记录所属病历内容的诊断依据为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"prel_wm_diag_code","病程记录所属病历内容的初步诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"prel_tcm_dise_name","病程记录所属病历内容的初步诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"finl_wm_diag_code","病程记录所属病历内容的鉴别诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"finl_wm_diag_name","病程记录所属病历内容的鉴别诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_plan","病程记录所属病历内容的诊疗计划为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"ipdr_code","病程记录所属病历内容的住院医师编号为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"ipdr_name","病程记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"prnt_doc_name","病程记录所属病历内容的上级医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
-
+//                MapUtils.checkEmptyErr(item,"dept","病程记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dept_name","病程记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"wardarea_name","病程记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"bedno","病程记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"chfcomp","病程记录所属病历内容的主诉为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"cas_ftur","病程记录所属病历内容的病例特点为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_evid","病程记录所属病历内容的诊断依据为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"prel_wm_diag_code","病程记录所属病历内容的初步诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"prel_tcm_dise_name","病程记录所属病历内容的初步诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"finl_wm_diag_code","病程记录所属病历内容的鉴别诊断-西医诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"finl_wm_diag_name","病程记录所属病历内容的鉴别诊断-西医诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_plan","病程记录所属病历内容的诊疗计划为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"ipdr_code","病程记录所属病历内容的住院医师编号为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"ipdr_name","病程记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"prnt_doc_name","病程记录所属病历内容的上级医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
+                item.put("vali_flag",Constants.SF.S);
                 item.put("source", "1"); //
             }
         }
@@ -696,33 +699,33 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
                 item.put("adm_dise",inptVisitDTO.getInsureIllnessName());
                 // 入院诊断编码
                 item.put("diag_code",inptVisitDTO.getInsureIllnessCode());
-                MapUtils.checkEmptyErr(item,"dept","病情抢救记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dept_name","病情抢救记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"wardarea_name","病情抢救记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"bedno","病情抢救记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"diag_name","病情抢救记录所属病历内容的诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"diag_code","病情抢救记录所属病历内容的诊断代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"cond_chg","病情抢救记录所属病历内容的病情变化情况为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"resc_mes","病情抢救记录所属病历内容的抢救措施为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"oprn_oprt_code","病情抢救记录所属病历内容的手术操作代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"oprn_oprt_name","病情抢救记录所属病历内容的手术操作名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"oprn_oper_part","病情抢救记录所属病历内容的手术及操作目标部位名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"itvt_name","病情抢救记录所属病历内容的介入物名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"oprt_mtd","病情抢救记录所属病历内容的操作方法为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"oprt_cnt","病情抢救记录所属病历内容的操作次数为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"resc_begntime","病情抢救记录所属病历内容的抢救开始日期时间为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"resc_endtime","病情抢救记录所属病历内容的抢救结束日期时间为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_item_name","病情抢救记录所属病历内容的检查/检验项目名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_ccls","病情抢救记录所属病历内容的检查/检验结果为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_ccls_qunt","病情抢救记录所属病历内容的检查/检验定量结果为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dise_ccls_code","病情抢救记录所属病历内容的检查/检验结果代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"mnan","病情抢救记录所属病历内容的注意事项为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"resc_psn_list","病情抢救记录所属病历内容的参加抢救人员名单为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"proftechttl_code","病情抢救记录所属病历内容的专业技术职务类别代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"doc_code","病情抢救记录所属病历内容的医师编号为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dr_name","病情抢救记录所属病历内容的医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
-
+//                MapUtils.checkEmptyErr(item,"dept","病情抢救记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dept_name","病情抢救记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"wardarea_name","病情抢救记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"bedno","病情抢救记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"diag_name","病情抢救记录所属病历内容的诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"diag_code","病情抢救记录所属病历内容的诊断代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"cond_chg","病情抢救记录所属病历内容的病情变化情况为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"resc_mes","病情抢救记录所属病历内容的抢救措施为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"oprn_oprt_code","病情抢救记录所属病历内容的手术操作代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"oprn_oprt_name","病情抢救记录所属病历内容的手术操作名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"oprn_oper_part","病情抢救记录所属病历内容的手术及操作目标部位名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"itvt_name","病情抢救记录所属病历内容的介入物名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"oprt_mtd","病情抢救记录所属病历内容的操作方法为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"oprt_cnt","病情抢救记录所属病历内容的操作次数为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"resc_begntime","病情抢救记录所属病历内容的抢救开始日期时间为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"resc_endtime","病情抢救记录所属病历内容的抢救结束日期时间为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_item_name","病情抢救记录所属病历内容的检查/检验项目名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_ccls","病情抢救记录所属病历内容的检查/检验结果为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_ccls_qunt","病情抢救记录所属病历内容的检查/检验定量结果为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dise_ccls_code","病情抢救记录所属病历内容的检查/检验结果代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"mnan","病情抢救记录所属病历内容的注意事项为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"resc_psn_list","病情抢救记录所属病历内容的参加抢救人员名单为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"proftechttl_code","病情抢救记录所属病历内容的专业技术职务类别代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"doc_code","病情抢救记录所属病历内容的医师编号为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dr_name","病情抢救记录所属病历内容的医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"vali_flag",Constants.SF.S);
+                item.put("vali_flag",Constants.SF.S);
                 item.put("source", "1"); //
             }
         }
@@ -755,23 +758,23 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
                 item.put("adm_dise",inptVisitDTO.getInsureIllnessCode());
                 // 入院情况
                 item.put("adm_info",inptVisitDTO.getInSituationName());
-                MapUtils.checkEmptyErr(item,"dept","死亡记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"dept_name","死亡记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"wardarea_name","死亡记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"bedno","死亡记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"adm_time","死亡记录所属病历内容的入院时间为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"adm_dise","死亡记录所属病历内容的入院诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"adm_info","死亡记录所属病历内容的入院情况为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"trt_proc_dscr","死亡记录所属病历内容的诊疗过程描述为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"die_time","死亡记录所属病历内容的死亡时间为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"die_drt_rea","死亡记录所属病历内容的直接死亡原因名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"die_drt_rea_code","死亡记录所属病历内容的直接死亡原因编码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"die_dise_name","死亡记录所属病历内容的死亡诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"die_diag_code","死亡记录所属病历内容的死亡诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"agre_corp_dset","死亡记录所属病历内容的家属是否同意尸体解剖标志为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"ipdr_name","死亡记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"chfpdr_name","死亡记录所属病历内容的主诊医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
-                MapUtils.checkEmptyErr(item,"chfdr_name","死亡记录所属病历内容的主任医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dept","死亡记录所属病历内容的科室代码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"dept_name","死亡记录所属病历内容的科室名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"wardarea_name","死亡记录所属病历内容的病区名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"bedno","死亡记录所属病历内容的病床号为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"adm_time","死亡记录所属病历内容的入院时间为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"adm_dise","死亡记录所属病历内容的入院诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"adm_info","死亡记录所属病历内容的入院情况为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"trt_proc_dscr","死亡记录所属病历内容的诊疗过程描述为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"die_time","死亡记录所属病历内容的死亡时间为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"die_drt_rea","死亡记录所属病历内容的直接死亡原因名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"die_drt_rea_code","死亡记录所属病历内容的直接死亡原因编码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"die_dise_name","死亡记录所属病历内容的死亡诊断名称为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"die_diag_code","死亡记录所属病历内容的死亡诊断编码为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"agre_corp_dset","死亡记录所属病历内容的家属是否同意尸体解剖标志为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"ipdr_name","死亡记录所属病历内容的住院医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"chfpdr_name","死亡记录所属病历内容的主诊医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
+//                MapUtils.checkEmptyErr(item,"chfdr_name","死亡记录所属病历内容的主任医师姓名为空,请先确认好是否匹配好元素,或者是否填写");
                 item.put("sign_time",DateUtils.format(DateUtils.Y_M_DH_M_S));//	签字日期时间
                 item.put("vali_flag",Constants.SF.S);//	是否有效
 

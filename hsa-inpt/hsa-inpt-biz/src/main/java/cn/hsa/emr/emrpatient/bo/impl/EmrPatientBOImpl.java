@@ -1195,10 +1195,32 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
      * @Return
      */
     @Override
-    public Boolean updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO) {
-//		String key = this.setHisEmrJosnInfo(inptVisitDTO);
-//		return true;
-        return true;
+    public Map<String, Object> updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO) {
+        Map map = new HashMap();
+        map.put("hospCode", inptVisitDTO.getHospCode());
+        map.put("visitId", inptVisitDTO.getVisitId());
+        inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+
+        EmrPatientDTO emrPatientDTO = new EmrPatientDTO();
+        emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
+        emrPatientDTO.setVisitId(inptVisitDTO.getVisitId());
+        List<EmrPatientDTO> emrPatientDTOS = emrPatientDAO.queryEmrPaitentInfo(map);
+        if (ListUtils.isEmpty(emrPatientDTOS)) {
+            throw new AppException("该患者还未书写病历，不能进行上传！");
+        }
+        //  查询住院诊断信息
+        List<String> diagnoseList = Stream.of("201","204", "303","203","301","302","202").collect(Collectors.toList());
+        map.put("diagnoseList", diagnoseList);
+        List<InptDiagnoseDTO> diagnoseDTOS = emrPatientDAO.queryEmrPatientDiagnose(map);
+        // 	查询出手术信息
+        List<OperInfoRecordDTO> operInfoRecordInfos = emrPatientDAO.queryEmrOperRecordInfo(map);
+
+        Map<String, Object> insureEmrNodeInfoMessage = setHisEmrJosnInfo(inptVisitDTO);
+        insureEmrNodeInfoMessage.put("diagnoseDTOS", diagnoseDTOS);
+        insureEmrNodeInfoMessage.put("operInfoRecordInfos", operInfoRecordInfos);
+        insureEmrNodeInfoMessage.put("visitId", inptVisitDTO.getVisitId());
+        insureEmrNodeInfoMessage.put("hospCode", map.get("hospCode"));
+        return insureEmrNodeInfoMessage;
     }
 
     private Map<String, Object> setHisEmrJosnInfo(InptVisitDTO inptVisit) {

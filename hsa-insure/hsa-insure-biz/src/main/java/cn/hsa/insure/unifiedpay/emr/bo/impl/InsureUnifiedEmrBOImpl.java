@@ -327,8 +327,8 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         //2.修改状态
         InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrDetailDTO.getInsureEmrAdminfoDTO();
         insureEmrAdminfoDTO.setStatu("2");
-        insureEmrAdminfoDTO.setUploadTime(new Date());
-        insureEmrAdminfoDTO.setUpdateTime(new Date());
+        insureEmrAdminfoDTO.setUploadTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+        insureEmrAdminfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
         insureEmrAdminfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrAdminfoDTO)));
     }
 

@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.datasource.bo.CenterDatasourceBO;
 import cn.hsa.module.center.datasource.dao.CenterHospitalDatasourceDAO;
 import cn.hsa.module.center.datasource.dto.CenterDatasourceDTO;
+import cn.hsa.module.center.datasource.dto.CenterHospitalDatasourceDTO;
 import cn.hsa.module.center.datasource.entity.CenterDatasourceDO;
 import cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO;
 import cn.hsa.module.center.hospital.bo.CenterHospitalBO;
@@ -264,6 +265,9 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
             try {
                 //新建医院数据库用户
                 try {
+                    if(centerRootDatabaseBO == null){
+                        throw new AppException("中心端ROOT权限用户未配置！");
+                    }
                     centerSyncFlowDto = new CenterSyncFlowDto ();
                     centerSyncFlowDto.setHospCode(centerHospitalDTO.getCode());
                     centerSyncFlowDto.setType("1");
@@ -425,7 +429,22 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
         List<CenterHospitalDatasourceDO> centerHospitalDatasourceDOS = new ArrayList<CenterHospitalDatasourceDO>();
         centerHospitalDatasourceDOS.add(centerHospitalDatasourceDO);
-        centerHospitalDatasourceDAO.batchInsert(centerHospitalDatasourceDOS);//批量新增数据源关系信息
+
+
+        Map map = new HashMap<>();
+        map.put("list", centerHospitalDatasourceDOS);
+        List<CenterHospitalDatasourceDTO> centerHospitalDatasourceList = centerHospitalDatasourceDAO.queryHaveHospCode(map);
+        if(!ListUtils.isEmpty(centerHospitalDatasourceList)){
+            for (CenterHospitalDatasourceDTO dto: centerHospitalDatasourceList) {
+                if(!dto.getDsCode().equals(centerHospitalDatasourceDO.getDsCode())){
+                    throw new AppException("存在医院已经绑定数据源");
+                }
+            }
+        }
+        //删除医院和数据源关系信息
+        centerHospitalDatasourceDAO.delByDsCode(centerHospitalDatasourceDO.getDsCode());
+        //批量新增数据源关系信息
+        centerHospitalDatasourceDAO.batchInsert(centerHospitalDatasourceDOS);
     }
 
 

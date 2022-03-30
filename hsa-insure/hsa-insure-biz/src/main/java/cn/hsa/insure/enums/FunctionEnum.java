@@ -67,6 +67,7 @@ public enum FunctionEnum {
 //    CLR_APPR_DETAIL("3704", "获取拨付单信息"),
     MR_PATIENT_SETTL_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4101, "上传结算清单信息"),
     MR_PATIENT_SETTL_UPLOAD_A(Constant.UnifiedPay.REGISTER.UP_4101A, "上传结算清单信息"),
+    INSUR_MRI_UPLOAD(Constant.UnifiedPay.INPT.UP_4401, "住院病案首页上传"),
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),

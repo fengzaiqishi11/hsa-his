@@ -71,4 +71,23 @@ public class InsureCommonUtil {
         return inputMap;
     }
 
+    /**
+     * @Method getEmptyErr
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/17 14:34
+     * @Return
+     **/
+    public void getEmptyErr(Object obj,String errMsg) {
+        if(obj ==null){
+            throw new RuntimeException(errMsg);
+        }
+        if(obj instanceof  String){
+            if(StringUtils.isEmpty((String) obj)){
+                throw new RuntimeException(errMsg);
+            }
+        }
+    }
 }

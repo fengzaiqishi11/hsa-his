@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.base.bpft.dto.BasePreferentialDTO;
 import cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO;
+import cn.hsa.module.base.bpft.entity.BasePreferentialDO;
 import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
@@ -377,9 +378,8 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
     List<BasePreferentialDTO> basePreferentialDTOS = basePreferentialService_consumer.queryPreferentials(map).getData();
 
     BigDecimal totalAdvance = inptVisitDTO.getTotalAdvance() == null ? new BigDecimal(0): inptVisitDTO.getTotalAdvance(); // 总预交
-    BigDecimal totalcost = inptVisitDTO.getTotalCost(); // 总费用
-    BigDecimal totalBalance = inptVisitDTO.getTotalBalance(); // 剩余总金额
-    BigDecimal totalPreferentialPrice = new BigDecimal(0); //累计优惠总金额
+    BigDecimal totalcost = new BigDecimal(0); // 总费用
+    BigDecimal totalBalance = new BigDecimal(0); // 剩余总金额
 
     if (!ListUtils.isEmpty(basePreferentialDTOS)) {
       // 不为空：根据优惠类型下的优惠项，重新计算金额及总金额
@@ -397,11 +397,19 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
         // 计算舍入金额，将舍入金额放入最后一个费用中
         BigDecimal roundPrice = new BigDecimal(0);
 
-        if (!ListUtils.isEmpty(cwflList)) {
-          for (int i = 0; i < cwflList.size(); i++) {
-            BasePreferentialDTO basePreferentialDTO = cwflList.get(i);
-            for (int j = 0; j < inptCostDOS.size(); j++) {
-              InptCostDO inptCostDO = inptCostDOS.get(j);
+        for (int i = 0; i < inptCostDOS.size(); i++) {
+          InptCostDO inptCostDO = inptCostDOS.get(i);
+          // 所有费用进来重置费用，后续如果有匹配的优惠 则重新计算优惠金额和优惠后金额
+          // 总金额
+          BigDecimal totalPrice = inptCostDO.getTotalPrice();
+          // 优惠总金额
+          inptCostDO.setPreferentialPrice(new BigDecimal(0));
+          // 优惠后总金额
+          inptCostDO.setRealityPrice(totalPrice);
+
+          // 按财务分类优惠
+          if (!ListUtils.isEmpty(cwflList)) {
+            for (BasePreferentialDTO basePreferentialDTO : cwflList) {
               if (basePreferentialDTO.getItemId().equals(inptCostDO.getBfcId())) {
                 // 优惠方式
                 String inCode = basePreferentialDTO.getInCode();
@@ -415,33 +423,27 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
                   // 去掉舍入金额后的优惠金额
                   preferentialPrice = preferentialPrice.subtract(roundPrice);
                   inptCostDO.setPreferentialPrice(preferentialPrice);
-                  // 计算累计优惠金额
-                  totalPreferentialPrice = totalPreferentialPrice.add(preferentialPrice);
                   // 优惠后金额
                   BigDecimal realityPrice = inptCostDO.getTotalPrice().subtract(preferentialPrice);
                   inptCostDO.setRealityPrice(realityPrice);
                   // 舍入金额存入最后一个修改的费用当中，在进行舍入
-                  if (j == (inptCostDOS.size() -1)) {
+                  if (i == (inptCostDOS.size() -1)) {
                     realityPrice = handleRealityPrice(sysParameterDTO.getValue(), inptCostDO.getRealityPrice(), roundPrice);
                     inptCostDO.setRealityPrice(realityPrice);
                   }
                 } else if (Constants.YHFS.AJE.equals(inCode)){
                   // 优惠金额
                   inptCostDO.setPreferentialPrice(inScale.abs());
-                  // 计算累计的优惠金额
-                  totalPreferentialPrice = totalPreferentialPrice.add(inScale.abs());
                   // 优惠后金额
                   inptCostDO.setRealityPrice(inptCostDO.getTotalPrice().subtract(inScale.abs()));
                 }
               }
             }
           }
-        }
-        if (!ListUtils.isEmpty(ypAndXmList)) {
-          for (int i = 0; i < ypAndXmList.size(); i++) {
-            BasePreferentialDTO basePreferentialDTO = ypAndXmList.get(i);
-            for (int j = 0; j < inptCostDOS.size(); j++) {
-              InptCostDO inptCostDO = inptCostDOS.get(j);
+
+          // 按药品、项目分类
+          if (!ListUtils.isEmpty(ypAndXmList)) {
+            for (BasePreferentialDTO basePreferentialDTO : ypAndXmList) {
               if (basePreferentialDTO.getItemId().equals(inptCostDO.getItemId())) {
                 // 优惠方式
                 String inCode = basePreferentialDTO.getInCode();
@@ -455,40 +457,46 @@ public class PatientComprehensiveQueryBOImpl extends HsafBO implements PatientCo
                   // 去掉舍入金额后的优惠金额
                   preferentialPrice = preferentialPrice.subtract(roundPrice);
                   inptCostDO.setPreferentialPrice(preferentialPrice);
-                  // 计算累计优惠金额
-                  totalPreferentialPrice = totalPreferentialPrice.add(preferentialPrice);
                   // 优惠后金额
                   BigDecimal realityPrice = inptCostDO.getTotalPrice().subtract(preferentialPrice);
                   inptCostDO.setRealityPrice(realityPrice);
                   // 舍入金额存入最后一个修改的费用当中，在进行舍入
-                  if (j == (inptCostDOS.size() -1)) {
+                  if (i == (inptCostDOS.size() -1)) {
                     realityPrice = handleRealityPrice(sysParameterDTO.getValue(), inptCostDO.getRealityPrice(), roundPrice);
                     inptCostDO.setRealityPrice(realityPrice);
                   }
                 } else if (Constants.YHFS.AJE.equals(inCode)){
                   // 优惠金额
                   inptCostDO.setPreferentialPrice(inScale.abs());
-                  // 计算累计的优惠金额
-                  totalPreferentialPrice = totalPreferentialPrice.add(inScale.abs());
                   // 优惠后金额
                   inptCostDO.setRealityPrice(inptCostDO.getTotalPrice().subtract(inScale.abs()));
                 }
-
               }
             }
           }
         }
+        // 计算总费用和剩余总金额
+        totalcost = inptCostDOS.stream().map(InptCostDO::getRealityPrice).reduce(BigDecimal::add).get();
+        // 总余额 = 总预交 - 总费用
+        totalBalance = totalAdvance.subtract(totalcost);
       }
-      // 总费用 = 原总费用 - 总优惠金额
-      totalcost = totalcost.subtract(totalPreferentialPrice);
-      // 总余额 = 总预交 - 总费用
+    }
+    else {
+      // 为空： 表示没有配置优惠类型，还原原费用
+      for (InptCostDO inptCostDO : inptCostDOS) {
+        // 总金额
+        BigDecimal totalPrice = inptCostDO.getTotalPrice();
+        // 优惠总金额
+        inptCostDO.setPreferentialPrice(new BigDecimal(0));
+        // 优惠后总金额
+        inptCostDO.setRealityPrice(totalPrice);
+        totalcost.add(inptCostDO.getRealityPrice());
+      }
       totalBalance = totalAdvance.subtract(totalcost);
     }
 
     // 1.修改费用表中费用
-    if (!ListUtils.isEmpty(basePreferentialDTOS)) {
-      patientComprehensiveQueryDAO.updateInptCost(inptCostDOS);
-    }
+    patientComprehensiveQueryDAO.updateInptCost(inptCostDOS);
 
     // 2.修改就诊表中的优惠类别id、累计费用、累计余额
     map.put("totalcost", totalcost);

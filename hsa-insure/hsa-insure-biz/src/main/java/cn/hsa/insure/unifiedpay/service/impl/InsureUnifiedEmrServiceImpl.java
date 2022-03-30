@@ -39,13 +39,13 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
 
     @Override
     public WrapperResponse<PageDTO> queryInsureUnifiedEmrInfo(Map<String, Object> map) {
-        //TODO 查询 联合 结算表 主，关联 医保就诊表，电子病历入院记录表
+        // 查询 联合 结算表 主，关联 医保就诊表，电子病历入院记录表
         return WrapperResponse.success(insureUnifiedEmrBO.queryInsureUnifiedEmrInfo(MapUtils.get(map,"insureEmrUnifiedDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrDetailDTO> queryInsureUnifiedEmrDetail(Map<String, Object> map) {
-        //TODO 根据 his就诊id，医保登记id，人员编号
+        // 根据 his就诊id，医保登记id，人员编号
         // 查询 患者基本展示信息
         // 查询 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         return WrapperResponse.success(insureUnifiedEmrBO.queryInsureUnifiedEmrDetail(MapUtils.get(map,"insureEmrUnifiedDTO")));
@@ -53,43 +53,43 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
 
     @Override
     public WrapperResponse<InsureEmrAdminfoDTO> updateInsureUnifiedEmrAdminfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrAdminfo(MapUtils.get(map,"insureEmrAdminfoDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrDiseinfoDTO> updateInsureUnifiedEmrDiseinfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDiseinfo(MapUtils.get(map,"insureEmrDiseinfoDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrCoursrinfoDTO> updateInsureUnifiedEmrCoursrinfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrCoursrinfo(MapUtils.get(map,"insureEmrCoursrinfoDTO")));
     }
 
     @Override
     public WrapperResponse updateInsureUnifiedEmrOprninfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrOprninfo(MapUtils.get(map,"insureEmrOprninfoDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrRescinfoDTO> updateInsureUnifiedEmrRescinfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrRescinfo(MapUtils.get(map,"insureEmrRescinfoDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrDieinfoDTO> updateInsureUnifiedEmrDieinfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDieinfo(MapUtils.get(map,"insureEmrDieinfoDTO")));
     }
 
     @Override
     public WrapperResponse<InsureEmrDscginfoDTO> updateInsureUnifiedEmrDscginfo(Map<String, Object> map) {
-        //TODO 根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        // 根据uuid 判断记录是否存在，不存在则新增，存在则修改
         return WrapperResponse.success(insureUnifiedEmrBO.updateInsureUnifiedEmrDscginfo(MapUtils.get(map,"insureEmrDscginfoDTO")));
     }
 
@@ -103,7 +103,7 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
 
     @Override
     public void updateInsureUnifiedEmrSync(Map<String, Object> map) {
-        //TODO 提供给电子病历系统，做数据初始化
+        // 提供给电子病历系统，做数据初始化
         // 初始化 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         insureUnifiedEmrBO.updateInsureUnifiedEmrSync(MapUtils.get(map,"insureEmrUnifiedDTO"));
     }

@@ -14,8 +14,11 @@ import lombok.Data;
  * @Version 1.0
  **/
 @Data
-public class InsureEmrUnifiedDTO extends PageDO implements Serializable {
+public class InsureEmrUnifiedDTO implements Serializable {
 
+    //分页参数
+    private int pageNo = 1 ;
+    private int pageSize = 10 ;
     /**
      * 住院号
      */

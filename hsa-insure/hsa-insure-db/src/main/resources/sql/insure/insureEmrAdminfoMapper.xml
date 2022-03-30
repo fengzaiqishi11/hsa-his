@@ -202,7 +202,7 @@
 
   <select id="queryInsureUnifiedEmrInfo" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO" resultType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO">
     select t.visit_id, t.medical_reg_no as mdtrtId, t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
-    t.visit_time as visitTime, e.crte_time as crteTime, c.bka035_name as psnTypeName, c.aka130_name as medTypeName, a.upload_time as uploadTime
+    t.visit_time as visitTime, e.crte_time as crteTime, c.bka035 as psnType, c.bka035_name as psnTypeName, c.aka130 as medType, c.aka130_name as medTypeName, a.upload_time as uploadTime
     FROM
     insure_individual_settle e
     LEFT JOIN insure_individual_visit t ON e.hosp_code = t.hosp_code

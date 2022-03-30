@@ -473,12 +473,24 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
                 item.put("ipt_medcas_hmpg_sn",MapUtils.get(item,"id")); // 住院病案首页流水号
             });
         }else{
-            // 用测试环境测试时，医保必须传手术节点
-            Map<String,Object> operInfoMap = new HashMap<>();
-            operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
-            operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
-            operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
-            operInfoDOList.add(operInfoMap);
+            /**
+             * 因为广东省的病案首页年手术节点 所以需要根据系统特殊处理
+             */
+            map.put("code","SHOW_GDSBASY");
+            SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
+            if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+                // 用测试环境测试时，医保必须传手术节点
+                Map<String,Object> operInfoMap = new HashMap<>();
+                operInfoDOList.add(operInfoMap);
+            }else{
+                // 用测试环境测试时，医保必须传手术节点
+                Map<String,Object> operInfoMap = new HashMap<>();
+                operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+                operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+                operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+                operInfoDOList.add(operInfoMap);
+            }
+
         }
         map.put("oprationMapList",operInfoDOList);
         return map;

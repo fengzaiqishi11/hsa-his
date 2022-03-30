@@ -826,16 +826,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
             // update by qiang.fan
             if( MapUtils.get(setlInfoMap,"trtType") !=null){
-//                String trtType = MapUtils.get(setlInfoMap,"trtType").toString();
-//                if("1".equals(trtType)){
-//                    setlInfoMap.put("trtType","10"); // 西医
-//                }else if("2.1".equals(trtType)){
-//                    setlInfoMap.put("trtType","21"); // 中医
-//                }else if("2.2".equals(trtType)){
-//                    setlInfoMap.put("trtType","22"); // 民族医
-//                }else{
-//                    setlInfoMap.put("trtType","30"); // 中西医
-//                }
+                String trtType = MapUtils.get(setlInfoMap,"trtType").toString();
+                if("1".equals(trtType)){
+                    setlInfoMap.put("trtType","10"); // 西医
+                }else if("2.1".equals(trtType)){
+                    setlInfoMap.put("trtType","21"); // 中医
+                }else if("2.2".equals(trtType)){
+                    setlInfoMap.put("trtType","22"); // 民族医
+                }else{
+                    setlInfoMap.put("trtType","30"); // 中西医
+                }
             }
         }
         else{

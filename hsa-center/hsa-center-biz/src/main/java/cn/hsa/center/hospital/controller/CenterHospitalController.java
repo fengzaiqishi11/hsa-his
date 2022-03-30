@@ -6,6 +6,8 @@ import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import cn.hsa.module.center.parameter.service.CenterParameterService;
@@ -202,5 +204,65 @@ public class CenterHospitalController extends CenterBaseController {
         }
         url = url + rsaKey;
         return WrapperResponse.success(url);
+    }
+
+
+
+    /**
+     * @Menthod queryCenterSyncFlows()
+     * @Desrciption  查询某一医院同步信息
+     * @Param
+     * [1. CenterHospitalDTO]
+     * @Author zhangxuan
+     * @Date   2022/3/21 14:45
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @GetMapping("/queryCenterSyncFlows")
+    public WrapperResponse<List<CenterSyncFlowDto>> queryCenterSyncFlows(CenterSyncFlowDto centerSyncFlowDto){
+        return this.centerHospitalService.queryCenterSyncFlows(centerSyncFlowDto);
+    }
+
+    /**
+     * @Menthod auditHosp()
+     * @Desrciption 审核医院
+     * @Param
+     * 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    @PostMapping("/auditHosp")
+    public WrapperResponse<Boolean> updateAudit(@RequestBody CenterHospitalDTO centerHospitalDTO){
+        centerHospitalDTO.setCrteId(userId);
+        centerHospitalDTO.setCrteName(userName);
+        return centerHospitalService.updateAudit(centerHospitalDTO);
+    }
+
+    /**
+     * @Menthod updateRootBase()
+     * @Desrciption 审核医院
+     * @Param
+     * 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    @PostMapping("/updateRootBase")
+    public WrapperResponse<Boolean> updateRootBase(@RequestBody CenterRootDatabaseBO centerRootDatabaseBO){
+        return centerHospitalService.updateRootBase(centerRootDatabaseBO);
+    }
+
+    /**
+     * @Menthod findRootBase()
+     * @Desrciption 审核医院
+     * @Param
+     * 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    @GetMapping("/findRootBase")
+    public WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO){
+        return centerHospitalService.findRootBase(centerRootDatabaseBO);
     }
 }

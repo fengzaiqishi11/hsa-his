@@ -51,4 +51,31 @@
     <select id="getGlobalConfigById" parameterType="java.lang.String" resultMap="centerConfigResultMap">
         select * from center_global_config where id = #{id}
     </select>
+
+    <resultMap type="cn.hsa.module.center.parameter.dto.CenterParameterDTO" id="CenterParameterMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="isShow" column="is_show" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="updId" column="upd_id" jdbcType="VARCHAR"/>
+        <result property="updName" column="upd_name" jdbcType="VARCHAR"/>
+        <result property="updTime" column="upd_time" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--根据编码获取参数信息-->
+    <select id="getParameterByCode" resultMap="CenterParameterMap">
+        select
+            id, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from center_parameter
+        where is_valid='1' and code=#{code}
+    </select>
 </mapper>

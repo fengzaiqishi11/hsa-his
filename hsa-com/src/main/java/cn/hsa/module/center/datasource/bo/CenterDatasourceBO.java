@@ -149,4 +149,6 @@ public interface CenterDatasourceBO {
      * @Date: 2022-02-17
      */
     WrapperResponse updateIsGuide();
+
+    void addDataUser(CenterHospitalDTO centerHospitalDTO);
 }

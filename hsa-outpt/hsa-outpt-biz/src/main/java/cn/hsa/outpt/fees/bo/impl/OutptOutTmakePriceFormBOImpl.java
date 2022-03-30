@@ -551,6 +551,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         outptVisitDTOFee.setCrteName(crteName);
         outptVisitDTOFee.setCrteId(crteId);
         outptVisitDTOFee.setTfcsMark("tfcs"); // 退费重收标记
+        // 退费重收取原始结算表中的病人类型  2022-03-28 lly
+        outptVisitDTOFee.setPatientCode(oldOutptSettleDTO.getPatientCode());
         outptVisitDTOFee.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
         Map setteleParam = new HashMap();
         setteleParam.put("hospCode",hospCode);

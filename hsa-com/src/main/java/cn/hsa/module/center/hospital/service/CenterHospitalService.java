@@ -3,6 +3,8 @@ package cn.hsa.module.center.hospital.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -96,5 +98,44 @@ public interface CenterHospitalService {
      * */
     @PostMapping("/service/center/hospital/update")
     WrapperResponse<Boolean> update(CenterHospitalDTO centerHospitalDTO);
-
+    /**
+     * @Menthod queryCenterSyncFlows()
+     * @Desrciption  查询某一医院同步信息
+     * @Param
+     * [1. CenterHospitalDTO]
+     * @Author zhangxuan
+     * @Date   2022/3/21 14:45
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    WrapperResponse<List<CenterSyncFlowDto>> queryCenterSyncFlows(CenterSyncFlowDto centerSyncFlowDto);
+    /**
+     * @Menthod auditHosp()
+     * @Desrciption 审核医院
+     * @Param
+     * 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    WrapperResponse<Boolean> updateAudit(CenterHospitalDTO centerHospitalDTO);
+    /**
+     * @Menthod updateRootBase()
+     * @Desrciption 修改root权限配置数据源
+     * @Param
+     * 1.[centerRootDatabaseBO] 修改root权限配置数据源
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    WrapperResponse<Boolean> updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+    /**
+     * @Menthod findRootBase()
+     * @Desrciption 查询root权限配置数据源
+     * @Param
+     * 1.[centerRootDatabaseBO] 查询root权限配置数据源
+     * @Author pengbo
+     * @Date   2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     **/
+    WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 }

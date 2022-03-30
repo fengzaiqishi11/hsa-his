@@ -74,10 +74,16 @@
                a.split_price,
                a.chinese_drug_num,
                a.usage_code,
+               a.stock_detail_id,
+               a.batch_no,
+               a.up_batch_surplus_num,
+               a.batch_surplus_num,
+               a.up_buy_price_all,
+               a.buy_price_all,
+               a.up_sell_price_all,
+               a.sell_price_all,
                a.curr_unit_code,
-               a.crte_id,
-               a.crte_name,
-               a.crte_time,
+               a.distribute_all_detail_id,
                a.old_dist_id
         from phar_in_distribute_detail a
         join phar_in_receive_detail b on a.hosp_code=b.hosp_code and a.ir_id=b.receive_id and a.ird_id=b.id

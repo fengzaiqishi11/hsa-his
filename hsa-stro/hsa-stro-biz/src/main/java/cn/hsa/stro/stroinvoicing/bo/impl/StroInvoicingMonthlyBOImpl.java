@@ -102,7 +102,8 @@ public class StroInvoicingMonthlyBOImpl implements StroInvoicingMonthlyBO {
         stroInvoicingMonthlyDAO.insertBatch(stroInvoicingMonthlyDTOS);
         //插入明细表
         stroInvoicingMonthlyDetailDAO.insertBatch(stroInvoicingDetails);
-        // 更新主表
+        // todo 4.更新主表
+
         return true;
     }
     /**

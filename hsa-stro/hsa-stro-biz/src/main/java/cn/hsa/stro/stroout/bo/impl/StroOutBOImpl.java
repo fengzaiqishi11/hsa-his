@@ -232,12 +232,12 @@ public class StroOutBOImpl extends HsafBO implements StroOutBO {
                     List<StroStockDetailDTO> stroStockDetailDTOS = queryStroOutDetailById(stroOutDTO,fourIds, stroOutDTO.getHospCode(), "4");
                     // 科室入库确认
                     handleStock(stroStockDetailDTOS,"20",stroOutDTO.getHospCode());
+                    stroOutDTO.setOkAuditTime(DateUtils.getNow());
+                    stroOutDTO.setOkAuditCode(Constants.SF.S);
+                    stroOutDTO.setOrderNos(fourIds);
+                    // 回写审核状态
+                    return stroOutDAO.updateBatchCheck(stroOutDTO);
                 }
-                stroOutDTO.setOkAuditTime(DateUtils.getNow());
-                stroOutDTO.setOkAuditCode(Constants.SF.S);
-                stroOutDTO.setOrderNos(fourIds);
-                // 回写审核状态
-                return stroOutDAO.updateBatchCheck(stroOutDTO);
             }
             return true;
         }

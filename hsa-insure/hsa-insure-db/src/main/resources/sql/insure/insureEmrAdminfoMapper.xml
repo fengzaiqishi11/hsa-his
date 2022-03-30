@@ -940,8 +940,8 @@
       <if test="uuid != null" >
         uuid = #{uuid,jdbcType=BIGINT},
       </if>
-      <if test="mdtrtSn != null" >
-        mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
+      <if test="visitId != null" >
+        mdtrt_sn = #{visitId,jdbcType=VARCHAR},
       </if>
       <if test="mdtrtId != null" >
         mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},

@@ -43,7 +43,7 @@ public interface InsureUnifiedEmrBO {
      **/
     InsureEmrDetailDTO queryInsureUnifiedEmrDetail(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
-    void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO,Map<String, Object> emrMap);
+    void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
     /**
      * @Method queryInsureUnifiedEmrDetail

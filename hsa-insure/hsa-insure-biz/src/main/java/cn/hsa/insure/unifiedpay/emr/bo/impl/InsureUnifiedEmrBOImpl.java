@@ -1,6 +1,9 @@
 package cn.hsa.insure.unifiedpay.emr.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.enums.HsaSrvEnum;
+import cn.hsa.exception.BizRtException;
+import cn.hsa.exception.InsureExecCodesEnum;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
@@ -254,12 +257,12 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     }
 
     @Override
-    public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO,Map<String, Object> emrMap) {
+    public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
         inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
 
-
+        Map<String, Object> emrMap = new HashMap<>();
 
         commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
         //先删除后新增
@@ -300,6 +303,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
 
     @Override
     public void updateInsureUnifiedEmrUpload(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new BizRtException(InsureExecCodesEnum.PARAM_CHANGE_ERROR,new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"visitId就医流水号"});
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new BizRtException(InsureExecCodesEnum.PARAM_CHANGE_ERROR,new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"mdtrtId医保就诊id"});
+        }
+
         String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
         String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
         String hospCode = insureEmrUnifiedDTO.getHospCode();
@@ -311,12 +321,12 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
-
+        paramMap.put("hospCode", hospCode);
         InsureEmrDetailDTO insureEmrDetailDTO = queryInsureUnifiedEmrDetail(insureEmrUnifiedDTO);
         paramMap.put("insureEmrDetailDTO", insureEmrDetailDTO);
 
         //参数校验,规则校验和请求初始化
-        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INSUR_EMR_UPLOAD.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         interfaceParamDTO.setHospCode(hospCode);
         interfaceParamDTO.setIsHospital(Constants.SF.S);
@@ -325,12 +335,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         insureItfBO.executeInsur(FunctionEnum.INSUR_EMR_UPLOAD, interfaceParamDTO);
 
         //2.修改状态
-        Map<String, Object> updateMap = new HashMap<>();
-        updateMap.put("mdtrtSn",mdtrtSn);
-        updateMap.put("mdtrtId",mdtrtId);
-        updateMap.put("status","2");
-        updateMap.put("uploadTime",new Date());
-        insureEmrAdminfoDAO.updateSelective(updateMap);
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrDetailDTO.getInsureEmrAdminfoDTO();
+        insureEmrAdminfoDTO.setStatu("2");
+        insureEmrAdminfoDTO.setUploadTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+        insureEmrAdminfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+        insureEmrAdminfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrAdminfoDTO)));
     }
 
     /**

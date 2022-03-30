@@ -54,7 +54,8 @@ public class InsureItfBOImpl {
         params.put("visitId", interfaceParamDTO.getVisitId());
         params.put("isHospital", interfaceParamDTO.getIsHospital());
 
-        params.put("paramMapJson", JSON.toJSONString(interfaceParamDTO));
+        String paramMapJson = JSON.toJSONString(interfaceParamDTO);
+        params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 5000 ? paramMapJson.substring(0, 4500) : paramMapJson);
         //请求医保接口日志记录
         logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), JSON.toJSONString(interfaceParamDTO));
         try {

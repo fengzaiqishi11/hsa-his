@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * stro_invoicing_monthly
+ * stro_invoicing_monthly_detail
  * @author 
  */
 @Data
@@ -20,8 +19,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
-    private static final long serialVersionUID = -25477061965976799L;
+public class StroInvoicingMonthlyDetailDO implements Serializable {
     /**
      * 主键
      */
@@ -310,11 +308,12 @@ public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
     private BigDecimal inSalesNum;
 
     /**
+     * 月度进销存主表id
+     */
+    private String monthlyId;
+    /**
      * 是药房还是药库的进销存（1：药库，2：药房）
      */
     private String stroPhar;
-    /**
-     * 更新时间
-     */
-    private Date modifyTime;
+    private static final long serialVersionUID = 1L;
 }

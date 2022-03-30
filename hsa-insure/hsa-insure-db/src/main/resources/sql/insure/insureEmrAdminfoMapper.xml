@@ -223,6 +223,11 @@
       <if test="certno != null and certno != '' ">
         and c.aac002 = #{certno}
       </if>
+      <if test="keyword != null and keyword != '' ">
+        and (c.aac002 like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        or t.visit_no like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        )
+      </if>
       <if test="uploadStatu != null and uploadStatu != '' ">
         and a.statu = #{uploadStatu}
       </if>

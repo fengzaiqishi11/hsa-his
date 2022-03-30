@@ -24,10 +24,6 @@ public class InsureEmrAdminfoDO extends PageDO implements Serializable {
      */
     private Long uuid;
     /**
-     * 就医流水号,院内唯一号
-     */
-    private String mdtrtSn;
-    /**
      * 医保病人必填,医保就诊ID
      */
     private String mdtrtId;

@@ -126,8 +126,12 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrAdminfoDTO.getUuid() == null){
                 insureEmrAdminfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrAdminfoDTO.setSource("2");
+            insureEmrAdminfoDTO.setStatu("1");
+            insureEmrAdminfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrAdminfoDAO.insert(insureEmrAdminfoDTO);
         }else {
+            insureEmrAdminfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrAdminfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrAdminfoDTO)));
         }
         return  insureEmrAdminfoDTO;
@@ -141,8 +145,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrDiseinfoDTO.getUuid() == null){
                 insureEmrDiseinfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrDiseinfoDTO.setSource("2");
+            insureEmrDiseinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDiseinfoDAO.insert(insureEmrDiseinfoDTO);
         }else {
+            insureEmrDiseinfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDiseinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDiseinfoDTO)));
         }
         return  insureEmrDiseinfoDTO;
@@ -156,8 +163,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrCoursrinfoDTO.getUuid() == null){
                 insureEmrCoursrinfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrCoursrinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            insureEmrCoursrinfoDTO.setSource("2");
             insureEmrCoursrinfoDAO.insert(insureEmrCoursrinfoDTO);
         }else {
+            insureEmrCoursrinfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrCoursrinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrCoursrinfoDTO)));
         }
         return  insureEmrCoursrinfoDTO;
@@ -171,8 +181,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrOprninfoDTO.getUuid() == null){
                 insureEmrOprninfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrOprninfoDTO.setSource("2");
+            insureEmrOprninfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrOprninfoDAO.insert(insureEmrOprninfoDTO);
         }else {
+            insureEmrOprninfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrOprninfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrOprninfoDTO)));
         }
         return  insureEmrOprninfoDTO;
@@ -186,8 +199,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrRescinfoDTO.getUuid() == null){
                 insureEmrRescinfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrRescinfoDTO.setSource("2");
+            insureEmrRescinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrRescinfoDAO.insert(insureEmrRescinfoDTO);
         }else {
+            insureEmrRescinfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrRescinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrRescinfoDTO)));
         }
         return  insureEmrRescinfoDTO;
@@ -201,8 +217,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrDieinfoDTO.getUuid() == null){
                 insureEmrDieinfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrDieinfoDTO.setSource("2");
+            insureEmrDieinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDieinfoDAO.insert(insureEmrDieinfoDTO);
         }else {
+            insureEmrDieinfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDieinfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDieinfoDTO)));
         }
         return  insureEmrDieinfoDTO;
@@ -216,8 +235,11 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             if(insureEmrDscginfoDTO.getUuid() == null){
                 insureEmrDscginfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            insureEmrDscginfoDTO.setSource("2");
+            insureEmrDscginfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDscginfoDAO.insert(insureEmrDscginfoDTO);
         }else {
+            insureEmrDscginfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
             insureEmrDscginfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureEmrDscginfoDTO)));
         }
         return  insureEmrDscginfoDTO;

@@ -55,7 +55,7 @@ public class InsureEmrDieinfoDTO extends InsureEmrDieinfoDO implements Serializa
     /**
      * 入院时间
      */
-    private Date admTime;
+    private String admTime;
     /**
      * 入院诊断编码
      */
@@ -71,7 +71,7 @@ public class InsureEmrDieinfoDTO extends InsureEmrDieinfoDO implements Serializa
     /**
      * 死亡时间
      */
-    private Date dieTime;
+    private String dieTime;
     /**
      * 直接死亡原因名称
      */
@@ -123,11 +123,11 @@ public class InsureEmrDieinfoDTO extends InsureEmrDieinfoDO implements Serializa
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

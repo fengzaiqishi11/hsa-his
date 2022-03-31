@@ -17,6 +17,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -201,12 +202,11 @@ public class InsureUnifiedEmrController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateInsureUnifiedEmrUpload")
-    public WrapperResponse updateInsureUnifiedEmrUpload(@RequestBody InsureEmrUnifiedDTO insureEmrUnifiedDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse updateInsureUnifiedEmrUpload(@RequestBody List<InsureEmrUnifiedDTO> insureEmrUnifiedDTOList, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
-        insureEmrUnifiedDTO.setHospCode(sysUserDTO.getHospCode());
-        map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
+        map.put("insureEmrUnifiedDTOList",insureEmrUnifiedDTOList);
         insureUnifiedEmrService_comsumer.updateInsureUnifiedEmrUpload(map);
         return WrapperResponse.success("上传成功");
     }

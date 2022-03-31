@@ -1199,6 +1199,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         Map map = new HashMap();
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("visitId", inptVisitDTO.getVisitId());
+        inptVisitDTO.setId(inptVisitDTO.getVisitId());
         inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
         map.put("deptId",inptVisitDTO.getInDeptId());
         inptVisitDTO.setVisitId(inptVisitDTO.getId());
@@ -1266,40 +1267,42 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             emrDieReMap = new HashMap<>(); // 死亡记录
             emrOutReMap = new HashMap<>(); // 出院小结
             insureTypeCode = MapUtils.get(map, "insureTypeCode");
-            JSONObject jsonObject = JSONObject.parseObject(MapUtils.get(map, "emrJson"));
-            // 2.去寻找与医保关联匹配的字段信息
-            for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
-                // his的电子病历元素
-                String hisEmrCode = emrElementMatchDO.getEmrElementCode();
-                // 对应的医保节点字段
-                String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
-                // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
-                if (jsonObject.containsKey(hisEmrCode)) {
-                    String emrValue = delHTMLTag(jsonObject.get(hisEmrCode).toString());
-                    switch (insureTypeCode) {
-                        case Constants.BLLX.YYJL: // 入院记录
-                            emrInReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.HLJLD: // 护理记录单
-                            emrInReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.BCJL: // 病程记录
-                            emrCoReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.SSJL: // 手术记录
-                            emrOpReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.BQQJ: // 抢救记录
-                            emrRescReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.SWJL: // 死亡记录
-                            emrDieReMap.put(insureEmrCode, emrValue);
-                            break;
-                        case Constants.BLLX.CYXJ: // 出院小结
-                            emrOutReMap.put(insureEmrCode, emrValue);
-                            break;
-                        default:
-                            break;
+            if (StringUtils.isNotEmpty(insureTypeCode)) {
+                JSONObject jsonObject = JSONObject.parseObject(MapUtils.get(map, "emrJson"));
+                // 2.去寻找与医保关联匹配的字段信息
+                for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
+                    // his的电子病历元素
+                    String hisEmrCode = emrElementMatchDO.getEmrElementCode();
+                    // 对应的医保节点字段
+                    String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
+                    // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
+                    if (jsonObject.containsKey(hisEmrCode)) {
+                        String emrValue = delHTMLTag(jsonObject.get(hisEmrCode).toString());
+                        switch (insureTypeCode) {
+                            case Constants.BLLX.YYJL: // 入院记录
+                                emrInReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.HLJLD: // 护理记录单
+                                emrInReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.BCJL: // 病程记录
+                                emrCoReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.SSJL: // 手术记录
+                                emrOpReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.BQQJ: // 抢救记录
+                                emrRescReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.SWJL: // 死亡记录
+                                emrDieReMap.put(insureEmrCode, emrValue);
+                                break;
+                            case Constants.BLLX.CYXJ: // 出院小结
+                                emrOutReMap.put(insureEmrCode, emrValue);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
@@ -1321,7 +1324,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         }
         insureEmrInfo = new HashMap<>();
         insureEmrInfo.put("adminfo", emrInReMap);
-        insureEmrInfo.put("coursrinfo", emrRescReList);
+        insureEmrInfo.put("coursrinfo", emrCoReList);
         insureEmrInfo.put("oprninfo", emrOpReList);
         insureEmrInfo.put("rescinfo", emrRescReList);
         insureEmrInfo.put("dieinfo", emrDieReList);

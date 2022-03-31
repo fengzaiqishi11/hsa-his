@@ -1,7 +1,9 @@
 package cn.hsa.insure.unifiedpay.util.outptbusiness;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +17,15 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.OUTPT.UP_4301)
-public class OutptDiagTreatRecordReqUtil<T> implements BaseReqUtil<T> {
+public class OutptDiagTreatRecordReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
         checkRequest(map);
-        return paramJson;
+        map.put("infno",Constant.UnifiedPay.OUTPT.UP_4301);
+        return getInsurCommonParam(map);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package cn.hsa.insure.unifiedpay.util.otherinfo;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import com.alibaba.fastjson.JSON;
@@ -18,10 +20,10 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_1901)
-public class InsurDictReqUtil<T> implements BaseReqUtil<T> {
+public class InsurDictReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
 
@@ -30,7 +32,8 @@ public class InsurDictReqUtil<T> implements BaseReqUtil<T> {
         dataMap.put("date", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_DH_M_S));
 
         checkRequest(dataMap);
-        return JSON.toJSONString(dataMap);
+        map.put("infno",Constant.UnifiedPay.REGISTER.UP_1901);
+        return getInsurCommonParam(map);
     }
 
     @Override

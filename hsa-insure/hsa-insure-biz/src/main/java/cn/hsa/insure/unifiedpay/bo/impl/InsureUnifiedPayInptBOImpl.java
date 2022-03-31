@@ -1006,7 +1006,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 Map<String,Object> acctPayMap = null;
                 if("settle".equals(action)) {
                     Map<String,Object> paramAcctMap = new HashMap<>();
-                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY");
+                    paramAcctMap.put("code","HN_INSURE_ACCT_PAY"); // 此参数不需要配置
                     paramAcctMap.put("hospCode",hospCode);
                     SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramAcctMap).getData();
                     if(data !=null && Constants.SF.S.equals(data.getValue())){
@@ -1016,7 +1016,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         settleDataMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
                         settleDataMap.put("INSURE_ACCT_PAY_PARAM",data.getValue());
                         settleDataMap.put("acct_used_flag",insureAccoutFlag);
-                        settleDataMap.put("regCode",insureConfigurationDTO.getRegCode());
+                        settleDataMap.put("orgCode",insureConfigurationDTO.getRegCode());
                         acctPayMap = handlerAcctPayBalance(settleDataMap);
                     }
                     settleDataMap.put("action","settle");
@@ -1060,7 +1060,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         BigDecimal decimal = BigDecimalUtils.convert(string);
         if(BigDecimalUtils.greaterZero(decimal)){
             settleDataMap.put("insureSettleId",MapUtils.get(settleDataMap,"setl_id"));
-            Map<String, Object> dataMap = insureUnifiedBaseService.queryBalanceCountDecrease(settleDataMap).getData();
+            Map<String, Object> dataMap = insureUnifiedBaseService.updateBalanceCountDecrease(settleDataMap).getData();
             balanceDataMap = MapUtils.get(dataMap,"result");
         }
         return balanceDataMap;

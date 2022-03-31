@@ -452,8 +452,8 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
      * @Return
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> queryBalanceCountDecrease(Map<String, Object> map) {
-        return  WrapperResponse.success(insureUnifiedBaseBO.queryBalanceCountDecrease(map));
+    public WrapperResponse<Map<String, Object>> updateBalanceCountDecrease(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.updateBalanceCountDecrease(map));
     }
 
     /**

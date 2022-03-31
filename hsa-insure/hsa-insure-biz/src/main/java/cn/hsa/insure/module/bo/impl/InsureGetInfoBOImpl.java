@@ -3,6 +3,8 @@ package cn.hsa.insure.module.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
@@ -71,6 +73,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Resource
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
 
+    @Resource
+    private InsureItfBOImpl insureItfBO;
 
     /**
      * @Method getSettleInfo
@@ -96,6 +100,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (insureConfigurationDTO == null) {
             throw new AppException("根据" + insureRegCode + "医保机构编码获取医保机构配置信息为空");
         }
+
+//        Map<String, Object> paramMap = new HashMap<>();
+//        paramMap.putAll(map);
+//
+//        // 参保地医保区划
+//        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
+//        paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
+//        paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
+//        paramMap.put("insureIndividualVisit", insureIndividualVisitDTO);
+//        paramMap.put("isHospital", Constants.SF.F);
+        // 调用统一支付平台接口
+
+
+//        Map<String,Object> resultDataMap = insureItfBO.executeInsur(FunctionEnum.getEnum(functionCode), paramMap);
         Map listMap = new HashMap();
         String functionCode =  selectParamSettleInfo(map);
         if(StringUtils.isEmpty(functionCode)){
@@ -174,27 +192,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private Map<String,Object> selectBaseSetlInfo(Map<String, Object> map) {
         InsureSettleInfoDTO settleInfoDTO = insureGetInfoDAO.selectBaseSetlInfo(map);
-        // 结算清单信息
+        // 湖南 结算清单信息
         Map setlinfo = new HashMap();
-        setlinfo.put("mdtrt_id", settleInfoDTO.getMdtrtId()); // 就医登记号
         setlinfo.put("psn_no", settleInfoDTO.getHiNo()); // 个人电脑号
+        setlinfo.put("mdtrt_id", settleInfoDTO.getMdtrtId()); // 就医登记号
         setlinfo.put("setl_id", settleInfoDTO.getInsureSettleId()); // 结算ID
-        setlinfo.put("insuplc",settleInfoDTO.getInsuplc());
-        setlinfo.put("fixmedins_name", settleInfoDTO.getFixmedinsName()); // 定点医药机构名称
-        setlinfo.put("fixmedins_code", settleInfoDTO.getFixmedinsCode()); // 定点医药机构编号
-        setlinfo.put("hi_setl_lv", settleInfoDTO.getHiSetlLv());//医保结算等级
         setlinfo.put("hi_no", settleInfoDTO.getHiNo()); //医保编号
         setlinfo.put("medcasno", settleInfoDTO.getMedcasno()); // 病案号
-        setlinfo.put("dcla_time", DateUtils.format(settleInfoDTO.getDclaTime(),DateUtils.Y_M_DH_M_S)); //结算清单申报时间
-        setlinfo.put("psn_name", settleInfoDTO.getPsnName());// 人员姓名
-        setlinfo.put("gend", settleInfoDTO.getGend());// 性别
-        setlinfo.put("brdy", DateUtils.format(settleInfoDTO.getBrdy(),DateUtils.Y_M_DH_M_S)); // 出生日期
-        setlinfo.put("age", settleInfoDTO.getAge()); // 年龄
-        setlinfo.put("ntly", settleInfoDTO.getNtly()); // 国籍
-        setlinfo.put("nwb_age", settleInfoDTO.getNebAge()); // （年龄不足1周岁）年龄
-        setlinfo.put("naty", settleInfoDTO.getNaty()); // 民族
-        setlinfo.put("patn_cert_type", settleInfoDTO.getPatnCertType()); // 患者证件类别
-        setlinfo.put("certno", settleInfoDTO.getCertNo()); // 证件号码
+        setlinfo.put("dcla_time", DateUtils.format(settleInfoDTO.getDclaTime(),DateUtils.Y_M_D)); //结算清单申报时间
+
+        setlinfo.put("ntly", "CHN"); // 国籍  默认是中国
+
         setlinfo.put("prfs", settleInfoDTO.getPrfs()); // 职业
         setlinfo.put("curr_addr", settleInfoDTO.getAddress()); // 现住址
         setlinfo.put("emp_name", settleInfoDTO.getWork()); // 工作单位 *******
@@ -205,42 +213,40 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("patn_rlts", settleInfoDTO.getPatnRlts()); // 与患者关系
         setlinfo.put("coner_addr", settleInfoDTO.getConerAddr()); // 联系人地址
         setlinfo.put("coner_tel", settleInfoDTO.getConerTel()); // 联系人电话
-        setlinfo.put("hi_type", settleInfoDTO.getHiType()); // 医保类型  也就是险种   sp_psn_type
-        setlinfo.put("insuplc", settleInfoDTO.getInsuplc()); // 参保地 *******
-        setlinfo.put("sp_psn_type", settleInfoDTO.getSpPsnType()); // 特殊人员类型
-        setlinfo.put("nwb_adm_type", settleInfoDTO.getNebAdmType()); // 新生儿入院类型
-        setlinfo.put("nwb_bir_wt", settleInfoDTO.getBabyBirthWeight()); // 新生儿出生体重
-        setlinfo.put("nwb_adm_wt", settleInfoDTO.getBabyInWeight()); // 新生儿入院体重
+
+        setlinfo.put("nwb_admtype", settleInfoDTO.getNebAdmType()); // 新生儿入院类型
+        setlinfo.put("nwbbirwt", settleInfoDTO.getBabyBirthWeight()); // 新生儿出生体重
+        setlinfo.put("nwbadmwt", settleInfoDTO.getBabyInWeight()); // 新生儿入院体重
+
         setlinfo.put("opsp_diag_caty", settleInfoDTO.getVisitDrptName()); // 诊断科别 *******
         setlinfo.put("opsp_mdtrt_date", settleInfoDTO.getOpspMdtrtDate()); // 就诊日期 *******
-        setlinfo.put("ipt_med_type", settleInfoDTO.getIptMedType()); // 住院医疗类型
+
         setlinfo.put("adm_way", settleInfoDTO.getInWay()); // 入院途径 *******
         setlinfo.put("trt_type", settleInfoDTO.getTrtType()); // 治疗类别 *******
-        setlinfo.put("adm_time", settleInfoDTO.getAdmTime()); // 入院时间 *******
-        setlinfo.put("adm_caty", settleInfoDTO.getAdmCaty()); // 入院科别
+        setlinfo.put("adm_time", DateUtils.format(settleInfoDTO.getAdmTime(),DateUtils.Y_M_DH_M_S)); // 入院时间 *******
+
         setlinfo.put("refldept_dept", settleInfoDTO.getRefldeptDept()); // 转科科别
-        setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
+
         setlinfo.put("dscg_time", DateUtils.format(settleInfoDTO.getDscgTime(),DateUtils.Y_M_DH_M_S)); // 出院时间 *******
-        setlinfo.put("act_ipt_days", settleInfoDTO.getActIptDays()); // 实际住院天数 *******
+        setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
+
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
         setlinfo.put("wm_dise_code", settleInfoDTO.getWmDiswCode()); // 西医诊断疾病代码 *******
-        setlinfo.put("otp_tcm_dise", settleInfoDTO.getOptTcmDise()); // 门（急）诊中医诊断 *******
-        setlinfo.put("tcm_dise_code", settleInfoDTO.getTcmDiseCode()); // 中医诊断代码 *******
-        setlinfo.put("diag_code_cnt", settleInfoDTO.getDiagCodeCnt()); // 诊断代码计数 *******
-        setlinfo.put("oprn_oprt_code_cnt", settleInfoDTO.getOprnOprtCodeCnt()); // 手术操作代码计数 *******
+
+        setlinfo.put("otptcmdise", settleInfoDTO.getOptTcmDise()); // 门（急）诊中医诊断 *******
+        setlinfo.put("tcmdisecode", settleInfoDTO.getTcmDiseCode()); // 中医诊断代码 *******
+
         setlinfo.put("vent_used_dura", settleInfoDTO.getVentUsedDura()); // 呼吸机使用时长 *******
         setlinfo.put("pwcry_bfadm_coma_dura", settleInfoDTO.getPwcryBfadmComaDura()); // 颅脑损伤患者入院前昏迷时长 *******
         setlinfo.put("pwcry_afadm_coma_dura", settleInfoDTO.getPwcryAfadmComaDura()); //颅脑损伤患者入院后昏迷时长
-        setlinfo.put("bld_cat", settleInfoDTO.getBldCat()); //输血品种
-        setlinfo.put("bld_amt", settleInfoDTO.getBldAmt()); //输血量
-        setlinfo.put("bld_unt", settleInfoDTO.getBldUnt()); //输血计量单位
-        setlinfo.put("spgaNurscare_Days", settleInfoDTO.getSpgaNurscareDays()); // 特级护理天数 *******
-        setlinfo.put("lv1Nurscare_Days", settleInfoDTO.getLv1NurscareDays()); // 一级护理天数 *******
-        setlinfo.put("scdNurscare_Days", settleInfoDTO.getScdNurscareDays()); // 二级护理天数 *******
-        setlinfo.put("lv3Nursecare_Days", settleInfoDTO.getLv3NursecareDays()); // 三级护理天数 *******
+
+        setlinfo.put("lv1_nurscare_days", settleInfoDTO.getLv1NurscareDays()); // 一级护理天数 *******
+        setlinfo.put("scd_nurscare_days", settleInfoDTO.getScdNurscareDays()); // 二级护理天数 *******
+        setlinfo.put("lv3_nursecare_days", settleInfoDTO.getLv3NursecareDays()); // 三级护理天数 *******
         setlinfo.put("dscg_way", settleInfoDTO.getDscgWay()); // 离院方式*******
         setlinfo.put("acp_medins_name", settleInfoDTO.getAcpMedinsName()); // 拟接收机构名称 *******
         setlinfo.put("acp_medins_code", settleInfoDTO.getAcpMedinsName()); // 拟接收机构代码 ******
+
         setlinfo.put("bill_code", settleInfoDTO.getBillCode()); // 票据代码**********
         setlinfo.put("bill_no", settleInfoDTO.getBillNo()); // 票据号码**********
         setlinfo.put("biz_sn", settleInfoDTO.getBizSn()); // 业务流水号
@@ -250,16 +256,57 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("chfpdr_code", settleInfoDTO.getChfpdrCode()); // 主诊医生代码 *******
         setlinfo.put("setl_begn_date", DateUtils.format(settleInfoDTO.getSetlBegnDate(),DateUtils.Y_M_DH_M_S)); // 结算开始日期
         setlinfo.put("setl_end_date", DateUtils.format(settleInfoDTO.getSetlEnDate(),DateUtils.Y_M_DH_M_S)); // 结算结束日期
+
+        setlinfo.put("medins_fill_dept", settleInfoDTO.getMedinsFillDept()); // 医疗机构填报部门
+        setlinfo.put("medins_fill_psn", settleInfoDTO.getMedinsFillPsn()); // 医疗机构填报人
+        setlinfo.put("resp_nurs_code", settleInfoDTO.getZrNurseCode()); // 责任护士
+
+        setlinfo.put("stas_type", ""); // 医保支付方式
+
+        setlinfo.put("hi_paymtd", settleInfoDTO.getHiPaymtd()); // 医保支付方式
+
+
+        //甘肃 江西
+        setlinfo.put("fixmedins_name", settleInfoDTO.getFixmedinsName()); // 定点医药机构名称
+        setlinfo.put("fixmedins_code", settleInfoDTO.getFixmedinsCode()); // 定点医药机构编号
+        setlinfo.put("hi_setl_lv", settleInfoDTO.getHiSetlLv());//医保结算等级
+        setlinfo.put("psn_name", settleInfoDTO.getPsnName());// 人员姓名
+
+        setlinfo.put("gend", settleInfoDTO.getGend());// 性别
+        setlinfo.put("brdy", DateUtils.format(settleInfoDTO.getBrdy(),DateUtils.Y_M_D)); // 出生日期
+        setlinfo.put("age", settleInfoDTO.getAge()); // 年龄
+        setlinfo.put("nwb_age", settleInfoDTO.getNebAge()); // （年龄不足1周岁）年龄
+        setlinfo.put("naty", settleInfoDTO.getNaty()); // 民族
+        setlinfo.put("patn_cert_type", settleInfoDTO.getPatnCertType()); // 患者证件类别
+        setlinfo.put("certno", settleInfoDTO.getCertNo()); // 证件号码
+        setlinfo.put("hi_type", settleInfoDTO.getHiType()); // 医保类型  也就是险种   sp_psn_type
+        setlinfo.put("insuplc", settleInfoDTO.getInsuplc()); // 参保地 *******
+        setlinfo.put("sp_psn_type", settleInfoDTO.getSpPsnType()); // 特殊人员类型
+
+        setlinfo.put("nwb_adm_type", settleInfoDTO.getNebAdmType()); // 新生儿入院类型
+        setlinfo.put("nwb_bir_wt", settleInfoDTO.getBabyBirthWeight()); // 新生儿出生体重
+        setlinfo.put("nwb_adm_wt", settleInfoDTO.getBabyInWeight()); // 新生儿入院体重
+        setlinfo.put("ipt_med_type", settleInfoDTO.getIptMedType()); // 住院医疗类型
+
+        setlinfo.put("adm_caty", settleInfoDTO.getAdmCaty()); // 入院科别
+        setlinfo.put("act_ipt_days", settleInfoDTO.getActIptDays()); // 实际住院天数 *******
+        setlinfo.put("otp_tcm_dise", settleInfoDTO.getOptTcmDise()); // 门（急）诊中医诊断 *******
+        setlinfo.put("tcm_dise_code", settleInfoDTO.getTcmDiseCode()); // 中医诊断代码 *******
+        setlinfo.put("diag_code_cnt", settleInfoDTO.getDiagCodeCnt()); // 诊断代码计数 *******
+        setlinfo.put("oprn_oprt_code_cnt", settleInfoDTO.getOprnOprtCodeCnt()); // 手术操作代码计数 *******
+        setlinfo.put("bld_cat", settleInfoDTO.getBldCat()); //输血品种
+        setlinfo.put("bld_amt", settleInfoDTO.getBldAmt()); //输血量
+        setlinfo.put("bld_unt", settleInfoDTO.getBldUnt()); //输血计量单位
+        setlinfo.put("spga_nurscare_days", settleInfoDTO.getSpgaNurscareDays()); // 特级护理天数 *******
+
         setlinfo.put("psn_selfpay", settleInfoDTO.getPsnSelfpay()); // 个人自付
         setlinfo.put("psn_ownpay",settleInfoDTO.getPsnOwnpay()); // 个人自费
         setlinfo.put("acct_pay", settleInfoDTO.getAcctPay()); // 个人账户支出
         setlinfo.put("psn_cashpay", settleInfoDTO.getPsnCashpay()); // 个人现金支付
-        setlinfo.put("hi_paymtd", settleInfoDTO.getHiPaymtd()); // 医保支付方式
+
         setlinfo.put("hsorg", settleInfoDTO.getHsorg()); // 医保机构
         setlinfo.put("hsorg_opter",settleInfoDTO.getHosrgOpter()); // 医保机构经办人
-        setlinfo.put("medins_fill_dept", settleInfoDTO.getMedinsFillDept()); // 医疗机构填报部门
-        setlinfo.put("medins_fill_psn", settleInfoDTO.getMedinsFillPsn()); // 医疗机构填报人
-        setlinfo.put("resp_nurs_code", settleInfoDTO.getZrNurseCode()); // 责任护士
+
         return setlinfo;
     }
 
@@ -354,9 +401,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private Object selectPayInfo(Map<String, Object> map) {
         List<Map<String, Object>> mapList = insureGetInfoDAO.selectHanderPayInfo(map);
-        if(ListUtils.isEmpty(mapList)){
-            throw new AppException("医疗保障基金结算清单上传时,基金支付信息节点入参为空");
-        }
         return mapList ;
     }
 
@@ -482,7 +526,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         String acctPay = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"acct_pay"));
         String cashPayamt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap,"cash_payamt"));
-        BigDecimal psnOwnpay = BigDecimalUtils.add(fulamtOwnpayAmt, overlmtSelfpay);
+
+        //修复bug 人自费金额算上了超限额自付的金额
+//        BigDecimal psnOwnpay = BigDecimalUtils.add(fulamtOwnpayAmt, overlmtSelfpay);
+        BigDecimal psnOwnpay = new BigDecimal(fulamtOwnpayAmt);
 
         setlinfo.put("psnOwnpay", psnOwnpay); // 个人自费
         setlinfo.put("acctPay", BigDecimalUtils.convert(acctPay)); // 个人账户支出
@@ -776,6 +823,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 date.setTime(MapUtils.get(setlInfoMap,"admTime"));
                 setlInfoMap.put("admTime",simpleDateFormat.format(date)); // 入院时间
             }
+
+            // update by qiang.fan
             if( MapUtils.get(setlInfoMap,"trtType") !=null){
                 String trtType = MapUtils.get(setlInfoMap,"trtType").toString();
                 if("1".equals(trtType)){
@@ -1157,7 +1206,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("opspDiagCaty",  null); // 门诊慢特病诊断科别 *******
             setlinfo.put("admCaty", MapUtils.get(baseInfoMap,"inDeptNatinCode")); // 入院科别
         }
-        setlinfo.put("iptMedTpe", "1"); // 住院医疗类型
+        setlinfo.put("iptMedType", "1"); // 住院医疗类型
         setlinfo.put("admWay", MapUtils.getMapVS(mriBaseInfo,"in_way",MapUtils.get(baseInfoMap,"adm_way"))); // 入院途径 *******
         setlinfo.put("trtType", "1"); // 治疗类别
         setlinfo.put("admTime", MapUtils.get(baseInfoMap,"inTime")); // 入院时间 *******
@@ -1199,15 +1248,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("bldCat", null); //输血品种
         setlinfo.put("bldAmt", null); //输血量
         setlinfo.put("bldUnt", null); //输血计量单位
+
         setlinfo.put("spgaNurscareDays",MapUtils.get(baseInfoMap,"spgaNurscareDays")); // 特级护理天数 *******
         setlinfo.put("lv1NurscareDays", MapUtils.get(baseInfoMap,"lv1NurscareDays")); // 一级护理天数 *******
         setlinfo.put("scdNurscareDays", MapUtils.get(baseInfoMap,"scdNurscareDays")); // 二级护理天数 *******
-        Object nursecareDays = MapUtils.get(baseInfoMap, "lv3NursecareDays");
-        if(nursecareDays == null){
-            setlinfo.put("lv3NurscareDays",0); // 三级护理天数 *******
-        }else{
-            setlinfo.put("lv3NurscareDays",MapUtils.get(baseInfoMap,"lv3NursecareDays")); // 三级护理天数 *******
-        }
+        setlinfo.put("lv3NurscareDays",MapUtils.get(baseInfoMap,"lv3NursecareDays")); // 三级护理天数 *******
+
         setlinfo.put("dscgWay",MapUtils.get(baseInfoMap,"out_mode_code")); // 离院方式 *******
         setlinfo.put("acpMedinsName", ""); // 拟接收机构名称 *******
         setlinfo.put("acpMedinsCode", ""); // 拟接收机构代码 ******

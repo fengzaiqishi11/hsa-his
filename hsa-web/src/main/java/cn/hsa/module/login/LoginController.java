@@ -62,7 +62,8 @@ public class LoginController extends BaseController {
     private static final int PWD_ERROR_CNT = 5;
     @Value("${rsa.private.key}")
     private String privateKey;
-
+    @Resource
+    private AuthCodeVerifier authCodeVerifier;
     private final ReentrantLock rnLock = new ReentrantLock(true);
     @Resource
     private RedisUtils redisUtils;
@@ -93,15 +94,7 @@ public class LoginController extends BaseController {
         try {
             //校验验证码
             String authCodeSession = getAndRemoveSession(req, res);
-            // 验证码已失效
-            if (StringUtils.isEmpty(authCodeSession)) {
-                throw new AppException("验证码已失效");
-            }
-
-            // 验证码错误
-            if (!authCode.equalsIgnoreCase(authCodeSession)) {
-                throw new AppException("验证码错误");
-            }
+            authCodeVerifier.verifyAuthCode(authCodeSession,authCode);
             // 解密医院编码
             try {
                 hospCode = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);

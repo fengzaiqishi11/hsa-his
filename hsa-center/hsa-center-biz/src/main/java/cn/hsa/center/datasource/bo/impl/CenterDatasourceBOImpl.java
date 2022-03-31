@@ -317,6 +317,11 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
         return WrapperResponse.success("同步成功!", null);
     }
 
+    @Override
+    public void addDataUser(CenterHospitalDTO centerHospitalDTO) {
+        centerDatasourceDAO.addDataUser(centerHospitalDTO);
+    }
+
     //根据数据库配置操作表
     private void tableStructureSyncByHospCode(CenterDatasourceDTO centerDatasourceDTO, TableStructureSyncDTO tableStructureSyncDTO,List<String> dataSoureIds) {
         if(centerDatasourceDTO == null ){

@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.config.bo.CenterGlobalConfigBO;
 import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
 import cn.hsa.module.center.config.service.CenterGlobalConfigService;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -64,5 +65,16 @@ public class CenterGlobalConfigServiceImpl extends HsafService implements Center
     public WrapperResponse<CenterGlobalConfigDTO> getGlobalConfigById(String id) {
         log.info("获取id为 {} 的全局配置信息",id);
         return WrapperResponse.success(centerGlobalConfigBO.getGlobalConfigById(id));
+    }
+
+    /**
+     * 获取中心端系统参数
+     *
+     * @param codeName  参数代码
+     * @return
+     */
+    @Override
+    public WrapperResponse<CenterParameterDTO> getParameterByCode(String codeName) {
+        return WrapperResponse.success(centerGlobalConfigBO.getParameterByCode(codeName));
     }
 }

@@ -349,7 +349,7 @@ public interface InsureUnifiedBaseService {
      * @Date   2022/3/15 15:33
      * @Return
      **/
-    WrapperResponse<Map<String, Object>> queryBalanceCountDecrease(Map<String, Object> map);
+    WrapperResponse<Map<String, Object>> updateBalanceCountDecrease(Map<String, Object> map);
 
     /**
      * @Method queryBalanceCount

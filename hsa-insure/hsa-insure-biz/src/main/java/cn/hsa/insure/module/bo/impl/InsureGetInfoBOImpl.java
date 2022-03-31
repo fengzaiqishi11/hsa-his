@@ -826,16 +826,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
             // update by qiang.fan
             if( MapUtils.get(setlInfoMap,"trtType") !=null){
-//                String trtType = MapUtils.get(setlInfoMap,"trtType").toString();
-//                if("1".equals(trtType)){
-//                    setlInfoMap.put("trtType","10"); // 西医
-//                }else if("2.1".equals(trtType)){
-//                    setlInfoMap.put("trtType","21"); // 中医
-//                }else if("2.2".equals(trtType)){
-//                    setlInfoMap.put("trtType","22"); // 民族医
-//                }else{
-//                    setlInfoMap.put("trtType","30"); // 中西医
-//                }
+                String trtType = MapUtils.get(setlInfoMap,"trtType").toString();
+                if("1".equals(trtType)){
+                    setlInfoMap.put("trtType","10"); // 西医
+                }else if("2.1".equals(trtType)){
+                    setlInfoMap.put("trtType","21"); // 中医
+                }else if("2.2".equals(trtType)){
+                    setlInfoMap.put("trtType","22"); // 民族医
+                }else{
+                    setlInfoMap.put("trtType","30"); // 中西医
+                }
             }
         }
         else{
@@ -1206,7 +1206,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("opspDiagCaty",  null); // 门诊慢特病诊断科别 *******
             setlinfo.put("admCaty", MapUtils.get(baseInfoMap,"inDeptNatinCode")); // 入院科别
         }
-        setlinfo.put("iptMedTpe", "1"); // 住院医疗类型
+        setlinfo.put("iptMedType", "1"); // 住院医疗类型
         setlinfo.put("admWay", MapUtils.getMapVS(mriBaseInfo,"in_way",MapUtils.get(baseInfoMap,"adm_way"))); // 入院途径 *******
         setlinfo.put("trtType", "1"); // 治疗类别
         setlinfo.put("admTime", MapUtils.get(baseInfoMap,"inTime")); // 入院时间 *******

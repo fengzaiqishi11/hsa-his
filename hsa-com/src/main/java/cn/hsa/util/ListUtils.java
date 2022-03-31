@@ -1,5 +1,7 @@
 package cn.hsa.util;
 
+import com.alibaba.fastjson.JSON;
+
 import java.util.*;
 
 /**
@@ -209,6 +211,18 @@ public class ListUtils {
     }
 
 
+    /**
+     * @Method copyList
+     * @Desrciption 复制list,从List<A> 到List<B>
+     * @Param [list, clazz]
+     * @Author zhangguorui
+     * @Date   2022/3/29 16:48
+     * @Return java.util.List<T>
+     */
+    public static <T> List<T> copyList(List<?> list,Class<T> clazz){
+        String oldOb = JSON.toJSONString(list);
+        return JSON.parseArray(oldOb, clazz);
+    }
 
 }
 

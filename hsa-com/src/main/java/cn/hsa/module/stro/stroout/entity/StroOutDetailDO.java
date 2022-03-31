@@ -67,6 +67,6 @@ public class StroOutDetailDO extends PageDO implements Serializable {
   //批号
   private String batchNo;
   //有效期
-  @JsonFormat(pattern = "yyyy-MM-dd")
+  @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
   private Date expiryDate;
 }

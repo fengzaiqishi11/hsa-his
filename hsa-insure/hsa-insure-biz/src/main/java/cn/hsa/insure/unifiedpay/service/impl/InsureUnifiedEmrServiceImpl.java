@@ -98,7 +98,11 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
         // 根据 his就诊id，医保登记id，人员编号
         // 查询 入院记录，诊断记录，病程记录，手术记录，抢救记录，死亡记录，出院小结
         // 组装 报文 调用医保接口
-        insureUnifiedEmrBO.updateInsureUnifiedEmrUpload(MapUtils.get(map,"insureEmrUnifiedDTO"));
+        List<InsureEmrUnifiedDTO> insureEmrUnifiedDTOList = MapUtils.get(map,"insureEmrUnifiedDTOList");
+        for(InsureEmrUnifiedDTO insureEmrUnifiedDTO:insureEmrUnifiedDTOList){
+            insureEmrUnifiedDTO.setHospCode(MapUtils.get(map,"hospCode").toString());
+            insureUnifiedEmrBO.updateInsureUnifiedEmrUpload(insureEmrUnifiedDTO);
+        }
     }
 
     @Override

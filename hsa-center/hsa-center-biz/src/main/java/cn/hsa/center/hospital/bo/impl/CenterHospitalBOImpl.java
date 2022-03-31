@@ -185,6 +185,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
         if(StringUtils.isEmpty(centerHospitalDTO.getId())){
             centerHospitalDTO.setId(SnowflakeUtils.getId());   // 设置主键id
             centerHospitalDTO.setCode(syncOrderRuleBO.updateOrderNo("YYBM"));
+            centerHospitalDTO.setAuditFlag("0");
             centerHospitalDTO.setCrteTime(DateUtils.getNow()); //设置操作时间
             centerHospitalDTO.setCrteId(centerHospitalDTO.getCrteId());     // 设置操作人id
             centerHospitalDTO.setCrteName(centerHospitalDTO.getCrteName()); // 设置操作人姓名
@@ -278,7 +279,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 }catch (Exception e){
                     e.printStackTrace();
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("新建医院数据库用户");
+                    centerSyncFlowDto.setMessage("新建医院数据库用户，原因："+e.getMessage());
                     throw new RuntimeException("新建医院数据库用户失败，原因："+e.getMessage());
                 }finally {
 
@@ -296,8 +297,8 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     centerHospitalDatasourceDO =  createDataSource (centerHospitalDTO,centerRootDatabaseBO);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("创建医院数据库信息操作失败");
-                    throw new RuntimeException("新建医院数据库信息失败!");
+                    centerSyncFlowDto.setMessage("创建医院数据库信息操作失败,原因："+e.getMessage());
+                    throw new RuntimeException("创建医院数据库信息失败!");
                 }finally {
 
                     centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -314,7 +315,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     linkDataSource(centerHospitalDatasourceDO);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("匹配医院数据源信息操作失败");
+                    centerSyncFlowDto.setMessage("匹配医院数据源信息操作失败,原因："+e.getMessage());
                     throw new RuntimeException("匹配医院数据源失败!");
                 }finally {
 
@@ -333,7 +334,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 }catch (Exception e){
                     e.printStackTrace();
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("下发医院基础数据操作失败");
+                    centerSyncFlowDto.setMessage("下发医院基础数据操作失败,原因："+e.getMessage());
                     throw new RuntimeException("下发匹配同步表失败!");
                 }finally {
 
@@ -351,7 +352,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     centerSyncFlowDtos.add(centerSyncFlowDto);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("操作失败");
+                    centerSyncFlowDto.setMessage("操作失败,原因："+e.getMessage());
                     throw new RuntimeException("全部完成失败!");
                 }finally {
                     centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -374,6 +375,11 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
     @Override
     public boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
+        if(StringUtils.isEmpty(centerRootDatabaseBO.getId())){
+            centerRootDatabaseBO.setId(SnowflakeUtils.getId());
+            return centerHospitalDao.insertRootBase(centerRootDatabaseBO);
+        }
+
         return centerHospitalDao.updateRootBase(centerRootDatabaseBO);
     }
 

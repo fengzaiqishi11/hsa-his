@@ -448,4 +448,27 @@
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
+    <select id="selectByHospIcdCode"  parameterType="cn.hsa.module.interf.outpt.dto.Mzzd" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        select
+            id,
+            hosp_code,
+            insure_reg_code,
+            hosp_illness_id,
+            hosp_illness_code,
+            hosp_illness_name,
+            insure_illness_id,
+            insure_illness_code,
+            insure_illness_name,
+            is_match,
+            is_trans,
+            audit_code,
+            remark,
+            crte_id,
+            crte_name,
+            crte_time
+        from insure_disease_match
+        where hosp_illness_code = #{icdcode}
+        and is_match = '1'
+    </select>
+
 </mapper>

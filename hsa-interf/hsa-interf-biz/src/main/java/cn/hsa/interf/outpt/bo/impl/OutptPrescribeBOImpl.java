@@ -12,8 +12,11 @@ import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
+import cn.hsa.module.insure.module.dao.InsureDiseaseMatchDAO;
+import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import cn.hsa.module.interf.outpt.bo.OutptPrescribeBO;
 import cn.hsa.module.interf.outpt.dao.OutptPrescribeDAO;
+import cn.hsa.module.interf.outpt.dto.Mzzd;
 import cn.hsa.module.interf.outpt.dto.YjRcDTO;
 import cn.hsa.module.interf.outpt.dto.YjRcDTODetail;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -24,6 +27,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.IdcardUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -75,8 +79,11 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
      */
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    InsureDiseaseMatchDAO insureDiseaseMatchDAO;
     /**
-     * 云净接口入口
+     * 云净接口入口1
      * @param map
      * @return
      */
@@ -172,6 +179,9 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
             List<Map<String, Object>> result = new ArrayList<>();
             result.add(mapResult);
             listReturn = result;
+        }// 就诊信息同步至his(0042008类型)  -2
+        else if(YjConstants.YWLX.JZTB.equals(yjRcDTO.getYwid())){
+            listReturn = saveMedicalInfo(map, yjRcDTO);
         }
         // 新增处方
         else if(YjConstants.YWLX.XZCF.equals(yjRcDTO.getYwid())){
@@ -189,6 +199,77 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         else{
             throw new AppException("查到不到对应业务功能");
         }
+        return listReturn;
+    }
+
+    /**
+     * @Description 保存就诊信息
+     * @Author guolai
+     * @Date 2022-03-30 11:21
+     * @param map
+     * @param yjRcDTO
+     * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    private List<Map<String, Object>> saveMedicalInfo(Map map, YjRcDTO yjRcDTO) throws Exception {
+        List<Map<String, Object>> listReturn;
+        if (StringUtils.isEmpty(yjRcDTO.getBrxm())) {
+            throw new AppException("姓名为空");
+        }
+        if (StringUtils.isEmpty(yjRcDTO.getSfzh())) {
+            throw new AppException("身份证号为空");
+        }
+        map.put("xm", yjRcDTO.getBrxm());
+        map.put("sfzh", yjRcDTO.getSfzh());
+        List<Map<String, Object>> list = this.queryProfileFileAll(map);
+        if (list.size() > 0) {
+            yjRcDTO.setBrid(MapUtils.get(list.get(0), "brid"));
+            yjRcDTO.setXm(yjRcDTO.getBrxm());
+            this.saveBasePofileFile(yjRcDTO);
+        } else {
+            throw new AppException("未获取到该人档案信息");
+        }
+        OutptVisitDTO outptVisitDTO = this.setOutptVisitDTO(yjRcDTO);
+        // 设置主诊断
+        OutptDiagnoseDTO outptDiagnoseDTO = new OutptDiagnoseDTO();
+        //主键
+        outptDiagnoseDTO.setId(SnowflakeUtils.getId());
+        //医院编码
+        outptDiagnoseDTO.setHospCode(outptVisitDTO.getHospCode());
+        //就诊ID
+        outptDiagnoseDTO.setVisitId(outptVisitDTO.getId());
+        //疾病ID  如果做了匹配则取匹配表  否则取系统配置表
+        if (ObjectUtil.isNotEmpty(yjRcDTO.getMzzdList()) && yjRcDTO.getMzzdList().size() > 0) {
+            for (Mzzd mzzd : yjRcDTO.getMzzdList()) {
+                if ("是".equals(mzzd.getSfzzd())) {
+                    InsureDiseaseMatchDTO matchDTO = insureDiseaseMatchDAO.selectByHospIcdCode(mzzd);
+                    if (ObjectUtil.isEmpty(matchDTO)) {
+                        throw new AppException(-1,"未查询到疾病匹配信息！疾病编码：【"+mzzd.getIcdcode()+"】");
+                    }
+                    outptDiagnoseDTO.setDiseaseId(matchDTO.getId());
+                    break;
+                }
+            }
+        } else {
+            map.put("code", "YJ_ZDD");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+            if (ObjectUtil.isEmpty(sysParameterDTO)) {
+                throw new AppException(-1,"未查询到疾病系统配置信息！");
+            }
+            outptDiagnoseDTO.setDiseaseId(sysParameterDTO.getValue());
+        }
+        outptDiagnoseDTO.setTypeCode(Constants.ZDLX.MZZZD);
+        outptDiagnoseDTO.setIsMain(Constants.SF.S);
+        //创建人ID
+        outptDiagnoseDTO.setCrteId(yjRcDTO.getJzysid());
+        // 保存主诊断
+        outptPrescribeDao.insertDiagnose(outptDiagnoseDTO);
+        outptPrescribeDao.insert(outptVisitDTO);
+        outptPrescribeDao.insertRegister(outptVisitDTO);
+        Map<String, Object> mapResult = new HashMap<>();
+        mapResult.put("jzid", outptVisitDTO.getId());
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(mapResult);
+        listReturn = result;
         return listReturn;
     }
 

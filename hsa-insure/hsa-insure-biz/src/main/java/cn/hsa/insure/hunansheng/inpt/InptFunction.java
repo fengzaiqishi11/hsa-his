@@ -120,7 +120,11 @@ public class InptFunction {
         String corpId = insureIndividualBasicDTO.getAab001(); //单位编码
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,insureRegCode);
         Map<String,Object> httpParam = new HashMap<String,Object>();//入参
-        httpParam.put(insureIndividualBasicDTO.getBka895(),insureIndividualBasicDTO.getBka896());//查询条件
+        if("02".equals(insureIndividualBasicDTO.getBka895())){
+            httpParam.put("idcard",insureIndividualBasicDTO.getBka896());//查询条件
+        }else{
+            httpParam.put(insureIndividualBasicDTO.getBka895(),insureIndividualBasicDTO.getBka896());//查询条件
+        }
         httpParam.put("hospital_id",insureConfigurationDO.getOrgCode());//医疗机构编码
         httpParam.put("biz_type",insureIndividualBasicDTO.getAka130());//业务类型
         httpParam.put("center_id",insureConfigurationDO.getCode());//医保中心编号

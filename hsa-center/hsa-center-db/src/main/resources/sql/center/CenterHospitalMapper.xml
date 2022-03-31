@@ -135,8 +135,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="" useGeneratedKeys="true">
-        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code)
-        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode})
+        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code,audit_flag)
+        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode},#{auditFlag})
     </insert>
 
     <!--通过主键删除-->
@@ -232,6 +232,14 @@
         </where>
 
     </update>
+
+    <insert id="insertRootBase">
+        INSERT INTO center_root_database
+        (id, type, jdbc_driver, root_user, root_password, root_url, hosp_url)
+        VALUES
+        ( #{id}, #{type}, #{jdbcDriver}, #{rootUser}, #{rootPassword}, #{rootUrl}, #{hospUrl})
+
+    </insert>
 
 
 </mapper>

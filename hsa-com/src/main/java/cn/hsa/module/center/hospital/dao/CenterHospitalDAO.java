@@ -136,4 +136,6 @@ public interface CenterHospitalDAO {
     CenterRootDatabaseBO findRootDataBase();
 
     boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    boolean insertRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 }

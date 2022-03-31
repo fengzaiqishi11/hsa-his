@@ -1,8 +1,10 @@
 package cn.hsa.insure.unifiedpay.util.baseinfoquery;
 
 import cn.hsa.exception.BizRtException;
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
@@ -19,10 +21,10 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_5102)
-public class StaffInfoReqUtil<T> implements BaseReqUtil<T> {
+public class StaffInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         String paramJson = (String) param;
         Map map = JSON.parseObject(paramJson, Map.class);
 
@@ -35,7 +37,8 @@ public class StaffInfoReqUtil<T> implements BaseReqUtil<T> {
         httpParam.put("prac_psn_code", MapUtils.get(map, "pracPsnCode"));
 
         checkRequest(httpParam);
-        return JSON.toJSONString(httpParam);
+        map.put("infno",Constant.UnifiedPay.REGISTER.UP_5102);
+        return getInsurCommonParam(map);
     }
 
     @Override

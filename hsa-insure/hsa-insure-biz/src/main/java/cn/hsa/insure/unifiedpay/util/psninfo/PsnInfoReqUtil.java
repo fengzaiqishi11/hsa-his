@@ -5,6 +5,7 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.MapUtils;
@@ -29,7 +30,7 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
     private SysParameterService sysParameterService_consumer;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         InsureIndividualBasicDTO insureIndividualBasicDTO = MapUtils.get(map, "insureIndividualBasicDTO");
@@ -131,9 +132,22 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
+
+        HashMap commParam = new HashMap();
         checkRequest(visitMap);
-        map.put("dataMap", visitMap);
-        return getInsurCommonParam(map);
+
+        commParam.put("dataMap", visitMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_1101);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

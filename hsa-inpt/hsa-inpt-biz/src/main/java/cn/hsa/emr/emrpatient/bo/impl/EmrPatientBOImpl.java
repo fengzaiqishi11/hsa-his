@@ -1200,10 +1200,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("visitId", inptVisitDTO.getVisitId());
         inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        map.put("deptId",inptVisitDTO.getInDeptId());
+        inptVisitDTO.setVisitId(inptVisitDTO.getId());
 
-        EmrPatientDTO emrPatientDTO = new EmrPatientDTO();
-        emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
-        emrPatientDTO.setVisitId(inptVisitDTO.getVisitId());
         List<EmrPatientDTO> emrPatientDTOS = emrPatientDAO.queryEmrPaitentInfo(map);
         if (ListUtils.isEmpty(emrPatientDTOS)) {
             throw new AppException("该患者还未书写病历，不能进行上传！");

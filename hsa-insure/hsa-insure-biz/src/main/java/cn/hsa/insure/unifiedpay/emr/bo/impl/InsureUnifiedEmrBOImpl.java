@@ -75,7 +75,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
 
     @Resource
     private InsureIndividualVisitDAO insureIndividualVisitDAO;
-
+    @Resource
     private EmrPatientService emrPatientService_consumer;
     @Override
     public PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
@@ -263,8 +263,12 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());
         inptVisitDTO.setVisitId(insureEmrUnifiedDTO.getVisitId());
-
-        Map<String, Object> emrMap = emrPatientService_consumer.updateHisEmrJosnInfo(JSONObject.parseObject(JSON.toJSONString(inptVisitDTO)));
+        inptVisitDTO.setId(insureEmrUnifiedDTO.getVisitId());
+        HashMap emrMapParam = new HashMap();
+        // 数据来源
+        emrMapParam.put("hospCode",insureEmrUnifiedDTO.getHospCode());
+        emrMapParam.put("inptVisitDTO", inptVisitDTO);
+        Map<String, Object> emrMap = emrPatientService_consumer.updateHisEmrJosnInfo(emrMapParam);
 
         commonGetVisitInfo(insureEmrUnifiedDTO.getHospCode(),insureEmrUnifiedDTO.getVisitId(),insureEmrUnifiedDTO.getMdtrtId());
         //先删除后新增

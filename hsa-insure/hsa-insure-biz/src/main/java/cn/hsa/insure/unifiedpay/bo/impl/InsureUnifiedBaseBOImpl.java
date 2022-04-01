@@ -377,8 +377,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         insureIndividualSettleDAO.updateEntityAcctPay(individualSettleDTO);
         if(Constants.SF.S.equals(isHospital)){
             // 查询预交金信息
-            InptVisitDTO inptVisitDTO = insureIndividualSettleDAO.selectTotalAdvance(map);
-            BigDecimal totalAdvance = inptVisitDTO.getTotalAdvance();
+            BigDecimal totalAdvance  = insureIndividualSettleDAO.selectTotalAdvance(map);
             BigDecimal acctCashPay = new BigDecimal(0.00);
             acctCashPay = BigDecimalUtils.subtractMany(psnPay,enttAcctPay,totalAdvance);
             if(BigDecimalUtils.isZero(acctCashPay)){
@@ -393,7 +392,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
                 result.put("ytPirce",new BigDecimal(0.00)); // 应退费金额
             }else{
                 result.put("yjPirce",new BigDecimal(0.00)); // 应缴金额
-                result.put("ytPirce",BigDecimalUtils.negate(acctCashPay)); // 应退费金额
+                result.put("ytPirce",BigDecimalUtils.negate(acctCashPay)); // 应退金额
                 individualSettleDTO.setSettleTakePrice(new BigDecimal(0.00));
                 individualSettleDTO.setSettleBackPrice(BigDecimalUtils.negate(acctCashPay));
             }

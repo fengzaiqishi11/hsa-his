@@ -1440,7 +1440,7 @@
         select count(id) from insure_individual_settle
         where hosp_code = #{hospCode} and visit_id =#{visitId} and medicalRegNo =#{medicalRegNo} and state ='0'
     </select>
-    <select id="selectTotalAdvance" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+    <select id="selectTotalAdvance" resultType="java.math.BigDecimal">
         select total_advance from inpt_visit where id =#{visitId} and hosp_code =#{hospCode}
     </select>
 

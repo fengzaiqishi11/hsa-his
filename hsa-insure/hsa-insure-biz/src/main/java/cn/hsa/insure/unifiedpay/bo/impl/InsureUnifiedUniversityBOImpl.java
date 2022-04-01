@@ -894,7 +894,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         }
         map.put("batchNo",batchNo);
         map.put("isUniversity","true");
-        insureUnifiedPayOutptService_consumer.updateFeeSubmit(map).getData();
+        insureUnifiedPayOutptService_consumer.UP_2204(map).getData();
         StringBuffer stringBuffer = new StringBuffer();
         String feeKey = stringBuffer.append(hospCode).append(settleId).append("2204").toString();
         String feeKeyValue = insureIndividualVisitDTO.getMedicalRegNo()+"-"+batchNo+insureIndividualVisitDTO.getAac001();
@@ -1067,7 +1067,15 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
 //        insuinfoMapList = insuinfoMapList.stream().filter(item -> "390".equals(MapUtils.get(item, "insutype"))).collect(Collectors.toList());
         Map<String,Object>  insuinfoMap = new HashMap<>();
         if(!ListUtils.isEmpty(insuinfoMapList)){
-            insuinfoMap = insuinfoMapList.get(0);
+            //update by qiang.fan 2022-03-14 获取参保信息，先取有效参保，无有效参保，去第一条参保信息
+            //psn_insu_stas 0:未参保,1:正常参保,2:暂停参保,4:终止参保
+            for(Map<String,Object> mapList : insuinfoMapList){
+                if("1".equals(MapUtils.get(tempMap,"psn_insu_stas"))){
+                    insuinfoMap = mapList;
+                }else {
+                    insuinfoMap = insuinfoMapList.get(0);
+                }
+            }
         }
         Map<String,Object> idetinfoMap = new HashMap<>();
         List<Map<String,Object>> idetinfoMapList  = MapUtils.get(tempMap,"idetinfo");

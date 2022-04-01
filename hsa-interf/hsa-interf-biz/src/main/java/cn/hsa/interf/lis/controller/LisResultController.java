@@ -37,11 +37,8 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("saveLisResult")
     public Boolean saveLisResult(@RequestBody List<MedicalApplyDTO> medicalApplyDTO){
-
         Map map = new HashMap<>();
-//        map.put("hospCode",hospCode);
         map.put("medicalApplyDTO", medicalApplyDTO);
-
         return lisResultService.saveLisResult(map);
     }
 
@@ -85,8 +82,8 @@ public class LisResultController extends BaseController {
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
         map.put("hospCode", MapUtils.get(medicalResultDTOList.get(0),"hospCode"));
         return lisResultService.insertDXLisResult(map);
-
     }
+
     /**
     * @Description: 查询没有结果的lis申请单的医嘱id（德星）
     * @Param:
@@ -114,11 +111,8 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("queryAdvice")
     public Map queryAdvice(@RequestBody Map map){
-
         map.put("typeCode", "3");
-
         return lisResultService.queryAdvice(map);
-
     }
 
     /**
@@ -130,13 +124,7 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("queryDept")
     public Map queryDept(@RequestBody Map map){
-
-//        map.put("hospCode",hospCode);
-//        map.put("crteName", userName);
-//        map.put("crteId",userId);
-
-        return lisResultService.queryAdvice(map);
-
+        return lisResultService.queryDept(map);
     }
 
     /**
@@ -148,27 +136,7 @@ public class LisResultController extends BaseController {
      */
     @PostMapping("queryUser")
     public Map queryUser(@RequestBody Map map){
-
-//        map.put("hospCode",hospCode);
-//        map.put("crteName", userName);
-//        map.put("crteId",userId);
-
-        return lisResultService.queryAdvice(map);
-
+        return lisResultService.queryUser(map);
     }
-
-    /**
-     * @Description: 测试
-     * @Param: []
-     * @return: java.lang.String
-     * @Author: zhangxuan
-     * @Date: 2021-07-19
-     */
-    @PostMapping("test")
-    public String aaa(){
-        return "111111111111";
-    }
-
-
 
 }

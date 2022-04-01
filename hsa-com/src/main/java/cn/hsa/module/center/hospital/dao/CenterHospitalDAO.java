@@ -1,6 +1,9 @@
 package cn.hsa.module.center.hospital.dao;
 
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -95,4 +98,44 @@ public interface CenterHospitalDAO {
      * @Return int
      **/
     int queryCodeIsExist(CenterHospitalDTO centerHospitalDTO);
+    /**
+     * @Menthod insertBatchCenterSyncFlow()
+     * @Desrciption 批量新增同步流程数据
+     * @Param
+     * 1. centerSyncFlowDtos  参数数据对象
+     * @Author PENGBO
+     * @Date   2022/3/21 15:58
+     * @Return int
+     **/
+    void insertBatchCenterSyncFlow(@Param("list") List<CenterSyncFlowDto> centerSyncFlowDtos);
+
+    /**
+     * @Menthod queryCenterSyncFlows()
+     * @Desrciption 查询同步流程数据
+     * @Param
+     * 1. centerSyncFlowDto  参数数据对象
+     * @Author PENGBO
+     * @Date   2022/3/21 15:58
+     * @Return int
+     **/
+    List<CenterSyncFlowDto> queryCenterSyncFlows(CenterSyncFlowDto centerSyncFlowDto);
+
+    /**
+     * @param centerHospitalDTO
+     * @Menthod auditHosp()
+     * @Desrciption 审核医院
+     * @Param 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date 2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     */
+    void updateAudit(CenterHospitalDTO centerHospitalDTO);
+
+    void updateBatchCenterSyncFlow(@Param("list")List<CenterSyncFlowDto> centerSyncFlowDtos);
+
+    CenterRootDatabaseBO findRootDataBase();
+
+    boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    boolean insertRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 }

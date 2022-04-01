@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.module.report.business.bo.factory.ReportBusinessBO;
 import cn.hsa.util.Constants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -17,6 +18,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
+@Slf4j
 public class SettleDeclareSheetBOImpl implements ReportBusinessBO {
 
     @Resource
@@ -25,8 +27,10 @@ public class SettleDeclareSheetBOImpl implements ReportBusinessBO {
     @Override
     public Map getReportDataMap(Map map) {
 
-        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfoPrint(map);
+        WrapperResponse<Map<String, Object>> result = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfos(map);
         map.putAll(result.getData());
+        //打印日志
+        log.error("获取到到数据为{}",map);
 
         switch (map.get("declaraType").toString()) {
             // 城镇职工（住院）
@@ -48,6 +52,8 @@ public class SettleDeclareSheetBOImpl implements ReportBusinessBO {
             default:
                 break;
         }
+        //打印日志
+        log.error("获取到到tempCode为{}",map.get("tempCode").toString());
         return map;
     }
 

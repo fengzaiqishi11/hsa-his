@@ -833,4 +833,19 @@
     <update id="updateOutptVisitCodeByid" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update outpt_visit set patient_code =#{patientCode} where hosp_code =#{hospCode} and id =#{id}
     </update>
+    <update id="updateCaretoMedic">
+        update outpt_medical_care_apply
+        <set>
+            <if test="profileId != null and profileId != ''">
+                profile_id = #{profileId},
+            </if>
+            <if test="profileId != null and profileId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="deptId != null and deptId != ''">
+                visit_dept_id = #{deptId},
+            </if>
+        </set>
+        where id = #{careToMedicId}
+    </update>
 </mapper>

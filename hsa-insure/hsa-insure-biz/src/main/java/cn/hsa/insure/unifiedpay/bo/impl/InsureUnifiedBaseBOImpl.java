@@ -7,6 +7,7 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
@@ -34,6 +35,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -328,6 +330,129 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return stringObjectMap;
     }
 
+    /**
+     * @Method queryBalanceCount
+     * @Desrciption  6.3.1.3个人账户扣减
+     * @Param       1.如果个人账户扣减成功以后 则需要根据是否住院标志来更新结算信息数据
+     *
+     *
+     * @Author fuhui
+     * @Date   2022/3/15 15:33
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> updateBalanceCountDecrease (Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("setlId", MapUtils.checkEmptyErr(map,"insureSettleId","结算Id不能为空"));
+        String aac001 = insureIndividualVisitDTO.getAac001();
+        dataMap.put("psnNo", aac001);
+        String medicalRegNo = insureIndividualVisitDTO.getMedicalRegNo();
+        dataMap.put("mdtrtId", medicalRegNo);
+        paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
+        map.put("msgName","个人账户扣减");
+        String visitId = insureIndividualVisitDTO.getVisitId();
+        map.put("visitId",visitId);
+        String isHospital = insureIndividualVisitDTO.getIsHospital();
+        map.put("isHospital",isHospital);
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5369, paramMap,map);
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        Map<String,Object> result = MapUtils.get(outptMap, "result");
+        // 个人账户支付
+        BigDecimal enttAcctPay = BigDecimalUtils.
+                convert(DataTypeUtils.dataToNumString(MapUtils.get(result, "enttAcctPay")));
+        // 个人支付金额
+        BigDecimal psnPay = BigDecimalUtils.
+                convert(DataTypeUtils.dataToNumString(MapUtils.get(result, "psnPay")));
+
+        InsureIndividualSettleDTO individualSettleDTO = new InsureIndividualSettleDTO();
+        individualSettleDTO.setHospCode(hospCode);
+        individualSettleDTO.setId(MapUtils.get(map,"id"));  // 医保结算表主键id
+        individualSettleDTO.setPersonalPrice(enttAcctPay); // 个人账户支出
+        individualSettleDTO.setBeforeSettle(BigDecimalUtils.convert(DataTypeUtils.dataToNumString(MapUtils.get(map,"balance"))));// 结算前余额
+        individualSettleDTO.setSettleId(MapUtils.get(map,"settleId"));
+        insureIndividualSettleDAO.updateEntityAcctPay(individualSettleDTO);
+        if(Constants.SF.S.equals(isHospital)){
+            // 查询预交金信息
+            BigDecimal totalAdvance  = insureIndividualSettleDAO.selectTotalAdvance(map);
+            BigDecimal acctCashPay = new BigDecimal(0.00);
+            acctCashPay = BigDecimalUtils.subtractMany(psnPay,enttAcctPay,totalAdvance);
+            if(BigDecimalUtils.isZero(acctCashPay)){
+                individualSettleDTO.setSettleBackPrice(new BigDecimal(0.00));
+                individualSettleDTO.setSettleTakePrice(new BigDecimal(0.00));
+                result.put("yjPirce",new BigDecimal(0.00)); // 应缴金额
+                result.put("ytPirce",new BigDecimal(0.00)); // 应退费金额
+            }else if(BigDecimalUtils.greaterZero(acctCashPay)){
+                individualSettleDTO.setSettleTakePrice(acctCashPay);
+                individualSettleDTO.setSettleBackPrice(new BigDecimal(0.00));
+                result.put("yjPirce",acctCashPay); // 应缴金额
+                result.put("ytPirce",new BigDecimal(0.00)); // 应退费金额
+            }else{
+                result.put("yjPirce",new BigDecimal(0.00)); // 应缴金额
+                result.put("ytPirce",BigDecimalUtils.negate(acctCashPay)); // 应退金额
+                individualSettleDTO.setSettleTakePrice(new BigDecimal(0.00));
+                individualSettleDTO.setSettleBackPrice(BigDecimalUtils.negate(acctCashPay));
+            }
+            insureIndividualSettleDAO.updateInptSettleAcctPay(individualSettleDTO);
+            result.put("totalAdvance",totalAdvance); // 累计预交金
+
+        }else{
+            insureIndividualSettleDAO.updateOutptSettleAcctPay(individualSettleDTO);
+        }
+        return result;
+    }
+
+    /**
+     * @param map
+     * @Method queryBalanceCount
+     * @Desrciption 6.3.1.3账户余额信息查询
+     *      增加条件判断Constants.SF.S.equals(MapUtils.get(map,"decreaseAcctPay"))
+     *      默认改接口是未登记之前，在医保个人信息获取界面通过输入身份证和证件号码来查询
+     *      2.如果符合条件这是结算以后的扣减操作
+     *
+     * @Param
+     * @Author fuhui
+     * @Date 2022/3/15 15:33
+     * @Return
+     */
+    @Override
+    public Map<String, Object> queryBalanceCount(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String orgCode =  MapUtils.get(map, "orgCode");
+        insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, orgCode);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("certno", MapUtils.checkEmptyErr(map,"certno","证件号码不能为空"));
+        dataMap.put("psnCertType", MapUtils.get(map,"psn_cert_type","01")); // 默认按照居民身份证
+        paramMap.put("data", dataMap);
+        map.put("msgName","账户余额信息查询");
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode,
+                orgCode, Constant.UnifiedPay.REGISTER.UP_5368, paramMap,map);
+        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        if(Constants.SF.S.equals(MapUtils.get(map,"decreaseAcctPay"))){
+            /**
+             * 因为余额信息查询无法获取到个人支付金额和定点医疗机构名称 所以需要查询结算信息
+             */
+            InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+            dataMap.put("setl_id", MapUtils.get(map,"insureSettleId"));
+            dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+            dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+            map.put("msgName","结算信息查询");
+            Map<String, Object> settleMap = insureUnifiedCommonUtil.
+                    commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_5203, paramMap, map);
+            Map<String,Object> outputSettleMap = MapUtils.get(settleMap, "output");
+            Map<String,Object> setlinfo = MapUtils.get(outputSettleMap,"setlinfo");
+            resultDataMap.put("setlinfo",setlinfo);
+        }
+        resultDataMap.put("outptMap", outptMap);
+        return resultDataMap;
+
+    }
+
 
     /**
      * @param
@@ -425,11 +550,22 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         individualSettleDTO.setState(Constants.SF.F);
         individualSettleDTO.setSettleState(Constants.SF.S);
         individualSettleDTO = insureIndividualSettleDAO.selectInsureSettInfo(individualSettleDTO);
+
+        map.put("msgName","结算信息查询");
+        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
+        map.put("visitId",visitId);
+        Map<String, Object> resultMap = new HashMap<>();
+        try{
+            resultMap  = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
+        }catch (Exception e){
+
+        }
+        outptMap = MapUtils.get(resultMap, "output");
         /**
-         * 省外医保  接口无数据返回。只能查询本地保存的费用数据
+         * 社保卡登记患者  接口无数据返回 时 查询本地保存的费用数据
          */
 //        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType()) || "06".equals(insureIndividualVisitDTO.getMdtrtCertType())) && data != null && "1".equals(data.getValue())) {
-        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType())) && StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
+        if (("03".equals(insureIndividualVisitDTO.getMdtrtCertType())) && StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay) && !outptMap.containsKey("setlinfo")) {
             Map<String, Object> setlinfoMap = insureIndividualSettleDAO.querySettleForMap(map);
             if(MapUtils.isEmpty(setlinfoMap)){
                 throw  new AppException("根据就诊id,结算id查询医保信息为空");
@@ -477,11 +613,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             map.put("outptMap", outptMap);
         }
         else {
-            map.put("msgName","结算信息查询");
-            map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
-            map.put("visitId",visitId);
-            Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
-            outptMap = MapUtils.get(resultMap, "output");
+
             Map<String,Object> setlinfo = MapUtils.get(outptMap,"setlinfo");
             InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
             insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());

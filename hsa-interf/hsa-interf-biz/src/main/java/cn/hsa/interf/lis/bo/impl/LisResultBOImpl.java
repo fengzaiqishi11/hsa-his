@@ -133,9 +133,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
             for(Map resultMap : medicalResultDTOList){
                 stringList.add(MapUtils.get(resultMap,"adviceId"));
                 resultMap.put("id", SnowflakeUtils.getId());
-//                resultMap.put("crteTime", DateUtils.getNow());
-//                resultMap.put("crteId", "lis");
-//                resultMap.put("crteName", "lis");
             }
             List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
@@ -158,7 +155,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public List<String> queryDXNoResult(Map map){
         List<String> list = lisResultDAO.queryDXNoResult(map);
-//        lisResultDAO.updateStatus(list);
         return list;
     }
 
@@ -183,10 +179,10 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     */ 
     @Override
     public Map updateNoResultLis(Map map){
-        map = new HashMap();
-        map.put("hospCode", MapUtils.get(map,"hospCode"));
-        map.put("code", "LIS_TXM");
-        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        Map codeMap = new HashMap();
+        codeMap.put("hospCode", MapUtils.get(map,"hospCode"));
+        codeMap.put("code", "LIS_TXM");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(codeMap).getData();
         String a = sysParameterDTO.getValue();
         List<Map> mapList = new ArrayList<>();
         List<String> backList = new ArrayList<>();
@@ -219,10 +215,8 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public Map queryAdvice(Map map){
         List<Map> mapList = lisResultDAO.queryAdvice(map);
-
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }
@@ -240,7 +234,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }
@@ -258,7 +251,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
         Map newMap = new HashMap();
         newMap.put("result",mapList);
-
         return newMap;
 
     }

@@ -695,7 +695,11 @@
         sum(if((a.outin_code='27' or a.outin_code='28'),a.sell_price * a.num,0)) inSalesPriAll,     /**住院销售总金额**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum,                   /**住院销售总数量**/
         sum(if( a.outin_code='4',a.sell_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
-        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum                  /**药房出库科室总数量**/
+        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum,                  /**药房出库科室总数量**/
+        sum(if( a.outin_code='24' and a.sell_price_all >
+                a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriAll,   /**调盈**/
+        sum(if( a.outin_code='24' and a.sell_price_all &lt;
+                a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0)) adjustLossPriAll   /**调亏**/
         FROM
         stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = "1"

@@ -736,6 +736,7 @@ public interface Constant {
         }
 
         public static class REGISTER {
+            public static final String UP_1101= "1101"; // 人员信息获取
             public static final String UP_3262= "3262"; // 异地清分结果确认
             public static final String UP_3261= "3261"; // 异地清分结果确认
             public static final String UP_3260= "3260"; // 5.1.1.1提取异地清分明细
@@ -768,6 +769,7 @@ public interface Constant {
             public static final String UP_2504 = "2504"; // 人员慢特病备案撤销
             public static final String UP_2505 = "2505"; // 人员定点备案
             public static final String UP_2506 = "2506"; // 人员定点病备案撤销
+            public static final String UP_2699 = "2699"; // 生育备案申请
             public static final String UP_5301 = "5301"; // 人员慢特病备案查询
             public static final String UP_5302 = "5302"; // 人员定点备案查询
             public static final String UP_5303 = "5303"; // 在院信息查询
@@ -797,6 +799,9 @@ public interface Constant {
 
             public static final String UP_7101 = "7101"; // 电子处方上传
             public static final String UP_4701 = "4701"; // 电子病历上传
+
+            public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
+            public static final String UP_5368 = "5368"; // 账户余额信息查询
 
         }
 

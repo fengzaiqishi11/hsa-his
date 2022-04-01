@@ -268,19 +268,13 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     /**
      * 特级护理天数
      */
-    private String spgaNurscareDays;
-    /**
-//     * 一级护理天数
-//     */
-    private String lv1NurscareDays;
-//    /**
-//     * 二级护理天数
-//     */
-    private String scdNurscareDays;
-//    /**
-//     * 三级护理天数
-//     */
-    private String lv3NursecareDays;
+    private int spgaNurscareDays;
+
+    private int lv1NurscareDays;
+
+    private int scdNurscareDays;
+
+    private int lv3NursecareDays;
 
     private String iptOptNo;
     private String isTransmit ;

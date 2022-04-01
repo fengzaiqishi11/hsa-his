@@ -200,4 +200,15 @@ public interface PatientComprehensiveQueryBO {
    *
    * @return*/
   List<Map<String, Object>> queryYWLX(Map map);
+
+  /**
+   * @Menthod: updateVisitPreferential
+   * @Desrciption: 修改病人优惠类别
+   * @Param: preferentialTypeId：优惠类别id，visitId：就诊id
+   * @Author: luoyong
+   * @Email: luoyong@powersi.com.cn
+   * @Date: 2022-03-21 11:31
+   * @Return: boolean
+   **/
+    Boolean updateVisitPreferential(Map<String, Object> map);
 }

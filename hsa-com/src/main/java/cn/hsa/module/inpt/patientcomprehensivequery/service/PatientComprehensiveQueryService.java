@@ -6,6 +6,7 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.patientcomprehensivequery.dto.PatientCompreHensiveQueryDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -223,4 +224,16 @@ public interface PatientComprehensiveQueryService {
    * @return*/
   @GetMapping("/service/inpt/patientComprehensiveQuery/queryYWLX")
   WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map);
+
+  /**
+   * @Menthod: updateVisitPreferential
+   * @Desrciption: 修改病人优惠类别
+   * @Param: preferentialTypeId：优惠类别id，visitId：就诊id
+   * @Author: luoyong
+   * @Email: luoyong@powersi.com.cn
+   * @Date: 2022-03-21 11:31
+   * @Return: boolean
+   **/
+   @PostMapping("/service/inpt/patientComprehensiveQuery/updateVisitPreferential")
+    WrapperResponse<Boolean> updateVisitPreferential(Map<String, Object> map);
 }

@@ -343,4 +343,24 @@ public class InsureReversalTradeController extends BaseController {
         return insureUnifiedPayReversalTradeService_consumer.downLoadSettleInfo(map);
     }
 
+
+
+    /**
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报合计报表打印
+     * @param paraMap
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @GetMapping("/querySumDeclareInfos")
+    public WrapperResponse<Map<String,Object>> querySumDeclareInfos(@RequestParam Map<String,Object> paraMap, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        paraMap.put("hospCode",sysUserDTO.getHospCode());
+        paraMap.put("crteId",sysUserDTO.getId());
+        paraMap.put("crteName",sysUserDTO.getName());
+        WrapperResponse<Map<String,Object>> resultMap = insureUnifiedPayReversalTradeService_consumer.querySumDeclareInfos(paraMap);
+        return resultMap;
+    }
+
 }

@@ -60,7 +60,7 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             }
         }
         // 身份证  本地社保卡 和省内异地社保卡
-        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) ) {
             // 就诊凭证类型  传值02
             visitMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.SFZ);
             if ("null".equals(insureIndividualBasicDTO.getAac002()) || StringUtils.isEmpty(insureIndividualBasicDTO.getAac002())) {
@@ -76,9 +76,9 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             visitMap.put("certno", "null".equals(insureIndividualBasicDTO.getAac002()) ? "" : insureIndividualBasicDTO.getAac002());
         }
         // 跨省异地读卡
-        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
             // 就诊凭证类型  传值03
-            visitMap.put("mdtrt_cert_type", mdtrtCertType);
+            visitMap.put("mdtrt_cert_type", "03");
             // 传值证件号码
             visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896());
             // 传值社保卡识别码

@@ -259,6 +259,115 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     }
 
     @Override
+    public List<InsureEmrDscginfoDTO> queryInsureUnifiedEmrDscginfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+        //出院记录
+        List<InsureEmrDscginfoDTO> insureEmrDscginfoDTOList = insureEmrDscginfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrDscginfoDTOList;
+    }
+
+    @Override
+    public List<InsureEmrDieinfoDTO> queryInsureUnifiedEmrDieinfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+        //死亡记录
+        List<InsureEmrDieinfoDTO> insureEmrDieinfoDTOList = insureEmrDieinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrDieinfoDTOList;
+    }
+
+    @Override
+    public List<InsureEmrRescinfoDTO> queryInsureUnifiedEmrRescinfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+
+        //病情抢救记录
+        List<InsureEmrRescinfoDTO> insureEmrRescinfoDTOList = insureEmrRescinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrRescinfoDTOList;
+    }
+
+    @Override
+    public List<InsureEmrOprninfoDTO> queryInsureUnifiedEmrOprninfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+
+        //手术记录
+        List<InsureEmrOprninfoDTO> insureEmrOprninfoDTOList = insureEmrOprninfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrOprninfoDTOList;
+    }
+
+    @Override
+    public List<InsureEmrCoursrinfoDTO> queryInsureUnifiedEmrCoursrinfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+
+        //病程记录
+        List<InsureEmrCoursrinfoDTO> insureEmrCoursrinfoDTOList = insureEmrCoursrinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrCoursrinfoDTOList;
+    }
+
+    @Override
+    public List<InsureEmrDiseinfoDTO> queryInsureUnifiedEmrDiseinfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+
+        //诊断信息
+        List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTOList = insureEmrDiseinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrDiseinfoDTOList;
+    }
+
+    @Override
+    public InsureEmrAdminfoDTO queryInsureUnifiedEmrAdminfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getVisitId())){
+            throw new AppException("传入的visitId就医流水号为空");
+        }
+        if(StringUtils.isEmpty(insureEmrUnifiedDTO.getMdtrtId())){
+            throw new AppException("传入的mdtrtId医保就诊id为空");
+        }
+        String mdtrtSn = insureEmrUnifiedDTO.getVisitId();
+        String mdtrtId = insureEmrUnifiedDTO.getMdtrtId();
+        //入院记录
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        return insureEmrAdminfoDTO;
+    }
+
+    @Override
     public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());

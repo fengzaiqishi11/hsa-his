@@ -117,4 +117,39 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
         List<InsureEmrUnifiedDTO> list = insureUnifiedEmrBO.export(MapUtils.get(map,"insureEmrUnifiedDTO"));
 
     }
+
+    @Override
+    public List<InsureEmrDscginfoDTO> queryInsureUnifiedEmrDscginfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrDscginfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public List<InsureEmrDieinfoDTO> queryInsureUnifiedEmrDieinfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrDieinfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public List<InsureEmrRescinfoDTO> queryInsureUnifiedEmrRescinfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrRescinfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public List<InsureEmrOprninfoDTO> queryInsureUnifiedEmrOprninfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrOprninfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public List<InsureEmrCoursrinfoDTO> queryInsureUnifiedEmrCoursrinfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrCoursrinfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public List<InsureEmrDiseinfoDTO> queryInsureUnifiedEmrDiseinfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrDiseinfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
+
+    @Override
+    public InsureEmrAdminfoDTO queryInsureUnifiedEmrAdminfo(Map map) {
+        return insureUnifiedEmrBO.queryInsureUnifiedEmrAdminfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
+    }
 }

@@ -4,7 +4,6 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.enums.HsaSrvEnum;
 import cn.hsa.exception.BizRtException;
 import cn.hsa.exception.InsureExecCodesEnum;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
@@ -30,6 +29,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 
 import javax.annotation.Resource;
@@ -43,6 +43,7 @@ import java.util.*;
  * @Date 2022/3/25 13:38
  * @Version 1.0
  **/
+@Slf4j
 @Component
 public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO {
 
@@ -100,6 +101,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
 
         //入院记录
         InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
+        if(insureEmrAdminfoDTO == null){
+            try{
+                updateInsureUnifiedEmrSync(insureEmrUnifiedDTO);
+            }catch (Exception e){
+                log.error("同步失败", e);
+            }
+        }
         insureEmrDetailDTO.setInsureEmrAdminfoDTO(insureEmrAdminfoDTO);
         //病程记录
         List<InsureEmrCoursrinfoDTO> insureEmrCoursrinfoDTOList = insureEmrCoursrinfoDAO.queryByMdtrtSn(mdtrtSn,mdtrtId);
@@ -164,6 +172,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     public InsureEmrCoursrinfoDTO updateInsureUnifiedEmrCoursrinfo(InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO){
         //根据uuid 判断记录是否存在，不存在则新增，存在则修改
         InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO1 = insureEmrCoursrinfoDAO.queryByUuid(insureEmrCoursrinfoDTO.getUuid());
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(insureEmrCoursrinfoDTO.getMdtrtSn(),insureEmrCoursrinfoDTO.getMdtrtId());
+        if(insureEmrAdminfoDTO != null){
+            insureEmrCoursrinfoDTO.setDeptCode(insureEmrAdminfoDTO.getDeptCode());
+            insureEmrCoursrinfoDTO.setDeptName(insureEmrAdminfoDTO.getDeptName());
+            insureEmrCoursrinfoDTO.setWardareaName(insureEmrAdminfoDTO.getWardareaName());
+            insureEmrCoursrinfoDTO.setBedno(insureEmrAdminfoDTO.getBedno());
+        }
         if(insureEmrCoursrinfoDTO1 == null){
             if(insureEmrCoursrinfoDTO.getUuid() == null){
                 insureEmrCoursrinfoDTO.setUuid(SnowflakeUtils.getLongId());
@@ -200,6 +215,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     public InsureEmrRescinfoDTO updateInsureUnifiedEmrRescinfo(InsureEmrRescinfoDTO insureEmrRescinfoDTO){
         //根据uuid 判断记录是否存在，不存在则新增，存在则修改
         InsureEmrRescinfoDTO insureEmrRescinfoDTO1 = insureEmrRescinfoDAO.queryByUuid(insureEmrRescinfoDTO.getUuid());
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(insureEmrRescinfoDTO.getMdtrtSn(),insureEmrRescinfoDTO.getMdtrtId());
+        if(insureEmrAdminfoDTO != null){
+            insureEmrRescinfoDTO.setDept(insureEmrAdminfoDTO.getDeptCode());
+            insureEmrRescinfoDTO.setDeptName(insureEmrAdminfoDTO.getDeptName());
+            insureEmrRescinfoDTO.setWardareaName(insureEmrAdminfoDTO.getWardareaName());
+            insureEmrRescinfoDTO.setBedno(insureEmrAdminfoDTO.getBedno());
+        }
         if(insureEmrRescinfoDTO1 == null){
             if(insureEmrRescinfoDTO.getUuid() == null){
                 insureEmrRescinfoDTO.setUuid(SnowflakeUtils.getLongId());
@@ -218,6 +240,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     public InsureEmrDieinfoDTO updateInsureUnifiedEmrDieinfo(InsureEmrDieinfoDTO insureEmrDieinfoDTO){
         //根据uuid 判断记录是否存在，不存在则新增，存在则修改
         InsureEmrDieinfoDTO insureEmrDieinfoDTO1 = insureEmrDieinfoDAO.queryByUuid(insureEmrDieinfoDTO.getUuid());
+        InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryByMdtrtSn(insureEmrDieinfoDTO.getMdtrtSn(),insureEmrDieinfoDTO.getMdtrtId());
+        if(insureEmrAdminfoDTO != null){
+            insureEmrDieinfoDTO.setDept(insureEmrAdminfoDTO.getDeptCode());
+            insureEmrDieinfoDTO.setDeptName(insureEmrAdminfoDTO.getDeptName());
+            insureEmrDieinfoDTO.setWardareaName(insureEmrAdminfoDTO.getWardareaName());
+            insureEmrDieinfoDTO.setBedno(insureEmrAdminfoDTO.getBedno());
+        }
         if(insureEmrDieinfoDTO1 == null){
             if(insureEmrDieinfoDTO.getUuid() == null){
                 insureEmrDieinfoDTO.setUuid(SnowflakeUtils.getLongId());

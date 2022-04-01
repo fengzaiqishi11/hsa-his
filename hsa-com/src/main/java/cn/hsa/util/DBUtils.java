@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.jdbc.ScriptRunner;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -60,13 +62,13 @@ public class DBUtils {
 
     /**
      * @Method 数据库是否已经存在表，存在表表示已经初始化过数据库
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:54
-     * @Return 
+     * @Return
      **/
     public static boolean existTable(String driverClassName, String url, String username, String password) {
         Connection conn = null;
@@ -87,13 +89,13 @@ public class DBUtils {
 
     /**
      * @Method 关闭数据库连接
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:53
-     * @Return 
+     * @Return
      **/
     public static void closeConnection(Connection conn, Statement st, ResultSet rs) {
         if (rs != null) {
@@ -124,13 +126,13 @@ public class DBUtils {
 
     /**
      * @Method 初始化数据库脚本
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:53
-     * @Return 
+     * @Return
      **/
     public static void initScript(String driverClassName, String url, String username, String password, String sqlScriptPath) {
         Connection conn = null;
@@ -152,7 +154,11 @@ public class DBUtils {
                 runner.setSendFullScript(false);
                 runner.setStopOnError(true);
                 InputStream in = new DBUtils().getClass().getResourceAsStream(sqlScriptPath);
-                runner.runScript(new InputStreamReader(in, "utf8"));
+                URL url_b = new DBUtils().getClass().getResource(sqlScriptPath);
+                log.info("=============="+url_b.getPath());
+                runner.runScript(new InputStreamReader(new FileInputStream(url_b.getPath()),"utf-8"));
+
+                //runner.runScript(new InputStreamReader(in, "utf8"));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);

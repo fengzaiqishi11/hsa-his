@@ -63,7 +63,7 @@ public class InsureItfBOImpl {
             if (StringUtils.isEmpty(result)) {
                 params.put("resultStr", "null");
                 params.put("infcode", "null");
-                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(),result});
+                throw new BizRtException(InsureExecCodesEnum.INSURE_RETURN_DATA_EMPTY, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(),result});
             }
             Map<String, Object> resultMap = JSON.parseObject(result);
             //云助手系统内部错误处理
@@ -71,14 +71,14 @@ public class InsureItfBOImpl {
                 params.put("infcode", resultMap.get("code"));
                 String errMsg = (String) resultMap.get("msg");
                 params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("msg")});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("msg")});
             }
             params.put("infcode", resultMap.get("infcode"));
             //云助手调用医保，医保返回错误处理
             if (!("0").equals(resultMap.get("infcode"))) {
                 String errMsg = (String) resultMap.get("err_msg");
                 params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
             }
             logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), result);
             params.put("resultStr", result == null ? "null" : result.length() > 5000 ? result.substring(0, 4500) : result);
@@ -89,7 +89,7 @@ public class InsureItfBOImpl {
             if (e instanceof BizRtException) {
                 throw e;
             } else {
-                throw new BizRtException(InsureExecCodesEnum.INSUR_SYS_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), e});
+                throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), e});
             }
         } finally {
             insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();

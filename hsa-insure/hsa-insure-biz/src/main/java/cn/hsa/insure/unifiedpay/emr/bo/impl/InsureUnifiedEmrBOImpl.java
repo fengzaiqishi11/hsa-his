@@ -155,6 +155,19 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         //根据uuid 判断记录是否存在，不存在则新增，存在则修改
         InsureEmrDiseinfoDTO insureEmrDiseinfoDTO1 = insureEmrDiseinfoDAO.queryByUuid(insureEmrDiseinfoDTO.getUuid());
         if(insureEmrDiseinfoDTO1 == null){
+            if(StringUtils.isEmpty(insureEmrDiseinfoDTO.getMdtrtSn())){
+                throw new AppException("传入的visitId就医流水号为空");
+            }
+            if(StringUtils.isEmpty(insureEmrDiseinfoDTO.getMdtrtId())){
+                throw new AppException("传入的mdtrtId医保就诊id为空");
+            }
+            //诊断序列号处理
+            int index = 0;
+            List<InsureEmrDiseinfoDTO> insureEmrDiseinfoDTOList = insureEmrDiseinfoDAO.queryByMdtrtSn(insureEmrDiseinfoDTO.getMdtrtSn(),insureEmrDiseinfoDTO.getMdtrtId());
+            if(insureEmrDiseinfoDTOList != null){
+                index = insureEmrDiseinfoDTOList.size();
+            }
+            insureEmrDiseinfoDTO.setDiagSeq(index);
             if(insureEmrDiseinfoDTO.getUuid() == null){
                 insureEmrDiseinfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
@@ -198,6 +211,19 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         //根据uuid 判断记录是否存在，不存在则新增，存在则修改
         InsureEmrOprninfoDTO insureEmrOprninfoDTO1 = insureEmrOprninfoDAO.queryByUuid(insureEmrOprninfoDTO.getUuid());
         if(insureEmrOprninfoDTO1 == null){
+            if(StringUtils.isEmpty(insureEmrOprninfoDTO.getMdtrtSn())){
+                throw new AppException("传入的visitId就医流水号为空");
+            }
+            if(StringUtils.isEmpty(insureEmrOprninfoDTO.getMdtrtId())){
+                throw new AppException("传入的mdtrtId医保就诊id为空");
+            }
+            //手术序列号处理
+            String index ="0";
+            List<InsureEmrOprninfoDTO> insureEmrOprninfoDTOList = insureEmrOprninfoDAO.queryByMdtrtSn(insureEmrOprninfoDTO.getMdtrtSn(),insureEmrOprninfoDTO.getMdtrtId());
+            if(insureEmrOprninfoDTOList != null){
+                index = String.valueOf(insureEmrOprninfoDTOList.size()) ;
+            }
+            insureEmrOprninfoDTO.setOprnSeq(index);
             if(insureEmrOprninfoDTO.getUuid() == null){
                 insureEmrOprninfoDTO.setUuid(SnowflakeUtils.getLongId());
             }

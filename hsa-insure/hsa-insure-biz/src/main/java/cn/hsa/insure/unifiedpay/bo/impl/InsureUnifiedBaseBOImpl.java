@@ -4,6 +4,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
@@ -13,16 +15,15 @@ import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
-import cn.hsa.module.insure.module.bo.InsureIndividualBasicBO;
 import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
-import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -86,11 +87,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Resource
     private InsureIndividualBasicService insureIndividualBasicService;
     @Resource
-    private InsureIndividualBasicBO insureIndividualBasicBO;
+    private InsureUnifiedLogService insureUnifiedLogService_consumer;
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
     @Resource
-    private InsureDictDAO insureDictDAO;
+    private BaseReqUtilFactory baseReqUtilFactory;
     @Resource
     private InsureItfBOImpl insureItfBO;
 
@@ -319,12 +320,18 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
         paramMap .put("insureIndividualBasicDTO",insureIndividualBasicDTO);
         paramMap.putAll(map);
-        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs()); // 参保地医保区划
+        // 参保地医保区划
+        paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
-        paramMap.put("hospCode", hospCode);
-        paramMap.put("isHospital",insureIndividualVisitDTO.getIsHospital());
-        paramMap.put("visitId",insureIndividualVisitDTO.getVisitId());
-        Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, paramMap);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INSUR_BASE_INFO.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+
+        interfaceParamDTO.setVisitId(insureIndividualBasicDTO.getVisitId());
+
+        Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, interfaceParamDTO);
         return stringObjectMap;
     }
 

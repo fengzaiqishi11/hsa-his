@@ -102,7 +102,7 @@ public class SnowflakeUtils {
     }
 
     public static Long getLongId(){
-        return SnowflakeUtils.getInstanceSnowflake().nextId();
+        return SnowflakeUtils.getInstanceSnowflake().nextId()/1000;
     }
 
     public static String getId(){

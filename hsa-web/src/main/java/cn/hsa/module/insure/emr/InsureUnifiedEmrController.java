@@ -67,6 +67,7 @@ public class InsureUnifiedEmrController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map map =new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
+        insureEmrUnifiedDTO.setHospCode(sysUserDTO.getHospCode());
         map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
         return insureUnifiedEmrService_comsumer.queryInsureUnifiedEmrDetail(map);
     }
@@ -118,7 +119,7 @@ public class InsureUnifiedEmrController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("insureEmrinsureEmrUnifiedDTODiseinfoDTO",insureEmrUnifiedDTO);
+        map.put("insureEmrUnifiedDTO",insureEmrUnifiedDTO);
         return WrapperResponse.success(insureUnifiedEmrService_comsumer.queryInsureUnifiedEmrDiseinfo(map));
     }
 

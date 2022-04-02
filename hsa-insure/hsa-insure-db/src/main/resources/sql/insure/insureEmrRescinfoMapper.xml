@@ -123,7 +123,7 @@
   <select id="queryByMdtrtSn" resultType="cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO">
     SELECT <include refid="Base_Column_List"/>
     FROM insure_emr_rescinfo
-    where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId}
+    where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId} and vali_flag = '1'
   </select>
 
     <select id="queryByUuid" resultType="cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO">

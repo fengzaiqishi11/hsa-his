@@ -166,4 +166,12 @@ public interface InsureDiseaseMatchDAO {
     List<Map<String, Object>> queryUnMacthAllPage(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
 
     int deleteInsureDiseaseInfos(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
+
+    /**
+     * @Author 产品二部-郭来
+     * @Date 2022-03-30 9:47
+     * @param map
+     * @return cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO
+     */
+    List<InsureDiseaseMatchDTO> selectByHospIcdCode(Map map);
 }

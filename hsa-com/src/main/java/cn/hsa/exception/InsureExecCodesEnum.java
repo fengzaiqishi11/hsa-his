@@ -18,6 +18,7 @@ public enum InsureExecCodesEnum implements BizExcCodes {
     IN_HOSP_DIAG_EMPTY(-1, SYS_MSG_INNER+"住院就诊号{1}的入院诊断为空"),
 
     OUT_HOSP_DIAG_EMPTY(-1, SYS_MSG_INNER+"住院就诊号{1}的出院诊断为空"),
+    INSUR_SYS_FAILURE(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！"),
 
     IN_HOSP_FEE_DATA_EMPTY(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！");
 

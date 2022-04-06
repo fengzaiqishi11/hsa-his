@@ -448,7 +448,7 @@
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
-    <select id="selectByHospIcdCode"  parameterType="java.util.Map" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+    <select id="selectByHospIcdCode"  parameterType="cn.hsa.module.interf.outpt.dto.Mzzd" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
         select
             id,
             hosp_code,

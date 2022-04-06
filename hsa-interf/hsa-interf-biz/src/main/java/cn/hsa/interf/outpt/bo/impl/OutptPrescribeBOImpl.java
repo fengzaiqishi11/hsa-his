@@ -241,11 +241,17 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         if (ObjectUtil.isNotEmpty(yjRcDTO.getMzzdList()) && yjRcDTO.getMzzdList().size() > 0) {
             for (Mzzd mzzd : yjRcDTO.getMzzdList()) {
                 if ("是".equals(mzzd.getSfzzd())) {
-                    InsureDiseaseMatchDTO matchDTO = insureDiseaseMatchDAO.selectByHospIcdCode(mzzd);
-                    if (ObjectUtil.isEmpty(matchDTO)) {
+                    Map inMap = new HashMap();
+                    inMap.put("hospCode",yjRcDTO.getHospCode());
+                    inMap.put("icdcode",mzzd.getIcdcode());
+                    List<InsureDiseaseMatchDTO> matchDTOs = insureDiseaseMatchDAO.selectByHospIcdCode(inMap);
+                    if (ObjectUtil.isEmpty(matchDTOs) || matchDTOs.size() < 1) {
                         throw new AppException(-1,"未查询到疾病匹配信息！疾病编码：【"+mzzd.getIcdcode()+"】");
                     }
-                    outptDiagnoseDTO.setDiseaseId(matchDTO.getId());
+                    if (matchDTOs.size() > 1) {
+                        throw new AppException(-1,"存在多条匹配信息，请检查！疾病编码：【"+mzzd.getIcdcode()+"】");
+                    }
+                    outptDiagnoseDTO.setDiseaseId(matchDTOs.get(0).getId());
                     break;
                 }
             }

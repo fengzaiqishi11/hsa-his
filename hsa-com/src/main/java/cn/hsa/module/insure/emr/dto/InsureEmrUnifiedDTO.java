@@ -30,6 +30,11 @@ public class InsureEmrUnifiedDTO implements Serializable {
     private String psnName;
 
     /**
+     * 人员编号
+     */
+    private String psnNo;
+
+    /**
      * 证件号码
      */
     private String certno;

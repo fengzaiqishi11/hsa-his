@@ -390,30 +390,42 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
 
     public CenterHospitalDatasourceDO createDataSource (CenterHospitalDTO centerHospitalDTO,CenterRootDatabaseBO centerRootDatabaseBO ){
+        String dsCode = "DS"+centerHospitalDTO.getCode();
+        CenterDatasourceDTO centerDatasourceDTO =  new CenterDatasourceDTO();
+        centerDatasourceDTO.setCode(dsCode);
+        List<CenterDatasourceDTO> centerDatasourceDTOList = (List<CenterDatasourceDTO>) centerDatasourceBO.queryCenterDatasourcePage(centerDatasourceDTO).getData().getResult();
+
+
         CenterDatasourceDO centerDatasourceDO = new CenterDatasourceDO();
-        //主键ID
-        centerDatasourceDO.setId(SnowflakeUtils.getId());//id
-        //数据据编码
-        centerDatasourceDO.setCode("DS"+centerHospitalDTO.getCode());
-        //数据库名称
-        centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
-        //数据库类型
-        centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
-        //数据源驱动
-        centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
-        //数据源URL
-        String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
-        centerDatasourceDO.setUrl(url);
-        //数据源账号
-        centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
-        //数据源密码
-        centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
-        //创建人ID
-        centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
-        //创建人姓名
-        centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
-        centerDatasourceDO.setCrteTime(new Date());//创建时间
-        centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        if(ListUtils.isEmpty(centerDatasourceDTOList)){
+            //主键ID
+            centerDatasourceDO.setId(SnowflakeUtils.getId());//id
+            //数据据编码
+            centerDatasourceDO.setCode(dsCode);
+            //数据库名称
+            centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
+            //数据库类型
+            centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
+            //数据源驱动
+            centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
+            //数据源URL
+            String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
+            centerDatasourceDO.setUrl(url);
+            //数据源账号
+            centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
+            //数据源密码
+            centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
+            //创建人ID
+            centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
+            //创建人姓名
+            centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
+            centerDatasourceDO.setCrteTime(new Date());//创建时间
+            centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        }else {
+            centerDatasourceDO = centerDatasourceDTOList.get(0);
+        }
+
+
 
         CenterHospitalDatasourceDO centerHospitalDatasourceDO = new CenterHospitalDatasourceDO () ;
         //主键

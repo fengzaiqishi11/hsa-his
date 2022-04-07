@@ -437,7 +437,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 System.out.println("==========================resultMap:" + resultMap.toString());
                 Map<String,Object> cancelReturnData =  MapUtils.get(resultMap,"output");
                 Map<String,Object> setlInfoMap = MapUtils.get(cancelReturnData,"setlinfo");
-                Boolean data = insureUnifiedPayOutptService_consumer.updateCancelFeeSubmit(map).getData();
+                Boolean data = insureUnifiedPayOutptService_consumer.UP_2205(map).getData();
                 if(data){
                     MapUtils.remove(map,"insureSettleId"); // 因为这是取消结算  所以要删除对应的费用数据
                     insureIndividualCostService_consumer.deleteOutptInsureCost(map);
@@ -551,6 +551,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         outptVisitDTOFee.setCrteName(crteName);
         outptVisitDTOFee.setCrteId(crteId);
         outptVisitDTOFee.setTfcsMark("tfcs"); // 退费重收标记
+        // 退费重收取原始结算表中的病人类型  2022-03-28 lly
+        outptVisitDTOFee.setPatientCode(oldOutptSettleDTO.getPatientCode());
         outptVisitDTOFee.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
         Map setteleParam = new HashMap();
         setteleParam.put("hospCode",hospCode);
@@ -950,7 +952,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId()))
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());

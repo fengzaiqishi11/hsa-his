@@ -1,0 +1,26 @@
+version: '3'
+services: 
+# 入出院启动函数
+  hsa-interf:
+    image: image-hsa-interf:1.0
+    container_name: cont-hsa-interf
+    ports:
+      - "9012:9012"
+      - "39005:39005"
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - LANG=en_US.UTF-8
+      - spring.cloud.nacos.config.server-addr=nginx:8848
+      - spring.cloud.nacos.config.enabled=true
+      - dubbo.registry.address=nacos://nginx:8848
+    networks:
+      - custom_net
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - /app/log/:/logs/      
+
+networks:
+  custom_net:
+    external:
+      name: app_net

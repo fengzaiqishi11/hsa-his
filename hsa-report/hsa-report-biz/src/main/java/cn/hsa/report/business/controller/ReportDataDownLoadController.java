@@ -41,8 +41,8 @@ public class ReportDataDownLoadController extends BaseController {
     public WrapperResponse<ReportReturnDataDTO> saveBuild(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("crterId", sysUserDTO.getId());
-        map.put("crterName", sysUserDTO.getName());
+        map.put("crteId", sysUserDTO.getId());
+        map.put("crteName", sysUserDTO.getName());
         return reportDataDownLoadService.saveBuild(map);
     }
 

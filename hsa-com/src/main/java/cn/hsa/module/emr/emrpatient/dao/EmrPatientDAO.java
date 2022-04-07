@@ -388,4 +388,14 @@ public interface EmrPatientDAO {
 	 * @return
 	 */
     List<Map<String,String>> queryHisEmrJosnInfo(Map<String, String> selectMap);
+
+	/**
+	 * @Description: 查询不同部门得同级别人员信息
+	 * @Param:
+	 * @Author: liuliyun
+	 * @Email: liuliyun@powersi.com
+	 * @Date 2021/3/14 11:57
+	 * @Return
+	 */
+	List<SysUserDTO> getDiffDeptUsers(EmrPatientDTO emrPatientDTO);
 }

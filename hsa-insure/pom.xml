@@ -21,8 +21,8 @@
         <module>hsa-insure-biz</module>
         <module>hsa-insure-db</module>
         <module>hsa-insure-generic</module>
-        <module>hsa-insure-tencent</module>
-        <module>hsa-insure-ali</module>
+<!--        <module>hsa-insure-tencent</module>-->
+<!--        <module>hsa-insure-ali</module>-->
     </modules>
 
     <dependencies>

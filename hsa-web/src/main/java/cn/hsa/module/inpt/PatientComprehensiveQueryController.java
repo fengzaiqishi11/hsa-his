@@ -15,10 +15,7 @@ import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -393,5 +390,21 @@ public class PatientComprehensiveQueryController extends BaseController {
         map.put("hospCode",sysUserDTOSession.getHospCode());
         map.put("codes", MapUtils.get(codes, "code"));
         return comprehensiveQueryService_consumer.queryYWLX(map);
+    }
+
+    /**
+     * @Menthod: updateVisitPreferential
+     * @Desrciption: 修改病人优惠类别
+     * @Param: preferentialTypeId：优惠类别id，visitId：就诊id
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2022-03-21 11:31
+     * @Return: boolean
+     **/
+    @PostMapping("/updateVisitPreferential")
+    public WrapperResponse<Boolean> updateVisitPreferential(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return comprehensiveQueryService_consumer.updateVisitPreferential(map);
     }
 }

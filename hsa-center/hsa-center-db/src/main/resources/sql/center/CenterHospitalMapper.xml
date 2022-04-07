@@ -36,6 +36,8 @@
         <result property="crteTime" column="crte_time" jdbcType="DATE"/>
         <result property="diseaseCode" column="disease_code" jdbcType="VARCHAR"/>
         <result property="operCode" column="oper_code" jdbcType="VARCHAR"/>
+        <result property="auditFlag" column="audit_flag" jdbcType="VARCHAR"/>
+        <result property="auditMsg" column="audit_msg" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -83,7 +85,7 @@
                 start_date = #{startDate},
                 end_date = #{endDate},
             encrypt_end_date = #{encryptEndDate},
-            encrypt_start_date = #{encrypt_start_date}
+            encrypt_start_date = #{encryptStartDate}
         </set>
         where id = #{id}
     </update>
@@ -114,7 +116,7 @@
     select
     id, code, name, pro_code, city_code, area_code, disease_code, oper_code, buli_image_path, address, phone, fax, email, post_code,
     hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date,
-    end_date, is_valid, crte_id, crte_name, crte_time
+    end_date, is_valid, crte_id, crte_name, crte_time,audit_flag,audit_msg
     from center_hospital
         <where>
             <if test="keyword != null and keyword != ''">
@@ -133,8 +135,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="" useGeneratedKeys="true">
-        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code)
-        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode})
+        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code,audit_flag)
+        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode},#{auditFlag})
     </insert>
 
     <!--通过主键删除-->
@@ -157,5 +159,87 @@
             and id != #{id}
         </if>
     </select>
+
+    <insert id="insertBatchCenterSyncFlow" >
+        insert into center_sync_flow(id,hosp_code, type,status_code, message,creat_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.hospCode}, #{item.type},#{item.statusCode}, #{item.message}, #{item.creatTime})
+        </foreach>
+    </insert>
+
+    <select id="queryCenterSyncFlows" resultType="cn.hsa.module.center.hospital.dto.CenterSyncFlowDto">
+        SELECT
+        a.id,
+        a.hosp_code AS hospCode,
+        a.type,
+        a.status_code AS statusCode,
+        a.message,
+        a.creat_time AS creatTime,
+        b.name as typeName
+    FROM
+        center_sync_flow a,center_code_detail b
+    WHERE
+        b.c_code ='TBLX'
+        AND a.type = b.value
+        AND a.hosp_code= #{hospCode}   ORDER BY A.creat_time
+    </select>
+
+    <update id="updateAudit">
+        UPDATE center_hospital SET AUDIT_FLAG =#{auditFlag},AUDIT_MSG = #{auditMsg} where code =#{code}
+    </update>
+
+    <select id="findRootDataBase" resultType="cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO">
+        SELECT
+        a.id,
+        a.type,
+        a.jdbc_driver AS jdbcDriver,
+        a.root_user AS rootUser,
+        a.root_password AS rootPassword,
+        a.root_url AS rootUrl,
+        a.hosp_url AS hospUrl
+        FROM
+        center_root_database a
+    </select>
+
+    <update id="updateBatchCenterSyncFlow">
+        <foreach collection="list" item="flow" separator=";">
+            UPDATE center_sync_flow
+            <set>
+                status_code = #{flow.statusCode},
+                message = #{flow.message},
+                creat_time = #{flow.creatTime}
+            </set>
+            <where>
+                hosp_code = #{flow.hospCode} and type = #{flow.type}
+            </where>
+        </foreach>
+
+    </update>
+
+    <update id="updateRootBase" >
+        UPDATE center_root_database a
+        <set>
+            a.type = #{type},
+            a.jdbc_driver = #{jdbcDriver} ,
+            a.root_user = #{rootUser} ,
+            a.root_password = #{rootPassword} ,
+            a.root_url = #{rootUrl} ,
+            a.hosp_url = #{hospUrl}
+        </set>
+        <where>
+            id = #{id}
+        </where>
+
+    </update>
+
+    <insert id="insertRootBase">
+        INSERT INTO center_root_database
+        (id, type, jdbc_driver, root_user, root_password, root_url, hosp_url)
+        VALUES
+        ( #{id}, #{type}, #{jdbcDriver}, #{rootUser}, #{rootPassword}, #{rootUrl}, #{hospUrl})
+
+    </insert>
+
 
 </mapper>

@@ -1,0 +1,7 @@
+FROM java:8
+RUN groupadd --gid 5000 app &&  useradd --home-dir /home/app --create-home --uid 5000 --gid 5000  app
+USER app
+WORKDIR /
+ADD /hsa-sys.jar /
+EXPOSE 19003
+ENTRYPOINT ["java","-Xms1024m","-Xmx1024m","-XX:+UseG1GC","-XX:+HeapDumpOnOutOfMemoryError","-XX:HeapDumpPath=/logs/hsa-sys","-XX:+PrintGCDetails","-XX:+PrintGCTimeStamps","-XX:+UseGCLogFileRotation","-XX:NumberOfGCLogFiles=10","-XX:GCLogFileSize=10M", "-Xloggc:/logs/hsa-sys/gc.log","-jar","/hsa-sys.jar"]

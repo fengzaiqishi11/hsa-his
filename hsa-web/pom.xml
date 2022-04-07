@@ -245,6 +245,12 @@
             <artifactId>spring-session-data-redis</artifactId>
             <version>${spring-session-data-redis.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>de.schlichtherle.truelicense</groupId>
+            <artifactId>truelicense-core</artifactId>
+            <version>1.33</version>
+        </dependency>
     </dependencies>
 
        <build>

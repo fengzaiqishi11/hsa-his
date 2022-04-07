@@ -171,4 +171,9 @@ public class OutptRegisterDTO extends OutptRegisterDO implements Serializable {
     private String bookingTime;
     // 初/复诊标志
     private String isFirstVisit;
+
+    /**
+     *  养转医标志
+     */
+    private String careToMedicId;
 }

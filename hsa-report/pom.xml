@@ -19,8 +19,8 @@
         <module>hsa-report-biz</module>
         <module>hsa-report-db</module>
         <module>hsa-report-generic</module>
-        <module>hsa-report-tencent</module>
-        <module>hsa-report-ali</module>
+<!--        <module>hsa-report-tencent</module>-->
+<!--        <module>hsa-report-ali</module>-->
     </modules>
 
     <dependencies>

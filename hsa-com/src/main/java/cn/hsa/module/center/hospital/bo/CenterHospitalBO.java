@@ -2,6 +2,8 @@ package cn.hsa.module.center.hospital.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 
 import java.util.List;
 /**
@@ -86,4 +88,28 @@ public interface CenterHospitalBO {
      * @Return int
      **/
     boolean update(CenterHospitalDTO centerHospitalDTO);
+    /**
+     * @Menthod queryCenterSyncFlows()
+     * @Desrciption 查询同步流程数据
+     * @Param
+     * 1. centerSyncFlowDto  参数数据对象
+     * @Author PENGBO
+     * @Date   2022/3/21 15:58
+     * @Return int
+     **/
+   List<CenterSyncFlowDto> queryCenterSyncFlows(CenterSyncFlowDto centerSyncFlowDto);
+    /**
+     * @param centerHospitalDTO
+     * @Menthod auditHosp()
+     * @Desrciption 审核医院
+     * @Param 1.[CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date 2022/3/21 16:28
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
+     */
+    boolean updateAudit(CenterHospitalDTO centerHospitalDTO);
+
+    boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    CenterRootDatabaseBO findRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 }

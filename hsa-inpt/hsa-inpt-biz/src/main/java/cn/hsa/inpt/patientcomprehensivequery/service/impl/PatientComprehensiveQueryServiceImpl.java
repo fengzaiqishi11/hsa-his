@@ -283,4 +283,18 @@ public class PatientComprehensiveQueryServiceImpl extends HsafService implements
   public WrapperResponse<List<Map<String, Object>>> queryYWLX(Map map) {
     return WrapperResponse.success(patientComprehensiveQueryBO.queryYWLX(map));
   }
+
+  /**
+   * @Menthod: updateVisitPreferential
+   * @Desrciption: 修改病人优惠类别
+   * @Param: preferentialTypeId：优惠类别id，visitId：就诊id
+   * @Author: luoyong
+   * @Email: luoyong@powersi.com.cn
+   * @Date: 2022-03-21 11:31
+   * @Return: boolean
+   **/
+  @Override
+  public WrapperResponse<Boolean> updateVisitPreferential(Map<String, Object> map) {
+    return WrapperResponse.success(patientComprehensiveQueryBO.updateVisitPreferential(map));
+  }
 }

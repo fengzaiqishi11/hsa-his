@@ -57,7 +57,7 @@ public class StroStockDetailDO extends PageDO implements Serializable {
     //批号
     private String batchNo;
     //有效期
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date expiryDate;
     //拆零数量

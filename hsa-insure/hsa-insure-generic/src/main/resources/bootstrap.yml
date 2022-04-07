@@ -39,3 +39,7 @@ security:
   oauth2:
     client:
       permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
+management:
+  health:
+    elasticsearch:
+      enabled: false

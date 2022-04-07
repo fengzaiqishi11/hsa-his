@@ -222,5 +222,31 @@ public class InsureUnifiedPayReversalTradeServiceImpl extends HsafService implem
         return WrapperResponse.success(insureUnifiedPayReversalTradeBO.querySumDeclareInfoPrint(paraMap));
     }
 
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfos
+     * @Desrciption 清算申报合计报表打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> querySumDeclareInfos(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.querySumDeclareInfos(paraMap));
+    }
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfoPrint
+     * @Desrciption 清算申报报表明细打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryDeclareInfosPrint(Map<String, Object> paraMap) {
+        return WrapperResponse.success(insureUnifiedPayReversalTradeBO.queryDeclareInfosPrint(paraMap));
+    }
+
 
 }

@@ -37,7 +37,7 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 * @Return
 	 */
 	@Override
-	public void insureOutptVisitUpload(Map<String, Object> unifiedPayMap) {
+	public void UP_2203(Map<String, Object> unifiedPayMap) {
 		insureUnifiedPayOutptBO.UP_2203(unifiedPayMap);
 	}
 
@@ -50,7 +50,7 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 * @Return
 	 */
 	@Override
-	public Map<String, Object> insureOutptSettleAccountIn(Map<String, Object> unifiedPayMap) {
+	public Map<String, Object> UP_2206(Map<String, Object> unifiedPayMap) {
 		return insureUnifiedPayOutptBO.UP_2206(unifiedPayMap);
 	}
 
@@ -119,7 +119,7 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 * @Return
 	 */
 	@Override
-	public WrapperResponse<Boolean> updateCancelFeeSubmit(Map<String, Object> map) {
+	public WrapperResponse<Boolean> UP_2205(Map<String, Object> map) {
 		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_2205(map));
 	}
 
@@ -133,8 +133,8 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 * @Return
 	 */
 	@Override
-	public WrapperResponse<Boolean> updateFeeSubmit(Map<String, Object> map) {
-		return WrapperResponse.success(insureUnifiedPayOutptBO.insertOutptUnifiedFee(map));
+	public WrapperResponse<Boolean> UP_2204(Map<String, Object> map) {
+		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_2204(map));
 	}
 
 	/**
@@ -193,31 +193,4 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 		return WrapperResponse.success(insureUnifiedPayOutptBO.UP4302(map));
 	}
 
-	/**
-	 * @Method handlerInsurePatientSum
-	 * @Desrciption  结算之前,保存个人累计信息
-	 * @Param
-	 *
-	 * @Author fuhui
-	 * @Date   2021/12/14 16:13
-	 * @Return
-	 **/
-	@Override
-	public WrapperResponse<Boolean> insertPatientSumInfo(Map<String, Object> map) {
-		return WrapperResponse.success(insureUnifiedPayOutptBO.insertPatientSumInfo(map));
-	}
-
-	/**
-	 * @Method updateInsureCost
-	 * @Desrciption  费用传输以后：更新医保的反参数据
-	 * @Param
-	 *
-	 * @Author fuhui
-	 * @Date   2021/5/21 8:35
-	 * @Return
-	 **/
-	@Override
-	public WrapperResponse<Boolean> insertInsureCost(List<Map<String, Object>> resultDataMap, Map<String, Object> map,List<Map<String, Object>> list) {
-		return WrapperResponse.success(insureUnifiedPayOutptBO.insertInsureCost(resultDataMap,map,list));
-	}
 }

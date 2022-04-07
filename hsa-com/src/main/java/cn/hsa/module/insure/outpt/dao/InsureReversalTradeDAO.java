@@ -175,4 +175,24 @@ public interface InsureReversalTradeDAO {
      * @Return
     **/
     InsureIndividualSettleDTO querySettleInfo(Map<String, Object> map);
+
+    /**
+     * @param paraMap
+     * @Method querySumDeclareInfosPage
+     * @Desrciption 清算申报合计报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List<Map<String,Object>> querySumDeclareInfos(Map<String, Object> paraMap);
+
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfosPage
+     * @Desrciption 清算申报报表
+     * @Author liaojiguang
+     * @Date 2021/10/21 09:01
+     * @Return
+     **/
+    List<Map<String, Object>> queryDeclareInfos(Map<String, Object> paraMap);
 }

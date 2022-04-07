@@ -16,17 +16,6 @@ import java.util.Map;
  **/
 @FeignClient(value = "hsa-insure")
 public interface InsureUnifiedPayInptService {
-    /**
-     * @Menthod: UP_2305
-     * @Desrciption: 统一支付平台-住院结算撤销
-     * @Param: 节点标识-flag-节点标识：data
-     * @Author: luoyong
-     * @Email: luoyong@powersi.com.cn
-     * @Date: 2021-02-10 11:00
-     * @Return:
-     **/
-    Map<String,Object> editCancelInptSettle(Map<String,Object> insureUnifiedMap);
-
 
 
     /**
@@ -124,5 +113,17 @@ public interface InsureUnifiedPayInptService {
      * @Date: 2021-08-21 16:22
      * @Return: 
      **/
+
+    /**
+     * @Menthod: UP_2305
+     * @Desrciption: 统一支付平台-住院结算撤销
+     * @Param: 节点标识-flag-节点标识：data
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-02-10 11:00
+     * @Return:
+     **/
+    Map<String,Object> UP_2305(Map<String,Object> insureUnifiedMap);
+
     WrapperResponse<Map<String, Object>> UP_4602(Map<String, Object> map);
 }

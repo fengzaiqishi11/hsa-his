@@ -1440,6 +1440,9 @@
         select count(id) from insure_individual_settle
         where hosp_code = #{hospCode} and visit_id =#{visitId} and medicalRegNo =#{medicalRegNo} and state ='0'
     </select>
+    <select id="selectTotalAdvance" resultType="java.math.BigDecimal">
+        select total_advance from inpt_visit where id =#{visitId} and hosp_code =#{hospCode}
+    </select>
 
     <!-- 修改数据 -->
     <update id="updateByInsureSettleId" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
@@ -1699,6 +1702,25 @@
             </if>
         </set>
         WHERE insureSettleId = #{insureSettleId} and hosp_code = #{hospCode} and insure_reg_code = #{insureRegCode}
+    </update>
+    <update id="updateEntityAcctPay">
+        update insure_individual_settle set personal_price =#{personalPrice},
+                                            before_settle =#{beforeSettle},
+                                            last_settle =#{beforeSettle} -#{personalPrice}
+        where id =#{id} and hosp_code =#{hospCode}
+
+    </update>
+    <update id="updateOutptSettleAcctPay" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        update outpt_settle set acct_pay =#{personalPrice},
+                               self_price =self_price - #{personalPrice}
+        where id =#{settleId} and hosp_code =#{hospCode}
+    </update>
+    <update id="updateInptSettleAcctPay" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        update inpt_settle set acct_pay =#{personalPrice},
+                               self_price =self_price - #{personalPrice},
+        settle_take_price =#{settleTakePrice},
+                               settle_back_price =#{settleBackPrice}
+        where id =#{settleId} and hosp_code =#{hospCode}
     </update>
 
 </mapper>

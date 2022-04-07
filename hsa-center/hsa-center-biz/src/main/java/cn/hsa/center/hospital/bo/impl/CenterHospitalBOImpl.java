@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.datasource.bo.CenterDatasourceBO;
 import cn.hsa.module.center.datasource.dao.CenterHospitalDatasourceDAO;
 import cn.hsa.module.center.datasource.dto.CenterDatasourceDTO;
+import cn.hsa.module.center.datasource.dto.CenterHospitalDatasourceDTO;
 import cn.hsa.module.center.datasource.entity.CenterDatasourceDO;
 import cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO;
 import cn.hsa.module.center.hospital.bo.CenterHospitalBO;
@@ -184,6 +185,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
         if(StringUtils.isEmpty(centerHospitalDTO.getId())){
             centerHospitalDTO.setId(SnowflakeUtils.getId());   // 设置主键id
             centerHospitalDTO.setCode(syncOrderRuleBO.updateOrderNo("YYBM"));
+            centerHospitalDTO.setAuditFlag("0");
             centerHospitalDTO.setCrteTime(DateUtils.getNow()); //设置操作时间
             centerHospitalDTO.setCrteId(centerHospitalDTO.getCrteId());     // 设置操作人id
             centerHospitalDTO.setCrteName(centerHospitalDTO.getCrteName()); // 设置操作人姓名
@@ -264,6 +266,9 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
             try {
                 //新建医院数据库用户
                 try {
+                    if(centerRootDatabaseBO == null){
+                        throw new AppException("中心端ROOT权限用户未配置！");
+                    }
                     centerSyncFlowDto = new CenterSyncFlowDto ();
                     centerSyncFlowDto.setHospCode(centerHospitalDTO.getCode());
                     centerSyncFlowDto.setType("1");
@@ -274,7 +279,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 }catch (Exception e){
                     e.printStackTrace();
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("新建医院数据库用户");
+                    centerSyncFlowDto.setMessage("新建医院数据库用户，原因："+e.getMessage());
                     throw new RuntimeException("新建医院数据库用户失败，原因："+e.getMessage());
                 }finally {
 
@@ -292,8 +297,8 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     centerHospitalDatasourceDO =  createDataSource (centerHospitalDTO,centerRootDatabaseBO);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("创建医院数据库信息操作失败");
-                    throw new RuntimeException("新建医院数据库信息失败!");
+                    centerSyncFlowDto.setMessage("创建医院数据库信息操作失败,原因："+e.getMessage());
+                    throw new RuntimeException("创建医院数据库信息失败!");
                 }finally {
 
                     centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -310,7 +315,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     linkDataSource(centerHospitalDatasourceDO);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("匹配医院数据源信息操作失败");
+                    centerSyncFlowDto.setMessage("匹配医院数据源信息操作失败,原因："+e.getMessage());
                     throw new RuntimeException("匹配医院数据源失败!");
                 }finally {
 
@@ -329,7 +334,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 }catch (Exception e){
                     e.printStackTrace();
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("下发医院基础数据操作失败");
+                    centerSyncFlowDto.setMessage("下发医院基础数据操作失败,原因："+e.getMessage());
                     throw new RuntimeException("下发匹配同步表失败!");
                 }finally {
 
@@ -347,7 +352,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                     centerSyncFlowDtos.add(centerSyncFlowDto);
                 }catch (Exception e){
                     centerSyncFlowDto.setStatusCode("2");
-                    centerSyncFlowDto.setMessage("操作失败");
+                    centerSyncFlowDto.setMessage("操作失败,原因："+e.getMessage());
                     throw new RuntimeException("全部完成失败!");
                 }finally {
                     centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -370,6 +375,11 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
     @Override
     public boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
+        if(StringUtils.isEmpty(centerRootDatabaseBO.getId())){
+            centerRootDatabaseBO.setId(SnowflakeUtils.getId());
+            return centerHospitalDao.insertRootBase(centerRootDatabaseBO);
+        }
+
         return centerHospitalDao.updateRootBase(centerRootDatabaseBO);
     }
 
@@ -380,30 +390,42 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
 
     public CenterHospitalDatasourceDO createDataSource (CenterHospitalDTO centerHospitalDTO,CenterRootDatabaseBO centerRootDatabaseBO ){
+        String dsCode = "DS"+centerHospitalDTO.getCode();
+        CenterDatasourceDTO centerDatasourceDTO =  new CenterDatasourceDTO();
+        centerDatasourceDTO.setCode(dsCode);
+        List<CenterDatasourceDTO> centerDatasourceDTOList = (List<CenterDatasourceDTO>) centerDatasourceBO.queryCenterDatasourcePage(centerDatasourceDTO).getData().getResult();
+
+
         CenterDatasourceDO centerDatasourceDO = new CenterDatasourceDO();
-        //主键ID
-        centerDatasourceDO.setId(SnowflakeUtils.getId());//id
-        //数据据编码
-        centerDatasourceDO.setCode("DS"+centerHospitalDTO.getCode());
-        //数据库名称
-        centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
-        //数据库类型
-        centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
-        //数据源驱动
-        centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
-        //数据源URL
-        String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
-        centerDatasourceDO.setUrl(url);
-        //数据源账号
-        centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
-        //数据源密码
-        centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
-        //创建人ID
-        centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
-        //创建人姓名
-        centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
-        centerDatasourceDO.setCrteTime(new Date());//创建时间
-        centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        if(ListUtils.isEmpty(centerDatasourceDTOList)){
+            //主键ID
+            centerDatasourceDO.setId(SnowflakeUtils.getId());//id
+            //数据据编码
+            centerDatasourceDO.setCode(dsCode);
+            //数据库名称
+            centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
+            //数据库类型
+            centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
+            //数据源驱动
+            centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
+            //数据源URL
+            String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
+            centerDatasourceDO.setUrl(url);
+            //数据源账号
+            centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
+            //数据源密码
+            centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
+            //创建人ID
+            centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
+            //创建人姓名
+            centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
+            centerDatasourceDO.setCrteTime(new Date());//创建时间
+            centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        }else {
+            centerDatasourceDO = centerDatasourceDTOList.get(0);
+        }
+
+
 
         CenterHospitalDatasourceDO centerHospitalDatasourceDO = new CenterHospitalDatasourceDO () ;
         //主键
@@ -425,7 +447,22 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
         List<CenterHospitalDatasourceDO> centerHospitalDatasourceDOS = new ArrayList<CenterHospitalDatasourceDO>();
         centerHospitalDatasourceDOS.add(centerHospitalDatasourceDO);
-        centerHospitalDatasourceDAO.batchInsert(centerHospitalDatasourceDOS);//批量新增数据源关系信息
+
+
+        Map map = new HashMap<>();
+        map.put("list", centerHospitalDatasourceDOS);
+        List<CenterHospitalDatasourceDTO> centerHospitalDatasourceList = centerHospitalDatasourceDAO.queryHaveHospCode(map);
+        if(!ListUtils.isEmpty(centerHospitalDatasourceList)){
+            for (CenterHospitalDatasourceDTO dto: centerHospitalDatasourceList) {
+                if(!dto.getDsCode().equals(centerHospitalDatasourceDO.getDsCode())){
+                    throw new AppException("存在医院已经绑定数据源");
+                }
+            }
+        }
+        //删除医院和数据源关系信息
+        centerHospitalDatasourceDAO.delByDsCode(centerHospitalDatasourceDO.getDsCode());
+        //批量新增数据源关系信息
+        centerHospitalDatasourceDAO.batchInsert(centerHospitalDatasourceDOS);
     }
 
 

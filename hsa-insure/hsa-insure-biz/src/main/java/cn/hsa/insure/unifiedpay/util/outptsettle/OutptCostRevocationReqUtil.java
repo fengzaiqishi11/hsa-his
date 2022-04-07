@@ -4,6 +4,7 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ import java.util.Map;
 public class OutptCostRevocationReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
 
@@ -32,9 +33,20 @@ public class OutptCostRevocationReqUtil<T> extends InsureCommonUtil implements B
         dataMap.put("chrg_bchno", "0000");
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
 
+        HashMap commParam = new HashMap();
         checkRequest(dataMap);
-        map.put("dataMap", dataMap);
-        return getInsurCommonParam(map);
+        commParam.put("dataMap", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2205);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

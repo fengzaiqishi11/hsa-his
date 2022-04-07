@@ -105,4 +105,10 @@ public class YjRcDTO extends YjRcDTODetail implements Serializable {
     private String outProfile;//档案号
 
     private String brnl;//病人年龄
+
+    //联系地址
+    private String lxdz;
+
+    //门诊诊断
+    private List<Mzzd> mzzdList;
 }

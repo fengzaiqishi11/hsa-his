@@ -43,4 +43,7 @@ public class StroInDetailDTO extends StroInDetailDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date auditTime;
+
+    //医保编码
+    private String nationCode;
 }

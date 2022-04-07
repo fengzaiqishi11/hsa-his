@@ -17,6 +17,7 @@ import cn.hsa.module.insure.emr.dao.InsureEmrAdminfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.util.*;
 
@@ -78,6 +79,9 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
     private InsureIndividualVisitDAO insureIndividualVisitDAO;
     @Resource
     private EmrPatientService emrPatientService_consumer;
+
+    @Resource
+    private InsureDictService insureDictService_consumer;
     @Override
     public PageDTO queryInsureUnifiedEmrInfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         // 设置分页信息
@@ -229,6 +233,12 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             }
             insureEmrOprninfoDTO.setSource("2");
             insureEmrOprninfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            //字典转义
+            insureEmrOprninfoDTO.setOprnTypeName(getSysCodeName(insureEmrOprninfoDTO.getHospCode(),"SSFL",insureEmrOprninfoDTO.getOprnTypeCode()));
+            insureEmrOprninfoDTO.setSincHealLvCode(getSysCodeName(insureEmrOprninfoDTO.getHospCode(),"YHDJ",insureEmrOprninfoDTO.getSincHealLv()));
+            insureEmrOprninfoDTO.setOprnLvName(getSysCodeName(insureEmrOprninfoDTO.getHospCode(),"SSJB",insureEmrOprninfoDTO.getOprnLvCode()));
+            insureEmrOprninfoDTO.setAnstMtdName(getSysCodeName(insureEmrOprninfoDTO.getHospCode(),"MZFS",insureEmrOprninfoDTO.getAnstMtdCode()));
+            insureEmrOprninfoDTO.setAnstAsaLvName(getSysCodeName(insureEmrOprninfoDTO.getHospCode(),"MGMZYSXH(ASA)FJBZDM",insureEmrOprninfoDTO.getAnstAsaLvCode()));
             insureEmrOprninfoDAO.insert(insureEmrOprninfoDTO);
         }else {
             insureEmrOprninfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
@@ -254,6 +264,8 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             }
             insureEmrRescinfoDTO.setSource("2");
             insureEmrRescinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            //字典转义
+            insureEmrRescinfoDTO.setDiseCcls(getSysCodeName(insureEmrRescinfoDTO.getHospCode(),"JC/JYJGDM",insureEmrRescinfoDTO.getDiseCclsCode()));
             insureEmrRescinfoDAO.insert(insureEmrRescinfoDTO);
         }else {
             insureEmrRescinfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
@@ -979,5 +991,13 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
             throw new AppException("请检查是否书写电子病历内容:出院小结信息等");
         }
         return HumpUnderlineUtils.underlineToHumpArray(JSON.parseArray(JSON.toJSONString(emrOutReList)),InsureEmrDscginfoDTO.class);
+    }
+
+    private String getSysCodeName(String hospCode, String code, String value) {
+        Map map = new HashMap(2);
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        Map<String, String> dictMap = insureDictService_consumer.querySysCodeByCode(map).getData();
+        return MapUtils.isEmpty(dictMap) ? "" : dictMap.get(value);
     }
 }

@@ -101,11 +101,15 @@ public class SnowflakeUtils {
         return result;
     }
 
-    public static String getId(){
-        return SnowflakeUtils.getInstanceSnowflake().nextId();
+    public static Long getLongId(){
+        return SnowflakeUtils.getInstanceSnowflake().nextId()/1000;
     }
 
-    private synchronized String nextId() {
+    public static String getId(){
+        return String.format("%016x", getLongId());
+    }
+
+    private synchronized Long nextId() {
         long timestamp = time();
         if (timestamp < lastTimestamp) {
             throw new RuntimeException("时钟向后移动，拒绝生成id  " + (lastTimestamp - timestamp) + " milliseconds");
@@ -127,7 +131,7 @@ public class SnowflakeUtils {
         long nextId = ((timestamp - TWEPOCH) << TIMESTAMP_LEFT_SHIFT)
                 | (dataCenterId << DATA_CENTER_ID_SHIFT) | (workerId << WORKER_ID_SHIFT) | sequence;
 
-        return String.valueOf(nextId);
+        return nextId;
     }
 
     private long tilNextMillis(final long lastTimestamp) {

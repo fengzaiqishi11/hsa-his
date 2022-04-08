@@ -11,8 +11,9 @@ public enum InsureExecCodesEnum implements BizExcCodes {
 
     INSUR_SYS_FAILURE(-1, OTHER_SYS_ERR_MSG+"流水号-{1},医保业务功能号 {2}-{3}, 错误异常信息:{4}"),
 
-    IN_HOSP_FEE_DATA_EMPTY(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！");
+    IN_HOSP_FEE_DATA_EMPTY(-1, SYS_MSG_INNER + "住院就诊号{1}的患者没有可以上传的医保费用数据！"),
 
+    PARAM_CHANGE_ERROR(-1,SYS_MSG_INNER + "{1},系统配置参数异常:{1}"),;
     /**
      * 100000-1000019 基础异常码
 

@@ -42,6 +42,8 @@ public class InptDiagnoseDTO extends InptDiagnoseDO implements Serializable {
     private String attachCode;
     //国家编码
     private String nationCode;
+    // 疾病国家名称
+    private String nationName;
     // 入院科室名称
     private String inDeptName;
    // 入院科室id

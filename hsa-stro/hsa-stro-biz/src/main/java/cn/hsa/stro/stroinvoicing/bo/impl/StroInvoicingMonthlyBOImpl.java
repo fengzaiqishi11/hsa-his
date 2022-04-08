@@ -43,8 +43,26 @@ public class StroInvoicingMonthlyBOImpl implements StroInvoicingMonthlyBO {
      */
     @Override
     public boolean copyStroInvoicing(Map map) {
+        // 获得同步日期
+        Date date = MapUtils.get(map, "date");
+        String hospCode = MapUtils.get(map, "hospCode");
+        // 取出当前主表中最近的更新时间
+         Date recentTime = stroInvoicingMonthlyDAO.queryRecentlyUpdateTime(date,hospCode);
 
-        // 获得当天的日期
+
+        business(map);
+        return true;
+    }
+    /**
+     * @Meth: business
+     * @Description: 同步的业务代码
+     * @Param: [map]
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/4/7
+     */
+    private void business(Map map) {
+        // 获得同步的日期
         Date date = MapUtils.get(map, "date");
         String hospCode = MapUtils.get(map, "hospCode");
         // 封装请求参数
@@ -100,12 +118,12 @@ public class StroInvoicingMonthlyBOImpl implements StroInvoicingMonthlyBO {
                 copyList(notExistMainDataList, StroInvoicingMonthlyDTO.class);
         //插入主表,注意主键要用monthlyId这个值，这样就不用再遍历了
         stroInvoicingMonthlyDAO.insertBatch(stroInvoicingMonthlyDTOS);
-        //插入明细表
+        //插入明细表，插入明细表之前，先删除当前日期的数据，防止重复
         stroInvoicingMonthlyDetailDAO.insertBatch(stroInvoicingDetails);
         // todo 4.更新主表
-
-        return true;
+        stroInvoicingMonthlyDAO.updateByDate(hospCode,date);
     }
+
     /**
      * @Meth: getStroInvoicingPharMonthlyDetails
      * @Description:

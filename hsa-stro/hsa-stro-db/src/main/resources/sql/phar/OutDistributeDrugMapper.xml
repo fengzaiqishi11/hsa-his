@@ -172,7 +172,8 @@
         br.daily_times as dailyTimes,
         d.herb_num as chineseDrugNum,
         br.remark as rateRemark,
-        case when e.big_type_code='2' then d.herb_num else opd.use_days end useDays
+        case when e.big_type_code='2' then d.herb_num else opd.use_days end useDays,
+        e.nation_code as nationCode
         from phar_out_receive_detail a
         join phar_out_receive b on a.or_id=b.id
         left join base_window c on b.window_id=c.id and c.hosp_code=#{hospCode}
@@ -214,6 +215,10 @@
         (select name from base_dept where id=b.phar_id and hosp_code=b.hosp_code) bizName,a.usage_code,
         (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code
         and f.id=a.item_id) prodName,
+        case a.item_code when '1'
+        then  e.nation_code
+        when '2'
+        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode,
         br.name as rateName,
         br.daily_times as dailyTimes,
         br.remark as rateRemark,

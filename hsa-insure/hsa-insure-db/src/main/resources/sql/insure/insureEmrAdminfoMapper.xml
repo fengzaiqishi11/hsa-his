@@ -211,7 +211,6 @@
     AND c.id = t.mib_id
     left join insure_emr_adminfo a on a.mdtrt_sn = e.visit_id
     <where>
-      a.vali_flag = '1'
       <if test="visitDrptId != null and visitDrptId != '' ">
         and t.visit_drpt_id = #{visitDrptId}
       </if>

@@ -75,4 +75,6 @@
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDoctorMgtinfoService" ref="insureDoctorMgtinfoService_provider"/>
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureUnifiedLogService" ref="insureUnifiedLogService_provider"/>
     <dubbo:service interface="cn.hsa.module.insure.outpt.service.InsureUnifiedUniversityService" ref="insureUnifiedUniversityService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService" ref="insureFmiOwnpayPatnService_provider"/>
 </beans>

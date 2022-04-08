@@ -100,4 +100,7 @@ public class PharInReceiveDetailDTO extends PharInReceiveDetailDO implements Ser
      * 总金额
      */
     private BigDecimal totalPrice;
+
+    //医保编码
+    private String nationCode;
 }

@@ -1,5 +1,7 @@
 package cn.hsa.insure.util;
 
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+
 import java.util.Map;
 
 /**
@@ -18,7 +20,7 @@ public interface BaseReqUtil<T> {
      * @return T
      * @method initRequest
      **/
-    String initRequest(T param);
+    InsureInterfaceParamDTO initRequest(T param);
 
     /**
      * 医保参数校验

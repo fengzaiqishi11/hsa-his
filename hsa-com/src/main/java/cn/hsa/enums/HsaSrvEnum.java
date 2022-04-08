@@ -18,7 +18,8 @@ public enum HsaSrvEnum {
     HSA_STRO("hsa-stro", "药房药库子系统"),
     HSA_PLATFORM("hsa-platform", "消息推送平台"),
     HSA_SYS("hsa-sys", "系统管理子系统"),
-    HYGEIA_HGS("hygeia-hgs", "医保助手平台");
+    HYGEIA_HGS("hygeia-hgs", "医保助手平台"),
+    HYGEIA_INSURE("hygeia-insure", "医保中心");
 
     private final String code;
     private final String desc;

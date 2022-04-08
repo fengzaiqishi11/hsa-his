@@ -799,6 +799,8 @@ public interface Constant {
 
             public static final String UP_7101 = "7101"; // 电子处方上传
             public static final String UP_4701 = "4701"; // 电子病历上传
+            public static final String UP_4101 = "4101"; // 医疗保障基金结算清单
+            public static final String UP_4101A = "4101A"; // 医疗保障基金结算清单新
 
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询

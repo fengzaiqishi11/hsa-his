@@ -147,6 +147,10 @@ public class BaseDrugDO extends PageDO implements Serializable {
      */
     private String nationCode;
     /**
+     * 国家卫健委编码名称
+     */
+    private String nationName;
+    /**
      * 药品说明书
      */
     private String drugRemark;

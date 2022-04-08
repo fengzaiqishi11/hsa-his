@@ -35,4 +35,7 @@ public class StroOutDetailDTO extends StroOutDetailDO implements Serializable {
     private String prodCode; //生产编码
     private List<String> outIds;// 出库id 集合
     private String deptName;// 接收单位
+    private String nationCode;// 医保编码
+
+
 }

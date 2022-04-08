@@ -94,4 +94,6 @@ public class PharOutReceiveDetailDTO extends PharOutReceiveDetailDO implements S
     private String isSkin;
     // 开方医生
     private String doctorName;
+    // 医保编码
+    private String nationCode;
 }

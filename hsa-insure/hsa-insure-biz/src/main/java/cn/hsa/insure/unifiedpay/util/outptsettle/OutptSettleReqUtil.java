@@ -4,6 +4,7 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.Constants;
@@ -26,7 +27,7 @@ import java.util.Map;
 public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
@@ -86,9 +87,22 @@ public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUt
         settleMap.put("inscp_scp_amt", "");
         // 公立医院改革标志
         settleMap.put("pub_hosp_rfom_flag", "");
+
+        HashMap commParam = new HashMap();
         checkRequest(settleMap);
-        map.put("dataMap", settleMap);
-        return getInsurCommonParam(map);
+
+        commParam.put("dataMap", settleMap);
+        commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2207);
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

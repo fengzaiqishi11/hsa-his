@@ -867,7 +867,7 @@
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.reimbursement_ratio
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.nation_name, a.reimbursement_ratio
         from base_drug a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -925,7 +925,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-        a.pym usual_pym ,'' as technology_code,a.nation_code, a.reimbursement_ratio
+        a.pym usual_pym ,'' as technology_code,a.nation_code, a.nation_name, a.reimbursement_ratio
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -967,7 +967,7 @@
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
         '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code, a.reimbursement_ratio as reimbursement_ratio
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code, '' as nation_name, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
@@ -1845,7 +1845,7 @@
     <!--  获取诊断信息 -->
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
-        a.is_main isMain, b.name diseaseName,b.code as diseaseCode,ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
+        a.is_main isMain, b.name diseaseName,b.code as diseaseCode, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName, ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
         a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
@@ -1859,7 +1859,7 @@
     <!--  获取门诊病历诊断信息 -->
     <select id="getOutptMedicalRecordDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select
-            a.id, a.hosp_code hospCode, c.id diseaseId, a.visit_id visitId, c.name diseaseName
+            a.id, a.hosp_code hospCode, c.id diseaseId, a.visit_id visitId, c.name diseaseName, c.nation_code as nationCode, ifnull(c.nation_name, c.name) as nationName
         from  outpt_medical_record a
                   left join base_disease c on find_in_set(c.id, a.disease_id) and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}

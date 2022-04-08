@@ -598,7 +598,7 @@ public class EmrPatientController extends BaseController {
 	 * @Return
 	 */
 	@GetMapping("/updateHisEmrJosnInfo")
-		public WrapperResponse<Boolean> updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+		public WrapperResponse updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
 		SysUserDTO sysUserDTO = getSession(req, res);
 		if (StringUtils.isEmpty(inptVisitDTO.getVisitId())){
 			throw new AppException("请选择要上传病历的病人");
@@ -610,7 +610,7 @@ public class EmrPatientController extends BaseController {
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("inptVisitDTO", inptVisitDTO);
-		return emrPatientService_consumer.updateHisEmrJosnInfo(map);
+		return WrapperResponse.success(emrPatientService_consumer.updateHisEmrJosnInfo(map));
 	}
 
 

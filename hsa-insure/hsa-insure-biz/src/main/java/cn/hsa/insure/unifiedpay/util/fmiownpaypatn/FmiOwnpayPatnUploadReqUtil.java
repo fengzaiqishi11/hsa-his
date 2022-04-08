@@ -9,8 +9,12 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
+import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
+import cn.hsa.module.insure.module.dto.InsureUploadCostDTO;
+import cn.hsa.module.insure.module.dto.ItemInfoDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -42,11 +46,12 @@ import java.util.stream.Collectors;
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_4261)
 public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
+
     @Resource
-    private SysParameterService sysParameterService_consumer;
+    private InsureGetInfoDAO insureGetInfoDAO;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         InsureConfigurationDTO insureConfigurationDTO =  (InsureConfigurationDTO) map.get("insureConfigurationDTO");
         InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisitDTO");
@@ -70,11 +75,26 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             dataMap.put("fmiOwnpayPatnDiseListDDTOS", initOutptDiseListDDTOS(outptDiagnoseDTOList,outptMatchDiagnoseDTOList,insureConfigurationDTO));
             dataMap.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO));
         }
-
-
+        List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
+        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() >0 ){
+            dataMap.put("upType", "1");
+        }else{
+            dataMap.put("upType", "0");
+        }
+        HashMap commParam = new HashMap();
         checkRequest(dataMap);
-        map.put("input", dataMap);
-        return getInsurCommonParam(map);
+        commParam.put("input", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4261);
+
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+        return getInsurCommonParam(commParam);
     }
 
     private FmiOwnpayPatnMdtrtDDTO initMdtrtDDTO(InptVisitDTO inptVisitDTO,InsureConfigurationDTO insureConfigurationDTO) {

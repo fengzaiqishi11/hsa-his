@@ -10,6 +10,7 @@ import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -46,7 +47,7 @@ public class FmiOwnpayPatnLedgerResultReqUtil<T> extends InsureCommonUtil implem
     private SysParameterService sysParameterService_consumer;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         Map<String, Object> dataMap = new HashMap<>(3);
@@ -57,9 +58,22 @@ public class FmiOwnpayPatnLedgerResultReqUtil<T> extends InsureCommonUtil implem
 
         dataMap.put("pageNum",MapUtils.get(map,"pageNum"));
         dataMap.put("pageSize",MapUtils.get(map,"pageSize"));
+
+        HashMap commParam = new HashMap();
         checkRequest(dataMap);
-        map.put("input", dataMap);
-        return getInsurCommonParam(map);
+        commParam.put("input", dataMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4263);
+
+        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

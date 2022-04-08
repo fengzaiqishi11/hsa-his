@@ -6,6 +6,7 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.DateUtils;
@@ -38,7 +39,7 @@ public class FmiOwnpayPatnFeeUploadReqUtil<T> extends InsureCommonUtil implement
     private SysParameterService sysParameterService_consumer;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         List<Map<String, Object>> mapList = MapUtils.get(map, "mapList");

@@ -325,10 +325,10 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         paramMap.put("isHospital",insureIndividualVisitDTO.getIsHospital());
         paramMap.put("visitId",insureIndividualVisitDTO.getVisitId());
         //参数校验,规则校验和请求初始化
-        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.OUTPATIENT_VISIT.getCode());
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INSUR_BASE_INFO.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         interfaceParamDTO.setHospCode(hospCode);
-        interfaceParamDTO.setIsHospital(Constants.SF.F);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
         interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
 
         Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, interfaceParamDTO);

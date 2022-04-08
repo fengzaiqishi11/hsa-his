@@ -144,6 +144,10 @@
         (ifnull((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end),'')))) patientInfo,
         a.split_unit_code splitUnitCode,ifnull(a.splitNum,0) splitNum,a.split_ratio splitRatio,
         (select name from base_product e join base_drug f on f.prod_code=e.code where e.hosp_code=a.hosp_code and f.hosp_code=a.hosp_code and f.id=a.item_id) prodName,
+        case a.item_code when '1'
+            then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+            then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode,
         a.in_no
         from (
         select a.id,a.receive_id,a.item_name,a.spec,
@@ -238,7 +242,11 @@
             select a.item_code itemCode,a.item_id itemId,a.item_name itemName,a.spec,a.price,a.unit_code unitCode,b.phar_id,a.split_ratio splitRatio,
             ifnull(sum(a.dosage),0) dosage,ifnull(sum(a.num),0) total,a.hosp_code,ifnull(sum(a.split_num),0) splitNum,a.split_unit_code splitUnitCode,
             a.dosage_unit_code dosageUnitCode,
-        (select name from base_product c join base_drug d on d.prod_code=c.code where c.hosp_code=a.hosp_code and d.hosp_code=a.hosp_code and d.id=a.item_id) prodName
+        (select name from base_product c join base_drug d on d.prod_code=c.code where c.hosp_code=a.hosp_code and d.hosp_code=a.hosp_code and d.id=a.item_id) prodName,
+        case a.item_code when '1'
+        then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode
             from phar_in_receive_detail a
             join phar_in_receive b on a.receive_id=b.id
             where 1=1

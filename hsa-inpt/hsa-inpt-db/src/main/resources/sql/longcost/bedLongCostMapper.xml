@@ -345,6 +345,18 @@
         a.item_code AS itemCode,
         a.item_id AS itemId,
         a.item_name AS itemName,
+        (case
+        when a.item_code = '1' then (select bd.nation_code from base_drug bd where a.item_id = bd.id and bd.hosp_code =a.hosp_code )
+        when a.item_code = '2' then (select bm.nation_code from base_material bm where a.item_id =  bm.id  and bm.hosp_code = a.hosp_code )
+        when a.item_code = '3' then (select bi.nation_code from base_item bi where a.item_id =  bi.id  and bi.hosp_code = a.hosp_code )
+        end
+        ) as nationCode,
+        (case
+        when a.item_code = '1' then (select bd.nation_name from base_drug bd where a.item_id = bd.id and bd.hosp_code =a.hosp_code )
+        when a.item_code = '2' then (select bm.nation_name from base_material bm where a.item_id =  bm.id  and bm.hosp_code = a.hosp_code )
+        when a.item_code = '3' then (select bi.nation_name from base_item bi where a.item_id =  bi.id  and bi.hosp_code = a.hosp_code )
+        end
+        ) as nationName,
         (case when a.item_code ='2' then e.bfc_id when a.item_code = '3' then d.bfc_id else '' end) as bfcId ,
         (case when a.item_code ='2' then e.bfc_name when a.item_code = '3' then d.bfc_name else '' end) as bfcName ,
         a.price,

@@ -60,7 +60,9 @@
         /*最近入库的时间*/
         (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
         /*最近入库的失效时间*/
-        ssd.expiry_date
+        ssd.expiry_date,
+        ifnull(b.nation_code, '') as insureItemCode,
+        ifnull(b.nation_name,  b.good_name) as insureItemName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -165,7 +167,9 @@
         /*最近入库的时间*/
         (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
         /*最近入库的失效时间*/
-        ssd.expiry_date
+        ssd.expiry_date,
+        ifnull(b.nation_code, '') as insureItemCode,
+        ifnull(b.nation_name,  b.name) as insureItemName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -260,7 +264,9 @@
         /*最近入库的时间*/
         (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
         /*最近入库的失效时间*/
-        ssd.expiry_date
+        ssd.expiry_date,
+        ifnull(b.nation_code, '') as insureItemCode,
+        ifnull(b.nation_name,  b.good_name) as insureItemName
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -361,7 +367,9 @@
         /*最近入库的时间*/
         (select crte_time from stro_in_record where stock_detail_id = ssd.id limit 1) as crteTime,
         /*最近入库的失效时间*/
-        ssd.expiry_date
+        ssd.expiry_date,
+        ifnull(b.nation_code, '') as insureItemCode,
+        ifnull(b.nation_name,  b.name) as insureItemName
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code

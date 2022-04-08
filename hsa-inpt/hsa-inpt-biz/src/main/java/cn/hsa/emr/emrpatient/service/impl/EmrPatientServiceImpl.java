@@ -423,8 +423,8 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 	 * @Return
 	 */
 	@Override
-	public WrapperResponse<Boolean> updateHisEmrJosnInfo(Map map) {
+	public Map<String, Object> updateHisEmrJosnInfo(Map map) {
 		InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
-		return WrapperResponse.success(emrPatientBO.updateHisEmrJosnInfo(inptVisitDTO));
+		return emrPatientBO.updateHisEmrJosnInfo(inptVisitDTO);
 	}
 }

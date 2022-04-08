@@ -29,6 +29,7 @@ public interface YjConstants {
         public static final String XZCF= "0042005"; //新增处方
         public static final String SCCF= "0042007"; //新增处方
         public static final String ZDXX = "000000"; // 诊断信息
+        public static final String JZTB= "0042008"; //就诊同步
 
     }
 

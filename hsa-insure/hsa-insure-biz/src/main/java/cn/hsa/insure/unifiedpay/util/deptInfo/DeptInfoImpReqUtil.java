@@ -1,8 +1,10 @@
 package cn.hsa.insure.unifiedpay.util.deptInfo;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -17,10 +19,10 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_3401)
-public class DeptInfoImpReqUtil<T> implements BaseReqUtil<T> {
+public class DeptInfoImpReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         BaseDeptDTO deptDTO = (BaseDeptDTO) param;
 
         Map<String, Object> httpParam = new HashMap<>(18);
@@ -63,7 +65,8 @@ public class DeptInfoImpReqUtil<T> implements BaseReqUtil<T> {
         httpParam.put("memo", deptDTO.getRemark());
 
         checkRequest(httpParam);
-        return JSON.toJSONString(httpParam);
+        httpParam.put("infno",Constant.UnifiedPay.REGISTER.UP_3401);
+        return getInsurCommonParam(httpParam);
     }
 
     @Override

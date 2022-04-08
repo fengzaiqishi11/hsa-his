@@ -106,7 +106,7 @@ public class SnowflakeUtils {
     }
 
     public static String getId(){
-        return String.format("%016x", getLongId());
+        return String.valueOf(SnowflakeUtils.getInstanceSnowflake().nextId());
     }
 
     private synchronized Long nextId() {

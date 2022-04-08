@@ -107,4 +107,8 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     private Date queryTime;
 
     private String longStockflag;
+
+    //国家编码
+    private String insureItemCode;
+    private String insureItemName;
 }

@@ -28,17 +28,18 @@
         <result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
         <result property="bfcName" column="bfcName" jdbcType="VARCHAR"/>
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
     <select id="queryItemAndMaterialPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.code as itemCode,a.use_code,
-        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName, a.nation_code,
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName, a.nation_code, a.nation_name,
         a.other_name
         FROM
         (   select id,`name`,type_code as itemTypeCode,price,unit_code,spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
-        '3' as type_code, m.nation_code,m.other_name,
+        '3' as type_code, m.nation_code,m.nation_name, m.other_name,
         (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName
         from base_item m
@@ -48,7 +49,7 @@
         </if>
         UNION ALL
         select id,`name`,type_code as itemTypeCode,split_price as price,split_unit_code as unit_code,spec,'','',hosp_code,code,use_code,
-        '2' as type_code, l.nation_code,l.other_name,
+        '2' as type_code, l.nation_code, l.nation_name, l.other_name,
         (select d.id from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcName
         from base_material l
@@ -65,26 +66,26 @@
     <!-- 查询出医院的项目和有库存的材料信息（typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码） -->
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode,a.code as itemCode,a.use_code,
-        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name
         FROM
         ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
         '3' as type_code,
         (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName,
-        b.name as inDeptName,c.name as outDeptName, m.nation_code
+        b.name as inDeptName,c.name as outDeptName, m.nation_code, m.nation_name
         from base_item m
         left join base_dept b on m.in_dept_code = b.`code` and m.hosp_code = b.hosp_code
         left join base_dept c on m.out_dept_code = c.`code` and m.hosp_code = c.hosp_code
         where m.is_valid = '1' and m.hosp_code = #{hospCode} and m.is_supp_curtain = '1'
-            and m.is_in = '1'
+        and m.is_in = '1'
         <if test="keyword != null and keyword != ''">
             and  (m.name like concat('%',#{keyword},'%') or m.name_pym like concat('%',#{keyword},'%')
-                  or m.name_wbm like concat('%',#{keyword},'%'))
+            or m.name_wbm like concat('%',#{keyword},'%'))
         </if>
         UNION ALL
         select a.id,a.`name`,a.type_code as itemTypeCode,a.price,a.unit_code,
         a.split_unit_code as splitUnitCode,a.spec,'','',a.hosp_code,a.code,a.use_code,
-        '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName, a.nation_code
+        '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName, a.nation_code, a.nation_name
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =

@@ -90,4 +90,6 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
      */
     private String nationCode;
     private String otherName;
+    // 国家编码名称
+    private String nationName;
 }

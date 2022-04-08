@@ -83,6 +83,8 @@
         <result property="isWait" column="is_wait" jdbcType="NUMERIC"/>
         <result property="hospItemCode" column="hospItemCode" jdbcType="VARCHAR"/>
         <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 实体字段映射 -->
@@ -471,6 +473,18 @@
         else (select bi.code from base_item bi where t.item_id = bi.id and bi.hosp_code = t.hosp_code)
         end
         ) as hospItemCode,
+        (case
+        when t.item_code = '1' then (select bd.nation_code from base_drug bd where t.item_id = bd.id and bd.hosp_code =t.hosp_code )
+        when t.item_code = '2' then (select bm.nation_code from base_material bm where t.item_id =  bm.id  and bm.hosp_code = t.hosp_code )
+        when t.item_code = '3' then (select bi.nation_code from base_item bi where t.item_id =  bi.id  and bi.hosp_code = t.hosp_code )
+        end
+        ) as nation_code,
+        (case
+        when t.item_code = '1' then (select bd.nation_name from base_drug bd where t.item_id = bd.id and bd.hosp_code =t.hosp_code )
+        when t.item_code = '2' then (select bm.nation_name from base_material bm where t.item_id =  bm.id  and bm.hosp_code = t.hosp_code )
+        when t.item_code = '3' then (select bi.nation_name from base_item bi where t.item_id =  bi.id  and bi.hosp_code = t.hosp_code )
+        end
+        ) as nation_name,
          t.item_id, t.item_name, t.price, t.num, t.spec, t.prep_code,
           t.dosage, t.dosage_unit_code, t.usage_code, t.rate_id, t.speed_code, t.use_days, t.num_unit_code, t.total_num, t.total_num_unit_code, t.herb_note_code, t.use_code, t.herb_num,
            t.total_price, t.preferential_price, t.reality_price, t.back_num, ROUND((t.back_num * t.price),2) backAmount,

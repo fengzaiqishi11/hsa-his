@@ -65,9 +65,18 @@ public enum FunctionEnum {
 //    CLR_FUND_DETAIL("3702", "获取基金明细信息"),
 //    CLR_SETTLE_DETAIL("3703", "获取结算明细信息"),
 //    CLR_APPR_DETAIL("3704", "获取拨付单信息"),
+
+//    MR_PATIENT_SETTL_UPLOAD("4101", "上传结算清单信息"),
+
+    FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
+    FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
+    FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),
+
+
     MR_PATIENT_SETTL_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4101, "上传结算清单信息"),
     MR_PATIENT_SETTL_UPLOAD_A(Constant.UnifiedPay.REGISTER.UP_4101A, "上传结算清单信息"),
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
+
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),
     MDTRT_INFO(Constant.UnifiedPay.REGISTER.UP_5201, "就诊信息查询"),

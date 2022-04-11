@@ -143,4 +143,9 @@ public class InsureEmrUnifiedDTO implements Serializable {
      * 住院号或证件号码
      */
     private String keyword;
+
+    /**
+     * 医保编码
+     */
+    private  String insureRegCode;
 }

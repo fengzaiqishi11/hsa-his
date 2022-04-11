@@ -270,6 +270,7 @@ public class PharApplyController extends BaseController {
         BaseDeptDTO data = byId.getData();
         pharApplyDetailDTO.setLoginDeptType(data.getTypeCode());
         pharApplyDetailDTO.setLoginTypeIdentity(data.getTypeIdentity());
+        pharApplyDetailDTO.setInBizId(sysUserDTO.getLoginBaseDeptDTO().getId());
         map.put("pharApplyDetailDTO", pharApplyDetailDTO);
         return this.pharApplyService_consumer.queryPageDeatil(map);
     }

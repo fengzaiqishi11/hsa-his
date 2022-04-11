@@ -199,7 +199,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 centerSyncFlowDto.setHospCode(centerHospitalDTO.getCode());
                 centerSyncFlowDto.setType(String.valueOf(i));
                 centerSyncFlowDto.setStatusCode((i == 0?"1":"0"));
-                centerSyncFlowDto.setMessage((i == 0?"操作成功":"进行中"));
+                centerSyncFlowDto.setMessage((i == 0?"操作成功":"等待"));
                 //创建时间每次往后移，是为了方便前端展示自动创建数据库的一个时间线，统一个时间不好去排序展示
                 centerSyncFlowDto.setCreatTime(DateUtils.dateAddMinute(new Date(),i));
                 centerSyncFlowDtos.add(centerSyncFlowDto);

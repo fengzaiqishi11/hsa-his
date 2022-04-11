@@ -294,6 +294,7 @@ public class CenterSyncBOImpl implements CenterSyncBo {
             userMap.put("code", userCode);
             userMap.put("password", MD5Utils.getMd5AndSha("888888"));
             userMap.put("is_in_job", "1");
+            userMap.put("status_code","0");
             userMap.put("name", "管理员");
             userList.add(userMap);
 

@@ -161,28 +161,6 @@ public class InsureGetInfoController extends BaseController {
 
 
     /**
-     * @Method getInsureCost
-     * @Desrciption 自费病人费用明细信息上传
-     * @Param
-     * [insureSettleInfoDTO]
-     * @Author zhangxuan
-     * @Date   2021-04-11 22:51
-     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
-     **/
-    @PostMapping("insertInsureCost")
-    public WrapperResponse<Boolean> insertInsureCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
-
-        Map map = new HashMap();
-        map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureGetInfoService_consumer.insertInsureCost(map);
-    }
-
-    /**
      * @Method queryCost
      * @Desrciption 查询费用明细（未上传,自费）
      * @Param
@@ -222,25 +200,6 @@ public class InsureGetInfoController extends BaseController {
         return insureGetInfoService_consumer.queryUploadCost(map);
     }
 
-    /**
-     * @Method queryVisit
-     * @Desrciption 查询自费病人
-     * @Param
-     * [insureSettleInfoDTO]
-     * @Author zhangxuan
-     * @Date   2021-04-13 17:35
-     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
-     **/
-    @GetMapping("queryVisit")
-    public WrapperResponse<PageDTO> queryVisit(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-
-        Map map = new HashMap();
-        map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureGetInfoService_consumer.queryVisit(map);
-    }
 
     /**
      * @Method queryInsureSettle费用清单
@@ -326,46 +285,8 @@ public class InsureGetInfoController extends BaseController {
     }
 
 
-    /**
-     * @Method queryPage()
-     * @Desrciption  分页查询医保住院费用传输数据
-     * @Param insureIndividualCostDTO数据传输对象
-     *
-     * @Author fuhui
-     * @Date   2020/11/5 10:58
-     * @Return insureIndividualCostDTO分页数据传输对象
-     **/
-    @GetMapping("/queryPage")
-    public WrapperResponse<PageDTO> queryPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("hospCode",sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());//创建人id
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());//创建人姓名
-        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureGetInfoService_consumer.queryPage(param);
-    }
 
-    /**
-     * @Method queryUnMatchPage
-     * @Desrciption  查询没有匹配的费用数据集合
-     * @Param
-     *
-     * @Author fuhui
-     * @Date   2021/6/20 9:55
-     * @Return
-     **/
-    @GetMapping("/queryUnMatchPage")
-    public WrapperResponse<PageDTO> queryUnMatchPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        Map<String,Object> param = new HashMap<String,Object>();
-        param.put("hospCode",sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());//创建人id
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());//创建人姓名
-        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureGetInfoService_consumer.queryUnMatchPage(param);
-    }
+
+
 
 }

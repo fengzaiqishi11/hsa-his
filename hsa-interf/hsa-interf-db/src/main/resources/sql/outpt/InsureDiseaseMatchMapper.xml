@@ -469,7 +469,6 @@
         from insure_disease_match
         where hosp_illness_code = #{icdcode}
         and hosp_code = #{hospCode}
-        and is_match = '1'
     </select>
 
 </mapper>

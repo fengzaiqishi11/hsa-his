@@ -594,7 +594,9 @@
         AND ic.`settle_code` IN ('0', '1')
         AND ic.`visit_id` = #{visitId}
         AND IFNULL(iim.`is_match`, '0') = #{isMatch}
-        AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+        <if test="transmitCode != null and transmitCode !='' ">
+            AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+        </if>
         AND iim.insure_reg_code = #{insureRegCode}
         <if test="queryBaby != null and queryBaby =='N'.toString() ">
             and (ic.baby_id is null or trim(ic.baby_id) = '')
@@ -887,10 +889,12 @@
                                AND ic.`hosp_code` = iic.`hosp_code`
 
         WHERE ic.`hosp_code` = #{hospCode}
-          AND ic.`settle_code` IN ('0', '1')
+          AND ic.`settle_code` IN ('0', '1','2')
           AND ic.`visit_id` = #{visitId}
           AND IFNULL(iim.`is_match`, '0') = #{isMatch}
-          AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+        <if test="transmitCode != null and transmitCode != '' ">
+            AND IFNULL(iic.transmit_code, '0') = #{transmitCode}
+        </if>
           AND iim.insure_reg_code = #{insureRegCode}
         <if test="opIds != null and opIds.size() > 0">
             and (ic.op_id in

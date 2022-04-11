@@ -432,7 +432,7 @@
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
-        ov.patient_code = '0' and os.id is null and ov.hosp_code =#{hospCode}
+        ov.patient_code = '0' and os.id is not null and ov.hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
@@ -492,6 +492,12 @@
         from insure_upload_cost
         where visit_id = #{id}
           and hosp_code = #{hospCode}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="deleteCost" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+        delete from insure_upload_cost
+        where visit_id = #{visitId} and hosp_code = #{hospCode}
     </select>
 
     <select id="queryInsureSettle" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">

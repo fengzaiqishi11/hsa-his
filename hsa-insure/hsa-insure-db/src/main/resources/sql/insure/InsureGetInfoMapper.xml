@@ -494,6 +494,12 @@
           and hosp_code = #{hospCode}
     </select>
 
+    <!--通过实体作为筛选条件查询-->
+    <select id="deleteCost" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+        delete from insure_upload_cost
+        where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </select>
+
     <select id="queryInsureSettle" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
         select IFNULL(total_price, 0)    as totalPrice,
                ifnull(insure_price, 0)   as insurePrice,

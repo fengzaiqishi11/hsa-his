@@ -70,7 +70,7 @@ public enum FunctionEnum {
 
     FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
     FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
-    FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账结果查询"),
+    FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),
 
 
     MR_PATIENT_SETTL_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4101, "上传结算清单信息"),

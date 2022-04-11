@@ -168,28 +168,6 @@ public class InsureFmiOwnpayPatnController extends BaseController {
         return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayPatnReconciliationInfo(map);
     }
 
-    /**
-     * @Method getInsureCost
-     * @Desrciption 自费病人费用明细信息上传
-     * @Param
-     * [insureSettleInfoDTO]
-     * @Author zhangxuan
-     * @Date   2021-04-11 22:51
-     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
-     **/
-    @PostMapping("insertInsureCost")
-    public WrapperResponse<Boolean> insertInsureCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
-        SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
-
-        Map map = new HashMap();
-        map.put("hospCode",sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
-        return insureFmiOwnpayPatnService_consumer.insertInsureCost(map);
-    }
-
 
 
 

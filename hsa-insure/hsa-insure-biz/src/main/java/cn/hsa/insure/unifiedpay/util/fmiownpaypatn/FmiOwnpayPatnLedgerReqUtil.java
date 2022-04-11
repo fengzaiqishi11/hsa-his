@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @ClassName PsnInfoReqUtil
- * @Deacription 人员信息获取-1101
+ * @ClassName FmiOwnpayPatnLedgerReqUtil
+ * @Deacription 自费病人明细信息对账-4262
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0

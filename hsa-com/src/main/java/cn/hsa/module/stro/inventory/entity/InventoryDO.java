@@ -99,4 +99,14 @@ public class InventoryDO extends PageDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
+    /**
+     * 盘前零售总金额
+     */
+
+    private BigDecimal beforeSellPrice;
+    /**
+     * 盘后零售总金额
+     */
+
+    private BigDecimal afterSellPrice;
 }

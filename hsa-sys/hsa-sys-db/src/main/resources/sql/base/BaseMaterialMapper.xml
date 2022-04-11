@@ -150,7 +150,7 @@
                a.spec, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price,
           a.is_supp_curtain, a.use_code, a.remark, a.prod_code, a.reg_cert_no, a.pym, a.wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
           a.last_buy_price,a.last_split_buy_price,a.avg_buy_price,a.avg_sell_price,model,a.other_name,
-          '2' as itemCode
+          '2' as itemCode,a.reimbursement_ratio
         from base_material a
         <where>
             <if test="id != null">

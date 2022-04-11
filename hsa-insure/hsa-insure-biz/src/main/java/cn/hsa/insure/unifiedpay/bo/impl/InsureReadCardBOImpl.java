@@ -2,10 +2,14 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.inpt.bo.InsureReadCardBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,12 @@ public class InsureReadCardBOImpl extends HsafBO implements InsureReadCardBO {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Resource
+    private InsureItfBOImpl insureItfBO;
+
+    @Resource
+    private BaseReqUtilFactory baseReqUtilFactory;
+
     /**
      * @Description: 读身份证密码校验接口
      * @Param: map
@@ -45,18 +55,28 @@ public class InsureReadCardBOImpl extends HsafBO implements InsureReadCardBO {
      */
     @Override
     public Map<String, Object> getReadIdCard(Map<String, Object> map) {
-        String hospCode =MapUtils.get(map, "hospCode");
-        String orgCode =MapUtils.get(map, "insureRegCode");
+        String idcard = MapUtils.get(map, "idcard");
+        String inputPassword = MapUtils.get(map, "inputPassword");
 
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("idcard",MapUtils.get(map, "idcard")); // 身份证号码
-        dataMap.put("insuAdmdvs",MapUtils.get(map, "insuAdmdvs")); // 行政区划
-        dataMap.put("fixmedinsCode",MapUtils.get(map, "fixmedinsCode")); // 医疗机构编码
-        dataMap.put("inputPassword",MD5Utils.encrypt32(MapUtils.get(map, "inputPassword"))); // 密码
+        if(StringUtils.isEmpty(idcard)){
+            throw new AppException("身份证密码校验,身份证卡号：idcard 内容为空");
+        }
+        if(StringUtils.isEmpty(inputPassword)){
+            throw new AppException("身份证密码校验,身份证卡号：inputPassword 内容为空");
+        }
+        // 调用统一支付平台接口
+        Map<String, Object> paramMap = new HashMap<>();
+        // 参保地医保区划
+        paramMap.putAll(map);
+        paramMap.put("configRegCode", MapUtils.get(map, "insureRegCode"));
 
-        Map<String,Object> inptMap = new HashMap<>();
-        inptMap.put("data",dataMap);
-        return commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.CARD.UP_1602, inptMap);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.IDCARD_PASSWORD_CHECK.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(MapUtils.get(map, "hospCode"));
+
+        return insureItfBO.executeInsur(FunctionEnum.IDCARD_PASSWORD_CHECK, interfaceParamDTO);
+
     }
 
     /**
@@ -69,19 +89,31 @@ public class InsureReadCardBOImpl extends HsafBO implements InsureReadCardBO {
      */
     @Override
     public Map<String, Object> updateReadIdCard(Map<String, Object> map) {
-        String hospCode =MapUtils.get(map, "hospCode");
-        String regCode =MapUtils.get(map, "insureRegCode");
+        String idcard = MapUtils.get(map, "idcard");
+        String password = MapUtils.get(map, "password");
+        String oldPassword = MapUtils.get(map, "oldPassword");
 
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("idcard",MapUtils.get(map, "idcard")); // 身份证号码
-        dataMap.put("psnName",MapUtils.get(map, "psnName")); // 姓名
-        dataMap.put("insuAdmdvs",MapUtils.get(map, "insuAdmdvs")); // 行政区划
-        dataMap.put("password",MD5Utils.encrypt32(MapUtils.get(map, "password"))); // 修改后的密码
-        dataMap.put("oldPassword",MD5Utils.encrypt32(MapUtils.get(map, "oldPassword"))); // 修改前的密码
+        if(StringUtils.isEmpty(idcard)){
+            throw new AppException("身份证密码校验,身份证卡号：idcard 内容为空");
+        }
+        if(StringUtils.isEmpty(password)){
+            throw new AppException("身份证密码校验,身份证卡号：password 内容为空");
+        }
+        if(StringUtils.isEmpty(oldPassword)){
+            throw new AppException("身份证密码校验,身份证卡号：oldPassword 内容为空");
+        }
+        // 调用统一支付平台接口
+        Map<String, Object> paramMap = new HashMap<>();
+        // 参保地医保区划
+        paramMap.putAll(map);
+        paramMap.put("configRegCode", MapUtils.get(map, "insureRegCode"));
 
-        Map<String,Object> inptMap = new HashMap<>();
-        inptMap.put("data",dataMap);
-        return commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.CARD.UP_1603, inptMap);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.IDCARD_PASSWORD_UPDATE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(MapUtils.get(map, "hospCode"));
+
+        return insureItfBO.executeInsur(FunctionEnum.IDCARD_PASSWORD_UPDATE, interfaceParamDTO);
     }
 
     /**

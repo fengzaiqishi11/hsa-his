@@ -22,6 +22,10 @@ public enum FunctionEnum {
     MEDICAL_DIR_MATCH_INFO(Constant.UnifiedPay.REGISTER.UP_1317, "医药机构目录匹配信息查询"),
     LMTPRIC_INFO(Constant.UnifiedPay.REGISTER.UP_1318, "医保目录限价信息查询"),
     SELFPAY_PROP_INFO(Constant.UnifiedPay.REGISTER.UP_1319, "医保目录先自付比例信息查询"),
+
+    IDCARD_PASSWORD_CHECK(Constant.UnifiedPay.CARD.UP_1602, "医保身份证密码校验"),
+    IDCARD_PASSWORD_UPDATE(Constant.UnifiedPay.CARD.UP_1603, "医保修改身份证密码"),
+
     INSUR_DICT_INFO(Constant.UnifiedPay.REGISTER.UP_1901, "医保字典信息查询"),
     OUTPATIENT_TREATMENT(Constant.UnifiedPay.REGISTER.UP_2001, "人员待遇享受检查"),
     OUTPATIENT_REG(Constant.UnifiedPay.OUTPT.UP_2201, "门诊挂号"),

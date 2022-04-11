@@ -40,4 +40,12 @@ public class InptLongCostDTO extends InptLongCostDO {
     private BigDecimal totalNum;
 
     private String changeCode;
+    /**
+     * 国家编码
+     */
+    private String nationCode;
+    /**
+     * 国家名称
+     */
+    private String nationName;
 }

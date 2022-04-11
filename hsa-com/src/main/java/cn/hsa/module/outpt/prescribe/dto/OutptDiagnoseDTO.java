@@ -51,4 +51,6 @@ public class OutptDiagnoseDTO extends OutptDiagnoseDO implements Serializable {
     private String tcmDiseaseName; // 中医诊断名称
     private String tcmSyndromesId; // 中医症候id
     private String tcmSyndromesName; // 中医症候名称
+    private String nationCode; // 疾病国家编码
+    private String nationName; // 疾病国家名称
 }

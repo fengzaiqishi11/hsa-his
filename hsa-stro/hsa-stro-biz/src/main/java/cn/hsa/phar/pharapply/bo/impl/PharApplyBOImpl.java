@@ -723,9 +723,12 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
         pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementUp(pharApplyDTO);
       } else {
           pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementDate(pharApplyDTO);
+          if (ListUtils.isEmpty(pharApplyDetailDTOS)){
+              new AppException("这段时间无消耗");
+          }
           Iterator<PharApplyDetailDTO> pharApplyIterators = pharApplyDetailDTOS.iterator();
           // 只生产负的
-          if (pharApplyIterators.hasNext()){
+          while (pharApplyIterators.hasNext()){
               PharApplyDetailDTO applyDetailDTO = pharApplyIterators.next();
               if(BigDecimalUtils.lessZero(applyDetailDTO.getNum())){
                   applyDetailDTO.setNum(applyDetailDTO.getNum().abs());

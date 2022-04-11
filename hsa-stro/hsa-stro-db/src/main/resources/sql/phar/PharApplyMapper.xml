@@ -268,16 +268,16 @@
         max(a.unit_code) as unitCode,
         case max(a.item_code) when '1' then d.last_buy_price when '2' then c.last_buy_price end buyPrice,
         case max(a.item_code) when '1' then d.price when '2' then c.price end sellPrice,
-        (select c.id from base_product c where c.hosp_code = #{hospCode} and c.code = d.prod_code) as productId,
+        (select c.id from base_product c where c.hosp_code = #{hospCode} and c.code = d.prod_code) as productId
         from stro_invoicing a
         left join base_drug d on a.hosp_code = d.hosp_code and a.item_id = d.id and d.is_valid = '1'
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
         where a.hosp_code = #{hospCode} and a.outin_code in ('4','5','21') and a.biz_id = #{inStroId}
-        <if test="startDate != null and startDate!=''" >
-            AND a.crte_time >= #{startDate}
+        <if test="startTime != null and startTime!=''" >
+            AND a.crte_time >= #{startTime}
         </if>
-        <if test="startDate != null and startDate!=''" >
-            <![CDATA[ AND a.crte_time <= DATE_ADD(STR_TO_DATE(#{endDate},'%Y-%m-%d'),INTERVAL 1 day)]]>
+        <if test="endTime != null and endTime!=''" >
+            <![CDATA[ AND a.crte_time <= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)]]>
         </if>
         group by a.item_id,a.biz_id
     </select>

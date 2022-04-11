@@ -2,10 +2,12 @@ package cn.hsa.module.phar.pharapply.dto;
 
 import cn.hsa.module.phar.pharapply.entity.PharApplyDO;
 import cn.hsa.module.phar.pharapply.entity.StroOut;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.joda.time.DateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
@@ -45,4 +47,11 @@ public class PharApplyDTO extends PharApplyDO implements Serializable {
     private String applyDeptName;  //领药科室名称
 
     private String limitFlag;
+
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String startTime;
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String endTime;
 }

@@ -419,7 +419,7 @@
         select m.* from (
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
-        patient_code = '0' and status_code in ('2','5','6') and hosp_code =#{hospCode}
+        patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
@@ -495,10 +495,10 @@
     </select>
 
     <!--通过实体作为筛选条件查询-->
-    <select id="deleteCost" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+    <delete id="deleteCost">
         delete from insure_upload_cost
         where visit_id = #{visitId} and hosp_code = #{hospCode}
-    </select>
+    </delete>
 
     <select id="queryInsureSettle" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
         select IFNULL(total_price, 0)    as totalPrice,

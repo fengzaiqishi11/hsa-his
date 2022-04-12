@@ -1448,7 +1448,8 @@
         t.num_unit_code,
         t.price,
         t.doctor_id,
-        t.doctor_name ORDER BY t.item_type,t.bfc_id,t.item_code,t.item_id
+        t.doctor_name
+        ORDER BY t.item_type,t.bfc_id,t.item_code,t.item_id
     </select>
 
     <select id = "queryHospitalItemReportInfoGroupFour" resultType="java.util.LinkedHashMap">
@@ -1639,7 +1640,9 @@
                 and b.item_id = #{itemId}
             </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
-                and b.doctor_id = #{userId}
+                <if test="userId != null and userId != ''">
+                    and b.doctor_id = #{userId}
+                </if>
             </if>
             <if test="sumCode != null and sumCode == '1'.toString()">
                 <if test="deptId != null and deptId != ''">

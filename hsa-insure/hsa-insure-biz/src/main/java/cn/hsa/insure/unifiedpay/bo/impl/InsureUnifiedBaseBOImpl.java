@@ -3,6 +3,9 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
@@ -17,6 +20,7 @@ import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
@@ -87,7 +91,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
     @Resource
-    private InsureDictDAO insureDictDAO;
+    private BaseReqUtilFactory baseReqUtilFactory;
+    @Resource
+    private InsureItfBOImpl insureItfBO;
 
     @Resource
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
@@ -299,34 +305,33 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Override
     public Map<String, Object> checkOneSettle(Map<String, Object> map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
-        String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
+
+        InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
+        insureIndividualBasicDTO.setBka895(insureIndividualVisitDTO.getMdtrtCertType());
+        insureIndividualBasicDTO.setBka896(insureIndividualVisitDTO.getMdtrtCertNo());
+        insureIndividualBasicDTO.setPsnCertType(insureIndividualVisitDTO.getMdtrtCertType());
+        insureIndividualBasicDTO.setAac003(insureIndividualVisitDTO.getAac003());
+        insureIndividualBasicDTO.setAac002(insureIndividualVisitDTO.getAac002());
+        insureIndividualBasicDTO.setCardIden(insureIndividualVisitDTO.getCardIden());
+
         String hospCode = MapUtils.get(map,"hospCode");
-        Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
-        String mdtrtCertType = insureIndividualVisitDTO.getMdtrtCertType();
-        String mdtrtCertNo = insureIndividualVisitDTO.getMdtrtCertNo();
-        if("06".equals(insureIndividualVisitDTO.getMdtrtCertType())){
-            mdtrtCertType = "02";
-            mdtrtCertNo = insureIndividualVisitDTO.getAac002();
-        }
 
-        // 电子凭证
-        if("01".equals(insureIndividualVisitDTO.getMdtrtCertType())) {
-            mdtrtCertType = "02";
-            mdtrtCertNo = insureIndividualVisitDTO.getAac002();
-        }
 
-        dataMap.put("mdtrt_cert_type", mdtrtCertType);
-        dataMap.put("mdtrt_cert_no",mdtrtCertNo);
-        dataMap.put("begntime", DateUtils.getNow());
-        dataMap.put("psn_cert_type", mdtrtCertType);
-        dataMap.put("certno", mdtrtCertNo);
-        paramMap.put("data", dataMap);  // 入参具体数据
-        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
-        map.put("msgName","人员信息获取");
-        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
-        map.put("visitId",insureIndividualVisitDTO.getVisitId());
-        Map<String, Object> stringObjectMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, orgCode, "1101", paramMap,map);
+        paramMap .put("insureIndividualBasicDTO",insureIndividualBasicDTO);
+        paramMap.putAll(map);
+        // 参保地医保区划
+        paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
+        paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INSUR_BASE_INFO.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+
+        interfaceParamDTO.setVisitId(insureIndividualBasicDTO.getVisitId());
+
+        Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.INSUR_BASE_INFO, interfaceParamDTO);
         return stringObjectMap;
     }
 

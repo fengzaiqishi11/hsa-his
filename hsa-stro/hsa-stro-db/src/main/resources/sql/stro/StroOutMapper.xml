@@ -335,7 +335,7 @@
 		)as materialProductName,
     case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
     case when a.item_code='2' then bm.model end model,
-	case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nationCode
+	case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code
 		from stro_out_detail as a
     left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
     left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}

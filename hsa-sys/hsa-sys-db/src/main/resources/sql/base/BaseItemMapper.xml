@@ -203,7 +203,7 @@
 		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
 		a.crte_name, a.crte_time,
 		b.name as outDeptName,
-		c.name as inDeptName
+		c.name as inDeptName,a.reimbursement_ratio
 		from base_item a
 		LEFT JOIN base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
 		LEFT JOIN base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code

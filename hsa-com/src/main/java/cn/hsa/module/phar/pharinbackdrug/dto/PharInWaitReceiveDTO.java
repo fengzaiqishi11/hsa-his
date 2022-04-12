@@ -90,4 +90,8 @@ public class PharInWaitReceiveDTO extends PharInWaitReceiveDO implements Seriali
     private String adviceDosage;  // 医嘱剂量
 
     private Boolean checkFlag;
+
+    private String productName;
+
+    private String color;// 设置颜色 1. 是红色
 }

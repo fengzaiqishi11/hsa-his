@@ -36,7 +36,7 @@ public class CSVWriterUtils {
                     for (String head : csvHead) {
                         if (map.get(head) instanceof String) {
                             cellData = map.get(head) == null ? "" : (String)map.get(head);
-                            csvBody.append(cellData.replaceAll(",", " ").replaceAll("\n"," ").replaceAll("[/r/n]"," ")).append(",");
+                            csvBody.append(cellData.replaceAll(",", " ").replaceAll("\n"," ").replaceAll("\r\n"," ")).append(",");
                         } else {
                             csvBody.append(map.get(head) == null ? "" : map.get(head)).append(",");
                         }

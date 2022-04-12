@@ -347,7 +347,7 @@
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,'1' as itemCode,
 		d.name as bfcName,
-		e.name as prod_name
+		e.name as prod_name,a.reimbursement_ratio
 		from base_drug a
 		LEFT JOIN base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
 		left join base_product e on a.hosp_code = e.hosp_code and e.code = a.prod_code

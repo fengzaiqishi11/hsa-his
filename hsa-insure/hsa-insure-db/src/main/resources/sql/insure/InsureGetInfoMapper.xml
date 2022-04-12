@@ -763,7 +763,7 @@
         and IFNULL(iim.audit_code,'0') =#{isMatch}
         and IFNULL(iim.is_valid,'0') =#{isMatch}
         and IFNULL(iim.is_match,'0') =#{isMatch}
-        and ic.settle_code in ('0','1')
+        and ic.settle_code in ('0','1','2')
         and iim.insure_reg_code = #{orgCode}
         <if test="isTransmit != null and isTransmit !=''">
             and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}

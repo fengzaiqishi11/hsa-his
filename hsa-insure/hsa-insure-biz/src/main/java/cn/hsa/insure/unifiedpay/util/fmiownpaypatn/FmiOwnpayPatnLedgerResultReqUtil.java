@@ -52,7 +52,7 @@ public class FmiOwnpayPatnLedgerResultReqUtil<T> extends InsureCommonUtil implem
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put("mdtrtId", MapUtils.get(map,"mdtrtId"));
+        dataMap.put("mdtrtId", MapUtils.get(map,"visitId"));
         dataMap.put("fixmedinsCode", MapUtils.get(map,"fixmedinsCode"));
         dataMap.put("certno",MapUtils.get(map,"certno"));
 

@@ -87,10 +87,10 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             dataMap.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }
         List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
-        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() >0 ){
-            dataMap.put("upType", "1");
-        }else{
+        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
             dataMap.put("upType", "0");
+        }else{
+            dataMap.put("upType", "1");
         }
         HashMap commParam = new HashMap();
         checkRequest(dataMap);
@@ -130,7 +130,10 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
 
         mdtrtinfoMap.setBegntime(DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_D));//	开始时间
-        mdtrtinfoMap.setEndtime(DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_D));
+        if(null != inptVisitDTO.getOutTime()){
+            mdtrtinfoMap.setEndtime(DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_D));
+        }
+
 
         mdtrtinfoMap.setMedType("2101");//	医疗类别
         mdtrtinfoMap.setIptOpNo(inptVisitDTO.getInNo());//	住院/门诊号
@@ -148,8 +151,8 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
         mdtrtinfoMap.setIfturnDept(null);
 
-        mdtrtinfoMap.setDscgDiseCode(inptVisitDTO.getOutDiseaseIcd10());//	住院主诊断代码
-        mdtrtinfoMap.setDscgDiseName(inptVisitDTO.getOutDiseaseName());//	住院主诊断名称
+        mdtrtinfoMap.setDscgDiseCode(inptVisitDTO.getInDiseaseId());//	住院主诊断代码
+        mdtrtinfoMap.setDscgDiseName(inptVisitDTO.getInDiseaseName());//	住院主诊断名称
 
         mdtrtinfoMap.setDscgDeptCode(inptVisitDTO.getOutDeptId());
         mdtrtinfoMap.setDscgDiseName(inptVisitDTO.getOutDeptName());
@@ -158,8 +161,8 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
         mdtrtinfoMap.setMainCondDesc(inptVisitDTO.getInDiseaseName());
 
-        String diseCode = null;
-        String diseCodeName = null;
+        String diseCode = inptVisitDTO.getInDiseaseId();
+        String diseCodeName = inptVisitDTO.getInDiseaseName();
         if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
             mdtrtinfoMap.setDiseNo("");//	病种编码
         }else{
@@ -313,6 +316,7 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             diseinfoMap.setDiagSrtNo(i);//	诊断排序号
             diseinfoMap.setDiagInfoId(inptDiagnoseDTOList.get(i).getId());
             diseinfoMap.setMdtrtId(inptDiagnoseDTOList.get(i).getVisitId());
+//            diseinfoMap.setInoutDiagType("");
 
             String type = inptDiagnoseDTOList.get(i).getTypeCode();
             switch(type){

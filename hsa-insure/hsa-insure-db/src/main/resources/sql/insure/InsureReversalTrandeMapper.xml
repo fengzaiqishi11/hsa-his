@@ -1100,7 +1100,6 @@
         c.aac003 AS psnName,
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
-        c.aka130_name AS medTypeName,
         c.bka008 insureUnit,
         tt.out_dept_name outDeptName,
         DATE_FORMAT(tt.in_time,'%Y-%m-%d') AS inTime,
@@ -1135,6 +1134,7 @@
         e.clr_optins AS clrOptins,
         e.clr_type AS clrType,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type = value ) as clrTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName,
         e.medicine_org_code AS medicineOrgCode,
         t.insure_reg_code AS setlOptins,
         t.aac001 AS psnNo,
@@ -1175,7 +1175,7 @@
             and c.aae140 = #{insutype}
         </if>
         <if test="medType != null and medType != '' ">
-            and c.aka130 = #{medType}
+            and e.aka130 = #{medType}
         </if>
         <if test="isHospital != null and isHospital != '' ">
             and t.is_hospital = #{isHospital}
@@ -1241,7 +1241,7 @@
         SELECT DISTINCT
         count( 1 ) AS psnNum,
         count( c.aac002 ) AS psnCount,
-        c.aka130_name AS medTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName,
         e.total_price AS totalPrice,
         e.portion_price AS portionPrice,
         e.starting_price AS startingPrice,
@@ -1300,7 +1300,7 @@
             and c.aae140 = #{insutype}
         </if>
         <if test="medType != null and medType != '' ">
-            and c.aka130 = #{medType}
+            and e.aka130 = #{medType}
         </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
@@ -1416,7 +1416,7 @@
         e.pool_prop_selfpay as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
         ia.admdvs_name as insuplcAdmdvsName,
-        c.aka130_name AS medTypeName
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1448,7 +1448,7 @@
             and c.aae140 = #{insutype}
         </if>
         <if test="medType != null and medType != '' ">
-            and c.aka130 = #{medType}
+            and e.aka130 = #{medType}
         </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
@@ -1568,7 +1568,7 @@
             and c.aae140 = #{insutype}
         </if>
         <if test="medType != null and medType != '' ">
-            and c.aka130 = #{medType}
+            and e.aka130 = #{medType}
         </if>
         <if test="isHospital != null and isHospital != '' ">
             and t.is_hospital = #{isHospital}

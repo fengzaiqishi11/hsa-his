@@ -1091,9 +1091,20 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //            if (!ListUtils.isEmpty(adviceIds)) {
 //                inptAdviceDAO.updateLastExeTime(medicalAdviceDTO, adviceIds);
 //            }
+
+            //获取医嘱集合并筛选预停时间是当天的，进行停嘱操作
+            List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(medicalAdviceDTO.getHospCode(), adviceIds);
+            if (!ListUtils.isEmpty(inptAdviceDTOList)) {
+                inptAdviceDTOList = inptAdviceDTOList.stream().filter(s->s.getPlanStopTime() !=null && (DateUtils.differentDays(new Date(),s.getPlanStopTime()) <= 0)).collect(Collectors.toList());
+                InptAdviceDTO adviceDTO = new InptAdviceDTO ();
+                adviceDTO.setCrteId("-1");
+                adviceDTO.setCrteName("预停自动停嘱");
+                updateStopAdvice(medicalAdviceDTO, adviceDTO, inptAdviceDTOList);
+            }
+
             logger.info("====长期费用6："+DateUtils.format());
         } catch (Exception e) {
-            AppException tmp = new AppException("长期费用计算失败:"+e.getMessage());;
+            AppException tmp = new AppException("长期费用计算失败:"+e.getMessage());
             tmp.setStackTrace(e.getStackTrace());
             // 保存被抑制的异常信息
             for(Throwable t : e.getSuppressed()){

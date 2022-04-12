@@ -398,4 +398,14 @@ public interface EmrPatientDAO {
 	 * @Return
 	 */
 	List<SysUserDTO> getDiffDeptUsers(EmrPatientDTO emrPatientDTO);
+
+	/**
+	 * @Description: 查询病人的会诊医生
+	 * @Param: emrPatientDTO
+	 * @Author: liuliyun
+	 * @Email: liuliyun@powersi.com
+	 * @Date 2022/4/12 09:35
+	 * @Return
+	 */
+	String getConsultationId(EmrPatientDTO emrPatientDTO);
 }

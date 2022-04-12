@@ -1729,6 +1729,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             map.put("age", new BigDecimal(MapUtils.get(setlInfoMap, "age").toString()).intValue()  ); // 年龄
         }
         map.put("psnNo", MapUtils.get(setlInfoMap, "psn_no")); // 个人编号
+        if(MapUtils.get(setlInfoMap, "psn_no") == null || "".equals(MapUtils.get(setlInfoMap, "psn_no"))){
+            map.put("psnNo", insureIndividualVisitDTO.getAac001());
+        }
         if (StringUtils.isEmpty(MapUtils.get(setlInfoMap, "psn_idet_type"))) {
             map.put("psnIdetType", "无"); //补助类别
         } else {
@@ -1896,10 +1899,6 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                                 BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
                                         (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
                                                 MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                        inscpScpAmt = BigDecimalUtils.add(inscpScpAmt,
-                                BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
-                                        (MapUtils.get(item, "inscp_scp_amt") == null ? "" :
-                                                MapUtils.get(item, "inscp_scp_amt").toString()))));
                         preselfpayAmt = BigDecimalUtils.add(preselfpayAmt,
                                 BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
                                         (MapUtils.get(item, "preselfpay_amt") == null ? "" :
@@ -1909,13 +1908,17 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                         }
                         if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
                             BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                            inscpScpAmt = BigDecimalUtils.add(inscpScpAmt,
+                                    BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+                                            (MapUtils.get(item, "inscp_scp_amt") == null ? "" :
+                                                    MapUtils.get(item, "inscp_scp_amt").toString()))));
                         }
                         if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
                             CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
                         }
                     }
                     pMap.put("sumDetItemFeeSumamt", sumDetItemFeeSumamt);
-                    pMap.put("inscpScpAmt", BigDecimalUtils.subtract(inscpScpAmt,AClassFee));
+                    pMap.put("inscpScpAmt", inscpScpAmt);
                     pMap.put("preselfpayAmt", preselfpayAmt);
                     pMap.put("AClassFee", AClassFee);
                     pMap.put("BClassFee", BClassFee);

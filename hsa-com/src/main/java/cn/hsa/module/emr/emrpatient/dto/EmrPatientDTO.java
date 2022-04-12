@@ -58,4 +58,8 @@ public class EmrPatientDTO extends EmrPatientDO implements Serializable {
 	private Integer validTime; // 电子病历创建时效性
 
 	private String allowEdit; // 编辑 ：1 允许同级编辑；2 只能上级编辑
+
+	private String isNurse; // 是否是护士  0：其他  1：护士
+
+	private String docCode; // 病历文档类型
 }

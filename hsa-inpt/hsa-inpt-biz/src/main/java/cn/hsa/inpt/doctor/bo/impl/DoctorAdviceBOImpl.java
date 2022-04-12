@@ -332,7 +332,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             for(InptAdviceDTO inptAdviceDTO : addInptAdviceDTOList){
                 //判断是否需要皮试
                 if(StringUtils.isNotEmpty(inptAdviceDTO.getIsSkin()) && Constants.SF.S.equals(inptAdviceDTO.getIsSkin())){
-                    InptAdviceDTO inptAdviceDTOPs  = this.buildPsfy(inptAdviceDTO.getHospCode(), inptAdviceDTO);
+                    InptAdviceDTO inptAdviceDTOPs  = this. buildPsfy(inptAdviceDTO.getHospCode(), inptAdviceDTO);
                     if(inptAdviceDTOPs != null){
                         addPsInptAdviceDTOList.add(inptAdviceDTOPs);
                         //获取换药药品明细
@@ -509,6 +509,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
                     throw new AppException(inptAdviceDTO.getItemName() + ":库存不足");
                 }
+                
             }
         }
     }

@@ -749,6 +749,19 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
                             return true;
                         }
                     }
+                    // 查询病人会诊医生 会诊医生有书写会诊病人病历 lly 2022/4/12 start
+                    String ids=emrPatientDAO.getConsultationId(temp);
+                    if (StringUtils.isNotEmpty(ids)){
+                        String [] consultationIds =ids.split(",");
+                        if (consultationIds!=null&&consultationIds.length>0){
+                            for (String conUserId:consultationIds){
+                                if (userId.equals(conUserId)) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    // 查询病人会诊医生 会诊医生有书写会诊病人病历 lly 2022/4/12 end
                 }
             }
         } else {

@@ -371,13 +371,12 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         // 查看当前领药申请id是否正在进行发药
         String key = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYFY").
                 append(pharInReceiveDTO.getId()).append(Constants.INPT_DISTRIBUTE_REDIS_KEY).toString();
-        if (StringUtils.isNotEmpty(redisUtils.get(key)) || redisUtils.hasKey(key)){
+        if (!redisUtils.setIfAbsent(key,key,600)){
             throw new AppException("该单据正在进行发药，请不要重复发药");
         }
         try {
             // 锁住退费，发药防止两个并发操作
             redisUtils.set(comkey, pharInReceiveDTO.getDeptId(), 600);
-            redisUtils.set(key,pharInReceiveDTO.getId(),600);
 
             //根据id获取住院领药申请对象
             PharInReceiveDO inReceiveDO = inDistributeDrugDAO.getInReceiveById(pharInReceiveDTO);

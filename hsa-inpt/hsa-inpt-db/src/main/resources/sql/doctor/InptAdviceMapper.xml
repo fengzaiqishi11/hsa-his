@@ -1383,13 +1383,6 @@
     <!--获取需要滚动长期费用的医嘱集合(长期医嘱、已核收、未停止、在院病人、拒收标志正常)-->
     <select id="queryAdvicesToLongCost" resultType="java.lang.String">
         select
-        --         a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
-        --         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
-        --         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
-        --         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
-        --         a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
-        --         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
-        --         a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time
         distinct a.id
         from
         inpt_advice a join inpt_visit b on a.visit_id=b.id
@@ -1409,7 +1402,7 @@
         --         医嘱开始时间小于等于当前时间
         and date_format(a.long_start_time, '%Y-%m-%d') &lt;= date_format(now(), '%Y-%m-%d')
         --         预停时间不为空,那么需要大于当前时间
-        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date_format(a.plan_stop_time, '%Y-%m-%d') &gt; date_format(now(), '%Y-%m-%d')))
+        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date_format(a.plan_stop_time, '%Y-%m-%d') &gt;= date_format(now(), '%Y-%m-%d')))
         <if test="visitId!=null and visitId!=''">
             and b.id=#{visitId}
         </if>

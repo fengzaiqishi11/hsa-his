@@ -287,7 +287,6 @@ public class CenterSyncBOImpl implements CenterSyncBo {
             String deptCode = Constants.CENTERSYNCKSCODE.DEPT_CODE;
             Map userMap = new HashMap();
             String userCode = "admin";
-            String userSystemCode = "";
             userMap.put("id", SnowflakeUtils.getId());
             userMap.put("hosp_code", hospCode);
             userMap.put("dept_code", deptCode);
@@ -316,9 +315,6 @@ public class CenterSyncBOImpl implements CenterSyncBo {
                 userSystemMap.put("id", SnowflakeUtils.getId());
                 userSystemMap.put("hosp_code", hospCode);
                 userSystemMap.put("us_code", us_code);
-                if("XTGLZXT".equals(map.get("code"))){
-                    userSystemCode = us_code;
-                }
                 userSystemMap.put("user_code", userCode);
                 userSystemMap.put("system_code", map.get("code"));
                 userSystemMap.put("dept_code", deptCode);
@@ -327,16 +323,18 @@ public class CenterSyncBOImpl implements CenterSyncBo {
                 userSystemMap.put("crte_time", new Date());
                 userSystemList.add(userSystemMap);
             }
-            for (Map<String,Object> map : roleList) {
-                Map userRoleMap = new HashMap();
-                userRoleMap.put("id", SnowflakeUtils.getId());
-                userRoleMap.put("hosp_code", hospCode);
-                userRoleMap.put("us_code", userSystemCode);
-                userRoleMap.put("role_code", map.get("code"));
-                userRoleMap.put("crte_id", centerSyncDTO.getCrteId());
-                userRoleMap.put("crte_name", centerSyncDTO.getCrteName());
-                userRoleMap.put("crte_time", new Date());
-                userRoleList.add(userRoleMap);
+            for (Map<String,Object> userSystemMap : userSystemList) {
+                for (Map<String,Object> map : roleList) {
+                    Map userRoleMap = new HashMap();
+                    userRoleMap.put("id", SnowflakeUtils.getId());
+                    userRoleMap.put("hosp_code", hospCode);
+                    userRoleMap.put("us_code", userSystemMap.get("us_code"));
+                    userRoleMap.put("role_code", map.get("code"));
+                    userRoleMap.put("crte_id", centerSyncDTO.getCrteId());
+                    userRoleMap.put("crte_name", centerSyncDTO.getCrteName());
+                    userRoleMap.put("crte_time", new Date());
+                    userRoleList.add(userRoleMap);
+                }
             }
 
             batchInsertMysqlData(connection, userList, "sys_user");

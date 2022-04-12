@@ -30,12 +30,13 @@
         <result property="html" column="html" jdbcType="BLOB"/>
         <result property="isAudit" column="is_audit" jdbcType="VARCHAR"/>
         <result property="haveHistory" column="haveHistory" jdbcType="VARCHAR"/>
+        <result property="docCode" column="doc_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个病历内容，带出病历是否需要审核，是否有历史记录 '0'无记录， '1' 有记录-->
     <select id="getEmrPatientDTO" resultMap="EmrPatientDTOMap">
         select
-          p.*, h.html, c.is_audit, if(p.sc_patient_html_id is null, '0', '1') as haveHistory
+          p.*, h.html, c.is_audit, if(p.sc_patient_html_id is null, '0', '1') as haveHistory,c.doc_code
         from emr_patient p left join emr_patient_html h on p.patient_html_id = h.id join emr_classify_template t on p.classify_template_id = t.id
         join emr_classify c on c.code = t.classify_code
         where p.id = #{id} and c.hosp_code = t.hosp_code and c.dept_id = t.dept_id
@@ -186,6 +187,12 @@
         and (c.gender_code = (select v.gender_code from inpt_visit v where v.id = #{visitId}) or c.gender_code = '' or c.gender_code is null )
         <if test="isCommon != null and isCommon != ''">
             and c.is_common = '1'
+        </if>
+        <if test="isNurse == '1'.toString()">
+            and c.doc_code = '1'
+        </if>
+        <if test="isNurse == '0'.toString()">
+            and c.doc_code != '1'
         </if>
     </select>
 
@@ -363,6 +370,9 @@
         where a.id = #{crteId} and a.hosp_code = #{hospCode}) u,
         sys_user_system sy
         where s.code = sy.user_code and s.hosp_code = u.hosp_code and s.work_type_code &lt;= u.work_type_code
+        <if test="isNurse !=null and isNurse !=''">
+            and s.work_type_code in('201','202','203','204','205')
+        </if>
     </select>
 
     <!-- 根据用户id查询用户信息 -->

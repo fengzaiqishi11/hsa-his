@@ -364,7 +364,9 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
           if(itemNum.get() <= 8 && !itemMap.containsKey(dto.getId())) {
             itemMap.put(dto.getId(),dto.getItemName());
             message.append("【");
+            message.append(dto.getProductName());
             message.append(dto.getItemName());
+            message.append(dto.getSpec());
             message.append("】,");
           }
         }
@@ -447,6 +449,23 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     }
     //领药申请详情汇总
     sumList = getSummary(inWaitReceiveList);
+    for (Iterator<PharInWaitReceiveDTO> it = sumList.iterator();it.hasNext();) {
+      PharInWaitReceiveDTO dto = it.next();
+      //校验库存
+      if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
+        InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
+        inptAdviceDTO.setHospCode(dto.getHospCode());
+        inptAdviceDTO.setItemId(dto.getItemId());
+        inptAdviceDTO.setPharId(dto.getPharId());
+        inptAdviceDTO.setTotalNum(dto.getAllNum());
+        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        //判断库存,如果库存为空就弄成红色
+        if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
+          dto.setColor(Constants.COLOR.RED);
+        }
+      }
+    }
+
     return PageDTO.of(sumList);
   }
 

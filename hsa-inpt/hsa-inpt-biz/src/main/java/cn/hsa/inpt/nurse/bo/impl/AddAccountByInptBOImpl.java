@@ -689,6 +689,8 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
                 inptCostDTO.setOkId(null);
                 inptCostDTO.setOkName(null) ;
                 inptCostDTO.setSettleCode("0") ;
+                inptCostDTO.setDoctorId(inptVisitById.getZzDoctorId());
+                inptCostDTO.setDoctorName(inptVisitById.getZzDoctorName());
                 inptCostDTO.setZgDoctorId(inptVisitById.getZgDoctorId());
                 inptCostDTO.setZgDoctorName(inptVisitById.getZgDoctorName());
                 inptCostDTO.setZzDoctorId(inptVisitById.getZzDoctorId());
@@ -762,6 +764,8 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
 
         //取主管医生,主治医生,就诊医生
         for (InptCostDTO inptCos: inptCostDTOs ) {
+            inptCos.setDoctorId(inptVisitById.getZzDoctorId());
+            inptCos.setDoctorName(inptVisitById.getZzDoctorName());
             inptCos.setZgDoctorId(inptVisitById.getZgDoctorId());
             inptCos.setZgDoctorName(inptVisitById.getZgDoctorName());
             inptCos.setZzDoctorId(inptVisitById.getZzDoctorId());

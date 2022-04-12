@@ -50,6 +50,8 @@
         <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
         <result property="inNo" column="in_no" jdbcType="VARCHAR"/>
         <result property="adviceDosage" column="adviceDosage" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="productName" column="productName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--单个查询-->
@@ -629,9 +631,12 @@
         e.crte_name as tellName,
         e.exec_name as execName,
         e.dosage as adviceDosage,
+        bp.name as productName,
+        b.spec,
         (select f.name from base_rate f where f.id = e.rate_id) as rateName
         from phar_in_wait_receive a
         left join base_drug b on a.item_id = b.id
+        left join base_product bp on b.prod_code = bp.code
         left join inpt_visit c on a.visit_id = c.id
         left join base_dept d on a.phar_id = d.id
         left join inpt_advice e on a.advice_id = e.id

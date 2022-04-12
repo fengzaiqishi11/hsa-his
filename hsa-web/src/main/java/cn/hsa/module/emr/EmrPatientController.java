@@ -16,6 +16,7 @@ import cn.hsa.module.emr.emrpatienthtml.dto.EmrPatientHtmlDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -60,10 +61,22 @@ public class EmrPatientController extends BaseController {
 	public WrapperResponse<List<TreeMenuNode>> getEmrClassifyTemplateDTO(EmrPatientDTO emrPatientDTO, HttpServletRequest req, HttpServletResponse res) {
 		SysUserDTO sysUserDTO = getSession(req, res);
 		emrPatientDTO.setHospCode(sysUserDTO.getHospCode());
-	if (sysUserDTO.getLoginBaseDeptDTO() != null) {
-		emrPatientDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
-		emrPatientDTO.setDeptType(sysUserDTO.getLoginBaseDeptDTO().getTypeCode());  // 当前登录科室是门诊还是住院  1：门诊  2 住院
-	}
+
+		if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+			emrPatientDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+			emrPatientDTO.setDeptType(sysUserDTO.getLoginBaseDeptDTO().getTypeCode());  // 当前登录科室是门诊还是住院  1：门诊  2 住院
+		}
+		// 职工类型为护士
+	    if (StringUtils.isNotEmpty(sysUserDTO.getWorkTypeCode())
+		     && (Constants.RYZW_NURSE.RYZW_NURSE_01.equals(sysUserDTO.getWorkTypeCode())
+	         || Constants.RYZW_NURSE.RYZW_NURSE_02.equals(sysUserDTO.getWorkTypeCode())
+		     ||Constants.RYZW_NURSE.RYZW_NURSE_03.equals(sysUserDTO.getWorkTypeCode())
+		     ||Constants.RYZW_NURSE.RYZW_NURSE_04.equals(sysUserDTO.getWorkTypeCode())
+		     ||Constants.RYZW_NURSE.RYZW_NURSE_05.equals(sysUserDTO.getWorkTypeCode()))){
+	    	emrPatientDTO.setIsNurse("1");
+	    }else {
+			emrPatientDTO.setIsNurse("0");
+		}
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("emrPatientDTO", emrPatientDTO);
@@ -349,6 +362,17 @@ public class EmrPatientController extends BaseController {
 		emrPatientDTO.setHospCode(sysUserDTO.getHospCode());
 	    if (sysUserDTO.getLoginBaseDeptDTO() != null) {
 		emrPatientDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+		}
+		// 职工类型为护士
+		if (StringUtils.isNotEmpty(sysUserDTO.getWorkTypeCode())
+				&& (Constants.RYZW_NURSE.RYZW_NURSE_01.equals(sysUserDTO.getWorkTypeCode())
+				|| Constants.RYZW_NURSE.RYZW_NURSE_02.equals(sysUserDTO.getWorkTypeCode())
+				||Constants.RYZW_NURSE.RYZW_NURSE_03.equals(sysUserDTO.getWorkTypeCode())
+				||Constants.RYZW_NURSE.RYZW_NURSE_04.equals(sysUserDTO.getWorkTypeCode())
+				||Constants.RYZW_NURSE.RYZW_NURSE_05.equals(sysUserDTO.getWorkTypeCode()))){
+			emrPatientDTO.setIsNurse("1");
+		}else {
+			emrPatientDTO.setIsNurse("0");
 		}
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());

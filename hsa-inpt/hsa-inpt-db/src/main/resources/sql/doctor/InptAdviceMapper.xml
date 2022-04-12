@@ -108,6 +108,8 @@
         <result property="specimenCode" column="specimen_code" jdbcType="VARCHAR"/>
         <result property="deptName" column="deptName" jdbcType="VARCHAR"/>
         <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -317,7 +319,9 @@
         if(a.item_code = '4', b.is_stop_myself,null  ) isStopMyself, a.source_ia_id source_ia_id, a.advice_prefix, a.advice_suffix, a.collect_blood_time,
         case when e.id is null then '0' else '1' end isWz, a.cancel_id, a.cancel_name, a.cancel_time, a.skin_durg_id,
         ef.good_name skinDurgName, a.skin_phar_id, a.skin_unit_code, case when a.item_code = '1' then '2' when a.item_code = '2' then '3' when a.item_code = '4' and e.id is not null then '4'
-        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx, b.technology_code, b.container_code, b.specimen_code
+        when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx, b.technology_code, b.container_code, b.specimen_code,
+        (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then d.nation_code else '' end) as nation_code,
+        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then d.nation_name else '' end) as nation_name
         from inpt_advice a
         left join base_advice b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '4'
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
@@ -926,9 +930,12 @@
         ) as visitInfo,
         (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
         (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
-        (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName
+        (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
+        (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then bm.nation_code else '' end) as nation_code,
+        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name
         from inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
         left join base_drug c on a.item_id=c.id and a.item_code='1' and c.hosp_code=a.hosp_code
+        left join base_material bm on a.item_id=bm.id and a.item_code='2' and bm.hosp_code=a.hosp_code
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
         where a.is_submit='1' and a.hosp_code=#{hospCode}
         and (
@@ -1356,7 +1363,7 @@
     <!--  获取诊断信息 -->
     <select id="getInptDiagnose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode, a.is_main isMain, b.name diseaseName,a.custom_disease as customDisease,
-        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName
         from inpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
@@ -1376,13 +1383,6 @@
     <!--获取需要滚动长期费用的医嘱集合(长期医嘱、已核收、未停止、在院病人、拒收标志正常)-->
     <select id="queryAdvicesToLongCost" resultType="java.lang.String">
         select
-        --         a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
-        --         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
-        --         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
-        --         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
-        --         a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.last_exec_time, a.teach_doctor_id, a.teach_doctor_name,
-        --         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
-        --         a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time
         distinct a.id
         from
         inpt_advice a join inpt_visit b on a.visit_id=b.id
@@ -1402,7 +1402,7 @@
         --         医嘱开始时间小于等于当前时间
         and date_format(a.long_start_time, '%Y-%m-%d') &lt;= date_format(now(), '%Y-%m-%d')
         --         预停时间不为空,那么需要大于当前时间
-        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date_format(a.plan_stop_time, '%Y-%m-%d') &gt; date_format(now(), '%Y-%m-%d')))
+        and (a.plan_stop_time is null or (a.plan_stop_time is not null and date_format(a.plan_stop_time, '%Y-%m-%d') &gt;= date_format(now(), '%Y-%m-%d')))
         <if test="visitId!=null and visitId!=''">
             and b.id=#{visitId}
         </if>

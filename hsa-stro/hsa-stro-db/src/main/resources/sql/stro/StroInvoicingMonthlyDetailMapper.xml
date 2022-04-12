@@ -152,10 +152,16 @@
 		and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = #{item.date}
 		and a.outin_code in ('2','3','4','5','7','8','21','24')
 		and a.biz_id in (select p.id from base_dept p where  p.type_code in ("13","3") and p.hosp_code = #{item.hospCode})
+		<if test="itemId != null and itemId != ''">
+            a.item_id = #{itemId}
+        </if>
     group by a.item_id,a.biz_id
   </select>
   <select id="queryItemIdList" resultType="java.lang.String">
     select item_id from stro_stock group by item_id
+    <if test="itemId != null and item_id != ''">
+        having item_id = #{itemId}
+    </if>
   </select>
   <select id="getRecentlyStroInvoicingByDate"
           resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO">

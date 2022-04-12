@@ -731,6 +731,10 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             if (editSysDto!=null&&StringUtils.isNotEmpty(editSysDto.getValue()) && "1".equals(editSysDto.getValue())) {
                 list = emrPatientDAO.getDeptUsers(temp);
             }else {
+                // 病历文档类型为护理病历时，只能护士编辑
+                if (StringUtils.isNotEmpty(temp.getDocCode())&&"1".equals(temp.getDocCode())){
+                    temp.setIsNurse("1");
+                }
                 list = emrPatientDAO.getDiffDeptUsers(temp);
             }
             //List<SysUserDTO> list = emrPatientDAO.getDeptUsers(temp);

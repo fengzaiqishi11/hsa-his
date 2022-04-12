@@ -272,6 +272,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("hospCode",insureSettleInfoDTO.getHospCode());
         // 参保地医保区划
 //        paramMap.put("insuplcAdmdvs", insureConfigurationDTO.getInsuplcAdmdvs());
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
         paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
         paramMap.put("isHospital", Constants.SF.F);
         //参数校验,规则校验和请求初始化
@@ -342,7 +343,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         List<InsureUploadCostDTO> costDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
         if(!costDTOList.isEmpty() && costDTOList.size() > 0) {
             for(InsureUploadCostDTO insureUploadCostDTO : costDTOList){
-                sum.add(insureUploadCostDTO.getDetItemFeeSumamt());
+                sum = sum.add(insureUploadCostDTO.getDetItemFeeSumamt());
             }
         }
         paramMap.put("totalFeeSumamt", sum);
@@ -488,7 +489,16 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             InsureUploadCostDTO insureUploadCostDTO = new InsureUploadCostDTO();
             insureUploadCostDTO.setId(SnowflakeUtils.getId());//id
             insureUploadCostDTO.setHospCode(infoDTO.getHospCode());//医院编码
-            insureUploadCostDTO.setVisitId(infoDTO.getVisitId());//患者id
+            insureUploadCostDTO.setVisitId(infoDTO.getId());//患者id
+
+            insureUploadCostDTO.setMdtrtSn("");
+            insureUploadCostDTO.setIptOtpNo("");
+            insureUploadCostDTO.setMedType("");
+            insureUploadCostDTO.setChrgBchno("");
+            insureUploadCostDTO.setPsnCertType("");
+            insureUploadCostDTO.setCertno("");
+            insureUploadCostDTO.setPsnName("");
+            insureUploadCostDTO.setOrgCode(infoDTO.getInsureRegCode());
             insureUploadCostDTO.setCostId(MapUtils.get(item, "id"));//费用id
 
             insureUploadCostDTO.setCrteId(infoDTO.getCrteId());//创建id
@@ -497,7 +507,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 
             String doctorId = MapUtils.get(item, "doctorId");
             String doctorName = MapUtils.get(item, "doctorName");
-
+            insureUploadCostDTO.setFeedetlSn(MapUtils.get(item, "id"));
             if (infoDTO.getLx().equals("1")) {
                 insureUploadCostDTO.setFeeOcurTime((Date) item.get("costTime")); // 费用发生时间
             } else if (infoDTO.getLx().equals("0")) {
@@ -535,7 +545,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             }
             insureIndividualCostDOList.add(insureUploadCostDTO);
         }
-        insureGetInfoDAO.deleteCost(infoDTO.getVisitId(),infoDTO.getHospCode());
+        insureGetInfoDAO.deleteCost(infoDTO.getId(),infoDTO.getHospCode());
         insureGetInfoDAO.insertCost(insureIndividualCostDOList);
     }
 

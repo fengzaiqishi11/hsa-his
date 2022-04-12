@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface Constants {
 
+
+
     /**
      * 病人来源途径（LYTJ）
      */
@@ -22,7 +24,12 @@ public interface Constants {
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
     }
-
+    /**
+     * 颜色（color）
+     */
+    class COLOR {
+        public static final String RED = "1"; // 红色
+    }
     class LNDW{
         public static final String S = "1"; // 岁
         public static final String Y= "2"; // 月

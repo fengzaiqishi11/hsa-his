@@ -131,6 +131,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureSettleInfoDTO.getHospCode());
         insureConfigurationDTO.setOrgCode(sysParameterDTO.getValue());
+        insureConfigurationDTO.setRegCode(insureSettleInfoDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
 

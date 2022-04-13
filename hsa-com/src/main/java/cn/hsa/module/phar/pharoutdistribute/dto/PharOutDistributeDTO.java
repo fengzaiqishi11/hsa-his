@@ -80,4 +80,6 @@ public class PharOutDistributeDTO extends PharOutDistributeDO implements Seriali
     private String deptToldId;  // 开方/开嘱科室id
     private String deptName; // 开方/开嘱科室名称
 
+    private String orderStatus;// 退药状态，0：未退药 1：已退药
+
 }

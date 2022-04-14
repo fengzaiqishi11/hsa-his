@@ -163,5 +163,31 @@ public interface OutBackDrugDAO {
    **/
   int updateDistributeAllDetailId(@Param("list")  List<PharOutDistributeDetailDTO> pharOutDistributeDetailDTOS);
 
-
+  /**
+   * @Meth: queryOutBackDrugPeopleRefundApplyPage
+   * @Description: 查询领药申请的未退药病人
+   * @Param: [pharOutDistributeDTO]
+   * @return: java.util.List<cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO>
+   * @Author: zhangguorui
+   * @Date: 2022/4/13
+   */
+  List<PharOutDistributeDTO> queryOutBackDrugPeopleRefundApplyPage(PharOutDistributeDTO pharOutDistributeDTO);
+  /**
+   * @Meth: queryOutBackDrugDetailRefundApplyPageById
+   * @Description: 查询领药申请已退药 病人
+   * @Param: [pharOutDistributeDTO]
+   * @return: java.util.List<cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO>
+   * @Author: zhangguorui
+   * @Date: 2022/4/13
+   */
+  List<PharOutDistributeDTO> queryOutBackDrugDetailRefundApplyPageById(PharOutDistributeDTO pharOutDistributeDTO);
+  /**
+   * @Meth: queryOutBackDrugDetailPageForSelect
+   * @Description: 查询可以药数量大于0的病人
+   * @Param: [pharOutDistributeDTO]
+   * @return: java.util.List
+   * @Author: zhangguorui
+   * @Date: 2022/4/13
+   */
+  List<PharOutDistributeDTO>  queryOutBackDrugDetailPageForSelect(PharOutDistributeDTO pharOutDistributeDTO);
 }

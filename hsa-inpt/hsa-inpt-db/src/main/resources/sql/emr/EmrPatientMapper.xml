@@ -706,4 +706,10 @@
           AND c.is_valid = '1'
     </select>
 
+    <select id="getConsultationId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+     select GROUP_CONCAT(consul_userid_list)
+     from inpt_consultation_apply
+     where visit_id=#{visitId} and hosp_code =#{hospCode}
+    </select>
+
 </mapper>

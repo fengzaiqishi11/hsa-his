@@ -305,7 +305,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     objectMap.put("feedetl_sn",k) ; // 费用明细流水号
                 }
                 if(BigDecimalUtils.lessZero((BigDecimal)item.get("totalNum"))){
-                    objectMap.put("init_feedetl_sn",Integer.valueOf(MapUtils.get(item,"initFeedetlSn"))) ;// 原费用流水号
+                    if(MapUtils.isEmpty(item,"initFeedetlSn")){
+                        objectMap.put("init_feedetl_sn","") ;// 原费用流水号
+                    }else {
+                        objectMap.put("init_feedetl_sn",Integer.valueOf(MapUtils.get(item,"initFeedetlSn"))) ;// 原费用流水号
+                    }
                 }
                 else{
                     objectMap.put("init_feedetl_sn","") ;// 原费用流水号

@@ -318,4 +318,13 @@ public interface InsureItemMatchDAO {
     int deleteInsureItemInfos(InsureItemMatchDTO insureItemMatchDTO);
 
     List<BaseMaterialDTO> queryAllInsureMaterialsInfo(Map selectMap);
+
+    /**
+     * 根据医保注册编码和医院项目编码查询数据
+     * @param selectMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-12 15:37
+     * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
+     */
+    List<InsureItemMatchDTO> selectItemsByParams(Map selectMap);
 }

@@ -599,6 +599,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 //        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
         insureCostParam.put("isHospital", Constants.SF.F); // 区分门诊还是住院
+        insureCostParam.put("settle_code", "2");//费用结算状态
         List<Map<String, Object>> insureCostList = insureIndividualCostDAO.queryOutptInsureCostByVisit(insureCostParam);
         if (ListUtils.isEmpty(insureCostList)) {
             throw new AppException("该病人没有可以上传的费用");

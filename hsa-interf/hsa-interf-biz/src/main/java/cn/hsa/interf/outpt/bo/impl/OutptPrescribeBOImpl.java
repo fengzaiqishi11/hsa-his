@@ -83,7 +83,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
     @Resource
     InsureDiseaseMatchDAO insureDiseaseMatchDAO;
     /**
-     * 云净接口入口1
+     * 云净接口入口
      * @param map
      * @return
      */

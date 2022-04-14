@@ -894,7 +894,7 @@
                                AND ic.`hosp_code` = iic.`hosp_code`
 
         WHERE ic.`hosp_code` = #{hospCode}
-          AND ic.`settle_code` IN ('0', '1','2')
+          AND ic.`settle_code` IN ('0', '1')
           AND ic.`visit_id` = #{visitId}
           AND IFNULL(iim.`is_match`, '0') = #{isMatch}
         <if test="transmitCode != null and transmitCode != '' ">

@@ -21,12 +21,15 @@ import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -241,6 +244,11 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
             i.setCrteName(insureItemMatchDTO.getCrteName());
             i.setBigTypeCode("3");
         }
+
+        //根据医保注册编码和医院项目编码查看表里是否已存在,已存在不新增
+        checkListExist(collect2,"drug",insureItemMatchDTOS);
+        checkListExist(collect4, "item",insureItemMatchDTOS);
+        checkListExist(collect6, "material",insureItemMatchDTOS);
 
         if (!ListUtils.isEmpty(collect2)) {
             saveBatchList(collect2, "drug");
@@ -1691,6 +1699,81 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
         return object != null;
     }
 
+    /**
+     * 根据医保注册编码和医院项目编码是否已存在,已存在不新增
+     * @param dataList
+     * @param type
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-12 15:22
+     * @return void
+     */
+    private void checkListExist(List dataList, String type ,List<InsureItemMatchDTO> list) {
+      List existList = new ArrayList();
+      //药品
+      if (ObjectUtil.isNotEmpty(type) && type.equals("drug")) {
+        for (int i = 0; i < dataList.size() ; i++) {
+          BaseDrugDTO drug = (BaseDrugDTO)dataList.get(i);
+          for (InsureItemMatchDTO dto : list) {
+            //判断医保注册编码和医院项目编码是否已存在,已存在不新增
+            if (ObjectUtil.isEmpty(drug.getCode())){
+              existList.add(dataList.get(i));
+            }else if (drug.getInsureRegCode().equals(dto.getInsureRegCode()) && drug.getCode().equals(dto.getHospItemCode())){
+              existList.add(dataList.get(i));
+            }
+          }
+        }
+         /*for (Object obj : dataList) {
+           //获取字段对应的值
+            Field filed1 = obj.getClass().getDeclaredField("insureItemCode");
+            Field filed2 = obj.getClass().getDeclaredField("code");
+            filed1.setAccessible(true);
+            filed2.setAccessible(true);
+            String insureItemCode = filed1.get(obj).toString();
+            String hospItemCode = filed2.get(obj).toString();
+          BaseDrugDTO dto = (BaseDrugDTO) obj;
+          selectMap.put("insureItemCode", dto.getInsureRegCode());
+          selectMap.put("hospItemCode", dto.getCode());
+          //根据医保注册编码和医院项目编码查看表里是否已存在
+          List<InsureItemMatchDTO> matchList = insureItemMatchDAO.selectItemsByParams(selectMap);
+          if (CollectionUtil.isNotEmpty(matchList)) {
+            //如果已存在，则不新增这条数据
+            dataList.remove(obj);
+          }
+        }
+      }*/
+      }
+      //项目
+      if (ObjectUtil.isNotEmpty(type) && type.equals("item")) {
+        for (int i = 0; i < dataList.size() ; i++) {
+          BaseItemDTO item = (BaseItemDTO) dataList.get(i);
+          for (InsureItemMatchDTO dto : list) {
+            //判断医保注册编码和医院项目编码是否已存在,已存在不新增
+            if (ObjectUtil.isEmpty(item.getCode())){
+              existList.add(dataList.get(i));
+            }else if (item.getInsureRegCode().equals(dto.getInsureRegCode()) && item.getCode().equals(dto.getHospItemCode())) {
+              existList.add(dataList.get(i));
+            }
+          }
+        }
+      }
+      //材料
+      if (ObjectUtil.isNotEmpty(type) && type.equals("material")) {
+        for (int i = 0; i < dataList.size(); i++) {
+          BaseMaterialDTO material = (BaseMaterialDTO) dataList.get(i);
+          for (InsureItemMatchDTO dto : list) {
+            //判断医保注册编码和医院项目编码是否已存在,已存在不新增
+            if (ObjectUtil.isEmpty(material.getCode())){
+              existList.add(dataList.get(i));
+            }else if (material.getInsureRegCode().equals(dto.getInsureRegCode()) && material.getCode().equals(dto.getHospItemCode())) {
+              existList.add(dataList.get(i));
+            }
+          }
+        }
+      }
+      //去除已存在的
+      dataList.removeAll(existList);
+    }
+
     private Boolean saveBatchList(List dataList, String type) {
         /*int dataSize = dataList.size();
         if (dataSize == 0) {
@@ -1707,7 +1790,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
                 }
             }
         }*/
-        this.insertItems(type,dataList);
+      this.insertItems(type,dataList);
         return true;
     }
 

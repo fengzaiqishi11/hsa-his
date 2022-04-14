@@ -1104,4 +1104,8 @@
         where bm.hosp_code = #{hospCode} and bm.is_valid = #{isValid} and ifnull(bm.type_code,'a') != '3'
     </select>
 
+    <select id="selectItemsByParams" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        select insure_reg_code from insure_item_match where insure_reg_code =#{insureItemCode} and
+        hosp_item_code =#{hospItemCode} and is_valid = 1
+    </select>
 </mapper>

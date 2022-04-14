@@ -97,6 +97,9 @@ public class StroAdjustDetailDO extends PageDO implements Serializable {
      * 调后拆零零售单价
      */
     private BigDecimal splitAfterPrice;
-
+    /**
+     * 调价的科室
+     */
+    private String bizId;
 
 }

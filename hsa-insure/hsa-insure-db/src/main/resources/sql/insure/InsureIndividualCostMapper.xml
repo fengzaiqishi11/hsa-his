@@ -591,10 +591,10 @@
         ON ic.`id` = iic.`cost_id`
         AND ic.`hosp_code` = iic.`hosp_code`
         WHERE ic.`hosp_code` = #{hospCode}
-        <if test="settle_code != null and settle_code !='' ">
+        <if test="settle_code == '2' ">
             AND ic.`settle_code` IN ('0', '1','2')
         </if>
-        <if test="settle_code == null ">
+        <if test="settle_code != '2' ">
             AND ic.`settle_code` IN ('0', '1')
         </if>
         AND ic.`visit_id` = #{visitId}
@@ -894,7 +894,13 @@
                                AND ic.`hosp_code` = iic.`hosp_code`
 
         WHERE ic.`hosp_code` = #{hospCode}
-          AND ic.`settle_code` IN ('0', '1','2')
+        <if test="settle_code == '2' ">
+            AND ic.`settle_code` IN ('0', '1','2')
+        </if>
+        <if test="settle_code != '2' ">
+            AND ic.`settle_code` IN ('0', '1')
+        </if>
+          AND ic.`settle_code` IN ('0', '1')
           AND ic.`visit_id` = #{visitId}
           AND IFNULL(iim.`is_match`, '0') = #{isMatch}
         <if test="transmitCode != null and transmitCode != '' ">

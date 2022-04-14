@@ -552,6 +552,9 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         map.put("hospCode", yjRcDTO.getHospCode());
         map.put("code", "YJ_ZDID");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)) {
+            throw new AppException(-1,"未查询的对应的诊断配置！医院编码为【"+yjRcDTO.getHospCode()+"】");
+        }
         outptPrescribeDTO.setDiagnoseIds(sysParameterDTO.getValue());
         //就诊ID
         outptPrescribeDTO.setVisitId(yjRcDTO.getJzid());

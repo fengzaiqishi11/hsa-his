@@ -2360,6 +2360,7 @@
     <select id="queryStroBusinessSummaryMainDeTail" resultType="java.util.Map">
         select
         bs.name as supplierName, /*供应商名*/
+        case sid.item_code when '1' then b.ndan when '2' then '' end ndan,
         sid.order_no as orderNo, /*单据号*/
         sid.item_name as itemName,
         sid.unit_code as unitCode,
@@ -2383,6 +2384,11 @@
         left join base_drug b on sid.item_id = b.id and sid.hosp_code = b.hosp_code and sid.item_code = '1'
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
+        <if test="keyword != null and keyword != ''">
+            and (
+            sid.item_name like concat('%', #{keyword}, '%')
+           )
+        </if>
         <if test="startDate != null and startDate != ''">
             and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>

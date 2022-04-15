@@ -165,4 +165,12 @@ public class InsureEmrUnifiedDTO implements Serializable {
      * 病床号
      */
     private String bedno;
+    /**
+     * 入院时间
+     */
+    private String admTime;
+    /**
+     * 入院诊断编码
+     */
+    private String admDise;
 }

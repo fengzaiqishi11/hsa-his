@@ -90,9 +90,9 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
         }
         List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
         if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
-            dataMap.put("upType", "0");
-        }else{
             dataMap.put("upType", "1");
+        }else{
+            dataMap.put("upType", "0");
         }
         HashMap commParam = new HashMap();
         checkRequest(dataMap);

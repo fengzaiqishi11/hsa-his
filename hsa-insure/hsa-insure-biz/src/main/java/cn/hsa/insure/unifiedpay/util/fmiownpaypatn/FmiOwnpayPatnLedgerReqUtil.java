@@ -54,7 +54,11 @@ public class FmiOwnpayPatnLedgerReqUtil<T> extends InsureCommonUtil implements B
 
         dataMap.put("mdtrtId", MapUtils.get(map,"mdtrtId"));
         dataMap.put("fixmedinsCode", MapUtils.get(map,"fixmedinsCode"));
-        dataMap.put("totalFeeSumamt",MapUtils.get(map,"totalFeeSumamt"));
+
+        DecimalFormat df1 = new DecimalFormat("0.00");
+        String realityPrice = df1.format(MapUtils.get(map,"totalFeeSumamt"));
+        BigDecimal totalFeeSumamt = BigDecimalUtils.convert(realityPrice);
+        dataMap.put("totalFeeSumamt",totalFeeSumamt);
 
         HashMap commParam = new HashMap();
         checkRequest(dataMap);

@@ -131,6 +131,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureSettleInfoDTO.getHospCode());
         insureConfigurationDTO.setOrgCode(sysParameterDTO.getValue());
+        insureConfigurationDTO.setRegCode(insureSettleInfoDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
 
@@ -272,6 +273,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("hospCode",insureSettleInfoDTO.getHospCode());
         // 参保地医保区划
 //        paramMap.put("insuplcAdmdvs", insureConfigurationDTO.getInsuplcAdmdvs());
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
         paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
         paramMap.put("isHospital", Constants.SF.F);
         //参数校验,规则校验和请求初始化
@@ -283,7 +285,6 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_UPLOD, interfaceParamDTO);
 
-        //TODO 插入 费用和标记
         insertHandlerInsureCost(mapList, insureSettleInfoDTO);
         return true;
     }
@@ -302,7 +303,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 
         paramMap.put("fixmedinsCode",sysParameterDTO.getValue());
         paramMap.put("visitId", insureSettleInfoDTO.getId());
-        paramMap.put("certno", insureSettleInfoDTO.getId());
+        paramMap.put("certno", insureSettleInfoDTO.getCertNo());
         paramMap.put("pageNum", insureSettleInfoDTO.getPageNo());
         paramMap.put("pageSize", insureSettleInfoDTO.getPageSize());
         // 参保地医保区划
@@ -342,7 +343,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         List<InsureUploadCostDTO> costDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
         if(!costDTOList.isEmpty() && costDTOList.size() > 0) {
             for(InsureUploadCostDTO insureUploadCostDTO : costDTOList){
-                sum.add(insureUploadCostDTO.getDetItemFeeSumamt());
+                sum = sum.add(insureUploadCostDTO.getDetItemFeeSumamt());
             }
         }
         paramMap.put("totalFeeSumamt", sum);
@@ -488,7 +489,16 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             InsureUploadCostDTO insureUploadCostDTO = new InsureUploadCostDTO();
             insureUploadCostDTO.setId(SnowflakeUtils.getId());//id
             insureUploadCostDTO.setHospCode(infoDTO.getHospCode());//医院编码
-            insureUploadCostDTO.setVisitId(infoDTO.getVisitId());//患者id
+            insureUploadCostDTO.setVisitId(infoDTO.getId());//患者id
+
+            insureUploadCostDTO.setMdtrtSn("");
+            insureUploadCostDTO.setIptOtpNo("");
+            insureUploadCostDTO.setMedType("");
+            insureUploadCostDTO.setChrgBchno("");
+            insureUploadCostDTO.setPsnCertType("");
+            insureUploadCostDTO.setCertno("");
+            insureUploadCostDTO.setPsnName("");
+            insureUploadCostDTO.setOrgCode(infoDTO.getInsureRegCode());
             insureUploadCostDTO.setCostId(MapUtils.get(item, "id"));//费用id
 
             insureUploadCostDTO.setCrteId(infoDTO.getCrteId());//创建id
@@ -497,7 +507,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 
             String doctorId = MapUtils.get(item, "doctorId");
             String doctorName = MapUtils.get(item, "doctorName");
-
+            insureUploadCostDTO.setFeedetlSn(MapUtils.get(item, "id"));
             if (infoDTO.getLx().equals("1")) {
                 insureUploadCostDTO.setFeeOcurTime((Date) item.get("costTime")); // 费用发生时间
             } else if (infoDTO.getLx().equals("0")) {
@@ -517,7 +527,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             insureUploadCostDTO.setMedListCodg(item.get("insureItemCode") == null ? "" : item.get("insureItemCode").toString()); // 医疗目录编码
             insureUploadCostDTO.setMedinsListCodg(item.get("hospItemCode") == null ? "" : item.get("hospItemCode").toString()); // 医药机构目录编码
             insureUploadCostDTO.setMedinsListName(MapUtils.get(item, "insureItemName")); // 医药机构目录名称
-            insureUploadCostDTO.setMedChrgitmType(MapUtils.get(item, "insureItemType")); // 医疗收费项目类别
+            insureUploadCostDTO.setMedChrgitmType(item.get("insureItemType") == null ? "" : item.get("insureItemType").toString()); // 医疗收费项目类别
             insureUploadCostDTO.setProdname(MapUtils.get(item, "insureItemName")); // 商品名
 
             insureUploadCostDTO.setBilgDeptCodg(MapUtils.get(item, "deptId")); // 开单科室编码
@@ -535,7 +545,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             }
             insureIndividualCostDOList.add(insureUploadCostDTO);
         }
-        insureGetInfoDAO.deleteCost(infoDTO.getVisitId(),infoDTO.getHospCode());
+        insureGetInfoDAO.deleteCost(infoDTO.getId(),infoDTO.getHospCode());
         insureGetInfoDAO.insertCost(insureIndividualCostDOList);
     }
 
@@ -589,6 +599,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 //        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureRegCode);// 医保机构编码
         insureCostParam.put("isHospital", Constants.SF.F); // 区分门诊还是住院
+        insureCostParam.put("settle_code", "2");//费用结算状态
         List<Map<String, Object>> insureCostList = insureIndividualCostDAO.queryOutptInsureCostByVisit(insureCostParam);
         if (ListUtils.isEmpty(insureCostList)) {
             throw new AppException("该病人没有可以上传的费用");
@@ -615,6 +626,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 //        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureSettleInfoDTO.getOrgCode());// 医保机构编码
         insureCostParam.put("queryBaby", "N");// 医保机构编码
+        insureCostParam.put("settle_code", "2");//费用结算状态
         List<Map<String, Object>> insureCostList = insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
         if (ListUtils.isEmpty(insureCostList)) {
             throw new AppException("该自费病人没有匹配的费用明细数据");

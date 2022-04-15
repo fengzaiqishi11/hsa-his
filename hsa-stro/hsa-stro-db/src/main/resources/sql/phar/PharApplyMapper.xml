@@ -252,4 +252,33 @@
           LEFT JOIN base_material c ON a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
           where a.hosp_code = #{hospCode} and stock_max is not null and a.biz_id = #{inStroId} and a.num &lt; a.stock_max
       </select>
+    <!--按消耗量生成-->
+    <select id="queryNeedSupplementDate" resultType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO" >
+        select
+        a.item_id as itemId,
+        max(a.item_code) as itemCode,
+        sum(a.num) as num,
+        max(a.hosp_code) as hospCode,
+        a.split_ratio as splitRatio,
+        case max(a.item_code) when '1' then abs(sum(a.num) * d.price) when '2' then abs(sum(a.num) * c.price) end sellPriceAll,
+        case a.item_code when '1' then d.split_price when '2' then c.split_price end splitPrice,
+        case max(a.item_code) when '1' then abs(sum(a.num) * d.last_buy_price) when '2' then abs(sum(a.num) * c.last_buy_price) end buyPriceAll,
+        case max(a.item_code) when '1' then d.spec when '2' then c.spec end spec,
+        max(a.item_name) as itemName,
+        max(a.unit_code) as unitCode,
+        case max(a.item_code) when '1' then d.last_buy_price when '2' then c.last_buy_price end buyPrice,
+        case max(a.item_code) when '1' then d.price when '2' then c.price end sellPrice,
+        (select c.id from base_product c where c.hosp_code = #{hospCode} and c.code = d.prod_code) as productId
+        from stro_invoicing a
+        left join base_drug d on a.hosp_code = d.hosp_code and a.item_id = d.id and d.is_valid = '1'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and c.is_valid = '1'
+        where a.hosp_code = #{hospCode} and a.outin_code in ('4','5','21') and a.biz_id = #{inStroId}
+        <if test="startTime != null and startTime!=''" >
+            AND a.crte_time >= #{startTime}
+        </if>
+        <if test="endTime != null and endTime!=''" >
+            <![CDATA[ AND a.crte_time <= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)]]>
+        </if>
+        group by a.item_id,a.biz_id
+    </select>
 </mapper>

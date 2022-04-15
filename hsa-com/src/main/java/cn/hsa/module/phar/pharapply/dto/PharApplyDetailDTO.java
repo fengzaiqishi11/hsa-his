@@ -43,4 +43,15 @@ public class PharApplyDetailDTO extends PharApplyDetailDO implements Serializabl
 
     private List<String> types;
 
+    private String productName;
+
+
+    private BigDecimal inStroNum;
+
+    private BigDecimal outStroNum;
+
+    private String inBizId;
+
+
+
 }

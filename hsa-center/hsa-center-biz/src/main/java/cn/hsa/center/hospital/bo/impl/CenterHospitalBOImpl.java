@@ -199,7 +199,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 centerSyncFlowDto.setHospCode(centerHospitalDTO.getCode());
                 centerSyncFlowDto.setType(String.valueOf(i));
                 centerSyncFlowDto.setStatusCode((i == 0?"1":"0"));
-                centerSyncFlowDto.setMessage((i == 0?"操作成功":"进行中"));
+                centerSyncFlowDto.setMessage((i == 0?"操作成功":"等待"));
                 //创建时间每次往后移，是为了方便前端展示自动创建数据库的一个时间线，统一个时间不好去排序展示
                 centerSyncFlowDto.setCreatTime(DateUtils.dateAddMinute(new Date(),i));
                 centerSyncFlowDtos.add(centerSyncFlowDto);
@@ -390,30 +390,42 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
 
     public CenterHospitalDatasourceDO createDataSource (CenterHospitalDTO centerHospitalDTO,CenterRootDatabaseBO centerRootDatabaseBO ){
+        String dsCode = "DS"+centerHospitalDTO.getCode();
+        CenterDatasourceDTO centerDatasourceDTO =  new CenterDatasourceDTO();
+        centerDatasourceDTO.setCode(dsCode);
+        List<CenterDatasourceDTO> centerDatasourceDTOList = (List<CenterDatasourceDTO>) centerDatasourceBO.queryCenterDatasourcePage(centerDatasourceDTO).getData().getResult();
+
+
         CenterDatasourceDO centerDatasourceDO = new CenterDatasourceDO();
-        //主键ID
-        centerDatasourceDO.setId(SnowflakeUtils.getId());//id
-        //数据据编码
-        centerDatasourceDO.setCode("DS"+centerHospitalDTO.getCode());
-        //数据库名称
-        centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
-        //数据库类型
-        centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
-        //数据源驱动
-        centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
-        //数据源URL
-        String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
-        centerDatasourceDO.setUrl(url);
-        //数据源账号
-        centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
-        //数据源密码
-        centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
-        //创建人ID
-        centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
-        //创建人姓名
-        centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
-        centerDatasourceDO.setCrteTime(new Date());//创建时间
-        centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        if(ListUtils.isEmpty(centerDatasourceDTOList)){
+            //主键ID
+            centerDatasourceDO.setId(SnowflakeUtils.getId());//id
+            //数据据编码
+            centerDatasourceDO.setCode(dsCode);
+            //数据库名称
+            centerDatasourceDO.setName(centerHospitalDTO.getName()+"数据库");
+            //数据库类型
+            centerDatasourceDO.setTypeCode(centerRootDatabaseBO.getType());
+            //数据源驱动
+            centerDatasourceDO.setDriverName(centerRootDatabaseBO.getJdbcDriver());;
+            //数据源URL
+            String url = centerRootDatabaseBO.getHospUrl().replaceAll("\\{dataBaseName}","" + centerHospitalDTO.getDataName() + "");
+            centerDatasourceDO.setUrl(url);
+            //数据源账号
+            centerDatasourceDO.setUsername(centerRootDatabaseBO.getRootUser());
+            //数据源密码
+            centerDatasourceDO.setPassword(centerRootDatabaseBO.getRootPassword());
+            //创建人ID
+            centerDatasourceDO.setCrteId(centerHospitalDTO.getCrteId());
+            //创建人姓名
+            centerDatasourceDO.setCrteName(centerHospitalDTO.getCrteName());
+            centerDatasourceDO.setCrteTime(new Date());//创建时间
+            centerDatasourceBO.addCenterDatasource(centerDatasourceDO);
+        }else {
+            centerDatasourceDO = centerDatasourceDTOList.get(0);
+        }
+
+
 
         CenterHospitalDatasourceDO centerHospitalDatasourceDO = new CenterHospitalDatasourceDO () ;
         //主键

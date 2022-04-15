@@ -79,6 +79,8 @@ public interface StroAdjustDetailDao {
     **/
     List<StroAdjustDetailDTO> queryStroAdjustDetailDTOs(StroAdjustDTO stroAdjustDTO);
 
+    List<StroAdjustDetailDTO> queryStroAdjustDetailById(StroAdjustDTO stroAdjustDTO);
+
     /**
     * @Method queryAdjustStroStockDetailDTOs
     * @Desrciption 获得库存明细数据
@@ -167,5 +169,14 @@ public interface StroAdjustDetailDao {
     * @Return int
     **/
     int updateAdjustDetailNum(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs);
-
+    /**
+     * @Meth: queryStockByItemIds
+     * @Description: 查询所有库存
+     * @Param: [hospCode, items]
+     * @return: java.util.List<cn.hsa.module.stro.stock.dto.StroStockDTO>
+     * @Author: zhangguorui
+     * @Date: 2022/4/14
+     */
+    List<StroStockDTO> queryStockByItemIds(@Param("hospCode") String hospCode,@Param("list") List<String> list,
+                                           @Param("sfdeptFilter") String sfdeptFilter);
 }

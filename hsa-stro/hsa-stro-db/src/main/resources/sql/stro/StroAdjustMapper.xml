@@ -233,5 +233,11 @@
         where hosp_code = #{item.hospCode} and id  = #{item.id}
       </foreach>
     </update>
+    <update id="updateAdjustDTOPriceById">
+       update stro_adjust
+       set before_price = #{beforePrice},
+       after_price = #{afterPrice}
+       where hosp_code = #{hospCode} and id  = #{id}
+    </update>
 
 </mapper>

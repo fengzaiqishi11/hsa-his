@@ -527,7 +527,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             insureUploadCostDTO.setMedListCodg(item.get("insureItemCode") == null ? "" : item.get("insureItemCode").toString()); // 医疗目录编码
             insureUploadCostDTO.setMedinsListCodg(item.get("hospItemCode") == null ? "" : item.get("hospItemCode").toString()); // 医药机构目录编码
             insureUploadCostDTO.setMedinsListName(MapUtils.get(item, "insureItemName")); // 医药机构目录名称
-            insureUploadCostDTO.setMedChrgitmType(MapUtils.get(item, "insureItemType")); // 医疗收费项目类别
+            insureUploadCostDTO.setMedChrgitmType(item.get("insureItemType") == null ? "" : item.get("insureItemType").toString()); // 医疗收费项目类别
             insureUploadCostDTO.setProdname(MapUtils.get(item, "insureItemName")); // 商品名
 
             insureUploadCostDTO.setBilgDeptCodg(MapUtils.get(item, "deptId")); // 开单科室编码

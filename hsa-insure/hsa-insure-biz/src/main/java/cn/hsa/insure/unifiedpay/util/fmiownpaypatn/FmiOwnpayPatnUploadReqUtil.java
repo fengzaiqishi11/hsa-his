@@ -82,8 +82,10 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             dataMap.put("fmiOwnpayPatnDiseListDDTOS", initInptDiseListDDTOS(inptDiagnoseDTOList,inptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
             dataMap.put("fmiOwnpayPatnFeeListDDTO",initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }else {
-            dataMap.put("fmiOwnpayPatnMdtrtDDTO", initMdtrtDDTO(outptVisitDTO,insureConfigurationDTO,sysParameterDTO.getValue()));
-            dataMap.put("fmiOwnpayPatnDiseListDDTOS", initOutptDiseListDDTOS(outptDiagnoseDTOList,outptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
+            FmiOwnpayPatnMdtrtDDTO fmiOwnpayPatnMdtrtDDTO = initMdtrtDDTO(outptVisitDTO,insureConfigurationDTO,sysParameterDTO.getValue());
+            dataMap.put("fmiOwnpayPatnMdtrtDDTO", fmiOwnpayPatnMdtrtDDTO);
+            dataMap.put("fmiOwnpayPatnDiseListDDTOS", initOutptDiseListDDTOS(outptDiagnoseDTOList,outptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue(),
+                    fmiOwnpayPatnMdtrtDDTO));
             dataMap.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }
         List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
@@ -255,8 +257,8 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
         mdtrtinfoMap.setMainCondDesc(null);
 
-        String diseCode = null;
-        String diseCodeName = null;
+        String diseCode = outptVisitDTO.getInDiseaseId();
+        String diseCodeName = outptVisitDTO.getInDiseaseName();
         if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
             mdtrtinfoMap.setDiseNo("");//	病种编码
         }else{
@@ -368,22 +370,6 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
         List<InptDiagnoseDTO> list = data.stream().filter(inptDiagnoseDTO ->
                 Constants.SF.S.equals(inptDiagnoseDTO.getIsMain())).collect(Collectors.toList());
-        int size = list.size();
-//        if("2401".equals(type)){
-//            if(size == 0){
-//                throw new AppException("没有开入院主诊断");
-//            }
-//            if(size >1){
-//                throw new AppException("入院主诊断数量大于1");
-//            }
-//        }else{
-//            if(size == 0){
-//                throw new AppException("没有开出院主诊断");
-//            }
-//            if(size >1){
-//                throw new AppException("出院院主诊断数量大于1");
-//            }
-//        }
         if(inptDiagnoseDTOList.size() != data.size()){
             List<String> dataCollect = data.stream().map(InptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
             List<String> inptDataCollect = inptDiagnoseDTOList.stream().map(InptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
@@ -399,16 +385,9 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
     }
 
     private List<FmiOwnpayPatnDiseListDDTO> initOutptDiseListDDTOS(List<OutptDiagnoseDTO> outptDiagnoseDTOList,List<OutptDiagnoseDTO> outptMatchDiagnoseDTOList,
-                                                              InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName) {
+                                                              InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName,FmiOwnpayPatnMdtrtDDTO fmiOwnpayPatnMdtrtDDTO) {
         List<FmiOwnpayPatnDiseListDDTO> diseinfoList = new ArrayList<FmiOwnpayPatnDiseListDDTO>();
 
-//        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
-//        SysUserDTO sysUserDTO = insureIndividualVisitDAO.queryDoctorPracCertiNo(outptVisitDTO);
-//        String doctorName = sysUserDTO.getName();
-//        String doctorId = sysUserDTO.getPracCertiNo();
-//        if (StringUtils.isEmpty(doctorId)) {
-//            throw new AppException("该" + doctorName + "医生的医师国家码没有维护,请去用户管理里面维护");
-//        }
         commonHandlerDisease(outptMatchDiagnoseDTOList, outptDiagnoseDTOList);
         for(int i=0;i<outptMatchDiagnoseDTOList.size();i++) {
             FmiOwnpayPatnDiseListDDTO diseinfoMap = new FmiOwnpayPatnDiseListDDTO();
@@ -418,13 +397,16 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             diseinfoMap.setDiagSrtNo(i + 1);//	诊断排序号
             diseinfoMap.setDiagInfoId(outptMatchDiagnoseDTOList.get(i).getId());
             diseinfoMap.setMdtrtId(outptMatchDiagnoseDTOList.get(i).getVisitId());
-            diseinfoMap.setInoutDiagType(null);
+            diseinfoMap.setInoutDiagType("1");
 
-            diseinfoMap.setDiagType(outptMatchDiagnoseDTOList.get(i).getTypeCode());//	诊断类别
+            diseinfoMap.setDiagType("1");//	诊断类别
             diseinfoMap.setMaindiagFlag(outptMatchDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
             diseinfoMap.setDiagCode(outptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
             diseinfoMap.setDiagName(outptMatchDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
-
+            if("1".equals(diseinfoMap.getMaindiagFlag())){
+                fmiOwnpayPatnMdtrtDDTO.setDiseNo(outptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());
+                fmiOwnpayPatnMdtrtDDTO.setDiseName(outptMatchDiagnoseDTOList.get(i).getInsureInllnessName());
+            }
             diseinfoMap.setAdmCond(null);//	入院病情
             diseinfoMap.setDiagDept(outptMatchDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
             diseinfoMap.setDiagDrCode(outptMatchDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码

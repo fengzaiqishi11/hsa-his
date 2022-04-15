@@ -156,4 +156,13 @@ public interface StroAdjustDao {
      * @Date: 2021/11/8
      */
     List<SysParameterDTO> getParameterValue(String hospCode, String[] code);
+    /**
+     * @Meth: updateAdjustDTOPriceById
+     * @Description: 根据id回写价格
+     * @Param: [stroAdjustDTO]
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/4/14
+     */
+    void updateAdjustDTOPriceById(StroAdjustDTO stroAdjustDTO);
 }

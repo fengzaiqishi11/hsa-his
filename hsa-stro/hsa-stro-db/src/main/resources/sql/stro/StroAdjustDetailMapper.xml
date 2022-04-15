@@ -199,6 +199,9 @@
         <foreach collection="ids"  item="id" separator="," open="(" close=")">
             #{id}
         </foreach>
+        <if test="bizId != null and bizId != ''">
+            and l.biz_id = #{bizId}
+        </if>
     </select>
 
 

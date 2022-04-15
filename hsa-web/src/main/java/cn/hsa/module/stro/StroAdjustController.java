@@ -159,7 +159,7 @@ public class StroAdjustController extends BaseController {
         stroAdjustDTO.setAuditId(sysUserDTO.getId());
         stroAdjustDTO.setAuditName(sysUserDTO.getName());
         stroAdjustDTO.setHospCode(sysUserDTO.getHospCode());
-
+        stroAdjustDTO.setBizId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("stroAdjustDTO",stroAdjustDTO);

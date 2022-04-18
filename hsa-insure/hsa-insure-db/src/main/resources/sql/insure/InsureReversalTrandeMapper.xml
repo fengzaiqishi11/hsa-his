@@ -1341,6 +1341,7 @@
         Round(sum( hospExemAmount ),2) AS hospExemAmount,
         Round(sum( governmentPay ),2) AS governmentPay,
         Round(sum( othPay ),2) AS othPay,
+        Round(sum( retiredPay ),2) AS retiredPay,
         Round(sum( totalPrice ),2) AS totalPrice,
         Round(sum( portionPrice ),2) AS portionPrice,
         Round(sum( startingPrice ),2) AS startingPrice,
@@ -1403,6 +1404,7 @@
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
         ifnull( e.maf_pay, 0 ) AS mafPay,
+        ifnull( e.retired_pay, 0 ) AS retiredPay,
         case
         when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
         when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
@@ -1499,6 +1501,7 @@
         Round(( e.insure_price - e.personal_price ),2) AS planSumPrice,
         Round(ifnull(e.hosp_exem_amount,0),2) AS hospExemAmount,
         Round(ifnull(e.government_pay,0),2) AS governmentPay,
+        Round(ifnull(e.retired_pay,0),2) AS retiredPay,
         e.clr_optins AS clrOptins,
         e.clr_type AS clrType,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type = value ) as clrTypeName,

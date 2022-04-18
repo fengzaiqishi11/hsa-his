@@ -90,6 +90,9 @@
     from stro_invoicing_monthly where hosp_code = #{item.hospCode} and DATE_FORMAT(crte_time,'%Y-%m') = DATE_FORMAT(#{item.crteTime},'%Y-%m')
     GROUP BY item_id,biz_id,crte_time,stroPhar
   </select>
+  <select id="queryRecentlyUpdateTime" resultType="java.sql.Date">
+    select DATE_FORMAT(max(modify_time),'%Y-%m-%d') from stro_invoicing_monthly where hosp_code = #{hospCode} and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt; #{date} limit 1;
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly
     where id = #{item.id}
@@ -800,4 +803,78 @@
       modify_time = #{item.modifyTime}
     where id = #{item.id}
   </update>
+    <!--回写主表-->
+    <update id="updateByDate">
+  update stro_invoicing_monthly a , (select id,hosp_code, biz_id, item_code, item_id, item_name, sum(num) as num,
+        unit_code, curr_unit_code, sell_price, buy_price, split_ratio, split_price, sum(split_num) as splitNum,
+        split_unit_code,sum(up_surplus_num) as upSurplusNum,sum(surplus_num) as surplusNum,
+        sum(up_buy_price_all) as upBuyPriceAll,sum(buy_price_all) as buyPriceAll,
+        sum(up_sell_price_all) as upSellPriceAll,sum(sell_price_all) as sellPriceAll, crte_time,
+        new_price, new_split_price,sum(stro_in_num) as stroInNum,sum(stro_in_num_price_all) as stroInNumPriceAll,
+        sum(return_supl_num) as returnSuplNum,sum(return_supl_price_all) as returnSuplPriceAll,
+        sum(stro_to_dept_num) as stroToDeptNum,sum(stro_to_dept_price_all) as stroToDeptPriceAll,
+        sum(stro_to_phar_num) as stroToPharNum,sum(stro_to_phar_price_all) as stroToPharPriceAll,
+        sum(report_losses_num) as reportLossesNum,sum(report_losses_price_all) as reportLossesPriceAll,
+        sum(phar_return_stro_num) as pharReturnStroNum,sum(phar_return_stro_price_all) as pharReturnStroPriceAll,
+        sum(adjust_profit_price_all) as adjustProfitPriceAll,sum(adjust_loss_price_all) as adjustLossPriceAll,
+        sum(take_strock_subtract_num) as takeStrockSubtractNum,sum(take_strock_subtract_price_all) as takeStrockSubtractPriceAll,
+        sum(take_strock_add_num) as takeStrockAddNum,sum(take_strock_add_price_all) as takeStrockAddPriceAll,
+        sum(stro_in_num_buy_price_all) as stroInNumBuyPriceAll,sum(return_supl_buy_price_all) as returnSuplBuyPriceAll,
+        sum(stro_to_dept_buy_price_all) as stroToDeptBuyPriceAll,sum(stro_to_phar_buy_price_all) as stroToPharBuyPriceAll,
+        sum(report_losses_buy_price_all) as reportLossesBuyPriceAll,
+        sum(phar_return_stro_buy_price_all) as pharReturnStroBuyPriceAll,
+        sum(adjust_profit_buy_price_all) as adjustProfitBuyPriceAll,
+        sum(adjust_loss_buy_price_all) as adjustLossBuyPriceAll,
+        sum(take_strock_subtract_buy_price_all) AS takeStrockSubtractBuyPriceAll,
+        sum(take_strock_add_buy_price_all) as takeStrockAddBuyPriceAll,
+        sum(out_sales_num) as outSalesNum,sum(out_sales_price_all) as outSalesPriceAll,
+        sum(out_sales_buy_price_all) as outSalesBuyPriceAll,sum(in_sales_buy_price_all) as inSalesBuyPriceAll,
+        sum(in_sales_price_all) as inSalesPriceAll,sum(in_sales_num) as inSalesNum,monthly_id
+  from stro_invoicing_monthly_detail where date(crte_time) = #{date} GROUP BY monthly_id)b
+        set
+          a.num = b.num,
+          a.split_num = b.splitNum,
+          a.up_surplus_num = b.upSurplusNum,
+          a.surplus_num = b.surplusNum,
+          a.up_buy_price_all = b.upBuyPriceAll,
+          a.buy_price_all = b.buyPriceAll,
+          a.up_sell_price_all = b.upSellPriceAll,
+          a.sell_price_all = b.sellPriceAll,
+          a.stro_in_num = b.stroInNum,
+          a.stro_in_num_price_all = b.stroInNumPriceAll,
+          a.return_supl_num = b.returnSuplNum,
+          a.return_supl_price_all = b.returnSuplPriceAll,
+          a.stro_to_dept_num = b.stroToDeptNum,
+          a.stro_to_dept_price_all = b.stroToDeptPriceAll,
+          a.stro_to_phar_num = b.stroToPharNum,
+          a.stro_to_phar_price_all = b.stroToPharPriceAll,
+          a.report_losses_num = b.reportLossesNum,
+          a.report_losses_price_all = b.reportLossesPriceAll,
+          a.phar_return_stro_num = b.pharReturnStroNum,
+          a.phar_return_stro_price_all = b.pharReturnStroPriceAll,
+          a.adjust_profit_price_all = b.adjustProfitPriceAll,
+          a.adjust_loss_price_all = b.adjustLossPriceAll,
+          a.take_strock_subtract_num = b.takeStrockSubtractNum,
+          a.take_strock_subtract_price_all = b.takeStrockSubtractPriceAll,
+          a.take_strock_add_num = b.takeStrockAddNum,
+          a.take_strock_add_price_all = b.takeStrockAddPriceAll,
+          a.stro_in_num_buy_price_all = b.stroInNumBuyPriceAll,
+          a.return_supl_buy_price_all = b.returnSuplBuyPriceAll,
+          a.stro_to_dept_buy_price_all = b.stroToDeptBuyPriceAll,
+          a.stro_to_phar_buy_price_all = b.stroToPharBuyPriceAll,
+          a.report_losses_buy_price_all = b.reportLossesBuyPriceAll,
+          a.phar_return_stro_buy_price_all = b.pharReturnStroBuyPriceAll,
+          a.adjust_profit_buy_price_all = b.adjustProfitBuyPriceAll,
+          a.adjust_loss_buy_price_all = b.adjustLossBuyPriceAll,
+          a.take_strock_subtract_buy_price_all = b.takeStrockSubtractBuyPriceAll,
+          a.take_strock_add_buy_price_all = b.takeStrockAddBuyPriceAll,
+          a.out_sales_num = b.outSalesNum,
+          a.out_sales_price_all = b.outSalesPriceAll,
+          a.out_sales_buy_price_all = b.outSalesBuyPriceAll,
+          a.in_sales_buy_price_all = b.inSalesBuyPriceAll,
+          a.in_sales_price_all = b.inSalesPriceAll,
+          a.in_sales_num = b.inSalesNum,
+          a.modify_time = now()
+          where a.id = b.monthly_id and DATE_FORMAT(a.crte_time,'%Y-%m') = DATE_FORMAT(#{date},'%Y-%m') and a.hosp_code = #{hospCode}
+    </update>
 </mapper>

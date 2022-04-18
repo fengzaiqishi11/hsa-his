@@ -84,7 +84,8 @@
     <!--查询有退药记录的人-->
     <select id="queryOutBackDrugPeoplePage" resultMap="PharOutDistributeMap" >
         select * from (
-         select pod.id,
+         select
+         pod.id,
          pod.order_no,
          pod.hosp_code,
          pod.visit_id,
@@ -110,14 +111,14 @@
          outpt.cert_no as certNo,
          outpt.phone as phone,
          outpt.visit_no as visitNo,
+         ad.total_back_num as totalBackNum,
          (select name from base_window where window_id = base_window.id and base_window.hosp_code = #{hospCode})as windowName,
-           case when total_price >=0 then '发药'
+           case when pod.total_price >=0 then '发药'
                else '退药'  end as type,
-         (select count(0) from phar_out_distribute_all_detail ad where ad.hosp_code = #{hospCode} and ad.distribute_id = pod.id
-          and (((case when ad.curr_unit_code = ad.unit_code then ad.num else ad.split_num end) - ifnull(ad.total_back_num,0)) > 0)) as detailNum
-         from phar_out_distribute pod left join outpt_visit outpt
-         on pod.hosp_code = outpt.hosp_code and pod.visit_id = outpt.id
-            <where>
+         ((case when ad.curr_unit_code = ad.unit_code then ad.num else ad.split_num end) - ifnull(ad.total_back_num,0) > 0) as detailNum
+          from phar_out_distribute pod left join outpt_visit outpt on pod.hosp_code = outpt.hosp_code and pod.visit_id = outpt.id
+          left join phar_out_distribute_all_detail ad on ad.hosp_code = #{hospCode} and ad.distribute_id = pod.id
+        <where>
                 and pod.hosp_code = #{hospCode} and pod.status_code = '0'
                 <if test="id != null and id != ''">
                     and pod.id = #{id}
@@ -180,22 +181,51 @@
                 </if>
             </where>
         ) a
-        where detailNum>0
+        where
+        1 = 1
+        <choose>
+            <when test="orderStatus != null and orderStatus == 0">
+                and  detailNum > 0
+            </when>
+            <when test="orderStatus != null and orderStatus == 1">
+                and  totalBackNum > 0
+            </when>
+        </choose>
+        GROUP BY a.id
         order by crte_time desc
     </select>
 
     <!--根据发药ID 查询出此人的所有发药记录-->
     <select id="queryOutBackDrugDetailPage" resultMap="PharOutDistributeDetailMap">
-     select
+         select
+            p.id, p.hosp_code, p.distribute_id, p.op_id, p.opd_id, p.old_cost_id, p.cost_id, p.item_code, p.item_id, p.item_name, p.spec,
+            p.dosage, p.dosage_unit_code, p.num, p.unit_code, p.price, p.split_ratio, p.split_unit_code, p.split_price, p.split_num,
+            p.total_price, p.chinese_drug_num, p.usage_code, p.use_code, p.back_num, p.total_back_num, p.old_dist_id, p.status_code,
+            p.curr_unit_code,
+            case
+                when p.curr_unit_code = p.unit_code
+                    then p.num
+                    else p.split_num
+                    end as num,
+            (select (rp.num - ifnull(cs.back_num,0)) from outpt_refund_apply rp where rp.status = '2' and rp.refund_code = '1' and rp.cost_id = cs.id) as backNumOk
+            from phar_out_distribute_all_detail p
+            join outpt_cost cs on cs.distribute_all_detail_id = p.id and cs.hosp_code = p.hosp_code and cs.status_code = '0'
+            where p.distribute_id = #{id} and p.hosp_code = #{hospCode} and p.num > 0
+    </select>
+
+    <select id="queryOutBackDrugDetailPageForSelect" resultMap="PharOutDistributeDetailMap">
+     select *from (select
         id, hosp_code, distribute_id, op_id, opd_id, old_cost_id, cost_id, item_code, item_id, item_name, spec,
         dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_price, split_num,
         total_price, chinese_drug_num, usage_code, use_code, back_num, total_back_num, old_dist_id, status_code,
         curr_unit_code,
         case when ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))>=0 then ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))
              else 0 end
-        as backNumOk, curr_unit_code
-        from phar_out_distribute_all_detail where distribute_id = #{id} and hosp_code = #{hospCode} and num >0
+        as backNumOk
+        from phar_out_distribute_all_detail where distribute_id = #{id} and hosp_code = #{hospCode} and num >0) a
+        where a.backNumOk > 0
     </select>
+
 
     <!--根据发药ID 查询出此人的所有发药记录 可退数量为门诊医生申请退费指定的数量-->
     <select id="queryOutBackDrugDetailRefundApplyPage1" resultMap="PharOutDistributeDetailMap">
@@ -235,9 +265,9 @@
 
     <!--根据发药ID 查询出此人的所有发药记录 可退数量为门诊医生申请退费指定的数量-->
     <select id="queryOutBackDrugDetailRefundApplyPage" resultType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO">
-     select
+     select *from (select
         p.id, p.hosp_code, p.distribute_id, p.op_id, p.opd_id, p.old_cost_id, p.cost_id, p.item_code, p.item_id, p.item_name, p.spec,
-        p.dosage, p.dosage_unit_code, p.num, p.unit_code, p.price, p.split_ratio, p.split_unit_code, p.split_price, p.split_num,
+        p.dosage, p.dosage_unit_code,p.unit_code, p.price, p.split_ratio, p.split_unit_code, p.split_price, p.split_num,
         p.total_price, p.chinese_drug_num, p.usage_code, p.use_code, p.back_num, p.total_back_num, p.old_dist_id, p.status_code,
         p.curr_unit_code,
         case
@@ -248,7 +278,8 @@
         (select (rp.num - ifnull(cs.back_num,0)) from outpt_refund_apply rp where rp.status = '2' and rp.refund_code = '1' and rp.cost_id = cs.id) as backNumOk
         from phar_out_distribute_all_detail p
         join outpt_cost cs on cs.distribute_all_detail_id = p.id and cs.hosp_code = p.hosp_code and cs.status_code = '0'
-        where p.distribute_id = #{id} and p.hosp_code = #{hospCode} and p.num > 0
+        where p.distribute_id = #{id} and p.hosp_code = #{hospCode} and p.num > 0) a where  a.backNumOk > 0
+
     </select>
 
 
@@ -324,8 +355,138 @@
         and a.distribute_all_detail_id = #{id}
         order by a.stock_detail_id desc
   </select>
+    <select id="queryOutBackDrugPeopleRefundApplyPage"
+            resultMap="PharOutDistributeMap">
+        select * from (
+        select
+        pod.id,
+        pod.order_no,
+        pod.hosp_code,
+        pod.visit_id,
+        pod.settle_id,
+        pod.total_price,
+        pod.phar_id,
+        pod.window_id,
+        pod.assign_user_id,
+        pod.assign_user_name,
+        pod.assign_time,
+        pod.dist_user_id,
+        pod.dist_user_name,
+        pod.dist_time,
+        pod.dept_id,
+        pod.crte_id,
+        pod.crte_name,
+        pod.crte_time,
+        pod.status_code,
+        outpt.name as name,
+        outpt.gender_code as genderCode,
+        outpt.age as age,
+        outpt.age_unit_code as ageUnitCode,
+        outpt.cert_no as certNo,
+        outpt.phone as phone,
+        outpt.visit_no as visitNo,
+        ad.total_back_num as totalBackNum,
+        (select name from base_window where window_id = base_window.id and base_window.hosp_code = #{hospCode})as windowName,
+        case when pod.total_price >=0 then '发药'
+        else '退药'  end as type,
+        (select (rp.num - ifnull(cs.back_num,0)) from outpt_refund_apply rp where rp.status = '2' and rp.refund_code = '1' and rp.cost_id = cs.id) as backNumOk
+        from phar_out_distribute pod left join outpt_visit outpt
+        on pod.hosp_code = outpt.hosp_code and pod.visit_id = outpt.id
+        left join phar_out_distribute_all_detail ad on ad.hosp_code = #{hospCode} and ad.distribute_id = pod.id
+        left join outpt_cost cs on cs.distribute_all_detail_id = ad.id and cs.status_code = '0'
+        <where>
+            and pod.hosp_code = #{hospCode} and pod.status_code = '0'
+            <if test="id != null and id != ''">
+                and pod.id = #{id}
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                and pod.order_no = #{orderNo}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and pod.visit_id = #{visitId}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and pod.settle_id = #{settleId}
+            </if>
+            <if test="totalPrice != null">
+                and pod.total_price = #{totalPrice}
+            </if>
+            <if test="pharId != null and pharId != ''">
+                and pod.phar_id = #{pharId}
+            </if>
+            <if test="windowId != null and windowId != ''">
+                and pod.window_id = #{windowId}
+            </if>
+            <if test="assignUserId != null and assignUserId != ''">
+                and pod.assign_user_id = #{assignUserId}
+            </if>
+            <if test="assignUserName != null and assignUserName != ''">
+                and pod.assign_user_name = #{assignUserName}
+            </if>
+            <if test="assignTime != null">
+                and pod.assign_time = #{assignTime}
+            </if>
+            <if test="distUserId != null and distUserId != ''">
+                and pod.dist_user_id = #{distUserId}
+            </if>
+            <if test="distUserName != null and distUserName != ''">
+                and pod.dist_user_name = #{distUserName}
+            </if>
+            <if test="distTime != null">
+                and pod.dist_time = #{distTime}
+            </if>
+            <if test="deptId != null and deptId != ''">
+                and pod.dept_id = #{deptId}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and pod.crte_id = #{crteId}
+            </if>
+            /*开始日期*/
+            <if test="startDate != null">
+                and pod.crte_time &gt;=#{startDate}
+            </if>
+            /*结束日期*/
+            <if test="endDate != null">
+                and pod.crte_time &lt;= DATE_FORMAT(DATE_ADD(#{endDate},INTERVAL 1 DAY),'%Y-%m-%d')
+            </if>
+            <if test="keyword != null and keyword!= ''">
+                and (outpt.name like concat('%',#{keyword},'%')
+                or outpt.phone like concat('%',#{keyword},'%')
+                or outpt.cert_no like concat('%',#{keyword},'%')
+                or order_no like concat('%',#{keyword},'%'))
+            </if>
+        </where>
+        ) a
+        where
+         1 = 1
+         <choose>
+             <when test="orderStatus != null and orderStatus == 0">
+                 and  backNumOk > 0
+             </when>
+             <when test="orderStatus != null and orderStatus == 1">
+                 and  totalBackNum > 0
+             </when>
+         </choose>
+         GROUP BY a.id
+         order by crte_time desc
+    </select>
+    <select id="queryOutBackDrugDetailRefundApplyPageById"
+            resultMap="PharOutDistributeDetailMap">
+    select
+        p.id, p.hosp_code, p.distribute_id, p.op_id, p.opd_id, p.old_cost_id, p.cost_id, p.item_code, p.item_id, p.item_name, p.spec,
+        p.dosage, p.dosage_unit_code,p.unit_code, p.price, p.split_ratio, p.split_unit_code, p.split_price, abs(p.split_num) as split_num,
+        abs(p.total_price) as total_price, p.chinese_drug_num, p.usage_code, p.use_code, p.back_num, p.total_back_num, p.old_dist_id, p.status_code,
+        p.curr_unit_code,
+        case
+            when p.curr_unit_code = p.unit_code
+                then abs(p.num)
+                else abs(p.split_num)
+                end as num
+        from phar_out_distribute_all_detail p
+        where p.distribute_id = #{id} and p.hosp_code = #{hospCode} and p.num &lt; 0
+    </select>
 
-  <update id="updateBatchBackNumAndTotalBackNum">
+    <update id="updateBatchBackNumAndTotalBackNum">
     <foreach collection="list" item="item" index="index" separator=";">
       update phar_out_distribute_all_detail
       <set>

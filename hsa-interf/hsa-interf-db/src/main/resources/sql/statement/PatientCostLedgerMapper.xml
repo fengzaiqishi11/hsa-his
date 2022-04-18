@@ -764,13 +764,17 @@
         sum(if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0)) inSalesPriAll,     /**住院销售总金额**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum,                   /**住院销售总数量**/
         sum(if( a.outin_code='4',a.sell_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
-        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum                  /**药房出库科室总数量**/
+        sum(if( a.outin_code='4',a.num,0)) pharOutStroNum,                  /**药房出库科室总数量**/
+        sum(if( a.outin_code='24' and a.sell_price_all >
+        a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriAll,   /**调盈**/
+        sum(if( a.outin_code='24' and a.sell_price_all &lt;
+        a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0)) adjustLossPriAll   /**调亏**/
         FROM
         stro_invoicing a
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = "1"
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = "2"
         where a.hosp_code = #{hospCode}
-        and a.outin_code in ( '7', '8', '20', '23', '25','6','27','28','4' )
+        and a.outin_code in ( '7', '8', '20', '23', '25','6','27','28','4','24' )
         and a.biz_id in (select p.id from base_dept p where p.type_code in ("4","5") and p.hosp_code = #{hospCode})
         <if test="drugType != null and drugType != ''">
             and b.type_code = #{drugType}
@@ -1448,7 +1452,8 @@
         t.num_unit_code,
         t.price,
         t.doctor_id,
-        t.doctor_name ORDER BY t.item_type,t.bfc_id,t.item_code,t.item_id
+        t.doctor_name
+        ORDER BY t.item_type,t.bfc_id,t.item_code,t.item_id
     </select>
 
     <select id = "queryHospitalItemReportInfoGroupFour" resultType="java.util.LinkedHashMap">
@@ -1639,7 +1644,9 @@
                 and b.item_id = #{itemId}
             </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
-                and b.doctor_id = #{userId}
+                <if test="userId != null and userId != ''">
+                    and b.doctor_id = #{userId}
+                </if>
             </if>
             <if test="sumCode != null and sumCode == '1'.toString()">
                 <if test="deptId != null and deptId != ''">
@@ -2360,6 +2367,7 @@
     <select id="queryStroBusinessSummaryMainDeTail" resultType="java.util.Map">
         select
         bs.name as supplierName, /*供应商名*/
+        case sid.item_code when '1' then b.ndan when '2' then '' end ndan,
         sid.order_no as orderNo, /*单据号*/
         sid.item_name as itemName,
         sid.unit_code as unitCode,
@@ -2383,6 +2391,11 @@
         left join base_drug b on sid.item_id = b.id and sid.hosp_code = b.hosp_code and sid.item_code = '1'
         left join base_material c on sid.item_id = c.id and sid.hosp_code = c.hosp_code and sid.item_code = '2'
         ${sql}
+        <if test="keyword != null and keyword != ''">
+            and (
+            sid.item_name like concat('%', #{keyword}, '%')
+           )
+        </if>
         <if test="startDate != null and startDate != ''">
             and sid.crte_time &gt;=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
         </if>

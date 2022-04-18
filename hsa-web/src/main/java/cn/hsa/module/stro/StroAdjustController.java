@@ -89,6 +89,7 @@ public class StroAdjustController extends BaseController {
     public WrapperResponse<PageDTO> queryStroAdjustDtoById (StroAdjustDTO stroAdjustDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         stroAdjustDTO.setHospCode(sysUserDTO.getHospCode());
+        stroAdjustDTO.setBizId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("stroAdjustDTO",stroAdjustDTO);
@@ -158,7 +159,7 @@ public class StroAdjustController extends BaseController {
         stroAdjustDTO.setAuditId(sysUserDTO.getId());
         stroAdjustDTO.setAuditName(sysUserDTO.getName());
         stroAdjustDTO.setHospCode(sysUserDTO.getHospCode());
-
+        stroAdjustDTO.setBizId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("stroAdjustDTO",stroAdjustDTO);

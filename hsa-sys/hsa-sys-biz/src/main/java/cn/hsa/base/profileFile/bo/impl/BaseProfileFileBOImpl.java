@@ -161,7 +161,8 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
      * @Return cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO
      **/
     private OutptProfileFileDTO update(OutptProfileFileDTO outptProfileFileDTO) {
-        OutptProfileFileDTO profileFileDTO = baseProfileFileDAO.queryById(outptProfileFileDTO);
+        try{
+            OutptProfileFileDTO profileFileDTO = baseProfileFileDAO.queryById(outptProfileFileDTO);
         if (profileFileDTO == null) {
             //新增
             return insert(outptProfileFileDTO);
@@ -206,6 +207,12 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 baseProfileFileDAO.update(outptProfileFileDTO);
             }
             return profileFileDTO;
+        }
+        }catch (Exception appException){
+            if(appException.getMessage().contains("TooManyResultsException")){
+                throw new AppException("档案存在重复的身份证号！");
+            }
+           throw appException;
         }
     }
 

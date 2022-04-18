@@ -1,5 +1,6 @@
 package cn.hsa.insure.unifiedpay.util.settlementlist;
 
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
@@ -110,6 +111,9 @@ public class SettlementListReqUtil<T> extends InsureCommonUtil implements BaseRe
 
     private Object selectBaseSetlInfo(Map map) {
         InsureSettleInfoDTO settleInfoDTO = insureGetInfoDAO.selectBaseSetlInfo(map);
+        if(null == settleInfoDTO){
+            throw new AppException("请先维护保存结算清单信息");
+        }
         // 结算清单信息
         Map setlinfo = new HashMap();
         setlinfo.put("mdtrt_id", settleInfoDTO.getMdtrtId()); // 就医登记号

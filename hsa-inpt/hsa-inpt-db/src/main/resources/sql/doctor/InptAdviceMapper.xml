@@ -925,8 +925,8 @@
         a.price,a.total_price totalPrice,a.long_start_time longStartTime,a.content content,a.start_exec_num startExecNum,
           IF(
         a.baby_id ,
-        CONCAT(ib.name, '/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = ib.gender_code AND e.c_code = 'XB' ), '' )), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
-        concat(b.NAME,'/', (ifnull(( SELECT e.NAME FROM sys_code_detail e WHERE e.VALUE = b.gender_code AND e.c_code = 'XB' ), '' )),'/', b.age,(ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = b.age_unit_code AND hosp_code = b.hosp_code ), '岁' )))
+        CONCAT(ib.name, '/', (ifnull((case ib.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
+        concat(b.NAME,'/', (ifnull((case b.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')),'/', b.age,(ifnull((case b.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end), '岁' )))
         ) as visitInfo,
         (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
         (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,

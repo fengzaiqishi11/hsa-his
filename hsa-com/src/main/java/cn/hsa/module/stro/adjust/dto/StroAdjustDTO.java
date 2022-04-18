@@ -35,6 +35,6 @@ public class StroAdjustDTO  extends StroAdjustDO implements Serializable {
     private Date startDate;        //开始日期
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;         //结束日期
-
+    private String bizId;
 
 }

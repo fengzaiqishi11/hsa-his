@@ -46,4 +46,6 @@ public class StroAdjustDetailDTO extends StroAdjustDetailDO implements Serializa
     private String model;
     // 是否过滤科室库存
     private String sfdeptFilter;
+    // 库位名称
+    private String bizName;
 }

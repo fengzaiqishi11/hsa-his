@@ -40,3 +40,8 @@ security:
   oauth2:
     client:
       permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
+# disable elasticsearch healthcheck
+management:
+  health:
+    elasticsearch:
+      enabled: false

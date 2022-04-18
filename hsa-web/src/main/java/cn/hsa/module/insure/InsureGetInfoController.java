@@ -255,7 +255,7 @@ public class InsureGetInfoController extends BaseController {
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("idcard",insureReadCardDO.getIdcard());
-        map.put("fixmedinsCode ",insureReadCardDO.getFixmedinsCode());
+        map.put("fixmedinsCode",insureReadCardDO.getFixmedinsCode());
         map.put("insuAdmdvs",insureReadCardDO.getInsuAdmdvs());
         map.put("inputPassword",insureReadCardDO.getInputPassword());
         return insureReadCardService_consumer.getReadIdCard(map);

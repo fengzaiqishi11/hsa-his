@@ -39,7 +39,7 @@ public class InsureEmrDscginfoDO extends PageDO implements Serializable {
     /**
      * 出院日期
      */
-    private Date dscgDate;
+    private String dscgDate;
     /**
      * 入院诊断描述
      */
@@ -91,11 +91,11 @@ public class InsureEmrDscginfoDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

@@ -285,6 +285,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         insureIndividualBasicDO.setCrteId(crteId);//创建人id
         insureIndividualBasicDO.setCrteName(crteName);//创建人姓名
         insureIndividualBasicDO.setCrteTime(now);//创建时间
+        insureIndividualBasicDO.setCardIden(MapUtils.get(info,"cardIden"));
         insureIndividualBasicDAO.insertSelective(insureIndividualBasicDO);
 
         insureIndividualBusinessDAO.deleteByVisitId(visitId);

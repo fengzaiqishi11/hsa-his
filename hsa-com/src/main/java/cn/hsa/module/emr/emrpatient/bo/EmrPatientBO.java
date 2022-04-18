@@ -287,5 +287,5 @@ public interface EmrPatientBO {
 	 * @Date 2022/01/06 14:32
 	 * @Return
 	 */
-	Boolean updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO);
+	Map<String, Object> updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO);
 }

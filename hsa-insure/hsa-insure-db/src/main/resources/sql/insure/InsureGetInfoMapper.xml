@@ -419,7 +419,7 @@
         select m.* from (
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
-        patient_code = '0' and status_code in ('2','5','6') and hosp_code =#{hospCode}
+        patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
@@ -432,7 +432,7 @@
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
-        ov.patient_code = '0' and os.id is null and ov.hosp_code =#{hospCode}
+        ov.patient_code = '0' and os.id is not null and ov.hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
@@ -493,6 +493,12 @@
         where visit_id = #{id}
           and hosp_code = #{hospCode}
     </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <delete id="deleteCost">
+        delete from insure_upload_cost
+        where visit_id = #{visitId} and hosp_code = #{hospCode}
+    </delete>
 
     <select id="queryInsureSettle" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
         select IFNULL(total_price, 0)    as totalPrice,
@@ -757,7 +763,7 @@
         and IFNULL(iim.audit_code,'0') =#{isMatch}
         and IFNULL(iim.is_valid,'0') =#{isMatch}
         and IFNULL(iim.is_match,'0') =#{isMatch}
-        and ic.settle_code in ('0','1')
+        and ic.settle_code in ('0','1','2')
         and iim.insure_reg_code = #{orgCode}
         <if test="isTransmit != null and isTransmit !=''">
             and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}
@@ -816,7 +822,7 @@
         and IFNULL(iim.audit_code,'0') =#{isMatch}
         and IFNULL(iim.is_valid,'0') =#{isMatch}
         and IFNULL(iim.is_match,'0') =#{isMatch}
-        and ic.settle_code in ('0','1')
+        and ic.settle_code in ('0','1','2')
         and iim.insure_reg_code = #{orgCode}
         <if test="isTransmit != null and isTransmit !=''">
             and IFNULL(iic.`transmit_code`,'0') = #{isTransmit}

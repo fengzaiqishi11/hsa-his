@@ -96,11 +96,11 @@ public class InsureEmrRescinfoDO extends PageDO implements Serializable {
     /**
      * 抢救开始日期时间
      */
-    private Date rescBegntime;
+    private String rescBegntime;
     /**
      * 抢救结束日期时间
      */
-    private Date rescEndtime;
+    private String rescEndtime;
     /**
      * 检查/检验项目名称
      */
@@ -148,11 +148,11 @@ public class InsureEmrRescinfoDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

@@ -192,6 +192,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private Map<String,Object> selectBaseSetlInfo(Map<String, Object> map) {
         InsureSettleInfoDTO settleInfoDTO = insureGetInfoDAO.selectBaseSetlInfo(map);
+        if(null == settleInfoDTO){
+            throw new AppException("请先维护保存结算清单信息");
+        }
         // 湖南 结算清单信息
         Map setlinfo = new HashMap();
         setlinfo.put("psn_no", settleInfoDTO.getHiNo()); // 个人电脑号

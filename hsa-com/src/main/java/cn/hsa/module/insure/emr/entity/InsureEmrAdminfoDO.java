@@ -24,10 +24,6 @@ public class InsureEmrAdminfoDO extends PageDO implements Serializable {
      */
     private Long uuid;
     /**
-     * 就医流水号,院内唯一号
-     */
-    private String mdtrtSn;
-    /**
      * 医保病人必填,医保就诊ID
      */
     private String mdtrtId;
@@ -74,7 +70,7 @@ public class InsureEmrAdminfoDO extends PageDO implements Serializable {
     /**
      * 入院时间
      */
-    private Date admTime;
+    private String admTime;
     /**
      * 病史陈述者姓名
      */
@@ -362,7 +358,7 @@ public class InsureEmrAdminfoDO extends PageDO implements Serializable {
     /**
      * 评估日期时间
      */
-    private Date evalTime;
+    private String evalTime;
     /**
      * 责任护士姓名
      */
@@ -382,15 +378,15 @@ public class InsureEmrAdminfoDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 上传时间
      */
-    private Date uploadTime;
+    private String uploadTime;
     /**
      * 医院编码
      */

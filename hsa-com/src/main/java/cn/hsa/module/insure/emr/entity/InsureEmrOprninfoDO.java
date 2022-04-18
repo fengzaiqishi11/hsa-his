@@ -52,7 +52,7 @@ public class InsureEmrOprninfoDO extends PageDO implements Serializable {
     /**
      * 手术日期
      */
-    private Date oprnTime;
+    private String oprnTime;
     /**
      * 手术分类代码
      */
@@ -284,11 +284,11 @@ public class InsureEmrOprninfoDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

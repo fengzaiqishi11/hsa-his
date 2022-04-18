@@ -227,6 +227,17 @@ public interface InsureGetInfoDAO {
     int insertCost(@Param("list")List<InsureUploadCostDTO> insureUploadCostList);
 
     /**
+     * @Method insertCost
+     * @Desrciption
+     * @Param
+     * [InsureUpladCostDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-13 19:10
+     *
+     **/
+    int deleteCost(@Param("visitId")String visitId,@Param("hospCode")String hospCode);
+
+    /**
      * @Method insertSettleInfo
      * @Desrciption
      * @Param

@@ -3230,6 +3230,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setOrgCode(orgCode);
         insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureItemDTO.getInsureRegCode());
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         insureItemDTO.setId(SnowflakeUtils.getId());
         insureItemDTO.setInsureRegCode(insureConfigurationDTO.getRegCode());

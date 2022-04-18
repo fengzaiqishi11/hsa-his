@@ -512,15 +512,9 @@
         from inpt_diagnose a
                  join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
                  join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
-                 join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
+                 left join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
                 and iim.is_trans ='1' and iim.is_match ='1'
-        where  a.visit_id = #{id} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
-        <if test="diagnoseList != null and diagnoseList.size() > 0">
-            and a.type_code in
-            <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </if>
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
     </select>
     <!--HIS数据抽取 获取手术信息-->
     <select id="queryEmrOperRecordInfo" parameterType="java.util.Map"
@@ -686,6 +680,7 @@
 
     <select id="queryHisEmrJosnInfo" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
+            DISTINCT
             k.id as id,
             a.emr_json as emrJson,
             c.name as name,
@@ -704,6 +699,7 @@
             a.hosp_code = #{hospCode}
           AND a.visit_id = #{visitId}
           AND c.is_valid = '1'
+          and c.insure_type_code is not null and c.insure_type_code !=''
     </select>
 
     <select id="getConsultationId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">

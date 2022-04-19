@@ -716,7 +716,7 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
     @Override
     public Boolean insertapplyOrderByminOrUp(PharApplyDTO pharApplyDTO) {
       List<PharApplyDetailDTO> pharApplyDetailDTOS = new ArrayList<>();
-      // limitFlag  1: 按下限生成  2：按上限生成 3:按消耗量生成
+      // limitFlag  1: 按下限生成  2：按上限生成 3:按消耗量生成,按消耗量生成 会重复生成
       if("1".equals(pharApplyDTO.getLimitFlag())){
         pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementMin(pharApplyDTO);
       } else if ("2".equals(pharApplyDTO.getLimitFlag())){
@@ -724,7 +724,7 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
       } else {
           pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementDate(pharApplyDTO);
           if (ListUtils.isEmpty(pharApplyDetailDTOS)){
-              new AppException("这段时间无消耗");
+              throw new AppException("这段时间无消耗");
           }
           Iterator<PharApplyDetailDTO> pharApplyIterators = pharApplyDetailDTOS.iterator();
           // 只生产负的

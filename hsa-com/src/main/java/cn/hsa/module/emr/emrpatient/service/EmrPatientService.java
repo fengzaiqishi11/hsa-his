@@ -327,5 +327,5 @@ public interface EmrPatientService {
 	 * @Date 2022/01/06 14:32
 	 * @Return
 	 */
-    WrapperResponse<Boolean> updateHisEmrJosnInfo(Map map);
+	Map<String, Object> updateHisEmrJosnInfo(Map map);
 }

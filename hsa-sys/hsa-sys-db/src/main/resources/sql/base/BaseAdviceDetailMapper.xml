@@ -77,10 +77,10 @@
         left join base_dept b on m.in_dept_code = b.`code` and m.hosp_code = b.hosp_code
         left join base_dept c on m.out_dept_code = c.`code` and m.hosp_code = c.hosp_code
         where m.is_valid = '1' and m.hosp_code = #{hospCode} and m.is_supp_curtain = '1'
-            and m.is_in = '1'
+        and m.is_in = '1'
         <if test="keyword != null and keyword != ''">
             and  (m.name like concat('%',#{keyword},'%') or m.name_pym like concat('%',#{keyword},'%')
-                  or m.name_wbm like concat('%',#{keyword},'%'))
+            or m.name_wbm like concat('%',#{keyword},'%'))
         </if>
         UNION ALL
         select a.id,a.`name`,a.type_code as itemTypeCode,a.price,a.unit_code,

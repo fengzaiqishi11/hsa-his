@@ -278,7 +278,6 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         listReturn = result;
         return listReturn;
     }
-
     /**
      * 用户
      * @param map

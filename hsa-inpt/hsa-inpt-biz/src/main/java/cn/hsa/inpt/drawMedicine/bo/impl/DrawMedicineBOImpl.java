@@ -23,6 +23,7 @@ import cn.hsa.module.phar.pharinbackdrug.entity.PharInWaitReceiveDO;
 import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -721,14 +722,26 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       //修改医嘱提前领药天数
       MedicalAdviceDTO medicalAdviceDTO = MapUtils.get(map,"medicalAdviceDTO");
       List<String> adviceIds = medicalAdviceDTO.getIds();
-      inptAdviceDAO.updateAdvanceDaysLastExcTime(adviceIds,"0");
-
+      List<List<String>>  groupedList = splitList(adviceIds,50);
+      for(List<String> subList : groupedList){
+        inptAdviceDAO.updateAdvanceDaysLastExcTime(subList,"0");
+      }
       //修改提前领药记录
-      map.put("sfpy","1");
+      map.put("sfpy", Constants.SF.S);
       inptAdviceDAO.updateMedicineAdvance(map);
     }
 
 
+  }
+
+  /**
+   *  将一个数据按照指定大小分割成若干大小
+   * @param sourceList 需要被分割的List
+   * @param groupSize  分割后每个子集合的大小(最后一个可能会小于该数值)
+   * @return 分割后的list
+   */
+  private  List<List<String>> splitList(List<String> sourceList,int groupSize){
+    return Lists.partition(sourceList,groupSize);
   }
 
   @Override

@@ -238,11 +238,11 @@ public class RequestInsure {
         if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
             // 直连医保
             logger.debug("*****开始【湖南省医保登录】直连方法*****");
-            logger.debug("【湖南省医保登录】直连入参：" + JSON.toJSONString(paramObj));
+            logger.info("【湖南省医保登录】直连入参：" + JSON.toJSONString(paramObj));
             String doPost = HttpConnectUtil.doPost(paramObj);
-            logger.debug("【湖南省医保登录】直连返参字符串：" + doPost);
+            logger.info("【湖南省医保登录】直连返参字符串：" + doPost);
             resultData = HygeiaUtil.xml2map(doPost);
-            logger.debug("【湖南省医保登录】直连返参XML解析后：" + resultData);
+            logger.info("【湖南省医保登录】直连返参XML解析后：" + resultData);
             logger.debug("*****结束【湖南省医保登录】直连方法*****");
         } else {
             //解析医保可识别的XML格式编码字符串

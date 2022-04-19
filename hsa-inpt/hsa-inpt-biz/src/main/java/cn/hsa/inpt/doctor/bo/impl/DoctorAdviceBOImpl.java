@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
+import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
@@ -549,6 +550,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     public InptAdviceDTO getPsfy(String psyzmlCode, InptAdviceDTO inptAdviceDTO){
         InptAdviceDTO inptAdviceDTOPs = new InptAdviceDTO();
         BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
+        List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = new ArrayList<>();
         //医嘱编码
         baseDrugDTO.setCode(psyzmlCode);
         //医院编码
@@ -557,6 +559,14 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         BaseAdviceDTO baseAdviceDTO = inptAdviceDAO.getAdviceData(baseDrugDTO);
         if(baseAdviceDTO == null){
             return null;
+        }else {
+        //校验皮试医嘱所附带的医嘱信息信息是否有效base_advice_detail
+            baseAdviceDetailDTOS =  inptAdviceDAO.getAdviceDataDetail(baseDrugDTO);
+            for (BaseAdviceDetailDTO b:baseAdviceDetailDTOS) {
+                if(!"1".equals(b.getIsValid()) ){
+                    throw new RuntimeException("编码："+b.getItemCode()+"，名称："+b.getItemName()+"在医嘱基础信息中可能被作废，请检查");
+                }
+            }
         }
         //主键
         inptAdviceDTOPs.setId(SnowflakeUtils.getId());

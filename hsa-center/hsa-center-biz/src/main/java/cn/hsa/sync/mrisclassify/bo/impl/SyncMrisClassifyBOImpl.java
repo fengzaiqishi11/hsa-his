@@ -102,6 +102,10 @@ public class SyncMrisClassifyBOImpl extends HsafBO implements SyncMrisClassifyBO
             for (SyncMrisClassifyDTO item:list){
 
                 String bfcCodes = item.getBfcCodes();
+
+                if(StringUtils.isEmpty(bfcCodes))
+                    continue;
+
                 List<String> strings = Arrays.asList(bfcCodes.split(","));
                 bfc.setIds(strings);
                 // 根据财务分类编码列表查出所有财务分类名称

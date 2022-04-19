@@ -2282,4 +2282,20 @@
         and a.is_reject ='0' and  a.is_submit ='1'
         group by v.zg_doctor_id,v.in_dept_id
     </select>
+    <select id="getAdviceDataDetail" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO">
+        SELECT
+            bad.*,
+            case bad.type_code when '1' then bd.is_valid when '2' then bm.is_valid
+                               when '3' then bi.is_valid end isValid
+        FROM
+            base_advice_detail bad
+                LEFT JOIN base_drug bd ON bad.type_code = '1'
+                AND bad.item_code = bd.`code` and bad.hosp_code = bd.hosp_code
+                LEFT JOIN base_item bi ON bad.type_code = '3'
+                AND bad.item_code = bi.`code`and bad.hosp_code = bi.hosp_code
+                LEFT JOIN base_material bm ON bad.type_code = '2'
+                AND bad.item_code = bm.`code`and bad.hosp_code = bm.hosp_code
+        WHERE
+            bad.advice_code = #{code} and bad.hosp_code = #{hospCode}
+    </select>
 </mapper>

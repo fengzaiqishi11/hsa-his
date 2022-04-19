@@ -1,6 +1,7 @@
 package cn.hsa.module.inpt.doctor.dao;
 
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
+import cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO;
 import cn.hsa.module.base.bac.dto.BaseAssistCalcDetailDTO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
@@ -905,4 +906,5 @@ public interface InptAdviceDAO {
      **/
     List<InptVisitDTO> querySubmitAdviceList(Map param);
 
+    List<BaseAdviceDetailDTO> getAdviceDataDetail(BaseDrugDTO baseDrugDTO);
 }

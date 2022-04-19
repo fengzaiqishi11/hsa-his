@@ -51,7 +51,7 @@ public class InsureEmrDiseinfoDO extends PageDO implements Serializable {
     /**
      * 诊断时间
      */
-    private Date diagTime;
+    private String diagTime;
     /**
      * 西医诊断编码
      */
@@ -87,11 +87,11 @@ public class InsureEmrDiseinfoDO extends PageDO implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    private String createTime;
     /**
      * 修改时间
      */
-    private Date updateTime;
+    private String updateTime;
     /**
      * 医院编码
      */

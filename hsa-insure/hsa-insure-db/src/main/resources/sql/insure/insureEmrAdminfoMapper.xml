@@ -191,7 +191,7 @@
   <select id="queryByMdtrtSn" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
   SELECT <include refid="Base_Column_List"/>
   FROM insure_emr_adminfo
-  where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId}
+  where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId} and vali_flag = '1'
 </select>
 
     <select id="queryByUuid" resultType="cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO">
@@ -201,8 +201,9 @@
     </select>
 
   <select id="queryInsureUnifiedEmrInfo" parameterType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO" resultType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO">
-    select t.visit_id, t.medical_reg_no as mdtrtId, t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
-    t.visit_time as visitTime, e.crte_time as crteTime, c.bka035_name as psnTypeName, c.aka130_name as medTypeName, a.upload_time as uploadTime
+    select t.visit_id, t.medical_reg_no as mdtrtId, t.aac001 AS psnNo,t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
+    t.visit_time as visitTime, e.crte_time as crteTime, c.bka035 as psnType, c.bka035_name as psnTypeName, c.aka130 as medType, c.aka130_name as medTypeName, a.upload_time as uploadTime, e.insure_reg_code,
+    t.visit_drpt_id as deptCode,t.visit_drpt_name as deptName,t.visit_area_name as wardareaName,t.visit_berth as bedno, t.visit_time as admTime, t.visit_icd_code as admDise
     FROM
     insure_individual_settle e
     LEFT JOIN insure_individual_visit t ON e.hosp_code = t.hosp_code
@@ -222,6 +223,14 @@
       </if>
       <if test="certno != null and certno != '' ">
         and c.aac002 = #{certno}
+      </if>
+      <if test="insureRegCode != null and insureRegCode != '' ">
+        and e.insure_reg_code = #{insureRegCode}
+      </if>
+      <if test="keyword != null and keyword != '' ">
+        and (c.aac002 like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        or t.visit_no like concat('%', #{keyword,jdbcType=VARCHAR}, '%')
+        )
       </if>
       <if test="uploadStatu != null and uploadStatu != '' ">
         and a.statu = #{uploadStatu}
@@ -937,292 +946,290 @@
     -->
     update insure_emr_adminfo
     <set >
-      <if test="record.uuid != null" >
-        uuid = #{record.uuid,jdbcType=BIGINT},
+      <if test="uuid != null" >
+        uuid = #{uuid,jdbcType=BIGINT},
       </if>
-      <if test="record.mdtrtSn != null" >
-        mdtrt_sn = #{record.mdtrtSn,jdbcType=VARCHAR},
+      <if test="visitId != null" >
+        mdtrt_sn = #{visitId,jdbcType=VARCHAR},
       </if>
-      <if test="record.mdtrtId != null" >
-        mdtrt_id = #{record.mdtrtId,jdbcType=VARCHAR},
+      <if test="mdtrtId != null" >
+        mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
       </if>
-      <if test="record.psnNo != null" >
-        psn_no = #{record.psnNo,jdbcType=VARCHAR},
+      <if test="psnNo != null" >
+        psn_no = #{psnNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.mdtrtsn != null" >
-        mdtrtsn = #{record.mdtrtsn,jdbcType=VARCHAR},
+      <if test="mdtrtsn != null" >
+        mdtrtsn = #{mdtrtsn,jdbcType=VARCHAR},
       </if>
-      <if test="record.name != null" >
-        name = #{record.name,jdbcType=VARCHAR},
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
       </if>
-      <if test="record.gend != null" >
-        gend = #{record.gend,jdbcType=VARCHAR},
+      <if test="gend != null" >
+        gend = #{gend,jdbcType=VARCHAR},
       </if>
-      <if test="record.age != null" >
-        age = #{record.age,jdbcType=DECIMAL},
+      <if test="age != null" >
+        age = #{age,jdbcType=DECIMAL},
       </if>
-      <if test="record.admRecNo != null" >
-        adm_rec_no = #{record.admRecNo,jdbcType=VARCHAR},
+      <if test="admRecNo != null" >
+        adm_rec_no = #{admRecNo,jdbcType=VARCHAR},
       </if>
-      <if test="record.wardareaName != null" >
-        wardarea_name = #{record.wardareaName,jdbcType=VARCHAR},
+      <if test="wardareaName != null" >
+        wardarea_name = #{wardareaName,jdbcType=VARCHAR},
       </if>
-      <if test="record.deptCode != null" >
-        dept_code = #{record.deptCode,jdbcType=VARCHAR},
+      <if test="deptCode != null" >
+        dept_code = #{deptCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.deptName != null" >
-        dept_name = #{record.deptName,jdbcType=VARCHAR},
+      <if test="deptName != null" >
+        dept_name = #{deptName,jdbcType=VARCHAR},
       </if>
-      <if test="record.bedno != null" >
-        bedno = #{record.bedno,jdbcType=VARCHAR},
+      <if test="bedno != null" >
+        bedno = #{bedno,jdbcType=VARCHAR},
       </if>
-      <if test="record.admTime != null" >
-        adm_time = #{record.admTime,jdbcType=TIMESTAMP},
+      <if test="admTime != null" >
+        adm_time = #{admTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.illhisStteName != null" >
-        illhis_stte_name = #{record.illhisStteName,jdbcType=VARCHAR},
+      <if test="illhisStteName != null" >
+        illhis_stte_name = #{illhisStteName,jdbcType=VARCHAR},
       </if>
-      <if test="record.illhisStteRltl != null" >
-        illhis_stte_rltl = #{record.illhisStteRltl,jdbcType=VARCHAR},
+      <if test="illhisStteRltl != null" >
+        illhis_stte_rltl = #{illhisStteRltl,jdbcType=VARCHAR},
       </if>
-      <if test="record.stteRele != null" >
-        stte_rele = #{record.stteRele,jdbcType=VARCHAR},
+      <if test="stteRele != null" >
+        stte_rele = #{stteRele,jdbcType=VARCHAR},
       </if>
-      <if test="record.chfcomp != null" >
-        chfcomp = #{record.chfcomp,jdbcType=VARCHAR},
+      <if test="chfcomp != null" >
+        chfcomp = #{chfcomp,jdbcType=VARCHAR},
       </if>
-      <if test="record.diseNow != null" >
-        dise_now = #{record.diseNow,jdbcType=VARCHAR},
+      <if test="diseNow != null" >
+        dise_now = #{diseNow,jdbcType=VARCHAR},
       </if>
-      <if test="record.hlcon != null" >
-        hlcon = #{record.hlcon,jdbcType=VARCHAR},
+      <if test="hlcon != null" >
+        hlcon = #{hlcon,jdbcType=VARCHAR},
       </if>
-      <if test="record.diseHis != null" >
-        dise_his = #{record.diseHis,jdbcType=VARCHAR},
+      <if test="diseHis != null" >
+        dise_his = #{diseHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.ifet != null" >
-        ifet = #{record.ifet,jdbcType=VARCHAR},
+      <if test="ifet != null" >
+        ifet = #{ifet,jdbcType=VARCHAR},
       </if>
-      <if test="record.ifetHis != null" >
-        ifet_his = #{record.ifetHis,jdbcType=VARCHAR},
+      <if test="ifetHis != null" >
+        ifet_his = #{ifetHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.prevVcnt != null" >
-        prev_vcnt = #{record.prevVcnt,jdbcType=VARCHAR},
+      <if test="prevVcnt != null" >
+        prev_vcnt = #{prevVcnt,jdbcType=VARCHAR},
       </if>
-      <if test="record.oprnHis != null" >
-        oprn_his = #{record.oprnHis,jdbcType=VARCHAR},
+      <if test="oprnHis != null" >
+        oprn_his = #{oprnHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.bldHis != null" >
-        bld_his = #{record.bldHis,jdbcType=VARCHAR},
+      <if test="bldHis != null" >
+        bld_his = #{bldHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.algsHis != null" >
-        algs_his = #{record.algsHis,jdbcType=VARCHAR},
+      <if test="algsHis != null" >
+        algs_his = #{algsHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.psnHis != null" >
-        psn_his = #{record.psnHis,jdbcType=VARCHAR},
+      <if test="psnHis != null" >
+        psn_his = #{psnHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.mrgHis != null" >
-        mrg_his = #{record.mrgHis,jdbcType=VARCHAR},
+      <if test="mrgHis != null" >
+        mrg_his = #{mrgHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.menaHis != null" >
-        mena_his = #{record.menaHis,jdbcType=VARCHAR},
+      <if test="menaHis != null" >
+        mena_his = #{menaHis,jdbcType=VARCHAR},
       </if>
-      <if test="record.fmhis != null" >
-        fmhis = #{record.fmhis,jdbcType=VARCHAR},
+      <if test="fmhis != null" >
+        fmhis = #{fmhis,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmTprt != null" >
-        physexm_tprt = #{record.physexmTprt,jdbcType=DECIMAL},
+      <if test="physexmTprt != null" >
+        physexm_tprt = #{physexmTprt,jdbcType=DECIMAL},
       </if>
-      <if test="record.physexmPule != null" >
-        physexm_pule = #{record.physexmPule,jdbcType=DECIMAL},
+      <if test="physexmPule != null" >
+        physexm_pule = #{physexmPule,jdbcType=DECIMAL},
       </if>
-      <if test="record.physexmVentFrqu != null" >
-        physexm_vent_frqu = #{record.physexmVentFrqu,jdbcType=VARCHAR},
+      <if test="physexmVentFrqu != null" >
+        physexm_vent_frqu = #{physexmVentFrqu,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmSystolicPre != null" >
-        physexm_systolic_pre = #{record.physexmSystolicPre,jdbcType=VARCHAR},
+      <if test="physexmSystolicPre != null" >
+        physexm_systolic_pre = #{physexmSystolicPre,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmDstlPre != null" >
-        physexm_dstl_pre = #{record.physexmDstlPre,jdbcType=VARCHAR},
+      <if test="physexmDstlPre != null" >
+        physexm_dstl_pre = #{physexmDstlPre,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmHeight != null" >
-        physexm_height = #{record.physexmHeight,jdbcType=DECIMAL},
+      <if test="physexmHeight != null" >
+        physexm_height = #{physexmHeight,jdbcType=DECIMAL},
       </if>
-      <if test="record.physexmWt != null" >
-        physexm_wt = #{record.physexmWt,jdbcType=DECIMAL},
+      <if test="physexmWt != null" >
+        physexm_wt = #{physexmWt,jdbcType=DECIMAL},
       </if>
-      <if test="record.physexmOrdnStas != null" >
-        physexm_ordn_stas = #{record.physexmOrdnStas,jdbcType=VARCHAR},
+      <if test="physexmOrdnStas != null" >
+        physexm_ordn_stas = #{physexmOrdnStas,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmSkinMusl != null" >
-        physexm_skin_musl = #{record.physexmSkinMusl,jdbcType=VARCHAR},
+      <if test="physexmSkinMusl != null" >
+        physexm_skin_musl = #{physexmSkinMusl,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmSpefLymph != null" >
-        physexm_spef_lymph = #{record.physexmSpefLymph,jdbcType=VARCHAR},
+      <if test="physexmSpefLymph != null" >
+        physexm_spef_lymph = #{physexmSpefLymph,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmHead != null" >
-        physexm_head = #{record.physexmHead,jdbcType=VARCHAR},
+      <if test="physexmHead != null" >
+        physexm_head = #{physexmHead,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmNeck != null" >
-        physexm_neck = #{record.physexmNeck,jdbcType=VARCHAR},
+      <if test="physexmNeck != null" >
+        physexm_neck = #{physexmNeck,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmChst != null" >
-        physexm_chst = #{record.physexmChst,jdbcType=VARCHAR},
+      <if test="physexmChst != null" >
+        physexm_chst = #{physexmChst,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmAbd != null" >
-        physexm_abd = #{record.physexmAbd,jdbcType=VARCHAR},
+      <if test="physexmAbd != null" >
+        physexm_abd = #{physexmAbd,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmFingerExam != null" >
-        physexm_finger_exam = #{record.physexmFingerExam,jdbcType=VARCHAR},
+      <if test="physexmFingerExam != null" >
+        physexm_finger_exam = #{physexmFingerExam,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmGenitalArea != null" >
-        physexm_genital_area = #{record.physexmGenitalArea,jdbcType=VARCHAR},
+      <if test="physexmGenitalArea != null" >
+        physexm_genital_area = #{physexmGenitalArea,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmSpin != null" >
-        physexm_spin = #{record.physexmSpin,jdbcType=VARCHAR},
+      <if test="physexmSpin != null" >
+        physexm_spin = #{physexmSpin,jdbcType=VARCHAR},
       </if>
-      <if test="record.physexmAllFors != null" >
-        physexm_all_fors = #{record.physexmAllFors,jdbcType=VARCHAR},
+      <if test="physexmAllFors != null" >
+        physexm_all_fors = #{physexmAllFors,jdbcType=VARCHAR},
       </if>
-      <if test="record.nersys != null" >
-        nersys = #{record.nersys,jdbcType=VARCHAR},
+      <if test="nersys != null" >
+        nersys = #{nersys,jdbcType=VARCHAR},
       </if>
-      <if test="record.spcyInfo != null" >
-        spcy_info = #{record.spcyInfo,jdbcType=VARCHAR},
+      <if test="spcyInfo != null" >
+        spcy_info = #{spcyInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.asstExamRslt != null" >
-        asst_exam_rslt = #{record.asstExamRslt,jdbcType=VARCHAR},
+      <if test="asstExamRslt != null" >
+        asst_exam_rslt = #{asstExamRslt,jdbcType=VARCHAR},
       </if>
-      <if test="record.tcm4dRslt != null" >
-        tcm4d_rslt = #{record.tcm4dRslt,jdbcType=VARCHAR},
+      <if test="tcm4dRslt != null" >
+        tcm4d_rslt = #{tcm4dRslt,jdbcType=VARCHAR},
       </if>
-      <if test="record.syddclft != null" >
-        syddclft = #{record.syddclft,jdbcType=VARCHAR},
+      <if test="syddclft != null" >
+        syddclft = #{syddclft,jdbcType=VARCHAR},
       </if>
-      <if test="record.syddclftName != null" >
-        syddclft_name = #{record.syddclftName,jdbcType=VARCHAR},
+      <if test="syddclftName != null" >
+        syddclft_name = #{syddclftName,jdbcType=VARCHAR},
       </if>
-      <if test="record.prnpTrt != null" >
-        prnp_trt = #{record.prnpTrt,jdbcType=VARCHAR},
+      <if test="prnpTrt != null" >
+        prnp_trt = #{prnpTrt,jdbcType=VARCHAR},
       </if>
-      <if test="record.recDocCode != null" >
-        rec_doc_code = #{record.recDocCode,jdbcType=VARCHAR},
+      <if test="recDocCode != null" >
+        rec_doc_code = #{recDocCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.recDocName != null" >
-        rec_doc_name = #{record.recDocName,jdbcType=VARCHAR},
+      <if test="recDocName != null" >
+        rec_doc_name = #{recDocName,jdbcType=VARCHAR},
       </if>
-      <if test="record.ipdrCode != null" >
-        ipdr_code = #{record.ipdrCode,jdbcType=VARCHAR},
+      <if test="ipdrCode != null" >
+        ipdr_code = #{ipdrCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.ipdrName != null" >
-        ipdr_name = #{record.ipdrName,jdbcType=VARCHAR},
+      <if test="ipdrName != null" >
+        ipdr_name = #{ipdrName,jdbcType=VARCHAR},
       </if>
-      <if test="record.chfdrCode != null" >
-        chfdr_code = #{record.chfdrCode,jdbcType=VARCHAR},
+      <if test="chfdrCode != null" >
+        chfdr_code = #{chfdrCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.chfdrName != null" >
-        chfdr_name = #{record.chfdrName,jdbcType=VARCHAR},
+      <if test="chfdrName != null" >
+        chfdr_name = #{chfdrName,jdbcType=VARCHAR},
       </if>
-      <if test="record.chfpdrCode != null" >
-        chfpdr_code = #{record.chfpdrCode,jdbcType=VARCHAR},
+      <if test="chfpdrCode != null" >
+        chfpdr_code = #{chfpdrCode,jdbcType=VARCHAR},
       </if>
-      <if test="record.chfpdrName != null" >
-        chfpdr_name = #{record.chfpdrName,jdbcType=VARCHAR},
+      <if test="chfpdrName != null" >
+        chfpdr_name = #{chfpdrName,jdbcType=VARCHAR},
       </if>
-      <if test="record.mainSymp != null" >
-        main_symp = #{record.mainSymp,jdbcType=VARCHAR},
+      <if test="mainSymp != null" >
+        main_symp = #{mainSymp,jdbcType=VARCHAR},
       </if>
-      <if test="record.admRea != null" >
-        adm_rea = #{record.admRea,jdbcType=VARCHAR},
+      <if test="admRea != null" >
+        adm_rea = #{admRea,jdbcType=VARCHAR},
       </if>
-      <if test="record.admWay != null" >
-        adm_way = #{record.admWay,jdbcType=VARCHAR},
+      <if test="admWay != null" >
+        adm_way = #{admWay,jdbcType=VARCHAR},
       </if>
-      <if test="record.apgr != null" >
-        apgr = #{record.apgr,jdbcType=VARCHAR},
+      <if test="apgr != null" >
+        apgr = #{apgr,jdbcType=VARCHAR},
       </if>
-      <if test="record.dietInfo != null" >
-        diet_info = #{record.dietInfo,jdbcType=VARCHAR},
+      <if test="dietInfo != null" >
+        diet_info = #{dietInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.growthDeg != null" >
-        growth_deg = #{record.growthDeg,jdbcType=VARCHAR},
+      <if test="growthDeg != null" >
+        growth_deg = #{growthDeg,jdbcType=VARCHAR},
       </if>
-      <if test="record.mtlStasNorm != null" >
-        mtl_stas_norm = #{record.mtlStasNorm,jdbcType=VARCHAR},
+      <if test="mtlStasNorm != null" >
+        mtl_stas_norm = #{mtlStasNorm,jdbcType=VARCHAR},
       </if>
-      <if test="record.slepInfo != null" >
-        slep_info = #{record.slepInfo,jdbcType=VARCHAR},
+      <if test="slepInfo != null" >
+        slep_info = #{slepInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.spInfo != null" >
-        sp_info = #{record.spInfo,jdbcType=VARCHAR},
+      <if test="spInfo != null" >
+        sp_info = #{spInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.mindInfo != null" >
-        mind_info = #{record.mindInfo,jdbcType=VARCHAR},
+      <if test="mindInfo != null" >
+        mind_info = #{mindInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.nurt != null" >
-        nurt = #{record.nurt,jdbcType=VARCHAR},
+      <if test="nurt != null" >
+        nurt = #{nurt,jdbcType=VARCHAR},
       </if>
-      <if test="record.selfAblt != null" >
-        self_ablt = #{record.selfAblt,jdbcType=VARCHAR},
+      <if test="selfAblt != null" >
+        self_ablt = #{selfAblt,jdbcType=VARCHAR},
       </if>
-      <if test="record.nurscareObsvItemName != null" >
-        nurscare_obsv_item_name = #{record.nurscareObsvItemName,jdbcType=VARCHAR},
+      <if test="nurscareObsvItemName != null" >
+        nurscare_obsv_item_name = #{nurscareObsvItemName,jdbcType=VARCHAR},
       </if>
-      <if test="record.nurscareObsvRslt != null" >
-        nurscare_obsv_rslt = #{record.nurscareObsvRslt,jdbcType=VARCHAR},
+      <if test="nurscareObsvRslt != null" >
+        nurscare_obsv_rslt = #{nurscareObsvRslt,jdbcType=VARCHAR},
       </if>
-      <if test="record.smoke != null" >
-        smoke = #{record.smoke,jdbcType=VARCHAR},
+      <if test="smoke != null" >
+        smoke = #{smoke,jdbcType=VARCHAR},
       </if>
-      <if test="record.stopSmokDays != null" >
-        stop_smok_days = #{record.stopSmokDays,jdbcType=INTEGER},
+      <if test="stopSmokDays != null" >
+        stop_smok_days = #{stopSmokDays,jdbcType=INTEGER},
       </if>
-      <if test="record.smokInfo != null" >
-        smok_info = #{record.smokInfo,jdbcType=VARCHAR},
+      <if test="smokInfo != null" >
+        smok_info = #{smokInfo,jdbcType=VARCHAR},
       </if>
-      <if test="record.smokDay != null" >
-        smok_day = #{record.smokDay,jdbcType=VARCHAR},
+      <if test="smokDay != null" >
+        smok_day = #{smokDay,jdbcType=VARCHAR},
       </if>
-      <if test="record.drnk != null" >
-        drnk = #{record.drnk,jdbcType=VARCHAR},
+      <if test="drnk != null" >
+        drnk = #{drnk,jdbcType=VARCHAR},
       </if>
-      <if test="record.drnkFrqu != null" >
-        drnk_frqu = #{record.drnkFrqu,jdbcType=VARCHAR},
+      <if test="drnkFrqu != null" >
+        drnk_frqu = #{drnkFrqu,jdbcType=VARCHAR},
       </if>
-      <if test="record.drnkDay != null" >
-        drnk_day = #{record.drnkDay,jdbcType=INTEGER},
+      <if test="drnkDay != null" >
+        drnk_day = #{drnkDay,jdbcType=INTEGER},
       </if>
-      <if test="record.evalTime != null" >
-        eval_time = #{record.evalTime,jdbcType=TIMESTAMP},
+      <if test="evalTime != null" >
+        eval_time = #{evalTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.respNursName != null" >
-        resp_nurs_name = #{record.respNursName,jdbcType=VARCHAR},
+      <if test="respNursName != null" >
+        resp_nurs_name = #{respNursName,jdbcType=VARCHAR},
       </if>
-      <if test="record.valiFlag != null" >
-        vali_flag = #{record.valiFlag,jdbcType=VARCHAR},
+      <if test="valiFlag != null" >
+        vali_flag = #{valiFlag,jdbcType=VARCHAR},
       </if>
-      <if test="record.statu != null" >
-        statu = #{record.statu,jdbcType=VARCHAR},
+      <if test="statu != null" >
+        statu = #{statu,jdbcType=VARCHAR},
       </if>
-      <if test="record.source != null" >
-        source = #{record.source,jdbcType=VARCHAR},
+      <if test="source != null" >
+        source = #{source,jdbcType=VARCHAR},
       </if>
-      <if test="record.createTime != null" >
-        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.updateTime != null" >
-        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.uploadTime != null" >
-        upload_time = #{record.uploadTime,jdbcType=TIMESTAMP},
+      <if test="uploadTime != null" >
+        upload_time = #{uploadTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="record.hospCode != null" >
-        hosp_code = #{record.hospCode,jdbcType=VARCHAR},
+      <if test="hospCode != null" >
+        hosp_code = #{hospCode,jdbcType=VARCHAR},
       </if>
     </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
+    where uuid = #{uuid}
   </update>
   <update id="updateByExample" parameterType="map" >
     <!--

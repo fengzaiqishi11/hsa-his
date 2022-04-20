@@ -184,4 +184,16 @@ public interface StroInBO {
    * @Date: 2021/9/17
    */
   List<StroInDetailDTO> queryStroinDetailForExprot(StroInDetailDTO stroInDetailDTO);
+  /**
+   * @Menthod updateStroInFk()
+   * @Desrciption  修改财务付款状态
+   *
+   * @Param
+   * [baseDrugDTO]
+   *
+   * @Author pengbo
+   * @Date   2022/04/19 17:36
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   **/
+  Boolean updateStroInFk(StroInDTO stroInDTO);
 }

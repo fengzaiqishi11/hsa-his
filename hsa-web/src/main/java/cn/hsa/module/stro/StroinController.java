@@ -255,4 +255,28 @@ public class StroinController extends BaseController {
       return this.stroInService_consumer.queryStroinDetailForExprot(map);
   }
 
+
+
+    /**
+     * @Menthod updateStroInFk()
+     * @Desrciption  修改财务付款状态
+     *
+     * @Param
+     * [baseDrugDTO]
+     *
+     * @Author pengbo
+     * @Date   2022/04/19 17:36
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @PostMapping("/updateStroInFk")
+    public WrapperResponse<Boolean> updateStroInFk(@RequestBody StroInDTO stroInDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        stroInDTO.setFkrId(sysUserDTO.getId());
+        stroInDTO.setFkrName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("stroInDTO",stroInDTO);
+        return this.stroInService_consumer.updateStroInFk(map);
+    }
+
 }

@@ -47,4 +47,5 @@ public class StroInDTO extends StroInDO implements Serializable {
     private List<String> itemNames; //存储整单出库时（药品、材料）不足的名称
     private String isWholeSuppOut;  // 是否整单出库
     private String itemNameKey; // 药品名称
+    private String supplierName ; //供应商
 }

@@ -14,8 +14,11 @@ import lombok.Data;
  * @Version 1.0
  **/
 @Data
-public class InsureEmrUnifiedDTO extends PageDO implements Serializable {
+public class InsureEmrUnifiedDTO implements Serializable {
 
+    //分页参数
+    private int pageNo = 1 ;
+    private int pageSize = 10 ;
     /**
      * 住院号
      */
@@ -25,6 +28,11 @@ public class InsureEmrUnifiedDTO extends PageDO implements Serializable {
      * 姓名
      */
     private String psnName;
+
+    /**
+     * 人员编号
+     */
+    private String psnNo;
 
     /**
      * 证件号码
@@ -130,4 +138,39 @@ public class InsureEmrUnifiedDTO extends PageDO implements Serializable {
      * 机构编码
      */
     private String hospCode;
+
+    /**
+     * 住院号或证件号码
+     */
+    private String keyword;
+
+    /**
+     * 医保编码
+     */
+    private  String insureRegCode;
+
+    /**
+     * 病区名称
+     */
+    private String wardareaName;
+    /**
+     * 科室代码
+     */
+    private String deptCode;
+    /**
+     * 科室名称
+     */
+    private String deptName;
+    /**
+     * 病床号
+     */
+    private String bedno;
+    /**
+     * 入院时间
+     */
+    private String admTime;
+    /**
+     * 入院诊断编码
+     */
+    private String admDise;
 }

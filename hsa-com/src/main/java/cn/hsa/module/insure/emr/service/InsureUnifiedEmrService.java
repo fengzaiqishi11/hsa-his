@@ -5,6 +5,7 @@ import cn.hsa.module.insure.emr.dto.*;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -97,4 +98,18 @@ public interface InsureUnifiedEmrService {
     void updateInsureUnifiedEmrSync(Map<String, Object> map);
 
     void export(HttpServletRequest req, Map<String, Object> map);
+
+    List<InsureEmrDscginfoDTO> queryInsureUnifiedEmrDscginfo(Map map);
+
+    List<InsureEmrDieinfoDTO> queryInsureUnifiedEmrDieinfo(Map map);
+
+    List<InsureEmrRescinfoDTO> queryInsureUnifiedEmrRescinfo(Map map);
+
+    List<InsureEmrOprninfoDTO> queryInsureUnifiedEmrOprninfo(Map map);
+
+    List<InsureEmrCoursrinfoDTO> queryInsureUnifiedEmrCoursrinfo(Map map);
+
+    List<InsureEmrDiseinfoDTO> queryInsureUnifiedEmrDiseinfo(Map map);
+
+    InsureEmrAdminfoDTO queryInsureUnifiedEmrAdminfo(Map map);
 }

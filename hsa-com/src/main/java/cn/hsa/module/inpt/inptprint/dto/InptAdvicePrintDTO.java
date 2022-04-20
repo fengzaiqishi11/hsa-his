@@ -70,4 +70,6 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
     private String itemName;
 
     private String remark;
+
+    private String useDays;
 }

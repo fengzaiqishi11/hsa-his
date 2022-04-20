@@ -2240,6 +2240,16 @@
                 and cost_id = #{dto.oldCostId}
         </foreach>
     </update>
+    <!--更新待领表的状态-->
+    <update id="updateInWaitStatus">
+        update phar_in_wait_receive
+        set status_code = #{statusCode}
+        where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </update>
 
 
     <!--单个新增-->

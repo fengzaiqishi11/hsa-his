@@ -225,4 +225,11 @@ public interface StroStockService {
      */
     @GetMapping("/service/web/stro/cxstrostock/queryAllStockDetails")
     WrapperResponse<PageDTO> queryAllStockDetails(Map map);
+    /**
+     * 查询药品和材料的利润统计信息
+     * @param map
+     * @return
+     */
+    @GetMapping("/service/web/stro/cxstrostock/queryDrugAndMaterialProfit")
+    WrapperResponse<PageDTO> queryDrugAndMaterialProfit(Map map);
 }

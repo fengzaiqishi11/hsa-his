@@ -9656,3 +9656,703 @@ CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `mi_insur_hosp_items_rel`
 -- ----------------------------
 DROP VIEW IF EXISTS `user_info`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `user_info` AS select `outpt_medical_record`.`chief_complaint` AS `chief_complaint`,`outpt_medical_record`.`present_illness` AS `present_illness`,`outpt_medical_record`.`past_history` AS `past_history`,`outpt_medical_record`.`oneself_history` AS `oneself_history`,`outpt_medical_record`.`family_history` AS `family_history`,`outpt_medical_record`.`allergy_history` AS `allergy_history`,`outpt_medical_record`.`vaccination_history` AS `vaccination_history`,`outpt_medical_record`.`auxiliary_inspect` AS `auxiliary_inspect`,`outpt_medical_record`.`disease_analysis` AS `disease_analysis`,`outpt_medical_record`.`handle_suggestion` AS `handle_suggestion`,`outpt_medical_record`.`temperature` AS `temperature`,`outpt_medical_record`.`min_blood_pressure` AS `min_blood_pressure`,`outpt_medical_record`.`max_blood_pressure` AS `max_blood_pressure`,`outpt_medical_record`.`breath` AS `breath`,`outpt_medical_record`.`height` AS `height`,`outpt_medical_record`.`blood_sugar` AS `blood_sugar`,`outpt_medical_record`.`pulse` AS `pulse`,`outpt_medical_record`.`weight` AS `weight`,`outpt_medical_record`.`bmi` AS `bmi`,'433130199209047510' AS `cardNo` from `outpt_medical_record` limit 1;
+
+
+-- ---------------------
+-- 2022-04-19 更新得索引
+-- ---------------------
+
+--     stro_adjust表格
+ALTER TABLE `stro_adjust` ADD UNIQUE INDEX `idx_stro_adjust_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `stro_adjust` ADD INDEX `idx_stro_adjust_02` USING BTREE(`hosp_code`, `biz_id`);
+
+--     stro_adjust_detail表格
+ALTER TABLE `stro_adjust_detail` ADD INDEX `idx_stro_adjust_detail_01` USING BTREE(`hosp_code`, `adjust_id`);
+
+--     stro_in 表格
+ALTER TABLE `stro_in` ADD UNIQUE INDEX `idx_stro_in_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `stro_in` ADD INDEX `idx_stro_in_02` USING BTREE(`hosp_code`, `stock_id`);
+
+--     stro_in_detail表格
+ALTER TABLE `stro_in_detail` ADD INDEX `idx_stro_in_detail_01` USING BTREE(`hosp_code`, `in_id`);
+
+--     stro_in_record 表格
+ALTER TABLE `stro_in_record` ADD INDEX `idx_record_01` USING BTREE(`stock_detail_id`, `hosp_code`);
+ALTER TABLE `stro_in_record` ADD INDEX `idx_record_02` USING BTREE(`item_id`, `hosp_code`);
+
+--     stro_incdec 表格
+ALTER TABLE `stro_incdec` ADD UNIQUE INDEX `idx_stro_incdec_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `stro_incdec` ADD INDEX `idx_stro_incdec_02` USING BTREE(`hosp_code`, `biz_id`);
+
+--     stro_incdec_detail表格
+ALTER TABLE `stro_incdec_detail` ADD INDEX `idx_stro_incdec_detail_01` USING BTREE(`hosp_code`, `adjust_id`);
+
+--     stro_inventory表格
+ALTER TABLE `stro_inventory` ADD UNIQUE INDEX `idx_stro_inventory_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `stro_inventory` ADD INDEX `idx_stro_inventory_02` USING BTREE(`hosp_code`, `biz_id`);
+
+--     stro_inventory_detail 表格
+ALTER TABLE `stro_inventory_detail` ADD INDEX `idx_stro_inventory_detail_01` USING BTREE(`hosp_code`, `inventory_id`);
+
+--     stro_invoicing表格
+ALTER TABLE `stro_invoicing` ADD INDEX `idx_stro_invoicing_01` USING BTREE(`hosp_code`, `biz_id`, `crte_time`, `outin_code`);
+ALTER TABLE `stro_invoicing` ADD INDEX `idx_stro_invoicing_02` USING BTREE(`hosp_code`, `item_id`, `biz_id`);
+ALTER TABLE `stro_invoicing` ADD INDEX `idx_stro_invoicing_03` USING BTREE(`upload_insure`);
+ALTER TABLE `stro_invoicing` ADD INDEX `idx_stro_invoicing_04` USING BTREE(`item_id`, `invoicing_target_id`);
+
+--     stro_out_detail表格
+ALTER TABLE `stro_out_detail` ADD INDEX `idx_stro_out_detail_01` USING BTREE(`hosp_code`, `out_id`);
+
+--     stro_purchase表格
+ALTER TABLE `stro_purchase` ADD UNIQUE INDEX `idx_stro_purchase_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `stro_purchase` ADD INDEX `idx_stro_purchase_02` USING BTREE(`hosp_code`, `biz_id`, `supplier_id`);
+
+--     stro_purchase_detail表格
+ALTER TABLE `stro_purchase_detail` ADD INDEX `idx_stro_purchase_detail_01` USING BTREE(`hosp_code`, `purchase_id`);
+
+--     stro_stock表格
+ALTER TABLE `stro_stock` ADD INDEX `idx_stro_stock_01` USING BTREE(`hosp_code`, `biz_id`);
+ALTER TABLE `stro_stock` ADD INDEX `idx_stro_stock_02` USING BTREE(`item_id`, `hosp_code`);
+
+--     stro_stock_detail表格
+ALTER TABLE `stro_stock_detail` ADD INDEX `idx_stro_stock_detail_01` USING BTREE(`hosp_code`, `biz_id`);
+ALTER TABLE `stro_stock_detail` ADD INDEX `idx_stro_stock_detail_02` USING BTREE(`hosp_code`, `item_id`);
+
+--     stro_stock_time表格
+ALTER TABLE `stro_stock_time` ADD INDEX `idx_stro_stock_01` USING BTREE(`hosp_code`, `biz_id`);
+ALTER TABLE `stro_stock_time` ADD INDEX `idx_stro_stock_02` USING BTREE(`item_id`, `hosp_code`);
+
+--     phar_apply表格
+ALTER TABLE `phar_apply` ADD INDEX `phar_apply_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_apply` ADD INDEX `phar_apply_idx_02` USING BTREE(`in_stro_id`);
+ALTER TABLE `phar_apply` ADD INDEX `phar_apply_idx_03` USING BTREE(`out_stro_id`);
+ALTER TABLE `phar_apply` ADD INDEX `phar_apply_idx_04` USING BTREE(`crte_time`);
+
+--     phar_apply_detail表格
+ALTER TABLE `phar_apply_detail` ADD INDEX `phar_apply_detail_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_apply_detail` ADD INDEX `phar_apply_detail_idx_02` USING BTREE(`item_id`);
+ALTER TABLE `phar_apply_detail` ADD INDEX `phar_apply_detail_idx_03` USING BTREE(`apply_id`);
+
+--     phar_in_distribute表格
+ALTER TABLE `phar_in_distribute` ADD INDEX `phar_in_distribute_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_in_distribute` ADD INDEX `phar_in_distribute_idx_02` USING BTREE(`dist_time`);
+ALTER TABLE `phar_in_distribute` ADD INDEX `phar_in_distribute_idx_03` USING BTREE(`order_no`);
+ALTER TABLE `phar_in_distribute` ADD INDEX `phar_in_distribute_idx_04` USING BTREE(`status_code`);
+ALTER TABLE `phar_in_distribute` ADD INDEX `phar_in_distribute_idx_05` USING BTREE(`phar_id`);
+
+--     phar_in_distribute_all_detail表格
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_02` USING BTREE(`crte_time`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_03` USING BTREE(`item_id`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_04` USING BTREE(`ird_id`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_05` USING BTREE(`ir_id`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_06` USING BTREE(`distribute_id`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_07` USING BTREE(`visit_id`);
+ALTER TABLE `phar_in_distribute_all_detail` ADD INDEX `phar_in_distribute_all_detail_idx_08` USING BTREE(`old_dist_id`);
+
+--     phar_in_distribute_detail表格
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_02` USING BTREE(`item_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_03` USING BTREE(`ird_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_04` USING BTREE(`ir_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_05` USING BTREE(`distribute_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_06` USING BTREE(`visit_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_07` USING BTREE(`old_dist_id`);
+ALTER TABLE `phar_in_distribute_detail` ADD INDEX `phar_in_distribute_detail_idx_08` USING BTREE(`distribute_all_detail_id`);
+
+--     phar_in_receive表格
+ALTER TABLE `phar_in_receive` ADD INDEX `phar_in_receive_idx_01` USING BTREE(`crte_time`);
+ALTER TABLE `phar_in_receive` ADD INDEX `phar_in_receive_idx_02` USING BTREE(`order_no`);
+ALTER TABLE `phar_in_receive` ADD INDEX `phar_in_receive_idx_03` USING BTREE(`phar_id`);
+ALTER TABLE `phar_in_receive` ADD INDEX `phar_in_receive_idx_04` USING BTREE(`dept_id`);
+ALTER TABLE `phar_in_receive` ADD INDEX `phar_in_receive_idx_05` USING BTREE(`hosp_code`);
+
+--     phar_in_receive_detail表格
+ALTER TABLE `phar_in_receive_detail` ADD INDEX `phar_in_receive_detail_idx_01` USING BTREE(`hosp_code`);
+ALTER TABLE `phar_in_receive_detail` ADD INDEX `phar_in_receive_detail_idx_02` USING BTREE(`item_id`);
+ALTER TABLE `phar_in_receive_detail` ADD INDEX `phar_in_receive_detail_idx_03` USING BTREE(`wr_id`);
+ALTER TABLE `phar_in_receive_detail` ADD INDEX `phar_in_receive_detail_idx_04` USING BTREE(`receive_id`);
+ALTER TABLE `phar_in_receive_detail` ADD INDEX `phar_in_receive_detail_idx_05` USING BTREE(`visit_id`);
+
+--     phar_in_wait_receive 表格
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_01` USING BTREE(`status_code`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_02` USING BTREE(`is_back`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_03` USING BTREE(`dept_id`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_04` USING BTREE(`advice_id`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_05` USING BTREE(`visit_id`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_06` USING BTREE(`cost_id`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_07` USING BTREE(`phar_id`);
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_08` USING BTREE(`old_wr_id`);
+
+--     phar_out_distribute表格
+ALTER TABLE `phar_out_distribute` ADD INDEX `phar_out_distribute_idx_01` USING BTREE(`phar_id`);
+ALTER TABLE `phar_out_distribute` ADD INDEX `phar_out_distribute_idx_02` USING BTREE(`visit_id`);
+ALTER TABLE `phar_out_distribute` ADD INDEX `phar_out_distribute_idx_03` USING BTREE(`status_code`);
+ALTER TABLE `phar_out_distribute` ADD INDEX `phar_out_distribute_idx_04` USING BTREE(`crte_time`);
+ALTER TABLE `phar_out_distribute` ADD INDEX `phar_out_distribute_idx_05` USING BTREE(`settle_id`);
+
+--     phar_out_distribute_all_detail 表格
+ALTER TABLE `phar_out_distribute_all_detail` ADD INDEX `phar_out_distribute_all_detail_idx_01` USING BTREE(`item_id`);
+ALTER TABLE `phar_out_distribute_all_detail` ADD INDEX `phar_out_distribute_all_detail_idx_02` USING BTREE(`cost_id`);
+ALTER TABLE `phar_out_distribute_all_detail` ADD INDEX `phar_out_distribute_all_detail_idx_03` USING BTREE(`op_id`, `opd_id`);
+ALTER TABLE `phar_out_distribute_all_detail` ADD INDEX `phar_out_distribute_all_detail_idx_04` USING BTREE(`distribute_id`);
+
+--     phar_out_distribute_detail表格
+ALTER TABLE `phar_out_distribute_detail` ADD INDEX `phar_out_distribute_detail_idx_01` USING BTREE(`item_id`);
+ALTER TABLE `phar_out_distribute_detail` ADD INDEX `phar_out_distribute_detail_idx_02` USING BTREE(`cost_id`);
+ALTER TABLE `phar_out_distribute_detail` ADD INDEX `phar_out_distribute_detail_idx_03` USING BTREE(`op_id`, `opd_id`);
+ALTER TABLE `phar_out_distribute_detail` ADD INDEX `phar_out_distribute_detail_idx_04` USING BTREE(`distribute_id`);
+
+--     phar_out_receive表格
+ALTER TABLE `phar_out_receive` ADD INDEX `phar_out_receive_idx_01` USING BTREE(`visit_id`);
+ALTER TABLE `phar_out_receive` ADD INDEX `phar_out_receive_idx_02` USING BTREE(`phar_id`);
+
+--     phar_out_receive_detail表格
+ALTER TABLE `phar_out_receive_detail` ADD INDEX `phar_out_receive_detail_idx_01` USING BTREE(`or_id`);
+ALTER TABLE `phar_out_receive_detail` ADD INDEX `phar_out_receive_detail_idx_02` USING BTREE(`op_id`, `opd_id`);
+ALTER TABLE `phar_out_receive_detail` ADD INDEX `phar_out_receive_detail_idx_03` USING BTREE(`cost_id`);
+ALTER TABLE `phar_out_receive_detail` ADD INDEX `phar_out_receive_detail_idx_04` USING BTREE(`item_id`);
+
+--     base_drug表格
+ALTER TABLE `base_drug` ADD UNIQUE INDEX `idx_base_drug_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_drug` ADD INDEX `idx_base_drug_02` USING BTREE(`hosp_code`, `bfc_code`, `type_code`);
+ALTER TABLE `base_drug` ADD INDEX `idx_base_drug_03` USING BTREE(`big_type_code`);
+
+--     base_material表格
+ALTER TABLE `base_material` ADD UNIQUE INDEX `idx_base_material_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_material` ADD INDEX `idx_base_material_02` USING BTREE(`hosp_code`, `bfc_code`, `type_code`);
+
+--     base_advice表格
+ALTER TABLE `base_advice` ADD UNIQUE INDEX `idx_base_advice_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_advice_detail表格
+ALTER TABLE `base_advice_detail` ADD INDEX `idx_base_advice_detail_01` USING BTREE(`hosp_code`, `advice_code`, `item_code`);
+
+--     base_assist表格
+ALTER TABLE `base_assist` ADD UNIQUE INDEX `idx_base_assist_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_assist_detail表格
+ALTER TABLE `base_assist_detail` ADD INDEX `idx_base_assist_detail_01` USING BTREE(`hosp_code`, `ac_code`, `item_code`);
+
+--     base_bed表格
+ALTER TABLE `base_bed` ADD UNIQUE INDEX `idx_base_bed_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_bed` ADD INDEX `idx_base_bed_02` USING BTREE(`hosp_code`, `dept_code`, `visit_id`);
+ALTER TABLE `base_bed` ADD INDEX `idx_base_bed_03` USING BTREE(`visit_id`, `hosp_code`);
+
+--     base_bed_item表格
+ALTER TABLE `base_bed_item` ADD INDEX `idx_base_bed_item_01` USING BTREE(`hosp_code`, `bed_code`, `item_code`);
+
+--     base_dailyfirst_calc表格
+ALTER TABLE `base_dailyfirst_calc` ADD INDEX `idx_base_dailyfirst_calc_01` USING BTREE(`hosp_code`, `dept_code`, `rate_code`);
+
+--     base_dept表格
+ALTER TABLE `base_dept` ADD INDEX `idx_base_dept_01` USING BTREE(`code`);
+ALTER TABLE `base_dept` ADD INDEX `idx_base_dept_02` USING BTREE(`hosp_code`, `type_code`, `nation_code`, `ward_code`);
+ALTER TABLE `base_dept` ADD INDEX `idx_base_dept_03` USING BTREE(`hosp_code`, `is_valid`);
+
+--     base_dept_drugstore表格
+ALTER TABLE `base_dept_drugstore` ADD INDEX `idx_base_dept_drugstore_01` USING BTREE(`hosp_code`, `dept_code`, `drugstore_code`);
+
+--     base_disease表格
+ALTER TABLE `base_disease` ADD UNIQUE INDEX `idx_base_disease_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_disease_rule表格
+ALTER TABLE `base_disease_rule` ADD INDEX `idx_base_disease_rule_01` USING BTREE(`hosp_code`, `disease_id`);
+
+--     base_finance_classify 表格
+ALTER TABLE `base_finance_classify` ADD UNIQUE INDEX `idx_base_finance_classify_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_item表格
+ALTER TABLE `base_item` ADD UNIQUE INDEX `idx_base_item_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_item` ADD INDEX `idx_base_item_02` USING BTREE(`hosp_code`, `bfc_code`, `type_code`);
+
+--     base_modify_trace表格
+ALTER TABLE `base_modify_trace` ADD INDEX `idx_base_modify_trace_01` USING BTREE(`hosp_code`, `biz_id`);
+
+--     base_mris_classify表格
+ALTER TABLE `base_mris_classify` ADD UNIQUE INDEX `idx_base_mris_classify_01` USING BTREE(`hosp_code`, `mris_code`);
+
+--     base_nurse_tbhead表格
+ALTER TABLE `base_nurse_tbhead` ADD INDEX `idx_base_nurse_tbhead_01` USING BTREE(`hosp_code`, `bno_code`);
+
+--     base_order_receive表格
+ALTER TABLE `base_order_receive` ADD UNIQUE INDEX `idx_base_order_receive_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_order_rule表格
+ALTER TABLE `base_order_rule` ADD UNIQUE INDEX `idx_base_order_rule_01` USING BTREE(`hosp_code`, `type_code`);
+
+--     base_preferential表格
+ALTER TABLE `base_preferential` ADD INDEX `idx_base_preferential_01` USING BTREE(`hosp_code`, `pf_type_code`);
+
+--     base_preferential_type表格
+ALTER TABLE `base_preferential_type` ADD UNIQUE INDEX `idx_base_preferential_type_01` USING BTREE(`hosp_code`, `code`);
+--     base_product 表格
+ALTER TABLE `base_product` ADD INDEX `idx_base_dept_03` USING BTREE(`hosp_code`, `is_valid`);
+ALTER TABLE `base_product` ADD UNIQUE INDEX `idx_base_product_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_product` ADD INDEX `indxe_product_code` USING BTREE(`code`);
+--     base_profile_file
+ALTER TABLE `base_profile_file` ADD UNIQUE INDEX `cert_no` USING BTREE(`cert_no`);
+
+--     base_rate
+ALTER TABLE `base_rate` ADD UNIQUE INDEX `idx_base_rate_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_special_calc
+ALTER TABLE `base_special_calc` ADD INDEX `idx_base_special_calc_01` USING BTREE(`hosp_code`, `dept_code`, `drug_code`);
+
+--     base_supplier
+ALTER TABLE `base_supplier` ADD UNIQUE INDEX `idx_base_supplier_01` USING BTREE(`hosp_code`, `code`);
+
+--     base_window
+ALTER TABLE `base_window` ADD UNIQUE INDEX `idx_base_window_01` USING BTREE(`hosp_code`, `code`);
+ALTER TABLE `base_window` ADD INDEX `idx_base_window_02` USING BTREE(`hosp_code`, `dept_code`);
+
+--     dr_base_item
+ALTER TABLE `dr_base_item` ADD UNIQUE INDEX `idx_base_item_01` USING BTREE(`code`);
+
+--        insure_bldinfo--
+ALTER TABLE `insure_bldinfo` ADD INDEX `idx_insure_bldinfo_01` USING BTREE(`visit_id`);
+
+--        insure_configuration--
+ALTER TABLE `insure_configuration` ADD INDEX `idx_insure_configuration_01` USING BTREE(`code`);
+ALTER TABLE `insure_configuration` ADD INDEX `idx_insure_configuration_02` USING BTREE(`org_code`);
+
+--        insure_dict--
+ALTER TABLE `insure_dict` ADD INDEX `idx_insure_dict_01` USING BTREE(`code`);
+
+--        insure_disease--
+ALTER TABLE `insure_disease` ADD INDEX `idx_insure_disease_01` USING BTREE(`insure_illness_code`);
+ALTER TABLE `insure_disease` ADD INDEX `idx_insure_disease_02` USING BTREE(`down_load_type`);
+ALTER TABLE `insure_disease` ADD INDEX `idx_insure_disease_03` USING BTREE(`insure_reg_code`);
+
+--        insure_disease_match--
+ALTER TABLE `insure_disease_match` ADD INDEX `idx_insure_disease_match_01` USING BTREE(`hosp_illness_code`);
+ALTER TABLE `insure_disease_match` ADD INDEX `idx_insure_disease_match_02` USING BTREE(`insure_illness_code`);
+ALTER TABLE `insure_disease_match` ADD INDEX `idx_insure_disease_match_03` USING BTREE(`insure_reg_code`);
+
+--        insure_diseinfo--
+ALTER TABLE `insure_diseinfo` ADD INDEX `idx_insure_diseinfo_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_diseinfo` ADD INDEX `idx_insure_diseinfo_02` USING BTREE(`insure_settle_id`);
+
+--        insure_entry_log--
+ALTER TABLE `insure_entry_log` ADD INDEX `idx_insure_entry_log_01` USING BTREE(`visit_id`);
+
+--        insure_fix_record--
+ALTER TABLE `insure_fix_record` ADD INDEX `idx_insure_fix_record_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_fix_record` ADD INDEX `idx_insure_fix_record_02` USING BTREE(`trt_dcla_detl_sn`);
+
+--        insure_function_log--
+ALTER TABLE `insure_function_log` ADD INDEX `idx_insure_function_log_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_function_log` ADD INDEX `idx_insure_function_log_02` USING BTREE(`msg_info`);
+ALTER TABLE `insure_function_log` ADD INDEX `idx_insure_function_log_03` USING BTREE(`crte_time`);
+
+--        insure_icuinfo--
+ALTER TABLE `insure_icuinfo` ADD INDEX `idx_insure_icuinfo_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_icuinfo` ADD INDEX `idx_insure_icuinfo_02` USING BTREE(`insure_settle_id`);
+
+--        insure_individual_basic--
+ALTER TABLE `insure_individual_basic` ADD INDEX `idx_insure_individual_basic_01` USING BTREE(`crte_time`);
+
+--        insure_individual_business--
+ALTER TABLE `insure_individual_business` ADD INDEX `idx_insure_individual_business_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_business` ADD INDEX `idx_insure_individual_business_02` USING BTREE(`mib_id`);
+
+--        insure_individual_cost--
+ALTER TABLE `insure_individual_cost` ADD INDEX `idx_insure_individual_cost_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_cost` ADD INDEX `idx_insure_individual_cost_02` USING BTREE(`cost_id`);
+ALTER TABLE `insure_individual_cost` ADD INDEX `idx_insure_individual_cost_03` USING BTREE(`settle_id`);
+ALTER TABLE `insure_individual_cost` ADD INDEX `idx_insure_individual_cost_04` USING BTREE(`insure_settle_id`);
+ALTER TABLE `insure_individual_cost` ADD INDEX `idx_insure_individual_cost_05` USING BTREE(`item_code`);
+
+--        insure_individual_fund--
+ALTER TABLE `insure_individual_fund` ADD INDEX `idx_insure_individual_fund_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_fund` ADD INDEX `idx_insure_individual_fund_02` USING BTREE(`mib_id`);
+ALTER TABLE `insure_individual_fund` ADD INDEX `idx_insure_individual_fund_03` USING BTREE(`insure_settle_id`);
+
+--        insure_individual_inpatient--
+ALTER TABLE `insure_individual_inpatient` ADD INDEX `idx_insure_individual_inpatient_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_inpatient` ADD INDEX `idx_insure_individual_inpatient_02` USING BTREE(`mib_id`);
+
+--        insure_individual_settle--
+ALTER TABLE `insure_individual_settle` ADD INDEX `idx_insure_individual_settle_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_settle` ADD INDEX `idx_insure_individual_settle_02` USING BTREE(`settle_id`);
+ALTER TABLE `insure_individual_settle` ADD INDEX `idx_insure_individual_settle_03` USING BTREE(`insureSettleId`);
+ALTER TABLE `insure_individual_settle` ADD INDEX `idx_insure_individual_settle_04` USING BTREE(`crte_time`);
+
+--        insure_individual_stats--
+ALTER TABLE `insure_individual_stats` ADD INDEX `idx_insure_individual_stats_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_stats` ADD INDEX `idx_insure_individual_stats_02` USING BTREE(`mib_id`);
+
+--        insure_individual_transfer--
+ALTER TABLE `insure_individual_transfer` ADD INDEX `idx_insure_individual_transfer_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_transfer` ADD INDEX `idx_insure_individual_transfer_02` USING BTREE(`mib_id`);
+
+--        insure_individual_visit--
+ALTER TABLE `insure_individual_visit` ADD INDEX `idx_insure_individual_visit_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_individual_visit` ADD INDEX `idx_insure_individual_visit_02` USING BTREE(`mib_id`);
+ALTER TABLE `insure_individual_visit` ADD INDEX `idx_insure_individual_visit_03` USING BTREE(`medicine_org_code`);
+
+--        insure_inpt_record--
+ALTER TABLE `insure_inpt_record` ADD INDEX `idx_insure_inpt_record_01` USING BTREE(`visit_id`);
+
+--        insure_inpt_transfusion_record--
+ALTER TABLE `insure_inpt_transfusion_record` ADD INDEX `idx_insure_inpt_transfusion_record_01` USING BTREE(`mdtrt_id`);
+ALTER TABLE `insure_inpt_transfusion_record` ADD INDEX `idx_insure_inpt_transfusion_record_02` USING BTREE(`psn_no`);
+
+--        insure_item--
+ALTER TABLE `insure_item` ADD INDEX `idx_insure_item_01` USING BTREE(`item_code`);
+ALTER TABLE `insure_item` ADD INDEX `idx_insure_item_02` USING BTREE(`insure_reg_code`);
+ALTER TABLE `insure_item` ADD INDEX `idx_insure_item_03` USING BTREE(`down_load_type`);
+
+--        insure_item_match--
+ALTER TABLE `insure_item_match` ADD INDEX `idx_insure_item_match_03` USING BTREE(`hosp_item_id`);
+ALTER TABLE `insure_item_match` ADD INDEX `idx_insure_item_match_04` USING BTREE(`insure_item_code`);
+
+--        insure_iteminfo--
+ALTER TABLE `insure_iteminfo` ADD INDEX `idx_insure_iteminfo_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_iteminfo` ADD INDEX `idx_insure_iteminfo_02` USING BTREE(`insure_settle_id`);
+ALTER TABLE `insure_iteminfo` ADD INDEX `idx_insure_iteminfo_03` USING BTREE(`medical_reg_no`);
+
+--        insure_oprninfo--
+ALTER TABLE `insure_oprninfo` ADD INDEX `idx_insure_oprninfo_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_oprninfo` ADD INDEX `idx_insure_oprninfo_02` USING BTREE(`insure_settle_id`);
+ALTER TABLE `insure_oprninfo` ADD INDEX `idx_insure_oprninfo_03` USING BTREE(`medical_reg_no`);
+
+--        insure_opspdiseinfo--
+ALTER TABLE `insure_opspdiseinfo` ADD INDEX `idx_insure_opspdiseinfo_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_opspdiseinfo` ADD INDEX `idx_insure_opspdiseinfo_02` USING BTREE(`insure_settle_id`);
+ALTER TABLE `insure_opspdiseinfo` ADD INDEX `idx_insure_opspdiseinfo_03` USING BTREE(`medical_reg_no`);
+
+--        insure_outpt_twodise--
+ALTER TABLE `insure_outpt_twodise` ADD INDEX `idx_insure_outpt_twodise_01` USING BTREE(`visit_id`);
+
+--        insure_patient_sum--
+ALTER TABLE `insure_patient_sum` ADD INDEX `idx_insure_patient_sum_01` USING BTREE(`medical_reg_no`);
+ALTER TABLE `insure_patient_sum` ADD INDEX `idx_insure_patient_sum_02` USING BTREE(`visit_id`);
+
+--        insure_payinfo--
+ALTER TABLE `insure_payinfo` ADD INDEX `idx_insure_payinfo_01` USING BTREE(`medical_reg_no`);
+ALTER TABLE `insure_payinfo` ADD INDEX `idx_insure_payinfo_02` USING BTREE(`insure_settle_id`);
+ALTER TABLE `insure_payinfo` ADD INDEX `idx_insure_payinfo_03` USING BTREE(`medical_reg_no`);
+
+--        insure_record--
+ALTER TABLE `insure_record` ADD INDEX `idx_insure_record_01` USING BTREE(`visit_id`);
+
+--        insure_setl_info--
+ALTER TABLE `insure_setl_info` ADD INDEX `idx_insure_setl_info_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_setl_info` ADD INDEX `idx_insure_setl_info_02` USING BTREE(`insure_settle_id`);
+
+--        insure_unified_directory--
+ALTER TABLE `insure_unified_directory` ADD INDEX `idx_insure_unified_directory_01` USING BTREE(`hilist_code`);
+
+--        insure_unified_limitprice--
+ALTER TABLE `insure_unified_limitprice` ADD INDEX `idx_insure_unified_limitprice_01` USING BTREE(`hilist_code`);
+
+--        insure_unified_match--
+ALTER TABLE `insure_unified_match` ADD INDEX `idx_insure_unified_match_01` USING BTREE(`med_list_codg`);
+ALTER TABLE `insure_unified_match` ADD INDEX `idx_insure_unified_match_02` USING BTREE(`hilist_code`);
+
+--        insure_unified_medicmatch--
+ALTER TABLE `insure_unified_medicmatch` ADD INDEX `idx_insure_unified_medicmatch_01` USING BTREE(`med_list_codg`);
+
+--        insure_unified_nation_drug--
+ALTER TABLE `insure_unified_nation_drug` ADD INDEX `idx_insure_unified_nation_drug_01` USING BTREE(`med_list_codg`);
+
+--        insure_unified_ratio--
+ALTER TABLE `insure_unified_ratio` ADD INDEX `idx_insure_unified_ratio_01` USING BTREE(`hilist_code`);
+
+--        insure_unified_reckon--
+ALTER TABLE `insure_unified_reckon` ADD INDEX `idx_insure_unified_reckon_01` USING BTREE(`insure_reg_code`);
+
+--        insure_unified_remote--
+ALTER TABLE `insure_unified_remote` ADD INDEX `idx_insure_unified_remote_01` USING BTREE(`mdtrt_id`);
+
+--        insure_upload_cost--
+ALTER TABLE `insure_upload_cost` ADD INDEX `idx_insure_upload_cost_01` USING BTREE(`visit_id`);
+ALTER TABLE `insure_upload_cost` ADD INDEX `idx_insure_upload_cost_02` USING BTREE(`cost_id`);
+
+
+--        outpt_classes--
+ALTER TABLE `outpt_classes` ADD INDEX `idx_outpt_classes_01` USING BTREE(`start_date`);
+ALTER TABLE `outpt_classes` ADD INDEX `idx_outpt_classes_02` USING BTREE(`end_date`);
+
+--        outpt_classes_doctor--
+ALTER TABLE `outpt_classes_doctor` ADD INDEX `idx_outpt_classes_doctor_01` USING BTREE(`cc_id`);
+ALTER TABLE `outpt_classes_doctor` ADD INDEX `idx_outpt_classes_doctor_02` USING BTREE(`doctor_id`);
+
+--        outpt_classes_queue--
+ALTER TABLE `outpt_classes_queue` ADD INDEX `idx_outpt_classes_queue_01` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_classes_queue` ADD INDEX `idx_outpt_classes_queue_02` USING BTREE(`queue_date`);
+ALTER TABLE `outpt_classes_queue` ADD INDEX `idx_outpt_classes_queue_03` USING BTREE(`cy_id`);
+
+--        outpt_classify--
+ALTER TABLE `outpt_classify` ADD INDEX `idx_outpt_classify_01` USING BTREE(`dept_id`);
+
+--        outpt_classify_classes--
+ALTER TABLE `outpt_classify_classes` ADD INDEX `idx_outpt_classify_classes_01` USING BTREE(`cy_id`);
+ALTER TABLE `outpt_classify_classes` ADD INDEX `idx_outpt_classify_classes_02` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_classify_classes` ADD INDEX `idx_outpt_classify_classes_03` USING BTREE(`weeks`);
+
+--        outpt_classify_cost--
+ALTER TABLE `outpt_classify_cost` ADD INDEX `idx_outpt_classify_cost_01` USING BTREE(`cy_id`);
+ALTER TABLE `outpt_classify_cost` ADD INDEX `idx_outpt_classify_cost_02` USING BTREE(`item_id`);
+
+--        outpt_cost--
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_02` USING BTREE(`settle_id`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_03` USING BTREE(`item_id`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_04` USING BTREE(`crte_time`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_05` USING BTREE(`op_id`, `opd_id`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_06` USING BTREE(`settle_invoice_id`);
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_07` USING BTREE(`distribute_all_detail_id`);
+
+--        outpt_diagnose--
+ALTER TABLE `outpt_diagnose` ADD INDEX `idx_outpt_diagnose_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_diagnose` ADD INDEX `idx_outpt_diagnose_02` USING BTREE(`disease_id`);
+
+--        outpt_doctor_queue--
+ALTER TABLE `outpt_doctor_queue` ADD INDEX `idx_outpt_doctor_queue_01` USING BTREE(`cq_id`);
+ALTER TABLE `outpt_doctor_queue` ADD INDEX `idx_outpt_doctor_queue_02` USING BTREE(`doctor_id`);
+
+--        outpt_doctor_register--
+ALTER TABLE `outpt_doctor_register` ADD INDEX `idx_outpt_doctor_register_01` USING BTREE(`dq_id`);
+ALTER TABLE `outpt_doctor_register` ADD INDEX `idx_outpt_doctor_register_02` USING BTREE(`start_time`);
+ALTER TABLE `outpt_doctor_register` ADD INDEX `idx_outpt_doctor_register_03` USING BTREE(`end_time`);
+ALTER TABLE `outpt_doctor_register` ADD INDEX `idx_outpt_doctor_register_04` USING BTREE(`profile_id`);
+
+--        outpt_infusion_register--
+ALTER TABLE `outpt_infusion_register` ADD INDEX `idx_outpt_infusion_register_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_infusion_register` ADD INDEX `idx_outpt_infusion_register_02` USING BTREE(`opd_id`);
+
+--        outpt_insure_pay--
+ALTER TABLE `outpt_insure_pay` ADD INDEX `idx_outpt_insure_pay_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_insure_pay` ADD INDEX `idx_outpt_insure_pay_02` USING BTREE(`settle_id`);
+
+--        outpt_medical_record--
+ALTER TABLE `outpt_medical_record` ADD INDEX `idx_outpt_medical_record_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_medical_record` ADD INDEX `idx_outpt_medical_record_02` USING BTREE(`profile_id`);
+
+--        outpt_medical_template--
+ALTER TABLE `outpt_medical_template` ADD INDEX `idx_outpt_medical_template_01` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_medical_template` ADD INDEX `idx_outpt_medical_template_02` USING BTREE(`doctor_id`);
+ALTER TABLE `outpt_medical_template` ADD INDEX `idx_outpt_medical_template_03` USING BTREE(`crte_time`);
+
+--        outpt_pay--
+ALTER TABLE `outpt_pay` ADD INDEX `idx_outpt_pay_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_pay` ADD INDEX `idx_outpt_pay_02` USING BTREE(`settle_id`);
+ALTER TABLE `outpt_pay` ADD INDEX `idx_outpt_pay_03` USING BTREE(`pay_code`);
+
+--        outpt_prescribe--
+ALTER TABLE `outpt_prescribe` ADD INDEX `idx_outpt_prescribe_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_prescribe` ADD INDEX `idx_outpt_prescribe_02` USING BTREE(`order_no`);
+ALTER TABLE `outpt_prescribe` ADD INDEX `idx_outpt_prescribe_03` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_prescribe` ADD INDEX `idx_outpt_prescribe_04` USING BTREE(`settle_id`);
+ALTER TABLE `outpt_prescribe` ADD INDEX `idx_outpt_prescribe_05` USING BTREE(`crte_time`);
+
+--        outpt_prescribe_detail--
+ALTER TABLE `outpt_prescribe_detail` ADD INDEX `idx_outpt_prescribe_detail_01` USING BTREE(`hosp_code`, `visit_id`, `op_id`);
+ALTER TABLE `outpt_prescribe_detail` ADD INDEX `idx_outpt_prescribe_detail_02` USING BTREE(`op_id`, `hosp_code`);
+ALTER TABLE `outpt_prescribe_detail` ADD INDEX `ix_outpt_prescribe_detail_itemId` USING BTREE(`item_id`);
+
+--        outpt_prescribe_detail_ext--
+ALTER TABLE `outpt_prescribe_detail_ext` ADD INDEX `idx_outpt_prescribe_detail_ext_01` USING BTREE(`hosp_code`, `visit_id`, `op_id`, `opd_id`);
+
+--        outpt_prescribe_exec--
+ALTER TABLE `outpt_prescribe_exec` ADD INDEX `idx_outpt_prescribe_exec_01` USING BTREE(`hosp_code`, `visit_id`, `opd_id`);
+
+--        outpt_prescribe_temp--
+ALTER TABLE `outpt_prescribe_temp` ADD INDEX `idx_outpt_prescribe_temp_01` USING BTREE(`hosp_code`);
+
+--        outpt_prescribe_temp_detail--
+ALTER TABLE `outpt_prescribe_temp_detail` ADD INDEX `idx_outpt_prescribe_temp_detail_01` USING BTREE(`hosp_code`, `opt_id`);
+
+--        outpt_refund_apply--
+ALTER TABLE `outpt_refund_apply` ADD INDEX `idx_outpt_refund_apply_01` USING BTREE(`cost_id`);
+ALTER TABLE `outpt_refund_apply` ADD INDEX `idx_outpt_refund_apply_02` USING BTREE(`settle_id`);
+
+--        outpt_register--
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_02` USING BTREE(`register_no`);
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_03` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_04` USING BTREE(`crte_time`);
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_05` USING BTREE(`hosp_code`, `is_cancel`, `register_time`);
+
+--        outpt_register_detail--
+ALTER TABLE `outpt_register_detail` ADD INDEX `idx_outpt_register_detail_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_register_detail` ADD INDEX `idx_outpt_register_detail_02` USING BTREE(`register_id`);
+
+--        outpt_register_pay--
+ALTER TABLE `outpt_register_pay` ADD INDEX `idx_outpt_register_pay_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_register_pay` ADD INDEX `idx_outpt_register_pay_02` USING BTREE(`rs_id`);
+
+--        outpt_register_settle--
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_01` USING BTREE(`register_id`);
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_02` USING BTREE(`settle_time`);
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_03` USING BTREE(`crte_id`);
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_04` USING BTREE(`daily_settle_id`);
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_05` USING BTREE(`hosp_code`, `status_code`);
+
+--        outpt_settle--
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_02` USING BTREE(`settle_time`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_03` USING BTREE(`settle_no`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_04` USING BTREE(`crte_id`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_05` USING BTREE(`daily_settle_id`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_06` USING BTREE(`is_settle`);
+
+--        outpt_settle_invoice--
+ALTER TABLE `outpt_settle_invoice` ADD INDEX `idx_outpt_settle_invoice_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_settle_invoice` ADD INDEX `idx_outpt_settle_invoice_02` USING BTREE(`settle_id`);
+
+--        outpt_settle_invoice_content--
+ALTER TABLE `outpt_settle_invoice_content` ADD INDEX `idx_outpt_settle_invoice_content_01` USING BTREE(`hosp_code`, `settle_invoice_id`);
+
+--        outpt_skin_result--
+ALTER TABLE `outpt_skin_result` ADD INDEX `idx_outpt_skin_result_01` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_skin_result` ADD INDEX `idx_outpt_skin_result_02` USING BTREE(`opd_id`);
+
+--        outpt_triage_visit--
+ALTER TABLE `outpt_triage_visit` ADD INDEX `idx_outpt_triage_visit_01` USING BTREE(`register_id`);
+ALTER TABLE `outpt_triage_visit` ADD INDEX `idx_outpt_triage_visit_02` USING BTREE(`visit_id`);
+ALTER TABLE `outpt_triage_visit` ADD INDEX `idx_outpt_triage_visit_03` USING BTREE(`dept_id`);
+ALTER TABLE `outpt_triage_visit` ADD INDEX `idx_outpt_triage_visit_04` USING BTREE(`doctor_id`);
+ALTER TABLE `outpt_triage_visit` ADD INDEX `idx_outpt_triage_visit_05` USING BTREE(`triage_id`);
+
+--        outpt_visit--
+ALTER TABLE `outpt_visit` ADD INDEX `idx_outpt_visit_01` USING BTREE(`register_id`);
+ALTER TABLE `outpt_visit` ADD INDEX `idx_outpt_visit_02` USING BTREE(`cert_no`);
+ALTER TABLE `outpt_visit` ADD INDEX `idx_outpt_visit_03` USING BTREE(`visit_time`);
+ALTER TABLE `outpt_visit` ADD INDEX `idx_outpt_visit_04` USING BTREE(`visit_no`);
+ALTER TABLE `outpt_visit` ADD INDEX `idx_outpt_visit_05` USING BTREE(`dept_id`);
+
+--        inpt_advance_pay--
+ALTER TABLE `inpt_advance_pay` ADD INDEX `idx_inpt_advance_pay_01` USING BTREE(`hosp_code`, `visit_id`, `ap_order_no`);
+
+--        inpt_advice--
+ALTER TABLE `inpt_advice` ADD UNIQUE INDEX `idx_inpt_advice_01` USING BTREE(`hosp_code`, `order_no`);
+ALTER TABLE `inpt_advice` ADD INDEX `idx_inpt_advice_02` USING BTREE(`hosp_code`, `visit_id`);
+ALTER TABLE `inpt_advice` ADD INDEX `idx_inpt_advice_03` USING BTREE(`source_ia_id`, `hosp_code`);
+ALTER TABLE `inpt_advice` ADD INDEX `idx_inpt_advice_04` USING BTREE(`exec_dept_id`, `is_check`);
+ALTER TABLE `inpt_advice` ADD INDEX `idx_inpt_advice_05` USING BTREE(`hosp_code`, `is_check`, `is_stop`, `usage_code`);
+ALTER TABLE `inpt_advice` ADD INDEX `idx_inpt_advice_technology_no` USING BTREE(`technology_no`);
+
+--        inpt_advice_detail--
+ALTER TABLE `inpt_advice_detail` ADD INDEX `idx_inpt_advice_detail_01` USING BTREE(`hosp_code`, `visit_id`, `ia_id`);
+ALTER TABLE `inpt_advice_detail` ADD INDEX `idx_inpt_advice_detail_02` USING BTREE(`ia_id`, `hosp_code`);
+
+--        inpt_advice_exec--
+ALTER TABLE `inpt_advice_exec` ADD INDEX `idx_inpt_advice_exec_01` USING BTREE(`hosp_code`, `advice_id`, `visit_id`);
+
+--        inpt_advice_print--
+ALTER TABLE `inpt_advice_print` ADD INDEX `idx_inpt_advice_print_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_advice_temp--
+ALTER TABLE `inpt_advice_temp` ADD INDEX `idx_inpt_advice_temp_01` USING BTREE(`hosp_code`, `type_code`);
+
+--        inpt_advice_temp_detail--
+ALTER TABLE `inpt_advice_temp_detail` ADD INDEX `idx_inpt_advice_temp_detail_01` USING BTREE(`hosp_code`, `iat_id`);
+
+--        inpt_baby--
+ALTER TABLE `inpt_baby` ADD INDEX `idx_inpt_baby_01` USING BTREE(`hosp_code`, `visit_id`);
+ALTER TABLE `inpt_baby` ADD INDEX `index_inpt_baby_02` USING BTREE(`hosp_code`, `id`);
+
+--        inpt_bed_change--
+ALTER TABLE `inpt_bed_change` ADD INDEX `idx_inpt_bed_change_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_cost--
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_01` USING BTREE(`visit_id`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_02` USING BTREE(`settle_id`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_03` USING BTREE(`item_id`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_04` USING BTREE(`cost_time`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_05` USING BTREE(`iat_id`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_06` USING BTREE(`distribute_all_detail_id`);
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_07` USING BTREE(`source_id`);
+
+--        inpt_cost_settle--
+ALTER TABLE `inpt_cost_settle` ADD INDEX `idx_inpt_cost_settle_01` USING BTREE(`settle_id`, `cost_id`);
+ALTER TABLE `inpt_cost_settle` ADD INDEX `idx_inpt_cost_settle_02` USING BTREE(`cost_id`, `visit_id`, `reality_price`);
+
+--        inpt_critical_values--
+ALTER TABLE `inpt_critical_values` ADD INDEX `idx_inpt_critical_values_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_diagnose--
+ALTER TABLE `inpt_diagnose` ADD INDEX `idx_inpt_diagnose_01` USING BTREE(`hosp_code`, `visit_id`);
+ALTER TABLE `inpt_diagnose` ADD INDEX `idx_inpt_diagnose_02` USING BTREE(`disease_id`);
+
+--        inpt_guarantee--
+ALTER TABLE `inpt_guarantee` ADD INDEX `idx_inpt_advance_pay_01` USING BTREE(`hosp_code`, `visit_id`, `guarantee_no`);
+
+--        inpt_insure_pay--
+ALTER TABLE `inpt_insure_pay` ADD INDEX `idx_inpt_insure_pay_01` USING BTREE(`settle_id`);
+ALTER TABLE `inpt_insure_pay` ADD INDEX `idx_inpt_insure_pay_02` USING BTREE(`visit_id`);
+
+--        inpt_long_cost--
+ALTER TABLE `inpt_long_cost` ADD INDEX `idx_inpt_long_cost_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_medicine_advance_advice--
+ALTER TABLE `inpt_medicine_advance_advice` ADD INDEX `idx_inpt_medicine_advance_advice_01` USING BTREE(`advice_id`);
+
+--        inpt_nurse_record--
+ALTER TABLE `inpt_nurse_record` ADD INDEX `idx_inpt_nurse_record_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_nurse_third--
+ALTER TABLE `inpt_nurse_third` ADD INDEX `idx_inpt_nurse_third_01` USING BTREE(`hosp_code`, `visit_id`);
+
+--        inpt_past_adrs--
+ALTER TABLE `inpt_past_adrs` ADD INDEX `idx_inpt_past_adrs_01` USING BTREE(`hosp_code`, `profile_id`, `visit_id`);
+
+--        inpt_past_allergy--
+ALTER TABLE `inpt_past_allergy` ADD INDEX `idx_inpt_past_allergy_01` USING BTREE(`hosp_code`, `profile_id`, `visit_id`);
+
+--        inpt_past_drug--
+ALTER TABLE `inpt_past_drug` ADD INDEX `idx_inpt_past_drug_01` USING BTREE(`hosp_code`, `profile_id`, `visit_id`);
+
+--        inpt_past_operation--
+ALTER TABLE `inpt_past_operation` ADD INDEX `idx_inpt_past_operation_01` USING BTREE(`hosp_code`, `profile_id`, `visit_id`);
+
+--        inpt_past_treat--
+ALTER TABLE `inpt_past_treat` ADD INDEX `idx_inpt_past_treat_01` USING BTREE(`hosp_code`, `profile_id`, `visit_id`);
+
+--        inpt_pay--
+ALTER TABLE `inpt_pay` ADD INDEX `idx_inpt_pay_01` USING BTREE(`hosp_code`, `settle_id`, `visit_id`);
+
+--        inpt_settle--
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_01` USING BTREE(`visit_id`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_02` USING BTREE(`settle_time`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_03` USING BTREE(`crte_id`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_04` USING BTREE(`settle_no`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_05` USING BTREE(`daily_settle_id`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_06` USING BTREE(`crte_time`);
+
+--        inpt_settle_invoice--
+ALTER TABLE `inpt_settle_invoice` ADD INDEX `idx_inpt_settle_invoice_01` USING BTREE(`hosp_code`, `settle_id`, `visit_id`);
+
+--        inpt_settle_invoice_content--
+ALTER TABLE `inpt_settle_invoice_content` ADD INDEX `idx_inpt_settle_invoice_content_01` USING BTREE(`hosp_code`, `settle_invoice_id`);
+
+--        inpt_visit--
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_01` USING BTREE(`in_no`);
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_02` USING BTREE(`cert_no`);
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_03` USING BTREE(`in_time`);
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_04` USING BTREE(`out_time`);
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_05` USING BTREE(`in_dept_id`);
+ALTER TABLE `inpt_visit` ADD INDEX `idx_inpt_visit_06` USING BTREE(`status_code`);
+
+-- ----------------------
+-- stro_in  2022-04-20 新增字段
+-- ---------------------
+
+ALTER TABLE stro_in
+ADD COLUMN fkr_id varchar(32) NULL COMMENT '付款人ID' AFTER in_order_no,
+ADD COLUMN fkr_name varchar(50) NULL COMMENT '付款人名称' AFTER fkr_id,
+ADD COLUMN fk_status_code varchar(2) NULL  DEFAULT '0' COMMENT '付款状态（0未付款，1已付款）' AFTER fkr_name,
+ADD COLUMN fk_remark varchar(1000) NULL COMMENT '付款备注' AFTER fk_status_code,
+ADD COLUMN fkdid varchar(32) NULL COMMENT '付款单ID' AFTER fk_remark,
+ADD COLUMN fk_time datetime(0) NULL COMMENT '付款确认时间' AFTER fkdid;
+
+
+
+
+
+
+
+

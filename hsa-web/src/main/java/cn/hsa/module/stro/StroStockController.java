@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
+import cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stock.service.StroStockService;
@@ -347,4 +348,21 @@ public class StroStockController extends BaseController {
       return stroStockService_consumer.queryStockByBatchAll(map);
     }
 
+    /**
+     *  查询药品和材料的利润统计报表
+     * @Author liudawen
+     * @Param [stroStockDetailDTO, req, res]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     * @Throws
+     * @Date 2022/4/18 17:30
+     **/
+    @GetMapping("/queryDrugAndMaterialProfit")
+    public WrapperResponse<PageDTO> queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        itemProfitStatisticsDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("itemProfitStatisticsDTO",itemProfitStatisticsDTO);
+        return stroStockService_consumer.queryDrugAndMaterialProfit(map);
+    }
 }

@@ -219,7 +219,9 @@
         dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code, split_price, split_num,
         total_price, chinese_drug_num, usage_code, use_code, back_num, total_back_num, old_dist_id, status_code,
         curr_unit_code,
-        case when ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))>=0 then ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))
+        case when
+        ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))>=0
+        then ((case when curr_unit_code = unit_code then num else split_num end) - ifnull(total_back_num,0))
              else 0 end
         as backNumOk
         from phar_out_distribute_all_detail where distribute_id = #{id} and hosp_code = #{hospCode} and num >0) a
@@ -355,6 +357,7 @@
         and a.distribute_all_detail_id = #{id}
         order by a.stock_detail_id desc
   </select>
+    <!--领药申请未退药的病人，如果不对id进行分组，有可能产生多条重复的数据-->
     <select id="queryOutBackDrugPeopleRefundApplyPage"
             resultMap="PharOutDistributeMap">
         select * from (
@@ -476,7 +479,7 @@
         p.id, p.hosp_code, p.distribute_id, p.op_id, p.opd_id, p.old_cost_id, p.cost_id, p.item_code, p.item_id, p.item_name, p.spec,
         p.dosage, p.dosage_unit_code,p.unit_code, p.price, p.split_ratio, p.split_unit_code, p.split_price, abs(p.split_num) as split_num,
         abs(p.total_price) as total_price, p.chinese_drug_num, p.usage_code, p.use_code, p.back_num, p.total_back_num, p.old_dist_id, p.status_code,
-        p.curr_unit_code,
+        p.curr_unit_code,p.crte_time,
         case
             when p.curr_unit_code = p.unit_code
                 then abs(p.num)

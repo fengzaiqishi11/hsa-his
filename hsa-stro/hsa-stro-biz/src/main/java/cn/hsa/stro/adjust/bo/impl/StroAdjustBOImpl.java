@@ -238,7 +238,7 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
                 new String[]{"SF_DEPTFILTER"});
         String sfdeptFilter = MapUtils.get(sfdeptFilterMap, "SF_DEPTFILTER", "0");
         List<StroAdjustDetailDTO> lists = stroAdjustDTO.getStroAdjustDetailDTOs();
-        //根据项目id进行分组
+        //根据项目id进行分组，filter是为了防止空指针
         Map<String, List<StroAdjustDetailDTO>> listsMap = lists.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
                 .collect(Collectors.groupingBy(StroAdjustDetailDTO::getItemId));
         // 得到项目id集合
@@ -246,7 +246,8 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         //根据项目id查询所有库存
         List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockByItemIds(stroAdjustDTO.getHospCode(),items,sfdeptFilter);
         //根据项目id进行分组，项目id作为key
-        Map<String, List<StroStockDTO>> stroStocksMap = stroStockDTOS.stream().collect(Collectors.groupingBy(StroStockDTO::getItemId));
+        Map<String, List<StroStockDTO>> stroStocksMap = stroStockDTOS.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
+                .collect(Collectors.groupingBy(StroStockDTO::getItemId));
         // 插入的明细集合
         List<StroAdjustDetailDTO> listInsert = new ArrayList<>();
         // 调价单调价前总金额

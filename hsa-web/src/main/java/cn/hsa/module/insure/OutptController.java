@@ -100,7 +100,7 @@ public class OutptController extends BaseController {
         }
         Map map = JSON.parseObject(sysParameterDTO.getValue(), Map.class);
         if("HaiNan".equals(MapUtils.get(map,"city"))){
-            insureIndividualBasicDTO.setCardIden(outInfo);
+            insureIndividualBasicDTO.setBka896(outInfo);
         }
 
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));

@@ -74,7 +74,6 @@ public class OutptElectronicBillFunction {
         httpParam.put("data",data);
         httpParam.put("orgId",regCode);
         httpParam.put("transType", Constant.hainan.FUNCTION.hosQueryInsu);
-
         // 查询电子凭证地址
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("hospCode", hospCode);
@@ -179,10 +178,11 @@ public class OutptElectronicBillFunction {
             throw new AppException("电子凭证已经上传了费用，请撤销费用后重新登记再上传");
         }
         //费用传输
-        JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
+        JSONObject app = JSONObject.parseObject(insureIndividualVisitDTO.getPayTokenDengJi());
         Map<String,Object> httpParam = new HashMap<String,Object>();
         JSONObject data = new JSONObject();
-        data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
+        //data.put("appId", "37B0389095E640F89DEE9F5C8D763E17");//app.get("chnlId"));//应用渠道编号
+        data.put("appId", app.get("chnlId"));//应用渠道编号
         data.put("orgCodg",insureIndividualVisitDTO.getMedicineOrgCode());//机构编码，不可空
         data.put("medListCodg", insureIndividualVisitDTO.getMedicineOrgCode()); // 医疗目录编码，不可为空
         data.put("orgId",app.get("insuOrg"));//电子凭证机构号，可空
@@ -412,6 +412,7 @@ public class OutptElectronicBillFunction {
             throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
         }
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
+        //
         httpResult.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         return httpResult;
     }

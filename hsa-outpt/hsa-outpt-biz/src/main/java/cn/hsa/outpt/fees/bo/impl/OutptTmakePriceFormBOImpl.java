@@ -2771,7 +2771,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             }
 
             //判断病人类型，如果是医保病人；做医保试算操作。
-            Map<String, String> payinfo = new HashMap<String, String>();
+            Map<String, Object> payinfo = new HashMap<String, Object>();
             BigDecimal miPrice = new BigDecimal(0); //统筹支付金额
             BigDecimal selfPrice = realityPrice; //个人需支付金额
 
@@ -2811,9 +2811,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptVisitDTO.setOutptCostDTOList(outptCostDTOList);
             result.put("outptVisit", outptVisitDTO);//返回个人信息
             result.put("outptSettle", outptSettleDO);//返回结算信息
-            result.put("payinfo", payinfo);//医保报销信息
             //
-            this.getUpFee(outptVisitDTO, outptSettleDO);
+            Map<String,Object> resultMap = this.getUpFee(outptVisitDTO, outptSettleDO);
+            Map<String,Object> data = (Map<String, Object>) resultMap.get("data");
+            payinfo = data;
+            result.put("payinfo", payinfo);//医保报销信息
         } catch (Exception e) {
             throw e;
         } finally {
@@ -2829,7 +2831,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @param outptSettleDO 结算信息
      * @return
      */
-    public String getUpFee(OutptVisitDTO outptVisitDTO, OutptSettleDO outptSettleDO) {
+    public Map<String,Object> getUpFee(OutptVisitDTO outptVisitDTO, OutptSettleDO outptSettleDO) {
         //撤销费用
         this.saveRevokeOrder(outptVisitDTO);
         String uploadFeeData = null;
@@ -2879,7 +2881,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         JSONObject jsonObject = JSONObject.parseObject(String.valueOf(httpResult));
         //保存费用
         this.getReturnValue(feeOrg, jsonObject, outptVisitDTO);
-        return JSONArray.toJSON(uploadFee).toString();
+        return httpResult;
     }
 
 

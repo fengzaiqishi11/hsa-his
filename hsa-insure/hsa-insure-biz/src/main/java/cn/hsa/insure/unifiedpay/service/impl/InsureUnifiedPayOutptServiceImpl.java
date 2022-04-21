@@ -3,6 +3,7 @@ package cn.hsa.insure.unifiedpay.service.impl;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.outpt.bo.InsureUnifiedOutptBO;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayOutptBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,9 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 
 	@Resource
 	private InsureUnifiedPayOutptBO insureUnifiedPayOutptBO;
+
+	@Resource
+	private InsureUnifiedOutptBO insureUnifiedOutptBO;
 	/**
 	 * @Description: 门诊患者信息上传
 	 * @Param:
@@ -176,7 +180,8 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 **/
 	@Override
 	public WrapperResponse<Map<String, Object>> UP_4301(Map<String, Object> map) {
-		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_4301(map));
+//		return WrapperResponse.success(insureUnifiedPayOutptBO.UP_4301(map));
+		return WrapperResponse.success(insureUnifiedOutptBO.UP_4301(map));
 	}
 
 	/**
@@ -190,7 +195,8 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	 **/
 	@Override
 	public WrapperResponse<Map<String, Object>> UP4302(Map<String, Object> map) {
-		return WrapperResponse.success(insureUnifiedPayOutptBO.UP4302(map));
+//		return WrapperResponse.success(insureUnifiedPayOutptBO.UP4302(map));
+		return WrapperResponse.success(insureUnifiedOutptBO.UP_4302(map));
 	}
 
 }

@@ -55,7 +55,7 @@ public class InsureItfBOImpl {
         params.put("isHospital", interfaceParamDTO.getIsHospital());
 
         String paramMapJson = JSON.toJSONString(interfaceParamDTO);
-        params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 5000 ? paramMapJson.substring(0, 4500) : paramMapJson);
+        params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 4000 ? paramMapJson.substring(0, 4000) : paramMapJson);
         //请求医保接口日志记录
         logger.info("流水号-{},医保业务功能号 {}-{},请求参数-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), JSON.toJSONString(interfaceParamDTO));
         try {
@@ -71,22 +71,22 @@ public class InsureItfBOImpl {
             if(("999").equals(resultMap.get("code"))){
                 params.put("infcode", resultMap.get("code"));
                 String errMsg = (String) resultMap.get("msg");
-                params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
+                params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 4000 ? errMsg.substring(0, 4000) : errMsg);
                 throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_HGS.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("msg")});
             }
             params.put("infcode", resultMap.get("infcode"));
             //云助手调用医保，医保返回错误处理
             if (!("0").equals(resultMap.get("infcode"))) {
                 String errMsg = (String) resultMap.get("err_msg");
-                params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 5000 ? errMsg.substring(0, 4500) : errMsg);
+                params.put("resultStr", errMsg == null ? "null" : errMsg.length() > 4000 ? errMsg.substring(0, 4000) : errMsg);
                 throw new BizRtException(InsureExecCodesEnum.INSUR_INTF_FAILURE, new Object[]{HsaSrvEnum.HYGEIA_INSURE.getDesc(), interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), resultMap.get("err_msg")});
             }
             logger.info("流水号-{},医保业务功能号 {}-{},成功结果-{}", interfaceParamDTO.getMsgid(), functionEnum.getDesc(), functionEnum.getCode(), result);
-            params.put("resultStr", result == null ? "null" : result.length() > 5000 ? result.substring(0, 4500) : result);
+            params.put("resultStr", result == null ? "null" : result.length() > 4000 ? result.substring(0, 4000) : result);
             return resultMap;
         } catch (Exception e) {
             //调接口后，请求失败插入医保人员信息获取日志
-            params.put("resultStr", e.getMessage() == null ? "null" : e.getMessage().length() > 5000 ? e.getMessage().substring(0, 4500) : e.getMessage());
+            params.put("resultStr", e.getMessage() == null ? "null" : e.getMessage().length() > 4000 ? e.getMessage().substring(0, 4000) : e.getMessage());
             if (e instanceof BizRtException) {
                 throw e;
             } else {

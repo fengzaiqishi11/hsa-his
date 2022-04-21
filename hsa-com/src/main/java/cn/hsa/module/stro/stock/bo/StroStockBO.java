@@ -1,6 +1,7 @@
 package cn.hsa.module.stro.stock.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
@@ -237,4 +238,11 @@ public interface StroStockBO {
      * @Date: 2021/9/26
      */
     PageDTO queryAllStockDetails(StroStockDetailDTO stroStockDetail);
+
+    /**
+     * 统计药品和材料的利润信息
+     * @param itemProfitStatisticsDTO
+     * @return
+     */
+    PageDTO queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
 }

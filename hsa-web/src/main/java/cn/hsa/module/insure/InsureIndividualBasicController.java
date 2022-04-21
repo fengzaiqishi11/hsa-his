@@ -18,6 +18,7 @@ import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -124,6 +125,7 @@ public class InsureIndividualBasicController extends BaseController {
         String bka895 = String.valueOf(param.get("bka895"));
         String bka896 = String.valueOf(param.get("bka896"));
         String cardIden = MapUtils.get(param,"cardIden");
+        String outInfo = MapUtils.get(param,"outInfo");
         String aab001 = String.valueOf(param.get("aab001"));
         String patientCode = String.valueOf(param.get("patientCode"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
@@ -170,6 +172,20 @@ public class InsureIndividualBasicController extends BaseController {
         }
         insureIndividualBasicDTO.setPsnCertType(psnCertType);
         insureIndividualBasicDTO.setNationECResult(nationECResult);
+
+        //海南读社保卡单独传参
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", sysUserDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "Device");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        if (sysParameterDTO == null) {
+            throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:Device,值为读卡参数");
+        }
+        Map deviceMap = JSON.parseObject(sysParameterDTO.getValue(), Map.class);
+        if("HaiNan".equals(MapUtils.get(deviceMap,"city"))){
+            insureIndividualBasicDTO.setBka896(outInfo);
+        }
+
         map.put("crteName",sysUserDTO.getCrteName());
         map.put("crteId",sysUserDTO.getCrteId());
         map.put("insureRegCode",regCode);

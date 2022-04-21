@@ -1,6 +1,7 @@
 package cn.hsa.module.stro.stock.dao;
 
 
+import cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 
 import java.util.List;
@@ -60,4 +61,32 @@ public interface StroStockDetailDao {
      * @Retrun: 库存明细数据集合
      */
     List<StroStockDetailDTO> queryAllStroStock(String param);
+
+    /**
+     * 查询门诊药品和材料利润统计信息（按批号和项目和科室和医生）
+     * @param itemProfitStatisticsDTO
+     * @return
+     */
+    List<ItemProfitStatisticsDTO> queryMZDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+
+    /**
+     * 查询住院药品和材料利润统计信息（按批号和项目和科室和医生）
+     * @param itemProfitStatisticsDTO
+     * @return
+     */
+    List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+
+    /**
+     * 查询门诊药品和材料利润统计信息（按批号和项目和科室）
+     * @param itemProfitStatisticsDTO
+     * @return
+     */
+    List<ItemProfitStatisticsDTO> queryMZDrugAndMaterialProfitByDept(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+
+    /**
+     * 查询住院药品和材料利润统计信息（按批号和项目和科室）
+     * @param itemProfitStatisticsDTO
+     * @return
+     */
+    List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfitByDept(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
 }

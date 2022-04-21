@@ -529,4 +529,188 @@
                expiry_date, split_ratio, split_num, split_price, split_unit_code from stro_stock_detail
         where hosp_code = #{hospCode}
     </select>
+
+    <!--查询门诊药品和材料利润统计信息（按批号和项目和科室和医生）-->
+    <select id="queryMZDrugAndMaterialProfit" resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+        SELECT
+            oc.dept_id as deptId, -- 科室id
+            bd.name as deptName, -- 科室名称
+            oc.doctor_name as doctorName, -- 医生姓名
+            podd.batch_no as batchNo, -- 批号
+            podd.item_id as itemId, -- 项目id
+            podd.item_name as itemName,  -- 项目名称
+            podd.spec as itemSpec, -- 项目规格
+            ssd.buy_price as buyPrice,  -- 购进单价
+            ssd.sell_price as sellPrice,  -- 零售单价
+            ssd.buy_price_all as buyPriceAll, -- 购进总价
+            sum(podd.num) as settleCount, -- 结算数量
+            sum(podd.back_num) as backCount -- 退药数量
+        FROM outpt_cost oc
+             left join outpt_settle os
+                on os.id = oc.settle_id and os.hosp_code = oc.hosp_code
+             left join phar_out_distribute_all_detail podad
+                on podad.cost_id = oc.id and podad.hosp_code = oc.hosp_code
+             left join phar_out_distribute_detail podd
+                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = podad.hosp_code
+             left join stro_stock_detail ssd
+                on ssd.id = podd.stock_detail_id and ssd.hosp_code = podd.hosp_code
+            left join base_dept bd
+                on bd.id = oc.dept_id and bd.hosp_code = oc.hosp_code
+        where
+            oc.is_dist ='1'
+          and oc.settle_code='2'
+          and oc.item_code in('1','2')
+          and oc.hosp_code= #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and oc.dept_id = #{deptId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and oc.doctorId = #{doctorId}
+        </if>
+        <if test="startDate != null ">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+        group by podd.item_id,podd.batch_no,oc.dept_id,oc.doctor_id
+    </select>
+
+    <!--查询住院药品和材料利润统计信息（按批号和项目和科室和医生）-->
+    <select id="queryZYDrugAndMaterialProfit" resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+        SELECT
+            ic.dept_id as deptId, -- 科室id
+            bd.name as deptName, -- 科室名称
+            ic.doctor_name as doctorName, -- 医生姓名
+            pidd.batch_no as batchNo, -- 批号
+            pidd.item_id as itemId, -- 项目id
+            pidd.item_name as itemName,  -- 项目名称
+            pidd.spec as itemSpec, -- 项目规格
+            ssd.buy_price as buyPrice,  -- 购进单价
+            ssd.sell_price as sellPrice,  -- 零售单价
+            ssd.buy_price_all as buyPriceAll, -- 购进总价
+            sum(pidd.num) as sellCount -- 结算数量
+        FROM inpt_cost ic
+             left join inpt_settle ins
+                on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code
+             left join phar_in_distribute_all_detail pidad
+                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code = ic.hosp_code
+             left join phar_in_distribute_detail pidd
+                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code = pidad.hosp_code
+             left join stro_stock_detail ssd
+                on ssd.id = pidd.stock_detail_id and ssd.hosp_code = pidd.hosp_code
+             left join base_dept bd
+                on bd.id = ic.dept_id and bd.hosp_code = ic.hosp_code
+        where
+            ic.is_dist ='1'
+          and ic.settle_code='2'
+          and ic.is_wait = '1'
+          and ic.item_code in('1','2')
+          and ic.hosp_code= #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and ic.dept_id = #{deptId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and ic.doctorId = #{doctorId}
+        </if>
+        <if test="startDate != null ">
+            and ins.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and ins.settle_time &lt;= #{endDate}
+        </if>
+        group by pidd.item_id,pidd.batch_no,ic.dept_id,ic.doctor_id
+    </select>
+
+    <!--查询门诊院药品和材料利润统计信息（按批号和项目和科室）-->
+    <select id="queryMZDrugAndMaterialProfitByDept"
+            resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+        SELECT
+        oc.dept_id as deptId, -- 科室id
+        bd.name as deptName, -- 科室名称
+        podd.batch_no as batchNo, -- 批号
+        podd.item_id as itemId, -- 项目id
+        podd.item_name as itemName,  -- 项目名称
+        podd.spec as itemSpec, -- 项目规格
+        ssd.buy_price as buyPrice,  -- 购进单价
+        ssd.sell_price as sellPrice,  -- 零售单价
+        ssd.buy_price_all as buyPriceAll, -- 购进总价
+        sum(podd.num) as settleCount, -- 结算数量
+        sum(podd.back_num) as backCount -- 退药数量
+        FROM outpt_cost oc
+            left join outpt_settle os
+                on os.id = oc.settle_id and os.hosp_code = oc.hosp_code
+            left join phar_out_distribute_all_detail podad
+                on podad.cost_id = oc.id and podad.hosp_code = oc.hosp_code
+            left join phar_out_distribute_detail podd
+                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = podad.hosp_code
+            left join stro_stock_detail ssd
+                on ssd.id = podd.stock_detail_id and ssd.hosp_code = podd.hosp_code
+            left join base_dept bd
+                on bd.id = oc.dept_id and bd.hosp_code = oc.hosp_code
+        where
+        oc.is_dist ='1'
+        and oc.settle_code='2'
+        and oc.item_code in('1','2')
+        and oc.hosp_code= #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and oc.dept_id = #{deptId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and oc.doctorId = #{doctorId}
+        </if>
+        <if test="startDate != null ">
+            and os.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and os.settle_time &lt;= #{endDate}
+        </if>
+        group by podd.item_id,podd.batch_no,oc.dept_id
+    </select>
+
+    <!--查询住院药品和材料利润统计信息（按批号和项目和科室）-->
+    <select id="queryZYDrugAndMaterialProfitByDept"
+            resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+        SELECT
+        ic.dept_id as deptId, -- 科室id
+        bd.name as deptName, -- 科室名称
+        pidd.batch_no as batchNo, -- 批号
+        pidd.item_id as itemId, -- 项目id
+        pidd.item_name as itemName,  -- 项目名称
+        pidd.spec as itemSpec, -- 项目规格
+        ssd.buy_price as buyPrice,  -- 购进单价
+        ssd.sell_price as sellPrice,  -- 零售单价
+        ssd.buy_price_all as buyPriceAll, -- 购进总价
+        sum(pidd.num) as sellCount -- 结算数量
+        FROM inpt_cost ic
+            left join inpt_settle ins
+                on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code
+            left join phar_in_distribute_all_detail pidad
+                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code = ic.hosp_code
+            left join phar_in_distribute_detail pidd
+                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code = pidad.hosp_code
+            left join stro_stock_detail ssd
+                on ssd.id = pidd.stock_detail_id and ssd.hosp_code = pidd.hosp_code
+            left join base_dept bd
+                on bd.id = ic.dept_id and bd.hosp_code = ic.hosp_code
+        where
+        ic.is_dist ='1'
+        and ic.settle_code='2'
+        and ic.is_wait = '1'
+        and ic.item_code in('1','2')
+        and ic.hosp_code= #{hospCode}
+        <if test="deptId != null and deptId != ''">
+            and ic.dept_id = #{deptId}
+        </if>
+        <if test="doctorId != null and doctorId != ''">
+            and ic.doctorId = #{doctorId}
+        </if>
+        <if test="startDate != null ">
+            and ins.settle_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null ">
+            and ins.settle_time &lt;= #{endDate}
+        </if>
+        group by pidd.item_id,pidd.batch_no,ic.dept_id
+    </select>
 </mapper>

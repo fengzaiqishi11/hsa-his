@@ -589,7 +589,7 @@
             ssd.buy_price as buyPrice,  -- 购进单价
             ssd.sell_price as sellPrice,  -- 零售单价
             ssd.buy_price_all as buyPriceAll, -- 购进总价
-            sum(pidd.num) as settleCount -- 结算数量
+            sum(pidd.num) as sellCount -- 结算数量
         FROM inpt_cost ic
              left join inpt_settle ins
                 on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code
@@ -681,7 +681,7 @@
         ssd.buy_price as buyPrice,  -- 购进单价
         ssd.sell_price as sellPrice,  -- 零售单价
         ssd.buy_price_all as buyPriceAll, -- 购进总价
-        sum(pidd.num) as settleCount -- 结算数量
+        sum(pidd.num) as sellCount -- 结算数量
         FROM inpt_cost ic
             left join inpt_settle ins
                 on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code

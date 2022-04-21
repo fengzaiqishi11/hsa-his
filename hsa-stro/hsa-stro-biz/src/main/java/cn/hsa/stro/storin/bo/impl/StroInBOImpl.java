@@ -910,5 +910,31 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
     return resultList;
   }
 
+  /**
+   * @param stroInDTO
+   * @Menthod updateStroInFk()
+   * @Desrciption 修改财务付款状态
+   * @Param [baseDrugDTO]
+   * @Author pengbo
+   * @Date 2022/04/19 17:36
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @Override
+  public Boolean updateStroInFk(StroInDTO stroInDTO) {
+
+    // 0未付款，1已付款
+    if (stroInDTO != null && "1".equals(stroInDTO.getFkStatusCode())){
+      stroInDTO.setFkdid("");
+      stroInDTO.setFkTime(new Date());
+    }else{
+      stroInDTO.setFkrId(null);
+      stroInDTO.setFkdid(null);
+      stroInDTO.setFkRemark(stroInDTO.getFkrName()+"已取消付款");
+      stroInDTO.setFkrName(null);
+    }
+
+    return stroInDao.updateStroInFk(stroInDTO)>0;
+  }
+
 
 }

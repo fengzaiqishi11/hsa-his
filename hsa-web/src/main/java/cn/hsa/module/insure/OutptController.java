@@ -2,17 +2,22 @@ package cn.hsa.module.insure;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.outpt.service.DzpzOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.alibaba.fastjson.JSON;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,6 +38,9 @@ public class OutptController extends BaseController {
 
     @Resource
     private DzpzOutptService dzpzOutptService;
+
+    @Resource
+    private SysParameterService sysParameterService_consumer;
 
     /**
      * @Menthod getOutptVisitInfo
@@ -59,6 +67,7 @@ public class OutptController extends BaseController {
         String bka895 = String.valueOf(param.get("bka895"));
         String bka896 = String.valueOf(param.get("bka896"));
         String cardIden = MapUtils.get(param,"cardIden");
+        String outInfo = MapUtils.get(param,"outInfo");
         String aab001 = String.valueOf(param.get("aab001"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
         String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
@@ -80,6 +89,19 @@ public class OutptController extends BaseController {
         insureIndividualBasicDTO.setAac002(aac002);
         insureIndividualBasicDTO.setAac003(aac003);
         insureIndividualBasicDTO.setAac004(aac004);
+
+        //海南读社保卡单独传参
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", sysUserDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "Device");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        if (sysParameterDTO == null) {
+            throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:Device,值为读卡参数");
+        }
+        Map map = JSON.parseObject(sysParameterDTO.getValue(), Map.class);
+        if("HaiNan".equals(MapUtils.get(map,"city"))){
+            insureIndividualBasicDTO.setBka896(outInfo);
+        }
 
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
         Object insuplcAdmdvs = MapUtils.get(param,"insuplcAdmdvs");

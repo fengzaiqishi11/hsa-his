@@ -97,4 +97,16 @@ public class StroInDO extends PageDO implements Serializable {
 
   // 整单出库--入库单号
   private String inOrderNo;
+
+
+  private String fkrId   ;//	付款人ID
+  private String fkrName;//		付款人名称
+  private String fkStatusCode	;//				付款状态（0未付款，1已付款）
+  private String fkRemark	;//				付款备注
+  private String fkdid	;//			付款单ID
+  // 时间戳转换为标准时间格式
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date fkTime ;
+
 }

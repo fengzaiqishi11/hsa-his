@@ -182,7 +182,7 @@ public class InsureIndividualBasicController extends BaseController {
             throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:Device,值为读卡参数");
         }
         Map deviceMap = JSON.parseObject(sysParameterDTO.getValue(), Map.class);
-        if("HaiNan".equals(MapUtils.get(deviceMap,"city"))){
+        if("HaiNan".equals(MapUtils.get(deviceMap,"city")) && "03".equals(bka895)){
             insureIndividualBasicDTO.setBka896(outInfo);
         }
 

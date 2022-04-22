@@ -14,6 +14,8 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -46,6 +48,7 @@ public class OutptElectronicBillFunction {
     @Resource
     private InsureConfigurationDAO insureConfigurationDAO;
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 
     /**
@@ -426,6 +429,7 @@ public class OutptElectronicBillFunction {
      * @return: Map
      */
     public Map deletePatientCost(HashMap<String, Object> param) {
+        logger.info("deletePatientCost================>"+param);
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
         InsureIndividualVisitDTO insureIndividualVisitDTO = (InsureIndividualVisitDTO) param.get("insureIndividualVisitDTO");//个人基本信息
@@ -445,6 +449,7 @@ public class OutptElectronicBillFunction {
         httpParam.put("data",data);//请求参数
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRevokeOrder);//操作类型
         httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
+        logger.info("deletePatientCost输送电子凭证入参================>"+httpParam);
 
         // 查询电子凭证地址
         Map<String, String> parameterMap = new HashMap<>();
@@ -455,7 +460,7 @@ public class OutptElectronicBillFunction {
             throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
         }
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode, regCode,resultMap.get("value"),httpParam);
-
+        logger.info("deletePatientCost输送电子凭证出参================>"+httpResult);
         return httpResult;
     }
 
@@ -468,6 +473,7 @@ public class OutptElectronicBillFunction {
      * @return: Map
      */
     public Map deletePatientCostPremium(HashMap<String, Object> param) {
+        logger.info("deletePatientCostPremium================>"+param);
         String hospCode = (String) param.get("hospCode");//医院编码
         String regCode = (String) param.get("insureRegCode");//机构编码
         OutptVisitDTO outptVisitDTO = (OutptVisitDTO) param.get("outptVisitDTO");//个人基本信息
@@ -478,7 +484,9 @@ public class OutptElectronicBillFunction {
         insureIndividualVisitDTO.setHospCode(hospCode);
         insureIndividualVisitDTO.setVisitId(outptVisitDTO.getId());
         List<InsureIndividualVisitDTO> insureIndividualVisitDTOList = insureIndividualVisitDAO.findByCondition(insureIndividualVisitDTO);
-        if (insureIndividualVisitDTOList == null || insureIndividualVisitDTOList.isEmpty()){ throw new AppException("未找到医保就诊信息。"); }
+        if (insureIndividualVisitDTOList == null || insureIndividualVisitDTOList.isEmpty()){
+          throw new AppException("未找到医保就诊信息。");
+        }
         insureIndividualVisitDTO = insureIndividualVisitDTOList.get(0);
 
         Map<String,Object> httpParam = new HashMap<String,Object>();
@@ -502,7 +510,7 @@ public class OutptElectronicBillFunction {
         httpParam.put("data",data);//
         httpParam.put("orgId",insureIndividualVisitDTO.getMedicineOrgCode());
         httpParam.put("transType",Constant.hainan.FUNCTION.hosRefundSetl);//操作类型
-
+        logger.info("deletePatientCostPremium输送电子凭证入参================>"+httpParam);
         // 查询电子凭证地址
         Map<String, String> parameterMap = new HashMap<>();
         parameterMap.put("hospCode", hospCode);
@@ -512,7 +520,7 @@ public class OutptElectronicBillFunction {
             throw new AppException("系统参数中未配置电子凭证地址(参数名：DZPZ_URL)，请联系管理员配置");
         }
         Map<String,Object> httpResult = requestInsure.callHaiNan(hospCode,regCode,resultMap.get("value"),httpParam);
-
+        logger.info("deletePatientCostPremium输送电子凭证入参================>"+httpParam);
         return httpResult;
     }
 

@@ -28,7 +28,7 @@ public class DrgFunction {
      * @Method: BIZC320008()
      * @Descrition: // 当医疗机构查询到当前参保人的已上传结算信息和病案首页信息，但未查询
      * 到具体的分组信息的时候，可以通过该接口重新调用分组器重新分组后获取当前
-     * 的分组详细信息
+     * 的分组详细信息**
      * @Pramas: insureIndividualVisitDTO:医保病人数据传输对象
      * @Author: fuhui
      * @mail: 3277857701@qq.com

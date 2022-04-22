@@ -284,4 +284,15 @@ public interface OutptSettleDAO {
      **/
     int updateRegisterCreditStatus(OutptSettleDTO outptSettleDTO);
 
+    /**
+     * @Menthod: queryApplyRefundCharge()
+     * @Desrciption: 门诊退费 - 查询门诊已申请退费的病人
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/04/22 09:51
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    List<Map<String, Object>> queryApplyRefundCharge(OutptSettleDTO outptSettleDTO);
+
 }

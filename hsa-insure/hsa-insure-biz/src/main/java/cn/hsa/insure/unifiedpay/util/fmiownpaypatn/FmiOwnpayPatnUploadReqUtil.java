@@ -98,7 +98,6 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
         checkRequest(dataMap);
         commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4261);
-        commParam.put("upType", "1");
         commParam.put("msgId",MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
@@ -112,6 +111,7 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
         insureInterfaceParamDTO.setFmiOwnpayPatnMdtrtDDTO((FmiOwnpayPatnMdtrtDDTO)commParam.get("fmiOwnpayPatnMdtrtDDTO"));
         insureInterfaceParamDTO.setFmiOwnpayPatnDiseListDDTOS((List<FmiOwnpayPatnDiseListDDTO>)commParam.get("fmiOwnpayPatnDiseListDDTOS"));
         insureInterfaceParamDTO.setFmiOwnpayPatnFeeListDDTO((List<FmiOwnpayPatnFeeListDDTO>)commParam.get("fmiOwnpayPatnFeeListDDTO"));
+        insureInterfaceParamDTO.setUpType("1");
         insureInterfaceParamDTO.setInput(null);
         return insureInterfaceParamDTO;
     }

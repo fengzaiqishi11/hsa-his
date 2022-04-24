@@ -74,4 +74,6 @@ public class InsureInterfaceParamDTO implements Serializable {
     private List<FmiOwnpayPatnDiseListDDTO> fmiOwnpayPatnDiseListDDTOS;
 
     private List<FmiOwnpayPatnFeeListDDTO> fmiOwnpayPatnFeeListDDTO;
+
+    private String upType;
 }

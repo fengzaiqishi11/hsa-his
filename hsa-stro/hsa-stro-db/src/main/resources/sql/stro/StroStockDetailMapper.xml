@@ -547,15 +547,17 @@
             sum(podd.back_num) as backCount -- 退药数量
         FROM outpt_cost oc
              left join outpt_settle os
-                on os.id = oc.settle_id and os.hosp_code = oc.hosp_code
+                on os.id = oc.settle_id and os.hosp_code = #{hospCode}
              left join phar_out_distribute_all_detail podad
-                on podad.cost_id = oc.id and podad.hosp_code = oc.hosp_code
+                on podad.cost_id = oc.id and podad.hosp_code = #{hospCode}
+                and oc.distribute_all_detail_id = podad.id
              left join phar_out_distribute_detail podd
-                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = podad.hosp_code
+                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = #{hospCode}
+                and podd.cost_id = oc.id
              left join stro_stock_detail ssd
-                on ssd.id = podd.stock_detail_id and ssd.hosp_code = podd.hosp_code
+                on ssd.id = podd.stock_detail_id and ssd.hosp_code = #{hospCode}
             left join base_dept bd
-                on bd.id = oc.dept_id and bd.hosp_code = oc.hosp_code
+                on bd.id = oc.dept_id and bd.hosp_code = #{hospCode}
         where
             oc.is_dist ='1'
           and oc.settle_code='2'
@@ -589,18 +591,18 @@
             ssd.buy_price as buyPrice,  -- 购进单价
             ssd.sell_price as sellPrice,  -- 零售单价
             ssd.buy_price_all as buyPriceAll, -- 购进总价
-            sum(pidd.num) as settleCount -- 结算数量
+            sum(pidd.num) as sellCount -- 结算数量
         FROM inpt_cost ic
-             left join inpt_settle ins
-                on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code
-             left join phar_in_distribute_all_detail pidad
-                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code = ic.hosp_code
-             left join phar_in_distribute_detail pidd
-                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code = pidad.hosp_code
-             left join stro_stock_detail ssd
-                on ssd.id = pidd.stock_detail_id and ssd.hosp_code = pidd.hosp_code
-             left join base_dept bd
-                on bd.id = ic.dept_id and bd.hosp_code = ic.hosp_code
+            left join inpt_settle ins
+                on ins.id = ic.settle_id and ins.hosp_code = #{hospCode}
+            left join phar_in_distribute_all_detail pidad
+                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code =  #{hospCode}
+            left join phar_in_distribute_detail pidd
+                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code =  #{hospCode}
+            left join stro_stock_detail ssd
+                on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
+            left join base_dept bd
+                on bd.id = ic.dept_id and bd.hosp_code =  #{hospCode}
         where
             ic.is_dist ='1'
           and ic.settle_code='2'
@@ -639,15 +641,17 @@
         sum(podd.back_num) as backCount -- 退药数量
         FROM outpt_cost oc
             left join outpt_settle os
-                on os.id = oc.settle_id and os.hosp_code = oc.hosp_code
+                on os.id = oc.settle_id and os.hosp_code = #{hospCode}
             left join phar_out_distribute_all_detail podad
-                on podad.cost_id = oc.id and podad.hosp_code = oc.hosp_code
+                on podad.cost_id = oc.id and podad.hosp_code = #{hospCode}
+                and oc.distribute_all_detail_id = podad.id
             left join phar_out_distribute_detail podd
-                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = podad.hosp_code
+                on podd.distribute_all_detail_id = podad.id and podd.hosp_code = #{hospCode}
+                and podd.cost_id = oc.id
             left join stro_stock_detail ssd
-                on ssd.id = podd.stock_detail_id and ssd.hosp_code = podd.hosp_code
+                on ssd.id = podd.stock_detail_id and ssd.hosp_code = #{hospCode}
             left join base_dept bd
-                on bd.id = oc.dept_id and bd.hosp_code = oc.hosp_code
+                on bd.id = oc.dept_id and bd.hosp_code = #{hospCode}
         where
         oc.is_dist ='1'
         and oc.settle_code='2'
@@ -681,18 +685,18 @@
         ssd.buy_price as buyPrice,  -- 购进单价
         ssd.sell_price as sellPrice,  -- 零售单价
         ssd.buy_price_all as buyPriceAll, -- 购进总价
-        sum(pidd.num) as settleCount -- 结算数量
+        sum(pidd.num) as sellCount -- 结算数量
         FROM inpt_cost ic
             left join inpt_settle ins
-                on ins.id = ic.settle_id and ins.hosp_code = ic.hosp_code
+                on ins.id = ic.settle_id and ins.hosp_code = #{hospCode}
             left join phar_in_distribute_all_detail pidad
-                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code = ic.hosp_code
+                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code =  #{hospCode}
             left join phar_in_distribute_detail pidd
-                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code = pidad.hosp_code
+                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code =  #{hospCode}
             left join stro_stock_detail ssd
-                on ssd.id = pidd.stock_detail_id and ssd.hosp_code = pidd.hosp_code
+                on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
             left join base_dept bd
-                on bd.id = ic.dept_id and bd.hosp_code = ic.hosp_code
+                on bd.id = ic.dept_id and bd.hosp_code =  #{hospCode}
         where
         ic.is_dist ='1'
         and ic.settle_code='2'
@@ -713,4 +717,5 @@
         </if>
         group by pidd.item_id,pidd.batch_no,ic.dept_id
     </select>
+
 </mapper>

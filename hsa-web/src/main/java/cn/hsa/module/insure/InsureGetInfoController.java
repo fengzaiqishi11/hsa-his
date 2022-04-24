@@ -161,6 +161,24 @@ public class InsureGetInfoController extends BaseController {
 
 
     /**
+     * @Method deleteSettleInfo
+     * @Desrciption  医疗保障结算清单信息状态修改
+     *
+     * @Param
+     *
+     * @Author liuhuiming
+     * @Date   2022/04/22 13:58
+     * @Return
+     **/
+    @PostMapping("/updateSettleInfo")
+    public WrapperResponse<Boolean> updateSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res ){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.updateSettleInfo(map);
+    }
+
+
+    /**
      * @Method queryCost
      * @Desrciption 查询费用明细（未上传,自费）
      * @Param

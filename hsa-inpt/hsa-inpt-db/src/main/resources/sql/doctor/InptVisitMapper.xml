@@ -1105,7 +1105,7 @@
 		iiv.medical_reg_no
 		from
 		inpt_visit iv
-		left join insure_individual_visit iiv on iv.id = iiv.visit_id
+		left join insure_individual_visit iiv on iv.id = iiv.visit_id and iiv.hosp_code = #{hospCode}
 		where
 		iv.hosp_code = #{hospCode}
 

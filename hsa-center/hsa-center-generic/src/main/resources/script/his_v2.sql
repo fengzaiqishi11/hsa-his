@@ -9656,3 +9656,24 @@ CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `mi_insur_hosp_items_rel`
 -- ----------------------------
 DROP VIEW IF EXISTS `user_info`;
 CREATE ALGORITHM = UNDEFINED SQL SECURITY DEFINER VIEW `user_info` AS select `outpt_medical_record`.`chief_complaint` AS `chief_complaint`,`outpt_medical_record`.`present_illness` AS `present_illness`,`outpt_medical_record`.`past_history` AS `past_history`,`outpt_medical_record`.`oneself_history` AS `oneself_history`,`outpt_medical_record`.`family_history` AS `family_history`,`outpt_medical_record`.`allergy_history` AS `allergy_history`,`outpt_medical_record`.`vaccination_history` AS `vaccination_history`,`outpt_medical_record`.`auxiliary_inspect` AS `auxiliary_inspect`,`outpt_medical_record`.`disease_analysis` AS `disease_analysis`,`outpt_medical_record`.`handle_suggestion` AS `handle_suggestion`,`outpt_medical_record`.`temperature` AS `temperature`,`outpt_medical_record`.`min_blood_pressure` AS `min_blood_pressure`,`outpt_medical_record`.`max_blood_pressure` AS `max_blood_pressure`,`outpt_medical_record`.`breath` AS `breath`,`outpt_medical_record`.`height` AS `height`,`outpt_medical_record`.`blood_sugar` AS `blood_sugar`,`outpt_medical_record`.`pulse` AS `pulse`,`outpt_medical_record`.`weight` AS `weight`,`outpt_medical_record`.`bmi` AS `bmi`,'433130199209047510' AS `cardNo` from `outpt_medical_record` limit 1;
+
+
+
+-- ----------------------
+-- stro_in  2022-04-20 新增字段
+-- ---------------------
+
+ALTER TABLE stro_in
+ADD COLUMN fkr_id varchar(32) NULL COMMENT '付款人ID' AFTER in_order_no,
+ADD COLUMN fkr_name varchar(50) NULL COMMENT '付款人名称' AFTER fkr_id,
+ADD COLUMN fk_status_code varchar(2) NULL  DEFAULT '0' COMMENT '付款状态（0未付款，1已付款）' AFTER fkr_name,
+ADD COLUMN fk_remark varchar(1000) NULL COMMENT '付款备注' AFTER fk_status_code,
+ADD COLUMN fkdid varchar(32) NULL COMMENT '付款单ID' AFTER fk_remark,
+ADD COLUMN fk_time datetime(0) NULL COMMENT '付款确认时间' AFTER fkdid;
+
+
+
+
+
+
+

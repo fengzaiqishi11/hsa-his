@@ -172,10 +172,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       //查询所有待领药品
       WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
       List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
-      //过滤出isback = 1 的是退药的药品
-//        List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "1".equals(dto.getIsBack())).collect(Collectors.toList());
-//        //过滤出isback = 0 的是退药的药品
-//        List<PharInWaitReceiveDTO> isNotBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "0".equals(dto.getIsBack())).collect(Collectors.toList());
       if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
         for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
           for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
@@ -253,9 +249,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       updateInwait.setIds(ids);
       updateInwait.setHospCode(hospCode);
       updateInwait.setStatusCode("1");
-      inwaitMap.put("hospCode", hospCode);
-      inwaitMap.put("pharInWaitReceiveDTO", updateInwait);
-      pharInWaitReceiveService_consumer.updateInWaitStatus(inwaitMap);
+      //todo 修改 ，由于事务不一致导致的重复预配药问题以及预配药操作，配药单没有生成数据的问题
+      inptCostDAO.updateInWaitStatus(updateInwait);
       //插入配药主表
       inptCostDAO.insertPharInReceives(inReceiveList);
       // 插入配药明细表

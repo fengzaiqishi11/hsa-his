@@ -21,8 +21,7 @@ public class OutptSurgeryRescueRecordReqUtil<T> extends InsureCommonUtil impleme
 
     @Override
     public InsureInterfaceParamDTO initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
+        Map map = (Map) param;
         checkRequest(map);
         map.put("infno",Constant.UnifiedPay.OUTPT.UP_4302);
         return getInsurCommonParam(map);

@@ -449,7 +449,7 @@
         AND b.is_settle = '1'
         AND b.status_code = '0'
         and b.patient_code ='-1'
-        <if test="keyWord != null and keyWord != ''">
+        <if test="keyword != null and keyword != ''">
             and (a.name like concat('%',#{keyword},'%')
             or a.cert_no like concat('%',#{keyword},'%')
             or a.visit_no like concat('%',#{keyword},'%')

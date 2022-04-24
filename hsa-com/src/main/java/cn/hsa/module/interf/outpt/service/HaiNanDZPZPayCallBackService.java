@@ -25,7 +25,7 @@ public interface HaiNanDZPZPayCallBackService {
 	 * @Date 2021/11/17 11:28
 	 * @Return 
 	 */
-	@GetMapping("/service/dzpz/haiNanDZPZPayCallBack")
+	@GetMapping("/pmc/api/hos/seltSucCallback")
 	void haiNanDZPZPayCallBack(Map<String, String> map);
 
 }

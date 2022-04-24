@@ -76,29 +76,29 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
         }
 
+        HashMap commParam = new HashMap();
         Map<String, Object> dataMap = new HashMap<>(3);
         if (insureSettleInfoDTO.getLx().equals("1")) {
-            dataMap.put("fmiOwnpayPatnMdtrtDDTO", initMdtrtDDTO(inptVisitDTO,insureConfigurationDTO,sysParameterDTO.getValue()));
-            dataMap.put("fmiOwnpayPatnDiseListDDTOS", initInptDiseListDDTOS(inptDiagnoseDTOList,inptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
-            dataMap.put("fmiOwnpayPatnFeeListDDTO",initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
+            commParam.put("fmiOwnpayPatnMdtrtDDTO", initMdtrtDDTO(inptVisitDTO,insureConfigurationDTO,sysParameterDTO.getValue()));
+            commParam.put("fmiOwnpayPatnDiseListDDTOS", initInptDiseListDDTOS(inptDiagnoseDTOList,inptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
+            commParam.put("fmiOwnpayPatnFeeListDDTO",initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }else {
             FmiOwnpayPatnMdtrtDDTO fmiOwnpayPatnMdtrtDDTO = initMdtrtDDTO(outptVisitDTO,insureConfigurationDTO,sysParameterDTO.getValue());
-            dataMap.put("fmiOwnpayPatnMdtrtDDTO", fmiOwnpayPatnMdtrtDDTO);
-            dataMap.put("fmiOwnpayPatnDiseListDDTOS", initOutptDiseListDDTOS(outptDiagnoseDTOList,outptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue(),
+            commParam.put("fmiOwnpayPatnMdtrtDDTO", fmiOwnpayPatnMdtrtDDTO);
+            commParam.put("fmiOwnpayPatnDiseListDDTOS", initOutptDiseListDDTOS(outptDiagnoseDTOList,outptMatchDiagnoseDTOList,insureConfigurationDTO,sysParameterDTO.getValue(),
                     fmiOwnpayPatnMdtrtDDTO));
-            dataMap.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
+            commParam.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }
-        List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
-        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
-            dataMap.put("upType", "1");
-        }else{
-            dataMap.put("upType", "0");
-        }
-        HashMap commParam = new HashMap();
-        checkRequest(dataMap);
-        commParam.put("input", dataMap);
-        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4261);
+//        List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
+//        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
+////            commParam.put("upType", "1");
+////        }else{
+////            commParam.put("upType", "0");
+////        }
 
+        checkRequest(dataMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4261);
+        commParam.put("upType", "1");
         commParam.put("msgId",MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
@@ -107,7 +107,13 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
         commParam.put("orgCode",MapUtils.get(map,"orgCode"));
         commParam.put("configCode",MapUtils.get(map,"configCode"));
         commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
-        return getInsurCommonParam(commParam);
+
+        InsureInterfaceParamDTO insureInterfaceParamDTO = getInsurCommonParam(commParam);
+        insureInterfaceParamDTO.setFmiOwnpayPatnMdtrtDDTO((FmiOwnpayPatnMdtrtDDTO)commParam.get("fmiOwnpayPatnMdtrtDDTO"));
+        insureInterfaceParamDTO.setFmiOwnpayPatnDiseListDDTOS((List<FmiOwnpayPatnDiseListDDTO>)commParam.get("fmiOwnpayPatnDiseListDDTOS"));
+        insureInterfaceParamDTO.setFmiOwnpayPatnFeeListDDTO((List<FmiOwnpayPatnFeeListDDTO>)commParam.get("fmiOwnpayPatnFeeListDDTO"));
+        insureInterfaceParamDTO.setInput(null);
+        return insureInterfaceParamDTO;
     }
 
     private FmiOwnpayPatnMdtrtDDTO initMdtrtDDTO(InptVisitDTO inptVisitDTO,InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName) {
@@ -342,6 +348,13 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             diseinfoMap.setDiagCode(inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
             diseinfoMap.setDiagName(inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
 
+            if(diseinfoMap.getDiagCode() == null){
+                diseinfoMap.setDiagCode("");
+            }
+            if(diseinfoMap.getDiagName() == null){
+                diseinfoMap.setDiagName("");
+            }
+
             diseinfoMap.setAdmCond(null);//	入院病情
             diseinfoMap.setDiagDept(inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
             diseinfoMap.setDiagDrCode(inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
@@ -403,6 +416,12 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
             diseinfoMap.setMaindiagFlag(outptMatchDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
             diseinfoMap.setDiagCode(outptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
             diseinfoMap.setDiagName(outptMatchDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+            if(diseinfoMap.getDiagCode() == null){
+                diseinfoMap.setDiagCode("");
+            }
+            if(diseinfoMap.getDiagName() == null){
+                diseinfoMap.setDiagName("");
+            }
             if("1".equals(diseinfoMap.getMaindiagFlag())){
                 fmiOwnpayPatnMdtrtDDTO.setDiseNo(outptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());
                 fmiOwnpayPatnMdtrtDDTO.setDiseName(outptMatchDiagnoseDTOList.get(i).getInsureInllnessName());

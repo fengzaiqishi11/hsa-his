@@ -1,8 +1,12 @@
 package cn.hsa.module.insure.module.dto;
 
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @ClassName InterfaceParamDTO
@@ -64,4 +68,10 @@ public class InsureInterfaceParamDTO implements Serializable {
 
     private String visitId;
     private String isHospital;
+
+    private FmiOwnpayPatnMdtrtDDTO fmiOwnpayPatnMdtrtDDTO;
+
+    private List<FmiOwnpayPatnDiseListDDTO> fmiOwnpayPatnDiseListDDTOS;
+
+    private List<FmiOwnpayPatnFeeListDDTO> fmiOwnpayPatnFeeListDDTO;
 }

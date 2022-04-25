@@ -44,10 +44,10 @@
         <!--        </dependency>-->
 
         <!-- 认证安全组件 -->
-        <dependency>
-            <groupId>cn.hsa.hsaf.auth.security</groupId>
-            <artifactId>hsaf-auth-security</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.auth.security</groupId>-->
+<!--            <artifactId>hsaf-auth-security</artifactId>-->
+<!--        </dependency>-->
 
         <!--MVC框架-->
         <dependency>

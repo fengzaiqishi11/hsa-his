@@ -735,6 +735,7 @@
         a.id = b.settle_id
         AND a.hosp_code = b.hosp_code
         AND a.is_settle = '1'
+        AND a.status_code = '0'
         AND a.hosp_code = #{hospCode}
         <if test="medType != null and medType != ''">
             AND b.aka130 = #{medType}

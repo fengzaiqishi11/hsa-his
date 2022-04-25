@@ -1413,7 +1413,7 @@
     </select>
     <select id="selectBaseSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select id, visit_id, insure_settle_id, settle_no, fixmedins_name, fixmedins_code,
-               (select value from insure_dict where code = 'HI_SETL_LV' and name = hi_setl_lv limit 1) hi_setl_lv ,
+               (select name from insure_dict where code = 'HI_SETL_LV' and  value= hi_setl_lv limit 1) hi_setl_lv ,
                hi_no, medcasno, dcla_time, psn_name, gend, brdy, age, ntly, neb_age,
                naty, patn_cert_type, certno, prfs, curr_addr, emp_name, emp_addr, emp_tel, poscode,
                coner_name, patn_rlts, coner_addr, coner_tel, hi_type, insuplc, sp_psn_type, nwb_adm_type,

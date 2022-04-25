@@ -535,6 +535,7 @@
         SELECT
             oc.dept_id as deptId, -- 科室id
             bd.name as deptName, -- 科室名称
+            bfc.name as bfcName, -- 财务分类名称
             oc.doctor_name as doctorName, -- 医生姓名
             podd.batch_no as batchNo, -- 批号
             podd.item_id as itemId, -- 项目id
@@ -556,8 +557,10 @@
                 and podd.cost_id = oc.id
              left join stro_stock_detail ssd
                 on ssd.id = podd.stock_detail_id and ssd.hosp_code = #{hospCode}
-            left join base_dept bd
+             left join base_dept bd
                 on bd.id = oc.dept_id and bd.hosp_code = #{hospCode}
+             left join base_finance_classify bfc
+                on bfc.id = oc.bfc_id and bfc.hosp_code = #{hospCode}
         where
             oc.is_dist ='1'
           and oc.settle_code='2'
@@ -583,6 +586,7 @@
         SELECT
             ic.dept_id as deptId, -- 科室id
             bd.name as deptName, -- 科室名称
+            bfc.name as bfcName, -- 财务分类名称
             ic.doctor_name as doctorName, -- 医生姓名
             pidd.batch_no as batchNo, -- 批号
             pidd.item_id as itemId, -- 项目id
@@ -603,6 +607,8 @@
                 on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
             left join base_dept bd
                 on bd.id = ic.dept_id and bd.hosp_code =  #{hospCode}
+            left join base_finance_classify bfc
+                on bfc.id = ic.bfc_id and bfc.hosp_code = #{hospCode}
         where
             ic.is_dist ='1'
           and ic.settle_code='2'
@@ -630,6 +636,7 @@
         SELECT
         oc.dept_id as deptId, -- 科室id
         bd.name as deptName, -- 科室名称
+        bfc.name as bfcName, -- 财务分类名称
         podd.batch_no as batchNo, -- 批号
         podd.item_id as itemId, -- 项目id
         podd.item_name as itemName,  -- 项目名称
@@ -652,6 +659,8 @@
                 on ssd.id = podd.stock_detail_id and ssd.hosp_code = #{hospCode}
             left join base_dept bd
                 on bd.id = oc.dept_id and bd.hosp_code = #{hospCode}
+            left join base_finance_classify bfc
+                on bfc.id = oc.bfc_id and bfc.hosp_code = #{hospCode}
         where
         oc.is_dist ='1'
         and oc.settle_code='2'
@@ -678,6 +687,7 @@
         SELECT
         ic.dept_id as deptId, -- 科室id
         bd.name as deptName, -- 科室名称
+        bfc.name as bfcName, -- 财务分类名称
         pidd.batch_no as batchNo, -- 批号
         pidd.item_id as itemId, -- 项目id
         pidd.item_name as itemName,  -- 项目名称
@@ -696,7 +706,9 @@
             left join stro_stock_detail ssd
                 on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
             left join base_dept bd
-                on bd.id = ic.dept_id and bd.hosp_code =  #{hospCode}
+                on bd.id =  ic.dept_id and bd.hosp_code =  #{hospCode}
+            left join base_finance_classify bfc
+                on bfc.id = ic.bfc_id and bfc.hosp_code = #{hospCode}
         where
         ic.is_dist ='1'
         and ic.settle_code='2'

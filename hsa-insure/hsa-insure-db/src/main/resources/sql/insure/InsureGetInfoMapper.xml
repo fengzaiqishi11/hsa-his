@@ -1771,6 +1771,7 @@
     <update id="updateInsureGetInfo">
         update insure_setl_info
         set settle_no =#{setlListId}
+        set stas_type = '0'
         where insure_settle_id = #{insureSettleId}
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}

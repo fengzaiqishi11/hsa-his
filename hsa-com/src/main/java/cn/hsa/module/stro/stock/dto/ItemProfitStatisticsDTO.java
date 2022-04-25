@@ -54,6 +54,11 @@ public class ItemProfitStatisticsDTO extends StroStockDetailDO implements Serial
     private String deptName;
 
     /**
+     * 财务分类名称
+     */
+    private String bfcName;
+
+    /**
      * 汇总方式 1：按批号和项目  2.按批号、项目和科室
      */
     private String sumCode;

@@ -755,7 +755,7 @@
             (select name from sys_code_detail scd where a.hosp_code = scd.hosp_code and a.usage_code = scd.value and scd.c_code = 'YF') as usage_name
         from outpt_prescribe_detail_ext a
         left join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.opd_id = b.id
-        left join outpt_prescribe c on a.hosp_code = c.hosp_code and a.visit_id = b.visit_id and a.op_id = b.id and a.op_id = c.id
+        left join outpt_prescribe c on a.hosp_code = c.hosp_code and a.visit_id = b.visit_id and a.opd_id = b.id and a.op_id = c.id
         left join (
             SELECT hosp_code, opd_id, MAX(plan_exec_date) as  max_plan_exec_date, MIN(plan_exec_date) as min_plan_exec_date
             from outpt_prescribe_exec where hosp_code = #{hospCode} and visit_id = #{visitId}

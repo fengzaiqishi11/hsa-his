@@ -88,12 +88,13 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
                     fmiOwnpayPatnMdtrtDDTO));
             dataMap.put("fmiOwnpayPatnFeeListDDTO", initFeeListDDTO(insureSettleInfoDTO, feeList,insureConfigurationDTO,sysParameterDTO.getValue()));
         }
-        List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
-        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
-            dataMap.put("upType", "1");
-        }else{
-            dataMap.put("upType", "0");
-        }
+//        List<InsureUploadCostDTO> itemInfoDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
+//        if(!itemInfoDTOList.isEmpty() && itemInfoDTOList.size() > 0 ){
+//            dataMap.put("upType", "1");
+//        }else{
+//            dataMap.put("upType", "0");
+//        }
+        dataMap.put("upType", "1");
         HashMap commParam = new HashMap();
         checkRequest(dataMap);
         commParam.put("input", dataMap);

@@ -8,11 +8,13 @@ import cn.hsa.module.center.tablecontrast.dao.TableContrastDAO;
 import cn.hsa.module.center.tablecontrast.dto.TableContrastDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
+import javassist.compiler.ast.ASTList;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -88,8 +90,16 @@ public class TableContrastBOImpl extends HsafBO implements TableContrastBO {
      * @Return int
      **/
     @Override
-    public boolean delete(TableContrastDTO TableContrastDTO) {
-            return tableContrastDao.delete(TableContrastDTO) > 0;
+    public boolean delete(TableContrastDTO tableContrastDTO) {
+            if(StringUtils.isEmpty(tableContrastDTO.getIds())){
+                throw  new RuntimeException("请选择需要删除的数据!!!");
+            }
+
+            tableContrastDTO.setListId(Arrays.asList(tableContrastDTO.getIds().split(",")));
+            if(ListUtils.isEmpty(tableContrastDTO.getListId())){
+                throw  new RuntimeException("请选择需要删除的数据!!!");
+            }
+            return tableContrastDao.delete(tableContrastDTO) > 0;
     }
     /**
      * @Menthod update()

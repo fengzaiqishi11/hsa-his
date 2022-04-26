@@ -27,7 +27,10 @@
 
     <!--删除-->
     <delete id="delete">
-        delete from center_table_contrast where  id = #{id}
+        delete from center_table_contrast where  id  in
+        <foreach collection="listId" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
     </delete>
 
     <!--根据ID获取-->
@@ -44,6 +47,8 @@
             </if>
 
         </where>
+
+        order by create_time desc
     </select>
 
 </mapper>

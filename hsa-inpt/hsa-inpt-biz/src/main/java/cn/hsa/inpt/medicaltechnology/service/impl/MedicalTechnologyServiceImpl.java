@@ -41,6 +41,18 @@ public class MedicalTechnologyServiceImpl extends HsafService implements Medical
 	public WrapperResponse<PageDTO> getLISorPASSNeedConfirmCost(Map<String, Object> map) {
 		return WrapperResponse.success(medicalTechnologyBO.getLISorPASSNeedConfirmCost(map));
 	}
+	/**
+	 * @Description: 查询康复理疗需要确费的数据
+	 * @Param:
+	 * @Author: yuelong.chen
+	 * @Email: yuelong.chen@powersi.com.cn
+	 * @Date 2022/4/25 16:54
+	 * @Return
+	 */
+	@Override
+	public WrapperResponse<PageDTO> getRecoveryConfirmCost(Map<String, Object> map) {
+		return WrapperResponse.success(medicalTechnologyBO.getRecoveryConfirmCost(map));
+	}
 
 	/**
 	 * @Description: 保存医技确费数据，确认需要收费

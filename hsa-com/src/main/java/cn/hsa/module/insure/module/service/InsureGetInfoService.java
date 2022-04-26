@@ -162,6 +162,18 @@ public interface InsureGetInfoService {
     WrapperResponse<Boolean> deleteSettleInfo(Map<String, Object> map);
 
     /**
+     * @Method updateSettleInfo
+     * @Desrciption  修改医疗保障结算清单信息
+     *
+     * @Param
+     *
+     * @Author liuhuiming
+     * @Date   2022/04/22 13:58
+     * @Return
+     **/
+    WrapperResponse<Boolean> updateSettleInfo(Map<String, Object> map);
+
+    /**
      * @Method selectLoadingSettleInfo
      * @Desrciption  加载保存到数据库的数据信息
      * @Param

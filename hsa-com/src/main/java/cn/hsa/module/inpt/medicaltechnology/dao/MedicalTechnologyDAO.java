@@ -24,6 +24,8 @@ public interface MedicalTechnologyDAO {
 
 	List<MedicalTechnologyDTO> getOutPutLISorPASSNeedConfirmCost(MedicalTechnologyDTO medicalTechnologyDTO);
 
+	List<MedicalTechnologyDTO> getRecoveryConfirmCost(MedicalTechnologyDTO medicalTechnologyDTO);
+
 	int saveMwdicalTechnologyConfirmCost(Map<String, Object> map);
 	int saveOutPtMwdicalTechnologyConfirmCost(Map<String, Object> map);
 	/**

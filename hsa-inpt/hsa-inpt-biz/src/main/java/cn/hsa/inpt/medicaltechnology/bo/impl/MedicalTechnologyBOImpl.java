@@ -54,6 +54,25 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 		}
 		return PageDTO.of(medicalTechnologyDAO.getLISorPASSNeedConfirmCost(medicalTechnologyDTO));
 	}
+	/**
+	 * @Description: 查询康复理疗需要确费的数据
+	 * @Param:
+	 * @Author: yuelong.chen
+	 * @Email: yuelong.chen@powersi.com.cn
+	 * @Date 2022/4/25 16:54
+	 * @Return
+	 */
+	@Override
+	public PageDTO getRecoveryConfirmCost(Map<String, Object> map) {
+		MedicalTechnologyDTO medicalTechnologyDTO = MapUtils.get(map, "medicalTechnologyDTO");
+		if ("".equals(medicalTechnologyDTO.getBabyId())) {
+			medicalTechnologyDTO.setBabyId(null);
+		} else if(medicalTechnologyDTO.getBabyId() != null ) {
+			medicalTechnologyDTO.setKeyword(null);
+		}
+		PageHelper.startPage(medicalTechnologyDTO.getPageNo(),medicalTechnologyDTO.getPageSize());
+		return PageDTO.of(medicalTechnologyDAO.getRecoveryConfirmCost(medicalTechnologyDTO));
+	}
 
 	/**
 	 * @Description: 确认医技收费
@@ -78,7 +97,7 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 		}
 		map.put("costIds", ids.toString());
 		//"1"为门诊确费
-		if("1".equals(MapUtils.get(map, "clinicType").toString())){
+		if(!MapUtils.isEmpty(map,"clinicType") &&"1".equals(MapUtils.get(map, "clinicType").toString())){
 			return medicalTechnologyDAO.saveOutPtMwdicalTechnologyConfirmCost(map) > 0;
 		}
 		return medicalTechnologyDAO.saveMwdicalTechnologyConfirmCost(map) > 0;
@@ -106,7 +125,7 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 		}
 		map.put("costIds", ids.toString());
 		//"1"为门诊取消
-		if("1".equals(MapUtils.get(map, "clinicType").toString())){
+		if(!MapUtils.isEmpty(map,"clinicType")&&"1".equals(MapUtils.get(map, "clinicType").toString())){
 			return medicalTechnologyDAO.updateOutPtMedicalTechnologyConfirmCost(map) > 0;
 		}
 		return medicalTechnologyDAO.updateMedicalTechnologyConfirmCost(map) > 0;

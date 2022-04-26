@@ -185,4 +185,62 @@
         select id,in_no as inNo
          from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
     </select>
+    <select id="getRecoveryConfirmCost"
+            resultType="cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO">
+        select (a.price*a.num) as sumPrice,a.*,ib.name as babyName,ib.gender_code as babyGenderCode from
+            (
+                SELECT
+                    c.id AS costId,
+                    c.item_id AS itemId,
+                    c.item_name AS itemName,
+                    c.price,
+                    c.num,
+                    v.NAME,
+                    v.age,
+                    v.age_unit_code,
+                    v.bed_name,
+                    v.in_no,
+                    d.NAME AS sourceDeptName,
+                    c.crte_time,
+                    v.gender_code,
+                    c.baby_id,
+                    c.hosp_code,
+                    CASE
+                        WHEN c.is_ok = '1' THEN
+                            '确费'
+                        WHEN c.is_ok = '0' THEN
+                            '未确费' ELSE '未确费'
+                        END AS isOk
+                FROM
+                    inpt_cost c
+                    left join inpt_advice b on c.visit_id = b.visit_id and c.iat_id = b.id and c.hosp_code = b.hosp_code
+                    left join inpt_visit v on  c.visit_id = v.id  and c.hosp_code = v.hosp_code
+                    left join base_dept d on d.id = c.dept_id  and c.hosp_code = d.hosp_code
+
+                WHERE
+                    c.hosp_code = #{hospCode}
+                  AND b.type_code = '19'
+                  AND c.status_code = '0'
+        <if test="execDeptId != null and execDeptId != ''">
+            and c.exec_dept_id = #{execDeptId}
+        </if>
+        <if test="sourceDeptId != null and sourceDeptId != ''">
+            and c.source_dept_id = #{sourceDeptId}
+        </if>
+
+        <if test="startTime != null and startTime != ''">
+            and c.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and c.crte_time &lt;= #{endTime}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and v.name like concat('%', #{keyword}, '%' )
+        </if>
+        <if test="isOk != null and isOk != ''">
+            and c.is_ok = #{isOk}
+        </if>
+        ) a
+        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+    </select>
 </mapper>

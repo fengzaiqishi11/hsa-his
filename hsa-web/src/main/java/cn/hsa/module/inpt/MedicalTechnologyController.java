@@ -81,7 +81,25 @@ public class MedicalTechnologyController extends BaseController {
 		map.put("medicalTechnologyDTO", medicalTechnologyDTO);
 		return medicalTechnologyService_consumer.getLISorPASSNeedConfirmCost(map);
 	}
-
+	/**
+	 * @Description: 查询康复理疗需要确费的数据
+	 * @Param:
+	 * @Author: yuelong.chen
+	 * @Email: yuelong.chen@powersi.com.cn
+	 * @Date 2022/4/25 16:54
+	 * @Return
+	 */
+	@GetMapping("/getRecoveryConfirmCost")
+	public WrapperResponse getRecoveryConfirmCost(MedicalTechnologyDTO medicalTechnologyDTO, HttpServletRequest req, HttpServletResponse res){
+		SysUserDTO sysUserDTO = getSession(req, res);
+		Map<String, Object> map = new HashMap<>();
+		medicalTechnologyDTO.setHospCode(sysUserDTO.getHospCode());
+		medicalTechnologyDTO.setExecDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+//		medicalTechnologyDTO.setTypeCode("6");
+		map.put("hospCode", sysUserDTO.getHospCode());
+		map.put("medicalTechnologyDTO", medicalTechnologyDTO);
+		return medicalTechnologyService_consumer.getRecoveryConfirmCost(map);
+	}
 	/**
 	 * @Description: 保存医技确费
 	 * @Param:

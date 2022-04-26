@@ -26,6 +26,16 @@ public interface MedicalTechnologyBO {
 	PageDTO getLISorPASSNeedConfirmCost(Map<String, Object> map);
 
 	/**
+	 * @Description: 查询康复理疗需要确费的数据
+	 * @Param:
+	 * @Author: yuelong.chen
+	 * @Email: yuelong.chen@powersi.com.cn
+	 * @Date 2022/4/25 16:54
+	 * @Return
+	 */
+	PageDTO getRecoveryConfirmCost(Map<String, Object> map);
+
+	/**
 	 * @Description: 确认医技收费，
 	 * @Param:
 	 * @Author: guanhongqiang

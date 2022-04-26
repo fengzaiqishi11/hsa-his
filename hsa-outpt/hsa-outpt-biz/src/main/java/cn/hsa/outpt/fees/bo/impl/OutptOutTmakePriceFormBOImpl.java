@@ -791,8 +791,19 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         //设置分页
         PageHelper.startPage(outptSettleDTO.getPageNo(), outptSettleDTO.getPageSize());
 
-        List<Map<String, Object>> list = outptSettleDAO.queryOutChargePage(outptSettleDTO);
-        return WrapperResponse.success(PageDTO.of(list));
+        // 退费管理是否只显示申请退费病人 lly 20220422 start
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", outptSettleDTO.getHospCode());
+        map.put("code", "SF_MZTF_APPLY");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if(sys!=null&&Constants.SF.S.equals(sys.getValue())){
+            List<Map<String, Object>> list = outptSettleDAO.queryApplyRefundCharge(outptSettleDTO);
+            return WrapperResponse.success(PageDTO.of(list));
+        // 退费管理是否只显示申请退费病人 lly 20220422 end
+        }else {
+            List<Map<String, Object>> list = outptSettleDAO.queryOutChargePage(outptSettleDTO);
+            return WrapperResponse.success(PageDTO.of(list));
+        }
     }
 
     /**

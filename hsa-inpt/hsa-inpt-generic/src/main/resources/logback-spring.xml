@@ -156,9 +156,9 @@
             <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="GELF"/>
         </root>
-        <logger name="druid.sql.Statement" level="debug" additivity="false">
-            <appender-ref ref="SQL_INFO_FILE" />
-        </logger>
+<!--        <logger name="druid.sql.Statement" level="debug" additivity="false">-->
+<!--            <appender-ref ref="SQL_INFO_FILE" />-->
+<!--        </logger>-->
         <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
             <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="GELF"/>

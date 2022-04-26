@@ -20,6 +20,7 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -3259,6 +3260,19 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
      **/
     @Override
     public PageDTO queryMzPatientFinanceCostList(OutptVisitDTO outptVisitDTO) {
+        // 设置分页信息
+        //PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
+        int pageNo = outptVisitDTO.getPageNo();
+        int pageSize = outptVisitDTO.getPageSize();
+        int satrtIndex = 1;
+        int endIndex = 1;
+        if(pageNo==1){
+            satrtIndex = 0;
+            endIndex = pageSize;
+        }else if(pageNo>1){
+            satrtIndex = (pageNo-1)*pageSize;
+            endIndex = pageNo*pageSize;
+        }
         if(StringUtils.isNotEmpty(outptVisitDTO.getStatisticType())&& outptVisitDTO.getStatisticType().equals("0")) {
 
 
@@ -3268,9 +3282,12 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                 List<Map<String,Object>> dataList = new ArrayList<>();
 
+                List<Map<String,Object>> dataList1 = new ArrayList<>();
+
                 List<OutptCostAndReigsterCostDTO> outptCostAndReigsterCostDTOS = patientCostLedgerDAO.getMzMedicalFinanceList(outptVisitDTO);
 
-                if (ListUtils.isEmpty(outptCostAndReigsterCostDTOS)){
+
+            if (ListUtils.isEmpty(outptCostAndReigsterCostDTOS)){
                     return PageDTO.of(dataList);
                 }
 
@@ -3381,7 +3398,15 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                         }
                     }
                 }
-                return PageDTO.of(dataList,sumData);
+                if(pageNo*pageSize>dataList.size()){
+                    endIndex = dataList.size();
+                }
+                dataList1 = dataList.subList(satrtIndex,endIndex);
+                PageInfo pageInfo = new PageInfo(dataList);
+                PageDTO dto = new PageDTO();
+                dto = PageDTO.of(dataList1,sumData);
+                dto.setTotal(pageInfo.getTotal());
+                return dto;
         } else {
             PageHelper.startPage(outptVisitDTO.getPageNo(), outptVisitDTO.getPageSize());
             // 统计挂号费用

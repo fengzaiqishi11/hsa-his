@@ -30,6 +30,16 @@ public interface MedicalTechnologyService {
 	 */
 	@GetMapping("/service/inpt/medicaltechnology/getLISorPASSNeedConfirmCost")
 	WrapperResponse<PageDTO> getLISorPASSNeedConfirmCost(Map<String, Object> map);
+	/**
+	 * @Description: 查询康复理疗需要确费的数据
+	 * @Param:
+	 * @Author: yuelong.chen
+	 * @Email: yuelong.chen@powersi.com.cn
+	 * @Date 2022/4/25 16:54
+	 * @Return
+	 */
+	@GetMapping("/service/inpt/medicaltechnology/getRecoveryConfirmCost")
+	WrapperResponse<PageDTO> getRecoveryConfirmCost(Map<String, Object> map);
 
 	/**
 	 * @Description: 保存医技确费数据

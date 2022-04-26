@@ -9671,6 +9671,12 @@ ADD COLUMN fk_remark varchar(1000) NULL COMMENT '付款备注' AFTER fk_status_c
 ADD COLUMN fkdid varchar(32) NULL COMMENT '付款单ID' AFTER fk_remark,
 ADD COLUMN fk_time datetime(0) NULL COMMENT '付款确认时间' AFTER fkdid;
 
+--  outpt_cost门诊费用表添加settle_code 结算状态索引
+ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_08` USING BTREE(`settle_code`);
+
+-- inpt_cost住院费用添加settle_code 结算状态索引
+ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_08` USING BTREE(`settle_code`);
+
 
 
 

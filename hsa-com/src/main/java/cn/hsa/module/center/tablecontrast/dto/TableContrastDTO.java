@@ -25,4 +25,8 @@ import java.util.List;
 @ToString(callSuper = true)
 public class TableContrastDTO extends TableContrastDO implements Serializable {
     String keyWord;
+
+    String ids;
+
+    List<String> listId;
 }

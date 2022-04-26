@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.tablecontrast.dao.TableContrastDAO">
+
+    <!--新增-->
+    <insert id="insert">
+        insert into
+            center_table_contrast
+            (id,table_name,sync_table_name,create_time)
+        values
+            ( #{id}, #{tableName}, #{syncTableName}, sysdate())
+    </insert>
+
+    <!--修改-->
+    <update id="update">
+        update center_table_contrast
+        <set>
+            <if test="tableName!=null and tableName!=''">
+                table_name=#{tableName},
+            </if>
+            <if test="syncTableName!=null and syncTableName!=''">
+                sync_table_name=#{syncTableName},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--删除-->
+    <delete id="delete">
+        delete from center_table_contrast where  id = #{id}
+    </delete>
+
+    <!--根据ID获取-->
+    <select id="getById" resultType="cn.hsa.module.center.tablecontrast.dto.TableContrastDTO">
+        select id,table_name as tableName,sync_table_name as syncTableName, create_time as createTime from center_table_contrast where  id = #{id}
+    </select>
+
+    <!--分页查询-->
+    <select id="queryPage" resultType="cn.hsa.module.center.tablecontrast.dto.TableContrastDTO">
+        select id,table_name as tableName,sync_table_name as syncTableName, create_time as createTime from center_table_contrast
+        <where>
+            <if test="keyWord != null and keyWord != ''">
+                table_name like '%${keyWord}%' or sync_table_name like '%${keyWord}%'
+            </if>
+
+        </where>
+    </select>
+
+</mapper>

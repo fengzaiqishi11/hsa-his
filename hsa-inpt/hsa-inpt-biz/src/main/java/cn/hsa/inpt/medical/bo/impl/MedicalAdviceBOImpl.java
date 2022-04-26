@@ -2131,6 +2131,16 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
             inptCostDTO.setOkTime(date);
         }
+        //康复理疗医嘱是否需要确费 2022/4/25 by yuelong.chen
+        SysParameterDTO sysParameterDTO2 =  getSysParameterDTO(inptCostDTO.getHospCode(),"RECOVERY_SFQF");
+        if((sysParameterDTO2 != null && "0".equals(sysParameterDTO2.getValue())) && ("19".equals(adviceDTO.getTypeCode()))){
+                inptCostDTO.setIsOk(Constants.SF.F);
+        }else{
+            inptCostDTO.setIsOk(Constants.SF.S);
+            inptCostDTO.setOkId(medicalAdviceDTO.getCheckId());
+            inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
+            inptCostDTO.setOkTime(date);
+        }
 
         inptCostDTO.setSettleCode("0");
         inptCostDTO.setIsCheck("0");

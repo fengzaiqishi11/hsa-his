@@ -702,7 +702,7 @@
           and c.insure_type_code is not null and c.insure_type_code !=''
     </select>
 
-    <select id="getConsultationId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO">
+    <select id="getConsultationId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.lang.String">
      select GROUP_CONCAT(consul_userid_list)
      from inpt_consultation_apply
      where visit_id=#{visitId} and hosp_code =#{hospCode}

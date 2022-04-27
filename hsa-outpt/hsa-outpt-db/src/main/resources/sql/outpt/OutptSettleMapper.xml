@@ -1246,6 +1246,12 @@
         <if test="isSettle != null and isSettle != ''">
             and a.is_settle = #{isSettle}
         </if>
+        <if test="refundStatus =='1'.toString()">
+            and a.status_code ='0'
+        </if>
+        <if test="refundStatus =='2'.toString()">
+            and a.status_code in ('1','2')
+        </if>
         order by a.settle_no desc, a.settle_time desc
     </select>
 </mapper>

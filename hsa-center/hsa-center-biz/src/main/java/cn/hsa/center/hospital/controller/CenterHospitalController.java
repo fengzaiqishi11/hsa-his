@@ -17,6 +17,7 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -264,5 +265,31 @@ public class CenterHospitalController extends CenterBaseController {
     @GetMapping("/findRootBase")
     public WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO){
         return centerHospitalService.findRootBase(centerRootDatabaseBO);
+    }
+
+    /**
+     *   中心端统一修改管理员账号密码
+     * @param modifiedInfo 修改参数信息，传递过来的修改参数，必填参数有：
+     *                     hospCode 医院编码
+     *                     accountName 账户名
+     *                     newPassword 新帐户密码
+     *
+     *
+     * @return
+     */
+    @PostMapping("/updatePasswordOfAdministratorUnified")
+    public WrapperResponse<Boolean>  updatePasswordOfAdministratorUnified(@RequestBody  Map<String,String> modifiedInfo){
+
+        if(checkRequiredParams(modifiedInfo)){
+            modifiedInfo.put("newPasswordByMd5",modifiedInfo.get("newPassword"));
+            return centerHospitalService.updatePasswordOfAdministratorUnified(modifiedInfo);
+        }else{
+            return WrapperResponse.error(HttpStatus.NO_CONTENT.value(), "部分必填参数未提交，请检查",false);
+        }
+    }
+
+    private boolean checkRequiredParams(Map<String,String> params){
+        return params.containsKey("hospCode") && !StringUtils.isEmpty(params.get("hospCode"))
+                && params.containsKey("accountName") && params.containsKey("newPassword");
     }
 }

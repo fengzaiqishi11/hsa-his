@@ -1,10 +1,7 @@
 package cn.hsa.module.center.user.dto;
 
 import cn.hsa.module.center.user.entity.CenterUserDO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.OutputStream;
 import java.io.Serializable;

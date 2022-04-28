@@ -2,6 +2,7 @@ package cn.hsa.module.sys.user.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.dto.SysUserRoleDto;
 import cn.hsa.module.sys.user.dto.SysUserSystemDTO;
@@ -201,4 +202,14 @@ public interface SysUserBO {
      * @Date: 2022-02-17
      */
     Boolean updateIsGuide(SysUserDTO sysUserDTO);
+
+    /**
+     *  统一更新用户密码
+     *  @param changePassWordParam 修改参数信息，传递过来的修改参数，必填参数有：
+     *                          hospCode 医院编码
+     *                          accountName 账户名
+     *                          newPassword 新帐户密码
+     * @return
+     */
+    WrapperResponse<Boolean> updatePassWordUnified(Map changePassWordParam);
 }

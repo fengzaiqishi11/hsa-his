@@ -42,7 +42,7 @@ public class InsureCommonUtil {
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
 
-        String msgId = map.get("msgId") != null ? map.get("msgId").toString() : StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
 
         // 交易编号
         interfaceParamDTO.setInfno(MapUtils.get(map,"infno"));
@@ -71,4 +71,23 @@ public class InsureCommonUtil {
         return inputMap;
     }
 
+    /**
+     * @Method getEmptyErr
+     * @Desrciption
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/17 14:34
+     * @Return
+     **/
+    public void getEmptyErr(Object obj,String errMsg) {
+        if(obj ==null){
+            throw new RuntimeException(errMsg);
+        }
+        if(obj instanceof  String){
+            if(StringUtils.isEmpty((String) obj)){
+                throw new RuntimeException(errMsg);
+            }
+        }
+    }
 }

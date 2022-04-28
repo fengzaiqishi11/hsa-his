@@ -378,6 +378,7 @@
     <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
     <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
+      <result property="useDays" column="use_days" jdbcType="INTEGER"/>
   </resultMap>
 
   <!--通过实体作为筛选条件查询医嘱信息-->
@@ -427,7 +428,7 @@
     a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time,ia.teach_doctor_id,ia.teach_doctor_name, a.stop_check_id, a.stop_check_name, a.stop_check_time,
     a.is_long, a.crte_id, a.crte_name, a.crte_time, a.is_in_print, a.is_stop_print, a.is_exec_print, a.is_skin_print, a.is_in_check_print,
     a.is_stop_check_print,a.seq_no,a.cancel_id,a.cancel_name,a.cancel_time,a.skin_result_code,
-    DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,ia.item_name,ia.remark,
+    DATE_FORMAT(a.last_exec_time,'%Y-%m-%d %H:%i') as execTimeNoM,ia.item_name,ia.remark,ia.use_days,
     ia.item_id,ia.item_code,ia.yylx,ia.type_code,ia.total_num,ia.total_num_unit_code,ia.use_code,ia.dosage,ia.dosage_unit_code, ia.herb_num,
     a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
     DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,

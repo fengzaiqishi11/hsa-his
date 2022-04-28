@@ -60,7 +60,7 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             }
         }
         // 身份证  本地社保卡 和省内异地社保卡
-        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) ) {
             // 就诊凭证类型  传值02
             visitMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.SFZ);
             if ("null".equals(insureIndividualBasicDTO.getAac002()) || StringUtils.isEmpty(insureIndividualBasicDTO.getAac002())) {
@@ -76,9 +76,9 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             visitMap.put("certno", "null".equals(insureIndividualBasicDTO.getAac002()) ? "" : insureIndividualBasicDTO.getAac002());
         }
         // 跨省异地读卡
-        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
             // 就诊凭证类型  传值03
-            visitMap.put("mdtrt_cert_type", mdtrtCertType);
+            visitMap.put("mdtrt_cert_type", "03");
             // 传值证件号码
             visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896());
             // 传值社保卡识别码
@@ -115,7 +115,8 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值05 或 04
             visitMap.put("psn_cert_type", insureIndividualBasicDTO.getBka895());
             // 传值证件号码
-            visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+//            visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+            visitMap.put("certno", insureIndividualBasicDTO.getBka896());
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
@@ -132,12 +133,13 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
-        checkRequest(visitMap);
+
         HashMap commParam = new HashMap();
+        checkRequest(visitMap);
+
         commParam.put("dataMap", visitMap);
         commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_1101);
 
-        commParam.put("msgId",MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
         commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));

@@ -15,13 +15,15 @@ import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
-import cn.hsa.module.insure.module.bo.InsureIndividualBasicBO;
 import cn.hsa.module.insure.module.dao.*;
-import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
-import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -85,15 +87,14 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     @Resource
     private InsureIndividualBasicService insureIndividualBasicService;
     @Resource
-    private InsureIndividualBasicBO insureIndividualBasicBO;
+    private InsureUnifiedLogService insureUnifiedLogService_consumer;
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
     @Resource
-    private InsureDictDAO insureDictDAO;
+    private BaseReqUtilFactory baseReqUtilFactory;
     @Resource
     private InsureItfBOImpl insureItfBO;
-    @Resource
-    private BaseReqUtilFactory baseReqUtilFactory;
+
     @Resource
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
     @Resource
@@ -319,7 +320,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
         paramMap .put("insureIndividualBasicDTO",insureIndividualBasicDTO);
         paramMap.putAll(map);
-        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs()); // 参保地医保区划
+        // 参保地医保区划
+        paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("hospCode", hospCode);
         paramMap.put("isHospital",insureIndividualVisitDTO.getIsHospital());

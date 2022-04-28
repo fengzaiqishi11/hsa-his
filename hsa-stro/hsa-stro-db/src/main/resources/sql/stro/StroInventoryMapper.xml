@@ -9,6 +9,8 @@
         <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
         <result property="beforePrice" column="before_price" jdbcType="OTHER"/>
         <result property="afterPrice" column="after_price" jdbcType="OTHER"/>
+        <result property="beforeSellPrice" column="before_sell_price" jdbcType="OTHER"/>
+        <result property="afterSellPrice" column="after_sell_price" jdbcType="OTHER"/>
         <result property="incdecPrice" column="incdec_price" jdbcType="OTHER"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
         <result property="auditId" column="audit_id" jdbcType="INTEGER"/>
@@ -33,7 +35,7 @@
     <select id="queryAll" resultMap="StroInventoryMap">
         select
         id, hosp_code, biz_id, order_no, ifnull(before_price,0) before_price, ifnull(after_price,0) after_price, ifnull(incdec_price,0) incdec_price,
-        remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time
+        remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time,before_sell_price,after_sell_price
         from stro_inventory
         <where>
                 and hosp_code = #{hospCode}
@@ -58,8 +60,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into stro_inventory(id,hosp_code, biz_id, order_no, before_price, after_price, incdec_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{incdecPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime})
+        insert into stro_inventory(id,hosp_code, biz_id, order_no, before_price, after_price, incdec_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time,before_sell_price,after_sell_price)
+        values (#{id},#{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{incdecPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime}, #{beforeSellPrice}, #{afterSellPrice})
     </insert>
 
     <!--通过主键修改数据-->
@@ -75,8 +77,14 @@
             <if test="beforePrice != null">
                 before_price = #{beforePrice},
             </if>
+            <if test="beforeSellPrice != null">
+                before_sell_price = #{beforeSellPrice},
+            </if>
             <if test="afterPrice != null">
                 after_price = #{afterPrice},
+            </if>
+            <if test="afterSellPrice != null">
+                after_sell_price = #{afterSellPrice},
             </if>
             <if test="incdecPrice != null">
                 incdec_price = #{incdecPrice},

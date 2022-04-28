@@ -93,7 +93,7 @@ public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUt
 
         commParam.put("dataMap", settleMap);
         commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2207);
-        commParam.put("msgId",MapUtils.get(map,"msgId"));
+
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
         commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));

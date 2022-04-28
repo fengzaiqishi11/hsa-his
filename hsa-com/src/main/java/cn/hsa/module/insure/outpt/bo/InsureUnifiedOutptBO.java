@@ -1,0 +1,38 @@
+package cn.hsa.module.insure.outpt.bo;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Package_name: cn.hsa.module.insure.outpt.bo
+ * @Class_name: InsureUnifiedPayOutptBo
+ * @Describe: 统一支付平台，门诊实现层接口
+ * @Author: guanhongqiang
+ * @Eamil: hongqiang.guan@powersi.com.cn
+ * @Date: 2021/2/10 8:07
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ **/
+public interface InsureUnifiedOutptBO {
+
+    /**
+     * @Menthod: UP_4301
+     * @Desrciption: 医保统一支付平台：门急诊诊疗记录，上传单次病人就诊信息
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-17 19:45
+     * @Return:
+     **/
+    Map<String, Object> UP_4301(Map<String, Object> map);
+
+    /**
+     * @Menthod: UP_4302
+     * @Desrciption: 医保统一支付平台：急诊留观手术及抢救信息
+     * @Param:
+     * @Author: luoyong
+     * @Email: luoyong@powersi.com.cn
+     * @Date: 2021-08-17 19:45
+     * @Return:
+     **/
+    Map<String, Object> UP_4302(Map<String, Object> map);
+}

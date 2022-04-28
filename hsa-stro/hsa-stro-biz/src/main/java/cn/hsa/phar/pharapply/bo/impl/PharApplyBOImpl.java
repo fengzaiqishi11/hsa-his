@@ -33,10 +33,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -320,8 +317,10 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
      * @Return:
      */
     public PharApplyDTO getById(PharApplyDTO pharApplyDTO) {
-        List<PharApplyDetailDTO> detailDTOS = pharApplyDetailDAO.getById(pharApplyDTO.getId(), pharApplyDTO.getHospCode());
         PharApplyDTO applyDTO = pharApplyDAO.getById(pharApplyDTO);
+        // List<PharApplyDetailDTO> detailDTOS = pharApplyDetailDAO.getById(pharApplyDTO.getId(), pharApplyDTO.getHospCode());
+        pharApplyDTO.setOutStroId(applyDTO.getOutStroId());
+        List<PharApplyDetailDTO> detailDTOS = pharApplyDetailDAO.getDetail(pharApplyDTO);
         applyDTO.setPharApplyDetailDTOS(detailDTOS);
         return applyDTO;
     }
@@ -717,11 +716,26 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
     @Override
     public Boolean insertapplyOrderByminOrUp(PharApplyDTO pharApplyDTO) {
       List<PharApplyDetailDTO> pharApplyDetailDTOS = new ArrayList<>();
-      // limitFlag  1: 按下限生成  2：按上限生成
+      // limitFlag  1: 按下限生成  2：按上限生成 3:按消耗量生成,按消耗量生成 会重复生成
       if("1".equals(pharApplyDTO.getLimitFlag())){
         pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementMin(pharApplyDTO);
-      } else {
+      } else if ("2".equals(pharApplyDTO.getLimitFlag())){
         pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementUp(pharApplyDTO);
+      } else {
+          pharApplyDetailDTOS = pharApplyDAO.queryNeedSupplementDate(pharApplyDTO);
+          if (ListUtils.isEmpty(pharApplyDetailDTOS)){
+              throw new AppException("这段时间无消耗");
+          }
+          Iterator<PharApplyDetailDTO> pharApplyIterators = pharApplyDetailDTOS.iterator();
+          // 只生产负的
+          while (pharApplyIterators.hasNext()){
+              PharApplyDetailDTO applyDetailDTO = pharApplyIterators.next();
+              if(BigDecimalUtils.lessZero(applyDetailDTO.getNum())){
+                  applyDetailDTO.setNum(applyDetailDTO.getNum().abs());
+              } else {
+                  pharApplyIterators.remove();
+              }
+          }
       }
       if(ListUtils.isEmpty(pharApplyDetailDTOS)) {
         throw new AppException("没有需要生成的库存");

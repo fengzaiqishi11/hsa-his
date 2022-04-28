@@ -4,6 +4,8 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
+import cn.hsa.module.interf.outpt.dto.Mzzd;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

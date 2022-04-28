@@ -347,6 +347,11 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         insureConfigurationDTO.setOrgCode(insureOrgCode);
         insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("根据" + insureOrgCode + "医保机构编码获取医保机构配置信息为空");
+        }
+        //参数校验
+        checkRequest(insureInptRecordDTO);
         Map<String, Object> paramMap = new HashMap<>(13);
         paramMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
         paramMap.put("insutype", insureIndividualVisitDTO.getAae140()); // 险种类型
@@ -364,12 +369,9 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         paramMap.put("refl_date", DateUtils.format(insureInptRecordDTO.getReflDate(), DateUtils.Y_M_DH_M_S)); // 转院日期
         paramMap.put("refl_rea", insureInptRecordDTO.getReflRea()); // 转院原因
         paramMap.put("refl_opnn", insureInptRecordDTO.getReflOpnn()); // 转院意见
-        if(insureInptRecordDTO.getBegndate() != null){
-            paramMap.put("begndate", DateUtils.format(insureInptRecordDTO.getBegndate(),DateUtils.Y_M_DH_M_S));  // 开始日期
-        }
-        if(insureInptRecordDTO.getEnddate() != null){
-            paramMap.put("enddate", DateUtils.format(insureInptRecordDTO.getEnddate(),DateUtils.Y_M_DH_M_S));  // 结束日期
-        }
+        paramMap.put("begndate", DateUtils.format(insureInptRecordDTO.getBegndate(),DateUtils.Y_M_DH_M_S));  // 开始日期
+        paramMap.put("enddate", DateUtils.format(insureInptRecordDTO.getEnddate(),DateUtils.Y_M_DH_M_S));  // 结束日期
+
         Map<String, Object> dataMap = new HashMap<>(1);
         dataMap.put("refmedin", paramMap);
         Map<String,Object> logMap = new HashMap<>();
@@ -757,4 +759,37 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         return PageDTO.of(list);
     }
 
+    private boolean checkRequest(InsureInptRecordDTO insureInptRecordDTO) {
+        if(insureInptRecordDTO.getReflinMedinsNo() == null){
+            throw new AppException("转往定点医药机构编号不能为空");
+        }
+        if(insureInptRecordDTO.getReflinMedinsName() == null){
+            throw new AppException("鉴定定点医药机构名称不能为空");
+        }
+        if(insureInptRecordDTO.getMdtrtareaAdmdvs() == null){
+            throw new AppException("就医地行政区划不能为空");
+        }
+        if(insureInptRecordDTO.getHospAgreReflFlag() == null){
+            throw new AppException("医院同意转院标志不能为空");
+        }
+        if(insureInptRecordDTO.getReflType() == null){
+            throw new AppException("转院类型不能为空");
+        }
+        if(insureInptRecordDTO.getReflDate() == null){
+            throw new AppException("转院日期不能为空");
+        }
+        if(insureInptRecordDTO.getReflRea() == null){
+            throw new AppException("转院原因不能为空");
+        }
+        if(insureInptRecordDTO.getReflOpnn() == null){
+            throw new AppException("转院意见不能为空");
+        }
+        if(insureInptRecordDTO.getBegndate() == null){
+            throw new AppException("开始日期不能为空");
+        }
+        if(insureInptRecordDTO.getEnddate() == null){
+            throw new AppException("结束日期不能为空");
+        }
+        return true;
+    }
 }

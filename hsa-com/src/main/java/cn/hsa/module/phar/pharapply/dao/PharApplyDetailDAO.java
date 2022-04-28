@@ -190,4 +190,13 @@ public interface PharApplyDetailDAO {
     * @Return java.lang.Boolean
     **/
     List<StroStockDTO> queryStockApply(PharApplyDetailDTO pharApplyDetailDTO);
+    /**
+     * @Meth: getDetail
+     * @Description: 获得明细数据
+     * @Param: [pharApplyDTO]
+     * @return: java.util.List<cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO>
+     * @Author: zhangguorui
+     * @Date: 2022/4/11
+     */
+    List<PharApplyDetailDTO> getDetail(PharApplyDTO pharApplyDTO);
 }

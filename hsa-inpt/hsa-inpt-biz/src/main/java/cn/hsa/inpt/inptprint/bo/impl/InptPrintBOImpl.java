@@ -3,8 +3,10 @@ package cn.hsa.inpt.inptprint.bo.impl;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.inpt.drawMedicine.bo.impl.DrawMedicineBOImpl;
+import cn.hsa.module.inpt.doctor.bo.DoctorAdviceBO;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
+import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -47,7 +49,8 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
 
   @Resource
   private InptBabyDAO inptBabyDAO;
-
+  @Resource
+  private DoctorAdviceBO doctorAdviceBO;
 
 
   /**
@@ -370,6 +373,23 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
     }
     //领药申请详情汇总
     sumList = drawMedicineBO.getSummary(inWaitReceiveList);
+    // 过滤掉库存不足的
+    for (Iterator<PharInWaitReceiveDTO> it = sumList.iterator();it.hasNext();) {
+      PharInWaitReceiveDTO dto = it.next();
+      //校验库存
+      if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
+        InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
+        inptAdviceDTO.setHospCode(dto.getHospCode());
+        inptAdviceDTO.setItemId(dto.getItemId());
+        inptAdviceDTO.setPharId(dto.getPharId());
+        inptAdviceDTO.setTotalNum(dto.getAllNum());
+        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        //判断库存,如果库存为空就移除
+        if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
+          it.remove();
+        }
+      }
+    }
     Map map1 = new HashMap();
     map1.put("data",sumList);
     return map1;

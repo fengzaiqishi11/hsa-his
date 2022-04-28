@@ -182,7 +182,7 @@
     WHERE
         b.c_code ='TBLX'
         AND a.type = b.value
-        AND a.hosp_code= #{hospCode}   ORDER BY A.creat_time
+        AND a.hosp_code= #{hospCode}   ORDER BY A.TYPE,A.creat_time
     </select>
 
     <update id="updateAudit">

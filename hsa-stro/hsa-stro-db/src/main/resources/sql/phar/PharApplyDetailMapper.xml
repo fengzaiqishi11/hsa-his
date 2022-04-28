@@ -29,6 +29,9 @@
         <result property="totalSellPrice" column="totalSellPrice" jdbcType="DECIMAL"/>
         <result property="stockNum" column="stockNum" jdbcType="DECIMAL"/>
         <result property="productId" column="product_id" jdbcType="VARCHAR"/>
+        <result property="inStroNum" column="inStroNum" jdbcType="DECIMAL"/>
+        <result property="outStroNum" column="outStroNum" jdbcType="DECIMAL"/>
+
     </resultMap>
 
     <!--显示领药申请的详细详细信息-->
@@ -242,11 +245,20 @@
 
     <select id="queryAllMaterial" resultMap="detailMap" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
         select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+        ss.num as outStroNum,
         b.unit_code,b.split_unit_code,b.split_ratio,
-        (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+        bp.id as productId,
+        bp.name as productName,
         b.split_price,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,b.model
+        <if test="inBizId != null and inBizId != ''">/*为了防止其他模块调用这个方法，保险期间，加上if判断*/
+            ,ifnull(sst.num,0) as inStroNum
+        </if>
         from stro_stock ss
         LEFT JOIN base_material b on ss.item_id = b.id
+        <if test="inBizId != null and inBizId != ''">
+            left join stro_stock sst on sst.item_id = ss.item_id and sst.biz_id = #{inBizId}
+        </if>
+        left join base_product bp on bp.hosp_code= b.hosp_code and bp.code = b.prod_code
         <where>
             and ss.num > 0 and ss.hosp_code = #{hospCode}
             <if test="id != null and id != ''">
@@ -274,11 +286,20 @@
     </select>
     <select id="queryAllDrug" resultMap="detailMap" parameterType="cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
         select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
-               b.unit_code,b.dosage,b.dosage_unit_code,b.split_ratio,b.split_unit_code,
-              (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
-               b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice
+        ss.num as outStroNum,
+        b.unit_code,b.dosage,b.dosage_unit_code,b.split_ratio,b.split_unit_code,
+        bp.id as productId,
+        bp.name as productName,
+        b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice
+        <if test="inBizId != null and inBizId != ''">/*为了防止其他模块调用这个方法，保险期间，加上if判断*/
+            ,ifnull(sst.num,0) as inStroNum
+        </if>
         from stro_stock ss
         LEFT JOIN base_drug b on ss.item_id = b.id
+        <if test="inBizId != null and inBizId != ''">
+            left join stro_stock sst on sst.item_id = ss.item_id and sst.biz_id = #{inBizId}
+        </if>
+        left join base_product bp on bp.hosp_code= b.hosp_code and bp.code = b.prod_code
         <where>
             and ss.num > 0 and ss.hosp_code = #{hospCode}
             <if test="id != null and id != ''">
@@ -314,12 +335,21 @@
     </select>
     <select id="queryAll" resultMap="detailMap" parameterType = "cn.hsa.module.phar.pharapply.dto.PharApplyDetailDTO">
       select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+      ss.num as outStroNum,
       b.unit_code,"" as dosage,"" as dosageUnitCode,b.split_unit_code,b.split_ratio,
-      (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+      bp.id as productId,
+      bp.name as productName,
       b.split_price,"" as usageCode,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,b.model
+      <if test="inBizId != null and inBizId != ''">/*为了防止其他模块调用这个方法，保险期间，加上if判断*/
+        ,ifnull(sst.num,0) as inStroNum
+      </if>
       from stro_stock ss
       JOIN base_material b on ss.item_id = b.id
-      <where>
+      <if test="inBizId != null and inBizId != ''">
+        left join stro_stock sst on sst.item_id = ss.item_id and sst.biz_id = #{inBizId}
+      </if>
+      left join base_product bp on bp.hosp_code= b.hosp_code and bp.code = b.prod_code
+        <where>
         and ss.num > 0 and ss.hosp_code = #{hospCode}
         <if test="id != null and id != ''">
           and ss.id = #{id}
@@ -345,12 +375,21 @@
       </where>
       union all
       select ss.id,ss.hosp_code,ss.biz_id,ss.item_code,ss.item_id,ss.item_name,ss.spec,ss.num as stockNum,
+      ss.num as outStroNum,
       b.unit_code,b.dosage,b.dosage_unit_code as dosageUnitCode,b.split_unit_code,b.split_ratio,
-      (select id from base_product bp where bp.hosp_code= b.hosp_code and bp.code = b.prod_code ) as productId,
+      bp.id as productId,
+      bp.name as productName,
       b.split_price,b.usage_code,b.last_buy_price as buyPrice,b.avg_sell_price as sellPrice,"" as model
+      <if test="inBizId != null and inBizId != ''">/*为了防止其他模块调用这个方法，保险期间，加上if判断*/
+          ,ifnull(sst.num,0) as inStroNum
+      </if>
       from stro_stock ss
       JOIN base_drug b on ss.item_id = b.id
-      <where>
+      <if test="inBizId != null and inBizId != ''">
+         left join stro_stock sst on sst.item_id = ss.item_id and sst.biz_id = #{inBizId}
+      </if>
+      left join base_product bp on bp.hosp_code= b.hosp_code and bp.code = b.prod_code
+        <where>
         and ss.num > 0 and ss.hosp_code = #{hospCode}
         <if test="id != null and id != ''">
           and ss.id = #{id}
@@ -417,5 +456,41 @@
       select * from stro_stock
       where item_id = #{itemId} and hosp_code = #{hospCode} and biz_id = #{bizId}
       and split_num - (stock_occupy + #{splitNum}) &gt;= 0
+    </select>
+    <select id="getDetail" resultMap="PharApplyDetailMap">
+                select a.id,
+               a.hosp_code,
+               a.item_code,
+               a.item_id,
+               a.item_name,
+               a.apply_id,
+               a.num,
+               a.unit_code,
+               a.spec,
+               a.dosage,
+               a.dosage_unit_code,
+               a.split_ratio,
+               a.split_unit_code,
+               a.split_num,
+               a.split_price,
+               a.chinese_drug_num,
+               a.usage_code,
+               a.buy_price,
+               a.sell_price,
+               a.buy_price_all,
+               a.sell_price_all,
+               a.product_id,
+               bp.name as productName,
+               ifnull(ss1.num,0) as outStroNum, /*申请库位的当前库存*/
+               ifnull(ss2.num,0) as inStroNum,/*当前药房的库存*/
+               case when a.item_code='2' then bm.model end model
+        from phar_apply_detail a
+        left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
+        left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
+        left join base_product bp on bp.id = a.product_id and bp.hosp_code = #{hospCode}
+        left join stro_stock ss1 on ss1.item_id = a.item_id and ss1.biz_id = #{outStroId}
+        left join stro_stock ss2 on ss2.item_id = a.item_id and ss2.biz_id = #{inStroId}
+        where a.apply_id = #{id}
+          and a.hosp_code = #{hospCode}
     </select>
 </mapper>

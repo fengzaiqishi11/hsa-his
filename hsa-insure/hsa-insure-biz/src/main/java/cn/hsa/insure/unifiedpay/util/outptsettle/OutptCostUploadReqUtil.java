@@ -29,7 +29,6 @@ public class OutptCostUploadReqUtil<T> extends InsureCommonUtil implements BaseR
         checkRequest(map);
         commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2204);
 
-        commParam.put("msgId", MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
         commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));

@@ -60,5 +60,4 @@ public class MedicalAdviceDTO extends InptAdviceDO implements Serializable {
      * 国家卫健委编码名称
      */
     private String nationName;
-
 }

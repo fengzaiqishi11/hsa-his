@@ -38,7 +38,6 @@ public class OutptCostRevocationReqUtil<T> extends InsureCommonUtil implements B
         commParam.put("dataMap", dataMap);
         commParam.put("infno",Constant.UnifiedPay.OUTPT.UP_2205);
 
-        commParam.put("msgId",MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
         commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));

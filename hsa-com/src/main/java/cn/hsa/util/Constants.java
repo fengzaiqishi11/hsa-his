@@ -14,6 +14,8 @@ import java.util.List;
  */
 public interface Constants {
 
+
+
     /**
      * 病人来源途径（LYTJ）
      */
@@ -22,7 +24,12 @@ public interface Constants {
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
     }
-
+    /**
+     * 颜色（color）
+     */
+    class COLOR {
+        public static final String RED = "1"; // 红色
+    }
     class LNDW{
         public static final String S = "1"; // 岁
         public static final String Y= "2"; // 月
@@ -696,6 +703,7 @@ public interface Constants {
         public static final String YZLB14 = "14";//小手术
         public static final String YZLB15 = "15";//材料
         public static final String YZLB17 = "17";//会诊
+        public static final String YZLB19 = "19";//理疗
     }
 
     /**
@@ -1245,5 +1253,18 @@ public interface Constants {
         public static final String CWFL = "1";// 财务分类
         public static final String YP = "2";// 药品
         public static final String XM = "3";// 项目
+    }
+
+    /**
+     * @Desrciption 职工类型（护士）
+     * @Author liuliyun
+     * @Date 2022/04/11 10:02
+     */
+    class RYZW_NURSE{
+        public static final String RYZW_NURSE_01 = "201"; //主任护师
+        public static final String RYZW_NURSE_02 = "202";//副主任护师
+        public static final String RYZW_NURSE_03 = "203";//主管护师
+        public static final String RYZW_NURSE_04 = "204";//护士
+        public static final String RYZW_NURSE_05 = "205";//实习护士
     }
 }

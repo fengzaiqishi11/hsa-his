@@ -156,4 +156,5 @@ public interface PharApplyDAO {
 
     List<PharApplyDetailDTO> queryNeedSupplementUp(PharApplyDTO pharApplyDTO);
 
+    List<PharApplyDetailDTO> queryNeedSupplementDate(PharApplyDTO pharApplyDTO);
 }

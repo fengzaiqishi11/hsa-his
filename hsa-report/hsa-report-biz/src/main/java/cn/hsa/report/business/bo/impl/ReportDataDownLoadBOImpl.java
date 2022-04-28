@@ -82,6 +82,9 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         map.put("customConfig", customConfigMap);
         String rUrl;
         String fileFormat = (String) customConfigMap.get("fileFormat");
+        if(StringUtils.isNotEmpty((String)map.get("fileFormat"))) {
+            fileFormat = map.get("fileFormat").toString();
+        }
         switch (fileFormat) {
             case "png":
             case "jpg":
@@ -107,13 +110,16 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         String returnDataType = configuration.getReturnDataType();
         String fileUrl = null;
         String keyId = null;
+        if(StringUtils.isNotEmpty((String)map.get("returnDataType"))){
+            returnDataType = map.get("returnDataType").toString();
+        }
         switch (returnDataType) {
             case "1":
                 try {
                     BASE64Decoder decoder = new BASE64Decoder();
                     byte[] byteArr = decoder.decodeBuffer(str);
                     InputStream inputStream = new ByteArrayInputStream(byteArr);
-                    fileName = "/pdf"+File.separator+fileName + "." + customConfigMap.get("fileFormat");
+                    fileName = "/pdf"+File.separator+fileName + "." + fileFormat;
                     keyId = fileName;
                     if (Constants.SF.F.equals(configuration.getIsUpload())) {
                         fileUrl = nginxUrl;
@@ -145,7 +151,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
             default:
                 break;
         }
-        return getReturnData(configuration.getReturnDataType(), keyId, str, fileUrl + keyId, fileName, fileFormat);
+        return getReturnData(returnDataType, keyId, str, fileUrl + keyId, fileName, fileFormat);
     }
 
     private String uploadFile(String fileName, Map map,ReportConfigurationDTO configuration,InputStream inputStream) throws Exception{

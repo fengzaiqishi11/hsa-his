@@ -801,6 +801,7 @@ public interface Constant {
             public static final String UP_4701 = "4701"; // 电子病历上传
             public static final String UP_4101 = "4101"; // 医疗保障基金结算清单
             public static final String UP_4101A = "4101A"; // 医疗保障基金结算清单新
+            public static final String UP_4102 = "4102"; // 医疗保障基金结算清单状态修改
 
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询

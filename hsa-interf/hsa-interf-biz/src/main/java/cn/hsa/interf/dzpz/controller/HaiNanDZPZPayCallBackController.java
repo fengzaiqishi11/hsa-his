@@ -34,7 +34,7 @@ import java.util.Map;
 @Slf4j
 public class HaiNanDZPZPayCallBackController {
 
-  @Value("${dzpz.hospcode}")
+  @Value("${dzpz.hospcode:#{null}}")
   private String dzpzHospCode;
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());

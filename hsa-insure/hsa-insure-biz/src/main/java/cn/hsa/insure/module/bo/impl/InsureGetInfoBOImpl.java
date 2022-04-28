@@ -6,6 +6,8 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -75,6 +77,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     private InsureItfBOImpl insureItfBO;
+
+    @Resource
+    private BaseReqUtilFactory baseReqUtilFactory;
 
     /**
      * @Method getSettleInfo
@@ -264,7 +269,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("medins_fill_psn", settleInfoDTO.getMedinsFillPsn()); // 医疗机构填报人
         setlinfo.put("resp_nurs_code", settleInfoDTO.getZrNurseCode()); // 责任护士
 
-        setlinfo.put("stas_type", ""); // 医保支付方式
+        setlinfo.put("stas_type", "0"); // 状态分类
 
         setlinfo.put("hi_paymtd", settleInfoDTO.getHiPaymtd()); // 医保支付方式
 
@@ -484,6 +489,57 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insureGetInfoDAO.deleteOprninfo(map);
         // 重置输血节点信息
         insureGetInfoDAO.deleteBldInfo(map);
+        return true;
+    }
+
+    /**
+     * @Method updateSettleInfo
+     * @Desrciption  修改医疗保障结算清单信息
+     *
+     * @Param
+     *
+     * @Author liuhuiming
+     * @Date   2022/04/22 13:58
+     * @Return
+     **/
+    @Override
+    public Boolean updateSettleInfo(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        // 获取患者信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        //获取医保配置
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureOrgCode());
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("根据" + insureIndividualVisitDTO.getInsureOrgCode() + "医保机构编码获取医保机构配置信息为空");
+        }
+        InsureSettleInfoDTO insureSettleInfoDTO =  insureGetInfoDAO.querySettlInfo(map);
+        if(insureSettleInfoDTO ==null){
+            throw  new AppException("未查询到结算清单信息");
+        }
+        if(insureSettleInfoDTO !=null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())){
+            throw  new AppException("该结算清单信息未上传至医保,不能修改状态");
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("psn_no",insureIndividualVisitDTO.getAac001());
+        paramMap.put("setl_id",insureIndividualVisitDTO.getInsureSettleId());
+        paramMap.put("stas_type","1");
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", Constants.SF.S);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.MR_PATIENT_SETTL_UPLOAD_UPDATE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(Constants.SF.S);
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_UPDATE, interfaceParamDTO);
+
         return true;
     }
 

@@ -202,5 +202,6 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         private String type; // 类型： 1 门诊；0 挂号
         private String printStatus;
         private String registerId;
+        private String refundStatus; // 退费状态  0：所有 1：待退费 2：已退费
 
 }

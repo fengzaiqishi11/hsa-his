@@ -709,6 +709,7 @@ public interface Constants {
         public static final String YZLB14 = "14";//小手术
         public static final String YZLB15 = "15";//材料
         public static final String YZLB17 = "17";//会诊
+        public static final String YZLB19 = "19";//理疗
     }
 
     /**

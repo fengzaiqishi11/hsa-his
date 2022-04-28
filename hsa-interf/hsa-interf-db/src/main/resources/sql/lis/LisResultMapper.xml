@@ -214,19 +214,19 @@ FROM
     </insert>
 
     <insert id="insertDXResult" keyProperty="" useGeneratedKeys="true">
-        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
-        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_valugnosis_id, diagnosis_name, crte_id,e, result_unit,
-        range_state, range_state_color, check_part, check_ways, check_type, dia
-        crte_name, crte_time, apply_no)
-        values
-        <foreach collection="list" item="entity" separator=",">
-            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
-            #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
-            #{entity.testitem_name}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
-            #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
-            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
-            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
-        </foreach>
+		insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+		item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+		range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+		crte_name, crte_time, apply_no)
+		values
+		<foreach collection="list" item="entity" separator=",">
+			(#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+			#{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.resultType}, #{entity.result},
+			#{entity.resultDetail}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
+			#{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
+			#{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+			#{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
+		</foreach>
     </insert>
 
     <delete id="deleteResult">

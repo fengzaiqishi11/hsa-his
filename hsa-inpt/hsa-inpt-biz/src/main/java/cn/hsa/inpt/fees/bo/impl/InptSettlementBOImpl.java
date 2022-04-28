@@ -32,6 +32,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -1109,6 +1110,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     insureIndividualVisitDTO.setInsureAccoutFlag(inptVisitDTO.getIsUserInsureAccount());
                 }
                 inptVisitDTO.setIsUseAccount(insureIndividualVisitDTO.getInsureAccoutFlag());
+                //住院结算增加读卡原始信息
+                insureIndividualVisitDTO.setHcardBasinfo(MapUtil.getStr(param,"hcardBasinfo"));
+                insureIndividualVisitDTO.setHcardChkinfo(MapUtil.getStr(param,"hcardChkinfo"));
 
 
                 /**

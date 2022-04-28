@@ -384,6 +384,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             // 当药品本身是限制用药时，医院审批标志传0走住院自付比例，传1时走门诊自付比例
             if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
                     (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
+                if (ObjectUtil.isEmpty(isReimburse)) {
+                    throw new RuntimeException("是否报销标志【isReimburse】不能为空！费用id为："+feedetlSn);
+                }
                 switch (isReimburse) {
                     case Constants.SF.S:
                         objectMap.put("hosp_appr_flag", "0");

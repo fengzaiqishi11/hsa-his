@@ -69,8 +69,14 @@ public interface Constants {
      * @Date 2020/8/26 11:03
      */
     class SF{
-        public static final String S = "1"; //是
-        public static final String F = "0"; //否
+        /**
+         * 是
+         */
+        public static final String S = "1";
+        /**
+         * 否
+         */
+        public static final String F = "0";
     }
 
     /**

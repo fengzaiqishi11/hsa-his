@@ -1,4 +1,4 @@
-package cn.hsa.center.config;
+package cn.hsa.sys.config;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
@@ -12,6 +12,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  *  异步线程池初始化
+ *
+ * @author: luonianxin
+ * @Date: 2022-04-26
  */
 
 @Configuration
@@ -26,7 +29,7 @@ public class AsyncExecutorConfig implements AsyncConfigurer {
         executor.setMaxPoolSize(64);
         executor.setQueueCapacity(20);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setThreadNamePrefix("HsaCenter-AsyncExecutor-Thread-");
+        executor.setThreadNamePrefix("HsaSys-AsyncExecutor-Thread-");
         executor.initialize();
         return executor;
     }

@@ -58,6 +58,9 @@
 		<result property="isAnaesthesia" column="is_anaesthesia" jdbcType="VARCHAR"/>
 		<result property="isPasswordChange" column="is_password_change" jdbcType="INTEGER"/>
 		<result property="onlyOpenItem" column="only_open_item" jdbcType="INTEGER"/>
+		<result property="isSystemAdmin" column="is_system_admin" jdbcType="VARCHAR"/>
+		<result property="lastPasswordModificationDate" column="last_password_modification_date" jdbcType="TIMESTAMP"/>
+		<result property="lastUsedPassword" column="last_used_password" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.sys.user.dto.SysUserSystemDTO" id="SysUserSystemMap">
@@ -87,7 +90,7 @@
           prac_certi_name, durg_code, antibacterial_code, ph_code,
           opeartion_code, pswd_err_cnt, last_login_time, last_login_ip,
           status_code, pym, wbm, crte_id, crte_name, crte_time, signature_path,
-          doctor_intro, is_guide,is_anaesthesia,is_password_change,only_open_item
+          doctor_intro, is_guide,is_anaesthesia,is_password_change,only_open_item,is_system_admin,last_password_modification_date,last_used_password
         from sys_user
         where hosp_code = #{hospCode} and id = #{id}
     </select>
@@ -895,14 +898,23 @@
 	</update>
 
 	<!--用户修改密码-->
-	<update id="updatePassWord" parameterType="cn.hsa.module.center.user.dto.CenterUserDTO">
+	<update id="updatePassWord" parameterType="java.util.Map">
      update sys_user set
      password = #{newPasswordByMd5},
+	 last_used_password =#{lastUsedPassword},
+	 last_password_modification_date = now(),
 	 is_password_change = 1
      where
      id = #{id} and hosp_code = #{hospCode}
     </update>
 
+	<update id="updatePassWordUnified" parameterType="java.util.Map">
+		update sys_user set
+							password = #{newPasswordByMd5},
+							is_password_change = 1
+		where
+			code = #{accountName} and hosp_code = #{hospCode}
+	</update>
 
 	<update id="updateResetPassword">
 		update sys_user set password = #{password},is_password_change = 0

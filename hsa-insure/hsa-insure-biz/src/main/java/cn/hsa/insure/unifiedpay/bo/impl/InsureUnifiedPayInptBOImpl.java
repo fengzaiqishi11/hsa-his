@@ -27,6 +27,8 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -382,6 +384,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             // 当药品本身是限制用药时，医院审批标志传0走住院自付比例，传1时走门诊自付比例
             if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
                     (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
+                if (ObjectUtil.isEmpty(isReimburse)) {
+                    throw new RuntimeException("是否报销标志【isReimburse】不能为空！费用id为："+feedetlSn);
+                }
                 switch (isReimburse) {
                     case Constants.SF.S:
                         objectMap.put("hosp_appr_flag", "0");
@@ -808,6 +813,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisit");
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
+        //读卡原始信息赋值
+        InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
+        if (ObjectUtil.isNotEmpty(visitDTO)) {
+            insureIndividualVisitDTO.setHcardChkinfo(visitDTO.getHcardChkinfo());
+            insureIndividualVisitDTO.setHcardBasinfo(visitDTO.getHcardBasinfo());
+        }
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
         insureConfigurationDTO.setHospCode(hospCode);

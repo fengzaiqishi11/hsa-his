@@ -199,4 +199,15 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 		return WrapperResponse.success(insureUnifiedOutptBO.UP_4302(map));
 	}
 
+	/**
+	 * 医保统一支付平台: 线上费用明细上传
+	 * @param map
+	 * @Author 医保开发二部-湛康
+	 * @Date 2022-04-26 9:35
+	 * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+	 */
+  @Override
+  public WrapperResponse<Map<String, Object>> UP6201(Map<String, Object> map) {
+    return WrapperResponse.success(insureUnifiedOutptBO.UP_6201(map));
+  }
 }

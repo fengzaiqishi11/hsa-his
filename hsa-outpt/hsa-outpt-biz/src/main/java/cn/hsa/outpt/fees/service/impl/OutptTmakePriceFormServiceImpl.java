@@ -503,4 +503,16 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
         return WrapperResponse.success(status);
     }
 
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 16:04
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+  @Override
+  public WrapperResponse<Boolean> uploadOnlineFeeDetail(Map<String, Object> map) {
+    return WrapperResponse.success(outptTmakePriceFormBO.uploadOnlineFeeDetail(map));
+  }
+
 }

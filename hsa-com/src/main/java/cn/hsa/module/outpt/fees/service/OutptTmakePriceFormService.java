@@ -404,4 +404,13 @@ public interface OutptTmakePriceFormService {
      **/
     @PostMapping("/servcie/outpt/tmakePriceForm/updateCreditQueryInovicePrint")
     WrapperResponse<Boolean> updateCreditQueryInovicePrint(Map paramMap);
+
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 15:32
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> uploadOnlineFeeDetail(Map<String, Object> map);
 }

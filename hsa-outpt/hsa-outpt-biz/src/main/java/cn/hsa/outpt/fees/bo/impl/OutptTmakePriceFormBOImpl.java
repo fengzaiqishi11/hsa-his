@@ -10,6 +10,7 @@ import cn.hsa.module.dzpz.hainan.CondList;
 import cn.hsa.module.dzpz.hainan.ExtData;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
+import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
@@ -50,6 +51,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -174,6 +176,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
     @Resource
     private SysParameterService getSysParameterService_consumer;
+
+    @Resource
+    private InsureIndividualVisitDAO insureIndividualVisitDAO;
 
 
     /**
@@ -4346,5 +4351,34 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptSettleInvoiceDAO.updateOutptSettleInvoicesBypj(invoiceDTOList);
         }
         return  true;
+    }
+
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 16:06
+     * @return java.lang.Boolean
+     */
+    @Override
+    public Boolean uploadOnlineFeeDetail(Map map) {
+      String hospCode = map.get("hospCode").toString();
+      InsureIndividualVisitDTO insureIndividualVisitDTO = null;
+      //判断入参是否传入
+      if (ObjectUtil.isEmpty(map.get("visitId"))) {
+        throw new AppException("请传入就诊ID!");
+      }
+      String visitId = (String) map.get("visitId");//就诊id
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", visitId);
+      insureVisitParam.put("hospCode", hospCode);
+      insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记。");
+      }
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      // 调用 统一支付平台-【6201】费用明细上传
+      insureUnifiedPayOutptService_consumer.UP6201(map);
+      return true;
     }
 }

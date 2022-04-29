@@ -35,4 +35,13 @@ public interface InsureUnifiedOutptBO {
      * @Return:
      **/
     Map<String, Object> UP_4302(Map<String, Object> map);
+
+    /**
+     * 医保统一支付平台: 线上费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-26 9:38
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String, Object> UP_6201(Map<String, Object> map);
 }

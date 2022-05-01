@@ -799,10 +799,17 @@ public interface Constant {
 
             public static final String UP_7101 = "7101"; // 电子处方上传
             public static final String UP_4701 = "4701"; // 电子病历上传
+            public static final String UP_4101 = "4101"; // 医疗保障基金结算清单
+            public static final String UP_4101A = "4101A"; // 医疗保障基金结算清单新
+            public static final String UP_4102 = "4102"; // 医疗保障基金结算清单状态修改
 
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询
-
+            public static final String UP_4201 = "4201"; // 自费病人费用信息上传
+            public static final String UP_4261 = "4261"; // 自费病人明细信息上传
+            public static final String UP_4262 = "4262"; // 自费病人明细信息对账
+            public static final String UP_4263 = "4263"; // 自费病人零报金额不符查询
+            public static final String UP_6201 = "6201"; // 线上费用明细上传
         }
 
         public static class DOWNLOAD {

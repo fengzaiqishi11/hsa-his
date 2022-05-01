@@ -214,9 +214,14 @@ public class SysUserServiceImpl extends HsafService implements SysUserService {
         try {
             return WrapperResponse.success(sysUserBO.updatePassWord(map));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("密码修改失败！",e);
             return WrapperResponse.error(500,e.getMessage(),null);
         }
+    }
+
+    @Override
+    public WrapperResponse<Boolean> passWordUnifiedModification(Map changePassWordParam) {
+        return sysUserBO.updatePassWordUnified(changePassWordParam);
     }
 
     /**

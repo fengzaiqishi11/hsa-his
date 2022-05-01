@@ -6,4 +6,15 @@
     <!--FastDFS客户端-->
     <bean id="dfsManagerImpl" class="cn.hsa.hsaf.generic.fsstore.FSStoreGenericManagerImpl"/>
 
+    <!--&lt;!&ndash;OSS客户端&ndash;&gt;-->
+    <!--<bean id="ossClient" class="com.aliyun.oss.OSSClient">-->
+        <!--<constructor-arg name="endpoint" value="${oss.endpoint}"></constructor-arg>-->
+        <!--<constructor-arg name="accessKeyId" value="${oss.accessKeyId}"></constructor-arg>-->
+        <!--<constructor-arg name="secretAccessKey" value="${oss.secretAccessKey}"></constructor-arg>-->
+    <!--</bean>-->
+
+    <!--&lt;!&ndash;声明OSS的实现&ndash;&gt;-->
+    <!--<bean id="dfsAliManagerImpl" class="cn.hsa.hsaf.ali.fsstore.FSStoreAliManagerImpl">-->
+        <!--<property name="ossClient" ref="ossClient"/>-->
+    <!--</bean>-->
 </beans>

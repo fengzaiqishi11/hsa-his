@@ -21,6 +21,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -232,20 +233,64 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
     * @Return void
     **/
     private void updateStroAdjustDetailDTO(StroAdjustDTO stroAdjustDTO){
+        // 调价是否过滤掉科室库存，注意我们虽然没有科室库存的概念，但是出库到科室确认之后，库存表中的biz_id就是科室的
+        Map<String, String> sfdeptFilterMap = this.getParameterValue(stroAdjustDTO.getHospCode(),
+                new String[]{"SF_DEPTFILTER"});
+        String sfdeptFilter = MapUtils.get(sfdeptFilterMap, "SF_DEPTFILTER", "0");
         List<StroAdjustDetailDTO> lists = stroAdjustDTO.getStroAdjustDetailDTOs();
+        //根据项目id进行分组，filter是为了防止空指针
+        Map<String, List<StroAdjustDetailDTO>> listsMap = lists.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
+                .collect(Collectors.groupingBy(StroAdjustDetailDTO::getItemId));
+        // 得到项目id集合
+        List<String> items = lists.stream().map(StroAdjustDetailDTO::getItemId).collect(Collectors.toList());
+        //根据项目id查询所有库存
+        List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockByItemIds(stroAdjustDTO.getHospCode(),items,sfdeptFilter);
+        //根据项目id进行分组，项目id作为key
+        Map<String, List<StroStockDTO>> stroStocksMap = stroStockDTOS.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
+                .collect(Collectors.groupingBy(StroStockDTO::getItemId));
+        // 插入的明细集合
         List<StroAdjustDetailDTO> listInsert = new ArrayList<>();
-
-        for(StroAdjustDetailDTO dto:lists){
-            if(StringUtils.isNotEmpty(dto.getItemId()) && StringUtils.isNotEmpty(dto.getItemName())){
-                dto.setId(SnowflakeUtils.getId());
-                dto.setHospCode(stroAdjustDTO.getHospCode());
-                dto.setAdjustId(stroAdjustDTO.getId());
-
-                listInsert.add(dto);
+        // 调价单调价前总金额
+        BigDecimal sumBeforePrice = BigDecimal.valueOf(0);
+        // 调价单调价后总金额
+        BigDecimal sumAfterPrice = BigDecimal.valueOf(0);
+        //遍历map,同一个药，不同的库位
+        for (Map.Entry<String, List<StroStockDTO>> entry : stroStocksMap.entrySet()) {
+            String itemId = entry.getKey();
+            List<StroStockDTO> value = entry.getValue();
+            if (listsMap.containsKey(itemId)) {
+                // 取调价前后的金额
+                List<StroAdjustDetailDTO> stroAdjustDetailDTOS = listsMap.get(itemId);
+                StroAdjustDetailDTO adjustDetailDTO = stroAdjustDetailDTOS.get(0);
+                // 封装数据
+                for (StroStockDTO x : value) {
+                    StroAdjustDetailDTO newStroAdjustDetailDTO = new StroAdjustDetailDTO();
+                    BeanUtils.copyProperties(adjustDetailDTO,newStroAdjustDetailDTO);
+                    newStroAdjustDetailDTO.setNum(x.getNum());
+                    newStroAdjustDetailDTO.setSplitNum(x.getSplitNum());
+                    newStroAdjustDetailDTO.setId(SnowflakeUtils.getId());
+                    newStroAdjustDetailDTO.setAdjustId(stroAdjustDTO.getId());
+                    newStroAdjustDetailDTO.setBizId(x.getBizId());
+                    newStroAdjustDetailDTO.setHospCode(stroAdjustDTO.getHospCode());
+                    listInsert.add(newStroAdjustDetailDTO);
+                    // 调价前总金额
+                    sumBeforePrice = BigDecimalUtils.add(sumBeforePrice,BigDecimalUtils.multiply(x.getNum(),newStroAdjustDetailDTO.getBeforePrice()));
+                    // 调价后总金额
+                    sumAfterPrice = BigDecimalUtils.add(sumAfterPrice,BigDecimalUtils.multiply(x.getNum(),newStroAdjustDetailDTO.getAfterPrice()));
+                }
             }
         }
+
         //批量新增调价明细
         stroAdjustDetailDao.insertStroAdjustDetailDTO(listInsert);
+        // 回写主表总金额
+        // 调价单调价前总金额
+        stroAdjustDTO.setAfterPrice(sumAfterPrice);
+        // 调价单调价后总金额
+        stroAdjustDTO.setBeforePrice(sumBeforePrice);
+        // 回写主表总价格
+        stroAdjustDao.updateAdjustDTOPriceById(stroAdjustDTO);
+
     }
 
     /**
@@ -300,7 +345,14 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
             //审核
             stroAdjustDao.updateStroAdjustDtoByIds(stroAdjustDTO);
             // 回写调价单数据
-            updateAdjustDetail(stroAdjustDTOS,sfdeptFilter);
+            for (StroAdjustDTO stroAdjustDTO1 : stroAdjustDTOS){
+                // 该调价单下所有明细数据
+                List<StroAdjustDetailDTO> stroAdjustDetailDTOList= stroAdjustDetailDao.queryStroAdjustDetailById(stroAdjustDTO1);
+                //先删除后新增
+                stroAdjustDetailDao.deleteStroAdjustDetailDTO(stroAdjustDTO1);
+                stroAdjustDTO1.setStroAdjustDetailDTOs(stroAdjustDetailDTOList);
+                updateStroAdjustDetailDTO(stroAdjustDTO1);
+            }
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
             List<StroAdjustDetailDTO> drugList = new ArrayList<>();
             List<StroAdjustDetailDTO> materialList = new ArrayList<>();
@@ -441,47 +493,45 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
     * @Return void
     **/
     public void updateAdjustDetail(List<StroAdjustDTO> stroAdjustDTOS,String sfdeptFilter) {
-      for (StroAdjustDTO stroAdjustDTO: stroAdjustDTOS) {
-        List ids = new ArrayList();
-        ids.add(stroAdjustDTO.getId());
-        stroAdjustDTO.setIds(ids);
-        // 该调价单下所有明细数据
-        List<StroAdjustDetailDTO> stroAdjustDetailDTOs = stroAdjustDetailDao.queryStroAdjustDetailDTOs(stroAdjustDTO);
-        if(ListUtils.isEmpty(stroAdjustDetailDTOs)) {
-          throw new AppException("调价单明细不能为空");
+        for (StroAdjustDTO stroAdjustDTO: stroAdjustDTOS) {
+            List ids = new ArrayList();
+            ids.add(stroAdjustDTO.getId());
+            stroAdjustDTO.setIds(ids);
+            // 该调价单下所有明细数据
+            List<StroAdjustDetailDTO> stroAdjustDetailDTOs = stroAdjustDetailDao.queryStroAdjustDetailDTOs(stroAdjustDTO);
+            if(ListUtils.isEmpty(stroAdjustDetailDTOs)) {
+                throw new AppException("调价单明细不能为空");
+            }
+            Map<String, List<StroAdjustDetailDTO>> collect = stroAdjustDetailDTOs.stream().collect(Collectors.groupingBy(StroAdjustDetailDTO::getItemId));
+            for(String key: collect.keySet()) {
+                List<StroAdjustDetailDTO> stroAdjustDetailDTOS = collect.get(key);
+                if(stroAdjustDetailDTOS.size() >= 2) {
+                    throw new AppException("调价单中有重复的项目");
+                }
+            }
+            // 调价单调价前总金额
+            BigDecimal sumBeforePrice = BigDecimal.valueOf(0);
+            // 调价单调价后总金额
+            BigDecimal sumAfterPrice = BigDecimal.valueOf(0);
+            for (StroAdjustDetailDTO stroAdjustDetailDTO :stroAdjustDetailDTOs) {
+                List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockSumNum(stroAdjustDetailDTO);
+                if(!ListUtils.isEmpty(stroStockDTOS)) {
+                    stroAdjustDetailDTO.setNum(stroStockDTOS.get(0).getNum());
+                    stroAdjustDetailDTO.setSplitNum(stroStockDTOS.get(0).getSplitNum());
+                    // 调价前总金额
+                    sumBeforePrice = BigDecimalUtils.add(sumBeforePrice,BigDecimalUtils.multiply(stroAdjustDetailDTO.getNum(),stroAdjustDetailDTO.getBeforePrice()));
+                    // 调价后总金额
+                    sumAfterPrice = BigDecimalUtils.add(sumAfterPrice,BigDecimalUtils.multiply(stroAdjustDetailDTO.getNum(),stroAdjustDetailDTO.getAfterPrice()));
+                }
+            }
+            // 调价单调价前总金额
+            stroAdjustDTO.setAfterPrice(sumAfterPrice);
+            // 调价单调价后总金额
+            stroAdjustDTO.setBeforePrice(sumBeforePrice);
+            // 回写明细表中的数量
+            stroAdjustDetailDao.updateAdjustDetailNum(stroAdjustDetailDTOs);
         }
-        Map<String, List<StroAdjustDetailDTO>> collect = stroAdjustDetailDTOs.stream().collect(Collectors.groupingBy(StroAdjustDetailDTO::getItemId));
-        for(String key: collect.keySet()) {
-          List<StroAdjustDetailDTO> stroAdjustDetailDTOS = collect.get(key);
-          if(stroAdjustDetailDTOS.size() >= 2) {
-            throw new AppException("调价单中有重复的项目");
-          }
-        }
-        // 调价单调价前总金额
-        BigDecimal sumBeforePrice = BigDecimal.valueOf(0);
-        // 调价单调价后总金额
-        BigDecimal sumAfterPrice = BigDecimal.valueOf(0);
-        for (StroAdjustDetailDTO stroAdjustDetailDTO :stroAdjustDetailDTOs) {
-            stroAdjustDetailDTO.setSfdeptFilter(sfdeptFilter);
-
-            List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockSumNum(stroAdjustDetailDTO);
-          if(!ListUtils.isEmpty(stroStockDTOS)) {
-            stroAdjustDetailDTO.setNum(stroStockDTOS.get(0).getNum());
-            stroAdjustDetailDTO.setSplitNum(stroStockDTOS.get(0).getSplitNum());
-            // 调价前总金额
-            sumBeforePrice = BigDecimalUtils.add(sumBeforePrice,BigDecimalUtils.multiply(stroAdjustDetailDTO.getNum(),stroAdjustDetailDTO.getBeforePrice()));
-            // 调价后总金额
-            sumAfterPrice = BigDecimalUtils.add(sumAfterPrice,BigDecimalUtils.multiply(stroAdjustDetailDTO.getNum(),stroAdjustDetailDTO.getAfterPrice()));
-          }
-        }
-        // 调价单调价前总金额
-        stroAdjustDTO.setAfterPrice(sumAfterPrice);
-        // 调价单调价后总金额
-        stroAdjustDTO.setBeforePrice(sumBeforePrice);
-        // 回写明细表中的数量
-        stroAdjustDetailDao.updateAdjustDetailNum(stroAdjustDetailDTOs);
-      }
-      // 回写主表总价格
-      stroAdjustDao.updateAdjustPriceById(stroAdjustDTOS);
+        // 回写主表总价格
+        stroAdjustDao.updateAdjustPriceById(stroAdjustDTOS);
     }
 }

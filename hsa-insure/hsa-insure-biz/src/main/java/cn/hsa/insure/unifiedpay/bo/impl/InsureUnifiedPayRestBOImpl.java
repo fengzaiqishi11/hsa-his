@@ -1528,6 +1528,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         String hospCode = MapUtils.get(map, "hospCode");
         String insureRegCode = MapUtils.get(map, "insureRegCode");
         String itemType = MapUtils.get(map, "downLoadType");
+        if(StringUtils.isEmpty(itemType)){
+            throw new AppException("请选择下载类型！");
+        }
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setRegCode(insureRegCode);
@@ -3230,6 +3233,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setOrgCode(orgCode);
         insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureItemDTO.getInsureRegCode());
         insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
         insureItemDTO.setId(SnowflakeUtils.getId());
         insureItemDTO.setInsureRegCode(insureConfigurationDTO.getRegCode());

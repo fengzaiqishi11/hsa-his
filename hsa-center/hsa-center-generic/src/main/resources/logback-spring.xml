@@ -11,7 +11,7 @@
     -->
 
     <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-center/"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-center-generic"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-center"/>
     <springProperty scope="context" name="LOG_SERVER_ADDRESS" source="logging.server.address" defaultValue="172.18.100.104"/>
     <springProperty scope="context" name="LOG_SERVER_PORT" source="logging.server.port" defaultValue="12201"/>
 
@@ -139,10 +139,7 @@
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
-            <!-- <appender-ref ref="FILE"/>
-             <appender-ref ref="FILE"/>-->
             <appender-ref ref="STDOUT"/>
-            <!--<appender-ref ref="GELF"/>-->
         </root>
         <logger name="druid.sql.Statement" level="debug" additivity="false">
             <appender-ref ref="STDOUT" />
@@ -152,15 +149,13 @@
     <!-- 其他环境日志级别为INFO -->
     <springProfile name="!local">
         <root level="INFO">
-            <!--<appender-ref ref="FILE"/>-->
             <appender-ref ref="ROLLING_FILE"/>
             <appender-ref ref="ROLLING_ERROR_FILE"/>
-            <!--<appender-ref ref="STDOUT"/>-->
             <appender-ref ref="GELF"/>
         </root>
-        <logger name="druid.sql.Statement" level="debug" additivity="false">
-            <appender-ref ref="SQL_INFO_FILE" />
-        </logger>
+<!--        <logger name="druid.sql.Statement" level="debug" additivity="false">-->
+<!--            <appender-ref ref="SQL_INFO_FILE" />-->
+<!--        </logger>-->
         <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
             <appender-ref ref="ROLLING_FILE"/>
             <appender-ref ref="GELF"/>

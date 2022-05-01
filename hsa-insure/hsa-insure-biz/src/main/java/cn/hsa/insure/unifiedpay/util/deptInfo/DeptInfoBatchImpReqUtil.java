@@ -1,8 +1,10 @@
 package cn.hsa.insure.unifiedpay.util.deptInfo;
 
+import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import com.alibaba.fastjson.JSON;
@@ -21,12 +23,12 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_3401A)
-public class DeptInfoBatchImpReqUtil<T> implements BaseReqUtil<T> {
+public class DeptInfoBatchImpReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         List<BaseDeptDTO> deptDTOList = (List<BaseDeptDTO>) param;
-//        Map map = JSON.parseObject(paramJson, Map.class);
+
 
         List<Map<String, Object>> mapList = new ArrayList<>();
         deptDTOList.stream().forEach(deptDTO -> {
@@ -75,10 +77,14 @@ public class DeptInfoBatchImpReqUtil<T> implements BaseReqUtil<T> {
             mapList.add(httpParam);
 
             checkRequest(httpParam);
+
+
         });
 
 
-        return JSON.toJSONString(mapList);
+        Map httpParam = new HashMap();
+        httpParam.put("infno",Constant.UnifiedPay.REGISTER.UP_3401A);
+        return getInsurCommonParam(httpParam);
     }
 
     @Override

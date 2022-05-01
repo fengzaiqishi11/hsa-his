@@ -7,30 +7,30 @@
     <bean id="apiManager" class="cn.hsa.hsaf.core.gateway.ApiCallerManager">
         <property name="apiCallers">
             <set>
-                <bean class="cn.hsa.hsaf.ali.gateway.csb.CSBApiCaller" init-method="init" destroy-method="close">
-                    <property name="name" value="csbcaller4channelA"/>
-                    <property name="csburl" value="${gateway.csb.csburl}"/>
-                    <property name="accessKey" value="${gateway.csb.accessKey}"/>
-                    <property name="securityKey" value="${gateway.csb.securityKey}"/>
-                    <property name="connectionMax" value="${gateway.csb.connectionMax}"/>
-                    <property name="connectionTimeout" value="${gateway.csb.connectionTimeout}"/>
-                    <property name="connectionSoTimeout" value="${gateway.csb.connectionSoTimeout}"/>
-                    <property name="connectionCrTimeout" value="${gateway.csb.connectionCrTimeout}"/>
-                    <property name="skipConnectionPool" value="${gateway.csb.skipConnectionPool}"/>
-                    <property name="connectionAsync" value="${gateway.csb.connectionAsync}"/>
-                </bean>
-                <bean class="cn.hsa.hsaf.tencent.gateway.RioApiCaller" init-method="init" destroy-method="close">
-                    <property name="name" value="rioApiCaller"/>
-                    <property name="gatewayUrl" value="${gateway.tencent.gatewayUrl}"/>
-                    <property name="paasid" value="${gateway.tencent.paasid}"/>
-                    <property name="token" value="${gateway.tencent.token}"/>
-                    <property name="socketTimeout" value="${gateway.tencent.socketTimeout}"/>
-                    <property name="connectTimeout" value="${gateway.tencent.connectTimeout}"/>
-                    <property name="soTimeout" value="${gateway.tencent.soTimeout}"/>
-                    <property name="connectionRequestTimeout" value="${gateway.tencent.connectionRequestTimeout}"/>
-                    <property name="maxConnTotal" value="${gateway.tencent.maxConnTotal}"/>
-                    <property name="maxConnPerRoute" value="${gateway.tencent.maxConnPerRoute}"/>
-                </bean>
+                <!--<bean class="cn.hsa.hsaf.ali.gateway.csb.CSBApiCaller" init-method="init" destroy-method="close">-->
+                    <!--<property name="name" value="csbcaller4channelA"/>-->
+                    <!--<property name="csburl" value="${gateway.csb.csburl}"/>-->
+                    <!--<property name="accessKey" value="${gateway.csb.accessKey}"/>-->
+                    <!--<property name="securityKey" value="${gateway.csb.securityKey}"/>-->
+                    <!--<property name="connectionMax" value="${gateway.csb.connectionMax}"/>-->
+                    <!--<property name="connectionTimeout" value="${gateway.csb.connectionTimeout}"/>-->
+                    <!--<property name="connectionSoTimeout" value="${gateway.csb.connectionSoTimeout}"/>-->
+                    <!--<property name="connectionCrTimeout" value="${gateway.csb.connectionCrTimeout}"/>-->
+                    <!--<property name="skipConnectionPool" value="${gateway.csb.skipConnectionPool}"/>-->
+                    <!--<property name="connectionAsync" value="${gateway.csb.connectionAsync}"/>-->
+                <!--</bean>-->
+                <!--<bean class="cn.hsa.hsaf.tencent.gateway.RioApiCaller" init-method="init" destroy-method="close">-->
+                    <!--<property name="name" value="rioApiCaller"/>-->
+                    <!--<property name="gatewayUrl" value="${gateway.tencent.gatewayUrl}"/>-->
+                    <!--<property name="paasid" value="${gateway.tencent.paasid}"/>-->
+                    <!--<property name="token" value="${gateway.tencent.token}"/>-->
+                    <!--<property name="socketTimeout" value="${gateway.tencent.socketTimeout}"/>-->
+                    <!--<property name="connectTimeout" value="${gateway.tencent.connectTimeout}"/>-->
+                    <!--<property name="soTimeout" value="${gateway.tencent.soTimeout}"/>-->
+                    <!--<property name="connectionRequestTimeout" value="${gateway.tencent.connectionRequestTimeout}"/>-->
+                    <!--<property name="maxConnTotal" value="${gateway.tencent.maxConnTotal}"/>-->
+                    <!--<property name="maxConnPerRoute" value="${gateway.tencent.maxConnPerRoute}"/>-->
+                <!--</bean>-->
                 <bean class="cn.hsa.hsaf.generic.gateway.KongApiCaller" init-method="init" destroy-method="close">
                     <property name="name" value="kongApiCaller"/>
                     <property name="gatewayUrl" value="${gateway.generic.gatewayUrl}"/>

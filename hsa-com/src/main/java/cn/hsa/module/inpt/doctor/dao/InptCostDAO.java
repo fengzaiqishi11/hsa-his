@@ -573,4 +573,13 @@ public interface InptCostDAO {
      * @Date: 2022/2/21
      */
     List<Map<String, Object>> querySurgeryInptBackCostInfoPage(Map<String, Object> map);
+    /**
+     * @Meth: updateInWaitStatus
+     * @Description:
+     * @Param: [updateInwait]
+     * @return: void
+     * @Author: zhangguorui
+     * @Date: 2022/4/20
+     */
+    void updateInWaitStatus(PharInWaitReceiveDTO updateInwait);
 }

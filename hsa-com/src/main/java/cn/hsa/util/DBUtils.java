@@ -3,10 +3,13 @@ package cn.hsa.util;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -60,13 +63,13 @@ public class DBUtils {
 
     /**
      * @Method 数据库是否已经存在表，存在表表示已经初始化过数据库
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:54
-     * @Return 
+     * @Return
      **/
     public static boolean existTable(String driverClassName, String url, String username, String password) {
         Connection conn = null;
@@ -87,13 +90,13 @@ public class DBUtils {
 
     /**
      * @Method 关闭数据库连接
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:53
-     * @Return 
+     * @Return
      **/
     public static void closeConnection(Connection conn, Statement st, ResultSet rs) {
         if (rs != null) {
@@ -124,13 +127,13 @@ public class DBUtils {
 
     /**
      * @Method 初始化数据库脚本
-     * @Description 
-     * 
-     * @Param 
-     * 
+     * @Description
+     *
+     * @Param
+     *
      * @Author zhongming
      * @Date 2020/9/1 17:53
-     * @Return 
+     * @Return
      **/
     public static void initScript(String driverClassName, String url, String username, String password, String sqlScriptPath) {
         Connection conn = null;
@@ -139,7 +142,7 @@ public class DBUtils {
 //            if (!file.exists() || !file.isFile()) {
 //                throw new AppException("file is not exist");
 //            }
-            conn = getConnection(driverClassName, url, username, password);
+             conn = getConnection(driverClassName, url, username, password);
             // 是否存在表（存在表表示已经初始化过数据）
             if (!existTable(driverClassName, url, username, password)) {
                 ScriptRunner runner = new ScriptRunner(conn);
@@ -151,8 +154,11 @@ public class DBUtils {
                 runner.setLogWriter(null);
                 runner.setSendFullScript(false);
                 runner.setStopOnError(true);
-                InputStream in = new DBUtils().getClass().getResourceAsStream(sqlScriptPath);
-                runner.runScript(new InputStreamReader(in, "utf8"));
+
+                log.info("初始化表结构SQL文件地址:"+sqlScriptPath);
+                ClassPathResource classPathResource = new ClassPathResource(sqlScriptPath);
+                InputStream inputStream =classPathResource.getInputStream();
+                runner.runScript(new InputStreamReader(inputStream, "utf8"));
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -164,14 +170,5 @@ public class DBUtils {
 
     public InputStream getPath (){
         return this.getClass().getResourceAsStream("/script/his_v2.sql");
-    }
-
-    public static void main(String[] args) {
-        String driverClassName = "com.mysql.jdbc.Driver";
-        String url = "jdbc:mysql://111.22.100.207:3306/his_v2_10000?connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowMultiQueries=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai";
-        String username = "his";
-        String password = "his$123456";
-        String sqlScriptPath = "/script/his_v2.sql";
-        initScript(driverClassName, url, username, password, sqlScriptPath);
     }
 }

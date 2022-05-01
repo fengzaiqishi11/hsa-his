@@ -220,5 +220,16 @@ public class StroStockServiceImpl extends HsafBO implements StroStockService {
         return WrapperResponse.success(stroStockBO.queryAllStockDetails(MapUtils.get(map,"stroStockDetail")));
     }
 
+    /**
+     * 查询药品和材料的利润统计信息
+     * @param map
+     * @return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryDrugAndMaterialProfit(Map map) {
+        return WrapperResponse.success(stroStockBO.queryDrugAndMaterialProfit(MapUtils.get(map,"itemProfitStatisticsDTO")));
+
+    }
+
 
 }

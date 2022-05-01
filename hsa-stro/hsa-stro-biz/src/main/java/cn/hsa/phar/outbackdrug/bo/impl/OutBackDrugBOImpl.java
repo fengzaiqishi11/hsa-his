@@ -73,8 +73,16 @@ public class OutBackDrugBOImpl  extends HsafBO implements OutBackDrugBO {
     public PageDTO queryOutBackDrugPeoplePage(PharOutDistributeDTO pharOutDistributeDTO) {
 
         PageHelper.startPage(pharOutDistributeDTO.getPageNo(),pharOutDistributeDTO.getPageSize());
-
-        return PageDTO.of(outBackDrugDAO.queryOutBackDrugPeoplePage(pharOutDistributeDTO));
+        // 校验医院退费时退费项目是收费员确定还是走门诊医生申请
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", pharOutDistributeDTO.getHospCode());
+        map.put("code", "REFUND_APPLY");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
+            return PageDTO.of(outBackDrugDAO.queryOutBackDrugPeopleRefundApplyPage(pharOutDistributeDTO));
+        }else{
+            return PageDTO.of(outBackDrugDAO.queryOutBackDrugPeoplePage(pharOutDistributeDTO));
+        }
     }
 
     /**
@@ -95,11 +103,17 @@ public class OutBackDrugBOImpl  extends HsafBO implements OutBackDrugBO {
         map.put("hospCode", pharOutDistributeDTO.getHospCode());
         map.put("code", "REFUND_APPLY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
-        if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
-            return PageDTO.of(outBackDrugDAO.queryOutBackDrugDetailRefundApplyPage(pharOutDistributeDTO));
-        } else {
-            return PageDTO.of(outBackDrugDAO.queryOutBackDrugDetailPage(pharOutDistributeDTO));
-        }
+
+            if (Constants.SF.F.equals(pharOutDistributeDTO.getOrderStatus())) {// 未退药
+                if (sys != null && sys.getValue().equals("1")) {  // 1:门诊医生申请  2：收费室自己决定
+                    return PageDTO.of(outBackDrugDAO.queryOutBackDrugDetailRefundApplyPage(pharOutDistributeDTO));
+                }else {
+                    return PageDTO.of(outBackDrugDAO.queryOutBackDrugDetailPageForSelect(pharOutDistributeDTO));
+                }
+            } else {// 已退药
+                return PageDTO.of(outBackDrugDAO.queryOutBackDrugDetailRefundApplyPageById(pharOutDistributeDTO));
+            }
+
     }
 
     /**

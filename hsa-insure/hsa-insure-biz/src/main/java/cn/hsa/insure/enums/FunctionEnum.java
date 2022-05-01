@@ -22,6 +22,10 @@ public enum FunctionEnum {
     MEDICAL_DIR_MATCH_INFO(Constant.UnifiedPay.REGISTER.UP_1317, "医药机构目录匹配信息查询"),
     LMTPRIC_INFO(Constant.UnifiedPay.REGISTER.UP_1318, "医保目录限价信息查询"),
     SELFPAY_PROP_INFO(Constant.UnifiedPay.REGISTER.UP_1319, "医保目录先自付比例信息查询"),
+
+    IDCARD_PASSWORD_CHECK(Constant.UnifiedPay.CARD.UP_1602, "医保身份证密码校验"),
+    IDCARD_PASSWORD_UPDATE(Constant.UnifiedPay.CARD.UP_1603, "医保修改身份证密码"),
+
     INSUR_DICT_INFO(Constant.UnifiedPay.REGISTER.UP_1901, "医保字典信息查询"),
     OUTPATIENT_TREATMENT(Constant.UnifiedPay.REGISTER.UP_2001, "人员待遇享受检查"),
     OUTPATIENT_REG(Constant.UnifiedPay.OUTPT.UP_2201, "门诊挂号"),
@@ -32,16 +36,16 @@ public enum FunctionEnum {
     OUTPATIENT_PRE_SETTLE(Constant.UnifiedPay.OUTPT.UP_2206, "门诊预结算"),
     OUTPATIENT_SETTLE(Constant.UnifiedPay.OUTPT.UP_2207, "门诊结算"),
     OUTPATIENT_SETTLE_BACK(Constant.UnifiedPay.OUTPT.UP_2208, "门诊结算撤销"),
-    INSUR_FEE_UPLOAD(Constant.UnifiedPay.INPT.UP_2301, "住院费用明细上传"),
-    INSUR_FEE_UPLOAD_BACK(Constant.UnifiedPay.INPT.UP_2302, "住院费用明细撤销"),
-    INSUR_PRE_SETTLE(Constant.UnifiedPay.INPT.UP_2303, "住院预结算"),
-    INSUR_SETTLE(Constant.UnifiedPay.INPT.UP_2304, "住院结算"),
-    INSUR_SETTLE_BACK(Constant.UnifiedPay.INPT.UP_2305, "住院结算撤销"),
-    INSUR_IN(Constant.UnifiedPay.REGISTER.UP_2401, "入院登记"),
-    INSUR_OUT(Constant.UnifiedPay.REGISTER.UP_2402, "出院登记"),
-    INSUR_UPDATE(Constant.UnifiedPay.REGISTER.UP_2403, "入院变更"),
-    INSUR_IN_BACK(Constant.UnifiedPay.REGISTER.UP_2404, "入院撤销"),
-    INSUR_OUT_BACK(Constant.UnifiedPay.REGISTER.UP_2405, "出院办理撤销"),
+    INPATIENT_FEE_UPLOAD(Constant.UnifiedPay.INPT.UP_2301, "住院费用明细上传"),
+    INPATIENT_FEE_UPLOAD_BACK(Constant.UnifiedPay.INPT.UP_2302, "住院费用明细撤销"),
+    INPATIENT_PRE_SETTLE(Constant.UnifiedPay.INPT.UP_2303, "住院预结算"),
+    INPATIENT_SETTLE(Constant.UnifiedPay.INPT.UP_2304, "住院结算"),
+    INPATIENT_SETTLE_BACK(Constant.UnifiedPay.INPT.UP_2305, "住院结算撤销"),
+    INPATIENT_IN(Constant.UnifiedPay.REGISTER.UP_2401, "入院登记"),
+    INPATIENT_OUT(Constant.UnifiedPay.REGISTER.UP_2402, "出院登记"),
+    INPATIENT_UPDATE(Constant.UnifiedPay.REGISTER.UP_2403, "入院变更"),
+    INPATIENT_IN_BACK(Constant.UnifiedPay.REGISTER.UP_2404, "入院撤销"),
+    INPATIENT_OUT_BACK(Constant.UnifiedPay.REGISTER.UP_2405, "出院办理撤销"),
     TRANS_HOSP_RECORD_UPLOAD(Constant.UnifiedPay.REGISTER.UP_2501, "转院备案"),
     TRANS_HOSP_RECORD_REVOCATION(Constant.UnifiedPay.REGISTER.UP_2502, "转院备案撤销"),
     OPSP_RECORD_UPLOAD(Constant.UnifiedPay.REGISTER.UP_2503, "人员慢特病备案"),
@@ -65,7 +69,24 @@ public enum FunctionEnum {
 //    CLR_FUND_DETAIL("3702", "获取基金明细信息"),
 //    CLR_SETTLE_DETAIL("3703", "获取结算明细信息"),
 //    CLR_APPR_DETAIL("3704", "获取拨付单信息"),
+
 //    MR_PATIENT_SETTL_UPLOAD("4101", "上传结算清单信息"),
+
+    FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
+    FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
+    FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),
+
+
+    OUTPATIENT_DIAGNOSIS_TREATMENT_INFO (Constant.UnifiedPay.OUTPT.UP_4301, "门急诊诊疗记录"),
+    OUTPATIENT_EMERGENCY_RESCUE_INFO (Constant.UnifiedPay.OUTPT.UP_4302, "急诊留观手术及抢救信息"),
+
+
+    MR_PATIENT_SETTL_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4101, "上传结算清单信息"),
+    MR_PATIENT_SETTL_UPLOAD_A(Constant.UnifiedPay.REGISTER.UP_4101A, "上传结算清单信息"),
+    MR_PATIENT_SETTL_UPLOAD_UPDATE(Constant.UnifiedPay.REGISTER.UP_4102, "上传结算清单信息状态修改"),
+    INSUR_MRI_UPLOAD(Constant.UnifiedPay.INPT.UP_4401, "住院病案首页上传"),
+    INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
+
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),
     MDTRT_INFO(Constant.UnifiedPay.REGISTER.UP_5201, "就诊信息查询"),
@@ -82,6 +103,7 @@ public enum FunctionEnum {
     IN_HOSP_INFO(Constant.UnifiedPay.REGISTER.UP_5303, "在院信息查询"),
     TRANS_HOSP_INFO(Constant.UnifiedPay.REGISTER.UP_5304, "转院信息查询"),
     PSN_POLICY(Constant.UnifiedPay.REGISTER.UP_100001, "政策项查询"),
+    ONLINE_FEE_PAY(Constant.UnifiedPay.REGISTER.UP_6201, "线上费用明细上传"),
     //接口功能号 请按顺序填写
 
     LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载");

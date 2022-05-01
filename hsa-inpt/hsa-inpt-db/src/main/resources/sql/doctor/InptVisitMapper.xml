@@ -1105,7 +1105,7 @@
 		iiv.medical_reg_no
 		from
 		inpt_visit iv
-		left join insure_individual_visit iiv on iv.id = iiv.visit_id
+		left join insure_individual_visit iiv on iv.id = iiv.visit_id and iiv.hosp_code = #{hospCode}
 		where
 		iv.hosp_code = #{hospCode}
 
@@ -1820,7 +1820,7 @@
 		visit.patient_code,
 		visit.preferential_type_id,
 		DATE_FORMAT( visit.in_time, '%Y-%m-%d %H:%i:%s' ) AS in_time,
-		TO_DAYS(ifnull(out_time,now()))- TO_DAYS( visit.in_time )+ 1 AS zyts,
+		(case when ifnull(datediff(ifnull(visit.out_time, now()),visit.in_time),0) = 0 then 1 else datediff(ifnull(visit.out_time, now()),visit.in_time) end) AS zyts,
 		visit.in_remark,
 		visit.out_remark,
 		visit.in_disease_name,
@@ -2269,7 +2269,7 @@
 		visit.patient_code,
 		visit.preferential_type_id,
 		DATE_FORMAT( visit.in_time, '%Y-%m-%d %H:%i:%s' ) AS in_time,
-		TO_DAYS(ifnull(out_time,now()))- TO_DAYS( visit.in_time )+ 1 AS zyts,
+		(case when ifnull(datediff(ifnull(visit.out_time, now()),visit.in_time),0) = 0 then 1 else datediff(ifnull(visit.out_time, now()),visit.in_time) end) AS zyts,
 		visit.in_remark,
 		visit.out_remark,
 		visit.in_disease_name,

@@ -9,6 +9,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.center.hospital.service
@@ -128,6 +129,14 @@ public interface CenterHospitalService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
      **/
     WrapperResponse<Boolean> updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    /**
+     *  统一更新管理员账号密码
+     *
+     * @param modifiedInfo 修改信息 
+     * @return 修改是否成功
+     */
+    WrapperResponse<Boolean> updatePasswordOfAdministratorUnified(Map<String,String> modifiedInfo);
     /**
      * @Menthod findRootBase()
      * @Desrciption 查询root权限配置数据源

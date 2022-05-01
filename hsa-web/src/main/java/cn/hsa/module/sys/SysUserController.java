@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.dto.SysUserPasswordDTO;
 import cn.hsa.module.sys.user.dto.SysUserRoleDto;
@@ -12,6 +13,7 @@ import cn.hsa.module.sys.user.dto.SysUserSystemDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,6 +69,7 @@ public class SysUserController extends BaseController {
             sysUserDTO.setIsPasswordChange("-2");
         }
         sysUserDTO.setPassword(null);
+        sysUserDTO.setLastUsedPassword(null);
         return WrapperResponse.success(sysUserDTO);
     }
 
@@ -298,7 +301,7 @@ public class SysUserController extends BaseController {
     public WrapperResponse<Boolean> updateActivePassword(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTOSession = getSession(req, res);
         if(StringUtils.isEmpty(sysUserDTO.getId())){
-            throw new AppException("id参数值为空");
+            return WrapperResponse.error(HttpStatus.NO_CONTENT.value(), "id参数值为空",false);
         }else{
             sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
             //封装参数
@@ -366,10 +369,10 @@ public class SysUserController extends BaseController {
         List<String> workTypeCode = sysUserDTO.getIds();
         String deptId = sysUserDTO.getLoginDeptId();
         if (ListUtils.isEmpty(sysUserDTO.getIds())){
-            throw new AppException("职工类型为空！");
+            return WrapperResponse.error(HttpStatus.NO_CONTENT.value(), "职工类型为空！",null);
         }
         if (StringUtils.isEmpty(sysUserDTO.getLoginDeptId())){
-            throw new AppException("科室Id为空！");
+            return WrapperResponse.error(HttpStatus.NO_CONTENT.value(), "科室Id为空！",null);
         }
         Map map = new HashMap();
         map.put("workTypeCode",workTypeCode);
@@ -392,7 +395,7 @@ public class SysUserController extends BaseController {
         SysUserDTO sysUserDTOSession = getSession(req, res);
         if (sysUserPasswordDTO == null  || StringUtils.isEmpty(sysUserPasswordDTO.getOldPassWord()) ||
                 StringUtils.isEmpty(sysUserPasswordDTO.getNewPassword()) ) {
-            return WrapperResponse.error(-1,"参数不能为空",null);
+            return WrapperResponse.error(-1,"参数不能为空",false);
         }
 
         // 指定医院数据源查询用户信息
@@ -409,29 +412,40 @@ public class SysUserController extends BaseController {
 
         // 校验用户信息
         if (sysUserDTO == null) {
-            throw new AppException("员工账号不存在！");
+            return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "员工账号不存在！",false);
         }
-
         // 是否停用
         if ("2".equals(sysUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被停用！");
+            return WrapperResponse.error(HttpStatus.LOCKED.value(), "当前账号已被停用！",false);
         }
 
         // 是否锁定
         if ("3".equals(sysUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被锁定！");
+            return WrapperResponse.error(HttpStatus.LOCKED.value(), "当前账号已被锁定！",false);
         }
 
         // 密码错误
         if (!MD5Utils.verifySha(sysUserPasswordDTO.getOldPassWord(), sysUserDTO.getPassword())) {
-            throw new AppException("原始密码错误！");
+            return WrapperResponse.error(HttpStatus.EXPECTATION_FAILED.value(), "原始密码错误！",false);
         }
         String newPasswordByMd5 = sysUserPasswordDTO.getNewPassword();
+        // 新旧密码不能相同
+        if(newPasswordByMd5.equals(sysUserDTO.getLastUsedPassword())){
+            return WrapperResponse.error(HttpStatus.EXPECTATION_FAILED.value(), "新密码不能与近期使用过的密码相同！",false);
+        }
+
         Map changePassWordParam = new HashMap<>();
-        changePassWordParam.put("oldPassWord",sysUserPasswordDTO.getOldPassWord());
+        changePassWordParam.put("oldPassWord",sysUserDTO.getPassword());
         changePassWordParam.put("newPasswordByMd5",newPasswordByMd5);
         changePassWordParam.put("hospCode",sysUserDTOSession.getHospCode());
         changePassWordParam.put("id",sysUserDTOSession.getId());
+        BaseDeptDTO loginBaseDeptDTO = sysUserDTOSession.getLoginBaseDeptDTO();
+        changePassWordParam.put("deptId",loginBaseDeptDTO == null?"" : loginBaseDeptDTO.getId());
+        changePassWordParam.put("deptName",loginBaseDeptDTO == null? "" : loginBaseDeptDTO.getName());
+        changePassWordParam.put("userName",sysUserDTOSession.getName());
+        changePassWordParam.put("userCode",sysUserDTOSession.getCode());
+        changePassWordParam.put("ip",ServletUtils.getRequestIp());
+
         return sysUserService_consumer.changePassWord(changePassWordParam);
     }
 

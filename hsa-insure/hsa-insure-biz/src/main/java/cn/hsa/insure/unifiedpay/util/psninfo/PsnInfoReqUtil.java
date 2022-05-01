@@ -5,6 +5,7 @@ import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.MapUtils;
@@ -29,7 +30,7 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
     private SysParameterService sysParameterService_consumer;
 
     @Override
-    public String initRequest(T param) {
+    public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
 
         InsureIndividualBasicDTO insureIndividualBasicDTO = MapUtils.get(map, "insureIndividualBasicDTO");
@@ -59,7 +60,7 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             }
         }
         // 身份证  本地社保卡 和省内异地社保卡
-        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.SFZ.equals(mdtrtCertType) ) {
             // 就诊凭证类型  传值02
             visitMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.SFZ);
             if ("null".equals(insureIndividualBasicDTO.getAac002()) || StringUtils.isEmpty(insureIndividualBasicDTO.getAac002())) {
@@ -75,9 +76,9 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             visitMap.put("certno", "null".equals(insureIndividualBasicDTO.getAac002()) ? "" : insureIndividualBasicDTO.getAac002());
         }
         // 跨省异地读卡
-        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType)) {
+        else if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
             // 就诊凭证类型  传值03
-            visitMap.put("mdtrt_cert_type", mdtrtCertType);
+            visitMap.put("mdtrt_cert_type", "03");
             // 传值证件号码
             visitMap.put("mdtrt_cert_no", insureIndividualBasicDTO.getBka896());
             // 传值社保卡识别码
@@ -114,7 +115,8 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值05 或 04
             visitMap.put("psn_cert_type", insureIndividualBasicDTO.getBka895());
             // 传值证件号码
-            visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+//            visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+            visitMap.put("certno", insureIndividualBasicDTO.getBka896());
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
@@ -131,9 +133,22 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值姓名
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
         }
+
+        HashMap commParam = new HashMap();
         checkRequest(visitMap);
-        map.put("dataMap", visitMap);
-        return getInsurCommonParam(map);
+
+        commParam.put("dataMap", visitMap);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_1101);
+
+        commParam.put("opter",MapUtils.get(map,"opter"));
+        commParam.put("opter_name",MapUtils.get(map,"opter_name"));
+        commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
+        commParam.put("hospCode",MapUtils.get(map,"hospCode"));
+        commParam.put("orgCode",MapUtils.get(map,"orgCode"));
+        commParam.put("configCode",MapUtils.get(map,"configCode"));
+        commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+
+        return getInsurCommonParam(commParam);
     }
 
     @Override

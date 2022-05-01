@@ -72,6 +72,23 @@
         </triggeringPolicy>
     </appender>
 
+    <!-- SQL日志输出，没有使用druid监控的去掉这部分以及下面的一个相关logger-->
+    <appender name="SQL_INFO_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 正在记录的日志文件的路径及文件名 -->
+        <file>${LOG_HOME}/${APP_NAME}.sql.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${SQL_INFO_NAME}.sql.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 追加方式记录日志 -->
+        <append>true</append>
+        <!-- 日志文件的格式 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/${APP_NAME}.log</file>
         <!--过滤器,只打INFO级别的日志-->
@@ -123,23 +140,29 @@
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
-            <appender-ref ref="FILE"/>
             <appender-ref ref="ROLLING_FILE"/>
             <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
-            <appender-ref ref="GELF"/>
         </root>
+        <logger name="druid.sql.Statement" level="debug" additivity="false">
+            <appender-ref ref="STDOUT" />
+        </logger>
     </springProfile>
 
     <!-- 其他环境日志级别为INFO -->
     <springProfile name="!local">
         <root level="INFO">
-            <appender-ref ref="FILE"/>
-            <!--<appender-ref ref="STDOUT"/>-->
             <appender-ref ref="ROLLING_FILE"/>
             <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="GELF"/>
         </root>
+<!--        <logger name="druid.sql.Statement" level="debug" additivity="false">-->
+<!--            <appender-ref ref="SQL_INFO_FILE" />-->
+<!--        </logger>-->
+        <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
+            <appender-ref ref="GELF"/>
+        </logger>
     </springProfile>
 
     <!-- 日志输出级别 -->

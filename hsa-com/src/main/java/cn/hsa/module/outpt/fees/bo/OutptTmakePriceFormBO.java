@@ -383,4 +383,13 @@ public interface OutptTmakePriceFormBO {
      * @Return: Boolean
      **/
     Boolean updateCreditQueryInovicePrint(OutinInvoiceDTO OutinInvoiceDTO);
+
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 16:03
+     * @return java.lang.Boolean
+     */
+    Boolean uploadOnlineFeeDetail(Map map);
 }

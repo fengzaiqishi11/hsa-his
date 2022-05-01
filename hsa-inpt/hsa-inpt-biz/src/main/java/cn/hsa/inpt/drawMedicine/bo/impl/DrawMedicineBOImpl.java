@@ -23,6 +23,7 @@ import cn.hsa.module.phar.pharinbackdrug.entity.PharInWaitReceiveDO;
 import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
 import cn.hsa.util.*;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -171,10 +172,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       //查询所有待领药品
       WrapperResponse<List<PharInWaitReceiveDTO>> waitResponse1 = pharInWaitReceiveService_consumer.queryPharInWaitReceiveApply(queryWaitReceiveMapIsBack);
       List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitResponse1.getData();
-      //过滤出isback = 1 的是退药的药品
-//        List<PharInWaitReceiveDTO> isBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "1".equals(dto.getIsBack())).collect(Collectors.toList());
-//        //过滤出isback = 0 的是退药的药品
-//        List<PharInWaitReceiveDTO> isNotBackWaitReceiveList = waitReceiveListAll.stream().filter((PharInWaitReceiveDTO dto) -> "0".equals(dto.getIsBack())).collect(Collectors.toList());
       if (!ListUtils.isEmpty(isBackWaitReceiveList)) {
         for (PharInWaitReceiveDTO isBackDto : isBackWaitReceiveList) {
           for (Iterator<PharInWaitReceiveDTO> it = waitReceiveListAll.iterator();it.hasNext();) {
@@ -252,9 +249,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       updateInwait.setIds(ids);
       updateInwait.setHospCode(hospCode);
       updateInwait.setStatusCode("1");
-      inwaitMap.put("hospCode", hospCode);
-      inwaitMap.put("pharInWaitReceiveDTO", updateInwait);
-      pharInWaitReceiveService_consumer.updateInWaitStatus(inwaitMap);
+      //todo 修改 ，由于事务不一致导致的重复预配药问题以及预配药操作，配药单没有生成数据的问题
+      inptCostDAO.updateInWaitStatus(updateInwait);
       //插入配药主表
       inptCostDAO.insertPharInReceives(inReceiveList);
       // 插入配药明细表
@@ -364,7 +360,9 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
           if(itemNum.get() <= 8 && !itemMap.containsKey(dto.getId())) {
             itemMap.put(dto.getId(),dto.getItemName());
             message.append("【");
+            message.append(dto.getProductName());
             message.append(dto.getItemName());
+            message.append(dto.getSpec());
             message.append("】,");
           }
         }
@@ -447,6 +445,23 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     }
     //领药申请详情汇总
     sumList = getSummary(inWaitReceiveList);
+    for (Iterator<PharInWaitReceiveDTO> it = sumList.iterator();it.hasNext();) {
+      PharInWaitReceiveDTO dto = it.next();
+      //校验库存
+      if (Constants.XMLB.YP.equals(dto.getItemCode()) || Constants.XMLB.CL.equals(dto.getItemCode())) {
+        InptAdviceDTO inptAdviceDTO = new InptAdviceDTO();
+        inptAdviceDTO.setHospCode(dto.getHospCode());
+        inptAdviceDTO.setItemId(dto.getItemId());
+        inptAdviceDTO.setPharId(dto.getPharId());
+        inptAdviceDTO.setTotalNum(dto.getAllNum());
+        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        //判断库存,如果库存为空就弄成红色
+        if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
+          dto.setColor(Constants.COLOR.RED);
+        }
+      }
+    }
+
     return PageDTO.of(sumList);
   }
 
@@ -702,14 +717,26 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       //修改医嘱提前领药天数
       MedicalAdviceDTO medicalAdviceDTO = MapUtils.get(map,"medicalAdviceDTO");
       List<String> adviceIds = medicalAdviceDTO.getIds();
-      inptAdviceDAO.updateAdvanceDaysLastExcTime(adviceIds,"0");
-
+      List<List<String>>  groupedList = splitList(adviceIds,50);
+      for(List<String> subList : groupedList){
+        inptAdviceDAO.updateAdvanceDaysLastExcTime(subList,"0");
+      }
       //修改提前领药记录
-      map.put("sfpy","1");
+      map.put("sfpy", Constants.SF.S);
       inptAdviceDAO.updateMedicineAdvance(map);
     }
 
 
+  }
+
+  /**
+   *  将一个数据按照指定大小分割成若干大小
+   * @param sourceList 需要被分割的List
+   * @param groupSize  分割后每个子集合的大小(最后一个可能会小于该数值)
+   * @return 分割后的list
+   */
+  private  List<List<String>> splitList(List<String> sourceList,int groupSize){
+    return Lists.partition(sourceList,groupSize);
   }
 
   @Override

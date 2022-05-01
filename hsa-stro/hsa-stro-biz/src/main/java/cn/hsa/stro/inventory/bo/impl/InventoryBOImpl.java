@@ -132,6 +132,10 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
         BigDecimal beforePriceAll = BigDecimal.valueOf(0);
         // 盘点后总金额
         BigDecimal afterPriceAll = BigDecimal.valueOf(0);
+        // 盘点前零售总金额
+        BigDecimal beforeSellPriceAll = BigDecimal.valueOf(0);
+        // 盘点后零售总金额
+        BigDecimal afterSellPriceAll = BigDecimal.valueOf(0);
         //盘点单明细补全参数并入库
         for (StroInventoryDetailDTO stroInventoryDetailDTO:baseAssistCalcDetaillist) {
             if (StringUtils.isEmpty(stroInventoryDetailDTO.getResultCode())) {
@@ -159,11 +163,19 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
             beforePriceAll = BigDecimalUtils.add(beforePriceAll,BigDecimalUtils.multiply(stroInventoryDetailDTO.getBeforeNum(),stroInventoryDetailDTO.getBuyPrice()));
             // 盘点后总金额
             afterPriceAll = BigDecimalUtils.add(afterPriceAll,BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroInventoryDetailDTO.getBuyPrice()));
+            // 盘点前零售总金额
+            beforeSellPriceAll = BigDecimalUtils.add(beforeSellPriceAll,BigDecimalUtils.multiply(stroInventoryDetailDTO.getBeforeNum(),stroInventoryDetailDTO.getSellPrice()));
+            // 盘点后零售总金额
+            afterSellPriceAll = BigDecimalUtils.add(afterSellPriceAll,BigDecimalUtils.multiply(stroInventoryDetailDTO.getFinalNum(),stroInventoryDetailDTO.getSellPrice()));
         }
         // 盘点前总金额
         inventoryDTO.setBeforePrice(beforePriceAll);
         // 盘点后总金额
         inventoryDTO.setAfterPrice(afterPriceAll);
+        // 盘点前零售总金额
+        inventoryDTO.setBeforeSellPrice(beforeSellPriceAll);
+        // 盘点后零售总金额
+        inventoryDTO.setAfterSellPrice(afterSellPriceAll);
         // 损益总金额
         inventoryDTO.setIncdecPrice(BigDecimalUtils.subtract(afterPriceAll,beforePriceAll));
         inventoryDAO.insert(inventoryDTO);
@@ -189,6 +201,10 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
         BigDecimal beforePriceAll = BigDecimal.valueOf(0);
         // 盘点后总金额
         BigDecimal afterPriceAll = BigDecimal.valueOf(0);
+        // 盘点前零售总金额
+        BigDecimal beforeSellPriceAll = BigDecimal.valueOf(0);
+        // 盘点后零售总金额
+        BigDecimal afterSellPriceAll = BigDecimal.valueOf(0);
         if(ListUtils.isEmpty(baseAssistCalcDetaillist)) {
           throw new AppException("盘点明细不能为空");
         }
@@ -206,12 +222,20 @@ public class InventoryBOImpl extends HsafBO implements InventoryBO {
             beforePriceAll = BigDecimalUtils.add(beforePriceAll,BigDecimalUtils.multiply(baseAssistCalcDetaillist.get(i).getBeforeNum(),baseAssistCalcDetaillist.get(i).getBuyPrice()));
             // 盘点后总金额
             afterPriceAll = BigDecimalUtils.add(afterPriceAll,BigDecimalUtils.multiply(baseAssistCalcDetaillist.get(i).getFinalNum(),baseAssistCalcDetaillist.get(i).getBuyPrice()));
+            // 盘点前零售总金额
+            beforeSellPriceAll = BigDecimalUtils.add(beforeSellPriceAll,BigDecimalUtils.multiply(baseAssistCalcDetaillist.get(i).getBeforeNum(),baseAssistCalcDetaillist.get(i).getSellPrice()));
+            // 盘点后零售总金额
+            afterSellPriceAll = BigDecimalUtils.add(afterSellPriceAll,BigDecimalUtils.multiply(baseAssistCalcDetaillist.get(i).getFinalNum(),baseAssistCalcDetaillist.get(i).getSellPrice()));
         }
         stroInventoryDetailDao.insertList(baseAssistCalcDetaillist);
         // 盘点前总金额
         inventoryDTO.setBeforePrice(beforePriceAll);
         // 盘点后总金额
         inventoryDTO.setAfterPrice(afterPriceAll);
+        // 盘点前零售总金额
+        inventoryDTO.setBeforeSellPrice(beforeSellPriceAll);
+        // 盘点后零售总金额
+        inventoryDTO.setAfterSellPrice(afterSellPriceAll);
         // 损益总金额
         inventoryDTO.setIncdecPrice(BigDecimalUtils.subtract(afterPriceAll,beforePriceAll));
         return inventoryDAO.update(inventoryDTO);

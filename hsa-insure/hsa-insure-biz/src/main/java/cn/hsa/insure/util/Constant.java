@@ -809,6 +809,7 @@ public interface Constant {
             public static final String UP_4261 = "4261"; // 自费病人明细信息上传
             public static final String UP_4262 = "4262"; // 自费病人明细信息对账
             public static final String UP_4263 = "4263"; // 自费病人零报金额不符查询
+            public static final String UP_6201 = "6201"; // 线上费用明细上传
         }
 
         public static class DOWNLOAD {

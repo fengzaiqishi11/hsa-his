@@ -158,4 +158,13 @@ public interface InsureUnifiedPayOutptService {
 	 * @Return:
 	 **/
     WrapperResponse<Map<String, Object>> UP4302(Map<String, Object> map);
+
+    /**
+     * 医保统一支付平台：线上费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-26 9:34
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6201(Map<String, Object> map);
 }

@@ -9678,6 +9678,16 @@ ALTER TABLE `outpt_cost` ADD INDEX `idx_outpt_cost_08` USING BTREE(`settle_code`
 ALTER TABLE `inpt_cost` ADD INDEX `idx_inpt_cost_08` USING BTREE(`settle_code`);
 
 
+-- ----------------------
+--   2022-04-28 索引新增
+-- ---------------------
+ALTER TABLE `phar_in_wait_receive` ADD INDEX `phar_in_wait_receive_idx_08` USING BTREE(`old_wr_id`);
+ALTER TABLE `outpt_register` ADD INDEX `idx_outpt_register_05` USING BTREE(`hosp_code`, `is_cancel`, `register_time`);
+ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_05` USING BTREE(`hosp_code`, `status_code`);
+ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_06` USING BTREE(`is_settle`);
+ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_06` USING BTREE(`crte_time`);
+
+
 
 
 

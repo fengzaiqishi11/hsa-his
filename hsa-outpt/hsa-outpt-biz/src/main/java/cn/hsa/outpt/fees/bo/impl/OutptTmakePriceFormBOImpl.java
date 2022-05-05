@@ -177,9 +177,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     @Resource
     private SysParameterService getSysParameterService_consumer;
 
-    @Resource
-    private InsureIndividualVisitDAO insureIndividualVisitDAO;
-
 
     /**
      * @param outptVisitDTO 请求参数
@@ -4372,7 +4369,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       Map<String, Object> insureVisitParam = new HashMap<String, Object>();
       insureVisitParam.put("id", visitId);
       insureVisitParam.put("hospCode", hospCode);
-      insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
+      insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
       if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
         throw new AppException("未查找到医保就诊信息，请做医保登记。");
       }

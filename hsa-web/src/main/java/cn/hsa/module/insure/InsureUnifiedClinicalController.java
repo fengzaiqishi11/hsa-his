@@ -3,17 +3,16 @@ package cn.hsa.module.insure;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -43,8 +42,11 @@ public class InsureUnifiedClinicalController extends BaseController {
      * @Return
      **/
     @PostMapping("/updateClinicalExaminationReportRecord")
-    public WrapperResponse<Boolean> updateClinicalExaminationReportRecord(Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<Boolean> updateClinicalExaminationReportRecord(@RequestBody ClinicalExaminationInfoDTO clinicalExaminationInfoDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<String,Object>();
+        clinicalExaminationInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("clinicalExaminationInfoDTO",clinicalExaminationInfoDTO);
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedClinicalService_consumer.updateClinicalExaminationReportRecord(map);
     }
@@ -58,8 +60,11 @@ public class InsureUnifiedClinicalController extends BaseController {
      * @Return
      **/
     @PostMapping("/insertClinicalExaminationReportRecord")
-    public WrapperResponse<Boolean> insertClinicalExaminationReportRecord(Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<Boolean> insertClinicalExaminationReportRecord(@RequestBody ClinicalExaminationInfoDTO clinicalExaminationInfoDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<String,Object>();
+        clinicalExaminationInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("clinicalExaminationInfoDTO",clinicalExaminationInfoDTO);
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedClinicalService_consumer.insertClinicalExaminationReportRecord(map);
     }
@@ -74,8 +79,11 @@ public class InsureUnifiedClinicalController extends BaseController {
      * @Return
      **/
     @PostMapping("/queryPageClinicalExaminationReportRecord")
-    public WrapperResponse<PageDTO> queryPageClinicalExaminationReportRecord(Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
+    public WrapperResponse<PageDTO> queryPageClinicalExaminationReportRecord(@RequestBody ClinicalExaminationInfoDTO clinicalExaminationInfoDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<String,Object>();
+        clinicalExaminationInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("clinicalExaminationInfoDTO",clinicalExaminationInfoDTO);
         map.put("hospCode", sysUserDTO.getHospCode());
         return insureUnifiedClinicalService_consumer.queryPageClinicalExaminationReportRecord(map);
     }

@@ -3,26 +3,35 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.util.BaseReqUtil;
+import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.UnifiedCommon;
+import cn.hsa.module.insure.clinica.dao.ClinicalExaminationInfoDAO;
+import cn.hsa.module.insure.clinica.dto.CommentDTO;
+import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedClinicalBO;
+import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dao.InsureUnifiedClinicalDAO;
+import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.entity.InsureBactreailReportDO;
 import cn.hsa.module.insure.module.entity.InsureDrugSensitiveReportDO;
 import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 import cn.hsa.module.insure.module.entity.InsurePathologicalReportDO;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static cn.hutool.core.map.MapUtil.toCamelCaseMap;
 
 /**
  * @Package_name: cn.hsa.insure.unifiedpay.bo.impl
@@ -42,7 +51,22 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
     private UnifiedCommon unifiedCommon;
 
     @Resource
+    private InsureItfBOImpl insureItfBO;
+
+    @Resource
+    private BaseReqUtilFactory baseReqUtilFactory;
+
+    @Resource
     private InsureUnifiedClinicalDAO insureUnifiedClinicalDAO;
+
+    @Resource
+    private ClinicalExaminationInfoDAO clinicalExaminationInfoDAO;
+
+    @Resource
+    private InsureIndividualVisitDAO insureIndividualVisitDAO;
+
+    @Resource
+    private InsureConfigurationDAO insureConfigurationDAO;
 
     /**
      * @Method updateClinicalReportRecord
@@ -54,106 +78,48 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      **/
 
-    public boolean updateClinicalExaminationReportRecord(Map<String,Object>map){
-        String hospCode = MapUtils.get(map, "hospCode");
+    public boolean updateClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO){
+        if(clinicalExaminationInfoDTO.getUuid() == null){
+            throw new AppException("传入的uuid主键为空为空");
+        }
+        ClinicalExaminationInfoDTO byUuid = clinicalExaminationInfoDAO.queryByUuid(clinicalExaminationInfoDTO.getUuid());
+        if(byUuid == null){
+            throw new AppException("根据uui未查询到临床检查报告记录");
+        }
+        String hospCode = byUuid.getHospCode();
+        String visitId = byUuid.getMdtrtSn();
+        String medicalRegNo = byUuid.getMdtrtId();
+        Map<String,Object> map = new HashMap<>() ;
+        map.put("hospCode",hospCode);
+        map.put("visitId",visitId);
+        map.put("medicalRegNo",medicalRegNo);
+        //查询患者信息
         InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
-        Map<String,Object> paramMap;
-        List<Map<String,Object>> mapArrayList = new ArrayList<>();
-        Map<String, Object> dataMap = new HashMap<>();
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        List<Map<String,Object>> itemInfoList = new ArrayList<>();
-        List<Map<String,Object>> sampleInfoList = new ArrayList<>();
-        if(!ListUtils.isEmpty(mapList)){
-            for(Map<String,Object> item : mapList){
-                paramMap = new HashMap<>();
-                paramMap.put("mdtrt_sn","");
-                paramMap.put("mdtrt_id","");
-                paramMap.put("psn_no","");
-                paramMap.put("appy_no","");
-                paramMap.put("appy_doc_name","");
-                paramMap.put("rpotc_no","");
-                paramMap.put("rpotc_type_code","");
-                paramMap.put("exam_rpotc_name","");
-                paramMap.put("exam_date","");
-                paramMap.put("rpt_date","");
-                paramMap.put("cma_date","");
-                paramMap.put("sapl_date","");
-                paramMap.put("spcm_no","");
-                paramMap.put("spcm_name","");
-                paramMap.put("exam_type_code","");
-                paramMap.put("exam_item_code","");
 
+        Map<String,Object> configMap = new HashMap<>() ;
+        configMap.put("hospCode",hospCode);
+        configMap.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
+        configMap.put("medicineOrgCode",insureIndividualVisitDTO.getMedicineOrgCode());
 
-                paramMap.put("exam_type_name","");
-                paramMap.put("exam_item_name","");
-                paramMap.put("inhosp_exam_item_code","");
-                paramMap.put("inhosp_exam_item_name","");
-                paramMap.put("exam_part","");
+        //查询医保机构信息
+        InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(configMap);
 
-                paramMap.put("exam_rslt_poit_flag","");
-                paramMap.put("exam_rslt_abn","");
-                paramMap.put("exam_ccls","");
-                paramMap.put("appy_org_name","");
-                paramMap.put("appy_dept_code","");
-
-                paramMap.put("exam_dept_code","");
-                paramMap.put("ipt_dept_code","");
-                paramMap.put("ipt_dept_name","");
-                paramMap.put("bilg_dr_codg","");
-                paramMap.put("bilg_dr_name","");
-                paramMap.put("exe_org_name","");
-                paramMap.put("vali_flag","");
-                mapArrayList.add(paramMap);
-            }
-        }else{
-            throw new AppException("该患者的临床检验报告记录数据为空");
-        }
-        if(!ListUtils.isEmpty(itemInfoList)){
-            for(Map<String,Object> item : itemInfoList){
-                paramMap = new HashMap<>();
-                paramMap.put("rpotc_no","");
-                paramMap.put("appy_no","");
-                paramMap.put("exam_item_code","");
-                paramMap.put("exam_item_name","");
-                paramMap.put("inhosp_exam_item_code","");
-                paramMap.put("inhosp_exam_item_name","");
-                paramMap.put("exam_charge","");
-
-            }
-        }
-
-        if(!ListUtils.isEmpty(sampleInfoList)){
-            for(Map<String,Object> item : sampleInfoList){
-                paramMap = new HashMap<>();
-                paramMap.put("rpotc_no","");
-                paramMap.put("appy_no","");
-                paramMap.put("sapl_date","");
-                paramMap.put("spcm_no","");
-                paramMap.put("spcm_name","");
-                mapArrayList.add(paramMap);
-            }
-        }
-
-        if(!ListUtils.isEmpty(sampleInfoList)){
-            for(Map<String,Object> item : sampleInfoList){
-                paramMap = new HashMap<>();
-                paramMap.put("rpotc_no","");
-                paramMap.put("study_uid","");
-                paramMap.put("patient_id","");
-                paramMap.put("patient_name","");
-                paramMap.put("acession_no","");
-
-                paramMap.put("study_time","");
-                paramMap.put("modality","");
-                paramMap.put("store_path","");
-                paramMap.put("series_count","");
-                paramMap.put("image_count","");
-                mapArrayList.add(paramMap);
-            }
-        }
-
-        dataMap.put("data", mapArrayList);
-        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "4504", dataMap);
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("clinicalExaminationInfoDTO",byUuid);
+        paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        paramMap.put("visitId", visitId);
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", insureIndividualVisitDTO.getIsHospital());
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.CLINICAL_EXAMINATION_UPLOAD.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+        interfaceParamDTO.setVisitId(visitId);
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.CLINICAL_EXAMINATION_UPLOAD, interfaceParamDTO);
         return true;
     }
 
@@ -316,7 +282,7 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
     }
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 保存到his数据库
      * @Param
@@ -325,12 +291,43 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public boolean insertClinicalExaminationReportRecord(Map<String, Object> map) {
-        return false;
+    public boolean insertClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO) {
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        ClinicalExaminationInfoDTO clinicalExaminationInfoDTO1 = clinicalExaminationInfoDAO.queryByUuid(clinicalExaminationInfoDTO.getUuid());
+        if(clinicalExaminationInfoDTO1 == null){
+            if(StringUtils.isEmpty(clinicalExaminationInfoDTO.getVisitNo())){
+                throw new AppException("传入的visitNo住院号/门诊号为空");
+            }
+            //根据住院号/门诊号查询医保登记信息
+            InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+            insureIndividualVisitDTO.setVisitNo(clinicalExaminationInfoDTO.getVisitNo());
+            insureIndividualVisitDTO.setHospCode(clinicalExaminationInfoDTO.getHospCode());
+            InsureIndividualVisitDTO byVisitNo = insureIndividualVisitDAO.getByVisitNo(insureIndividualVisitDTO);
+            if (byVisitNo == null || StringUtils.isEmpty(byVisitNo.getId())) {
+                throw new AppException("未查找到医保就诊信息，请做医保登记。");
+            }
+            clinicalExaminationInfoDTO.setMdtrtSn(byVisitNo.getVisitId());
+            clinicalExaminationInfoDTO.setMdtrtId(byVisitNo.getMedicalRegNo());
+            clinicalExaminationInfoDTO.setPsnNo(byVisitNo.getAac001());
+            if(clinicalExaminationInfoDTO.getUuid() == null){
+                clinicalExaminationInfoDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            clinicalExaminationInfoDTO.setIsUplod("0");
+            clinicalExaminationInfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            clinicalExaminationInfoDAO.insertClinicalExamination(clinicalExaminationInfoDTO);
+        }
+        else {
+            clinicalExaminationInfoDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if("0".equals(clinicalExaminationInfoDTO.getValiFlag()) && "1".equals(clinicalExaminationInfoDTO1.getIsUplod())){
+                throw new AppException("已上传数据不可以删除");
+            }
+            clinicalExaminationInfoDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(clinicalExaminationInfoDTO)));
+        }
+        return true;
     }
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 分页查询
      * @Param
@@ -339,9 +336,11 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public PageDTO queryPageClinicalExaminationReportRecord(Map<String, Object> map) {
-
-        return null;
+    public PageDTO queryPageClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO) {
+        // 设置分页信息
+        PageHelper.startPage(clinicalExaminationInfoDTO.getPageNo(), clinicalExaminationInfoDTO.getPageSize());
+        List<ClinicalExaminationInfoDTO> clinicalExaminationInfoDTOList = clinicalExaminationInfoDAO.queryPageClinicalExamination(clinicalExaminationInfoDTO);
+        return PageDTO.of(clinicalExaminationInfoDTOList);
     }
 
 
@@ -602,5 +601,28 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
         Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "4506", dataMap);
 
         return true;
+    }
+
+    /**
+     * @Method checkInsureConfig
+     * @Desrciption 检查医保机构是否已选择
+     * @Param insureSettleInfoDTO
+     * @Author fuhui
+     * @Date 2021/8/21 13:58
+     * @Return
+     **/
+    private InsureConfigurationDTO checkInsureConfig(Map map) {
+        if (MapUtils.get(map, "insureRegCode") == null) {
+            throw new AppException("患者的医保机构为空");
+        }
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(MapUtils.get(map, "hospCode"));
+        insureConfigurationDTO.setOrgCode(MapUtils.get(map, "medicineOrgCode"));
+        insureConfigurationDTO.setRegCode(MapUtils.get(map, "insureRegCode"));
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("医保机构配置信息为空");
+        }
+        return insureConfigurationDTO;
     }
 }

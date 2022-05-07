@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.inpt.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
 
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateClinicalExaminationReportRecord(Map<String,Object>map);
+    boolean updateClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 
     /**
      * @param map
@@ -182,7 +183,7 @@ public interface InsureUnifiedClinicalBO  {
     boolean queryPageClinicalReportRecord(Map<String, Object> map);
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 保存到his数据库
      * @Param
@@ -190,10 +191,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertClinicalExaminationReportRecord(Map<String, Object> map);
+    boolean insertClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 分页查询
      * @Param
@@ -201,5 +202,5 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPageClinicalExaminationReportRecord(Map<String, Object> map);
+    PageDTO queryPageClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 }

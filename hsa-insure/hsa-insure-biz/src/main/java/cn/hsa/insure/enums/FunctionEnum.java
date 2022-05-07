@@ -87,6 +87,8 @@ public enum FunctionEnum {
     INSUR_MRI_UPLOAD(Constant.UnifiedPay.INPT.UP_4401, "住院病案首页上传"),
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
 
+    CLINICAL_EXAMINATION_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4501,"临床检查报告记录"),
+
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),
     MDTRT_INFO(Constant.UnifiedPay.REGISTER.UP_5201, "就诊信息查询"),

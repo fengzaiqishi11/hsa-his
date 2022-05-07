@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedClinicalBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService;
+import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -110,7 +111,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> updateClinicalExaminationReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateClinicalExaminationReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
     }
 
     /**
@@ -251,7 +252,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> insertClinicalExaminationReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalExaminationReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
     }
 
     /**
@@ -265,6 +266,6 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<PageDTO> queryPageClinicalExaminationReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalExaminationReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
     }
 }

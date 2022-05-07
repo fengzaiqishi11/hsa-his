@@ -108,7 +108,9 @@ public enum FunctionEnum {
     ONLINE_FEE_PAY(Constant.UnifiedPay.REGISTER.UP_6201, "线上费用明细上传"),
     //接口功能号 请按顺序填写
 
-    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载");
+    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载"),
+
+    POLICY_ITEM_INFO("100001", "政策项查询");
     private final String code;
     private final String desc;
 

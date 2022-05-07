@@ -168,4 +168,14 @@ public interface InsureIndividualVisitBO {
      * @Return
      */
     void updateInsureSettleCounts(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * 根据医保就诊ID查询就诊信息
+     * @param insureVisitParam
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-07 15:10
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map<String, Object> insureVisitParam);
+
 }

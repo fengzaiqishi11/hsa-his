@@ -607,6 +607,7 @@ public class EmrPatientController extends BaseController {
 			inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
 		}
 		inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+    inptVisitDTO.setId(inptVisitDTO.getVisitId());
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("inptVisitDTO", inptVisitDTO);

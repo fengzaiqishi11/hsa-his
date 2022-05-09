@@ -201,5 +201,17 @@ public class CenterDatasourceServiceImpl extends HsafService implements CenterDa
     public WrapperResponse<List<CenterDatasourceDTO>> getCenterHospitalDatasource(String hospCode) {
         return WrapperResponse.success(centerDatasourceBO.getCenterHospitalDatasource(hospCode));
     }
+
+    /**
+     * @Description: 导出医院数据（SaaS导出）
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    @Override
+    public WrapperResponse exportHospitalData(String startDate,String endDate) {
+        return centerDatasourceBO.exportHospitalData(startDate,endDate);
+    }
 }
 

@@ -2118,6 +2118,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
         //决定lis,pass项目是否确费：未配置时或否定时，所有核收费用都是确费状态，配置了lis pass项目为未确费状态
         SysParameterDTO sysParameterDTO =  getSysParameterDTO(inptCostDTO.getHospCode(),"LIS_PACS_SFQF");
+        //康复理疗医嘱是否需要确费 2022/4/25 by yuelong.chen
+        SysParameterDTO sysParameterDTO2 =  getSysParameterDTO(inptCostDTO.getHospCode(),"RECOVERY_SFQF");
         if((sysParameterDTO != null && "0".equals(sysParameterDTO.getValue())) && ("3".equals(adviceDTO.getTypeCode())||"12".equals(adviceDTO.getTypeCode()))){
             // 2021年5月14日14:37:54 官红强  如果执行科室的科室性质为检验科室或影像科室，则为未确费，否则确费
             if (adviceDTO.getExecDeptKsxz() != null && ("7".equals(adviceDTO.getExecDeptKsxz()) || "8".equals(adviceDTO.getExecDeptKsxz()))) {
@@ -2125,22 +2127,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             } else {
                 inptCostDTO.setIsOk(Constants.SF.S);
             }
+        }else if((sysParameterDTO2 != null && "0".equals(sysParameterDTO2.getValue())) && ("19".equals(adviceDTO.getTypeCode()))){
+            inptCostDTO.setIsOk(Constants.SF.F);
         }else{
             inptCostDTO.setIsOk(Constants.SF.S);
             inptCostDTO.setOkId(medicalAdviceDTO.getCheckId());
             inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
             inptCostDTO.setOkTime(date);
         }
-        //康复理疗医嘱是否需要确费 2022/4/25 by yuelong.chen
-        SysParameterDTO sysParameterDTO2 =  getSysParameterDTO(inptCostDTO.getHospCode(),"RECOVERY_SFQF");
-        if((sysParameterDTO2 != null && "0".equals(sysParameterDTO2.getValue())) && ("19".equals(adviceDTO.getTypeCode()))){
-                inptCostDTO.setIsOk(Constants.SF.F);
-        }else{
-            inptCostDTO.setIsOk(Constants.SF.S);
-            inptCostDTO.setOkId(medicalAdviceDTO.getCheckId());
-            inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
-            inptCostDTO.setOkTime(date);
-        }
+
 
         inptCostDTO.setSettleCode("0");
         inptCostDTO.setIsCheck("0");

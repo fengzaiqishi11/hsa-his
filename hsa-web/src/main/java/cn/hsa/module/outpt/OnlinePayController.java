@@ -2,7 +2,9 @@ package cn.hsa.module.outpt;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.outpt.fees.dto.OnlinePayFeeDTO;
+import cn.hsa.module.outpt.fees.dto.SetlResultQueryDTO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,5 +47,24 @@ public class OnlinePayController  extends BaseController {
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("onlinePayFeeDTO", dto);
     return outptTmakePriceFormService_consumer.uploadOnlineFeeDetail(map);
+  }
+
+  /**
+   * 【6301】医保订单结算结果查询
+   * @param dto
+   * @param req
+   * @param res
+   * @Author 医保开发二部-湛康
+   * @Date 2022-05-09 14:47
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
+   */
+  @PostMapping("/queryInsureSetlResult")
+  public WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(@RequestBody SetlResultQueryDTO dto,
+                                                                   HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlResultQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.queryInsureSetlResult(map);
   }
 }

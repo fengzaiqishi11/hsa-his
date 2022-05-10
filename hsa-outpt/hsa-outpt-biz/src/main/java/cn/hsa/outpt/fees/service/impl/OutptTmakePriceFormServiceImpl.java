@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.outpt.fees.bo.OutptTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
@@ -513,6 +514,18 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
   @Override
   public WrapperResponse<Boolean> uploadOnlineFeeDetail(Map<String, Object> map) {
     return WrapperResponse.success(outptTmakePriceFormBO.uploadOnlineFeeDetail(map));
+  }
+
+  /**
+   * 医保订单结算结果查询
+   * @param map
+   * @Author 医保开发二部-湛康
+   * @Date 2022-05-09 15:15
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
+   */
+  @Override
+  public WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(Map<String, Object> map) {
+    return WrapperResponse.success(outptTmakePriceFormBO.queryInsureSetlResult(map));
   }
 
 }

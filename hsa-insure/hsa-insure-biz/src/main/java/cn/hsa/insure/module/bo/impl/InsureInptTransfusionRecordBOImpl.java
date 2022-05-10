@@ -69,12 +69,13 @@ public class InsureInptTransfusionRecordBOImpl  implements InsureInptTransfusion
         String strIds = MapUtils.get(params,"ids");
         String hospCode = MapUtils.get(params,"hospCode");
         String orgCode =  MapUtils.get(params,"orgCode");
+        String regCode =  MapUtils.get(params,"regCode");
         List<String> idList = Arrays.asList(strIds.split(","));
         List<Map> dataMapList = insureInptTransfusionRecordDAO.queryInsureInptTransfusionRecordsMap(hospCode,idList);
         Map inputMap = new HashMap(4);
         inputMap.put("data",dataMapList);
 
-        commonInsureUnified(hospCode,orgCode, Constant.UnifiedPay.INPT.UP_4601,inputMap);
+        commonInsureUnified(hospCode,orgCode,regCode, Constant.UnifiedPay.INPT.UP_4601,inputMap);
         InsureInptTransfusionRecordDTO paramDTO = new InsureInptTransfusionRecordDTO();
         paramDTO.setIdList(idList);
         paramDTO.setIsTransmission(Constants.SF.S);
@@ -92,10 +93,12 @@ public class InsureInptTransfusionRecordBOImpl  implements InsureInptTransfusion
      * @param paramMap 需要传输的参数
      * @return 调用结果
      */
-    private Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap) {
+    private Map<String, Object> commonInsureUnified(String hospCode, String orgCode,String regCode,
+                                                    String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setOrgCode(orgCode);
+        insureConfigurationDTO.setRegCode(regCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map httpParam = new HashMap();

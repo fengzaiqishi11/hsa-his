@@ -424,4 +424,13 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
      */
     WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(Map<String, Object> map);
+
+    /**
+     * 【6401】费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:48
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map);
 }

@@ -109,6 +109,7 @@ public enum FunctionEnum {
     PSN_POLICY(Constant.UnifiedPay.REGISTER.UP_100001, "政策项查询"),
     ONLINE_FEE_PAY(Constant.UnifiedPay.REGISTER.UP_6201, "线上费用明细上传"),
     ORD_QUERY_PAY(Constant.UnifiedPay.REGISTER.UP_6301, "医保订单结算结果查询"),
+    ONLINE_FEE_REVOKE(Constant.UnifiedPay.REGISTER.UP_6401, "医保订单结算结果查询"),
     //接口功能号 请按顺序填写
 
     LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载"),

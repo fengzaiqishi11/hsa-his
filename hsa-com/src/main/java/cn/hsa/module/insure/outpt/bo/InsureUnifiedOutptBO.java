@@ -53,4 +53,13 @@ public interface InsureUnifiedOutptBO {
      * @return java.util.Map<java.lang.String,java.lang.Object>
      */
     Map<String, Object> UP_6301(Map<String, Object> map);
+
+    /**
+     * 费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 14:09
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String, Object> UP_6401(Map<String, Object> map);
 }

@@ -30,5 +30,7 @@ public class InptAdviceDetailTempDTO extends InptAdviceDetailTempDO implements S
     private String splitUnitCode;// 拆零单位
     private String bigUnitCode;// 大单位
     private String pharId;// 药房
+    private String color;// 颜色
+
 
 }

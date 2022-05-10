@@ -222,6 +222,7 @@
         <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
         <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
         <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"></result>
+        <result property="color" column="color" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
@@ -1617,6 +1618,10 @@
             case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.unit_code end bigUnitCode,
             c.drug_remark drugRemark, c.drug_img_path drugImgPath,
             case when a.item_code = '1' then '1' when a.item_code = '2' then '15' else e.type_code end typeCode,
+            case when a.item_code = '1' then (case when c.is_in = '0' then '1' else '0' end)
+                 when a.item_code = '4' then (case when e.use_scope_code = '2' then '0' else '1' end)
+                 else '0'
+                end color,
             case when parameter.id is null then '0' else '1' end isWz
         from outpt_prescribe_temp_detail a
                  left join base_rate b on a.rate_id = b.id and a.hosp_code = b.hosp_code

@@ -51,7 +51,7 @@
     </sql>
 
     <select id="queryComment" resultType="cn.hsa.module.insure.clinica.dto.CommentDTO">
-    select COLUMN_NAME,column_comment from INFORMATION_SCHEMA.Columns where table_name= 'insure_bacterial_report' and table_schema='his_v2';
+    select COLUMN_NAME,column_comment from INFORMATION_SCHEMA.Columns where table_name= 'insure_pathological_report' and table_schema='his_v2';
 </select>
 
     <select id="queryPageInsureClinicalCheckout" resultType="cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO">

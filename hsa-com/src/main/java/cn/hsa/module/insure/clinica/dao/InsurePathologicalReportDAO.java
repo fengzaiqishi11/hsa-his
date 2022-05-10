@@ -1,29 +1,30 @@
 package cn.hsa.module.insure.clinica.dao;
 
-import cn.hsa.module.insure.clinica.dto.InsureBacterialReportDTO;
+
+import cn.hsa.module.insure.clinica.dto.InsurePathologicalReportDTO;
 
 import java.util.List;
 import java.util.Map;
 
 /**
-* @ClassName InsureBacterialReportDAO
-* @Deacription 细菌培养报告记录信息表dao层
+* @ClassName InsurePathologicalReportDAO
+* @Deacription 病理检查报告记录信息表dao层
 * @Author liuhuiming
-* @Date 2022-05-09
+* @Date 2022-05-10
 * @Version 1.0
 **/
-public interface InsureBacterialReportDAO {
+public interface InsurePathologicalReportDAO {
 
     /**
      * @Menthod queryPage
      * @Desrciption 分页查询
      * @Param
-     * 1. InsureBacterialReportDTO  参数数据对象
+     * 1. InsurePathologicalReportDTO  参数数据对象
      * @Author liuhuiming
      * @Date   2022/3/25 17:02
      * @Return
      **/
-    List<InsureBacterialReportDTO> queryPageInsureBacterialReport(InsureBacterialReportDTO insureBacterialReportDTO);
+    List<InsurePathologicalReportDTO> queryPagePathologicalReport(InsurePathologicalReportDTO insurePathologicalReportDTO);
 
     /**
      * @Menthod insert()
@@ -34,7 +35,7 @@ public interface InsureBacterialReportDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    int insertInsureBacterialReport(InsureBacterialReportDTO insureBacterialReportDTO);
+    int insertInsurePathologicalReport(InsurePathologicalReportDTO insurePathologicalReportDTO);
 
     /**
      * @Menthod updateSelective()
@@ -56,16 +57,6 @@ public interface InsureBacterialReportDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    InsureBacterialReportDTO queryByUuid(Long uuid);
+    InsurePathologicalReportDTO queryByUuid(Long uuid);
 
-    /**
-     * @Menthod queryByUuid()
-     * @Desrciption 查询单条
-     * @Param
-     *1. insureEmrAdminfoDTO  参数数据对象
-     * @Author liuhuiming
-     * @Date   2022/3/25 17:02
-     * @Return int
-     **/
-    List<InsureBacterialReportDTO> queryByMdtrtSn(String mdtrtSn);
 }

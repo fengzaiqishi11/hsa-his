@@ -7,13 +7,8 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.UnifiedCommon;
-import cn.hsa.module.insure.clinica.dao.ClinicalExaminationInfoDAO;
-import cn.hsa.module.insure.clinica.dao.InsureBacterialReportDAO;
-import cn.hsa.module.insure.clinica.dao.InsureClinicalCheckoutDAO;
-import cn.hsa.module.insure.clinica.dto.CommentDTO;
-import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
-import cn.hsa.module.insure.clinica.dto.InsureBacterialReportDTO;
-import cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO;
+import cn.hsa.module.insure.clinica.dao.*;
+import cn.hsa.module.insure.clinica.dto.*;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedClinicalBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
@@ -71,6 +66,12 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
 
     @Resource
     private InsureBacterialReportDAO insureBacterialReportDAO;
+
+    @Resource
+    private InsureDrugsensitiveReportDAO insureDrugsensitiveReportDAO;
+
+    @Resource
+    private InsurePathologicalReportDAO insurePathologicalReportDAO;
 
     @Resource
     private InsureIndividualVisitDAO insureIndividualVisitDAO;
@@ -260,6 +261,14 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      */
     @Override
     public PageDTO queryPageClinicalReportRecord(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO) {
+        List<CommentDTO>  commentDTOList=insureClinicalCheckoutDAO.queryComment();
+        Map map = new HashMap();
+        for(CommentDTO commentDTO1:commentDTOList){
+            map.put(commentDTO1.getColumnName(),commentDTO1.getColumnComment());
+        }
+        map =toCamelCaseMap(map);
+        JSONObject json = new JSONObject (map);
+        System.out.print(json);
         // 设置分页信息
         PageHelper.startPage(insureClinicalCheckoutDTO.getPageNo(), insureClinicalCheckoutDTO.getPageSize());
         List<InsureClinicalCheckoutDTO> insureClinicalCheckoutDTOList = insureClinicalCheckoutDAO.queryPageInsureClinicalCheckout(insureClinicalCheckoutDTO);
@@ -282,10 +291,10 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
         }
         InsureClinicalCheckoutDTO byUuid = insureClinicalCheckoutDAO.queryByUuid(insureClinicalCheckoutDTO.getUuid());
         if(byUuid == null){
-            throw new AppException("未查询到临床检查报告记录");
+            throw new AppException("未查询到临床检验报告记录");
         }
         if("1".equals(byUuid.getIsUplod())){
-            throw new AppException("临床检查报告记录已上传");
+            throw new AppException("临床检验报告记录已上传");
         }
         String hospCode = byUuid.getHospCode();
         String visitId = byUuid.getMdtrtSn();
@@ -491,25 +500,53 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
     }
 
     /**
-     * @param map
+     * @param
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录---上传到医保
+     * @Desrciption 病理检查报告记录---保存到his库
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
      * @Return
      */
     @Override
-    public boolean insertPathologicalReportRecord(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map,"hospCode");
-        InsurePathologicalReportDO insurePathologicalReportDO = MapUtils.get(map,"insurePathologicalReportDO");
-        insurePathologicalReportDO.setId(SnowflakeUtils.getId());
-        insurePathologicalReportDO.setHospCode(hospCode);
-        return  insureUnifiedClinicalDAO.insertPathologicalReportRecord(insurePathologicalReportDO) ;
+    public boolean insertPathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO) {
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsurePathologicalReportDTO insurePathologicalReportDTO1 = insurePathologicalReportDAO.queryByUuid(insurePathologicalReportDTO.getUuid());
+        if(insurePathologicalReportDTO1 == null){
+            if(StringUtils.isEmpty(insurePathologicalReportDTO.getVisitNo())){
+                throw new AppException("传入的visitNo住院号/门诊号为空");
+            }
+            //根据住院号/门诊号查询医保登记信息
+            InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+            insureIndividualVisitDTO.setVisitNo(insurePathologicalReportDTO.getVisitNo());
+            insureIndividualVisitDTO.setHospCode(insurePathologicalReportDTO.getHospCode());
+            InsureIndividualVisitDTO byVisitNo = insureIndividualVisitDAO.getByVisitNo(insureIndividualVisitDTO);
+            if (byVisitNo == null || StringUtils.isEmpty(byVisitNo.getId())) {
+                throw new AppException("未查找到医保就诊信息，请做医保登记。");
+            }
+            insurePathologicalReportDTO.setMdtrtSn(byVisitNo.getVisitId());
+            insurePathologicalReportDTO.setMdtrtId(byVisitNo.getMedicalRegNo());
+            insurePathologicalReportDTO.setPsnNo(byVisitNo.getAac001());
+            if(insurePathologicalReportDTO.getUuid() == null){
+                insurePathologicalReportDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insurePathologicalReportDTO.setIsUplod("0");
+            insurePathologicalReportDTO.setValiFlag("1");
+            insurePathologicalReportDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            insurePathologicalReportDAO.insertInsurePathologicalReport(insurePathologicalReportDTO);
+        }
+        else {
+            insurePathologicalReportDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if("0".equals(insurePathologicalReportDTO.getValiFlag()) && "1".equals(insurePathologicalReportDTO1.getIsUplod())){
+                throw new AppException("已上传数据不可以删除");
+            }
+            insurePathologicalReportDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insurePathologicalReportDTO)));
+        }
+        return true;
     }
 
     /**
-     * @param map
+     * @param
      * @Method queryPagePathologicalReportRecord
      * @Desrciption 病理检查报告记录---分页查询
      * @Param
@@ -518,17 +555,15 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public PageDTO queryPagePathologicalReportRecord(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map,"hospCode");
-        InsurePathologicalReportDO insurePathologicalReportDO = MapUtils.get(map,"insurePathologicalReportDO");
-        insurePathologicalReportDO.setHospCode(hospCode);
-        PageHelper.startPage(insurePathologicalReportDO.getPageNo(),insurePathologicalReportDO.getPageSize());
-        List<InsurePathologicalReportDO> reportDOList = insureUnifiedClinicalDAO.queryPagePathologicalReportRecord(insurePathologicalReportDO);
-        return PageDTO.of(reportDOList);
+    public PageDTO queryPagePathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO) {
+        // 设置分页信息
+        PageHelper.startPage(insurePathologicalReportDTO.getPageNo(), insurePathologicalReportDTO.getPageSize());
+        List<InsurePathologicalReportDTO> insurePathologicalReportDTOList = insurePathologicalReportDAO.queryPagePathologicalReport(insurePathologicalReportDTO);
+        return PageDTO.of(insurePathologicalReportDTOList);
     }
 
     /**
-     * @param map
+     * @param
      * @Method insertDrugSensitivityReportRecord
      * @Desrciption 药敏记录报告记录  ----保存到his数据库
      * @Param
@@ -537,101 +572,180 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public boolean insertDrugSensitivityReportRecord(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map,"hospCode");
-        InsureDrugSensitiveReportDO insureDrugSensitiveReportDO = MapUtils.get(map,"insureDrugSensitiveReportDO");
-        insureDrugSensitiveReportDO.setId(SnowflakeUtils.getId());
-        insureDrugSensitiveReportDO.setHospCode(hospCode);
-        return insureUnifiedClinicalDAO.insertDrugSensitivityReportRecord(insureDrugSensitiveReportDO);
+    public boolean insertDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO) {
+        //根据uuid 判断记录是否存在，不存在则新增，存在则修改
+        InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO1 = insureDrugsensitiveReportDAO.queryByUuid(insureDrugsensitiveReportDTO.getUuid());
+        if(insureDrugsensitiveReportDTO1 == null){
+            if(StringUtils.isEmpty(insureDrugsensitiveReportDTO.getVisitNo())){
+                throw new AppException("传入的visitNo住院号/门诊号为空");
+            }
+            //根据住院号/门诊号查询医保登记信息
+            InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+            insureIndividualVisitDTO.setVisitNo(insureDrugsensitiveReportDTO.getVisitNo());
+            insureIndividualVisitDTO.setHospCode(insureDrugsensitiveReportDTO.getHospCode());
+            InsureIndividualVisitDTO byVisitNo = insureIndividualVisitDAO.getByVisitNo(insureIndividualVisitDTO);
+            if (byVisitNo == null || StringUtils.isEmpty(byVisitNo.getId())) {
+                throw new AppException("未查找到医保就诊信息，请做医保登记。");
+            }
+            insureDrugsensitiveReportDTO.setMdtrtSn(byVisitNo.getVisitId());
+            insureDrugsensitiveReportDTO.setMdtrtId(byVisitNo.getMedicalRegNo());
+            insureDrugsensitiveReportDTO.setPsnNo(byVisitNo.getAac001());
+            if(insureDrugsensitiveReportDTO.getUuid() == null){
+                insureDrugsensitiveReportDTO.setUuid(SnowflakeUtils.getLongId());
+            }
+            insureDrugsensitiveReportDTO.setIsUplod("0");
+            insureDrugsensitiveReportDTO.setValiFlag("1");
+            insureDrugsensitiveReportDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            insureDrugsensitiveReportDAO.insertInsureDrugsensitiveReport(insureDrugsensitiveReportDTO);
+        }
+        else {
+            insureDrugsensitiveReportDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if("0".equals(insureDrugsensitiveReportDTO.getValiFlag()) && "1".equals(insureDrugsensitiveReportDTO1.getIsUplod())){
+                throw new AppException("已上传数据不可以删除");
+            }
+            insureDrugsensitiveReportDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureDrugsensitiveReportDTO)));
+        }
+        return true;
+    }
+
+    /**
+     * @param
+     * @Method insertDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录  ----分页查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public PageDTO queryDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO) {
+        // 设置分页信息
+        PageHelper.startPage(insureDrugsensitiveReportDTO.getPageNo(), insureDrugsensitiveReportDTO.getPageSize());
+        List<InsureDrugsensitiveReportDTO> insureDrugsensitiveReportDTOList = insureDrugsensitiveReportDAO.queryPageInsureDrugsensitiveReport(insureDrugsensitiveReportDTO);
+        return PageDTO.of(insureDrugsensitiveReportDTOList);
     }
 
 
     /**
      * @Method updateDrugSensitivityReportRecord
-     * @Desrciption 药敏记录报告记录
+     * @Desrciption 药敏记录报告记录 -- 上传到医保
      * @Param
      *
      * @Author fuhui
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    public boolean updateDrugSensitivityReportRecord(Map<String,Object>map){
-        String hospCode = MapUtils.get(map, "hospCode");
-        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
-        Map<String,Object> paramMap;
-        List<InsureDrugSensitiveReportDO> insureDrugSensitiveReportDOList = insureUnifiedClinicalDAO.queryAllDrugSensitivityReportRecord(map);
-        Map<String, Object> dataMap = new HashMap<>();
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        if(!ListUtils.isEmpty(insureDrugSensitiveReportDOList)){
-            for(InsureDrugSensitiveReportDO drugSensitiveReportDO : insureDrugSensitiveReportDOList){
-                paramMap = new HashMap<>();
-                paramMap.put("mdtrt_sn",drugSensitiveReportDO.getId()); // 就医流水号
-                paramMap.put("mdtrt_id",drugSensitiveReportDO.getMdtrtId()); // 就诊ID
-                paramMap.put("psn_no",drugSensitiveReportDO.getPsnNo()); // 人员编号
-                paramMap.put("appy_no",drugSensitiveReportDO.getAppyNo()); // 申请单号
-                paramMap.put("rpotc_no",drugSensitiveReportDO.getRpotcNo()); // 报告单号
-                paramMap.put("germ_code",drugSensitiveReportDO.getGermCode()); // 细菌代号
-                paramMap.put("germ_name",drugSensitiveReportDO.getGermName()); // 细菌名称
-                paramMap.put("sstb_code",drugSensitiveReportDO.getSstbCode()); // 药敏代码
-                paramMap.put("sstb_name",drugSensitiveReportDO.getSstbName()); // 药敏名称
-                paramMap.put("reta_rslt_code",drugSensitiveReportDO.getRetaRsltCode()); // 抗药结果代码
-                paramMap.put("reta_rslt_name",drugSensitiveReportDO.getRetaRsltName()); // 抗药结果
-                paramMap.put("ref_val",drugSensitiveReportDO.getRefVal()); // 参考值
-                paramMap.put("exam_mtd",drugSensitiveReportDO.getExamMtd()); // 检验方法
-                paramMap.put("exam_rslt",drugSensitiveReportDO.getExamRslt()); // 检验结果
-                paramMap.put("exam_org_name",drugSensitiveReportDO.getExamOrgName()); // 检验机构名称
-                paramMap.put("vali_flag",drugSensitiveReportDO.getValiFlag()); // 有效标志
-                mapList.add(paramMap);
-            }
-        }else{
-            throw new AppException("该患者的药敏记录报告记录数据为空");
+    public boolean updateDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO){
+        if(insureDrugsensitiveReportDTO.getUuid() == null){
+            throw new AppException("传入的uuid主键为空为空");
         }
-        dataMap.put("data", mapList);
-        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "4504", dataMap);
+        InsureDrugsensitiveReportDTO byUuid = insureDrugsensitiveReportDAO.queryByUuid(insureDrugsensitiveReportDTO.getUuid());
+        if(byUuid == null){
+            throw new AppException("未查询到药敏记录报告记录");
+        }
+        if("1".equals(byUuid.getIsUplod())){
+            throw new AppException("药敏记录报告记录已上传");
+        }
+        String hospCode = byUuid.getHospCode();
+        String visitId = byUuid.getMdtrtSn();
+        String medicalRegNo = byUuid.getMdtrtId();
+        Map<String,Object> map = new HashMap<>() ;
+        map.put("hospCode",hospCode);
+        map.put("visitId",visitId);
+        map.put("medicalRegNo",medicalRegNo);
+        //查询患者信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
+
+        Map<String,Object> configMap = new HashMap<>() ;
+        configMap.put("hospCode",hospCode);
+        configMap.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
+        configMap.put("medicineOrgCode",insureIndividualVisitDTO.getMedicineOrgCode());
+
+        //查询医保机构信息
+        InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(configMap);
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("insureDrugsensitiveReportDTO",byUuid);
+        paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        paramMap.put("visitId", visitId);
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", insureIndividualVisitDTO.getIsHospital());
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.DRUGSENSITIVE_REPORT_UPLOAD.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+        interfaceParamDTO.setVisitId(visitId);
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.DRUGSENSITIVE_REPORT_UPLOAD, interfaceParamDTO);
+        //修改上传状态
+        insureDrugsensitiveReportDTO.setIsUplod("1");
+        insureDrugsensitiveReportDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+        insureDrugsensitiveReportDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insureDrugsensitiveReportDTO)));
         return true;
     }
 
 
     /**
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
+     * @Desrciption 病理检查报告记录 -- 上传到医保
      * @Param
      *
      * @Author fuhui
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    public boolean updatePathologicalReportRecord(Map<String,Object>map){
-        String hospCode = MapUtils.get(map, "hospCode");
-        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
-        Map<String,Object> paramMap;
-        List<Map<String,Object>> mapArrayList = new ArrayList<>();
-        Map<String, Object> dataMap = new HashMap<>();
-        List<InsurePathologicalReportDO> insurePathologicalReportDOList = insureUnifiedClinicalDAO.queryAllPathologicalReportRecord(map);
-        if(!ListUtils.isEmpty(insurePathologicalReportDOList)){
-            for(InsurePathologicalReportDO pathologicalReportDO : insurePathologicalReportDOList){
-                paramMap = new HashMap<>();
-                paramMap.put("mdtrt_sn",pathologicalReportDO.getId());
-                paramMap.put("mdtrt_id",pathologicalReportDO.getMdtrtId());
-                paramMap.put("psn_no",pathologicalReportDO.getPsnNo());
-                paramMap.put("palg_no",pathologicalReportDO.getPalgDiag());
-                paramMap.put("frozen_no",pathologicalReportDO.getFrozenNo());
-                paramMap.put("cma_date",pathologicalReportDO.getCmaDate());
-                paramMap.put("rpot_date",pathologicalReportDO.getRpotDate());
-                paramMap.put("cma_matl",pathologicalReportDO.getCmaMatl());
-                paramMap.put("clnc_dise",pathologicalReportDO.getClncDise());
-                paramMap.put("exam_fnd",pathologicalReportDO.getExamFnd());
-                paramMap.put("sabc",pathologicalReportDO.getSabc());
-                paramMap.put("palg_diag",pathologicalReportDO.getPalgDiag());
-                paramMap.put("rpot_doc",pathologicalReportDO.getRpotDoc());
-                paramMap.put("vali_flag",pathologicalReportDO.getValiFlag());
-                mapArrayList.add(paramMap);
-            }
-        }else{
-            throw new AppException("该患者的病理检查报告记录数据为空");
+    public boolean updatePathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO){
+        if(insurePathologicalReportDTO.getUuid() == null){
+            throw new AppException("传入的uuid主键为空为空");
         }
-        dataMap.put("data", mapArrayList);
-        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "4505", dataMap);
+        InsurePathologicalReportDTO byUuid = insurePathologicalReportDAO.queryByUuid(insurePathologicalReportDTO.getUuid());
+        if(byUuid == null){
+            throw new AppException("未查询到药敏记录报告记录");
+        }
+        if("1".equals(byUuid.getIsUplod())){
+            throw new AppException("药敏记录报告记录已上传");
+        }
+        String hospCode = byUuid.getHospCode();
+        String visitId = byUuid.getMdtrtSn();
+        String medicalRegNo = byUuid.getMdtrtId();
+        Map<String,Object> map = new HashMap<>() ;
+        map.put("hospCode",hospCode);
+        map.put("visitId",visitId);
+        map.put("medicalRegNo",medicalRegNo);
+        //查询患者信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
+
+        Map<String,Object> configMap = new HashMap<>() ;
+        configMap.put("hospCode",hospCode);
+        configMap.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
+        configMap.put("medicineOrgCode",insureIndividualVisitDTO.getMedicineOrgCode());
+
+        //查询医保机构信息
+        InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(configMap);
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("insurePathologicalReportDTO",byUuid);
+        paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        paramMap.put("visitId", visitId);
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", insureIndividualVisitDTO.getIsHospital());
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.PATHOLOGICAL_REPORT_UPLOAD.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+        interfaceParamDTO.setVisitId(visitId);
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.PATHOLOGICAL_REPORT_UPLOAD, interfaceParamDTO);
+        //修改上传状态
+        insurePathologicalReportDTO.setIsUplod("1");
+        insurePathologicalReportDTO.setUpdateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+        insurePathologicalReportDAO.updateSelective(JSONObject.parseObject(JSON.toJSONString(insurePathologicalReportDTO)));
         return true;
     }
 

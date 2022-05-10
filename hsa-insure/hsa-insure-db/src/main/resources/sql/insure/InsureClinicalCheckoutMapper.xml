@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.clinica.dao.InsureClinicalCheckoutDAO">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.hsa.module.insure.clinica.entity.InsureClinicalCheckoutDO">
+        <id column="uuid" property="uuid" />
+        <result column="mdtrt_sn" property="mdtrtSn" />
+        <result column="mdtrt_id" property="mdtrtId" />
+        <result column="psn_no" property="psnNo" />
+        <result column="visit_no" property="visitNo" />
+        <result column="appy_no" property="appyNo" />
+        <result column="appy_org_code" property="appyOrgCode" />
+        <result column="appy_org_name" property="appyOrgName" />
+        <result column="bilg_dr_codg" property="bilgDrCodg" />
+        <result column="bilg_dr_name" property="bilgDrName" />
+        <result column="exam_org_code" property="examOrgCode" />
+        <result column="exam_org_name" property="examOrgName" />
+        <result column="appy_dept_code" property="appyDeptCode" />
+        <result column="exam_dept_code" property="examDeptCode" />
+        <result column="exam_dept_name" property="examDeptName" />
+        <result column="exam_mtd" property="examMtd" />
+        <result column="rpotc_no" property="rpotcNo" />
+        <result column="exam_item_code" property="examItemCode" />
+        <result column="exam_item_name" property="examItemName" />
+        <result column="inhosp_exam_item_code" property="inhospExamItemCode" />
+        <result column="inhosp_exam_item_name" property="inhospExamItemName" />
+        <result column="rpt_date" property="rptDate" />
+        <result column="rpot_doc" property="rpotDoc" />
+        <result column="exam_charge" property="examCharge" />
+        <result column="vali_flag" property="valiFlag" />
+        <result column="ref_val" property="refVal" />
+        <result column="exam_unt" property="examUnt" />
+        <result column="exam_rslt_val" property="examRsltVal" />
+        <result column="exam_rslt_dicm" property="examRsltDicm" />
+        <result column="exam_item_detl_code" property="examItemDetlCode" />
+        <result column="exam_item_detl_name" property="examItemDetlName" />
+        <result column="exam_rslt_abn" property="examRsltAbn" />
+        <result column="sapl_date" property="saplDate" />
+        <result column="spcm_no" property="spcmNo" />
+        <result column="spcm_name" property="spcmName" />
+        <result column="is_uplod" property="isUplod" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="hosp_code" property="hospCode" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        uuid, mdtrt_sn, mdtrt_id, psn_no, visit_no, appy_no, appy_org_code, appy_org_name, bilg_dr_codg, bilg_dr_name, exam_org_code, exam_org_name, appy_dept_code, exam_dept_code,exam_dept_name, exam_mtd, rpotc_no, exam_item_code, exam_item_name, inhosp_exam_item_code, inhosp_exam_item_name, rpt_date, rpot_doc, exam_charge, vali_flag, ref_val, exam_unt, exam_rslt_val, exam_rslt_dicm, exam_item_detl_code, exam_item_detl_name, exam_rslt_abn, sapl_date, spcm_no, spcm_name, is_uplod, create_time, update_time, hosp_code
+    </sql>
+
+    <select id="queryComment" resultType="cn.hsa.module.insure.clinica.dto.CommentDTO">
+    select COLUMN_NAME,column_comment from INFORMATION_SCHEMA.Columns where table_name= 'insure_bacterial_report' and table_schema='his_v2';
+</select>
+
+    <select id="queryPageInsureClinicalCheckout" resultType="cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO">
+        select <include refid="Base_Column_List"/>
+        from insure_clinical_checkout
+        <where>
+            and vali_flag = '1'
+            <if test="visitNo != null and mdtrtSn != '' ">
+                and visit_no like concat('%', #{visitNo,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="appyNo != null and appyNo != '' ">
+                and appy_no like concat('%', #{appyNo,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryByUuid" resultType="cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO">
+        select <include refid="Base_Column_List"/>
+        from insure_clinical_checkout
+        where uuid = #{uuid}
+    </select>
+
+    <insert id="insertInsureClinicalCheckout" parameterType="cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO" >
+        insert into insure_clinical_checkout (uuid, mdtrt_sn, mdtrt_id,
+        psn_no, visit_no, appy_no,appy_org_code,
+        appy_org_name, bilg_dr_codg, bilg_dr_name,
+        exam_org_code, exam_org_name, appy_dept_code,
+        exam_dept_code,exam_dept_name, exam_mtd, rpotc_no,
+        exam_item_code, exam_item_name,
+        inhosp_exam_item_code, inhosp_exam_item_name,
+        rpt_date, rpot_doc, exam_charge,
+        vali_flag, ref_val, exam_unt,
+        exam_rslt_val, exam_rslt_dicm, exam_item_detl_code,
+        exam_item_detl_name, exam_rslt_abn, sapl_date,
+        spcm_no, spcm_name, is_uplod,
+        create_time, update_time, hosp_code
+        )
+        values (#{uuid,jdbcType=BIGINT}, #{mdtrtSn,jdbcType=VARCHAR}, #{mdtrtId,jdbcType=VARCHAR},
+        #{psnNo,jdbcType=VARCHAR}, #{visitNo,jdbcType=VARCHAR},#{appyNo,jdbcType=VARCHAR},
+        #{appyOrgCode,jdbcType=VARCHAR}, #{appyOrgName,jdbcType=VARCHAR}, #{bilgDrCodg,jdbcType=VARCHAR},
+        #{bilgDrName,jdbcType=VARCHAR}, #{examOrgCode,jdbcType=VARCHAR},#{examOrgName,jdbcType=VARCHAR},
+        #{appyDeptCode,jdbcType=VARCHAR},#{examDeptCode,jdbcType=VARCHAR},#{examDeptName,jdbcType=VARCHAR}, #{examMtd,jdbcType=VARCHAR},
+        #{rpotcNo,jdbcType=VARCHAR}, #{examItemCode,jdbcType=VARCHAR},
+        #{examItemName,jdbcType=VARCHAR}, #{inhospExamItemCode,jdbcType=VARCHAR}, #{inhospExamItemName,jdbcType=VARCHAR},
+        #{rptDate,jdbcType=TIMESTAMP},#{rpotDoc,jdbcType=VARCHAR}, #{examCharge,jdbcType=DECIMAL}, #{valiFlag,jdbcType=VARCHAR},
+        #{refVal,jdbcType=VARCHAR}, #{examUnt,jdbcType=VARCHAR}, #{examRsltVal,jdbcType=VARCHAR},
+        #{examRsltDicm,jdbcType=VARCHAR}, #{examItemDetlCode,jdbcType=VARCHAR}, #{examItemDetlName,jdbcType=VARCHAR},
+        #{examRsltAbn,jdbcType=VARCHAR}, #{saplDate,jdbcType=TIMESTAMP}, #{spcmNo,jdbcType=VARCHAR},
+        #{spcmName,jdbcType=VARCHAR}, #{isUplod,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},
+        #{hospCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateSelective" parameterType="map" >
+        update insure_clinical_checkout
+        <set >
+            <if test="mdtrtSn != null" >
+                mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
+            </if>
+            <if test="mdtrtId != null" >
+                mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
+            </if>
+            <if test="psnNo != null" >
+                psn_no = #{psnNo,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null" >
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="appyNo != null" >
+                appy_no = #{appyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="appyOrgCode != null" >
+                appy_org_code = #{appyOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="appyOrgName != null" >
+                appy_org_name = #{appyOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="bilgDrCodg != null" >
+                bilg_dr_codg = #{bilgDrCodg,jdbcType=DECIMAL},
+            </if>
+            <if test="bilgDrName != null" >
+                bilg_dr_name = #{bilgDrName,jdbcType=VARCHAR},
+            </if>
+            <if test="examOrgCode != null" >
+                exam_org_code = #{examOrgCode,jdbcType=VARCHAR},
+            </if>
+            <if test="examOrgName != null" >
+                exam_org_name = #{examOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="appyDeptCode != null" >
+                appy_dept_code = #{appyDeptCode,jdbcType=VARCHAR},
+            </if>
+            <if test="examDeptCode != null" >
+                exam_dept_code = #{examDeptCode,jdbcType=VARCHAR},
+            </if>
+            <if test="examDeptName != null" >
+                exam_dept_name = #{examDeptName,jdbcType=VARCHAR},
+            </if>
+            <if test="examMtd != null" >
+                exam_mtd = #{examMtd,jdbcType=VARCHAR},
+            </if>
+            <if test="rpotcNo != null" >
+                rpotc_no = #{rpotcNo,jdbcType=VARCHAR},
+            </if>
+            <if test="examItemCode != null" >
+                exam_item_code = #{examItemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="examItemName != null" >
+                exam_item_name = #{examItemName,jdbcType=VARCHAR},
+            </if>
+            <if test="inhospExamItemCode != null" >
+                inhosp_exam_item_code = #{inhospExamItemCode,jdbcType=VARCHAR},
+            </if>
+            <if test="inhospExamItemName != null" >
+                inhosp_exam_item_name = #{inhospExamItemName,jdbcType=VARCHAR},
+            </if>
+            <if test="valiFlag != null" >
+                vali_flag = #{valiFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="examCharge != null" >
+                exam_charge = #{examCharge,jdbcType=VARCHAR},
+            </if>
+            <if test="rptDate != null" >
+                rpt_date = #{rptDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="rpotDoc != null" >
+                rpot_doc = #{rpotDoc,jdbcType=VARCHAR},
+            </if>
+            <if test="refVal != null" >
+                ref_val = #{refVal,jdbcType=VARCHAR},
+            </if>
+            <if test="examUnt != null" >
+                exam_unt = #{examUnt,jdbcType=VARCHAR},
+            </if>
+            <if test="examRsltVal != null" >
+                exam_rslt_val = #{examRsltVal,jdbcType=VARCHAR},
+            </if>
+            <if test="examRsltDicm != null" >
+                exam_rslt_dicm = #{examRsltDicm,jdbcType=VARCHAR},
+            </if>
+            <if test="examItemDetlCode != null" >
+                exam_item_detl_code = #{examItemDetlCode,jdbcType=VARCHAR},
+            </if>
+            <if test="examItemDetlName != null" >
+                exam_item_detl_name = #{examItemDetlName,jdbcType=VARCHAR},
+            </if>
+            <if test="examRsltAbn != null" >
+                exam_rslt_abn = #{examRsltAbn,jdbcType=VARCHAR},
+            </if>
+            <if test="saplDate != null" >
+                sapl_date = #{saplDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="spcmNo != null" >
+                spcm_no = #{spcmNo,jdbcType=DECIMAL},
+            </if>
+            <if test="spcmName != null" >
+                spcm_name = #{spcmName,jdbcType=DECIMAL},
+            </if>
+            <if test="isUplod != null" >
+                is_uplod = #{isUplod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="hospCode != null" >
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where uuid = #{uuid}
+    </update>
+
+
+
+</mapper>

@@ -144,7 +144,7 @@ public interface InsureUnifiedClinicalService {
 
     /**
      * @Method queryPageBacterialReportRecord
-     * @Desrciption 细菌培养报告记录 -- 保存到his数据库
+     * @Desrciption 细菌培养报告记录 -- 分页查询
      * @Param
      *
      * @Author fuhui
@@ -182,7 +182,7 @@ public interface InsureUnifiedClinicalService {
      * @Date 2021/9/2 10:18
      * @Return
      **/
-    WrapperResponse<Boolean> queryPageClinicalReportRecord(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryPageClinicalReportRecord(Map<String, Object> map);
 
     /**
      * @Method insertClinicalReportRecord

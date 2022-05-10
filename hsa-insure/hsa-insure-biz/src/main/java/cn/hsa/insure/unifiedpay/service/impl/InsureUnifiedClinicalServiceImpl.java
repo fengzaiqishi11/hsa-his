@@ -32,78 +32,8 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
 
     /**
      * @param map
-     * @Method 非结构化报告记录
-     * @Desrciption 临床检验报告记录
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean>  updateNoStructReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateNoStructReportRecord(map));
-    }
-
-    /**
-     * @param map
-     * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean> updatePathologicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updatePathologicalReportRecord(map));
-    }
-
-    /**
-     * @param map
-     * @Method updateBacterialReportRecord
-     * @Desrciption 细菌培养报告记录
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean> updateBacterialReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateBacterialReportRecord(map));
-    }
-
-    /**
-     * @param map
-     * @Method updateDrugSensitivityReportRecord
-     * @Desrciption 药敏记录报告记录
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean> updateDrugSensitivityReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateDrugSensitivityReportRecord(map));
-    }
-
-    /**
-     * @param map
      * @Method updateClinicalReportRecord
-     * @Desrciption 临床检验报告记录
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean> updateClinicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateClinicalReportRecord(map));
-    }
-
-    /**
-     * @param map
-     * @Method updateClinicalReportRecord
-     * @Desrciption 临床检查报告记录
+     * @Desrciption 临床检查报告记录--上传到医保
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
@@ -112,6 +42,119 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
     @Override
     public WrapperResponse<Boolean> updateClinicalExaminationReportRecord(Map<String, Object> map) {
         return WrapperResponse.success(insureUnifiedClinicalBO.updateClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method insertClinicalReportRecord
+     * @Desrciption 临床检查报告记录  -- 保存到his数据库
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> insertClinicalExaminationReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method insertClinicalReportRecord
+     * @Desrciption 临床检查报告记录  -- 分页查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPageClinicalExaminationReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method insertClinicalReportRecord
+     * @Desrciption 临床检验报告记录 -- 保存到his数据库
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> insertClinicalReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalReportRecord(MapUtils.get(map,"insureClinicalCheckoutDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method insertClinicalReportRecord
+     * @Desrciption 临床检验报告记录 -- 分页查询his数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPageClinicalReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalReportRecord(MapUtils.get(map,"insureClinicalCheckoutDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method updateClinicalReportRecord
+     * @Desrciption 临床检验报告记录 --上传到医保
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateClinicalReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateClinicalReportRecord(MapUtils.get(map,"insureClinicalCheckoutDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method updateBacterialReportRecord
+     * @Desrciption 细菌培养报告记录--上传
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> updateBacterialReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateBacterialReportRecord(MapUtils.get(map,"insureBacterialReportDTO")));
+    }
+
+
+    /**
+     * @param map
+     * @Method insertBacterialReportRecord
+     * @Desrciption 细菌培养报告记录 -- 保存到his数据库
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> insertBacterialReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertBacterialReportRecord(MapUtils.get(map,"insureBacterialReportDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method queryPageBacterialReportRecord
+     * @Desrciption 细菌培养报告记录 -- 分页查询
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPageBacterialReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageBacterialReportRecord(MapUtils.get(map,"insureBacterialReportDTO")));
     }
 
     /**
@@ -173,34 +216,6 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
 
     /**
      * @param map
-     * @Method insertBacterialReportRecord
-     * @Desrciption 细菌培养报告记录 -- 保存到his数据库
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<Boolean> insertBacterialReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertBacterialReportRecord(map));
-    }
-
-    /**
-     * @param map
-     * @Method queryPageBacterialReportRecord
-     * @Desrciption 细菌培养报告记录 -- 保存到his数据库
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<PageDTO> queryPageBacterialReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageBacterialReportRecord(map));
-    }
-
-    /**
-     * @param map
      * @Method insertDrugSensitivityReportRecord
      * @Desrciption 药敏记录报告记录  ----保存到his数据库
      * @Param
@@ -215,57 +230,44 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
 
     /**
      * @param map
-     * @Method insertClinicalReportRecord
-     * @Desrciption 临床检验报告记录 -- 保存到his数据库
+     * @Method 非结构化报告记录
+     * @Desrciption 临床检验报告记录
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> insertClinicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalReportRecord(map));
+    public WrapperResponse<Boolean>  updateNoStructReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateNoStructReportRecord(map));
     }
 
     /**
      * @param map
-     * @Method insertClinicalReportRecord
-     * @Desrciption 临床检验报告记录 -- 分页查询his数据
+     * @Method updatePathologicalReportRecord
+     * @Desrciption 病理检查报告记录
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> queryPageClinicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalReportRecord(map));
+    public WrapperResponse<Boolean> updatePathologicalReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.updatePathologicalReportRecord(map));
     }
 
     /**
      * @param map
-     * @Method insertClinicalReportRecord
-     * @Desrciption 临床检查报告记录  -- 保存到his数据库
+     * @Method updateDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> insertClinicalExaminationReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
+    public WrapperResponse<Boolean> updateDrugSensitivityReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateDrugSensitivityReportRecord(map));
     }
 
-    /**
-     * @param map
-     * @Method insertClinicalReportRecord
-     * @Desrciption 临床检查报告记录  -- 分页查询
-     * @Param
-     * @Author fuhui
-     * @Date 2021/9/2 10:18
-     * @Return
-     */
-    @Override
-    public WrapperResponse<PageDTO> queryPageClinicalExaminationReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageClinicalExaminationReportRecord(MapUtils.get(map,"clinicalExaminationInfoDTO")));
-    }
 }

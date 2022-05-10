@@ -1,30 +1,31 @@
 package cn.hsa.module.insure.clinica.dao;
 
 
-import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
+import cn.hsa.module.insure.clinica.dto.CommentDTO;
+import cn.hsa.module.insure.clinica.dto.InsureClinicalCheckoutDTO;
 
 import java.util.List;
 import java.util.Map;
 
 /**
-* @ClassName ClinicalExaminationInfoDAO
-* @Deacription 临床检查报告信息表dao层
+* @ClassName InsureClinicalCheckoutDAO
+* @Deacription 临床检验报告信息表dao层
 * @Author liuhuiming
-* @Date 2022-05-05
+* @Date 2022-05-07
 * @Version 1.0
 **/
-public interface ClinicalExaminationInfoDAO {
+public interface InsureClinicalCheckoutDAO {
 
     /**
      * @Menthod queryPage
      * @Desrciption 分页查询
      * @Param
-     * 1. clinicalExaminationInfoDTO  参数数据对象
+     * 1. InsureClinicalCheckoutDTO  参数数据对象
      * @Author liuhuiming
      * @Date   2022/3/25 17:02
      * @Return
      **/
-    List<ClinicalExaminationInfoDTO> queryPageClinicalExamination(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
+    List<InsureClinicalCheckoutDTO> queryPageInsureClinicalCheckout(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO);
 
     /**
      * @Menthod insert()
@@ -35,7 +36,7 @@ public interface ClinicalExaminationInfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    int insertClinicalExamination(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
+    int insertInsureClinicalCheckout(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO);
 
     /**
      * @Menthod updateSelective()
@@ -57,6 +58,8 @@ public interface ClinicalExaminationInfoDAO {
      * @Date   2022/3/25 17:02
      * @Return int
      **/
-    ClinicalExaminationInfoDTO queryByUuid(Long uuid);
+    InsureClinicalCheckoutDTO queryByUuid(Long uuid);
+
+    List<CommentDTO> queryComment();
 
 }

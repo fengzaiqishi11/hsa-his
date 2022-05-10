@@ -158,10 +158,10 @@
                 cma_date = #{cmaDate,jdbcType=TIMESTAMP},
             </if>
             <if test="saplDate != null" >
-                sapl_date = #{saplDate,jdbcType=VARCHAR},
+                sapl_date = #{saplDate,jdbcType=TIMESTAMP},
             </if>
             <if test="spcmNo != null" >
-                spcm_no = #{spcmNo,jdbcType=TIMESTAMP},
+                spcm_no = #{spcmNo,jdbcType=VARCHAR},
             </if>
             <if test="spcmName != null" >
                 spcm_name = #{spcmName,jdbcType=VARCHAR},

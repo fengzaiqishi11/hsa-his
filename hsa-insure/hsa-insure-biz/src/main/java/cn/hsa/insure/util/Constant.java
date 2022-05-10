@@ -804,6 +804,8 @@ public interface Constant {
             public static final String UP_4102 = "4102"; // 医疗保障基金结算清单状态修改
 
             public static final String UP_4501= "4501"; // 临床检查报告记录
+            public static final String UP_4502= "4502"; // 临床检验报告记录
+            public static final String UP_4503= "4503"; // 细菌培养报告记录
 
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询

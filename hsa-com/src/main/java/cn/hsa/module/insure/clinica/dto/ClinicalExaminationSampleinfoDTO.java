@@ -26,7 +26,7 @@ public class ClinicalExaminationSampleinfoDTO implements Serializable {
     /**
      * 采样日期
      */
-    private Date saplDate;
+    private String saplDate;
     /**
      * 标本号
      */

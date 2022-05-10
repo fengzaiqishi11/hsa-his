@@ -65,7 +65,7 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     PolicyRequestDTO policy = MapUtils.get(map,"policyRequestDTO");
     //参数校验
     if (ObjectUtil.isEmpty(policy.getCertno())){
-      throw new AppException("人员编号必传！");
+      throw new AppException("证件号码必传！");
     }
     if (ObjectUtil.isEmpty(policy.getMdtrtId())){
       throw new AppException("医保就诊ID必传！");

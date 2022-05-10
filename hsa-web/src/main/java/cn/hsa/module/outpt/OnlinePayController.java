@@ -67,4 +67,24 @@ public class OnlinePayController  extends BaseController {
     map.put("setlResultQueryDTO", dto);
     return outptTmakePriceFormService_consumer.queryInsureSetlResult(map);
   }
+
+  /**
+   * 6401-费用明细上传撤销
+   * @param dto
+   * @param req
+   * @param res
+   * @Author 医保开发二部-湛康
+   * @Date 2022-05-10 11:46
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
+   */
+  @PostMapping("/insureFeeRevoke")
+  public WrapperResponse<Boolean> insureFeeRevoke(@RequestBody SetlResultQueryDTO dto,
+                                                                   HttpServletRequest req,
+                                                                   HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlResultQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.insureFeeRevoke(map);
+  }
 }

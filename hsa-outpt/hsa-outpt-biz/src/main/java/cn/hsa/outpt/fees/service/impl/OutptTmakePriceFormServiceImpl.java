@@ -528,4 +528,16 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     return WrapperResponse.success(outptTmakePriceFormBO.queryInsureSetlResult(map));
   }
 
+    /**
+     * 【6401】费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:50
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.insureFeeRevoke(map));
+    }
+
 }

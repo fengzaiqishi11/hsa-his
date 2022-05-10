@@ -4411,4 +4411,35 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
           SeltSucCallbackDTO.class);
       return seltSucCallbackDTO;
     }
+
+    /**
+     * 6401-费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:54
+     * @return java.lang.Boolean
+     */
+    @Override
+    public Boolean insureFeeRevoke(Map map) {
+      String hospCode = map.get("hospCode").toString();
+      //判断入参是否传入
+      SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
+      if (ObjectUtil.isEmpty(setlResultQueryDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      String visitId = setlResultQueryDTO.getVisitId();//就诊id
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", visitId);
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记。");
+      }
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("setlResultQueryDTO",setlResultQueryDTO);
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6401(map).getData();
+      return null;
+    }
 }

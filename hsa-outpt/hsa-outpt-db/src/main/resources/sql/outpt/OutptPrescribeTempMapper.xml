@@ -56,6 +56,9 @@
         <result property="prescribeTypeCode" column="prescribe_type_code" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="VARCHAR"/>
         <result property="phCode" column="phCode" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+
     </resultMap>
 
 
@@ -93,10 +96,13 @@
     <!--根据处方模板id查询出处方模板明细-->
     <select id="queryOutptPrescribeTempDetails" resultMap="OutptPrescribeTempDetailMap">
         select
-          id, hosp_code, opt_id, group_no, group_seq_no, item_code, item_id, item_name, spec, prep_code, dosage, dosage_unit_code, usage_code,
-          rate_id, speed_code, num, unit_code, total_num, price, total_price, bfc_id, use_days, exec_dept_id, use_code,
-          herb_note_code, is_skin, content
-        from outpt_prescribe_temp_detail
+          a.id, a.hosp_code, a.opt_id, a.group_no, a.group_seq_no, a.item_code, a.item_id, a.item_name, a.spec, a.prep_code,
+          a.dosage, a.dosage_unit_code, a.usage_code,
+          a.rate_id, a.speed_code, a.num, a.unit_code,
+          a.total_num, a.price, a.total_price, a.bfc_id, a.use_days, a.exec_dept_id, a.use_code,
+          a.herb_note_code, a.is_skin, a.content,bd.is_out,bd.is_in
+        from outpt_prescribe_temp_detail a
+        left join base_drug bd on bd.id = a.item_id
         where hosp_code = #{hospCode}
         and opt_id = #{id}
     </select>

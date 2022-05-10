@@ -55,6 +55,8 @@ public class OutptPrescribeTempDetailDTO extends OutptPrescribeTempDetailDO impl
     private String isIn;
     // 是否门诊可用
     private String isOut;
+    // 颜色
+    private String color;
 
 }
 

@@ -444,6 +444,16 @@ public class SysCodeServiceImpl extends HsafBO implements SysCodeService {
     public WrapperResponse<SysCodeDetailDTO> getCodeDetailByValue(Map map) {
         return WrapperResponse.success(sysCodeBO.getCodeDetailByValue(MapUtils.get(map, "sysCodeDetailDTO")));
     }
+    /**
+     * @Author gory
+     * @Description 启用作废的值域明细
+     * @Date 2022/5/9 16:30
+     * @Param [map]
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateStatus(Map map) {
+        return WrapperResponse.success(sysCodeBO.updateStatus(MapUtils.get(map, "sysCodeDetailDTO")));
+    }
 
 
     /**

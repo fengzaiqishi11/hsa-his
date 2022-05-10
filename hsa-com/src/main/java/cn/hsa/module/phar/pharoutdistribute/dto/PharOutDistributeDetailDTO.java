@@ -8,6 +8,7 @@ import lombok.ToString;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * @Package_name: cn.hsa.module.phar.phardistribute.dto
@@ -32,4 +33,6 @@ public class PharOutDistributeDetailDTO extends PharOutDistributeDetailDO implem
 
     // 进销存目标名称
     private String invoicingTargetName;
+
+    private Date crteTime;
 }

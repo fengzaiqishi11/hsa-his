@@ -102,7 +102,16 @@
         a.crte_id,a.crte_name,a.crte_time,up_name as upValueName
         from sys_code_detail a
         where
-        1=1 and a.is_valid='1' and a.hosp_code=#{hospCode}
+        1=1 and a.hosp_code=#{hospCode}
+        /**为了兼容调用了该方法的接口,使用choose**/
+        <choose>
+            <when test="isValid != null and  isValid != ''">
+                and a.is_valid= #{isValid}
+            </when>
+            <otherwise>
+                and a.is_valid='1'
+            </otherwise>
+        </choose>
         <if test="keyword!=null and keyword!=''">
           and ((a.value like CONCAT('%',#{keyword},'%')) or (a.name like CONCAT('%',#{keyword},'%'))
           or (a.pym like CONCAT('%',#{keyword},'%')) or (a.wbm like CONCAT('%',#{keyword},'%')))
@@ -249,6 +258,17 @@
             </foreach>
         </if>
     </update>
+    <!--启用明细-->
+    <update id="updateStatus">
+        update sys_code_detail
+        set is_valid = 1 where 1=1 and is_valid = 0 and hosp_code=#{hospCode}
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
 
     <!--根据值域代码编码获取值域代码值-->
     <select id="getCodeTree" parameterType="java.lang.String" resultType="cn.hsa.base.TreeMenuNode">
@@ -290,5 +310,21 @@
         <if test="value != null and value != ''">
             and value = #{value}
         </if>
+    </select>
+    <select id="getCodeDetailByIds" resultType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
+        select id, hosp_code, c_code as code, name, value, remark, seq_no, pym, wbm, up_value, is_end, is_valid, crte_id, crte_name, crte_time
+        from sys_code_detail where  hosp_code = #{hospCode} and is_valid = #{isValid}
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+    </select>
+    <select id="getCodeDetailByValues" resultType="cn.hsa.module.sys.code.dto.SysCodeDetailDTO">
+        select id, hosp_code, c_code as code, name, value, remark, seq_no, pym, wbm, up_value, is_end, is_valid, crte_id, crte_name, crte_time
+        from sys_code_detail where  hosp_code = #{hospCode} and is_valid = #{isValid} and c_code = #{code}
+        and value in
+        <foreach collection="valueList" index= "index" item="value"  separator="," open="(" close=")">
+            #{value}
+        </foreach>
     </select>
 </mapper>

@@ -8,6 +8,7 @@ import cn.hsa.module.base.bpft.service.BasePreferentialService;
 import cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO;
 import cn.hsa.module.dzpz.hainan.CondList;
 import cn.hsa.module.dzpz.hainan.ExtData;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
@@ -25,10 +26,7 @@ import cn.hsa.module.outpt.card.dto.BaseCardRechargeChangeDTO;
 import cn.hsa.module.outpt.card.service.BaseCardRechargeChangeService;
 import cn.hsa.module.outpt.fees.bo.OutptTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dao.*;
-import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceDTO;
+import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.fees.entity.*;
 import cn.hsa.module.outpt.outinInvoice.dao.OutinInvoiceDAO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
@@ -4377,5 +4375,40 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       // 调用 统一支付平台-【6201】费用明细上传
       insureUnifiedPayOutptService_consumer.UP6201(map);
       return true;
+    }
+
+    /**
+     * 6301-医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 15:17
+     * @return cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO
+     */
+    @Override
+    public SeltSucCallbackDTO queryInsureSetlResult(Map map) {
+      String hospCode = map.get("hospCode").toString();
+      //判断入参是否传入
+      SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
+      if (ObjectUtil.isEmpty(setlResultQueryDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      String visitId = setlResultQueryDTO.getVisitId();//就诊id
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", visitId);
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记。");
+      }
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("setlResultQueryDTO",setlResultQueryDTO);
+      // 调用 【6301】医保订单结算结果查询
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6301(map).getData();
+      Map<String, Object> dataMap = MapUtils.get(resultMap, "data");
+      SeltSucCallbackDTO seltSucCallbackDTO = FastJsonUtils.fromJson(FastJsonUtils.toJson(dataMap),
+          SeltSucCallbackDTO.class);
+      return seltSucCallbackDTO;
     }
 }

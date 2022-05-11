@@ -189,7 +189,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
     /**
      * @param map
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录---上传到医保
+     * @Desrciption 病理检查报告记录---保存到his库
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
@@ -197,7 +197,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> insertPathologicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertPathologicalReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertPathologicalReportRecord(MapUtils.get(map,"insurePathologicalReportDTO")));
     }
 
     /**
@@ -211,7 +211,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<PageDTO> queryPagePathologicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPagePathologicalReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPagePathologicalReportRecord(MapUtils.get(map,"insurePathologicalReportDTO")));
     }
 
     /**
@@ -225,7 +225,21 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> insertDrugSensitivityReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertDrugSensitivityReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertDrugSensitivityReportRecord(MapUtils.get(map,"insureDrugsensitiveReportDTO")));
+    }
+
+    /**
+     * @param map
+     * @Method insertDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录  ----保存到his数据库
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryDrugSensitivityReportRecord(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryDrugSensitivityReportRecord(MapUtils.get(map,"insureDrugsensitiveReportDTO")));
     }
 
     /**
@@ -245,7 +259,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
     /**
      * @param map
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
+     * @Desrciption 病理检查报告记录 -- 上传到医保
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
@@ -253,7 +267,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> updatePathologicalReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updatePathologicalReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.updatePathologicalReportRecord(MapUtils.get(map,"insurePathologicalReportDTO")));
     }
 
     /**
@@ -267,7 +281,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean> updateDrugSensitivityReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateDrugSensitivityReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateDrugSensitivityReportRecord(MapUtils.get(map,"insureDrugsensitiveReportDTO")));
     }
 
 }

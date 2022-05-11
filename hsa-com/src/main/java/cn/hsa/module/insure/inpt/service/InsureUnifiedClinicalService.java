@@ -33,7 +33,7 @@ public interface InsureUnifiedClinicalService {
 
     /**
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
+     * @Desrciption 病理检查报告记录 -- 上传到医保
      * @Param
      *
      * @Author fuhui
@@ -163,6 +163,17 @@ public interface InsureUnifiedClinicalService {
      * @Return
      **/
     WrapperResponse<Boolean> insertDrugSensitivityReportRecord(Map<String, Object> map);
+
+    /**
+     * @Method insertDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录  ----分页查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/2 10:18
+     * @Return
+     **/
+    WrapperResponse<PageDTO> queryDrugSensitivityReportRecord(Map<String, Object> map);
 
     /**
      * @Method insertClinicalReportRecord

@@ -90,6 +90,8 @@ public enum FunctionEnum {
     CLINICAL_EXAMINATION_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4501,"临床检查报告记录"),
     CLINICAL_CHECKOUT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4502,"临床检验报告记录"),
     BACTERIAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4503,"细菌培养报告记录"),
+    DRUGSENSITIVE_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4504,"药敏记录报告记录"),
+    PATHOLOGICAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4505,"病理检查报告记录"),
 
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),

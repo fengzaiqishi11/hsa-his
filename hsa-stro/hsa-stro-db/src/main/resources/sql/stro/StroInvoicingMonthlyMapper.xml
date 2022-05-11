@@ -93,6 +93,23 @@
   <select id="queryRecentlyUpdateTime" resultType="java.util.Date">
     select DATE_FORMAT(ifnull(max(modify_time),now()),'%Y-%m-%d') from stro_invoicing_monthly where hosp_code = #{hospCode} and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt; #{nowDate} limit 1;
   </select>
+  <!-- 分页查询主表信息 -->
+  <select id="queryPage" resultMap="BaseResultMap">
+    select * from stro_invoicing_monthly where hosp_code = #{hospCode}
+    <if test="bizId != null and bizId != ''">
+      and biz_id = #{bizId}
+    </if>
+    <if test="itemCode != null and itemCode != ''">
+      and item_code = #{itemCode}
+    </if>
+    <if test="itemId != null and itemCode != ''">
+      and item_id = #{itemId}
+    </if>
+    <if test="itemName != null and itemCode != ''">
+      and item_name = #{itemName}
+    </if>
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly
     where id = #{id} and hosp_code = #{hospCode}

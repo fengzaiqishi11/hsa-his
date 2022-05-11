@@ -86,4 +86,11 @@ public interface StroInvoicingMonthlyDetailDAO {
      * @Param [hospCode, nowDate]
      **/
     void deleteBatch(@Param("hospCode") String hospCode,@Param("nowDate") Date nowDate);
+    /**
+     * @Author gory
+     * @Description 根据id查询明细数据
+     * @Date 2022/5/11 20:14
+     * @Param [stroInvoicingMonthlyDTO]
+     **/
+    List<StroInvoicingMonthlyDetailDTO> queryDetailByMonthlyId(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO);
 }

@@ -151,7 +151,7 @@
 		and a.hosp_code = si.hosp_code
 		and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = DATE_FORMAT(#{nowDate},'%Y-%m-%d')
 		and a.outin_code in ('2','3','4','5','7','8','21','24')
-		and a.biz_id in (select p.id from base_dept p where  p.type_code in ("13","3") and p.hosp_code = #{hospCode})
+		and a.biz_id in (select p.id from base_dept p where  p.type_code in ('13','3') and p.hosp_code = #{hospCode})
 		<if test="itemId != null and itemId != ''">
             a.item_id = #{itemId}
         </if>
@@ -186,7 +186,14 @@
     (select d.surplus_num from stro_invoicing d
       where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) upSurplusNum, /*上期数量*/
     ifnull((select d.sell_price_all from stro_invoicing d
-      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll /*上期零售总金额*/
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll, /*上期零售总金额*/
+    /*按购进价*/
+    (select d.buy_price from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+    (select d.buy_price_all from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+    ifnull((select d.up_buy_price_all from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll
     from (
     select a.num,a.buy_price,a.item_id,a.outin_code,a.id,a.buy_price_all,
         a.up_buy_price_all,a.hosp_code,a.sell_price_all,a.up_sell_price_all,a.biz_id,a.item_name,a.item_code,a.unit_code,
@@ -210,6 +217,7 @@
       #{nowDate} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
       '2' as stroPhar,
       a.item_id itemId,
+      a.biz_id bizId,
       a.hosp_code as hospCode,
       max(a.item_name) itemName,
       max(a.unit_code) unitCode,
@@ -220,6 +228,8 @@
             where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPrice,
       (select d.surplus_num from stro_invoicing d
             where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) num,
+      (select d.surplus_num from stro_invoicing d
+       where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) surplusNum,
       (select d.sell_price_all from stro_invoicing d
             where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPriceAll,
       (select d.up_surplus_num from stro_invoicing d
@@ -246,6 +256,12 @@
       a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriceAll,   /**调盈**/
       sum(if( a.outin_code='24' and a.sell_price_all &lt; a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0)) adjustLossPriceAll,   /**调亏**/
       /**按购进价**/
+      (select d.buy_price from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+      (select d.buy_price_all from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+      ifnull((select d.up_buy_price_all from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll,
       sum(if( a.outin_code='20',a.buy_price * a.num,0)) stroInNumBuyPriceAll,    /**入库购进总金额**/
       sum(if( a.outin_code='8',a.buy_price * a.num,0)) reportLossesBuyPriceAll,    /**药房购进总金额**/
       sum(if( a.outin_code='6',a.buy_price * a.num,0)) pharReturnStroBuyPriceAll, /**药房退药库购进总金额**/
@@ -286,7 +302,13 @@
     (select d.surplus_num from stro_invoicing d
     where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) upSurplusNum, /*上期数量*/
     ifnull((select d.sell_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll /*上期零售总金额*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll, /*上期零售总金额*/
+    (select d.buy_price from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+    (select d.buy_price_all from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+    ifnull((select d.up_buy_price_all from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll
     from
     (
     select a.num,a.buy_price,a.item_id,a.outin_code,a.id,a.buy_price_all,
@@ -305,10 +327,15 @@
     where a.hosp_code = #{hospCode}
     group by a.item_id,a.biz_id
   </select>
+    <select id="queryDetailByMonthlyId"
+           resultMap="BaseResultMap">
+        select *from  stro_invoicing_monthly_detail
+        where hosp_code = #{hospCode} and crte_time = #{nowDate}
+    </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly_detail
-    where id = #{id}
+    where id = #{id} AND monthly_id = #{id}
   </delete>
 
     <delete id="deleteBatch">

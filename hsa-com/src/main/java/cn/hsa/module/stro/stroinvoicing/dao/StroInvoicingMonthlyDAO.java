@@ -49,4 +49,11 @@ public interface StroInvoicingMonthlyDAO {
      * @Date: 2022/4/8
      */
     Date queryRecentlyUpdateTime(@Param("nowDate") Date nowDate,@Param("hospCode") String hospCode);
+    /**
+     * @Author gory
+     * @Description 分页查询主表信息
+     * @Date 2022/5/11 20:08
+     * @Param [stroInvoicingMonthlyDTO]
+     **/
+    List<StroInvoicingMonthlyDTO> queryPage(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO);
 }

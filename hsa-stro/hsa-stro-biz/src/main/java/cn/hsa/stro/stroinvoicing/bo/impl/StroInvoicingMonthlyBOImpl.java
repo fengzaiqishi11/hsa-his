@@ -1,11 +1,14 @@
 package cn.hsa.stro.stroinvoicing.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.module.stro.stroinvoicing.bo.StroInvoicingMonthlyBO;
 import cn.hsa.module.stro.stroinvoicing.dao.StroInvoicingMonthlyDAO;
 import cn.hsa.module.stro.stroinvoicing.dao.StroInvoicingMonthlyDetailDAO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO;
 import cn.hsa.util.*;
+import cn.hutool.core.util.PageUtil;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
@@ -59,6 +62,30 @@ public class StroInvoicingMonthlyBOImpl implements StroInvoicingMonthlyBO {
             recentTime = DateUtils.dateAdd(recentTime, 1);
         }
         return true;
+    }
+    /**
+     * @Author gory
+     * @Description 分页查询主表数据
+     * @Date 2022/5/11 20:03
+     * @Param [map]
+     **/
+    @Override
+    public PageDTO queryPage(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO) {
+        PageHelper.startPage(stroInvoicingMonthlyDTO.getPageNo(),stroInvoicingMonthlyDTO.getPageSize());
+        List<StroInvoicingMonthlyDTO> resultList = stroInvoicingMonthlyDAO.queryPage(stroInvoicingMonthlyDTO);
+        return PageDTO.of(resultList);
+    }
+    /**
+     * @Author gory
+     * @Description 根据主键id查询明细
+     * @Date 2022/5/11 20:03
+     * @Param [map]
+     **/
+    @Override
+    public PageDTO queryDetailByMonthlyId(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO) {
+        PageHelper.startPage(stroInvoicingMonthlyDTO.getPageNo(),stroInvoicingMonthlyDTO.getPageSize());
+        List<StroInvoicingMonthlyDetailDTO> resultList = stroInvoicingMonthlyDetailDAO.queryDetailByMonthlyId(stroInvoicingMonthlyDTO);
+        return PageDTO.of(resultList);
     }
 
     /**

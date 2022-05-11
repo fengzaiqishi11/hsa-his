@@ -94,6 +94,8 @@
             <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
             <result property="unitCode" column="unitCode" jdbcType="VARCHAR"></result>
             <result property="remark" column="remarkDetail" jdbcType="VARCHAR"></result>
+            <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+            <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         </collection>
     </resultMap>
 
@@ -581,7 +583,9 @@
                f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
                b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,
                ifnull(a.tcm_syndromes_id,'') as tcmSyndromesId,ifnull(a.tcm_syndromes_name,'') as tcmSyndromesName,
-               ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName
+               ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName,
+               (case when b.item_code = '1' then f.nation_code when b.item_code = '2' then g.nation_code else '' end) as nation_code,
+               (case when b.item_code = '1' then ifnull(f.nation_name,f.usual_name) when b.item_code = '2' then ifnull(g.nation_name,g.name) else '' end) as nation_name
         from outpt_prescribe a
                  join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
                  left join(

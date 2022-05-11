@@ -289,4 +289,25 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
     message.put("flag",flag);
     return message;
   }
+    /**
+     * @Menthod getIsReallyPwd
+     * @Desrciption 请求登录人员与机构信息信息
+     *
+     * @Param
+     * [sysParameterDTO, req, res]
+     *
+     * @Author yuelong.chen
+     * @Date   2022/5/10 10:05
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @Override
+    public Map getLoginInfo(Map map) {
+        SysUserDTO sysUserDTO = MapUtils.get(map,"sysUserDTO");
+        String hospCode = sysUserDTO.getHospCode();
+        SysParameterDTO sysParameterDTO = sysParameterDao.getParameterByCode(hospCode, "HOSP_INSURE_NATION_INFO");
+        Map<String,Object> resultMap = new HashMap();
+        resultMap.put("pracCertiNo",sysUserDTO.getPracCertiNo());
+        resultMap.put("sysParameterDTO",sysParameterDTO);
+        return resultMap;
+    }
 }

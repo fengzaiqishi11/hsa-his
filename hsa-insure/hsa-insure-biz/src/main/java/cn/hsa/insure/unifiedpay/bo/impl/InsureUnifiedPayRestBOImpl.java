@@ -13,6 +13,7 @@ import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bmm.service.BaseMaterialService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.drug.service.BaseDrugService;
+import cn.hsa.module.center.nationstandarddrug.entity.NationStandardDrugDO;
 import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.*;
@@ -24,6 +25,7 @@ import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayRestBO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -1702,9 +1704,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             case "1314":
                 insert_1314(dataResultMap, map);
                 break;
-            case "1315":
-                insert_1315(dataResultMap, map);
-                break;
         }
         return resultMap;
     }
@@ -1961,6 +1960,174 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             }
         }
     }
+    /**
+     * @Method insert_1313
+     * @Desrciption 医保统一支付平台：医保目录限价信息下载
+     * @Param dataResultMap , map
+     * @Author fuhui
+     * @Date 2021/4/9 15:18
+     * @Return
+     **/
+    private void insert_1318(List<Map<String, Object>> dataResultMap, Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String crteId = MapUtils.get(map, "crteId");
+        String listType = MapUtils.get(map, "downLoadType");
+        String crteName = MapUtils.get(map, "crteName");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        List<InsureDiseaseDTO> insureDiseaseDTOList = new ArrayList<>();
+        int size = MapUtils.get(map, "size");
+        int num = MapUtils.get(map, "num");
+        String ver = MapUtils.get(map, "ver");
+        int recordCounts = MapUtils.get(map, "recordCounts");
+        if (!ListUtils.isEmpty(dataResultMap)) {
+            List<InsureUnifiedLimitPriceDO> insertList = new ArrayList<>();
+            InsureUnifiedLimitPriceDO insureUnifiedLimitPriceDO = null;
+            for (Map<String, Object> item : dataResultMap) {
+                    insureUnifiedLimitPriceDO = new InsureUnifiedLimitPriceDO();
+                    insureUnifiedLimitPriceDO.setId(SnowflakeUtils.getId());
+                    insureUnifiedLimitPriceDO.setHospCode(hospCode);
+                    insureUnifiedLimitPriceDO.setHilistCode(MapUtils.get(item, "hilist_code"));
+                    insureUnifiedLimitPriceDO.setHilistLmtpricType(MapUtils.get(item, "hilist_lmtpric_type"));
+                    insureUnifiedLimitPriceDO.setOverlmtDspoWay(MapUtils.get(item, "overlmt_dspo_way"));
+                    insureUnifiedLimitPriceDO.setInsuAdmdvs(MapUtils.get(item, "insu_admdvs"));
+                    if (StringUtils.isEmpty(MapUtils.get(item, "begndate"))) {
+                        insureUnifiedLimitPriceDO.setBegndate(null);
+                    } else {
+                        insureUnifiedLimitPriceDO.setBegndate(DateUtils.parse(MapUtils.get(item, "begndate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    if (StringUtils.isEmpty(MapUtils.get(item, "enddate"))) {
+                        insureUnifiedLimitPriceDO.setEnddate(null);
+                    } else {
+                        insureUnifiedLimitPriceDO.setEnddate(DateUtils.parse(MapUtils.get(item, "enddate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    insureUnifiedLimitPriceDO.setHilistPricUplmtAmt(MapUtils.get(item, "hilist_pric_uplmt_amt"));
+                    insureUnifiedLimitPriceDO.setValiFlag(MapUtils.get(item, "vali_flag"));
+                    insureUnifiedLimitPriceDO.setRid(MapUtils.get(item, "rid"));
+
+
+                    if (StringUtils.isEmpty(MapUtils.get(item, "crte_time"))) {
+                        insureUnifiedLimitPriceDO.setCrteTime(null);
+                    } else {
+                        insureUnifiedLimitPriceDO.setCrteTime(DateUtils.parse(MapUtils.get(item, "crte_time"), DateUtils.Y_M_DH_M_S));
+                    }
+                    insureUnifiedLimitPriceDO.setOptTime(null);
+                    if (StringUtils.isEmpty(MapUtils.get(item, "updt_time"))) {
+                        insureUnifiedLimitPriceDO.setUpdtTime(null);
+                    } else {
+                        insureUnifiedLimitPriceDO.setUpdtTime(DateUtils.parse(MapUtils.get(item, "updt_time"), DateUtils.Y_M_DH_M_S));
+                    }
+
+                    insureUnifiedLimitPriceDO.setCrterId(MapUtils.get(item, "crter_id"));
+                    insureUnifiedLimitPriceDO.setCrterName(MapUtils.get(item, "crter_name"));
+                    insureUnifiedLimitPriceDO.setCrteOptinsNo(MapUtils.get(item, "crte_optins_no"));
+                    insureUnifiedLimitPriceDO.setOpterId(MapUtils.get(item, "opter_id"));
+                    insureUnifiedLimitPriceDO.setOpterName(MapUtils.get(item, "opter_name"));
+                    insureUnifiedLimitPriceDO.setOptinsNo(MapUtils.get(item, "optins_no"));
+                    insureUnifiedLimitPriceDO.setTabname(MapUtils.get(item, "tabname"));
+                    insureUnifiedLimitPriceDO.setPoolareaNo(MapUtils.get(item, "poolarea_no"));
+                    insertList.add(insureUnifiedLimitPriceDO);
+
+            }
+            if (!ListUtils.isEmpty(insertList)) {
+                int toIndex = 1000;
+                for (int i = 0; i < insertList.size(); i += 1000) {
+                    if (i + 1000 > insertList.size()) {
+                        toIndex = insertList.size() - i;
+                    }
+                    List newList = insertList.subList(i, i + toIndex);
+                    insureDirectoryDownLoadDAO.insertInsureUnfiedLimitPrice(newList);
+                }
+            }
+        }
+
+    }
+    /**
+     * @Method insert_1313
+     * @Desrciption 医保统一支付平台：医保目录先自付比例信息下载
+     * @Param dataResultMap , map
+     * @Author fuhui
+     * @Date 2021/4/9 15:18
+     * @Return
+     **/
+    private void insert_1319(List<Map<String, Object>> dataResultMap, Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String crteId = MapUtils.get(map, "crteId");
+        String listType = MapUtils.get(map, "downLoadType");
+        String crteName = MapUtils.get(map, "crteName");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        List<InsureDiseaseDTO> insureDiseaseDTOList = new ArrayList<>();
+        int size = MapUtils.get(map, "size");
+        int num = MapUtils.get(map, "num");
+        String ver = MapUtils.get(map, "ver");
+        int recordCounts = MapUtils.get(map, "recordCounts");
+        if (!ListUtils.isEmpty(dataResultMap)) {
+            InsureUnifidRatioDO insureUnifidRatioDO = null;
+            List<InsureUnifidRatioDO> insureDirectoryInfoDOList = new ArrayList<>();
+            for (Map<String, Object> item : dataResultMap) {
+                    insureUnifidRatioDO = new InsureUnifidRatioDO();
+                    insureUnifidRatioDO.setId(SnowflakeUtils.getId());
+                    insureUnifidRatioDO.setHospCode(hospCode);
+                    insureUnifidRatioDO.setHilistCode(MapUtils.get(item, "hilist_code"));
+                    insureUnifidRatioDO.setSelfpayPropPsnType(MapUtils.get(item, "selfpay_prop_psn_type"));
+                    insureUnifidRatioDO.setSelfpayPropType(MapUtils.get(item, "selfpay_prop_type"));
+                    if (StringUtils.isEmpty(MapUtils.get(item, "begndate"))) {
+                        insureUnifidRatioDO.setBegndate(null);
+                    } else {
+                        insureUnifidRatioDO.setBegndate(DateUtils.parse(MapUtils.get(item, "begndate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    if (StringUtils.isEmpty(MapUtils.get(item, "enddate"))) {
+                        insureUnifidRatioDO.setEnddate(null);
+                    } else {
+                        insureUnifidRatioDO.setEnddate(DateUtils.parse(MapUtils.get(item, "enddate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    insureUnifidRatioDO.setInsuAdmdvs(MapUtils.get(item, "insu_admdvs"));
+                    insureUnifidRatioDO.setSelfpayProp(MapUtils.get(item, "selfpay_prop"));
+                    insureUnifidRatioDO.setValiFlag(MapUtils.get(item, "vali_flag"));
+                    insureUnifidRatioDO.setRid(MapUtils.get(item, "rid"));
+
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "updt_time"))){
+                        insureUnifidRatioDO.setUpdtTime(DateUtils.parse(MapUtils.get(item, "updt_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setUpdtTime(null);
+                    }
+
+                    insureUnifidRatioDO.setCrterId(MapUtils.get(item, "crter_id"));
+                    insureUnifidRatioDO.setCrterName(MapUtils.get(item, "crter_name"));
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "crte_time"))){
+                        insureUnifidRatioDO.setCrteTime(DateUtils.parse(MapUtils.get(item, "crte_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setCrteTime(null);
+                    }
+                    insureUnifidRatioDO.setCrteOptinsNo(MapUtils.get(item, "crte_optins_no"));
+                    insureUnifidRatioDO.setOpterId(MapUtils.get(item, "opter_id"));
+                    insureUnifidRatioDO.setOpterName(MapUtils.get(item, "opter_name"));
+                    insureUnifidRatioDO.setOptinsNo(MapUtils.get(item, "optins_no"));
+                    insureUnifidRatioDO.setPoolareaNo(MapUtils.get(item, "poolarea_no"));
+
+                    if(StringUtils.isNotEmpty(MapUtils.get(item, "opt_time"))){
+                        insureUnifidRatioDO.setOptTime(DateUtils.parse(MapUtils.get(item, "opt_time"), DateUtils.Y_M_DH_M_S));
+                    }else{
+                        insureUnifidRatioDO.setOptTime(null);
+                    }
+                    insureDirectoryInfoDOList.add(insureUnifidRatioDO);
+                }
+
+            if (!ListUtils.isEmpty(insureDirectoryInfoDOList)) {
+                int toIndex = 1000;
+                for (int i = 0; i < insureDirectoryInfoDOList.size(); i += 1000) {
+                    if (i + 1000 > insureDirectoryInfoDOList.size()) {
+                        toIndex = insureDirectoryInfoDOList.size() - i;
+                    }
+                    List newList = insureDirectoryInfoDOList.subList(i, i + toIndex);
+                    insureDirectoryDownLoadDAO.insertInsureUnifiedRation(newList);
+                }
+            }
+            if (!ListUtils.isEmpty(insureDiseaseDTOList)) {
+                insureDiseaseDAO.insertDisease(insureDiseaseDTOList);
+            }
+        }
+    }
+
 
     /**
      * @Method insert_1309
@@ -2742,6 +2909,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("visitId","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_1319, inputMap,map);
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","根据"+MapUtils.get(map, "hilistCode")+" 查询医保目录先自付比例信息为空");
+            return map;
+        }
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         List<InsureUnifidRatioDO> list = insureDirectoryDownLoadDAO.queryAllInsureUnifiedRatio(map);
         Map<String, InsureUnifidRatioDO> collect = list.stream().collect(Collectors.toMap(InsureUnifidRatioDO::getRid, Function.identity(), (k1, k2) -> k1));
@@ -2812,6 +2983,24 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("根据"+MapUtils.get(map, "hilistCode")+" 查询医保目录先自付比例信息为空");
         }
         return map;
+    }
+    public Map<String, Object> insureUnifiedRationParam(Map<String, Object> map,Map<String, Object> paramMap) {
+
+        paramMap.put("query_date", ""); // 查询时间点
+        paramMap.put("hilist_code", MapUtils.get(map, "hilistCode")); // 医保目录编码
+        paramMap.put("selfpay_prop_psn_type", ""); //医保目录自付比例人员类别
+        paramMap.put("selfpay_prop_type", ""); // 目录自付比例类别
+
+        paramMap.put("insu_admdvs", ""); //参保机构医保区划
+        paramMap.put("begndate", null); // 开始日期
+        paramMap.put("enddate", null); // 结束日期
+        paramMap.put("vali_flag", "1"); // 有效标志
+        paramMap.put("rid", ""); // 唯一记录号
+        paramMap.put("tabname", null); // 表名
+        paramMap.put("poolarea_no", ""); // 统筹区
+        paramMap.put("updt_time", MapUtils.get(map, "updtTime")); // 更新时间
+
+        return paramMap;
     }
 
     /**
@@ -2958,7 +3147,117 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         map.put("mapList", mapList);
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","查询医保目录信息为空");
+            return map;
+        }
+        List<InsureUnifiedNationDrugDO> unifiedNationDrudDOList = insureDirectoryDownLoadDAO.queyrAllInsureNationDrug(map);
+        Map<String, InsureUnifiedNationDrugDO> collect = unifiedNationDrudDOList.stream().collect(Collectors.toMap(InsureUnifiedNationDrugDO::getRid, Function.identity(), (k1, k2) -> k1));
+        if (!ListUtils.isEmpty(mapList)) {
+            List<InsureUnifiedNationDrugDO> insertList = new ArrayList<>();
+            InsureUnifiedNationDrugDO InsureUnifiedNationDrugDO = null;
+            for (Map<String, Object> item : mapList) {
+                if ((collect.isEmpty() || !collect.containsKey(MapUtils.get(item, "rid"))) && !StringUtils.isEmpty(MapUtils.get(item, "med_list_codg"))) {
+                    InsureUnifiedNationDrugDO = new InsureUnifiedNationDrugDO();
+                    InsureUnifiedNationDrugDO.setId(SnowflakeUtils.getId());
+                    InsureUnifiedNationDrugDO.setHospCode(hospCode);
+                    InsureUnifiedNationDrugDO.setMedListCodg(MapUtils.get(item, "med_list_codg"));
+                    InsureUnifiedNationDrugDO.setGennameCodg(MapUtils.get(item, "genname_codg"));
+                    InsureUnifiedNationDrugDO.setDrugGenname(MapUtils.get(item, "drug_genname"));
+                    InsureUnifiedNationDrugDO.setDrugProdname(MapUtils.get(item, "drug_prodname"));
+                    InsureUnifiedNationDrugDO.setValiFlag(MapUtils.get(item, "vali_flag"));
+                    InsureUnifiedNationDrugDO.setEthdrugType(MapUtils.get(item, "ethdrug_type"));
+                    InsureUnifiedNationDrugDO.setChemname(MapUtils.get(item, "chemname"));
+                    InsureUnifiedNationDrugDO.setAlis(MapUtils.get(item, "alis"));
+                    InsureUnifiedNationDrugDO.setEngName(MapUtils.get(item, "eng_name"));
+                    InsureUnifiedNationDrugDO.setDosform(MapUtils.get(item, "dosform"));
+                    InsureUnifiedNationDrugDO.setEachDos(MapUtils.get(item, "each_dos"));
+                    InsureUnifiedNationDrugDO.setUsedFrqu(MapUtils.get(item, "used_frqu"));
+                    InsureUnifiedNationDrugDO.setNatDrugNo(MapUtils.get(item, "nat_drug_no"));
+                    InsureUnifiedNationDrugDO.setUsedMtd(MapUtils.get(item, "used_mtd"));
+                    InsureUnifiedNationDrugDO.setIng(MapUtils.get(item, "ing"));
+                    InsureUnifiedNationDrugDO.setChrt(MapUtils.get(item, "chrt"));
+                    InsureUnifiedNationDrugDO.setDefs(MapUtils.get(item, "defs"));
+                    InsureUnifiedNationDrugDO.setTabo(MapUtils.get(item, "tabo"));
+                    InsureUnifiedNationDrugDO.setMnan(MapUtils.get(item, "mnan"));
+                    InsureUnifiedNationDrugDO.setStog(MapUtils.get(item, "stog"));
+                    InsureUnifiedNationDrugDO.setDrugSpec(MapUtils.get(item, "drug_spec"));
+                    InsureUnifiedNationDrugDO.setPrcuntType(MapUtils.get(item, "prcunt_type"));
+                    InsureUnifiedNationDrugDO.setOtcFlag(MapUtils.get(item, "otc_flag"));
+                    InsureUnifiedNationDrugDO.setPacmatl(MapUtils.get(item, "pacmatl"));
+                    InsureUnifiedNationDrugDO.setPacspec(MapUtils.get(item, "pacspec"));
+                    InsureUnifiedNationDrugDO.setMinUseunt(MapUtils.get(item, "min_useunt"));
+                    InsureUnifiedNationDrugDO.setMinSalunt(MapUtils.get(item, "min_salunt"));
+                    InsureUnifiedNationDrugDO.setManl(MapUtils.get(item, "manl"));
+                    InsureUnifiedNationDrugDO.setRute(MapUtils.get(item, "rute"));
+                    InsureUnifiedNationDrugDO.setPhamType(MapUtils.get(item, "pham_type"));
+                    InsureUnifiedNationDrugDO.setMemo(MapUtils.get(item, "memo"));
+                    InsureUnifiedNationDrugDO.setPacCnt(MapUtils.get(item, "pac_cnt"));
+                    InsureUnifiedNationDrugDO.setMinUnt(MapUtils.get(item, "min_unt"));
+                    InsureUnifiedNationDrugDO.setMinPacCnt(MapUtils.get(item, "min_pac_cnt"));
+                    InsureUnifiedNationDrugDO.setMinPacCnt(MapUtils.get(item, "min_pacunt"));
+                    InsureUnifiedNationDrugDO.setMinPrepunt(MapUtils.get(item, "min_prepunt"));
+                    InsureUnifiedNationDrugDO.setDrugExpy(MapUtils.get(item, "drug_expy"));
+                    InsureUnifiedNationDrugDO.setEfccAtd(MapUtils.get(item, "efcc_atd"));
+                    InsureUnifiedNationDrugDO.setMinPrcunt(MapUtils.get(item, "min_prcunt"));
+                    InsureUnifiedNationDrugDO.setWubi(MapUtils.get(item, "wubi"));
+                    InsureUnifiedNationDrugDO.setPinyin(MapUtils.get(item, "pinyin"));
+                    InsureUnifiedNationDrugDO.setValiFlag(MapUtils.get(item, "vali_flag"));
+                    InsureUnifiedNationDrugDO.setRid(MapUtils.get(item, "rid"));
+                    InsureUnifiedNationDrugDO.setCrterId(MapUtils.get(item, "crter_id"));
+                    InsureUnifiedNationDrugDO.setCrterName(MapUtils.get(item, "crter_name"));
+                    InsureUnifiedNationDrugDO.setCrteOptinsNo(MapUtils.get(item, "crte_optins_no"));
+                    InsureUnifiedNationDrugDO.setOpterId(MapUtils.get(item, "opter_id"));
+                    InsureUnifiedNationDrugDO.setOpterName(MapUtils.get(item, "opter_name"));
+                    InsureUnifiedNationDrugDO.setOptinsNo(MapUtils.get(item, "optins_no"));
+                    InsureUnifiedNationDrugDO.setVer(MapUtils.get(item, "ver"));
+
+
+                    if (StringUtils.isEmpty(MapUtils.get(item, "begndate"))) {
+                        InsureUnifiedNationDrugDO.setBegndate(null);
+                    } else {
+                        InsureUnifiedNationDrugDO.setBegndate(DateUtils.parse(MapUtils.get(item, "begndate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    if (StringUtils.isEmpty(MapUtils.get(item, "enddate"))) {
+                        InsureUnifiedNationDrugDO.setEnddate(null);
+                    } else {
+                        InsureUnifiedNationDrugDO.setEnddate(DateUtils.parse(MapUtils.get(item, "enddate"), DateUtils.Y_M_DH_M_S));
+                    }
+                    if (StringUtils.isEmpty(MapUtils.get(item, "crte_time"))) {
+                        InsureUnifiedNationDrugDO.setCrteTime(null);
+                    } else {
+                        InsureUnifiedNationDrugDO.setCrteTime(DateUtils.parse(MapUtils.get(item, "crte_time"), DateUtils.Y_M_DH_M_S));
+                    }
+                    InsureUnifiedNationDrugDO.setOptTime(null);
+                    if (StringUtils.isEmpty(MapUtils.get(item, "updt_time"))) {
+                        InsureUnifiedNationDrugDO.setUpdtTime(null);
+                    } else {
+                        InsureUnifiedNationDrugDO.setUpdtTime(DateUtils.parse(MapUtils.get(item, "updt_time"), DateUtils.Y_M_DH_M_S));
+                    }
+                    insertList.add(InsureUnifiedNationDrugDO);
+                }
+            }
+            if (!ListUtils.isEmpty(insertList)) {
+                int toIndex = 1000;
+                for (int i = 0; i < insertList.size(); i += 1000) {
+                    if (i + 1000 > insertList.size()) {
+                        toIndex = insertList.size() - i;
+                    }
+                    List newList = insertList.subList(i, i + toIndex);
+                    insureDirectoryDownLoadDAO.insertInsureNationDrug(newList);
+                }
+            }
+        }
         return map;
+    }
+
+    private Map<String, Object> nationDrugParam(Map<String, Object> map,Map<String, Object> dataMap) {
+        dataMap.put("drug_genname", MapUtils.get(map, "drugGenname")); // 药品通用名
+        dataMap.put("drug_prodname", MapUtils.get(map, "drugProdname")); //药品商品名
+        dataMap.put("med_list_codg", MapUtils.get(map, "hilistCode")); // 医疗目录编码
+        dataMap.put("vali_flag", Constants.SF.S); // 有效标志
+        dataMap.put("updt_time", MapUtils.get(map, "updtTime")); // 更新时间
+        return dataMap;
     }
 
     /**
@@ -2998,6 +3297,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("visitId","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_1317, inputMap,map);
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","根据"+MapUtils.get(map, "hilistCode")+"查询医保目录信息为空");
+            return map;
+        }
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         List<InsureUnifiedMatchMedicinsDO> unifiedMatchDOList = insureDirectoryDownLoadDAO.queyrAllInsureMedicinesMatch(map);
         Map<String, InsureUnifiedMatchMedicinsDO> collect = unifiedMatchDOList.stream().collect(Collectors.toMap(InsureUnifiedMatchMedicinsDO::getRid, Function.identity(), (k1, k2) -> k1));
@@ -3242,6 +3545,20 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
     }
 
     /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-05 11:40
+     * @Description 分页查询所有民族药品目录信息
+     * @param insureUnifiedNationDrugDO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryPageInsureUnifiedNationDrug(InsureUnifiedNationDrugDO insureUnifiedNationDrugDO) {
+        PageHelper.startPage(insureUnifiedNationDrugDO.getPageNo(), insureUnifiedNationDrugDO.getPageSize());
+        List<InsureUnifiedNationDrugDO> insureUnifiedNationDrugDOList = insureDirectoryDownLoadDAO.queryPageInsureUnifiedNationDrug(insureUnifiedNationDrugDO);
+        return PageDTO.of(insureUnifiedNationDrugDOList);
+    }
+
+    /**
      * @Method UP_1312
      * @Desrciption 医保目录信息查询
      * @Param
@@ -3287,6 +3604,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("visitId","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(),  Constant.UnifiedPay.REGISTER.UP_1312, inputMap,map);
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","根据"+MapUtils.get(map, "hilistCode")+"查询医保目录信息为空");
+            return map;
+        }
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         List<InsureDirectoryInfoDO> list = insureDirectoryDownLoadDAO.queryAllInsureDirectory(map);
         Map<String, InsureDirectoryInfoDO> collect = list.stream().collect(Collectors.toMap(InsureDirectoryInfoDO::getRid, Function.identity(), (k1, k2) -> k1));
@@ -3365,7 +3686,28 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
         return map;
     }
-
+    private Map<String, Object> insureDirectoryParam(Map<String, Object> map,Map<String, Object> paramMap) {
+        paramMap.put("query_date", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_DH_M_S)); // 查询时间点
+        paramMap.put("hilist_code", MapUtils.get(map, "hilistCode")); // 目录类别
+        paramMap.put("insu_admdvs", ""); //参保机构医保区划
+        paramMap.put("begndate", ""); // 开始日期
+        paramMap.put("wubi", ""); //五笔助记码
+        paramMap.put("pinyin", ""); // 拼音助记码
+        paramMap.put("med_chrgitm_type", ""); //医疗收费项目类别
+        paramMap.put("chrgitm_lv", ""); // 收费项目等级
+        paramMap.put("lmt_used_flag", ""); //限制使用标志
+        paramMap.put("list_type", MapUtils.get(map, "listType")); // 目录类别
+        paramMap.put("med_use_flag", ""); //医疗使用标志
+        paramMap.put("matn_used_flag", ""); // 生育使用标志
+        paramMap.put("hilist_use_type", ""); //医保目录使用类别
+        paramMap.put("lmt_cpnd_type", ""); // 限复方使用类型
+        paramMap.put("vali_flag", Constants.SF.S); // 有效标志
+        paramMap.put("rid", ""); // 唯一记录号
+        paramMap.put("tabname", ""); // 表名
+        paramMap.put("poolarea_no", ""); // 统筹区
+        paramMap.put("updt_time", MapUtils.get(map, "updtTime")); // 更新时间
+        return paramMap;
+    }
     /**
      * @Method UP_1316
      * @Desrciption 医疗目录与医保目录匹配信息查询
@@ -3405,6 +3747,10 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("visitId","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(),  Constant.UnifiedPay.REGISTER.UP_1316, inputMap,map);
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","根据"+MapUtils.get(map, "hilistCode")+"查询医保目录信息为空");
+            return map;
+        }
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         List<InsureUnifiedMatchDO> unifiedMatchDOList = insureDirectoryDownLoadDAO.queyrAllInsureUnifiedMatch(map);
         Map<String, InsureUnifiedMatchDO> collect = unifiedMatchDOList.stream().collect(Collectors.toMap(InsureUnifiedMatchDO::getRid, Function.identity(), (k1, k2) -> k1));
@@ -3576,5 +3922,21 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("根据"+MapUtils.get(map, "hilistCode")+"医保目录编码查询限价信息为空");
         }
         return map;
+    }
+    private Map<String, Object> insureUnfiedLimitPriceParam(Map<String, Object> map,Map<String, Object> paramMap) {
+        paramMap.put("query_date", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_DH_M_S)); // 查询时间点
+        paramMap.put("hilist_code", MapUtils.get(map, "hilistCode")); // 医保目录编码
+        paramMap.put("hilist_lmtpric_type", ""); // 医保目录限价类型
+        paramMap.put("overlmt_dspo_way", ""); // 医保目录超限处理方式
+        paramMap.put("insu_admdvs", ""); //参保机构医保区划
+        paramMap.put("begndate", ""); // 开始日期
+        paramMap.put("enddate", ""); // 结束日期
+        paramMap.put("vali_flag", Constants.SF.S); // 有效标志
+        paramMap.put("rid", ""); // 唯一记录号
+        paramMap.put("tabname", ""); // 表名
+        paramMap.put("poolarea_no", ""); // 统筹区
+        paramMap.put("updt_time", MapUtils.get(map, "updtTime")); // 更新时间
+
+        return paramMap;
     }
 }

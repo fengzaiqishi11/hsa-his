@@ -1505,8 +1505,16 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (materialDTO == null){
                         throw new AppException("辅助计费【"+name+"】配置的材料有误!");
                     }
-                    inptCostDTO.setPrice(materialDTO.getSplitPrice());
-                    inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+                    //inptCostDTO.setPrice(materialDTO.getSplitPrice());
+                    //inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+                    //之前是按最小单位算的  但是现在 辅助计费 需要根据 辅助计费明细里面的单位去确定按什么单位收费 -- 2022-05-11
+                    if(StringUtils.isNotEmpty(baseAssistCalcDetailDO.getItemUnitCode()) && baseAssistCalcDetailDO.getItemUnitCode().equals(materialDTO.getSplitUnitCode())){
+                        inptCostDTO.setPrice(materialDTO.getSplitPrice());
+                        inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+                    }else{
+                        inptCostDTO.setPrice(materialDTO.getPrice());
+                        inptCostDTO.setNumUnitCode(materialDTO.getUnitCode());
+                    }
                 }else {
                     throw new AppException("辅助计费【"+name+"】未配置项目或材料!");
                 }
@@ -1709,12 +1717,19 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 if (materiaDTO == null ){
                     throw new AppException("生成静态计费未获取到材料信息!");
                 }
+
+                //这里的医嘱明细单位必须从辅助计费中的明细里面取 单位值  -  2022-05-11 彭波
+                if(StringUtils.isNotEmpty(detailDTO.getItemUnitCode()) && detailDTO.getItemUnitCode().equals(materiaDTO.getSplitUnitCode())){
+                    inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
+                    inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
+                }else{
+                    inptAdviceDetailDTO.setPrice(materiaDTO.getPrice());
+                    inptAdviceDetailDTO.setUnitCode(materiaDTO.getUnitCode());
+                }
                 //单价
-                inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
-                //名称
-                inptAdviceDetailDTO.setItemName(materiaDTO.getName());
+                //inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
                 //单位
-                inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
+                //inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
                 //项目ID
                 inptAdviceDetailDTO.setItemId(materiaDTO.getId());
                 //用药性质
@@ -1994,7 +2009,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                         numBig = BigDecimal.valueOf(Math.ceil(BigDecimalUtils.multiply(numBig, drugDTO.getSplitRatio()).doubleValue()));
                         inptCostDTO.setPrice(drugDTO.getSplitPrice());
                     }
-                } else if (Constants.XMLB.CL.equals(inptAdviceDetailDTO.getItemCode())) {//材料
+                } else if (Constants.XMLB.CL.equals(inptAdviceDetailDTO.getItemCode()) && !Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode())) {//材料
                     if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getUnitCode())) {
                         numBig = BigDecimal.valueOf(Math.ceil(BigDecimalUtils.divide(numBig, materialDTO.getSplitRatio()).doubleValue()));
                         inptCostDTO.setPrice(materialDTO.getPrice());
@@ -2623,6 +2638,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
                 if(inptCostDTO == null ){
+                    //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
+                    adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                     startTime = DateUtils.dateAdd(startTime, day);
                     continue;
                 }

@@ -49,7 +49,7 @@ public class StroInvoicingMonthlyJobHandler extends IJobHandler{
         for(CenterHospitalDTO centerHospitalDTO : centerHospitalDTOList){
             Map map =new HashMap<>();
             map.put("hospCode",centerHospitalDTO.getCode());
-            stroInvoicingMonthlyService_consumer.copyStroInvoicing(map);
+            stroInvoicingMonthlyService_consumer.insertCopyStroInvoicing(map);
         }
         return SUCCESS;
     }

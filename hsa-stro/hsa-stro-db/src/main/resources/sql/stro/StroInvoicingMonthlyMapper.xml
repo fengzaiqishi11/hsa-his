@@ -82,20 +82,20 @@
     select
     <include refid="Base_Column_List" />
     from stro_invoicing_monthly
-    where id = #{item.id}
+    where id = #{id}
   </select>
   <select id="queryAllByDate" resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     SELECT
-    itemId,bizId,DATE_FORMAT(crte_time,'%Y-%m') as crteTime,stroPhar,id,hospCode
-    from stro_invoicing_monthly where hosp_code = #{item.hospCode} and DATE_FORMAT(crte_time,'%Y-%m') = DATE_FORMAT(#{item.crteTime},'%Y-%m')
-    GROUP BY item_id,biz_id,crte_time,stroPhar
+    item_id as itemId,biz_id as bizId,DATE_FORMAT(crte_time,'%Y-%m-%d') as crteTime,stro_phar as stroPhar,id,hosp_code
+    from stro_invoicing_monthly where hosp_code = #{hospCode} and DATE_FORMAT(crte_time,'%Y-%m') = DATE_FORMAT(#{nowDate},'%Y-%m')
+    GROUP BY item_id,biz_id,crte_time,stro_phar
   </select>
-  <select id="queryRecentlyUpdateTime" resultType="java.sql.Date">
-    select DATE_FORMAT(max(modify_time),'%Y-%m-%d') from stro_invoicing_monthly where hosp_code = #{hospCode} and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt; #{date} limit 1;
+  <select id="queryRecentlyUpdateTime" resultType="java.util.Date">
+    select DATE_FORMAT(ifnull(max(modify_time),now()),'%Y-%m-%d') from stro_invoicing_monthly where hosp_code = #{hospCode} and DATE_FORMAT(crte_time,'%Y-%m-%d') &lt; #{nowDate} limit 1;
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly
-    where id = #{item.id}
+    where id = #{id} and hosp_code = #{hospCode}
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO" useGeneratedKeys="true">
     insert into stro_invoicing_monthly (hosp_code, biz_id, item_code,
@@ -121,29 +121,29 @@
       out_sales_num, out_sales_price_all, out_sales_buy_price_all,
       in_sales_buy_price_all, in_sales_price_all, in_sales_num,
       stro_phar, modify_time)
-    values (#{item.hospCode}, #{item.bizId}, #{item.itemCode},
-      #{item.itemId}, #{item.itemName}, #{item.num},
-      #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
-      #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice},
-      #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum},
-      #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll},
-      #{item.upSellPriceAll}, #{item.sellPriceAll}, #{item.crteTime},
-      #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum},
-      #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll},
-      #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum},
-      #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll},
-      #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll},
-      #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll},
-      #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll},
-      #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll},
-      #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll},
-      #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll},
-      #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll},
-      #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll},
-      #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll},
-      #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
-      #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
-      #{item.stroPhar}, #{item.modifyTime})
+    values (#{hospCode}, #{bizId}, #{itemCode},
+      #{itemId}, #{itemName}, #{num},
+      #{unitCode}, #{currUnitCode}, #{sellPrice},
+      #{buyPrice}, #{splitRatio}, #{splitPrice},
+      #{splitNum}, #{splitUnitCode}, #{upSurplusNum},
+      #{surplusNum}, #{upBuyPriceAll}, #{buyPriceAll},
+      #{upSellPriceAll}, #{sellPriceAll}, #{crteTime},
+      #{newPrice}, #{newSplitPrice}, #{stroInNum},
+      #{stroInNumPriceAll}, #{returnSuplNum}, #{returnSuplPriceAll},
+      #{stroToDeptNum}, #{stroToDeptPriceAll}, #{stroToPharNum},
+      #{stroToPharPriceAll}, #{reportLossesNum}, #{reportLossesPriceAll},
+      #{pharReturnStroNum}, #{pharReturnStroPriceAll},
+      #{adjustProfitPriceAll}, #{adjustLossPriceAll},
+      #{takeStrockSubtractNum}, #{takeStrockSubtractPriceAll},
+      #{takeStrockAddNum}, #{takeStrockAddPriceAll},
+      #{stroInNumBuyPriceAll}, #{returnSuplBuyPriceAll},
+      #{stroToDeptBuyPriceAll}, #{stroToPharBuyPriceAll},
+      #{reportLossesBuyPriceAll}, #{pharReturnStroBuyPriceAll},
+      #{adjustProfitBuyPriceAll}, #{adjustLossBuyPriceAll},
+      #{takeStrockSubtractBuyPriceAll}, #{takeStrockAddBuyPriceAll},
+      #{outSalesNum}, #{outSalesPriceAll}, #{outSalesBuyPriceAll},
+      #{inSalesBuyPriceAll}, #{inSalesPriceAll}, #{inSalesNum},
+      #{stroPhar}, #{modifyTime})
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO" useGeneratedKeys="true">
     insert into stro_invoicing_monthly
@@ -328,488 +328,489 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hospCode != null">
-        #{item.hospCode},
+        #{hospCode},
       </if>
       <if test="bizId != null">
-        #{item.bizId},
+        #{bizId},
       </if>
       <if test="itemCode != null">
-        #{item.itemCode},
+        #{itemCode},
       </if>
       <if test="itemId != null">
-        #{item.itemId},
+        #{itemId},
       </if>
       <if test="itemName != null">
-        #{item.itemName},
+        #{itemName},
       </if>
       <if test="num != null">
-        #{item.num},
+        #{num},
       </if>
       <if test="unitCode != null">
-        #{item.unitCode},
+        #{unitCode},
       </if>
       <if test="currUnitCode != null">
-        #{item.currUnitCode},
+        #{currUnitCode},
       </if>
       <if test="sellPrice != null">
-        #{item.sellPrice},
+        #{sellPrice},
       </if>
       <if test="buyPrice != null">
-        #{item.buyPrice},
+        #{buyPrice},
       </if>
       <if test="splitRatio != null">
-        #{item.splitRatio},
+        #{splitRatio},
       </if>
       <if test="splitPrice != null">
-        #{item.splitPrice},
+        #{splitPrice},
       </if>
       <if test="splitNum != null">
-        #{item.splitNum},
+        #{splitNum},
       </if>
       <if test="splitUnitCode != null">
-        #{item.splitUnitCode},
+        #{splitUnitCode},
       </if>
       <if test="upSurplusNum != null">
-        #{item.upSurplusNum},
+        #{upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        #{item.surplusNum},
+        #{surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        #{item.upBuyPriceAll},
+        #{upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        #{item.buyPriceAll},
+        #{buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        #{item.upSellPriceAll},
+        #{upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        #{item.sellPriceAll},
+        #{sellPriceAll},
       </if>
       <if test="crteTime != null">
-        #{item.crteTime},
+        #{crteTime},
       </if>
       <if test="newPrice != null">
-        #{item.newPrice},
+        #{newPrice},
       </if>
       <if test="newSplitPrice != null">
-        #{item.newSplitPrice},
+        #{newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        #{item.stroInNum},
+        #{stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        #{item.stroInNumPriceAll},
+        #{stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        #{item.returnSuplNum},
+        #{returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        #{item.returnSuplPriceAll},
+        #{returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        #{item.stroToDeptNum},
+        #{stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        #{item.stroToDeptPriceAll},
+        #{stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        #{item.stroToPharNum},
+        #{stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        #{item.stroToPharPriceAll},
+        #{stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        #{item.reportLossesNum},
+        #{reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        #{item.reportLossesPriceAll},
+        #{reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        #{item.pharReturnStroNum},
+        #{pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        #{item.pharReturnStroPriceAll},
+        #{pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        #{item.adjustProfitPriceAll},
+        #{adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        #{item.adjustLossPriceAll},
+        #{adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        #{item.takeStrockSubtractNum},
+        #{takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        #{item.takeStrockSubtractPriceAll},
+        #{takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        #{item.takeStrockAddNum},
+        #{takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        #{item.takeStrockAddPriceAll},
+        #{takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        #{item.stroInNumBuyPriceAll},
+        #{stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        #{item.returnSuplBuyPriceAll},
+        #{returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        #{item.stroToDeptBuyPriceAll},
+        #{stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        #{item.stroToPharBuyPriceAll},
+        #{stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        #{item.reportLossesBuyPriceAll},
+        #{reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        #{item.pharReturnStroBuyPriceAll},
+        #{pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        #{item.adjustProfitBuyPriceAll},
+        #{adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        #{item.adjustLossBuyPriceAll},
+        #{adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        #{item.takeStrockSubtractBuyPriceAll},
+        #{takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        #{item.takeStrockAddBuyPriceAll},
+        #{takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        #{item.outSalesNum},
+        #{outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        #{item.outSalesPriceAll},
+        #{outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        #{item.outSalesBuyPriceAll},
+        #{outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        #{item.inSalesBuyPriceAll},
+        #{inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        #{item.inSalesPriceAll},
+        #{inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        #{item.inSalesNum},
+        #{inSalesNum},
       </if>
       <if test="stroPhar != null">
-        #{item.stroPhar},
+        #{stroPhar},
       </if>
       <if test="modifyTime != null">
-        #{item.modifyTime},
+        #{modifyTime},
       </if>
     </trim>
   </insert>
-  <insert id="insertBatch">
-   insert into stro_invoicing_monthly (id,hosp_code, biz_id, item_code,
-      item_id, item_name, num,
-      unit_code, curr_unit_code, sell_price,
-      buy_price, split_ratio, split_price,
-      split_num, split_unit_code, up_surplus_num,
-      surplus_num, up_buy_price_all, buy_price_all,
-      up_sell_price_all, sell_price_all, crte_time,
-      new_price, new_split_price, stro_in_num,
-      stro_in_num_price_all, return_supl_num, return_supl_price_all,
-      stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
-      stro_to_phar_price_all, report_losses_num, report_losses_price_all,
-      phar_return_stro_num, phar_return_stro_price_all,
-      adjust_profit_price_all, adjust_loss_price_all,
-      take_strock_subtract_num, take_strock_subtract_price_all,
-      take_strock_add_num, take_strock_add_price_all,
-      stro_in_num_buy_price_all, return_supl_buy_price_all,
-      stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
-      report_losses_buy_price_all, phar_return_stro_buy_price_all,
-      adjust_profit_buy_price_all, adjust_loss_buy_price_all,
-      take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
-      out_sales_num, out_sales_price_all, out_sales_buy_price_all,
-      in_sales_buy_price_all, in_sales_price_all, in_sales_num,
-      stro_phar, modify_time)
-    values 
-    <foreach collection="stroInvoicingMonthlyDTOS" item="item" open="(" separator="," close=")">
-      #{item.monthlyId},#{item.hospCode}, #{item.bizId}, #{item.itemCode},
-      #{item.itemId}, #{item.itemName}, #{item.num},
-      #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
-      #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice},
-      #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum},
-      #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll},
-      #{item.upSellPriceAll}, #{item.sellPriceAll}, DATE_FORMAT(#{item.crteTime},'%Y-%m-%d'),
-      #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum},
-      #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll},
-      #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum},
-      #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll},
-      #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll},
-      #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll},
-      #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll},
-      #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll},
-      #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll},
-      #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll},
-      #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll},
-      #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll},
-      #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll},
-      #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
-      #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
-      #{item.stroPhar}, #{item.modifyTime}
-    </foreach>
+  <insert id="insertBatch" parameterType="java.util.List" >
+    insert into stro_invoicing_monthly (id,hosp_code, biz_id, item_code,
+    item_id, item_name, num,
+    unit_code, curr_unit_code, sell_price,
+    buy_price, split_ratio, split_price,
+    split_num, split_unit_code, up_surplus_num,
+    surplus_num, up_buy_price_all, buy_price_all,
+    up_sell_price_all, sell_price_all, crte_time,
+    new_price, new_split_price, stro_in_num,
+    stro_in_num_price_all, return_supl_num, return_supl_price_all,
+    stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
+    stro_to_phar_price_all, report_losses_num, report_losses_price_all,
+    phar_return_stro_num, phar_return_stro_price_all,
+    adjust_profit_price_all, adjust_loss_price_all,
+    take_strock_subtract_num, take_strock_subtract_price_all,
+    take_strock_add_num, take_strock_add_price_all,
+    stro_in_num_buy_price_all, return_supl_buy_price_all,
+    stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
+    report_losses_buy_price_all, phar_return_stro_buy_price_all,
+    adjust_profit_buy_price_all, adjust_loss_buy_price_all,
+    take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
+    out_sales_num, out_sales_price_all, out_sales_buy_price_all,
+    in_sales_buy_price_all, in_sales_price_all, in_sales_num,
+    stro_phar, modify_time)
+    values<foreach collection="stroInvoicingMonthlyDTOS" item="item" separator=",">
+    (
+    #{item.monthlyId},#{item.hospCode}, #{item.bizId}, #{item.itemCode},
+    #{item.itemId}, #{item.itemName}, #{item.num},
+    #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
+    #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice},
+    #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum},
+    #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll},
+    #{item.upSellPriceAll}, #{item.sellPriceAll}, DATE_FORMAT(#{item.crteTime},'%Y-%m-%d'),
+    #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum},
+    #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll},
+    #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum},
+    #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll},
+    #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll},
+    #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll},
+    #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll},
+    #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll},
+    #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll},
+    #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll},
+    #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll},
+    #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll},
+    #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll},
+    #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
+    #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
+    #{item.stroPhar}, #{item.modifyTime}
+    )
+  </foreach>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     update stro_invoicing_monthly
     <set>
       <if test="hospCode != null">
-        hosp_code = #{item.hospCode},
+        hosp_code = #{hospCode},
       </if>
       <if test="bizId != null">
-        biz_id = #{item.bizId},
+        biz_id = #{bizId},
       </if>
       <if test="itemCode != null">
-        item_code = #{item.itemCode},
+        item_code = #{itemCode},
       </if>
       <if test="itemId != null">
-        item_id = #{item.itemId},
+        item_id = #{itemId},
       </if>
       <if test="itemName != null">
-        item_name = #{item.itemName},
+        item_name = #{itemName},
       </if>
       <if test="num != null">
-        num = #{item.num},
+        num = #{num},
       </if>
       <if test="unitCode != null">
-        unit_code = #{item.unitCode},
+        unit_code = #{unitCode},
       </if>
       <if test="currUnitCode != null">
-        curr_unit_code = #{item.currUnitCode},
+        curr_unit_code = #{currUnitCode},
       </if>
       <if test="sellPrice != null">
-        sell_price = #{item.sellPrice},
+        sell_price = #{sellPrice},
       </if>
       <if test="buyPrice != null">
-        buy_price = #{item.buyPrice},
+        buy_price = #{buyPrice},
       </if>
       <if test="splitRatio != null">
-        split_ratio = #{item.splitRatio},
+        split_ratio = #{splitRatio},
       </if>
       <if test="splitPrice != null">
-        split_price = #{item.splitPrice},
+        split_price = #{splitPrice},
       </if>
       <if test="splitNum != null">
-        split_num = #{item.splitNum},
+        split_num = #{splitNum},
       </if>
       <if test="splitUnitCode != null">
-        split_unit_code = #{item.splitUnitCode},
+        split_unit_code = #{splitUnitCode},
       </if>
       <if test="upSurplusNum != null">
-        up_surplus_num = #{item.upSurplusNum},
+        up_surplus_num = #{upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        surplus_num = #{item.surplusNum},
+        surplus_num = #{surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        up_buy_price_all = #{item.upBuyPriceAll},
+        up_buy_price_all = #{upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        buy_price_all = #{item.buyPriceAll},
+        buy_price_all = #{buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        up_sell_price_all = #{item.upSellPriceAll},
+        up_sell_price_all = #{upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        sell_price_all = #{item.sellPriceAll},
+        sell_price_all = #{sellPriceAll},
       </if>
       <if test="crteTime != null">
-        crte_time = #{item.crteTime},
+        crte_time = #{crteTime},
       </if>
       <if test="newPrice != null">
-        new_price = #{item.newPrice},
+        new_price = #{newPrice},
       </if>
       <if test="newSplitPrice != null">
-        new_split_price = #{item.newSplitPrice},
+        new_split_price = #{newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        stro_in_num = #{item.stroInNum},
+        stro_in_num = #{stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        stro_in_num_price_all = #{item.stroInNumPriceAll},
+        stro_in_num_price_all = #{stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        return_supl_num = #{item.returnSuplNum},
+        return_supl_num = #{returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        return_supl_price_all = #{item.returnSuplPriceAll},
+        return_supl_price_all = #{returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        stro_to_dept_num = #{item.stroToDeptNum},
+        stro_to_dept_num = #{stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        stro_to_dept_price_all = #{item.stroToDeptPriceAll},
+        stro_to_dept_price_all = #{stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        stro_to_phar_num = #{item.stroToPharNum},
+        stro_to_phar_num = #{stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        stro_to_phar_price_all = #{item.stroToPharPriceAll},
+        stro_to_phar_price_all = #{stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        report_losses_num = #{item.reportLossesNum},
+        report_losses_num = #{reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        report_losses_price_all = #{item.reportLossesPriceAll},
+        report_losses_price_all = #{reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        phar_return_stro_num = #{item.pharReturnStroNum},
+        phar_return_stro_num = #{pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
+        phar_return_stro_price_all = #{pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        adjust_profit_price_all = #{item.adjustProfitPriceAll},
+        adjust_profit_price_all = #{adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        adjust_loss_price_all = #{item.adjustLossPriceAll},
+        adjust_loss_price_all = #{adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        take_strock_subtract_num = #{item.takeStrockSubtractNum},
+        take_strock_subtract_num = #{takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
+        take_strock_subtract_price_all = #{takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        take_strock_add_num = #{item.takeStrockAddNum},
+        take_strock_add_num = #{takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        take_strock_add_price_all = #{item.takeStrockAddPriceAll},
+        take_strock_add_price_all = #{takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
+        stro_in_num_buy_price_all = #{stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
+        return_supl_buy_price_all = #{returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
+        stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
+        stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
+        report_losses_buy_price_all = #{reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
+        phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
+        adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
+        adjust_loss_buy_price_all = #{adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
+        take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
+        take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        out_sales_num = #{item.outSalesNum},
+        out_sales_num = #{outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        out_sales_price_all = #{item.outSalesPriceAll},
+        out_sales_price_all = #{outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
+        out_sales_buy_price_all = #{outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
+        in_sales_buy_price_all = #{inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        in_sales_price_all = #{item.inSalesPriceAll},
+        in_sales_price_all = #{inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        in_sales_num = #{item.inSalesNum},
+        in_sales_num = #{inSalesNum},
       </if>
       <if test="stroPhar != null">
-        stro_phar = #{item.stroPhar},
+        stro_phar = #{stroPhar},
       </if>
       <if test="modifyTime != null">
-        modify_time = #{item.modifyTime},
+        modify_time = #{modifyTime},
       </if>
     </set>
-    where id = #{item.id}
+    where id = #{id}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO">
     update stro_invoicing_monthly
-    set hosp_code = #{item.hospCode},
-      biz_id = #{item.bizId},
-      item_code = #{item.itemCode},
-      item_id = #{item.itemId},
-      item_name = #{item.itemName},
-      num = #{item.num},
-      unit_code = #{item.unitCode},
-      curr_unit_code = #{item.currUnitCode},
-      sell_price = #{item.sellPrice},
-      buy_price = #{item.buyPrice},
-      split_ratio = #{item.splitRatio},
-      split_price = #{item.splitPrice},
-      split_num = #{item.splitNum},
-      split_unit_code = #{item.splitUnitCode},
-      up_surplus_num = #{item.upSurplusNum},
-      surplus_num = #{item.surplusNum},
-      up_buy_price_all = #{item.upBuyPriceAll},
-      buy_price_all = #{item.buyPriceAll},
-      up_sell_price_all = #{item.upSellPriceAll},
-      sell_price_all = #{item.sellPriceAll},
-      crte_time = #{item.crteTime},
-      new_price = #{item.newPrice},
-      new_split_price = #{item.newSplitPrice},
-      stro_in_num = #{item.stroInNum},
-      stro_in_num_price_all = #{item.stroInNumPriceAll},
-      return_supl_num = #{item.returnSuplNum},
-      return_supl_price_all = #{item.returnSuplPriceAll},
-      stro_to_dept_num = #{item.stroToDeptNum},
-      stro_to_dept_price_all = #{item.stroToDeptPriceAll},
-      stro_to_phar_num = #{item.stroToPharNum},
-      stro_to_phar_price_all = #{item.stroToPharPriceAll},
-      report_losses_num = #{item.reportLossesNum},
-      report_losses_price_all = #{item.reportLossesPriceAll},
-      phar_return_stro_num = #{item.pharReturnStroNum},
-      phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
-      adjust_profit_price_all = #{item.adjustProfitPriceAll},
-      adjust_loss_price_all = #{item.adjustLossPriceAll},
-      take_strock_subtract_num = #{item.takeStrockSubtractNum},
-      take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
-      take_strock_add_num = #{item.takeStrockAddNum},
-      take_strock_add_price_all = #{item.takeStrockAddPriceAll},
-      stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
-      return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
-      stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
-      stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
-      report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
-      phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
-      adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
-      adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
-      take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
-      take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
-      out_sales_num = #{item.outSalesNum},
-      out_sales_price_all = #{item.outSalesPriceAll},
-      out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
-      in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
-      in_sales_price_all = #{item.inSalesPriceAll},
-      in_sales_num = #{item.inSalesNum},
-      stro_phar = #{item.stroPhar},
-      modify_time = #{item.modifyTime}
-    where id = #{item.id}
+    set hosp_code = #{hospCode},
+      biz_id = #{bizId},
+      item_code = #{itemCode},
+      item_id = #{itemId},
+      item_name = #{itemName},
+      num = #{num},
+      unit_code = #{unitCode},
+      curr_unit_code = #{currUnitCode},
+      sell_price = #{sellPrice},
+      buy_price = #{buyPrice},
+      split_ratio = #{splitRatio},
+      split_price = #{splitPrice},
+      split_num = #{splitNum},
+      split_unit_code = #{splitUnitCode},
+      up_surplus_num = #{upSurplusNum},
+      surplus_num = #{surplusNum},
+      up_buy_price_all = #{upBuyPriceAll},
+      buy_price_all = #{buyPriceAll},
+      up_sell_price_all = #{upSellPriceAll},
+      sell_price_all = #{sellPriceAll},
+      crte_time = #{crteTime},
+      new_price = #{newPrice},
+      new_split_price = #{newSplitPrice},
+      stro_in_num = #{stroInNum},
+      stro_in_num_price_all = #{stroInNumPriceAll},
+      return_supl_num = #{returnSuplNum},
+      return_supl_price_all = #{returnSuplPriceAll},
+      stro_to_dept_num = #{stroToDeptNum},
+      stro_to_dept_price_all = #{stroToDeptPriceAll},
+      stro_to_phar_num = #{stroToPharNum},
+      stro_to_phar_price_all = #{stroToPharPriceAll},
+      report_losses_num = #{reportLossesNum},
+      report_losses_price_all = #{reportLossesPriceAll},
+      phar_return_stro_num = #{pharReturnStroNum},
+      phar_return_stro_price_all = #{pharReturnStroPriceAll},
+      adjust_profit_price_all = #{adjustProfitPriceAll},
+      adjust_loss_price_all = #{adjustLossPriceAll},
+      take_strock_subtract_num = #{takeStrockSubtractNum},
+      take_strock_subtract_price_all = #{takeStrockSubtractPriceAll},
+      take_strock_add_num = #{takeStrockAddNum},
+      take_strock_add_price_all = #{takeStrockAddPriceAll},
+      stro_in_num_buy_price_all = #{stroInNumBuyPriceAll},
+      return_supl_buy_price_all = #{returnSuplBuyPriceAll},
+      stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll},
+      stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll},
+      report_losses_buy_price_all = #{reportLossesBuyPriceAll},
+      phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll},
+      adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll},
+      adjust_loss_buy_price_all = #{adjustLossBuyPriceAll},
+      take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll},
+      take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll},
+      out_sales_num = #{outSalesNum},
+      out_sales_price_all = #{outSalesPriceAll},
+      out_sales_buy_price_all = #{outSalesBuyPriceAll},
+      in_sales_buy_price_all = #{inSalesBuyPriceAll},
+      in_sales_price_all = #{inSalesPriceAll},
+      in_sales_num = #{inSalesNum},
+      stro_phar = #{stroPhar},
+      modify_time = #{modifyTime}
+    where id = #{id} and hosp_code = #{hospCode}
   </update>
     <!--回写主表-->
     <update id="updateByDate">
   update stro_invoicing_monthly a , (select id,hosp_code, biz_id, item_code, item_id, item_name, sum(num) as num,
         unit_code, curr_unit_code, sell_price, buy_price, split_ratio, split_price, sum(split_num) as splitNum,
-        split_unit_code,sum(up_surplus_num) as upSurplusNum,sum(surplus_num) as surplusNum,
-        sum(up_buy_price_all) as upBuyPriceAll,sum(buy_price_all) as buyPriceAll,
-        sum(up_sell_price_all) as upSellPriceAll,sum(sell_price_all) as sellPriceAll, crte_time,
+        split_unit_code,sum(up_surplus_num) as upSurplusNum,surplus_num as surplusNum,
+        sum(up_buy_price_all) as upBuyPriceAll,buy_price_all as buyPriceAll,
+        sum(up_sell_price_all) as upSellPriceAll,sell_price_all as sellPriceAll, crte_time,
         new_price, new_split_price,sum(stro_in_num) as stroInNum,sum(stro_in_num_price_all) as stroInNumPriceAll,
         sum(return_supl_num) as returnSuplNum,sum(return_supl_price_all) as returnSuplPriceAll,
         sum(stro_to_dept_num) as stroToDeptNum,sum(stro_to_dept_price_all) as stroToDeptPriceAll,
@@ -830,15 +831,15 @@
         sum(out_sales_num) as outSalesNum,sum(out_sales_price_all) as outSalesPriceAll,
         sum(out_sales_buy_price_all) as outSalesBuyPriceAll,sum(in_sales_buy_price_all) as inSalesBuyPriceAll,
         sum(in_sales_price_all) as inSalesPriceAll,sum(in_sales_num) as inSalesNum,monthly_id
-  from stro_invoicing_monthly_detail where date(crte_time) = #{date} GROUP BY monthly_id)b
+  from stro_invoicing_monthly_detail where DATE_FORMAT(crte_time,'%Y-%m') = DATE_FORMAT(#{nowDate},'%Y-%m') and hosp_code = #{hospCode} GROUP BY monthly_id)b
         set
           a.num = b.num,
           a.split_num = b.splitNum,
-          a.up_surplus_num = b.upSurplusNum,
+          /**a.up_surplus_num = b.upSurplusNum,**/
           a.surplus_num = b.surplusNum,
-          a.up_buy_price_all = b.upBuyPriceAll,
+          /**a.up_buy_price_all = b.upBuyPriceAll,**/
           a.buy_price_all = b.buyPriceAll,
-          a.up_sell_price_all = b.upSellPriceAll,
+          /**a.up_sell_price_all = b.upSellPriceAll,**/
           a.sell_price_all = b.sellPriceAll,
           a.stro_in_num = b.stroInNum,
           a.stro_in_num_price_all = b.stroInNumPriceAll,
@@ -875,6 +876,6 @@
           a.in_sales_price_all = b.inSalesPriceAll,
           a.in_sales_num = b.inSalesNum,
           a.modify_time = now()
-          where a.id = b.monthly_id and DATE_FORMAT(a.crte_time,'%Y-%m') = DATE_FORMAT(#{date},'%Y-%m') and a.hosp_code = #{hospCode}
+          where a.id = b.monthly_id and DATE_FORMAT(a.crte_time,'%Y-%m') = DATE_FORMAT(#{nowDate},'%Y-%m') and a.hosp_code = #{hospCode}
     </update>
 </mapper>

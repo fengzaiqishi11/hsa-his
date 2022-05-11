@@ -9,5 +9,5 @@ import java.util.Map;
  * @Date: 2022/3/18 9:34
  **/
 public interface StroInvoicingMonthlyBO {
-    boolean copyStroInvoicing(Map map);
+    boolean insertCopyStroInvoicing(Map map);
 }

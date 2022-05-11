@@ -16,5 +16,5 @@ import java.util.Map;
 public interface StroInvoicingMonthlyService {
 
     @PostMapping("/service/web/stro/stroStock/stroInvoicingMonthly")
-    WrapperResponse<Boolean> copyStroInvoicing(Map map);
+    WrapperResponse<Boolean> insertCopyStroInvoicing(Map map);
 }

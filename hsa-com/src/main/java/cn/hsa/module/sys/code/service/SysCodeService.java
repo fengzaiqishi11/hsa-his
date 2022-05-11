@@ -247,4 +247,13 @@ public interface SysCodeService {
      **/
     @GetMapping("/service/sys/code/getCodeDetailByValue")
     WrapperResponse<SysCodeDetailDTO> getCodeDetailByValue(Map map);
+    /**
+     * @Author gory
+     * @Description 启用作废的值域明细
+     * @Date 2022/5/9 16:29
+     * @Param [map]
+     **/
+    @GetMapping("/service/sys/code/updateStatus")
+    WrapperResponse<Boolean> updateStatus(Map map);
+
 }

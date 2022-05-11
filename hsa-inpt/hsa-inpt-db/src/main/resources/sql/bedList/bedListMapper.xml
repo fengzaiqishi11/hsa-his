@@ -308,7 +308,8 @@
 
     <!-- 修改住院病人信息-出院召回 -->
     <update id="updateInptVisit_Cyzh">
-        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',out_time = null
+        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',out_time = null,
+                              out_disease_name = null
         where id = #{id} and status_code = '5'
     </update>
 

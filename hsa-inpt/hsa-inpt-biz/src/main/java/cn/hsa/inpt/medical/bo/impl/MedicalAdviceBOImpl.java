@@ -1732,6 +1732,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
                 //项目ID
                 inptAdviceDetailDTO.setItemId(materiaDTO.getId());
+                //名称
+                inptAdviceDetailDTO.setItemName(materiaDTO.getName());
                 //用药性质
                 inptAdviceDetailDTO.setUseCode(Constants.YYXZ.KSZB);
 

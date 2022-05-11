@@ -38,12 +38,13 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="operDiseaseIcd9" column="oper_disease_icd9" jdbcType="VARCHAR"/>
         <result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
+        <result property="operNationCode" column="oper_nation_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="getById" resultMap="BaseAdviceMap">
         select
-        id, hosp_code, code,oper_disease_icd9, name, other_name, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time, reimbursement_ratio
+        id, hosp_code, code,oper_disease_icd9, name, other_name, type_code, technology_code, price, unit_code, out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code, doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same, is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time, reimbursement_ratio,oper_nation_code
         from base_advice
         where id = #{id} and hosp_code = #{hospCode}
     </select>
@@ -203,11 +204,11 @@
         insert into base_advice(id,hosp_code, code, name,other_name,  type_code, technology_code, price, unit_code,
          out_dept_code, in_dept_code, biz_type, biz_code, container_code, specimen_code, use_scope_code, dept_code,
           doctor_level_code, opeartion_code, insure_list_code, gender_code, min_age, max_age, is_cost, is_stop_same,
-           is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time,oper_disease_icd9, reimbursement_ratio)
+           is_stop_same_not, is_stop_myself, pym, wbm, is_valid, crte_id, crte_name, crte_time,oper_disease_icd9, reimbursement_ratio,oper_nation_code)
         values (#{id},#{hospCode}, #{code}, #{name},#{otherName}, #{typeCode}, #{technologyCode}, #{price}, #{unitCode}, #{outDeptCode},
          #{inDeptCode}, #{bizType}, #{bizCode}, #{containerCode}, #{specimenCode}, #{useScopeCode}, #{deptCode},
           #{doctorLevelCode}, #{opeartionCode}, #{insureListCode}, #{genderCode}, #{minAge}, #{maxAge}, #{isCost},
-           #{isStopSame}, #{isStopSameNot}, #{isStopMyself}, #{pym}, #{wbm},'1', #{crteId}, #{crteName}, #{crteTime},#{operDiseaseIcd9}, #{reimbursementRatio})
+           #{isStopSame}, #{isStopSameNot}, #{isStopMyself}, #{pym}, #{wbm},'1', #{crteId}, #{crteName}, #{crteTime},#{operDiseaseIcd9}, #{reimbursementRatio},#{operNationCode})
     </insert>
 
     <insert id="insertList" keyProperty="id" useGeneratedKeys="true">
@@ -259,6 +260,7 @@
             is_valid = #{isValid},
             reimbursement_ratio = #{reimbursementRatio},
             oper_disease_icd9 = #{operDiseaseIcd9},
+            oper_nation_code = #{operNationCode}
         </set>
         where id = #{id} and hosp_code = #{hospCode}
     </update>

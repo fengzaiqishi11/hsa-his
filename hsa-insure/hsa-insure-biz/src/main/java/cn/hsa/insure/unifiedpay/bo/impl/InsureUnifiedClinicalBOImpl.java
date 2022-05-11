@@ -172,9 +172,21 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
             if(clinicalExaminationInfoDTO.getUuid() == null){
                 clinicalExaminationInfoDTO.setUuid(SnowflakeUtils.getLongId());
             }
+            if(StringUtils.isEmpty(clinicalExaminationInfoDTO.getStudyUid())){
+                clinicalExaminationInfoDTO.setStudyUid(SnowflakeUtils.getId());
+            }
             clinicalExaminationInfoDTO.setIsUplod("0");
             clinicalExaminationInfoDTO.setValiFlag("1");
             clinicalExaminationInfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if(StringUtils.isEmpty(clinicalExaminationInfoDTO.getRptDate())){
+                clinicalExaminationInfoDTO.setRptDate(null);
+            }
+            if(StringUtils.isEmpty(clinicalExaminationInfoDTO.getExamDate())){
+                clinicalExaminationInfoDTO.setExamDate(null);
+            }
+            if(StringUtils.isEmpty(clinicalExaminationInfoDTO.getSaplDate())){
+                clinicalExaminationInfoDTO.setSaplDate(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            }
             clinicalExaminationInfoDAO.insertClinicalExamination(clinicalExaminationInfoDTO);
         }
         else {
@@ -238,6 +250,12 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
             insureClinicalCheckoutDTO.setIsUplod("0");
             insureClinicalCheckoutDTO.setValiFlag("1");
             insureClinicalCheckoutDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if(StringUtils.isEmpty(insureClinicalCheckoutDTO.getRptDate())){
+                insureClinicalCheckoutDTO.setRptDate(null);
+            }
+            if(StringUtils.isEmpty(insureClinicalCheckoutDTO.getSaplDate())){
+                insureClinicalCheckoutDTO.setSaplDate(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            }
             insureClinicalCheckoutDAO.insertInsureClinicalCheckout(insureClinicalCheckoutDTO);
         }
         else {
@@ -261,14 +279,6 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      */
     @Override
     public PageDTO queryPageClinicalReportRecord(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO) {
-        List<CommentDTO>  commentDTOList=insureClinicalCheckoutDAO.queryComment();
-        Map map = new HashMap();
-        for(CommentDTO commentDTO1:commentDTOList){
-            map.put(commentDTO1.getColumnName(),commentDTO1.getColumnComment());
-        }
-        map =toCamelCaseMap(map);
-        JSONObject json = new JSONObject (map);
-        System.out.print(json);
         // 设置分页信息
         PageHelper.startPage(insureClinicalCheckoutDTO.getPageNo(), insureClinicalCheckoutDTO.getPageSize());
         List<InsureClinicalCheckoutDTO> insureClinicalCheckoutDTOList = insureClinicalCheckoutDAO.queryPageInsureClinicalCheckout(insureClinicalCheckoutDTO);
@@ -371,6 +381,9 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
             insureBacterialReportDTO.setIsUplod("0");
             insureBacterialReportDTO.setValiFlag("1");
             insureBacterialReportDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            if(StringUtils.isEmpty(insureBacterialReportDTO.getClteTime())){
+                insureBacterialReportDTO.setClteTime(null);
+            }
             insureBacterialReportDAO.insertInsureBacterialReport(insureBacterialReportDTO);
         }
         else {

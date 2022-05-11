@@ -950,6 +950,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureInptRegisterDTO.setAke024(inptVisitDto.getInRemark()); // 病情备注
         insureInptRegisterDTO.setBka245(BigDecimalUtils.nullToZero(inptVisitDTO.getPrice()) + ""); // 预付款
         insureInptRegisterDTO.setBka008(inptVisitDto.getWork()); // 单位名称
+        insureInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001()); // 单位ID
 
         // 长沙医保必要参数
         insureInptRegisterDTO.setInNo(inptVisitDto.getInNo());
@@ -1032,6 +1033,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 insureRemoteInptRegisterDTO.setAae005(insureInptRegisterDTO.getAae005()); // 联系电话
                 insureRemoteInptRegisterDTO.setBka008(insureIndividualBasicDTO.getBka008());
                 insureRemoteInptRegisterDTO.setInjuryBorthSn(insureInptRegisterDTO.getInjuryBorthSn());
+                insureRemoteInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001());//单位ID
 
                 insureRemoteInptRegisterDTO.setBka036("0"); // 是否读卡
                 if ("iccardno".equals(insureIndividualBasicDTO.getBka895())) {

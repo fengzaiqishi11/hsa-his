@@ -17,6 +17,7 @@ import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import kafka.api.ApiUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -757,6 +758,96 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         PageHelper.startPage(insureSpecialRecordDTO.getPageNo(),insureSpecialRecordDTO.getPageSize());
         List<InsureSpecialRecordDTO> list = insureDiseaseRecordDAO.queryPageSpecialRecord(insureSpecialRecordDTO);
         return PageDTO.of(list);
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:34
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryPageInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO) {
+        PageHelper.startPage(insureAccidentalInjuryDTO.getPageNo(),insureAccidentalInjuryDTO.getPageSize());
+        List<InsureAccidentalInjuryDTO> list = insureDiseaseRecordDAO.queryPageInsureAccidentInjureRecord(insureAccidentalInjuryDTO);
+        return PageDTO.of(list);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:34
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public Boolean insertInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO) {
+       // String requestBody =  ApiUtils.requestJson("data",reginsApiDTO, ApiNoEnum.NAT_8506.getCode());
+        String hospCode = insureAccidentalInjuryDTO.getHospCode();
+        String insureRegCode = insureAccidentalInjuryDTO.getRegCode();
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        Map<String, Object> paramMap = new HashMap<>(13);
+        paramMap.put("dcla_souc", insureAccidentalInjuryDTO.getDclaSouc()); // 申报来源
+        paramMap.put("psn_no", insureAccidentalInjuryDTO.getPsnNo()); // 人员编号
+        paramMap.put("insutype", insureAccidentalInjuryDTO.getInsutype()); // 险种类型
+        paramMap.put("psn_insu_rlts_id", insureAccidentalInjuryDTO.getPsnInsuRltsId()); //人员参保关系ID
+        paramMap.put("psn_cert_type", insureAccidentalInjuryDTO.getPsnCertType()); //人员证件类型
+        paramMap.put("certno", insureAccidentalInjuryDTO.getCertno()); //人员证件号码
+        paramMap.put("psn_name", insureAccidentalInjuryDTO.getPsnName()); //人员姓名
+        paramMap.put("gend", insureAccidentalInjuryDTO.getGend()); //性别
+        paramMap.put("naty", insureAccidentalInjuryDTO.getNaty()); //民族
+        paramMap.put("brdy", insureAccidentalInjuryDTO.getBrdy()); //出生日期
+        paramMap.put("tel", insureAccidentalInjuryDTO.getTel()); //联系电话
+        paramMap.put("insu_admdvs", insureConfigurationDTO.getRegCode()); // 所属医保区划
+        paramMap.put("addr", insureAccidentalInjuryDTO.getAddr()); // 联系地址
+        paramMap.put("begndate", DateUtils.format(insureAccidentalInjuryDTO.getBegndate(), DateUtils.Y_M_DH_M_S));  // 开始日期
+        paramMap.put("enddate", DateUtils.format(insureAccidentalInjuryDTO.getEnddate(), DateUtils.Y_M_DH_M_S));  // 结束日期
+        paramMap.put("emp_no", insureAccidentalInjuryDTO.getEmpNo()); // 单位编号
+        paramMap.put("emp_name", insureAccidentalInjuryDTO.getEmpName()); // 联系地址
+        paramMap.put("mdtrtarea_admdvs", insureAccidentalInjuryDTO.getMdtrtareaAdmdvs()); // 联系地址
+        paramMap.put("fixmedins_code", insureAccidentalInjuryDTO.getFixmedinsCode()); // 联系地址
+        paramMap.put("fixmedins_name", insureAccidentalInjuryDTO.getFixmedinsName()); // 联系地址
+        paramMap.put("hosp_lv", insureAccidentalInjuryDTO.getHospLv()); // 联系地址
+        paramMap.put("adm_time", insureAccidentalInjuryDTO.getAdmTime()); // 入院时间
+        paramMap.put("trum_time", insureAccidentalInjuryDTO.getTrumTime()); // 受伤时间
+        paramMap.put("trum_site", insureAccidentalInjuryDTO.getTrumSite()); // 受伤地点
+        paramMap.put("trum_rea", insureAccidentalInjuryDTO.getTrumRea()); // 致伤原因
+        paramMap.put("chk_pay_flag", insureAccidentalInjuryDTO.getChkPayFlag()); // 审核支付标志
+        paramMap.put("agnter_name", insureAccidentalInjuryDTO.getAgnterName()); // 代办人姓名
+        paramMap.put("agnter_cert_type", insureAccidentalInjuryDTO.getAgnterCertType()); // 代办人证件类型
+        paramMap.put("agnter_certno", insureAccidentalInjuryDTO.getAgnterCertno()); // 代办人证件号码
+        paramMap.put("agnter_tel", insureAccidentalInjuryDTO.getAgnterTel()); // 代办人联系方式
+        paramMap.put("agnter_addr", insureAccidentalInjuryDTO.getAgnterAddr()); // 代办人联系地址
+        paramMap.put("memo", insureAccidentalInjuryDTO.getMemo()); // 备注
+        Map<String, Object> dataMap = new HashMap<>(1);
+        dataMap.put("data", paramMap);
+        Map<String,Object> logMap = new HashMap<>();
+        logMap.put("msgName","人员意外伤害备案");
+        logMap.put("visitId","");
+        logMap.put("hospCode",hospCode);
+        logMap.put("crteName",insureAccidentalInjuryDTO.getCrteName());
+        logMap.put("crteId",insureAccidentalInjuryDTO.getCrteId());
+        logMap.put("crteTime",DateUtils.getNow());
+        logMap.put("isHospital","0");
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.REGISTER.UP_2507, dataMap, logMap);
+        Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
+        Map<String, Object> result = (Map<String, Object>) outputMap.get("result");
+      /*  if(StringUtils.isEmpty(MapUtils.get(result,"trt_dcla_detl_sn "))){
+            throw new AppException("人员意外伤害备案失败,医保无备案流水号返回");
+        }*/
+        try{
+            insureAccidentalInjuryDTO.setTrtDclaDetlSn(result.get("trt_dcla_detl_sn").toString());
+            insureAccidentalInjuryDTO.setId(SnowflakeUtils.getId());
+            insureAccidentalInjuryDTO.setCrteTime(DateUtils.getNow());
+            //insureDiseaseRecordDAO.insertRecordAccidentInjury(insureAccidentalInjuryDTO);
+        }catch (Exception e){
+            throw new AppException(e.getMessage());
+        }
+
+        return true;
     }
 
     private boolean checkRequest(InsureInptRecordDTO insureInptRecordDTO) {

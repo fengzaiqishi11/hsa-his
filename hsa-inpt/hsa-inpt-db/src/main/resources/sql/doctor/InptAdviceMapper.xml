@@ -1567,19 +1567,13 @@
         bd.start_time startTime,
         bd.end_time endTime,
         bd.num,
+        bd.unit_code as itemUnitCode,
     CASE
             WHEN bd.type_code = '3' THEN
-            b.id
+                b.id
             WHEN bd.type_code = '2' THEN
-            c.id
-        END itemId,
-    CASE
-
-            WHEN bd.type_code = '3' THEN
-            b.unit_code
-            WHEN bd.type_code = '2' THEN
-            c.unit_code
-        END itemUnitCode,
+                c.id
+            END itemId,
     CASE
 
             WHEN bd.type_code = '3' THEN

@@ -179,6 +179,23 @@ public class SysParameterController extends BaseController {
       map.put("sysUserDTO",sysUserDTO);
       return sysParameterService_consumer.getIsReallyPwd(map);
     }
-
-
+    /**
+     * @Menthod getIsReallyPwd
+     * @Desrciption 请求登录人员与机构信息信息
+     *
+     * @Param
+     * [sysParameterDTO, req, res]
+     *
+     * @Author yuelong.chen
+     * @Date   2022/5/10 10:05
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @GetMapping("/getLoginInfo")
+    public WrapperResponse<Map> getLoginInfo(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("sysUserDTO",sysUserDTO);
+        return sysParameterService_consumer.getLoginInfo(map);
+    }
 }

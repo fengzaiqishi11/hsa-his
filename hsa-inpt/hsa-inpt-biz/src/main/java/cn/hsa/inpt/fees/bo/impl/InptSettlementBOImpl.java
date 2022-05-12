@@ -1136,6 +1136,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     insureIndividualVisitDTO.setInsureAccoutFlag(inptVisitDTO.getIsUserInsureAccount());
                 }
                 inptVisitDTO.setIsUseAccount(insureIndividualVisitDTO.getInsureAccoutFlag());
+                //住院结算增加读卡原始信息
+                insureIndividualVisitDTO.setHcardBasinfo(MapUtil.getStr(param,"hcardBasinfo"));
+                insureIndividualVisitDTO.setHcardChkinfo(MapUtil.getStr(param,"hcardChkinfo"));
 
 
                 /**

@@ -396,7 +396,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
                     (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
                 if (ObjectUtil.isNotEmpty(isReimburse)) {
-                        throw new RuntimeException("是否报销标志【isReimburse】不会为空！费用id为："+feedetlSn);
+                        throw new RuntimeException("是否报销标志【isReimburse】不能为空！费用id为："+feedetlSn);
                 }
                     switch (isReimburse) {
                         case Constants.SF.S:
@@ -787,6 +787,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisit");
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
+        //读卡原始信息赋值
+        InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
+        if (ObjectUtil.isNotEmpty(visitDTO)) {
+            insureIndividualVisitDTO.setHcardChkinfo(visitDTO.getHcardChkinfo());
+            insureIndividualVisitDTO.setHcardBasinfo(visitDTO.getHcardBasinfo());
+        }
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
 

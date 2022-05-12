@@ -108,4 +108,16 @@ public interface SysParameterService {
     **/
     @GetMapping("/service/sys/parameter/getIsReallyPwd")
     WrapperResponse<Map> getIsReallyPwd(Map map);
+    /**
+     * @Menthod getIsReallyPwd
+     * @Desrciption 请求登录人员与机构信息信息
+     *
+     * @Param
+     * [sysParameterDTO, req, res]
+     *
+     * @Author yuelong.chen
+     * @Date   2022/5/10 10:05
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    WrapperResponse<Map> getLoginInfo(Map map);
 }

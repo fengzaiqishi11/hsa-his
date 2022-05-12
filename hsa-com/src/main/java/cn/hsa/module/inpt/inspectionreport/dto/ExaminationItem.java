@@ -59,4 +59,6 @@ public class ExaminationItem implements Serializable {
     * */
     private String deptName;
 
+    private String zhId;
+
 }

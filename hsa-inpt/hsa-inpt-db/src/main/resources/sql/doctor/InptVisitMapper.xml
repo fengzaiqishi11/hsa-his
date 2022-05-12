@@ -1102,6 +1102,8 @@
 		iv.crte_id,
 		iv.crte_name,
 		iv.crte_time,
+        iiv.mdtrt_cert_type,
+        iiv.mdtrt_cert_no,
 		iiv.medical_reg_no
 		from
 		inpt_visit iv
@@ -1234,6 +1236,8 @@
     iv.crte_id,
     iv.crte_name,
     iv.crte_time,
+    iiv.mdtrt_cert_type,
+    iiv.mdtrt_cert_no,
     iiv.medical_reg_no
     from
     inpt_visit iv

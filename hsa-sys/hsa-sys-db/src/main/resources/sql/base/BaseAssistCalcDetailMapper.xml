@@ -18,14 +18,15 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="itemTypeCode" column="itemTypeCode" jdbcType="TIMESTAMP"/>
         <result property="spec" column="spec" jdbcType="TIMESTAMP"/>
-        <result property="unitCode" column="unit_code" jdbcType="TIMESTAMP"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
         <result property="bfcId" column="bfcId" jdbcType="TIMESTAMP"/>
+        <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="BaseAssistDetailMap">
         select
-          id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+          id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time,unit_code, num, is_valid, crte_id, crte_name, crte_time
         from base_assist_detail
         where id = #{id}
     </select>
@@ -34,7 +35,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="BaseAssistDetailMap">
         select
-        id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time
+        id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, unit_code,num, is_valid, crte_id, crte_name, crte_time
         from base_assist_detail
         <where>
                 and hosp_code = #{hospCode}
@@ -65,6 +66,7 @@
         a.inDeptName,
         a.outDeptName,
         a.price,
+        b.unit_code  as checkUnitCode,
         a.unit_code,
         a.split_price as splitPrice,
         a.split_unit_code as splitUnitCode,
@@ -149,8 +151,8 @@
     </select>
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_assist_detail(id,hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
-        values (#{id},#{hospCode}, #{acCode}, #{typeCode}, #{itemCode}, #{useCode}, #{startTime}, #{endTime}, #{num}, '1', #{crteId}, #{crteName}, #{crteTime})
+        insert into base_assist_detail(id,hosp_code, ac_code, type_code, item_code,unit_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{acCode}, #{typeCode}, #{itemCode},#{unitCode}, #{useCode}, #{startTime}, #{endTime}, #{num}, '1', #{crteId}, #{crteName}, #{crteTime})
     </insert>
 
     <!--通过主键修改数据-->
@@ -164,6 +166,9 @@
                 item_code = #{itemCode},
             <if test="useCode != null and useCode != ''">
                 use_code = #{useCode},
+            </if>
+            <if test="unitCode != null and unitCode != ''">
+                unit_code = #{unitCode},
             </if>
             <if test="startTime != null">
                 start_time = #{startTime},
@@ -199,16 +204,16 @@
     <!--批量新增所有列，列表长度不能为0，且-->
     <insert id="insertList" parameterType="list">
         insert into base_assist_detail
-        (id,hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
+        (id,hosp_code, ac_code, type_code, item_code,unit_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
-            (#{item.id},#{item.hospCode}, #{item.acCode}, #{item.typeCode}, #{item.itemCode}, #{item.useCode}, #{item.startTime}, #{item.endTime}, #{item.num}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
+            (#{item.id},#{item.hospCode}, #{item.acCode}, #{item.typeCode}, #{item.itemCode}, #{item.unitCode}, #{item.useCode}, #{item.startTime}, #{item.endTime}, #{item.num}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
         </foreach>
     </insert>
 
     <select id="queryAssistDetails" resultMap="BaseAssistDetailMap">
         select
-          id, hosp_code, ac_code, type_code, item_code, use_code, start_time, end_time, ifnull(num,0) num, is_valid, crte_id, crte_name, crte_time
+          id, hosp_code, ac_code, type_code, item_code,unit_code, use_code, start_time, end_time, ifnull(num,0) num, is_valid, crte_id, crte_name, crte_time
         from base_assist_detail a
         where hosp_code = #{hospCode} and ac_code=#{code}
     </select>

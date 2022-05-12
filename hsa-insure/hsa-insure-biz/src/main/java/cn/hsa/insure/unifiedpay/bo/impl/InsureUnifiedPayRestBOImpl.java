@@ -2909,11 +2909,17 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         map.put("visitId","");
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_1319, inputMap,map);
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
-        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+
+       /* if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
             map.put("msgName","根据"+MapUtils.get(map, "hilistCode")+" 查询医保目录先自付比例信息为空");
             return map;
-        }
+        }*/
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
+        map.put("mapList", mapList);
+        if(ObjectUtil.isEmpty(MapUtils.get(outMap, "data"))){
+            map.put("msgName","查询医保目录信息为空");
+            return map;
+        }
         List<InsureUnifidRatioDO> list = insureDirectoryDownLoadDAO.queryAllInsureUnifiedRatio(map);
         Map<String, InsureUnifidRatioDO> collect = list.stream().collect(Collectors.toMap(InsureUnifidRatioDO::getRid, Function.identity(), (k1, k2) -> k1));
         if (!ListUtils.isEmpty(mapList)) {

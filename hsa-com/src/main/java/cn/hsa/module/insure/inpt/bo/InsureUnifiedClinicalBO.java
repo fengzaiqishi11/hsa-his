@@ -2,6 +2,7 @@ package cn.hsa.module.insure.inpt.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.clinica.dto.*;
+import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateNoStructReportRecord(Map<String,Object> map);
+    boolean updateNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO);
 
 
     /**
@@ -84,7 +85,7 @@ public interface InsureUnifiedClinicalBO  {
     boolean updateClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 
     /**
-     * @param map
+     * @param insureNoStructReportDO
      * @Method updateNoStructReportRecord
      * @Desrciption 非结构化报告记录--新增数据
      * @Param
@@ -92,7 +93,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertNoStructReportRecord(Map<String, Object> map);
+    boolean insertNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDO);
 
     /**
      * @param map
@@ -103,7 +104,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPageNoStructReportRecord(Map<String, Object> map);
+    PageDTO queryPageNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO);
 
     /**
      * @param

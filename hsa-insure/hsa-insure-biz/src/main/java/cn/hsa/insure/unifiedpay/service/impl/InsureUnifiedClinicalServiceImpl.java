@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedClinicalBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedClinicalService;
+import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -167,8 +168,8 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> insertNoStructReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.insertNoStructReportRecord(map));
+    public WrapperResponse<Boolean> insertNoStructReportRecord(Map<String,Object> map) {
+        return WrapperResponse.success(insureUnifiedClinicalBO.insertNoStructReportRecord(MapUtils.get(map,"insureNoStructReportDO")));
     }
 
     /**
@@ -183,7 +184,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
     @Override
     public WrapperResponse<PageDTO> queryPageNoStructReportRecord(Map<String, Object> map)
     {
-        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageNoStructReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.queryPageNoStructReportRecord(MapUtils.get(map,"insureNoStructReportDTO")));
     }
 
     /**
@@ -253,7 +254,7 @@ public class InsureUnifiedClinicalServiceImpl extends HsafService implements Ins
      */
     @Override
     public WrapperResponse<Boolean>  updateNoStructReportRecord(Map<String, Object> map) {
-        return WrapperResponse.success(insureUnifiedClinicalBO.updateNoStructReportRecord(map));
+        return WrapperResponse.success(insureUnifiedClinicalBO.updateNoStructReportRecord(MapUtils.get(map,"insureNoStructReportDTO")));
     }
 
     /**

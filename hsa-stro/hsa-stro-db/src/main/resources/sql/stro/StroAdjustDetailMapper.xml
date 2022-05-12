@@ -25,6 +25,7 @@
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
         <result property="model" column="model" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="bizName" column="bizName" jdbcType="VARCHAR"/>
 
     </resultMap>
 
@@ -62,7 +63,7 @@
     </select>
 
     <!--批量新增-->
-    <insert id="insertStroAdjustDetailDTO" parameterType="cn.hsa.module.stro.adjust.dto.StroAdjustDTO">
+    <insert id="insertStroAdjustDetailDTO" parameterType="cn.hsa.module.stro.adjust.dto.StroAdjustDetailDTO">
 
             insert into stro_adjust_detail(id,hosp_code, adjust_id, item_code, item_id, item_name, before_price, after_price, buy_price, num, unit_code, split_ratio, split_num, split_unit_code, split_buy_price, split_before_price, split_after_price,biz_id)
             values

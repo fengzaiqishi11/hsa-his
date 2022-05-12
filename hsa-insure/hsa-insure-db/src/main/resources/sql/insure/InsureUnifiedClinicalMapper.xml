@@ -108,7 +108,7 @@
         update insure_nostruct_report
         <set >
             <if test="isTrans != null" >
-                is_trans = #{isTrans}
+                is_trans = #{isTrans},
             </if>
 
             <if test="valiFlag != null" >

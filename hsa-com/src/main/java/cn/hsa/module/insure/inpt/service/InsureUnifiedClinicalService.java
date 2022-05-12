@@ -2,6 +2,7 @@ package cn.hsa.module.insure.inpt.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.Map;
@@ -95,7 +96,7 @@ public interface InsureUnifiedClinicalService {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    WrapperResponse<Boolean> insertNoStructReportRecord(Map<String, Object> map);
+    WrapperResponse<Boolean> insertNoStructReportRecord(Map<String,Object> map);
 
 
     /**

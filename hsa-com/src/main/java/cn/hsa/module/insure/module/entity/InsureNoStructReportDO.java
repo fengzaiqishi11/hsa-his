@@ -24,7 +24,11 @@ import java.io.Serializable;
 public class InsureNoStructReportDO extends PageDO implements Serializable {
     private String id; //主键id
     private String hospCode; // 医院编码
+    private String mdtrtSn;//就医流水号
+    private String isUplod;//是否上传
+    private String createTime;//创建时间
     private String visitId; // 就诊id
+    private String visitNo; // 住院/门诊号
     private String mdtrtId; // 就医登记号
     private String psnNo; // 人员编号
     private String otpIptFlag; // 门诊/住院标志

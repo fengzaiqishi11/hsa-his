@@ -481,5 +481,14 @@ public interface InsureIndividualVisitDAO {
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
     InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map param);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-11 11:36
+     * @Description 根据就诊号查询门诊登记信息
+     * @param insureIndividualVisitDTO
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO queryInsureIndividualVisitByNo(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }
 

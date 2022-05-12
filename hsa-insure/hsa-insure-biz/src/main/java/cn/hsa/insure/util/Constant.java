@@ -769,6 +769,7 @@ public interface Constant {
             public static final String UP_2504 = "2504"; // 人员慢特病备案撤销
             public static final String UP_2505 = "2505"; // 人员定点备案
             public static final String UP_2506 = "2506"; // 人员定点病备案撤销
+            public static final String UP_2507 = "2507"; // 人员意外伤害备案
             public static final String UP_2699 = "2699"; // 生育备案申请
             public static final String UP_5301 = "5301"; // 人员慢特病备案查询
             public static final String UP_5302 = "5302"; // 人员定点备案查询

@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.hutool.core.map.MapUtil.toCamelCaseMap;
 
@@ -476,7 +477,7 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
     }
 
     /**
-     * @param map
+     * @param insureNoStructReportDO
      * @Method updateNoStructReportRecord
      * @Desrciption 非结构化报告记录--新增数据
      * @Param
@@ -485,16 +486,67 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public boolean insertNoStructReportRecord(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map,"hospCode");
-        InsureNoStructReportDO insureNoStructReportDO = MapUtils.get(map,"insureNoStructReportDO");
-        insureNoStructReportDO.setHospCode(hospCode);
-        insureNoStructReportDO.setId(SnowflakeUtils.getId());
-        return insureUnifiedClinicalDAO.insertNoStructReportRecord(insureNoStructReportDO);
+    public boolean insertNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDO) {
+        if(StringUtils.isEmpty(insureNoStructReportDO.getId())){
+            String hospCode = insureNoStructReportDO.getHospCode();
+            //InsureNoStructReportDO insureNoStructReportDO = MapUtils.get(map,"insureNoStructReportDO");
+            String outptVisitNo = insureNoStructReportDO.getVisitNo();
+            String otpIptFlag = insureNoStructReportDO.getOtpIptFlag();
+            String examTestFlag  = insureNoStructReportDO.getOtpIptFlag();
+            String appyNo  = insureNoStructReportDO.getOtpIptFlag();
+            String fileName  = insureNoStructReportDO.getOtpIptFlag();
+            String examTestRpot  = insureNoStructReportDO.getOtpIptFlag();
+            String fileFormate   = insureNoStructReportDO.getFileFormate();
+            if(StringUtils.isEmpty(outptVisitNo)){
+                throw new AppException("住院/门诊号不能为空！");
+            }
+            if(StringUtils.isEmpty(otpIptFlag)){
+                throw new AppException("门诊/住院标志不能为空！");
+            }
+            if(StringUtils.isEmpty(examTestFlag)){
+                throw new AppException("检查/检验标志不能为空！");
+            }
+            if(StringUtils.isEmpty(appyNo)){
+                throw new AppException("申请号 不能为空！");
+            }
+            if(StringUtils.isEmpty(fileName)){
+                throw new AppException("文件名 不能为空！");
+            }
+            if(StringUtils.isEmpty(examTestRpot)){
+                throw new AppException("检查/检验报告不能为空！");
+            }
+            if(StringUtils.isEmpty(fileFormate)){
+                throw new AppException("文件类型不能为空！");
+            }
+            //根据住院号/门诊号查询医保登记信息，获取就诊号、就医流水号、人员编号
+            InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+            insureIndividualVisitDTO.setVisitNo(insureNoStructReportDO.getVisitNo());
+            insureIndividualVisitDTO.setHospCode(insureNoStructReportDO.getHospCode());
+            InsureIndividualVisitDTO byVisitNo = insureIndividualVisitDAO.getByVisitNo(insureIndividualVisitDTO);
+            if (byVisitNo == null || StringUtils.isEmpty(byVisitNo.getId())) {
+                throw new AppException("未查找到医保就诊信息，请做医保登记。");
+            }
+            insureNoStructReportDO.setMdtrtSn(byVisitNo.getVisitId());
+            insureNoStructReportDO.setMdtrtId(byVisitNo.getMedicalRegNo());
+            insureNoStructReportDO.setPsnNo(byVisitNo.getAac001());
+            insureNoStructReportDO.setIsTrans("0");
+            insureNoStructReportDO.setValiFlag("1");
+            insureNoStructReportDO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+            insureNoStructReportDO.setHospCode(hospCode);
+            insureNoStructReportDO.setId(SnowflakeUtils.getId());
+            return insureUnifiedClinicalDAO.insertNoStructReportRecord(insureNoStructReportDO);
+        }else{
+            InsureNoStructReportDTO insureNoStructReportDTO = insureUnifiedClinicalDAO.queryById(insureNoStructReportDO.getId());
+            if("1".equals(insureNoStructReportDTO.getIsTrans())&&"0".equals(insureNoStructReportDO.getValiFlag())){
+                throw  new AppException("已经上传的数据不能撤销！");
+            }
+            insureUnifiedClinicalDAO.updateInsureNoStructReport(insureNoStructReportDO);
+        }
+        return true;
     }
 
     /**
-     * @param map
+     * @param insureNoStructReportDTO
      * @Method updateNoStructReportRecord
      * @Desrciption 非结构化报告记录--分页查询
      * @Param
@@ -503,12 +555,27 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Return
      */
     @Override
-    public PageDTO queryPageNoStructReportRecord(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map,"hospCode");
-        InsureNoStructReportDO insureNoStructReportDO = MapUtils.get(map,"insureNoStructReportDO");
-        insureNoStructReportDO.setHospCode(hospCode);
-        PageHelper.startPage(insureNoStructReportDO.getPageNo(),insureNoStructReportDO.getPageSize());
-        List<InsureNoStructReportDO> noStructReportDOList  =insureUnifiedClinicalDAO.queryPageNoStructReportRecord(insureNoStructReportDO);
+    public PageDTO queryPageNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO) {
+
+        if(StringUtils.isEmpty(insureNoStructReportDTO.getHospCode())){
+            throw  new AppException("医院编码不能为空！");
+        }
+        PageHelper.startPage(insureNoStructReportDTO.getPageNo(),insureNoStructReportDTO.getPageSize());
+        List<InsureNoStructReportDTO> noStructReportDOList  =insureUnifiedClinicalDAO.queryPageNoStructReportRecord(insureNoStructReportDTO);
+        for(InsureNoStructReportDTO dto:noStructReportDOList){
+            if("0".equals(dto.getExamTestFlag())){
+                dto.setExamTestFlagName("否");
+            }
+            if("1".equals(dto.getExamTestFlag())){
+                dto.setExamTestFlagName("是");
+            }
+            if("0".equals(dto.getOtpIptFlag())){
+                dto.setOtpIptFlagName("否");
+            }
+            if("1".equals(dto.getOtpIptFlag())){
+                dto.setOtpIptFlagName("是");
+            }
+        }
         return PageDTO.of(noStructReportDOList);
     }
 
@@ -773,14 +840,29 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    public boolean updateNoStructReportRecord(Map<String,Object> map){
-        String hospCode = MapUtils.get(map, "hospCode");
-        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
+    public boolean updateNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO){
+        InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+        insureIndividualVisitDTO.setVisitNo(insureNoStructReportDTO.getVisitNo());
+        insureIndividualVisitDTO.setHospCode(insureNoStructReportDTO.getHospCode());
+        insureIndividualVisitDTO = insureIndividualVisitDAO.getByVisitNo(insureIndividualVisitDTO);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记。");
+        }
         Map<String,Object> paramMap;
         List<Map<String,Object>> mapArrayList = new ArrayList<>();
         Map<String, Object> dataMap = new HashMap<>();
+        Map map = new HashMap();
+        map.put("hospCode",insureNoStructReportDTO.getHospCode());
+        map.put("visitNo",insureIndividualVisitDTO.getVisitNo());
+        map.put("Id",insureNoStructReportDTO.getId());
         List<InsureNoStructReportDO> insureNoStructReportDOList = insureUnifiedClinicalDAO.queryAllNoStructReportRecord(map);
+
         if(!ListUtils.isEmpty(insureNoStructReportDOList)){
+            //筛选出未上传的数据
+            insureNoStructReportDOList = insureNoStructReportDOList
+                    .stream()
+                    .filter(InsureNoStructReportDO -> "0".equals(InsureNoStructReportDO.getIsTrans()))
+                    .collect(Collectors.toList());
             for(InsureNoStructReportDO insureNoStructReportDO : insureNoStructReportDOList){
                 paramMap = new HashMap<>();
                 paramMap.put("mdtrt_sn",insureNoStructReportDO.getId()); // 就医流水号
@@ -796,11 +878,15 @@ public class InsureUnifiedClinicalBOImpl extends HsafBO implements InsureUnified
                 mapArrayList.add(paramMap);
             }
         }else{
-            throw new AppException("该患者的非结构化报告记录数据为空");
+            throw new AppException("该患者的待上传非结构化报告记录数据为空");
         }
         dataMap.put("data", mapArrayList);
-        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "4506", dataMap);
-
+        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(insureNoStructReportDTO.getHospCode(), insureIndividualVisitDTO.getInsureRegCode(), "4506", dataMap);
+        //上传成功后修改传输状态
+        for(InsureNoStructReportDO dto:insureNoStructReportDOList){
+            dto.setIsTrans("1");
+            insureUnifiedClinicalDAO.updateInsureNoStructReport(dto);
+        }
         return true;
     }
 

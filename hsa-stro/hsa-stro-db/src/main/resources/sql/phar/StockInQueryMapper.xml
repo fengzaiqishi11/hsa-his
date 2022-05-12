@@ -113,6 +113,7 @@
         <result property="splitUnitCode" column="split_unit_code" jdbcType="DECIMAL"/>
         <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
         <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
+        <result property="nationCode" column="nationCode" jdbcType="VARCHAR"/>
     </resultMap>
     <!--点击入库信息  查询入库明细表格数据-->
     <select id="queryStockInDetail" resultMap="stroOutinMap_detail" parameterType="cn.hsa.module.phar.pharapply.dto.StroOutDTO">
@@ -127,7 +128,11 @@
                         union all
                         select prod_code from base_material where hosp_code = a.hosp_code and id = a.item_id
                     )
-        )as productName
+        )as productName,
+        case a.item_code when '1' then
+        ( select nation_code from base_drug where hosp_code = a.hosp_code and id = a.item_id)
+        when '2' then
+        (select nation_code from base_material where hosp_code = a.hosp_code and id = a.item_id) end nationCode
         from stro_out_detail a
         where a.hosp_code=#{hospCode}
         <if test="outId !=null and outId !='' ">

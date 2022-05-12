@@ -85,13 +85,19 @@ public class OnlinePayController  extends BaseController {
     }
 
     SysUserDTO userDTO = getSession(req, res) ;
-    outptVisitDTO.setHospCode(userDTO.getHospCode());//医院编码
-    outptVisitDTO.setHospName(userDTO.getHospName());//医院名称
-    outptVisitDTO.setCrteId(userDTO.getId());//当前用户id
+    //医院编码
+    outptVisitDTO.setHospCode(userDTO.getHospCode());
+    //医院名称
+    outptVisitDTO.setHospName(userDTO.getHospName());
+    //当前用户id
+    outptVisitDTO.setCrteId(userDTO.getId());
     outptVisitDTO.setCrteName(userDTO.getName());
-    outptVisitDTO.setCode(userDTO.getCode()); // 操作员编码
-    outptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId() );//当前登录用户操作科室ID
-    outptSettleDTO.setHospCode(userDTO.getHospCode());//医院编码
+    // 操作员编码
+    outptVisitDTO.setCode(userDTO.getCode());
+    //当前登录用户操作科室ID
+    outptVisitDTO.setDeptId(userDTO.getLoginBaseDeptDTO().getId() );
+    //医院编码
+    outptSettleDTO.setHospCode(userDTO.getHospCode());
 
     Map params = new HashMap();
     params.put("hospCode",userDTO.getHospCode());

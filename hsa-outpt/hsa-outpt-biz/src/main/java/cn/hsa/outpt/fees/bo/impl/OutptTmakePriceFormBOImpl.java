@@ -4445,9 +4445,67 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");//获取个人信息
         OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");//获取结算信息
         List<OutptPayDO> outptPayDOList = MapUtils.get(map, "outptPayDOList");//支付方式信息
+
+        //发票制单
+        saveInvoiceInfo(outptSettleDTO);
+
+        // 1、校验是否使用发票，是否存在发票段（没有返回错误信息，页面给出选择发票段信息）
+        checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
       }
       return null;
     }
+
+    /**
+     * 1、校验是否使用发票，是否存在发票段（没有返回错误信息，页面给出选择发票段信息）
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 14:46
+     * @return void
+     */
+    private OutinInvoiceDTO checkUseInvoice(Boolean isInvoice,OutptVisitDTO outptVisitDTO){
+      OutinInvoiceDTO outinInvoiceDTO = new OutinInvoiceDTO();//发票段信息
+      if (isInvoice) {
+        outinInvoiceDTO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+        outinInvoiceDTO.setUseId(outptVisitDTO.getCrteId());//发票使用人id
+        List<String> typeCode = new ArrayList<String>();//票据类型（0、全院通用，1、门诊发票，2、挂号发票，3、门诊通用，4、住院）
+        Collections.addAll(typeCode, Constants.PJLX.TY, Constants.PJLX.MZ, Constants.PJLX.MZTY);
+        outinInvoiceDTO.setTypeCodeList(typeCode);//0、全院通用；1、门诊发票；3、门诊通用
+        //校验是否有在用状态的发票段，有就返回在用的发票信息
+        outinInvoiceDTO.setStatusCode(Constants.PJSYZT.ZY);//使用状态 = 在用状态
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", outptVisitDTO.getHospCode());
+        map.put("outinInvoiceDTO", outinInvoiceDTO);
+        List<OutinInvoiceDTO> outinInvoiceDTOS = outinInvoiceService.updateForOutinInvoiceQuery(map).getData();
+        if (outinInvoiceDTOS == null || outinInvoiceDTOS.size() != 1) {
+          //没有发票信息
+          //return WrapperResponse.info(-2, "请选择发票段", outinInvoiceDTOS);
+          throw new AppException("当前没有可用发票，请领取发票或取消使用发票再结算");
+        }
+        outinInvoiceDTO = outinInvoiceDTOS.get(0);
+      }
+      return outinInvoiceDTO;
+    }
+
+
+    /**
+     * 发票制单
+     * @param outptSettleDTO
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 14:36
+     * @return
+     */
+    private void saveInvoiceInfo(OutptSettleDTO outptSettleDTO){
+      // 门诊结算票据表
+      List<OutptSettleInvoiceDTO> pjList = null;
+      //门诊结算票据内容表
+      List<OutptSettleInvoiceContentDTO> pjnrList = null;
+      // 先进行发票分单
+      Map<String, Object> pjMap = this.disposeFpfd(outptSettleDTO.getVisitId(), outptSettleDTO.getId(), outptSettleDTO.getHospCode());
+      // 门诊结算票据表
+      pjList = MapUtils.get(pjMap, "jspjJsonList");
+      //门诊结算票据内容表
+      pjnrList = MapUtils.get(pjMap, "fplbJsonList");
+      saveOutptSettleInvoice(pjList, pjnrList);
+   }
 
     /**
      * 6401-费用明细上传撤销

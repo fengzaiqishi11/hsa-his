@@ -782,6 +782,8 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
      */
     @Override
     public Boolean insertInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO) {
+        insureAccidentalInjuryDTO.setDclaSouc("01");
+        insureAccidentalInjuryDTO.setChkPayFlag("01");
        // String requestBody =  ApiUtils.requestJson("data",reginsApiDTO, ApiNoEnum.NAT_8506.getCode());
         String hospCode = insureAccidentalInjuryDTO.getHospCode();
         String insureRegCode = insureAccidentalInjuryDTO.getRegCode();
@@ -791,6 +793,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         Map<String, Object> paramMap = new HashMap<>(13);
         paramMap.put("dcla_souc", insureAccidentalInjuryDTO.getDclaSouc()); // 申报来源
+        paramMap.put("chk_pay_flag", insureAccidentalInjuryDTO.getChkPayFlag()); // 审核支付标志
         paramMap.put("psn_no", insureAccidentalInjuryDTO.getPsnNo()); // 人员编号
         paramMap.put("insutype", insureAccidentalInjuryDTO.getInsutype()); // 险种类型
         paramMap.put("psn_insu_rlts_id", insureAccidentalInjuryDTO.getPsnInsuRltsId()); //人员参保关系ID

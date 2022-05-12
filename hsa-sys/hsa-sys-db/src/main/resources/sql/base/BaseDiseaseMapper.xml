@@ -182,8 +182,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, usual_name, nation_code, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no,platform_code)
-        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{usualName}, #{nationCode}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo},#{platformCode})
+        insert into base_disease(id , hosp_code, type_code, code, attach_code, name, usual_name, nation_code,nation_name, is_add, pym, wbm, is_valid, crte_id, crte_name, crte_time,is_infectious,infectious_name,infectious_interval_days,seq_no,platform_code)
+        values (#{id},#{hospCode}, #{typeCode}, #{code}, #{attachCode}, #{name}, #{usualName}, #{nationCode},#{nationName}, #{isAdd}, #{pym}, #{wbm}, '1', #{crteId}, #{crteName}, #{crteTime},#{isCrb},#{crbName},#{crbInterval},#{seqNo},#{platformCode})
     </insert>
 
 	<!--新增疾病规则-->
@@ -214,6 +214,7 @@
 			name = #{name},
 			usual_name = #{usualName},
 			nation_code = #{nationCode},
+			nation_name = #{nationName},
 			is_add = #{isAdd},
 			pym = #{pym},
 			wbm = #{wbm},

@@ -11,6 +11,7 @@ import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +38,19 @@ public class InptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
 
         Map<String,Object> dataMap = new HashMap<>();
+
+        //结算刷卡如果是电子凭证，校验paytoken值
+        /*if (ObjectUtil.isEmpty(inptVisitDTO.getMdtrtCertType())){
+          throw new RuntimeException("结算刷卡未传入就诊凭证类型!");
+        }
+        //电子凭证
+        if ("01".equals(inptVisitDTO.getMdtrtCertType())){
+          dataMap.put("mdtrt_cert_type",inptVisitDTO.getMdtrtCertType());// 就诊凭证类型
+          dataMap.put("mdtrt_cert_no",inptVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        }else{
+          dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型
+          dataMap.put("mdtrt_cert_no",insureIndividualVisitDTO.getMdtrtCertNo()); // 就诊凭证编号
+        }*/
 
         dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());// 人员编号
         dataMap.put("mdtrt_cert_type",insureIndividualVisitDTO.getMdtrtCertType());// 就诊凭证类型

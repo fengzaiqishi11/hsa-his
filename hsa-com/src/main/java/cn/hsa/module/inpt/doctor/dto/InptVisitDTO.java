@@ -496,5 +496,7 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String insureIllnessCode;
     // 优惠类型名称
     private String preferentialTypeName;
+    private String mdtrtCertType;   //证件类型
+    private String mdtrtCertNo;  //入参值
 
 }

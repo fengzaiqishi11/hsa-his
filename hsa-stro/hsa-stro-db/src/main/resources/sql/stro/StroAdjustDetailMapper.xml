@@ -25,6 +25,7 @@
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
         <result property="model" column="model" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+        <result property="bizName" column="bizName" jdbcType="VARCHAR"/>
 
     </resultMap>
 

@@ -769,6 +769,7 @@ public interface Constant {
             public static final String UP_2504 = "2504"; // 人员慢特病备案撤销
             public static final String UP_2505 = "2505"; // 人员定点备案
             public static final String UP_2506 = "2506"; // 人员定点病备案撤销
+            public static final String UP_2507 = "2507"; // 人员意外伤害备案
             public static final String UP_2699 = "2699"; // 生育备案申请
             public static final String UP_5301 = "5301"; // 人员慢特病备案查询
             public static final String UP_5302 = "5302"; // 人员定点备案查询
@@ -803,12 +804,21 @@ public interface Constant {
             public static final String UP_4101A = "4101A"; // 医疗保障基金结算清单新
             public static final String UP_4102 = "4102"; // 医疗保障基金结算清单状态修改
 
+            public static final String UP_4501= "4501"; // 临床检查报告记录
+            public static final String UP_4502= "4502"; // 临床检验报告记录
+            public static final String UP_4503= "4503"; // 细菌培养报告记录
+            public static final String UP_4504= "4504"; // 药敏记录报告记录
+            public static final String UP_4505= "4505"; // 病理检查报告记录
+
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询
             public static final String UP_4201 = "4201"; // 自费病人费用信息上传
             public static final String UP_4261 = "4261"; // 自费病人明细信息上传
             public static final String UP_4262 = "4262"; // 自费病人明细信息对账
             public static final String UP_4263 = "4263"; // 自费病人零报金额不符查询
+            public static final String UP_6201 = "6201"; // 线上费用明细上传
+            public static final String UP_6301 = "6301"; // 医保订单结算结果查询
+            public static final String UP_6401 = "6401"; // 费用明细上传撤销
         }
 
         public static class DOWNLOAD {

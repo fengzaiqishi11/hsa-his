@@ -43,4 +43,6 @@
     <dubbo:reference id="mrisHomeService_consumer" interface="cn.hsa.module.mris.mrisHome.service.MrisHomeService" check="false"/>
 
     <dubbo:reference id="emrPatientService_consumer" interface="cn.hsa.module.emr.emrpatient.service.EmrPatientService" check="false"/>
+
+    <dubbo:reference id="inptSettlementService_provider" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
 </beans>

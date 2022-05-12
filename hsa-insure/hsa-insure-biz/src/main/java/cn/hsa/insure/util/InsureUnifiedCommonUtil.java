@@ -64,12 +64,7 @@ public class InsureUnifiedCommonUtil {
         }
         Map httpParam = new HashMap();
         httpParam.put("infno", functionCode);  //交易编号
-        if(StringUtils.isEmpty(MapUtils.get(paramMap,"insuplcAdmdvs"))){
-            httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
-        }else{
-            httpParam.put("insuplc_admdvs", MapUtils.get(paramMap,"insuplcAdmdvs")); //参保地医保区划分
-            MapUtils.remove(paramMap,"insuplcAdmdvs");
-        }
+        httpParam.put("fixmedins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());

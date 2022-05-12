@@ -28,6 +28,7 @@ import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -148,6 +149,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     public Map<String, Object> queryDoctorInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String orgCode = MapUtils.get(map, "regCode");
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "pracPsnType"))) {
+            throw new AppException("执业人员分类【pracPsnType】不能为空！");
+        }
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
 
@@ -987,6 +991,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     @Override
     public Map<String, Object> queryItemConfirm(Map<String, Object> map) {
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "psnNo"))) {
+            throw new AppException("人员编号【psnNo】不能为空！");
+        }
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
         /**
@@ -1008,7 +1015,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("exam_item_code", MapUtils.get(map, "examItemCode"));
         dataMap.put("exam_item_name", MapUtils.get(map, "examItemName"));
         paramMap.put("data", dataMap);
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "5401", paramMap,map);
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureRegCode(), "5401", paramMap,map);
         List<Map<String, Object>> resultDataMap= MapUtils.get(resultMap, "bilgiteminfo");
         map.put("resultDataMap", resultDataMap);
         return map;
@@ -1093,6 +1100,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      */
     @Override
     public Map<String, Object> queryReportDetails(Map<String, Object> map) {
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "psnNo"))) {
+            throw new AppException("人员编号【psnNo】不能为空！");
+        }
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "fixmedinsCode"))) {
+            throw new AppException("医院编号【fixmedinsCode】不能为空！");
+        }
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
         /**

@@ -541,4 +541,16 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     public void updateInsureSettleCounts(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         insureIndividualVisitDAO.updateInsureSettleCounts(insureIndividualVisitDTO);
     }
+
+    /**
+     * 根据医保就诊ID获取医保就诊信息
+     * @param insureVisitParam
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-07 15:12
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+  @Override
+  public InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map<String, Object> insureVisitParam) {
+    return insureIndividualVisitDAO.getInsureIndividualVisitByMedRegNo(insureVisitParam);
+  }
 }

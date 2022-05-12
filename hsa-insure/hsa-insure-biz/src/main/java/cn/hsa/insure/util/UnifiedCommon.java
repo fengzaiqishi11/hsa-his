@@ -48,10 +48,10 @@ public class UnifiedCommon {
      * @Date 2021/4/28 19:51
      * @Return
      **/
-     public  Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap) {
+     public  Map<String, Object> commonInsureUnified(String hospCode, String regCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(orgCode);
+        insureConfigurationDTO.setRegCode(regCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if(insureConfigurationDTO ==null){

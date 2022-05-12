@@ -42,4 +42,6 @@ public class PatientInspectItem extends PatientTreeQueryDTO implements Serializa
      private Date crteTime;
      /**检验检测类型 4为LIS,5为PACS**/
      private String typeCode;
+
+     private String zhId;
 }

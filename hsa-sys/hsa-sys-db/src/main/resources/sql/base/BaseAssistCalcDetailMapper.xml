@@ -18,8 +18,9 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="itemTypeCode" column="itemTypeCode" jdbcType="TIMESTAMP"/>
         <result property="spec" column="spec" jdbcType="TIMESTAMP"/>
-        <result property="unitCode" column="unit_code" jdbcType="TIMESTAMP"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
         <result property="bfcId" column="bfcId" jdbcType="TIMESTAMP"/>
+        <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -65,7 +66,8 @@
         a.inDeptName,
         a.outDeptName,
         a.price,
-        b.unit_code,
+        b.unit_code  as checkUnitCode,
+        a.unit_code,
         a.split_price as splitPrice,
         a.split_unit_code as splitUnitCode,
         a.spec,

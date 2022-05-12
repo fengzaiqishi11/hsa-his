@@ -22,7 +22,6 @@ public class BaseAssistCalcDetailDTO extends BaseAssistCalcDetailDO implements S
     private String itemName;
     private BigDecimal price;
     private String bfcCode;
-
     private String unitName;
     private String spec;
 
@@ -37,5 +36,6 @@ public class BaseAssistCalcDetailDTO extends BaseAssistCalcDetailDO implements S
     private String name;
     private String splitPrice;
     private String splitUnitCode;
+    private String  checkUnitCode;
 
 }

@@ -1,9 +1,6 @@
 package cn.hsa.module.insure.module.dao;
 
-import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
-import cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO;
-import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
-import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
+import cn.hsa.module.insure.module.dto.*;
 
 import java.util.List;
 import java.util.Map;
@@ -221,4 +218,17 @@ public interface InsureDiseaseRecordDAO {
      * @Return
      */
     List<InsureSpecialRecordDTO> queryPageSpecialRecord(InsureSpecialRecordDTO insureSpecialRecordDTO);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:34
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @return java.util.List<cn.hsa.module.insure.module.dto.InsureAccidentalInjuryDTO>
+     */
+    List<InsureAccidentalInjuryDTO> queryPageInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO);
+
+    void insertInsureNationDrug(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO);
+
+    void insertRecordAccidentInjury(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO);
 }

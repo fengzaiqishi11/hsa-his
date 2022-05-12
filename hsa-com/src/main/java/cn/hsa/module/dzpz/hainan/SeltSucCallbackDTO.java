@@ -20,6 +20,12 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SeltSucCallbackDTO {
 
+
+  /**
+   * 订单状态
+   */
+  String ordStas;
+
   /**
    * 回调类型
    */

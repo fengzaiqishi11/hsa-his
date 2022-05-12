@@ -3,12 +3,13 @@
 <mapper namespace="cn.hsa.module.insure.module.dao.InsureUnifiedClinicalDAO">
     <insert id="insertNoStructReportRecord">
     insert into insure_nostruct_report
-        (id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag,
+        (id, hosp_code, visit_no,visit_id,mdtrt_sn, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag,
         appy_no, file_name, file_formate, exam_test_rpot, vali_flag, is_trans)
-        values (#{id},#{hospCode},#{visitId},#{mdtrtId},#{psnNo},
+        values (#{id},#{hospCode},#{visitNo},#{visitId},#{mdtrtSn},#{mdtrtId},#{psnNo},
         #{otpIptFlag},#{examTestFlag},#{appyNo},#{fileName},#{fileFormate},#{examTestRpot},#{valiFlag},
                 #{isTrans})
     </insert>
+
     <insert id="insertPathologicalReportRecord">
         insert into insure_pathological_report
             (id, hosp_code, mdtrt_id, psn_no, palg_no, frozen_no, cma_date, rpot_date, cma_matl, clnc_dise, exam_fnd,
@@ -38,7 +39,16 @@
             resultType="cn.hsa.module.insure.module.entity.InsureNoStructReportDO">
         select id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag, appy_no, file_name,
                file_formate, exam_test_rpot, vali_flag, is_trans
-        from insure_nostruct_report where hosp_code =#{hospCode} and is_trans='0' and visit_id =#{visitId}
+        from insure_nostruct_report where hosp_code =#{hospCode} and is_trans='0'
+        <if test="visitId != null and visitId != ''">
+            and visit_id =#{visitId}
+        </if>
+        <if test="visitNo != null and visitNo != ''">
+            and visit_no =#{visitNo}
+        </if>
+        <if test="id != null and id != ''">
+            and id =#{Id}
+        </if>
     </select>
     <select id="queryAllPathologicalReportRecord"
             resultType="cn.hsa.module.insure.module.entity.InsurePathologicalReportDO">
@@ -62,10 +72,17 @@
         from insure_drugsensitive_report  where hosp_code =#{hospCode} and is_trans='0'and visit_id =#{visitId}
     </select>
     <select id="queryPageNoStructReportRecord"
-            resultType="cn.hsa.module.insure.module.entity.InsureNoStructReportDO">
+            resultType="cn.hsa.module.insure.clinica.dto.InsureNoStructReportDTO">
         select id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag, appy_no, file_name,
-               file_formate, exam_test_rpot, vali_flag, is_trans
-        from insure_nostruct_report where hosp_code =#{hospCode} and visit_id =#{visitId}
+               file_formate, exam_test_rpot, vali_flag, is_trans,visit_no
+        from insure_nostruct_report where hosp_code =#{hospCode} and vali_flag='1' and is_trans='0'
+        <if test="appyNo != null and appyNo != ''">
+            and appy_no =#{appyNo}
+        </if>
+        <if test="visitNo != null and visitNo != ''">
+            and visit_no =#{visitNo}
+        </if>
+
     </select>
     <select id="queryPagePathologicalReportRecord"
             resultType="cn.hsa.module.insure.module.entity.InsurePathologicalReportDO">
@@ -81,4 +98,23 @@
                clte_time, clte_cond, exam_rslt, fnd_way, exam_org_name, vali_flag, is_trans
         from insure_bacterial_report where hosp_code =#{hospCode} and visit_id =#{visitId}
     </select>
+
+    <select id="queryById"
+            resultType="cn.hsa.module.insure.clinica.dto.InsureNoStructReportDTO">
+        select *
+        from insure_nostruct_report where id =#{Id}
+    </select>
+    <update id="updateInsureNoStructReport">
+        update insure_nostruct_report
+        <set >
+            <if test="isTrans != null" >
+                is_trans = #{isTrans},
+            </if>
+
+            <if test="valiFlag != null" >
+                vali_flag = #{valiFlag}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
 </mapper>

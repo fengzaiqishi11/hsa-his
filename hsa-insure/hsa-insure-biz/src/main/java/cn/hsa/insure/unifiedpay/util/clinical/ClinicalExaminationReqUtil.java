@@ -6,7 +6,6 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.clinica.dto.*;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.HumpUnderlineUtils;
-import cn.hsa.util.MapUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 

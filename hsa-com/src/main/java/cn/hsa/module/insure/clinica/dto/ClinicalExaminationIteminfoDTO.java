@@ -45,5 +45,37 @@ public class ClinicalExaminationIteminfoDTO implements Serializable {
      * 检查费用
      */
     private BigDecimal examCharge;
+    /**
+     * 检验方法
+     */
+    private String examMtd;
+    /**
+     * 参考值
+     */
+    private String refVal;
+    /**
+     * 检验-计量单位
+     */
+    private String examUnt;
+    /**
+     * 检验-结果(数值)
+     */
+    private BigDecimal examRsltVal;
+    /**
+     * 检验 - 结果(定性)
+     */
+    private String examRsltDicm;
+    /**
+     * 检验 - 项目明细代码
+     */
+    private String examItemDetlCode;
+    /**
+     * 检验 - 项目明细名称
+     */
+    private String examItemDetlName;
+    /**
+     * 检查 / 检验结果异常标志
+     */
+    private String examRsltAbn;
 
 }

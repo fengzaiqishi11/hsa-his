@@ -17,13 +17,12 @@ import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedOutptBO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
-import cn.hsa.module.outpt.fees.dto.DiseInfoDTO;
-import cn.hsa.module.outpt.fees.dto.FeeDetailDTO;
-import cn.hsa.module.outpt.fees.dto.OnlinePayFeeDTO;
-import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
@@ -92,6 +91,9 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
 
     @Resource
     private OutptDoctorPrescribeService doctorPrescribeService_consumer;
+
+    @Resource
+    private InsureIndividualVisitService insureIndividualVisitService_consumer;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
@@ -282,11 +284,158 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
       // 调用统一支付平台接口
       Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.ONLINE_FEE_PAY, interfaceParamDTO);
-
+      //修改表信息
+      /*JSONObject payToken = JSONObject.parseObject(insureIndividualVisitDTO.getPayToken());
+      payToken.put("payToken",resultMap.get("payToken"));
+      InsureIndividualVisitDO insureIndividualVisitDO = new InsureIndividualVisitDO();
+      insureIndividualVisitDO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      insureIndividualVisitDO.setHospCode(insureIndividualVisitDTO.getHospCode());
+      insureIndividualVisitDO.setPayOrdId((String) resultMap.get("payOrdId"));
+      insureIndividualVisitDO.setPayToken(JSONObject.toJSONString(payToken));
+      Map<String,Object> insureVisitMap = new HashMap<String,Object>();
+      insureVisitMap.put("hospCode",insureIndividualVisitDTO.getHospCode());
+      insureVisitMap.put("insureIndividualVisitDO",insureIndividualVisitDO);
+      insureIndividualVisitService_consumer.editInsureIndividualVisit(insureVisitMap);*/
       return resultMap;
     }
 
     /**
+     * 6301 医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 16:44
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> UP_6301(Map<String, Object> map) {
+      //医保信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+      //入参信息
+      SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
+      String hospCode = MapUtils.get(map, "hospCode");
+      String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
+      if (StringUtils.isEmpty(insureRegCode)) {
+        throw new RuntimeException("未传入医保机构编码");
+      }
+      //根据医院编码、医保机构编码查询医保配置信息
+      InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+      configDTO.setHospCode(hospCode);
+      configDTO.setRegCode(insureRegCode);
+      InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+      if (insureConfigurationDTO == null)
+        throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
+
+      //封装入参数据
+      SetlResultQueryDTO dto = new SetlResultQueryDTO();
+      dto.setPayOrdId(insureIndividualVisitDTO.getPayOrdId());
+      dto.setOrgCodg(insureConfigurationDTO.getOrgCode());
+      dto.setPayToken(insureIndividualVisitDTO.getPayToken());
+      dto.setIdNo(setlResultQueryDTO.getIdNo());
+      dto.setIdType(setlResultQueryDTO.getIdType());
+      dto.setUserName(setlResultQueryDTO.getUserName());
+      // 调用统一支付平台接口
+      /*map1.put("payOrdId",insureIndividualVisitDTO.getPayOrdId());
+      map1.put("orgCodg",insureConfigurationDTO.getOrgCode());
+      map1.put("payToken",insureIndividualVisitDTO.getPayToken());
+      map1.put("idNo",setlResultQueryDTO.getIdNo());
+      map1.put("idType",setlResultQueryDTO.getIdType());
+      map1.put("userName",setlResultQueryDTO.getUserName());
+      dataMap.put("data",map1);*/
+
+      Map httpMap = new HashMap();
+      httpMap.put("hospCode",hospCode);
+      httpMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+      httpMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+      // 交易编号
+      httpMap.put("infno", Constant.UnifiedPay.REGISTER.UP_6301);
+      // 发送方报文
+      httpMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+      // 参保地医保区划
+      httpMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());
+      // 就医地医保区划
+      httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+      // 定点医药机构编号
+      httpMap.put("medins_code", insureConfigurationDTO.getOrgCode());
+      // 医保中心编码
+      httpMap.put("insur_code", insureConfigurationDTO.getRegCode());
+      // 交易输入
+      httpMap.put("input", dto);
+
+      //参数校验,规则校验和请求初始化
+      BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.ORD_QUERY_PAY.getCode());
+      InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(httpMap);
+      interfaceParamDTO.setHospCode(hospCode);
+      interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+      interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      // 调用统一支付平台接口
+      Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.ORD_QUERY_PAY, interfaceParamDTO);
+      return resultMap;
+    }
+
+    /**
+     * 费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 14:11
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> UP_6401(Map<String, Object> map) {
+      //医保信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+      //入参信息
+      SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
+      String hospCode = MapUtils.get(map, "hospCode");
+      String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
+      if (StringUtils.isEmpty(insureRegCode)) {
+        throw new RuntimeException("未传入医保机构编码");
+      }
+      //根据医院编码、医保机构编码查询医保配置信息
+      InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+      configDTO.setHospCode(hospCode);
+      configDTO.setRegCode(insureRegCode);
+      InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+      if (insureConfigurationDTO == null)
+        throw new RuntimeException("未发现【" + insureRegCode + "】相关医保配置信息");
+      //封装入参数据
+      SetlResultQueryDTO dto = new SetlResultQueryDTO();
+      dto.setPayOrdId(insureIndividualVisitDTO.getPayOrdId());
+      dto.setOrgCodg(insureConfigurationDTO.getOrgCode());
+      dto.setPayToken(insureIndividualVisitDTO.getPayToken());
+      dto.setIdNo(setlResultQueryDTO.getIdNo());
+      dto.setIdType(setlResultQueryDTO.getIdType());
+      dto.setUserName(setlResultQueryDTO.getUserName());
+      Map httpMap = new HashMap();
+      httpMap.put("hospCode",hospCode);
+      httpMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+      httpMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+      // 交易编号
+      httpMap.put("infno", Constant.UnifiedPay.REGISTER.UP_6301);
+      // 发送方报文
+      httpMap.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+      // 参保地医保区划
+      httpMap.put("insuplc_admdvs", insureConfigurationDTO.getRegCode());
+      // 就医地医保区划
+      httpMap.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+      // 定点医药机构编号
+      httpMap.put("medins_code", insureConfigurationDTO.getOrgCode());
+      // 医保中心编码
+      httpMap.put("insur_code", insureConfigurationDTO.getRegCode());
+      // 交易输入
+      httpMap.put("input", dto);
+
+      //参数校验,规则校验和请求初始化
+      BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.ONLINE_FEE_REVOKE.getCode());
+      InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(httpMap);
+      interfaceParamDTO.setHospCode(hospCode);
+      interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
+      interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      // 调用统一支付平台接口
+      Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.ONLINE_FEE_REVOKE, interfaceParamDTO);
+      return resultMap;
+    }
+
+  /**
      * 封装onlinePayFeeDTO参数信息
      * @param map
      * @Author 医保开发二部-湛康

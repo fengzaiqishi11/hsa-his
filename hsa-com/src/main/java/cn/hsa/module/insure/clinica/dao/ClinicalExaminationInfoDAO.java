@@ -2,7 +2,6 @@ package cn.hsa.module.insure.clinica.dao;
 
 
 import cn.hsa.module.insure.clinica.dto.ClinicalExaminationInfoDTO;
-import cn.hsa.module.insure.clinica.dto.CommentDTO;
 
 import java.util.List;
 import java.util.Map;

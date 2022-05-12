@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.fees.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.deptDrug.dto.BaseDeptDrugStoreDTO;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleInvoiceContentDTO;
@@ -392,4 +393,22 @@ public interface OutptTmakePriceFormBO {
      * @return java.lang.Boolean
      */
     Boolean uploadOnlineFeeDetail(Map map);
+
+    /**
+     * 医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 15:15
+     * @return cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO
+     */
+    SeltSucCallbackDTO queryInsureSetlResult(Map map);
+
+    /**
+     *【6401】费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:51
+     * @return java.lang.Boolean
+     */
+    Boolean insureFeeRevoke(Map map);
 }

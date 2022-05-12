@@ -472,5 +472,23 @@ public interface InsureIndividualVisitDAO {
     void updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
 
     InptVisitDTO selectInptVisit(Map<String, Object> map);
+
+    /**
+     * 根据医保就诊ID获取医保就诊信息
+     * @param param
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-07 15:12
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map param);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-11 11:36
+     * @Description 根据就诊号查询门诊登记信息
+     * @param insureIndividualVisitDTO
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO queryInsureIndividualVisitByNo(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }
 

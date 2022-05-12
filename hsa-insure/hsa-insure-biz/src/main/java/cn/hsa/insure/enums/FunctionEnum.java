@@ -88,6 +88,10 @@ public enum FunctionEnum {
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
 
     CLINICAL_EXAMINATION_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4501,"临床检查报告记录"),
+    CLINICAL_CHECKOUT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4502,"临床检验报告记录"),
+    BACTERIAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4503,"细菌培养报告记录"),
+    DRUGSENSITIVE_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4504,"药敏记录报告记录"),
+    PATHOLOGICAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4505,"病理检查报告记录"),
 
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),
@@ -106,9 +110,13 @@ public enum FunctionEnum {
     TRANS_HOSP_INFO(Constant.UnifiedPay.REGISTER.UP_5304, "转院信息查询"),
     PSN_POLICY(Constant.UnifiedPay.REGISTER.UP_100001, "政策项查询"),
     ONLINE_FEE_PAY(Constant.UnifiedPay.REGISTER.UP_6201, "线上费用明细上传"),
+    ORD_QUERY_PAY(Constant.UnifiedPay.REGISTER.UP_6301, "医保订单结算结果查询"),
+    ONLINE_FEE_REVOKE(Constant.UnifiedPay.REGISTER.UP_6401, "医保订单结算结果查询"),
     //接口功能号 请按顺序填写
 
-    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载");
+    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载"),
+
+    POLICY_ITEM_INFO("100001", "政策项查询");
     private final String code;
     private final String desc;
 

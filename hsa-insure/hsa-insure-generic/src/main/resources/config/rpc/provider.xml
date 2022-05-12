@@ -79,6 +79,8 @@
     <dubbo:service interface="cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService" ref="insureFmiOwnpayPatnService_provider"/>
     <!--电子病历-->
     <dubbo:service interface="cn.hsa.module.insure.emr.service.InsureUnifiedEmrService" ref="insureUnifiedEmrService_provider"/>
+
+    <dubbo:service interface="cn.hsa.module.insure.other.service.InsurePolicyService" ref="insurePolicyService_provider"/>
     <!--明细审核分析服务-->
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDetailAuditService" ref="insureDetailAuditService"/>
 </beans>

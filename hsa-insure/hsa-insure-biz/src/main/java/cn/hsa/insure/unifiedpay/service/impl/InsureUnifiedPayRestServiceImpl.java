@@ -353,4 +353,17 @@ public class InsureUnifiedPayRestServiceImpl extends HsafService implements Insu
         InsureItemDTO insureItemDTO  = MapUtils.get(map,"insureItemDTO");
         return WrapperResponse.success(insureUnifiedPayRestBO.insertUnifiedItem(insureItemDTO));
     }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-05 11:36
+     * @Description 分页查询所有民族药品目录信息
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPageInsureUnifiedNationDrug(Map<String, Object> map) {
+        InsureUnifiedNationDrugDO insureUnifiedNationDrugDO = MapUtils.get(map,"insureUnifiedNationDrugDO");
+        return WrapperResponse.success(insureUnifiedPayRestBO.queryPageInsureUnifiedNationDrug(insureUnifiedNationDrugDO));
+    }
 }

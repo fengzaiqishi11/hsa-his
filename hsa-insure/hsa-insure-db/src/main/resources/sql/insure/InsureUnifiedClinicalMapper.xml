@@ -75,7 +75,7 @@
             resultType="cn.hsa.module.insure.clinica.dto.InsureNoStructReportDTO">
         select id, hosp_code, visit_id, mdtrt_id, psn_no, otp_ipt_flag, exam_test_flag, appy_no, file_name,
                file_formate, exam_test_rpot, vali_flag, is_trans,visit_no
-        from insure_nostruct_report where hosp_code =#{hospCode} and vali_flag='1'
+        from insure_nostruct_report where hosp_code =#{hospCode} and vali_flag='1' and is_trans='0'
         <if test="appyNo != null and appyNo != ''">
             and appy_no =#{appyNo}
         </if>

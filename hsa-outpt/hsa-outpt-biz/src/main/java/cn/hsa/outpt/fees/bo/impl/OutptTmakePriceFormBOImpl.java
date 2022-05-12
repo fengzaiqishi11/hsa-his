@@ -4409,7 +4409,44 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       Map<String, Object> dataMap = MapUtils.get(resultMap, "data");
       SeltSucCallbackDTO seltSucCallbackDTO = FastJsonUtils.fromJson(FastJsonUtils.toJson(dataMap),
           SeltSucCallbackDTO.class);
+      //判断是否结算完成，修改结算信息数据
+      updateSettleInfo(map,seltSucCallbackDTO);
       return seltSucCallbackDTO;
+    }
+
+    /**
+     * 0	已保存
+     * 1	预结算完成
+     * 2	结算中
+     * 3	自费完成
+     * 4	医保支付完成
+     * 5	院内结算完成
+     * 6	结算完成
+     * 7	已退款
+     * 8	已医保全部退款
+     * 9	仅自费全部退款
+     * 10	仅自费部分退款
+     * 11	医保全部退自费部分退款
+     * 12	已撤销
+     * 13	医保已撤销
+     * 14	异常
+     * 15	结算失败
+     * 16	医保结算失败自费冲正失败
+     * 判断是否结算完成，修改结算信息数据
+     * @param map
+     * @param seltSucCallbackDTO
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 9:08
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    private Map<String, Object> updateSettleInfo(Map map,SeltSucCallbackDTO seltSucCallbackDTO){
+      //订单状态为6 结算成功才修改信息
+      if (ObjectUtil.isNotEmpty(seltSucCallbackDTO.getOrdStas())&&"6".equals(seltSucCallbackDTO.getOrdStas())){
+        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");//获取个人信息
+        OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");//获取结算信息
+        List<OutptPayDO> outptPayDOList = MapUtils.get(map, "outptPayDOList");//支付方式信息
+      }
+      return null;
     }
 
     /**

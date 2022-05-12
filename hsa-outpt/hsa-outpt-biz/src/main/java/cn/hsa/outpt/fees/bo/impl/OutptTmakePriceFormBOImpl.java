@@ -4453,9 +4453,31 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         saveInvoiceInfo(outptSettleDTO);
 
         // 1、校验是否使用发票，是否存在发票段（没有返回错误信息，页面给出选择发票段信息）
-        checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
+        OutinInvoiceDTO outinInvoiceDTO = checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
+
+        // 2、 根据当前结算id，查询费用表,更新医技申请单状态
+        updateMedicApply(outptVisitDTO,outptSettleDTO.getId() );
       }
       return null;
+    }
+
+    /**
+     *  根据当前结算id，查询费用表,更新医技申请单状态
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 19:28
+     * @return void
+     */
+    private void updateMedicApply(OutptVisitDTO outptVisitDTO,String settleId){
+      Map<String, Object> param = new HashMap<String, Object>();
+      //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
+      param.put("hospCode", outptVisitDTO.getHospCode());//hospCode（医院编码）
+      param.put("statusCode", Constants.ZTBZ.ZC);//statusCode（状态标志 = 正常）
+      param.put("settleCode", Constants.JSZT.YUJS);//settleCode（结算状态 = 已结算）
+      param.put("settleId", settleId);//settleId（结算id）
+      List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
+      if (!ListUtils.isEmpty(outptCostDTOList)) {
+        outptCostDAO.updateMedicApply(outptVisitDTO.getId(), outptVisitDTO.getHospCode(), "02", outptCostDTOList);
+      }
     }
 
     /**

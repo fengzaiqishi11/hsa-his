@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +113,10 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
     interfaceParamDTO.setVisitId(policy.getVisitId());
     // 调用统一支付平台接口
-    insureItfBO.executeInsur(FunctionEnum.POLICY_ITEM_INFO, interfaceParamDTO);
-    return null;
+    Map<String, Object> result = insureItfBO.executeInsur(FunctionEnum.POLICY_ITEM_INFO, interfaceParamDTO);
+    PolicyResponseDTO response = MapUtils.get(result,"output");
+    List<PolicyResponseDTO> list = new ArrayList<>();
+    list.add(response);
+    return list;
   }
 }

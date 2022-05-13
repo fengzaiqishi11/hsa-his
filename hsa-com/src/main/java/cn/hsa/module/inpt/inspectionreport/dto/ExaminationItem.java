@@ -9,12 +9,12 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
-   * @Class_name: ExaminationItem
-   * @Describe: 检验检测具体项目传输对象
-   * @author: luonianxin
-   * @Email: nianxin.luo@powersi.com
-   * @Date: 2021/5/18 10:09
-**/
+ * @Class_name: ExaminationItem
+ * @Describe: 检验检测具体项目传输对象
+ * @author: luonianxin
+ * @Email: nianxin.luo@powersi.com
+ * @Date: 2021/5/18 10:09
+ **/
 
 @Data
 @NoArgsConstructor
@@ -56,7 +56,7 @@ public class ExaminationItem implements Serializable {
     private String adviceName;
     /**
      * 送检科室名称
-    * */
+     * */
     private String deptName;
 
     private String zhId;

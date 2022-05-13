@@ -63,15 +63,15 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
   @Override
   public List<PolicyResponseDTO> queryInsurePolicy(Map map) {
     //参数获取
-    PolicyRequestDTO policy = MapUtils.get(map,"policyRequestDTO");
+    PolicyRequestDTO policy = MapUtils.get(map, "policyRequestDTO");
     //参数校验
-    if (ObjectUtil.isEmpty(policy.getCertno())){
+    if (ObjectUtil.isEmpty(policy.getCertno())) {
       throw new AppException("证件号码必传！");
     }
-    if (ObjectUtil.isEmpty(policy.getMdtrtId())){
+    if (ObjectUtil.isEmpty(policy.getMdtrtId())) {
       throw new AppException("医保就诊ID必传！");
     }
-    if (ObjectUtil.isEmpty(policy.getSetlId())){
+    if (ObjectUtil.isEmpty(policy.getSetlId())) {
       throw new AppException("人员结算ID必传！");
     }
     /*if (ObjectUtil.isEmpty(policy.getVisitId())){
@@ -79,7 +79,7 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     }*/
     Map<String, Object> insureVisitParam = new HashMap<String, Object>();
     insureVisitParam.put("medicalRegNo", policy.getMdtrtId());
-    insureVisitParam.put("hospCode", MapUtils.get(map,"hospCode"));
+    insureVisitParam.put("hospCode", MapUtils.get(map, "hospCode"));
     InsureIndividualVisitDTO insureIndividualVisitDTO =
         insureIndividualVisitService_consumer.getInsureIndividualVisitByMedRegNo(insureVisitParam);
     if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
@@ -87,7 +87,7 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     }
     //获取医保配置
     InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
-    insureConfigurationDTO.setHospCode(MapUtils.get(map,"hospCode"));
+    insureConfigurationDTO.setHospCode(MapUtils.get(map, "hospCode"));
     // 医疗机构编码
     insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
     insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureOrgCode());
@@ -99,24 +99,26 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     dataMap.put("setl_Id", policy.getSetlId());
     dataMap.put("psn_No", insureIndividualVisitDTO.getAac001());
     dataMap.put("mdtrt_Id", policy.getMdtrtId());
+    Map<String, Object> dataMap1 = new HashMap<>();
+    dataMap1.put("data",dataMap);
     //参数校验,规则校验和请求初始化
-    BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.POLICY_ITEM_INFO.getCode());
+    BaseReqUtil reqUtil =
+        baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.POLICY_ITEM_INFO.getCode());
     Map<String, Object> paramMap = new HashMap<String, Object>();
-    paramMap.put("hospCode",MapUtils.get(map,"hospCode"));
+    paramMap.put("hospCode", MapUtils.get(map, "hospCode"));
     paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
     paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
     paramMap.put("infno", Constant.UnifiedPay.REGISTER.UP_100001);
     //paramMap.put("input", JSONUtil.toJsonStr(policy));
-    paramMap.put("input", dataMap);
+    paramMap.put("input", dataMap1);
     InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
-    interfaceParamDTO.setHospCode(MapUtils.get(map,"hospCode"));
+    interfaceParamDTO.setHospCode(MapUtils.get(map, "hospCode"));
     interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
     interfaceParamDTO.setVisitId(policy.getVisitId());
     // 调用统一支付平台接口
     Map<String, Object> result = insureItfBO.executeInsur(FunctionEnum.POLICY_ITEM_INFO, interfaceParamDTO);
-    PolicyResponseDTO response = MapUtils.get(result,"output");
-    List<PolicyResponseDTO> list = new ArrayList<>();
-    list.add(response);
+    List<PolicyResponseDTO> list = MapUtils.get(result, "output");
+    //List<PolicyResponseDTO> list = new ArrayList<>();
     return list;
   }
 }

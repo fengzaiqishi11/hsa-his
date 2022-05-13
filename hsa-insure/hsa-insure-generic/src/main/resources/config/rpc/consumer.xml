@@ -45,4 +45,6 @@
     <dubbo:reference id="emrPatientService_consumer" interface="cn.hsa.module.emr.emrpatient.service.EmrPatientService" check="false"/>
 
     <dubbo:reference id="inptSettlementService_provider" interface="cn.hsa.module.inpt.fees.service.InptSettlementService" check="false"/>
+
+    <dubbo:reference id="compositeQueryService_provider" interface="cn.hsa.module.inpt.compositequery.service.CompositeQueryService" check="false"/>
 </beans>

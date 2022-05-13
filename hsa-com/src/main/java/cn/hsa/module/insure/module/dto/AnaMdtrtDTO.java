@@ -79,12 +79,12 @@ public class AnaMdtrtDTO implements Serializable {
      * 主诊断编码
      */
     @JSONField(name = "dscg_main_dise_codg")
-    private String dscgMaindiseCodg;
+    private String dscgMainDiseCodg;
     /**
      * 主诊断名称
      */
     @JSONField(name = "dscg_main_dise_name")
-    private String dscgMaindiseName;
+    private String dscgMainDiseName;
     /**
      * 医师标识
      */

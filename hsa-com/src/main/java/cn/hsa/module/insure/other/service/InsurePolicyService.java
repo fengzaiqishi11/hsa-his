@@ -1,5 +1,7 @@
 package cn.hsa.module.insure.other.service;
 
+import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.other.dto.PolicyResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
@@ -21,5 +23,5 @@ public interface InsurePolicyService {
    * @Date 2022-05-07 8:52
    * @return List<>
    */
-  List<PolicyResponseDTO> queryInsurePolicy(Map map);
+  WrapperResponse<PageDTO> queryInsurePolicy(Map map);
 }

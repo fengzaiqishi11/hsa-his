@@ -273,4 +273,13 @@ public interface InsureUnifiedPayRestService {
      * @Return
      **/
     WrapperResponse<Boolean> insertInsureUnifiedItem(Map map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-05 11:36
+     * @Description 分页查询所有民族药品目录信息
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> queryPageInsureUnifiedNationDrug(Map<String, Object> map);
 }

@@ -382,7 +382,26 @@ public class InsureUnifiedMatchController extends BaseController {
         map.put("insureUnifiedLimitPriceDO",insureUnifiedLimitPriceDO);
         return insureUnifiedPayRestService_consumer.queryPageInsureUnifiedLimitPrice(map);
     }
+    /**
+     * @Method queryPageInsureUnifiedLimitPrice
+     * @Desrciption  分页查询所有的民族药品目录信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/4/21 19:16
+     * @Return
+     **/
 
+    @GetMapping("/queryPageInsureUnifiedNationDrug")
+    public WrapperResponse<PageDTO> queryPageInsureUnifiedNationDrug(InsureUnifiedNationDrugDO insureUnifiedNationDrugDO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        insureUnifiedNationDrugDO.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureUnifiedNationDrugDO",insureUnifiedNationDrugDO);
+
+        return insureUnifiedPayRestService_consumer.queryPageInsureUnifiedNationDrug(map);
+    }
     /**
      * @Method queryPageInsureUnifiedMatch
      * @Desrciption  分页查询所有医疗目录与医保目录匹配信息

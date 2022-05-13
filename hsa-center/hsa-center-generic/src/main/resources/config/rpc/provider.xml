@@ -79,5 +79,7 @@
     <!-- ########################################### 信息中心服务consumer end ########################################### -->
     <!-- 中心端全局配置信息生产者 -->
     <dubbo:service interface="cn.hsa.module.center.config.service.CenterGlobalConfigService" ref="centerGlobalConfigService_provider"/>
+    <!-- 中心端密码修改日志信息记录生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.log.service.CenterPasswordModifyLogService" ref="centerPasswordModifyLogService_provider"/>
 
 </beans>

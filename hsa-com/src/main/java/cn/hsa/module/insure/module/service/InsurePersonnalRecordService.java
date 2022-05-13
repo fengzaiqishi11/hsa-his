@@ -197,4 +197,21 @@ public interface InsurePersonnalRecordService {
      * @Return
      **/
     WrapperResponse<PageDTO> queryPageSpecialRecord(Map<String, Object> map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> queryPageInsureAccidentInjureRecord(Map<String, Object> map);
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<Boolean> insertInsureAccidentInjureRecord(Map map);
 }

@@ -166,6 +166,13 @@ public interface SysUserService {
     WrapperResponse<Boolean> changePassWord(Map changePassWordParam);
 
     /**
+     *  统一修改密码接口
+     * @param changePassWordParam 密码修改参数
+     * @return 修改结果
+     */
+    WrapperResponse<Boolean> passWordUnifiedModification(Map changePassWordParam);
+
+    /**
      * @Method: getTeachDoctor
      * @Description: 获取带教医生信息
      * @Param: [map]

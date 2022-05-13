@@ -26,7 +26,7 @@ public class AsyncExecutorConfig implements AsyncConfigurer {
         executor.setMaxPoolSize(64);
         executor.setQueueCapacity(20);
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setThreadNamePrefix("HsaAsyncExecutor-Thread-");
+        executor.setThreadNamePrefix("HsaCenter-AsyncExecutor-Thread-");
         executor.initialize();
         return executor;
     }

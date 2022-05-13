@@ -167,4 +167,8 @@ public interface InsureDirectoryDownLoadDAO {
      * @Return 
     **/
     List<InsureUnifiedNationDrugDO> queyrAllInsureNationDrug(Map<String, Object> map);
+
+    List<InsureUnifiedNationDrugDO> queryPageInsureUnifiedNationDrug(InsureUnifiedNationDrugDO insureUnifiedNationDrugDO);
+
+    void insertInsureNationDrug(List newList);
 }

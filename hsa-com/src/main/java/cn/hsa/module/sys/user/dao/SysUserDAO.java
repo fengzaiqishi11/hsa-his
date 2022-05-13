@@ -229,8 +229,9 @@ public interface SysUserDAO {
      * @Date: 2020/9/9 11：37
      * @Return: Boolean
      */
-    boolean updatePassWord(@Param("id") String id,@Param("newPasswordByMd5") String newPasswordByMd5,
-                           @Param("hospCode")String hospCode);
+    int updatePassWord(Map<String,Object> params);
+
+    int updatePassWordUnified(Map<String,String> params);
 
     /**
      * @Method: getTeachDoctor

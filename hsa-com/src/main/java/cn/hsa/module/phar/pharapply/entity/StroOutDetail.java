@@ -115,5 +115,8 @@ public class StroOutDetail extends PageDO implements Serializable {
      * 生产厂家名称
      */
     private String productName;
-
+    /**
+     *国家编码
+     */
+    private String nationCode;
 }

@@ -145,5 +145,7 @@ public class OutptPrescribeDetailsDTO extends OutptPrescribeDetailsDO {
     private OperInfoRecordDTO operInfoRecordDTO;
     /** 医技类型式代码 PACSXMLX、LISXMLX **/
     private String technologyCode;
+    private String nationCode; //
+    private String nationName; //
 }
 

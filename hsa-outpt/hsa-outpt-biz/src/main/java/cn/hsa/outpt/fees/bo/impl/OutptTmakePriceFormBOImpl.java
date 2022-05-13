@@ -4449,13 +4449,166 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");//获取结算信息
         List<OutptPayDO> outptPayDOList = MapUtils.get(map, "outptPayDOList");//支付方式信息
 
+        //参数获取
+        String hospCode = outptVisitDTO.getHospCode(); //医院编码
+        String visitId = outptVisitDTO.getId(); //就诊id
+        String userId = outptVisitDTO.getCrteId(); //当前登录用户id
+        String userName = outptVisitDTO.getCrteName(); //当前登录用户姓名
+        String depId = outptVisitDTO.getDeptId(); //执行科室
+        String settleId = outptSettleDTO.getId();//结算id
+        String code = outptVisitDTO.getCode(); // 操作人编码
+        List<Map<String, Object>> outinInvoiceList = null;//返回发票打印的费用统计信息
+
         //发票制单
         saveInvoiceInfo(outptSettleDTO);
 
         // 1、校验是否使用发票，是否存在发票段（没有返回错误信息，页面给出选择发票段信息）
+        OutinInvoiceDTO outinInvoiceDTO = checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
+
+        // 2、 根据当前结算id，查询费用表,更新医技申请单状态
+        List<OutptCostDTO> costDTOList = updateMedicApply(outptVisitDTO,settleId);
+
+        //保存支付方式（结算）
+        saveOnlineOutptPays(outptPayDOList, outptVisitDTO, settleId);
+
+        // 生成领药申请单，校验库存、领药申请单明细
+        Map<String, Object> queryParam = new HashMap<String, Object>();
+        queryParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+        queryParam.put("pfTypeCode", outptVisitDTO.getPreferentialTypeId());//优惠类型
+        queryParam.put("items", costDTOList);//当前用户的费用信息
+        List<OutptCostDTO> outptCostDTOS = outptCostDAO.queryDrugMaterialListByIds(queryParam);
+
+        // 3、 校验药品、材料库存，并生成领药申请单明细
+        Map<String, Object> tempMap = this.checkStockAndCreatePharOutReceiveDetail(costDTOList, outptCostDTOS,  outptVisitDTO.getHospCode());
+
+        // 6、 根据费用信息修改本次结算的费用状态
+        List<String> ids = (List<String>) tempMap.get("ids");
+        Map<String, Object> costParam = new HashMap<String, Object>();
+        costParam.put("settleCode", Constants.JSZT.YIJS);//费用状态 = 已结算
+        costParam.put("ids", ids);//费用id
+        outptCostDAO.editCostSettleCodeByIDS(costParam);
+
+        // 7、 修改门诊结算表此次结算信息状态 结算后需要将结算单号返回给前端
+        String settleNo = updateSettleStatus(settleId,outptVisitDTO);
+
+        // 8、 修改处方表结算信息
+        List<String> outptPrescribeIds = (List<String>) tempMap.get("outptPrescribeIds");
+        if (!outptPrescribeIds.isEmpty()) {
+          Map<String, Object> outptPrescribeParam = new HashMap<String, Object>();
+          outptPrescribeParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+          outptPrescribeParam.put("ids", outptPrescribeIds);//处方ids
+          outptPrescribeParam.put("settleId", settleId );//结算id
+          outptPrescribeParam.put("isSettle", Constants.SF.S);//是否结算 = 是
+          outptCostDAO.updateOutptPrescribeByIds(outptPrescribeParam);
+        }
+
+        // 9、判断是否需要生成发票信息
+        if (outptSettleDTO.getIsInvoice()) {
+          outinInvoiceDTO.setVisitId(visitId);
+          outinInvoiceDTO.setSettleId(settleId);
+        }
+
+        // 10、 取最佳领药窗口，生成领药申请单（主单），保存领药申请单与领药申请单详单
+        List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList =
+            (List<PharOutReceiveDetailDO>) tempMap.get("pharOutReceiveDetailDOList");
+        Map<String, Map<String, Object>> pharOutReceiveMap =
+            (Map<String, Map<String, Object>>) tempMap.get("pharOutReceiveMap");
+        this.savePharOutReceive(hospCode, visitId, depId, userId, userName, settleId,
+            pharOutReceiveMap, costDTOList, pharOutReceiveDetailDOList);
         checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
       }
+
+      // 13、 将优惠发票总金额返回给前端（优惠后总金额）
+      /*outptVisitDTO.setRealityPrice(realityPrice);
+      outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
+
+      outptVisitDTO.setReceiveName(outinInvoiceDTO.getReceiveName());
+      outptVisitDTO.setPrefix(outinInvoiceDTO.getPrefix());
+      // 发票不分单返回发票号
+      outptVisitDTO.setInvoiceNo(outinInvoiceDTO.getCurrNo());*/
       return null;
+    }
+
+    /**
+     * 修改门诊结算表此次结算信息状态
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-13 10:39
+     * @return void
+     */
+    private String updateSettleStatus(String settleId, OutptVisitDTO outptVisitDTO){
+      OutptSettleDO outptSettleDO = new OutptSettleDO();//修改参数
+      BigDecimal realityPrice = new BigDecimal(0);
+      BigDecimal cardPrice = new BigDecimal(0);
+      outptSettleDO.setId(settleId);//结算id
+      SysParameterDO sysParameterDO = getSysParameter(outptVisitDTO.getHospCode(), Constants.HOSPCODE_DISCOUNTS_KEY);
+      //获取当前医院优惠配置
+      BigDecimal ssje = new BigDecimal(0);
+      if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
+        ssje = BigDecimalUtils.subtract(realityPrice, outptVisitDTO.getTruncPrice());
+      } else {
+        ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
+      }
+      outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
+      outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
+      outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
+      outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+      outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
+
+      // 7.1 结算后需要将结算单号返回给前端
+      Map<String, Object> settleMap = new HashMap<>();
+      settleMap.put("id", settleId);
+      settleMap.put("hospCode", outptVisitDTO.getHospCode());
+      OutptSettleDTO dto = outptSettleDAO.getById(settleMap);
+      String settleNo = dto.getSettleNo();
+      return settleNo;
+    }
+
+    /**
+     * 保存支付方式（结算）
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 20:58
+     * @return void
+     */
+    private void saveOnlineOutptPays(List<OutptPayDO> outptPayDOList,OutptVisitDTO outptVisitDTO, String settleId){
+      List<OutptPayDO> outptPayDOS = new ArrayList<OutptPayDO>();
+      BigDecimal actualPrice = new BigDecimal(0);
+      if (outptPayDOList != null && !outptPayDOList.isEmpty()) {
+        for (OutptPayDO outptPayDO : outptPayDOList) {
+          if (StringUtils.isNotEmpty(outptPayDO.getPayCode()) && outptPayDO.getPrice() != null) {
+            outptPayDO.setId(SnowflakeUtils.getId());//id
+            outptPayDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+            outptPayDO.setSettleId(settleId);//结算id
+            outptPayDO.setVisitId(outptVisitDTO.getVisitId());//就诊id
+            outptPayDO.setServicePrice(outptPayDO.getServicePrice() != null ? outptPayDO.getServicePrice() : new BigDecimal(0));//手续费
+            actualPrice = BigDecimalUtils.add(actualPrice, outptPayDO.getPrice());
+            outptPayDOS.add(outptPayDO);
+          }
+        }
+      }
+      //批量保存结算信息
+      if (!ListUtils.isEmpty(outptPayDOS)) {
+        outptPayDAO.batchInsertOutptPay(outptPayDOS);
+      }
+    }
+
+    /**
+     *  根据当前结算id，查询费用表,更新医技申请单状态
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-12 19:28
+     * @return void
+     */
+    private List<OutptCostDTO> updateMedicApply(OutptVisitDTO outptVisitDTO,String settleId){
+      Map<String, Object> param = new HashMap<String, Object>();
+      //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
+      param.put("hospCode", outptVisitDTO.getHospCode());//hospCode（医院编码）
+      param.put("statusCode", Constants.ZTBZ.ZC);//statusCode（状态标志 = 正常）
+      param.put("settleCode", Constants.JSZT.YUJS);//settleCode（结算状态 = 已结算）
+      param.put("settleId", settleId);//settleId（结算id）
+      List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
+      if (!ListUtils.isEmpty(outptCostDTOList)) {
+        outptCostDAO.updateMedicApply(outptVisitDTO.getId(), outptVisitDTO.getHospCode(), "02", outptCostDTOList);
+      }
+      return outptCostDTOList;
     }
 
     /**

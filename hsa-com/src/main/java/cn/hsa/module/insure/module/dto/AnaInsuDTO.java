@@ -51,5 +51,5 @@ public class AnaInsuDTO implements Serializable {
      * 就诊信息集合
      */
     @JSONField(name = "fsi_encounter_dtos")
-    private List<AnaMdtrtDTO> fsiEncounterDtos;
+    private AnaMdtrtDTO fsiEncounterDtos;
 }

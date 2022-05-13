@@ -34,11 +34,11 @@
 
     <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
     <select id="queryItemAndMaterialPage" resultMap="BaseAdviceDetailMap">
-        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.code as itemCode,a.use_code,
+        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.split_price,a.price,a.split_unit_code,a.unit_code,a.code as itemCode,a.use_code,
         a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,b.name as inDeptName,c.name as outDeptName,bfcId,bfcName, a.nation_code, a.nation_name,
         a.other_name
         FROM
-        (   select id,`name`,type_code as itemTypeCode,price,unit_code,spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
+        (   select id,`name`,type_code as itemTypeCode,price as split_price,price, unit_code as split_unit_code ,unit_code,spec,out_dept_code,in_dept_code,hosp_code,code,'' as use_code,
         '3' as type_code, m.nation_code,m.nation_name, m.other_name,
         (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName
@@ -48,7 +48,7 @@
             and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%'))
         </if>
         UNION ALL
-        select id,`name`,type_code as itemTypeCode,split_price as price,split_unit_code as unit_code,spec,'','',hosp_code,code,use_code,
+        select id,`name`,type_code as itemTypeCode,split_price , price,split_unit_code , unit_code,spec,'','',hosp_code,code,use_code,
         '2' as type_code, l.nation_code, l.nation_name, l.other_name,
         (select d.id from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where l.bfc_code = d.code and l.hosp_code = d.hosp_code limit 1) bfcName

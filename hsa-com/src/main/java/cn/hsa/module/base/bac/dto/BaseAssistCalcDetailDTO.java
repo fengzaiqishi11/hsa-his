@@ -37,5 +37,6 @@ public class BaseAssistCalcDetailDTO extends BaseAssistCalcDetailDO implements S
     private String name;
     private String splitPrice;
     private String splitUnitCode;
-
+    private String  checkUnitCode;
+    private String  checkPrice;
 }

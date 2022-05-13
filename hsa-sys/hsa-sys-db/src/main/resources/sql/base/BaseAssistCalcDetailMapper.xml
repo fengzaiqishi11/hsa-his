@@ -18,8 +18,10 @@
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="itemTypeCode" column="itemTypeCode" jdbcType="TIMESTAMP"/>
         <result property="spec" column="spec" jdbcType="TIMESTAMP"/>
-        <result property="unitCode" column="unit_code" jdbcType="TIMESTAMP"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
         <result property="bfcId" column="bfcId" jdbcType="TIMESTAMP"/>
+        <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
+        <result property="checkPrice" column="checkPrice" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -65,7 +67,9 @@
         a.inDeptName,
         a.outDeptName,
         a.price,
-        b.unit_code,
+        b.unit_code  as checkUnitCode,
+        (case when b.unit_code = a.unit_code then a.price when b.unit_code  = a.split_unit_code then a.split_price end ) as checkPrice,
+        a.unit_code,
         a.split_price as splitPrice,
         a.split_unit_code as splitUnitCode,
         a.spec,
@@ -165,8 +169,8 @@
             <if test="useCode != null and useCode != ''">
                 use_code = #{useCode},
             </if>
-            <if test="unitCode != null and unitCode != ''">
-                unit_code = #{unitCode},
+            <if test="checkUnitCode != null and checkUnitCode != ''">
+                unit_code = #{checkUnitCode},
             </if>
             <if test="startTime != null">
                 start_time = #{startTime},
@@ -205,7 +209,7 @@
         (id,hosp_code, ac_code, type_code, item_code,unit_code, use_code, start_time, end_time, num, is_valid, crte_id, crte_name, crte_time)
         values
         <foreach item="item" collection="list" separator="," open="" close="" index="index">
-            (#{item.id},#{item.hospCode}, #{item.acCode}, #{item.typeCode}, #{item.itemCode}, #{item.unitCode}, #{item.useCode}, #{item.startTime}, #{item.endTime}, #{item.num}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
+            (#{item.id},#{item.hospCode}, #{item.acCode}, #{item.typeCode}, #{item.itemCode}, #{item.checkUnitCode}, #{item.useCode}, #{item.startTime}, #{item.endTime}, #{item.num}, '1', #{item.crteId}, #{item.crteName}, #{item.crteTime})
         </foreach>
     </insert>
 

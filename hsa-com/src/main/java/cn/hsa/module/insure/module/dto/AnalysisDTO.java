@@ -36,7 +36,7 @@ public class AnalysisDTO implements Serializable {
      * 参保人信息
      */
     @JSONField(name = "patient_dtos")
-    private List<AnaInsuDTO> patientDtos;
+    private AnaInsuDTO patientDtos;
 
     @JSONField(serialize = false)
     private String mdtrtAdmdvs;

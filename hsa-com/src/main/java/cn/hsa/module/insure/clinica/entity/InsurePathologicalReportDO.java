@@ -51,11 +51,11 @@ public class InsurePathologicalReportDO extends PageDO implements Serializable {
     /**
      * 送检日期
      */
-    private Date cmaDate;
+    private String cmaDate;
     /**
      * 报告日期
      */
-    private Date rpotDate;
+    private String rpotDate;
     /**
      * 送检材料
      */

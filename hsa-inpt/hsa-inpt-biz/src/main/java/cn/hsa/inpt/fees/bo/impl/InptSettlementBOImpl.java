@@ -2834,9 +2834,9 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //*是否为长期医嘱  1:是   0：否
             anaOrderDTO.setLongDrordFlag("0".equals(MapUtil.getStr(map,"isLong"))?"1":"0");
             //*目录类别
-            anaOrderDTO.setHilistType(MapUtil.getStr(map,"insureItemType"));
+            anaOrderDTO.setHilistType(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemType"))?"101":MapUtil.getStr(map,"insureItemType"));
             //*收费类别
-            anaOrderDTO.setChrgType(MapUtil.getStr(map,"chrgType"));
+            anaOrderDTO.setChrgType(ObjectUtil.isEmpty(MapUtil.getStr(map,"chrgType"))?"1":MapUtil.getStr(map,"chrgType"));
             //*医嘱行为
             anaOrderDTO.setDrordBhvr("-");
             //*医保目录代码
@@ -2846,7 +2846,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //医保目录(药品)剂型
             anaOrderDTO.setHilistDosform(MapUtil.getStr(map,"insureItemPrepCode"));
             //*医保目录等级
-            anaOrderDTO.setHilistLv(MapUtil.getStr(map,"hilistLv"));
+            anaOrderDTO.setHilistLv(ObjectUtil.isEmpty(MapUtil.getStr(map,"hilistLv"))?"1":MapUtil.getStr(map,"hilistLv"));
             //*医保目录价格
 
             anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")));
@@ -2869,19 +2869,19 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //*自付金额
             anaOrderDTO.setSelfpayAmt(new BigDecimal(MapUtil.getStr(map,"preselfpayAmt")));
             //*规格
-            anaOrderDTO.setSpec(MapUtil.getStr(map,"spec"));
+            anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
             //*数量单位
-            anaOrderDTO.setSpecUnt(MapUtil.getStr(map,"numUnitCode"));
+            anaOrderDTO.setSpecUnt(ObjectUtil.isEmpty(MapUtil.getStr(map,"numUnitCode"))?"-":MapUtil.getStr(map,"numUnitCode"));
             //*医嘱开始日期
             anaOrderDTO.setDrordBegnDate(MapUtil.getDate(map,"longStartTime"));
             //*下达医嘱的科室标识
-            anaOrderDTO.setDrordDeptCodg(MapUtil.getStr(map,"execDeptId"));
+            anaOrderDTO.setDrordDeptCodg(ObjectUtil.isEmpty(MapUtil.getStr(map,"execDeptId"))?"-":MapUtil.getStr(map,"execDeptId"));
             //*下达医嘱科室名称
-            anaOrderDTO.setDrordDeptName(MapUtil.getStr(map,"execDeptName"));
+            anaOrderDTO.setDrordDeptName(ObjectUtil.isEmpty(MapUtil.getStr(map,"execDeptName"))?"-":MapUtil.getStr(map,"execDeptName"));
             //*开处方(医嘱)医生标识
-            anaOrderDTO.setDrordDrCodg(MapUtil.getStr(map,"crteId"));
+            anaOrderDTO.setDrordDrCodg(ObjectUtil.isEmpty(MapUtil.getStr(map,"crteId"))?"-":MapUtil.getStr(map,"crteId"));
             //*开处方(医嘱)医生姓名
-            anaOrderDTO.setDrordDrName(MapUtil.getStr(map,"crteName"));
+            anaOrderDTO.setDrordDrName(ObjectUtil.isEmpty(MapUtil.getStr(map,"crteName"))?"-":MapUtil.getStr(map,"crteName"));
             //*开处方(医嘱)医职称
             anaOrderDTO.setDrordDrProfttl("-");
             //*是否当前处方(医嘱)  1=是,0=否

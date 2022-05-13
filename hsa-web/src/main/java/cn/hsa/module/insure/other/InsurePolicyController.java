@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.other;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.dzpz.hainan.SetlInfoDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO;
@@ -42,11 +43,12 @@ public class InsurePolicyController  extends BaseController {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
   @PostMapping("/queryInsurePolicy")
-  public WrapperResponse queryInsurePolicy(@RequestBody PolicyRequestDTO setlInfoDTO, HttpServletRequest req, HttpServletResponse res){
+  public WrapperResponse<PageDTO> queryInsurePolicy(@RequestBody PolicyRequestDTO setlInfoDTO,
+                                                    HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map map = new HashMap();
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("policyRequestDTO",setlInfoDTO);
-    return WrapperResponse.success(insurePolicyService.queryInsurePolicy(map));
+    return insurePolicyService.queryInsurePolicy(map);
   }
 }

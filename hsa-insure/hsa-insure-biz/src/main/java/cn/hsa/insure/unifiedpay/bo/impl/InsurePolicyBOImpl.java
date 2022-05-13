@@ -1,5 +1,6 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
@@ -20,6 +21,7 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -61,7 +63,8 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
    * @return java.util.List<cn.hsa.module.insure.other.dto.PolicyResponseDTO>
    */
   @Override
-  public List<PolicyResponseDTO> queryInsurePolicy(Map map) {
+  public PageDTO queryInsurePolicy(Map map) {
+    PageHelper.startPage(1, 20);
     //参数获取
     PolicyRequestDTO policy = MapUtils.get(map, "policyRequestDTO");
     //参数校验
@@ -119,6 +122,6 @@ public class InsurePolicyBOImpl  extends HsafBO implements InsurePolicyBO {
     Map<String, Object> result = insureItfBO.executeInsur(FunctionEnum.POLICY_ITEM_INFO, interfaceParamDTO);
     List<PolicyResponseDTO> list = MapUtils.get(result, "output");
     //List<PolicyResponseDTO> list = new ArrayList<>();
-    return list;
+    return PageDTO.of(list);
   }
 }

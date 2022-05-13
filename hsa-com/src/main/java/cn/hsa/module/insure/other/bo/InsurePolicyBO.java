@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.other.bo;
 
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.other.dto.PolicyResponseDTO;
 
 import java.util.List;
@@ -20,5 +21,5 @@ public interface InsurePolicyBO {
    * @Date 2022-05-07 9:10
    * @return java.util.List<cn.hsa.module.insure.other.PolicyResponseDTO>
    */
-  List<PolicyResponseDTO> queryInsurePolicy(Map map);
+  PageDTO queryInsurePolicy(Map map);
 }

@@ -9,11 +9,13 @@ import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
 import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
+import cn.hsa.module.sys.user.service.SysUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.center.hospital.service.impl
@@ -33,6 +35,8 @@ public class CenterHospitalServiceImpl extends HsafService implements CenterHosp
      */
     @Resource
     private CenterHospitalBO centerHospitalBO;
+    @Resource
+    private SysUserService sysUserService_consumer;
 
     /**
      * @Menthod getById
@@ -170,6 +174,11 @@ public class CenterHospitalServiceImpl extends HsafService implements CenterHosp
     @Override
     public WrapperResponse<Boolean> updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
         return WrapperResponse.success(centerHospitalBO.updateRootBase(centerRootDatabaseBO));
+    }
+
+    @Override
+    public WrapperResponse<Boolean> updatePasswordOfAdministratorUnified(Map<String, String> modifiedInfo) {
+        return sysUserService_consumer.passWordUnifiedModification(modifiedInfo);
     }
 
     /**

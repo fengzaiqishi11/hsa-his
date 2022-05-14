@@ -1505,8 +1505,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (materialDTO == null){
                         throw new AppException("辅助计费【"+name+"】配置的材料有误!");
                     }
-                    inptCostDTO.setPrice(materialDTO.getSplitPrice());
-                    inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+
+                    //之前是按最小单位算的  但是现在 辅助计费 需要根据 辅助计费明细里面的单位去确定按什么单位收费 -- 2022-05-11
+                    if(StringUtils.isNotEmpty(baseAssistCalcDetailDO.getItemUnitCode()) && baseAssistCalcDetailDO.getItemUnitCode().equals(materialDTO.getSplitUnitCode())){
+                        inptCostDTO.setPrice(materialDTO.getSplitPrice());
+                        inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+                    }else{
+                        inptCostDTO.setPrice(materialDTO.getPrice());
+                        inptCostDTO.setNumUnitCode(materialDTO.getUnitCode());
+                    }
                 }else {
                     throw new AppException("辅助计费【"+name+"】未配置项目或材料!");
                 }
@@ -1709,12 +1716,21 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 if (materiaDTO == null ){
                     throw new AppException("生成静态计费未获取到材料信息!");
                 }
-                //单价
-                inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
                 //名称
                 inptAdviceDetailDTO.setItemName(materiaDTO.getName());
+
+                //这里的医嘱明细单位必须从辅助计费中的明细里面取 单位值  -  2022-05-11 彭波
+                if(StringUtils.isNotEmpty(detailDTO.getItemUnitCode()) && detailDTO.getItemUnitCode().equals(materiaDTO.getSplitUnitCode())){
+                    inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
+                    inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
+                }else{
+                    inptAdviceDetailDTO.setPrice(materiaDTO.getPrice());
+                    inptAdviceDetailDTO.setUnitCode(materiaDTO.getUnitCode());
+                }
+                //单价
+                //inptAdviceDetailDTO.setPrice(materiaDTO.getSplitPrice());
                 //单位
-                inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
+                //inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
                 //项目ID
                 inptAdviceDetailDTO.setItemId(materiaDTO.getId());
                 //用药性质
@@ -1994,7 +2010,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                         numBig = BigDecimal.valueOf(Math.ceil(BigDecimalUtils.multiply(numBig, drugDTO.getSplitRatio()).doubleValue()));
                         inptCostDTO.setPrice(drugDTO.getSplitPrice());
                     }
-                } else if (Constants.XMLB.CL.equals(inptAdviceDetailDTO.getItemCode())) {//材料
+                } else if (Constants.XMLB.CL.equals(inptAdviceDetailDTO.getItemCode()) && !Constants.FYLYFS.DJTJF.equals(inptAdviceDetailDTO.getSourceCode())) {//材料
                     if (inptCostDTO.getTotalNumUnitCode().equals(materialDTO.getUnitCode())) {
                         numBig = BigDecimal.valueOf(Math.ceil(BigDecimalUtils.divide(numBig, materialDTO.getSplitRatio()).doubleValue()));
                         inptCostDTO.setPrice(materialDTO.getPrice());
@@ -2118,6 +2134,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
         //决定lis,pass项目是否确费：未配置时或否定时，所有核收费用都是确费状态，配置了lis pass项目为未确费状态
         SysParameterDTO sysParameterDTO =  getSysParameterDTO(inptCostDTO.getHospCode(),"LIS_PACS_SFQF");
+        //康复理疗医嘱是否需要确费 2022/4/25 by yuelong.chen
+        SysParameterDTO sysParameterDTO2 =  getSysParameterDTO(inptCostDTO.getHospCode(),"RECOVERY_SFQF");
         if((sysParameterDTO != null && "0".equals(sysParameterDTO.getValue())) && ("3".equals(adviceDTO.getTypeCode())||"12".equals(adviceDTO.getTypeCode()))){
             // 2021年5月14日14:37:54 官红强  如果执行科室的科室性质为检验科室或影像科室，则为未确费，否则确费
             if (adviceDTO.getExecDeptKsxz() != null && ("7".equals(adviceDTO.getExecDeptKsxz()) || "8".equals(adviceDTO.getExecDeptKsxz()))) {
@@ -2125,22 +2143,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             } else {
                 inptCostDTO.setIsOk(Constants.SF.S);
             }
+        }else if((sysParameterDTO2 != null && "0".equals(sysParameterDTO2.getValue())) && ("19".equals(adviceDTO.getTypeCode()))){
+            inptCostDTO.setIsOk(Constants.SF.F);
         }else{
             inptCostDTO.setIsOk(Constants.SF.S);
             inptCostDTO.setOkId(medicalAdviceDTO.getCheckId());
             inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
             inptCostDTO.setOkTime(date);
         }
-        //康复理疗医嘱是否需要确费 2022/4/25 by yuelong.chen
-        SysParameterDTO sysParameterDTO2 =  getSysParameterDTO(inptCostDTO.getHospCode(),"RECOVERY_SFQF");
-        if((sysParameterDTO2 != null && "0".equals(sysParameterDTO2.getValue())) && ("19".equals(adviceDTO.getTypeCode()))){
-                inptCostDTO.setIsOk(Constants.SF.F);
-        }else{
-            inptCostDTO.setIsOk(Constants.SF.S);
-            inptCostDTO.setOkId(medicalAdviceDTO.getCheckId());
-            inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
-            inptCostDTO.setOkTime(date);
-        }
+
 
         inptCostDTO.setSettleCode("0");
         inptCostDTO.setIsCheck("0");
@@ -2629,6 +2640,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 InptCostDTO inptCostDTO = buildInptCostDTO(medicalAdviceDTO, inptAdviceDTO, inptAdviceDetailDTO, dailyTimes, date, visitDTO, drugMap, materiaMap);
 
                 if(inptCostDTO == null ){
+                    //记录每条医嘱的最后费用时间是哪一天,周期内的医嘱不做这样的处理，医嘱核收后的每一天都会生成费用(pengbo)
+                    adviceIdCostTime.put(inptAdviceDetailDTO.getIaId(),startTime);
                     startTime = DateUtils.dateAdd(startTime, day);
                     continue;
                 }

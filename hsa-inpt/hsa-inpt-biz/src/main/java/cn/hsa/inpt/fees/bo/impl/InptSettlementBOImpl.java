@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.inpt.advancepay.dao.InptAdvancePayDAO;
 import cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO;
+import cn.hsa.module.inpt.compositequery.service.CompositeQueryService;
 import cn.hsa.module.inpt.doctor.dao.InptBabyDAO;
 import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
@@ -18,9 +19,11 @@ import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.inpt.fees.bo.InptSettlementBO;
 import cn.hsa.module.inpt.fees.dao.*;
 import cn.hsa.module.inpt.fees.entity.*;
+import cn.hsa.module.inpt.fees.service.InptSettlementService;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
+import cn.hsa.module.insure.module.bo.InsureIndividualCostBO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
@@ -32,7 +35,9 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -127,6 +132,17 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
 
     @Resource
     private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
+
+    @Resource
+    private InsureDetailAuditService insureDetailAuditService;
+
+    @Resource
+    private InptSettlementService inptSettlementServiceProvider;
+    @Resource
+    private InsureIndividualBasicService InsureIndividualBasicServiceConsumer;
+
+    @Resource
+    private CompositeQueryService compositeQueryService;
 
 
     /**
@@ -301,6 +317,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             }
 
             //校验医保费用是否传输
+            List<Map<String, Object>> insureCostList = new ArrayList<>();
             if (patientValueCode > 0) {
                 Map<String, String> insureCostParam = new HashMap<String, String>();
                 insureCostParam.put("hospCode", hospCode);//医院编码
@@ -309,7 +326,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                 insureCostParam.put("isMatch", Constants.SF.S);//是否匹配 = 是
                 insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
                 insureCostParam.put("queryBaby","N");
-                List<Map<String, Object>> insureCostList = insureIndividualCostService.queryInsureCostByVisit(insureCostParam);
+                insureCostList = insureIndividualCostService.queryInsureCostByVisit(insureCostParam);
                 if (insureCostList != null && insureCostList.size() > 0) {
                     throw new AppException("住院医保费用需进行费用传输。");
                 }
@@ -431,6 +448,33 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     inptInsureParam.put("inptVisitDTO", inptVisitDTO);//就诊患者信息
                     inptInsureParam.put("settleNo", settleNo);// 结算单号
                     inptInsureResult = inptService.verifyAndCalculateCost(inptInsureParam);
+                }
+                //明细审核事前分析
+                Map<String, Object> map = new HashMap<>();
+                map.put("hospCode",inptVisitDTO.getHospCode());
+                map.put("code","DETAILAUDIT_SWITCH");
+                WrapperResponse<SysParameterDTO> response = sysParameterService_consumer.getParameterByCode(map);
+                if (WrapperResponse.SUCCESS != response.getCode()) {
+                    throw new AppException(response.getMessage());
+                }
+                if (ObjectUtil.isNotEmpty(response.getData())&&"1".equals(response.getData().getValue())) {
+                    //查询所有传输费用信息
+                    Map<String, String> hashMap = new HashMap<>();
+                    hashMap.put("hospCode", hospCode);//医院编码
+                    hashMap.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
+                    hashMap.put("visitId", id);//就诊id
+                    hashMap.put("isMatch", Constants.SF.S);//是否匹配 = 是
+                    hashMap.put("transmitCode", Constants.SF.S);//传输标志 = 未传输
+                    hashMap.put("insureRegCode", insureIndividualVisitDTO.getInsureRegCode());// 医保机构编码
+                    hashMap.put("isHalfSettle", isMidWaySettle);// 是否中途结算
+                    List<Map<String, Object>> mapList = insureIndividualCostService.queryInsureCostByVisit(hashMap);
+                    inptVisitDTO.setInsureCostList(mapList);
+                    AnalysisDTO analysisDTO = this.initAnalysisDTO(inptVisitDTO,insureIndividualVisitDTO);
+                    Map<String, Object> inMap = new HashMap<>();
+                    inMap.put("hospCode",inptVisitDTO.getHospCode());
+                    inMap.put("analysisDTO",analysisDTO);
+                    inMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+                    AnaResJudgeDTO anaResJudgeDTO = insureDetailAuditService.upldMidAnalysisDTO(inMap);
                 }
 
                 //TODO 保存医保试算接口返回的报销信息
@@ -2765,4 +2809,242 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
 //
 //        System.out.println("ok");
 //    }
+
+    /**
+     * @Description 拼装明细审核入参
+     * @Author 产品三部-郭来
+     * @Date 2022-05-09 15:37
+     * @return cn.hsa.module.insure.module.dto.AnalysisDTO
+     */
+    public AnalysisDTO initAnalysisDTO(InptVisitDTO inptVisitDTO,InsureIndividualVisitDTO insureVisitDTO){
+        if (ObjectUtil.isEmpty(inptVisitDTO)) {
+            throw new AppException("入参不能为空！");
+        }
+
+        List<AnaOrderDTO> anaOrderDTOS = new ArrayList<>();
+        List<Map<String, Object>> insureCostList = inptVisitDTO.getInsureCostList();
+        for (Map<String, Object> map : insureCostList) {
+            AnaOrderDTO anaOrderDTO = new AnaOrderDTO();
+            //*处方(医嘱)标识
+            anaOrderDTO.setRxId(MapUtil.getStr(map,"id"));
+            //*处方号
+            anaOrderDTO.setRxno(MapUtil.getStr(map,"iatId"));
+            //组编号
+            anaOrderDTO.setGrpno(MapUtil.getStr(map,"iatdGroupNo"));
+            //*是否为长期医嘱  1:是   0：否
+            anaOrderDTO.setLongDrordFlag("0".equals(MapUtil.getStr(map,"isLong"))?"1":"0");
+            //*目录类别
+            anaOrderDTO.setHilistType(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemType"))?"101":MapUtil.getStr(map,"insureItemType"));
+            //*收费类别
+            anaOrderDTO.setChrgType(ObjectUtil.isEmpty(MapUtil.getStr(map,"chrgType"))?"1":MapUtil.getStr(map,"chrgType"));
+            //*医嘱行为
+            anaOrderDTO.setDrordBhvr("-");
+            //*医保目录代码
+            anaOrderDTO.setHilistCode(MapUtil.getStr(map,"insureItemCode"));
+            //*医保目录名称
+            anaOrderDTO.setHilistName(MapUtil.getStr(map,"insureItemName"));
+            //医保目录(药品)剂型
+            anaOrderDTO.setHilistDosform(MapUtil.getStr(map,"insureItemPrepCode"));
+            //*医保目录等级
+            anaOrderDTO.setHilistLv(ObjectUtil.isEmpty(MapUtil.getStr(map,"hilistLv"))?"1":MapUtil.getStr(map,"hilistLv"));
+            //*医保目录价格
+
+            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")));
+            //医保目录备注
+            anaOrderDTO.setHilistMemo("");
+            //*医院目录代码
+            anaOrderDTO.setHosplistCode(MapUtil.getStr(map,"hospItemCode"));
+            //*医院目录名称
+            anaOrderDTO.setHosplistName(MapUtil.getStr(map,"hospItemName"));
+            //医院目录(药品)剂型
+            anaOrderDTO.setHosplistDosform(MapUtil.getStr(map,"hospItemPrepCode"));
+            //*数量
+            anaOrderDTO.setCnt(new BigDecimal(MapUtil.getStr(map,"num")));
+            //*单价
+            anaOrderDTO.setPric(new BigDecimal(MapUtil.getStr(map,"price")));
+            //*总费用
+            anaOrderDTO.setSumamt(new BigDecimal(MapUtil.getStr(map,"totalPrice")));
+            //*自费金额
+            anaOrderDTO.setOwnpayAmt(new BigDecimal(MapUtil.getStr(map,"fulamtOwnpayAmt")));
+            //*自付金额
+            anaOrderDTO.setSelfpayAmt(new BigDecimal(MapUtil.getStr(map,"preselfpayAmt")));
+            //*规格
+            anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
+            //*数量单位
+            anaOrderDTO.setSpecUnt(ObjectUtil.isEmpty(MapUtil.getStr(map,"numUnitCode"))?"-":MapUtil.getStr(map,"numUnitCode"));
+            //*医嘱开始日期
+            anaOrderDTO.setDrordBegnDate(MapUtil.getDate(map,"longStartTime"));
+            //*下达医嘱的科室标识
+            anaOrderDTO.setDrordDeptCodg(ObjectUtil.isEmpty(MapUtil.getStr(map,"execDeptId"))?"-":MapUtil.getStr(map,"execDeptId"));
+            //*下达医嘱科室名称
+            anaOrderDTO.setDrordDeptName(ObjectUtil.isEmpty(MapUtil.getStr(map,"execDeptName"))?"-":MapUtil.getStr(map,"execDeptName"));
+            //*开处方(医嘱)医生标识
+            anaOrderDTO.setDrordDrCodg(ObjectUtil.isEmpty(MapUtil.getStr(map,"crteId"))?"-":MapUtil.getStr(map,"crteId"));
+            //*开处方(医嘱)医生姓名
+            anaOrderDTO.setDrordDrName(ObjectUtil.isEmpty(MapUtil.getStr(map,"crteName"))?"-":MapUtil.getStr(map,"crteName"));
+            //*开处方(医嘱)医职称
+            anaOrderDTO.setDrordDrProfttl("-");
+            //*是否当前处方(医嘱)  1=是,0=否
+            anaOrderDTO.setCurrDrordFlag("1");
+            anaOrderDTOS.add(anaOrderDTO);
+        }
+        //诊断信息DTO
+        List<AnaDiagnoseDTO> anaDiagnoseDTOS = new ArrayList<>();
+        Map<Object, Object> map = new HashMap<>();
+        map.put("inptVisitDTO",inptVisitDTO);
+        map.put("hospCode",inptVisitDTO.getHospCode());
+        WrapperResponse<PageDTO> response = inptSettlementServiceProvider.queryDiagnose(map);
+        if (WrapperResponse.SUCCESS != response.getCode()) {
+            throw new AppException(response.getMessage());
+        }
+        if (ObjectUtil.isEmpty(response.getData())) {
+            throw new AppException("未查询到诊断信息！");
+        }
+        List<InptDiagnoseDTO> inptDiagnoseDTOS = JSON.parseArray(JSON.toJSONString(response.getData().getResult()), InptDiagnoseDTO.class);
+        for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseDTOS) {
+            AnaDiagnoseDTO diagnoseDTO = new AnaDiagnoseDTO();
+            //*诊断标识
+            diagnoseDTO.setDiseId(inptDiagnoseDTO.getId());
+            //*诊断日期
+            diagnoseDTO.setInoutDiseType("1");
+            //*出入诊断类别
+            diagnoseDTO.setMaindiseFlag(inptDiagnoseDTO.getIsMain());
+            //*主诊断标志
+            diagnoseDTO.setDiasSrtNo(ObjectUtil.isEmpty(inptDiagnoseDTO.getDiagnoseNo())? BigDecimal.ZERO:new BigDecimal(inptDiagnoseDTO.getDiagnoseNo()));
+            //*诊断排序号
+            diagnoseDTO.setDiseCodg(inptDiagnoseDTO.getDiseaseCode());
+            //*诊断(疾病)编码
+            diagnoseDTO.setDiseName(inptDiagnoseDTO.getDiseaseName());
+            //*诊断(疾病)名称
+            diagnoseDTO.setDiseDate(inptDiagnoseDTO.getCrteTime());
+            anaDiagnoseDTOS.add(diagnoseDTO);
+        }
+        //就诊信息
+        InsureIndividualBasicDTO basicInParm = new InsureIndividualBasicDTO();
+        basicInParm.setVisitId(inptVisitDTO.getId());
+        basicInParm.setHospCode(inptVisitDTO.getHospCode());
+        basicInParm.setMedicalRegNo(inptVisitDTO.getMedicalRegNo());
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("insureIndividualBasicDTO",basicInParm);
+        map2.put("hospCode",inptVisitDTO.getHospCode());
+        WrapperResponse<InsureIndividualBasicDTO> res = InsureIndividualBasicServiceConsumer.getByVisitId(map2);
+        if (WrapperResponse.SUCCESS != res.getCode()) {
+            throw new AppException("查询医保参保信息失败！"+res.getMessage());
+        }
+        if (ObjectUtil.isEmpty(res.getData())) {
+            throw new AppException("未查询到医保参保信息！");
+        }
+        InsureIndividualBasicDTO basicDTO = res.getData();
+        //查询住院信息
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("inptVisitDTO",inptVisitDTO);
+        map1.put("hospCode",inptVisitDTO.getHospCode());
+        WrapperResponse<InptVisitDTO> response1 = compositeQueryService.queryInptVisit(map1);
+        if (WrapperResponse.SUCCESS != response1.getCode()) {
+            throw new AppException("查询住院信息失败！"+response1.getMessage());
+        }
+        if (ObjectUtil.isEmpty(response1.getData())) {
+            throw new AppException("未查询到住院信息！");
+        }
+        InptVisitDTO mdtrtDTO = response1.getData();
+        AnaMdtrtDTO anaMdtrtDTO = new AnaMdtrtDTO();
+        //*就诊标识
+        anaMdtrtDTO.setMdtrtId(mdtrtDTO.getId());
+        //*医疗服务机构标识
+        anaMdtrtDTO.setMedinsId(mdtrtDTO.getHospCode());
+        //*医疗机构名称
+        anaMdtrtDTO.setMedinsName("-");
+        //*医疗机构行政区划编码
+        anaMdtrtDTO.setMedinsAdmdvs(insureVisitDTO.getInsureRegCode());
+        //*医疗服务机构类型
+        anaMdtrtDTO.setMedinsType("1");
+        //*医疗机构等级
+        anaMdtrtDTO.setMedinsLv("02");
+        //病区标识
+        anaMdtrtDTO.setWardareaCodg("");
+        //病房号
+        anaMdtrtDTO.setWardno("");
+        //病床号
+        anaMdtrtDTO.setBedno("");
+        //*入院日期
+        anaMdtrtDTO.setAdmDate(mdtrtDTO.getInTime());
+        //*出院日期
+        anaMdtrtDTO.setDscgDate(ObjectUtil.isEmpty(mdtrtDTO.getOutTime())?mdtrtDTO.getInTime():mdtrtDTO.getOutTime());
+        //*主诊断编码
+        anaMdtrtDTO.setDscgMainDiseCodg(insureVisitDTO.getVisitIcdCode());
+        //*主诊断名称
+        anaMdtrtDTO.setDscgMainDiseName(insureVisitDTO.getVisitIcdName());
+        //*医师标识
+        anaMdtrtDTO.setDrCodg(mdtrtDTO.getZzDoctorId());
+        //*入院科室标识
+        anaMdtrtDTO.setAdmDeptCodg(mdtrtDTO.getInDeptId());
+        //*入院科室名称
+        anaMdtrtDTO.setAdmDeptName(mdtrtDTO.getInDeptName());
+        //*出院科室标识
+        anaMdtrtDTO.setDscgDeptCodg(mdtrtDTO.getOutDeptId());
+        //*出院科室名称
+        anaMdtrtDTO.setDscgDeptName(mdtrtDTO.getOutDeptName());
+        //*就诊类型
+        anaMdtrtDTO.setMedMdtrtType("210");//住院写死210
+        //*医疗类别
+        anaMdtrtDTO.setMedType("21");
+        //*生育状态
+        anaMdtrtDTO.setMatnStas("0");
+        //*总费用
+        anaMdtrtDTO.setMedfeeSumamt(new BigDecimal("0"));
+        //*自费金额
+        anaMdtrtDTO.setOwnpayAmt(new BigDecimal("0"));
+        //*自付金额
+        anaMdtrtDTO.setSelfpayAmt(new BigDecimal("0"));
+        //个人账户支付金额
+        anaMdtrtDTO.setMaAmt(new BigDecimal("0"));
+        //救助金支付金额
+        anaMdtrtDTO.setAcctPayamt(new BigDecimal("0"));
+        //统筹金支付金额
+        anaMdtrtDTO.setHifpPayamt(new BigDecimal("0"));
+        //*结算总次数
+        anaMdtrtDTO.setSetlTotlnum(new BigDecimal("1"));
+        //*险种
+        anaMdtrtDTO.setInsutype(basicDTO.getAae140());
+        //*报销标志
+        anaMdtrtDTO.setReimFlag("0");
+        //*异地结算标志
+        anaMdtrtDTO.setOutSetlFlag(ObjectUtil.isEmpty(inptVisitDTO.getIsOut())?"0":inptVisitDTO.getIsOut());
+        //处方(医嘱)信息
+        anaMdtrtDTO.setFsiOrderDtos(anaOrderDTOS);
+        //诊断信息DTO
+        anaMdtrtDTO.setFsiDiagnoseDtos(anaDiagnoseDTOS);
+
+        //参保信息
+        AnaInsuDTO anaInsuDTO = new AnaInsuDTO();
+        //*参保人标识
+        anaInsuDTO.setPatnId(basicDTO.getAac001());
+        //*姓名
+        anaInsuDTO.setPatnName(basicDTO.getAac003());
+        //*性别
+        anaInsuDTO.setGend(basicDTO.getAac004());
+        //*出生日期
+        anaInsuDTO.setBrdy(DateUtils.parse(basicDTO.getAac006(), DatePattern.NORM_DATE_PATTERN));
+        //*统筹区编码
+        anaInsuDTO.setPoolarea(insureVisitDTO.getInsuplcAdmdvs());
+        //*当前就诊标识
+        anaInsuDTO.setCurrMdtrtId(mdtrtDTO.getId());
+        //*就诊信息集合
+        anaInsuDTO.setFsiEncounterDtos(anaMdtrtDTO);
+
+        //入参DTO
+        AnalysisDTO analysisDTO = new AnalysisDTO();
+        //*系统编码
+        analysisDTO.setSyscode("YYDS");
+        //任务ID
+        analysisDTO.setTaskId("");
+        //触发场景
+        analysisDTO.setTrigScen("9");
+        //规则标识集合
+        analysisDTO.setRuleIds("");
+        //*参保人信息
+        analysisDTO.setPatientDtos(anaInsuDTO);
+
+        return analysisDTO;
+    }
 }

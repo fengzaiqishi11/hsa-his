@@ -455,7 +455,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       int update = inptPrintDAO.updateAdvicePrint(updateList);
     }
     inptAdvicePrintDTO.setIsValid("1");
-    return inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
+    List<InptAdvicePrintDTO> inptAdvicePrintDTOS1 = inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
+    for (InptAdvicePrintDTO advicePrintDTO : inptAdvicePrintDTOS1) {
+      if(!StringUtils.isEmpty(advicePrintDTO.getDosage())){
+        String dosage = advicePrintDTO.getDosage();
+        String [] low = dosage.split("\\.");
+        dosage = Integer.parseInt(low[1])<=0?low[0]:dosage;
+        advicePrintDTO.setDosage(dosage);
+      }
+    }
+    return inptAdvicePrintDTOS1;
   }
 
   /**

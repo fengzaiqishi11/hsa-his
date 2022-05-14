@@ -1,6 +1,8 @@
 package cn.hsa.module.sys.user.entity;
 
 import cn.hsa.base.PageDO;
+import cn.hsa.util.Constants;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +46,7 @@ public class SysUserDO extends PageDO implements Serializable {
     /**
      * 登录密码（初始化密码：888888）
      */
-    private String password;
+    private  String password;
     /**
      * 是否在职
      */
@@ -241,5 +243,17 @@ public class SysUserDO extends PageDO implements Serializable {
      * 是否具有麻醉权
      */
     private String onlyOpenItem;
-
+    /**
+     *  上次改密时间
+     */
+    private Date lastPasswordModificationDate;
+    /**
+     *  近期使用过的密码，
+     */
+    @JsonIgnore
+    private  String lastUsedPassword;
+    /**
+     *  是否为系统管理员，默认是否: SF.F
+     */
+    private String isSystemAdmin= Constants.SF.F;
 }

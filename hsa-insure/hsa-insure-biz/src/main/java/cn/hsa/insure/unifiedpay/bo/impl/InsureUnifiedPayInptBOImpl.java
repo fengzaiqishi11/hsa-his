@@ -396,7 +396,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
                     (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
                 if (ObjectUtil.isEmpty(isReimburse)) {
-                    throw new RuntimeException("是否报销标志【isReimburse】不能为空！费用id为："+feedetlSn);
+                    throw new RuntimeException("【"+MapUtil.getStr(item,"hospItemName")+"】为限制使用项目，其是否报销标志【isReimburse】不能为空，请检查！费用id为："+feedetlSn);
                 }
                 switch (isReimburse) {
                     case Constants.SF.S:

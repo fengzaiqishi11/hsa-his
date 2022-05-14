@@ -305,4 +305,12 @@ public class BaseDiseaseController extends BaseController {
         map.put("crteId", sysUserDTO.getId());
         return baseDiseaseService_consumer.insertInsureDiseaseMatch(map);
     }
+
+    @PostMapping("/updateDiseaseMatch")
+    public WrapperResponse<Boolean> updateDisease(@RequestBody Map<String,Object> map,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        return baseDiseaseService_consumer.updateDisease(map);
+    }
+
 }

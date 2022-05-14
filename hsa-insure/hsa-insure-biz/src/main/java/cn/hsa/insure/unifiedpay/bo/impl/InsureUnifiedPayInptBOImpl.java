@@ -731,6 +731,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         Map<String, Object> paramMap = new HashMap<>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -812,6 +813,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         Map<String,Object> paramMap = new HashMap<String,Object>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("insureAccoutFlag", inptVisitDTO.getIsUseAccount());
         paramMap.put("costStr", costMap.get("costStr").toString());
@@ -895,6 +897,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         Map<String,Object> paramMap = new HashMap<String,Object>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("insureAccoutFlag", inptVisitDTO.getIsUseAccount());
         paramMap.put("costStr", costMap.get("costStr").toString());
@@ -999,6 +1002,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
 
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_SETTLE_BACK.getCode());
@@ -1327,6 +1331,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.putAll(map);
         paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualBasicDTO.getInsuplc_admdvs());
         paramMap.put("orgCode", insureIndividualBasicDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualBasicDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualBasicDTO.getInsureRegCode());
@@ -1448,6 +1453,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.putAll(map);
         paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -1500,6 +1506,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         paramMap.putAll(map);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -1547,6 +1554,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureOrgCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
 
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_IN_BACK.getCode());
@@ -1602,6 +1610,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         paramMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());

@@ -311,5 +311,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dscgTime;
     // 单位邮编
     private String poscode;
+    //修改状态
+    private String stasType;
 
 }

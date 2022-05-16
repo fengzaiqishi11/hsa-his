@@ -151,6 +151,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String,Object> outputDataMap = MapUtils.get(resultDataMap,"output");
         Map<String,Object> dataMap = MapUtils.get(outputDataMap,"data");
         map.put("setlListId",MapUtils.get(dataMap,"setl_list_id"));
+        if(StringUtils.isEmpty(MapUtils.get(map,"stasType"))){
+            map.put("stasType","0");
+        }
         insureGetInfoDAO.updateInsureGetInfo(map);
         return listMap;
     }
@@ -523,10 +526,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(insureSettleInfoDTO !=null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())){
             throw  new AppException("该结算清单信息未上传至医保,不能修改状态");
         }
+        if("1".equals(insureSettleInfoDTO.getStasType())){
+            throw  new AppException("该结算清单信息已修改状态不能再次修改");
+        }
+        String functionCode =  selectParamSettleInfo(map);
+        if(StringUtils.isEmpty(functionCode)){
+            throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医疗结算清单功能号");
+        }
+        if(!"4101A".equals(functionCode)){
+            throw  new AppException("上传到4101A接口的数据才能修改状态");
+        }
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("psn_no",insureIndividualVisitDTO.getAac001());
+        dataMap.put("setl_id",insureIndividualVisitDTO.getInsureSettleId());
+        if(StringUtils.isEmpty(MapUtils.get(map,"stasType"))){
+            dataMap.put("stas_type","1");
+        }
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("psn_no",insureIndividualVisitDTO.getAac001());
-        paramMap.put("setl_id",insureIndividualVisitDTO.getInsureSettleId());
-        paramMap.put("stas_type","1");
+        paramMap.put("stastinfo",dataMap);
+
         paramMap.put("hospCode",hospCode);
         paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
         paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
@@ -540,6 +558,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_UPDATE, interfaceParamDTO);
 
+        //修改状态
+        if(StringUtils.isEmpty(MapUtils.get(map,"stasType"))){
+            map.put("stasType","1");
+        }
+        insureGetInfoDAO.updateStasType(map);
         return true;
     }
 
@@ -1992,9 +2015,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (sysParameterDTO == null) {
             throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
         }
+        if (insureSettleInfoDTO.getInsureRegCode() == null) {
+            throw new AppException("请先选择要上传的医保机构");
+        }
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureSettleInfoDTO.getHospCode());
         insureConfigurationDTO.setOrgCode(sysParameterDTO.getValue());
+        insureConfigurationDTO.setRegCode(insureSettleInfoDTO.getInsureRegCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if (insureConfigurationDTO == null) {
             throw new AppException("医保机构配置信息为空");
@@ -2045,9 +2072,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insureCostParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
         insureCostParam.put("visitId", visitId);//就诊id
         insureCostParam.put("isMatch", Constants.SF.S);//是否匹配 = 是
-        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
+//        insureCostParam.put("transmitCode", Constants.SF.F);//传输标志 = 未传输
         insureCostParam.put("insureRegCode", insureSettleInfoDTO.getOrgCode());// 医保机构编码
         insureCostParam.put("queryBaby", "N");// 医保机构编码
+        insureCostParam.put("settle_code", "2");//费用结算状态
         List<Map<String, Object>> insureCostList = insureIndividualCostDAO.queryInsureCostByVisit(insureCostParam);
         if (ListUtils.isEmpty(insureCostList)) {
             throw new AppException("该自费病人没有匹配的费用明细数据");

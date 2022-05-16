@@ -300,14 +300,14 @@ public class RequestInsure {
             SysParameterDTO sysParamDTO = this.getSysParamDTO(hospCode, "DIRECT_OR_QUEUE");
             if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
                 // 直连医保
-                logger.debug("*****开始【湖南省医保调用】直连方法*****");
-                logger.debug("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
+                logger.info("*****开始【湖南省医保调用】直连方法*****");
+                logger.info("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
                 String doPost = HttpConnectUtil.doPost(paramObj);
-                logger.debug("【湖南省医保调用】直连返参字符串：" + doPost);
-                logger.debug("开始解析xml");
+                logger.info("【湖南省医保调用】直连返参字符串：" + doPost);
+                logger.info("开始解析xml");
                 resultData = HygeiaUtil.xml2map(doPost);
-                logger.debug("【湖南省医保调用】直连返参XML解析：" + resultData);
-                logger.debug("*****结束【湖南省医保调用】直连方法*****");
+                logger.info("【湖南省医保调用】直连返参XML解析：" + resultData);
+                logger.info("*****结束【湖南省医保调用】直连方法*****");
             } else {
                 // 默认消息队列
                 Map<String,Object> resultObj = new HashMap<>();

@@ -257,6 +257,7 @@ public class InptFunction {
         httpParam.put("biz_times","1");//本年住院次数
         httpParam.put("in_bed",insureInptRegisterDTO.getAke020());//入院病床编号
         httpParam.put("injury_borth_sn",insureInptRegisterDTO.getInjuryBorthSn());
+        httpParam.put("aab001",insureInptRegisterDTO.getAab001());// 单位ID
         if (StringUtils.isEmpty(insureInptRegisterDTO.getAke020())) {
             httpParam.put("in_bed","未安床");//入院病床编号
         }

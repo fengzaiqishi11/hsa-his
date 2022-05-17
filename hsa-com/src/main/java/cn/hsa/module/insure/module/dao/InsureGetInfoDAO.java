@@ -506,6 +506,8 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     void updateInsureGetInfo(Map<String, Object> map);
+
+    void updateStasType(Map<String, Object> map);
     
     /**
      * @Method  查询医疗保障结算信息

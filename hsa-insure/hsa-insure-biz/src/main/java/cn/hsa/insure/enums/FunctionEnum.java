@@ -73,7 +73,7 @@ public enum FunctionEnum {
 //    CLR_APPR_DETAIL("3704", "获取拨付单信息"),
 
 //    MR_PATIENT_SETTL_UPLOAD("4101", "上传结算清单信息"),
-    FMI_OWNPAY_PATN_DELETE(Constant.UnifiedPay.REGISTER.UP_2404, "自费病人住院费用明细删除"),
+    FMI_OWNPAY_PATN_DELETE(Constant.UnifiedPay.REGISTER.UP_4204, "自费病人住院费用明细删除"),
     FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
     FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
     FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),

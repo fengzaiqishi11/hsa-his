@@ -236,4 +236,25 @@ public interface SysCodeDao {
      * @Return: SysCodeDetailDTO
      **/
     SysCodeDetailDTO getCodeDetailByValue(SysCodeDetailDTO sysCodeDetailDTO);
+    /**
+     * @Author gory
+     * @Description 值域明细启用
+     * @Date 2022/5/9 16:42
+     * @Param [sysCodeDetailDTO]
+     **/
+    int updateStatus(SysCodeDetailDTO sysCodeDetailDTO);
+    /**
+     * @Author gory
+     * @Description 根据ids去判断是否有已存在的数值
+     * @Date 2022/5/10 10:17
+     * @Param [sysCodeDetailDTO]
+     **/
+    List<SysCodeDetailDTO> getCodeDetailByIds(SysCodeDetailDTO sysCodeDetailDTO);
+    /**
+     * @Author gory
+     * @Description 查看是否有重复的值域
+     * @Date 2022/5/10 10:56
+     * @Param [newCodeDetailDTO]
+     **/
+    List<SysCodeDetailDTO> getCodeDetailByValues(SysCodeDetailDTO newCodeDetailDTO);
 }

@@ -204,5 +204,9 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.25</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
     </dependencies>
 </project>

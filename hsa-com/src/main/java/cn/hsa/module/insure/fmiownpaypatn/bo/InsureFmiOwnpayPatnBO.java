@@ -57,6 +57,8 @@ public interface InsureFmiOwnpayPatnBO {
 
     Map<String, Object> queryFmiOwnPayPatnReconciliationInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    Boolean insertInsureMdtrtAndDiag(InsureSettleInfoDTO insureSettleInfoDTO);
+
     /**
      * @Method queryInsureCost
      * @Desrciption

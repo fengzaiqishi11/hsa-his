@@ -63,5 +63,8 @@ public interface InsureFmiOwnpayPatnService {
     @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnReconciliationInfo")
     WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map);
 
+    @PostMapping("/service/insure/insureSettleInfo/insertInsureMdtrtAndDiag")
+    WrapperResponse insertInsureMdtrtAndDiag(Map map);
+
 
 }

@@ -234,4 +234,16 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
   public WrapperResponse<Map<String, Object>> UP6401(Map<String, Object> map) {
     return WrapperResponse.success(insureUnifiedOutptBO.UP_6401(map));
   }
+
+  /**
+   *
+   * @param map
+   * @Author 医保开发二部-湛康
+   * @Date 2022-05-17 10:00
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+   */
+  @Override
+  public WrapperResponse<Map<String, Object>> UP6203(Map<String, Object> map) {
+    return WrapperResponse.success(insureUnifiedOutptBO.UP_6203(map));
+  }
 }

@@ -819,6 +819,7 @@ public interface Constant {
             public static final String UP_6201 = "6201"; // 线上费用明细上传
             public static final String UP_6301 = "6301"; // 医保订单结算结果查询
             public static final String UP_6401 = "6401"; // 费用明细上传撤销
+            public static final String UP_6203 = "6203"; // 医保退费
         }
 
         public static class DOWNLOAD {

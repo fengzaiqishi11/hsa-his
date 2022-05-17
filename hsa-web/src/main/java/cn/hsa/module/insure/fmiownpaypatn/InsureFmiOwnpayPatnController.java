@@ -169,6 +169,46 @@ public class InsureFmiOwnpayPatnController extends BaseController {
     }
 
 
-
+    /**
+     * @Method insertInsureFmiOwnPayPatnCost
+     * @Desrciption 自费病人费用明细信息删除
+     * 1.查询是否有自费就诊记录
+     * 2.查询自费上传表是否有数据
+     * 3.调用医保接口
+     * 4.删除本地数据
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2022-05-17 13:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("deleteInsureFmiOwnPayPatnCost")
+    public WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.deleteInsureFmiOwnPayPatnCost(map);
+    }
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询自费病人上传费用数据集合
+     * @Param
+     * @Author qiang.fan
+     * @Date   2022/04/08 10:58
+     * @Return
+     **/
+    @GetMapping("/queryFeeInfoDetailPage")
+    public WrapperResponse<PageDTO> queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFeeInfoDetailPage(param);
+    }
 
 }

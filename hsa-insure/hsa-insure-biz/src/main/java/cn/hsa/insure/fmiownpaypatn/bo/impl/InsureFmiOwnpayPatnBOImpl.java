@@ -475,6 +475,65 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         return true;
     }
     /**
+     * @Method insertInsureFmiOwnPayPatnCost
+     * @Desrciption 自费病人费用明细信息删除
+     * 1.查询是否有自费就诊记录
+     * 2.查询自费上传表是否有数据
+     * 3.调用医保接口
+     * 4.删除本地数据
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2022-05-17 13:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @Override
+    public Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO) {
+        // 1.先判断是否选择了医保机构
+        InsureConfigurationDTO  insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
+        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+        //1.查询是否有自费就诊记录
+        List<InsureUploadCostDTO> costDTOList = insureIndividualCostDAO.queryFeeInfoDetailPage(insureSettleInfoDTO);
+        if(ListUtils.isEmpty(costDTOList)){
+            throw new AppException("没有要删除的费用记录!");
+        }
+        //2.调用接口
+        Map paramMap = new HashMap();
+        paramMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
+        paramMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
+        paramMap.put("orgCode", insureSettleInfoDTO.getOrgCode());
+        paramMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        paramMap.put("configRegCode",insureConfigurationDTO.getRegCode());
+        //处理流水号
+        if(insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
+            List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
+            List<String> bkkpSnList = new ArrayList<>();
+            for (InsureUploadCostDTO insureUploadCostDTO : costDTOList) {
+                if(feeIdList.contains(insureUploadCostDTO.getId())){
+                    bkkpSnList.add(insureUploadCostDTO.getFeedetlSn());
+                }
+            }
+            paramMap.put("bkkp_sn",bkkpSnList);
+        }
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_DELETE.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        interfaceParamDTO.setIsHospital(insureSettleInfoDTO.getLx());
+        interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
+        // 调用统一支付平台接口
+        Map<String, Object> res = insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DELETE, interfaceParamDTO);
+        return true;
+    }
+
+    @Override
+    public PageDTO queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO) {
+        PageHelper.startPage(insureSettleInfoDTO.getPageNo(), insureSettleInfoDTO.getPageSize());
+        List<InsureUploadCostDTO> costDTOList = insureIndividualCostDAO.queryFeeInfoDetailPage(insureSettleInfoDTO);
+        return PageDTO.of(costDTOList);
+    }
+
+    /**
      * @Method insertHandlerInsureCost
      * @Desrciption 处理自费病人明细数据
      * @Param item ：上传参数

@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -311,5 +312,5 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dscgTime;
     // 单位邮编
     private String poscode;
-
+    private List<String> feeIdList; // 自费上传明细id集合
 }

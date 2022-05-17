@@ -63,6 +63,12 @@ public interface InsureFmiOwnpayPatnService {
     @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnReconciliationInfo")
     WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map);
 
+    @PostMapping("/service/insure/insureSettleInfo/insertInsureMdtrtAndDiag")
+    WrapperResponse insertInsureMdtrtAndDiag(Map map);
+
+    @PostMapping("/service/insure/insureSettleInfo/insertInsureFinish")
+    WrapperResponse insertInsureFinish(Map map);
+
 
     WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(Map map);
 

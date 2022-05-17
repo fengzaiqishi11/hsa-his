@@ -1455,7 +1455,7 @@
         limit 1
     </select>
     <select id="querySettlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
-        select settle_no
+        select settle_no,stas_type
         from insure_setl_info
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -1771,6 +1771,13 @@
     <update id="updateInsureGetInfo">
         update insure_setl_info
         set settle_no =#{setlListId},stas_type = '0'
+        where insure_settle_id = #{insureSettleId}
+          and hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
+    <update id="updateStasType">
+        update insure_setl_info
+        set stas_type = #{stasType}
         where insure_settle_id = #{insureSettleId}
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}

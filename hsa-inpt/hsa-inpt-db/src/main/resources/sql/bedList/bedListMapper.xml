@@ -215,7 +215,8 @@
     <update id="updateInptVisit_Ac">
         update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',
         jz_doctor_id = #{jzDoctorId}, jz_doctor_name = #{jzDoctorName}, zz_doctor_id = #{zzDoctorId}, zz_doctor_name = #{zzDoctorName},
-        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName}
+        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName},
+        in_time = #{inTime}
         where id = #{id} and status_code = '1'
     </update>
 

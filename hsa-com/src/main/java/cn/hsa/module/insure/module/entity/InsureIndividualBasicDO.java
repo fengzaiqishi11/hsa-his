@@ -161,5 +161,7 @@ public class InsureIndividualBasicDO extends PageDO implements Serializable {
         @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
         private Date endDate;
-
+        private String iptPsnSpFlagType;// 单位ID
+        private String iptPsnSpFlag;// 单位ID
+        private String iptPsnSpFlagDetlId;// 单位ID
 }

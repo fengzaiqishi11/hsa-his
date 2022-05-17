@@ -57,6 +57,10 @@ public interface InsureFmiOwnpayPatnBO {
 
     Map<String, Object> queryFmiOwnPayPatnReconciliationInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    Boolean insertInsureMdtrtAndDiag(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean insertInsureFinish(InsureSettleInfoDTO insureSettleInfoDTO);
+
     /**
      * @Method queryInsureCost
      * @Desrciption
@@ -68,4 +72,7 @@ public interface InsureFmiOwnpayPatnBO {
      **/
     Boolean insertInsureCost(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    PageDTO queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

@@ -784,4 +784,10 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     List<InptDiagnoseDTO> selectMriInptDiagNose(Map<String, Object> map);
+
+    List<InsureIndividualVisitDTO> queryInsureSpecialAttributeInfoPage(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    InsureIndividualVisitDTO queryVisitById(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    void updateSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

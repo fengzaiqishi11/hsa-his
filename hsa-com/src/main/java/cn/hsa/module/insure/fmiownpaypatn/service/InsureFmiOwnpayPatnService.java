@@ -70,4 +70,7 @@ public interface InsureFmiOwnpayPatnService {
     WrapperResponse insertInsureFinish(Map map);
 
 
+    WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(Map map);
+
+    WrapperResponse<PageDTO> queryFeeInfoDetailPage(Map<String, Object> param);
 }

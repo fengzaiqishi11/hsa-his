@@ -2,6 +2,7 @@ package cn.hsa.module.insure.fmiownpaypatn.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -63,5 +64,13 @@ public interface InsureFmiOwnpayPatnService {
     @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnReconciliationInfo")
     WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map);
 
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayInfoDetail")
+    WrapperResponse queryFmiOwnPayInfoDetail(Map map);
+
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnFeeListDetail")
+    WrapperResponse queryFmiOwnPayPatnFeeListDetail(Map map);
+
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayDiseListDetail")
+    WrapperResponse queryFmiOwnPayDiseListDetail(Map map);
 
 }

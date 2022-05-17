@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.fmiownpaypatn.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 
 import java.util.Map;
@@ -67,5 +68,38 @@ public interface InsureFmiOwnpayPatnBO {
      * @Return java.util.Map
      **/
     Boolean insertInsureCost(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+      * 自费病人就医就诊信息查询
+      * @method queryFmiOwnPayInfoDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:45
+      * @param  insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayInfoDetail(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+      * 自费病人就医就诊信息查询
+      * @method queryFmiOwnPayPatnFeeListDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:45
+      * @param  insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayPatnFeeListDetail(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+      * 自费病人就医诊断信息查询
+      * @method queryFmiOwnPayDiseListDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:29
+      * @param insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayDiseListDetail(InsureSettleInfoDTO insureSettleInfoDTO);
 
 }

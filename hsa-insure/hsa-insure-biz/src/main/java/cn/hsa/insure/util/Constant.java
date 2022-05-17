@@ -813,6 +813,9 @@ public interface Constant {
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询
             public static final String UP_4201 = "4201"; // 自费病人费用信息上传
+            public static final String UP_4207 = "4207"; // 自费病人就医费用明细查询
+            public static final String UP_4208 = "4208"; // 自费病人就医就诊信息查询
+            public static final String UP_4209 = "4209"; // 自费病人就医诊断信息查询
             public static final String UP_4261 = "4261"; // 自费病人明细信息上传
             public static final String UP_4262 = "4262"; // 自费病人明细信息对账
             public static final String UP_4263 = "4263"; // 自费病人零报金额不符查询

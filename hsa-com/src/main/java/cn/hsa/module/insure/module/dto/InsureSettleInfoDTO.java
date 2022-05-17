@@ -312,4 +312,17 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     // 单位邮编
     private String poscode;
 
+    private String fixmedinsMdtrtId;//医药机构就诊ID
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String begntime; //开始时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String endtime; //结束时间
+    private String medfeeSumamt; //医疗总费用
+    private String medType; //医疗类型
+    private String elecBillnoCode; //电子票据号码
+    private String cpltFlag; //完成标志
+
+
 }

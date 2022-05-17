@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.fmiownpaypatn.bo.InsureFmiOwnpayPatnBO;
 import cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService;
+import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,21 @@ public class InsureFmiOwnpayPatnServiceImpl extends HsafService implements Insur
     @Override
     public WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map) {
         return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayPatnReconciliationInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayInfoDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayInfoDetail(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayPatnFeeListDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayPatnFeeListDetail(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayDiseListDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayDiseListDetail(MapUtils.get(map, "insureSettleInfoDTO")));
     }
 
 

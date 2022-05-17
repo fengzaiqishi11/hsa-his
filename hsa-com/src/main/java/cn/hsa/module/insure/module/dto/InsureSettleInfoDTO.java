@@ -313,5 +313,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String poscode;
     //修改状态
     private String stasType;
+    //完成标志
+    private String cpltFlag;
 
 }

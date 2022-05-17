@@ -59,6 +59,8 @@ public interface InsureFmiOwnpayPatnBO {
 
     Boolean insertInsureMdtrtAndDiag(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    Boolean insertInsureFinish(InsureSettleInfoDTO insureSettleInfoDTO);
+
     /**
      * @Method queryInsureCost
      * @Desrciption

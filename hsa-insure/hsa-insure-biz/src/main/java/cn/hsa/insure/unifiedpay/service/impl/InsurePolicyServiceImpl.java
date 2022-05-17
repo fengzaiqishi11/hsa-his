@@ -1,5 +1,6 @@
 package cn.hsa.insure.unifiedpay.service.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.other.bo.InsurePolicyBO;
@@ -33,7 +34,7 @@ public class InsurePolicyServiceImpl  implements InsurePolicyService {
    * @return java.util.List<cn.hsa.module.insure.other.PolicyResponseDTO>
    */
   @Override
-  public List<PolicyResponseDTO> queryInsurePolicy(Map map){
-    return insurePolicyBO.queryInsurePolicy(map);
+  public WrapperResponse<PageDTO>  queryInsurePolicy(Map map){
+    return WrapperResponse.success(insurePolicyBO.queryInsurePolicy(map));
   }
 }

@@ -131,6 +131,8 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String statusCode;
         // 医疗机构名称
         private String fixmedinsName;
+        // 医疗机构名称
+        private String fixmedinsCode;
         // 医院等级
         private String hospLv;
         // 住院天数
@@ -142,4 +144,7 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String visitNationCode;  // 就诊科别
         private BigDecimal  totalAdvance; // 累计预交金
         private String aab001;// 单位ID
+        private String iptPsnSpFlagType;// 单位ID
+        private String iptPsnSpFlag;// 单位ID
+        private String iptPsnSpFlagDetlId;// 单位ID
 }

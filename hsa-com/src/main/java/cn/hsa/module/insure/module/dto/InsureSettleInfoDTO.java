@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -311,6 +312,11 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dscgTime;
     // 单位邮编
     private String poscode;
+    private List<String> feeIdList; // 自费上传明细id集合
+    //修改状态
+    private String stasType;
+    //完成标志
+    private String cpltFlag;
 
     private String fixmedinsMdtrtId;//医药机构就诊ID
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

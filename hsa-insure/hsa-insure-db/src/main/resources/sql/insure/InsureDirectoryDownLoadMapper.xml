@@ -394,9 +394,9 @@
         drug_genname, ethdrug_type, chemname, alis, eng_name, dosform, each_dos, used_frqu,
         nat_drug_no, used_mtd, ing, chrt, defs, tabo, mnan, stog, drug_spec, prcunt_type, otc_flag,
         pacmatl, pacspec, min_useunt, min_salunt, manl, rute, begndate, enddate, pham_type, memo, pac_cnt, min_unt, min_pac_cnt, min_pacunt, min_prepunt, drug_expy, efcc_atd, min_prcunt, wubi, pinyin, vali_flag, rid, crte_time, updt_time,
-        crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver from insure_unified_nation_drug
+        crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver from insure_unified_nation_drug where 1=1
         <if test="keyword != null and keyword != ''">
-            and ( hilist_code like concat('%',#{keyword},'%')
+            and ( med_list_codg like concat('%',#{keyword},'%')
             )
         </if>
     </select>

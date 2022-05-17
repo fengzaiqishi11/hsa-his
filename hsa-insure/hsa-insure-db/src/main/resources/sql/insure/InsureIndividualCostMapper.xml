@@ -1360,7 +1360,11 @@
           and insure_settle_id is null order by crte_time desc limit 1
     </select>
 
-<!--    &lt;!&ndash; 根据就诊id查询所有已上传医保的费用明细信息&ndash;&gt;-->
+    <select id="queryFeeInfoDetailPage" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+        select * from insure_upload_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+    </select>
+
+    <!--    &lt;!&ndash; 根据就诊id查询所有已上传医保的费用明细信息&ndash;&gt;-->
 <!--    <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">-->
 <!--        SELECT-->
 <!--        ic.id id,-->

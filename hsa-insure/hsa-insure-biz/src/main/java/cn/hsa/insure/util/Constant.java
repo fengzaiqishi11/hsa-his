@@ -759,6 +759,8 @@ public interface Constant {
             public static final String UP_2403 = "2403";// 住院信息变更
             public static final String UP_2404 = "2404"; // 入院办理撤销
             public static final String UP_2405 = "2405"; // 出院办理撤销
+            public static final String UP_2406 = "2406"; // 就医特殊属性上传
+            public static final String UP_2407 = "2407"; // 就医特殊属性查询
             public static final String UP_2601 = "2601"; // 冲正交易
             public static final String UP_9162 = "9162"; // 对象
             public static final String UP_3301 = "3301"; // 项目对照上传
@@ -813,6 +815,9 @@ public interface Constant {
             public static final String UP_5369 = "5369"; // 6.3.1.3个人账户扣减
             public static final String UP_5368 = "5368"; // 账户余额信息查询
             public static final String UP_4201 = "4201"; // 自费病人费用信息上传
+            public static final String UP_4204 = "4204"; // 自费病人费用信息上传
+            public static final String UP_4202 = "4202"; // 自费病人住院就诊和诊断信息上传
+            public static final String UP_4203 = "4203"; // 自费病人就诊以及费用明细上传完成
             public static final String UP_4207 = "4207"; // 自费病人就医费用明细查询
             public static final String UP_4208 = "4208"; // 自费病人就医就诊信息查询
             public static final String UP_4209 = "4209"; // 自费病人就医诊断信息查询
@@ -822,6 +827,7 @@ public interface Constant {
             public static final String UP_6201 = "6201"; // 线上费用明细上传
             public static final String UP_6301 = "6301"; // 医保订单结算结果查询
             public static final String UP_6401 = "6401"; // 费用明细上传撤销
+            public static final String UP_6203 = "6203"; // 医保退费
         }
 
         public static class DOWNLOAD {

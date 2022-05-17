@@ -1938,7 +1938,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             Map param = new HashMap();
             param.put("infno", "4201");  //交易编号
             param.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-            param.put("insuplc_admdvs", ""); //参保地医保区划分
+            param.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
             param.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
             param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
             param.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划

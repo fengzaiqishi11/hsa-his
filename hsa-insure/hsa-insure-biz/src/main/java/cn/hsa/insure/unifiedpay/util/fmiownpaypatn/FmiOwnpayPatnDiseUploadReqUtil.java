@@ -63,8 +63,8 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put("ownPayPatnMdtrtD", initMdtrtDDTO(inptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt));
-        dataMap.put("ownPayPatnDiagListD", initInptDiseListDDTOS(inptDiagnoseDTOList, inptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue()));
+        dataMap.put("ownPayPatnMdtrtD", HumpUnderlineUtils.humpToUnderline(initMdtrtDDTO(inptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt)));
+        dataMap.put("ownPayPatnDiagListD", HumpUnderlineUtils.humpToUnderlineArray(initInptDiseListDDTOS(inptDiagnoseDTOList, inptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue())));
 
 
         HashMap commParam = new HashMap();

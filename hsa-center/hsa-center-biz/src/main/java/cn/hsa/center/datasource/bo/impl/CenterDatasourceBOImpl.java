@@ -22,10 +22,9 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -377,5 +376,150 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
                 e.printStackTrace();
             }
         }
+    }
+
+    /**
+     * @Description: 导出医院数据（SaaS导出）
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    @Override
+    public WrapperResponse exportHospitalData(String startDate,String endDate) {
+        List<CenterDatasourceDTO> list = new ArrayList<CenterDatasourceDTO>();
+        // 查询所有的数据库
+        list = centerDatasourceDAO.findHospitalCenterDataSource();
+        // 同步所有的数据库的更新公告标识
+        TableStructureSyncDTO tableStructureSyncDTO = new TableStructureSyncDTO();
+        // 设置更新公告已读标识
+        tableStructureSyncDTO.setSql("select " +
+                "(select name from sys_code_detail where value=c.pro_code and c_code='XZQH'and hosp_code={hospCode}) as 'pro'," +
+                "(select name from sys_code_detail where value=c.city_code and c_code='XZQH'and hosp_code={hospCode}) as 'city'," +
+                "(select name from sys_code_detail where value=c.area_code and c_code='XZQH' and hosp_code={hospCode}) as 'area'," +
+                "'云His' as 'proName'," +
+                "c.nation_code as 'nationCode'," +
+                "c.name as 'hospitalName'," +
+                "c.admin_name as 'contactName'," +
+                "c.admin_phone as 'phone'," +
+                "c.`code` as 'hospCode'," +
+                "ifnull(sum(ff.insureCount),0) as 'insureCount'," +
+                "ifnull(sum(ff.inptCount),0) as 'inptCount'," +
+                "c.start_date as 'startDate'," +
+                "c.end_date as 'endDate'" +
+                " from his_v2_center.center_hospital c left JOIN (" +
+                "select a.hosp_code as hospCode,COUNT(a.id) insureCount,0 as inptCount,MIN(a.crte_time) as startTime,MAX(a.crte_time) as endTime\n" +
+                "from insure_individual_settle a\n" +
+                "where a.settle_state='1' and a.state ='0' and a.crte_time >='" +startDate+"'"+ " and a.crte_time <='" +endDate+"' "+
+                "union all \n" +
+                "select a.hosp_code as hospCode,0 as  insureCount, COUNT(*) as inptCount,MIN(b.crte_time) as startTime,MAX(b.crte_time) as endTime\n" +
+                "from inpt_visit a\n" +
+                "JOIN inpt_settle b on a.id = b.visit_id and a.hosp_code =b.hosp_code\n" +
+                "where b.is_settle='1' and a.patient_code='0' and b.status_code ='0' and b.settle_time  >='" +startDate+"'"+ " and b.settle_time <='" +endDate+"'"+
+                "union all \n" +
+                "select a.hosp_code as hospCode,0 as insureCount, COUNT(*) as inptCount,MIN(b.crte_time) as startTime,MAX(b.crte_time) as endTime\n" +
+                "from outpt_visit a\n" +
+                "JOIN outpt_settle b on a.id = b.visit_id and a.hosp_code =b.hosp_code\n" +
+                "where b.is_settle='1' and a.patient_code='0' and b.status_code ='0' and b.settle_time  >='" +startDate+"'"+ " and b.settle_time <='" +endDate+"'"+
+                ") ff on c.`code`=ff.hospCode" +
+                " where c.`code` ={hospCode}");
+
+        List<String> dataSoureIds = new ArrayList<>();
+        String message = "";
+        List<Map<String,Object>> dataList=new ArrayList<>();
+        for (CenterDatasourceDTO centerDatasourceDTO:list){
+            try{
+                List<Map<String,Object>> data=tableStructureExportDataByHospCode(centerDatasourceDTO,tableStructureSyncDTO,dataSoureIds);
+                dataList.addAll(data);
+            }catch(Exception e){
+                if(message.length()>0){
+                    message +=  ","+ e.getMessage();
+                }else{
+                    message = e.getMessage();
+                }
+            }
+        }
+        return WrapperResponse.success("导出成功!", PageDTO.of(dataList));
+    }
+
+    //根据数据库配置操作表
+    private List tableStructureExportDataByHospCode(CenterDatasourceDTO centerDatasourceDTO, TableStructureSyncDTO tableStructureSyncDTO,List<String> dataSoureIds) {
+        if(centerDatasourceDTO == null ){
+            throw new  AppException("执行导出未获取到数据库");
+        }
+        List<Map<String,Object>> data=new ArrayList<>();
+        /**
+         * 获取医院配置的数据库连接
+         */
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = DBUtils.getConnection(centerDatasourceDTO.getDriverName(), centerDatasourceDTO.getUrl(), centerDatasourceDTO.getUsername(),
+                    centerDatasourceDTO.getPassword());
+            String sql = tableStructureSyncDTO.getSql() ;
+            Matcher matcher = PATTERN.matcher(sql);
+            while(matcher.find()) {
+                String key = matcher.group(1).replaceAll("\\{","").replace("}", "");
+                if("id".equals(key.toLowerCase())){
+                    sql = sql.replaceAll("\\{"+key+"}","'" + SnowflakeUtils.getId() + "'");
+                }else{
+                    sql = sql.replaceAll("\\{"+key+"}","'" + centerDatasourceDTO.getHospCode() + "'");
+                }
+            }
+            connection.setAutoCommit(false);
+            preparedStatement = connection.prepareStatement(sql);
+            ResultSet result = preparedStatement.executeQuery();
+            data = convertList(result);
+            connection.commit();
+            dataSoureIds.add(connection.getCatalog());
+        }catch (Exception e){
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            throw new  AppException(centerDatasourceDTO.getName());
+        }
+        finally {
+            try {
+                if (preparedStatement != null){
+                    preparedStatement.close();
+                }
+                connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return data;
+    }
+
+    /**
+     * @Description: 将ResultSet结果集转为list
+     * @Param: rs
+     * @return: list
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    private List<Map<String,Object>> convertList(ResultSet rs) throws SQLException {
+
+        List list = new ArrayList();
+
+        ResultSetMetaData md = rs.getMetaData();
+
+        int columnCount = md.getColumnCount();
+
+        while (rs.next()) {
+
+            Map rowData = new LinkedHashMap();
+
+            for (int i = 1; i <= columnCount; i++) {
+
+                rowData.put(md.getColumnName(i), rs.getObject(i));
+
+            }
+
+            list.add(rowData);
+
+        } return list;
     }
 }

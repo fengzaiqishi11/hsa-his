@@ -199,4 +199,14 @@ public class BaseDiseaseServiceImpl extends HsafService implements BaseDiseaseSe
         BaseDiseaseDTO baseDiseaseDTO=MapUtils.get(map,"baseDiseaseDTO");
         return WrapperResponse.success(baseDiseaseBO.queryAllInfectious(baseDiseaseDTO));
     }
+
+    @Override
+    public WrapperResponse<Boolean> updateDisease(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        String insureRegCode =  MapUtils.get(map,"insureRegCode");
+        BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
+        baseDiseaseDTO.setHospCode(hospCode);
+        baseDiseaseDTO.setInsureRegCode(insureRegCode);
+        return WrapperResponse.success(baseDiseaseBO.updateDisease(baseDiseaseDTO));
+    }
 }

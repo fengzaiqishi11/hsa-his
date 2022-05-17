@@ -827,6 +827,11 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
 //        }
 
         List<BaseDrugDTO> baseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
+        baseDrugDTOList.stream().forEach(x->{
+            if (StringUtils.isEmpty(x.getNationCode())) {
+                x.setNationName("");
+            }
+        });
         return PageDTO.of(baseDrugDTOList);
     }
 

@@ -274,4 +274,14 @@ public class SysCodeController extends BaseController {
         map.put("code", code);
         return sysCodeService_consumer.getCodeTree(map);
     }
+
+    @PostMapping("/updateStatus")
+    public WrapperResponse<Boolean> updateStatus(@RequestBody SysCodeDetailDTO sysCodeDetailDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        sysCodeDetailDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("sysCodeDetailDTO", sysCodeDetailDTO);
+        return sysCodeService_consumer.updateStatus(map);
+    }
 }

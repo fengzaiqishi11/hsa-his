@@ -765,7 +765,7 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
         if(!ListUtils.isEmpty(emrCoReList)){
             for(Map<String,Object> item : emrCoReList){
                 // 科室代码
-                item.put("dept",inptVisitDTO.getInDeptCode());
+                item.put("dept",inptVisitDTO.getInDeptId());
                 // 科室名称
                 item.put("dept_name",inptVisitDTO.getInDeptName());
                 // 病区名称

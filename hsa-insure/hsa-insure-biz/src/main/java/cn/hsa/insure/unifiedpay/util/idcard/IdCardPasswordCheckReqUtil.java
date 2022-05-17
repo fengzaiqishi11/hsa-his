@@ -24,8 +24,13 @@ public class IdCardPasswordCheckReqUtil<T> extends InsureCommonUtil implements B
 
     @Override
     public InsureInterfaceParamDTO initRequest(T param) {
-        String paramJson = (String) param;
-        Map map = JSON.parseObject(paramJson, Map.class);
+        Map map = null;
+        if(param instanceof Map){
+            map =(Map) param;
+        } else {
+            String paramJson = (String) param;
+            map = JSON.parseObject(paramJson, Map.class);
+        }
 
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("idcard",MapUtils.get(map, "idcard")); // 身份证号码

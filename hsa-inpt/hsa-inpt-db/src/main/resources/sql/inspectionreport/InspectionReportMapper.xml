@@ -23,46 +23,46 @@
 
     <select id="getPatientsTreeOfDepartment" resultMap="patientListTree">
         SELECT
-        a.id,
-        '' as visit_id,
-        a.label,
-        a.parentId
+            a.id,
+            '' as visit_id,
+            a.label,
+            a.parentId
         FROM
-        (
-        SELECT
-        bd.CODE id,
-        bd.NAME label,
-        ifnull( bd.up_dept_code, '-2' ) parentId
-        FROM
-        base_dept bd
-        WHERE
-        bd.is_valid = '1'
-        AND bd.CODE != 'B30'
+            (
+                SELECT
+                    bd.CODE id,
+                    bd.NAME label,
+                    ifnull( bd.up_dept_code, '-2' ) parentId
+                FROM
+                    base_dept bd
+                WHERE
+                    bd.is_valid = '1'
+                  AND bd.CODE != 'B30'
         AND bd.type_code = #{deptType}
-        AND bd.hosp_code = #{hospCode}
-        ) a UNION ALL
+                  AND bd.hosp_code = #{hospCode}
+            ) a UNION ALL
         SELECT
-        bd.`code` id,
-        '' as visit_id,
-        bd.`name` label,
-        '-2' parentId
+            bd.`code` id,
+            '' as visit_id,
+            bd.`name` label,
+            '-2' parentId
         FROM
-        base_dept bd
+            base_dept bd
         WHERE
-        bd.CODE in (
-        SELECT
-        IFNULL(
-        up_dept_code,#{code})
+                bd.CODE in (
+                SELECT
+                    IFNULL(
+                            up_dept_code,#{code})
 
-        FROM
-        base_dept inbd
-        WHERE
-        inbd.is_valid = '1'
-        AND inbd.type_code =#{deptType}
-        AND inbd.CODE != 'B30'
-        AND inbd.hosp_code = #{hospCode}
-        )
-        AND bd.up_dept_code IS NULL
+                FROM
+                    base_dept inbd
+                WHERE
+                    inbd.is_valid = '1'
+                  AND inbd.type_code =#{deptType}
+                  AND inbd.CODE != 'B30'
+          AND inbd.hosp_code = #{hospCode}
+            )
+          AND bd.up_dept_code IS NULL
 
     </select>
 
@@ -189,35 +189,36 @@
     </select>
     <select id="getPatientInspectItems" resultType="cn.hsa.module.inpt.inspectionreport.dto.PatientInspectItem">
         SELECT
-            `apply_no` AS applyNo,
-            `visit_id` AS visitId,
-            `in_no` AS inNo,
-            `order_no` AS orderNo,
-            `result_id` AS resultId,
-            `opd_id` AS opdId,
-            content,
-            `crte_time` AS crteTime
-
-        FROM
-            medic_apply
+        a.apply_no AS applyNo,
+        a.visit_id AS visitId,
+        a.in_no AS inNo,
+        a.order_no AS orderNo,
+        a.result_id AS resultId,
+        a.opd_id as opdId,
+        CONCAT (a.bar_code,c.code)  AS zhId,
+        a.content,
+        a.crte_time AS crteTime
+        from medic_apply a
+        left join inpt_advice_detail b on a.hosp_code = b.hosp_code and a.opd_id = b.id
+        left join base_advice c on a.hosp_code = b.hosp_code  and  b.ba_id =c.id
         WHERE
-            hosp_code=#{hospCode}
-          and type_code= #{typeCode}
-          and	in_no = #{inNo}
+        a.hosp_code=#{hospCode}
+        and a.type_code= #{typeCode}
+        and	a.in_no = #{inNo}
         <if test="startTime != null and startTime != ''">
-            and crte_Time &gt; #{startTime}
+            and a.crte_Time &gt; #{startTime}
         </if>
         <if test="endTime != null and endTime != ''">
-            and crte_Time &lt; #{endTime}
+            and a.crte_Time &lt; #{endTime}
         </if>
         <if test="typeCode != null and typeCode != ''">
-            and type_code = #{typeCode}
+            and a.type_code = #{typeCode}
         </if>
         <if test="babyId != null and babyId != ''">
-            and baby_id = #{babyId}
+            and a.baby_id = #{babyId}
         </if>
         <if test="babyId == null or babyId == ''">
-            and (baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
+            and (a.baby_id is null or LENGTH(TRIM(baby_id)) &lt; 1)
         </if>
     </select>
     <select id="getExaminationItems" resultType="cn.hsa.module.inpt.inspectionreport.dto.ExaminationItem">
@@ -238,7 +239,7 @@
             medic_result mr
         WHERE
             mr.in_no = #{inNo}
-          AND mr.advice_id = #{adviceId}
+          AND ( mr.advice_id = #{adviceId} or mr.advice_id = #{zhId} )
         ORDER BY
             crte_time ASC
     </select>
@@ -303,7 +304,7 @@
     </select>
     <select id="getDepartmentById" parameterType="map" resultType="map">
         select id from base_dept where hosp_code = #{hospCode}
-            and id = #{deptId} and (type_code = '1' or type_code = '2');
+                                   and id = #{deptId} and (type_code = '1' or type_code = '2');
     </select>
 
     <select id="getHospitalInfo" resultType="map" parameterType="map" >

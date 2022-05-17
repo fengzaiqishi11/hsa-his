@@ -787,6 +787,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisit");
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
+        //读卡原始信息赋值
+        InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
+        if (ObjectUtil.isNotEmpty(visitDTO)) {
+            insureIndividualVisitDTO.setHcardChkinfo(visitDTO.getHcardChkinfo());
+            insureIndividualVisitDTO.setHcardBasinfo(visitDTO.getHcardBasinfo());
+        }
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
 

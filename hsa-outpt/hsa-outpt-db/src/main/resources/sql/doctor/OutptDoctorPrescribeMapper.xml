@@ -94,6 +94,8 @@
             <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
             <result property="unitCode" column="unitCode" jdbcType="VARCHAR"></result>
             <result property="remark" column="remarkDetail" jdbcType="VARCHAR"></result>
+            <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+            <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         </collection>
     </resultMap>
 
@@ -222,6 +224,7 @@
         <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
         <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
         <result property="bigUnitCode" column="bigUnitCode" jdbcType="VARCHAR"></result>
+        <result property="color" column="color" jdbcType="VARCHAR"></result>
     </resultMap>
 
     <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
@@ -581,7 +584,9 @@
                f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
                b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,
                ifnull(a.tcm_syndromes_id,'') as tcmSyndromesId,ifnull(a.tcm_syndromes_name,'') as tcmSyndromesName,
-               ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName
+               ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName,
+               (case when b.item_code = '1' then f.nation_code when b.item_code = '2' then g.nation_code else '' end) as nation_code,
+               (case when b.item_code = '1' then ifnull(f.nation_name,f.usual_name) when b.item_code = '2' then ifnull(g.nation_name,g.name) else '' end) as nation_name
         from outpt_prescribe a
                  join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
                  left join(
@@ -867,7 +872,7 @@
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.nation_name, a.reimbursement_ratio
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, ifnull(a.nation_name,a.good_name)  nation_name, a.reimbursement_ratio
         from base_drug a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -925,7 +930,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-        a.pym usual_pym ,'' as technology_code,a.nation_code, a.nation_name, a.reimbursement_ratio
+        a.pym usual_pym ,'' as technology_code,a.nation_code, ifnull(a.nation_name,a.name) nation_name, a.reimbursement_ratio
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -1617,6 +1622,10 @@
             case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.unit_code end bigUnitCode,
             c.drug_remark drugRemark, c.drug_img_path drugImgPath,
             case when a.item_code = '1' then '1' when a.item_code = '2' then '15' else e.type_code end typeCode,
+            case when a.item_code = '1' then (case when c.is_in = '0' then '1' else '0' end)
+                 when a.item_code = '4' then (case when e.use_scope_code = '2' then '0' else '1' end)
+                 else '0'
+                end color,
             case when parameter.id is null then '0' else '1' end isWz
         from outpt_prescribe_temp_detail a
                  left join base_rate b on a.rate_id = b.id and a.hosp_code = b.hosp_code
@@ -1846,7 +1855,7 @@
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
         a.is_main isMain, b.name diseaseName,b.code as diseaseCode, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName, ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
-        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName,b.is_valid isValid
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         join outpt_visit ov on ov.id = a.visit_id and ov.hosp_code = a.hosp_code

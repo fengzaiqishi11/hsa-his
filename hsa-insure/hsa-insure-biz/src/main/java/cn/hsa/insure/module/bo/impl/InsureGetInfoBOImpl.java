@@ -1880,7 +1880,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 Map feedetail = new HashMap();
                 String doctorId = MapUtils.get(item, "doctorId");
                 String doctorName = MapUtils.get(item, "doctorName");
-                feedetail.put("mdtrt_sn", insureSettleInfoDTO.getVisitNo()); // 就医流水号
+                feedetail.put("mdtrt_sn", insureSettleInfoDTO.getId()); // 就医流水号
                 feedetail.put("ipt_otp_no", insureSettleInfoDTO.getVisitNo()); // 住院/门诊号
                 if ("1".equals(insureSettleInfoDTO.getLx())) {
                     feedetail.put("med_type", "1201"); // 医疗类别
@@ -1912,6 +1912,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 feedetail.put("medins_list_codg", item.get("hospItemCode") == null ? "" : item.get("hospItemCode").toString()); // 医药机构目录编码
                 feedetail.put("medins_list_name", MapUtils.get(item, "insureItemName")); // 医药机构目录名称
                 feedetail.put("med_chrgitm_type", MapUtils.get(item, "insureItemType")); // 医疗收费项目类别
+                if(StringUtils.isEmpty(MapUtils.get(feedetail, "med_chrgitm_type"))){
+                    feedetail.put("med_chrgitm_type","01");
+                }
                 feedetail.put("prodname", MapUtils.get(item, "insureItemName")); // 商品名
                 feedetail.put("bilg_dept_codg", MapUtils.get(item, "deptId")); // 开单科室编码
                 feedetail.put("bilg_dept_name", MapUtils.get(item, "deptName")); // 开单科室名称
@@ -1939,26 +1942,27 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             param.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
             param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
             param.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
+
+            Map feedetail = new HashMap();
+            feedetail.put("feedetail", listMap);
+            param.put("input", feedetail);  //交易输入
+            String json = JSONObject.toJSONString(param);
+            logger.info("自费病人费用明细传输入参:" + json);
+            String url = insureConfigurationDTO.getUrl();
+            String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
+            logger.info("自费病人费用明细传输回参:" + resultJson);
+            Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
+            if (StringUtils.isEmpty(resultJson)) {
+                throw new AppException("访问统一支付平台失败");
+            }
+            if ("999".equals(resultMap.get("infcode").toString())) {
+                throw new AppException((String) resultMap.get("msg"));
+            }
+            if (!"0".equals(resultMap.get("infcode").toString())) {
+                throw new AppException((String) resultMap.get("err_msg"));
+            }
             for (Map map : listMap) {
-                param.put("input", map);  //交易输入
-                String json = JSONObject.toJSONString(param);
-                logger.info("自费病人费用明细传输入参:" + json);
-                String url = insureConfigurationDTO.getUrl();
-                String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
-                logger.info("自费病人费用明细传输回参:" + resultJson);
-                Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
-                if (StringUtils.isEmpty(resultJson)) {
-                    throw new AppException("访问统一支付平台失败");
-                }
-                if ("999".equals(resultMap.get("infcode").toString())) {
-                    throw new AppException((String) resultMap.get("msg"));
-                }
-                if (!"0".equals(resultMap.get("infcode").toString())) {
-                    throw new AppException((String) resultMap.get("err_msg"));
-                }
-
                 insertHandlerInsureCost(map, insureSettleInfoDTO);
-
             }
 
         }

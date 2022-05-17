@@ -474,6 +474,84 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         insertHandlerInsureCost(listMap, insureSettleInfoDTO);
         return true;
     }
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 西藏 -- 4202自费病人住院就诊和诊断信息上传
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return java.util.Map
+     */
+    @Override
+    public Boolean insertInsureMdtrtAndDiag(InsureSettleInfoDTO insureSettleInfoDTO) {
+        // 1.先判断是否选择了医保机构
+        InsureConfigurationDTO  insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
+        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        List<InptDiagnoseDTO> inptDiagnoseDTOList = new ArrayList<>();
+        List<InptDiagnoseDTO> inptMatchDiagnoseDTOList = new ArrayList<>();
+        inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        inptVisitDTO.setId(insureSettleInfoDTO.getId());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        reqMap.put("inptVisitDTO", inptVisitDTO);
+        inptVisitDTO = inptVisitService_consumer.getInptVisitById(reqMap).getData();
+
+        String insureOrgCode = insureConfigurationDTO.getRegCode();
+        inptVisitDTO.setInsureRegCode(insureOrgCode);
+        List<String> diagnoseList = Stream.of("101","102","201","202","203","303","204").collect(Collectors.toList());
+        inptVisitDTO.setVisitId(insureSettleInfoDTO.getId());
+        inptVisitDTO.setDiagnoseList(diagnoseList);
+        reqMap.put("inptVisitDTO",inptVisitDTO);
+        inptDiagnoseDTOList = doctorAdviceService_consumer.getInptDiagnose(reqMap).getData();
+        if(ListUtils.isEmpty(inptDiagnoseDTOList)) {
+            throw new AppException("该患者没有开诊断信息");
+        }
+        /**
+         * 做医保入院登记办理的时候
+         * 1.需要判断是否开了诊断
+         * 2.开了的诊断是否已经匹配
+         */
+        inptMatchDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(reqMap).getData();
+        mapList = handlerInptCostFee(insureSettleInfoDTO);
+        BigDecimal sum = new BigDecimal(0);
+        List<InsureUploadCostDTO> costDTOList = insureGetInfoDAO.queryAll(insureSettleInfoDTO);
+        if(!mapList.isEmpty() && mapList.size() > 0) {
+            for(Map<String, Object> item : mapList){
+                DecimalFormat df1 = new DecimalFormat("0.00");
+                String realityPrice = df1.format(BigDecimalUtils.convert(item.get("realityPrice").toString()));
+                BigDecimal convertPrice = BigDecimalUtils.convert(realityPrice);
+                sum = sum.add(convertPrice);
+            }
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("insureSettleInfoDTO",insureSettleInfoDTO);
+
+        paramMap.put("inptVisitDTO",inptVisitDTO);
+        paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
+        paramMap.put("inptMatchDiagnoseDTOList",inptMatchDiagnoseDTOList);
+        paramMap.put("medfeeSumamt",sum);
+
+        paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        paramMap.put("visitId", insureSettleInfoDTO.getId());
+        paramMap.put("hospCode",insureSettleInfoDTO.getHospCode());
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", Constants.SF.S);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_DISE_UPLOD.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        interfaceParamDTO.setIsHospital(Constants.SF.S);
+        interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_UPLOD, interfaceParamDTO);
+        return true;
+    }
+
     /**
      * @Method insertHandlerInsureCost
      * @Desrciption 处理自费病人明细数据

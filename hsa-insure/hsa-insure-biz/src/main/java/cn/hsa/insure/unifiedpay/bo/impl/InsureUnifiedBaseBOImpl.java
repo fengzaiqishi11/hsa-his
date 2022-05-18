@@ -751,7 +751,25 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
             map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
             String setlTime = MapUtils.get(setlinfo,"setl_time");
-            Map<String,Object> resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
+            ////////////2022-05-18 zjp
+            // 人员信息获取-1101, 请求失败,错误原因：调用就诊凭证返回异常，异常信息：无效token
+            //使用电子凭证方式查询人员信息报错，改为使用身份证方式
+            //根据医保登记表中个人基本信息表id获取身份证号码
+            Map<String,Object> checkMap = map;
+            Map<String,Object> resultBaseMap = new HashMap<>();
+            if("01".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+                InsureIndividualBasicDTO basicDTO = new InsureIndividualBasicDTO();
+                basicDTO.setId(insureIndividualVisitDTO.getMibId());
+                basicDTO.setHospCode(hospCode);
+                basicDTO = insureIndividualBasicDAO.getById(basicDTO);
+                insureIndividualVisitDTO.setMdtrtCertType("02");
+                insureIndividualVisitDTO.setMdtrtCertNo(basicDTO.getAac002());
+                checkMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+                resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(checkMap).getData();
+            }else{
+                resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
+            }
+            //////////////2022-05-18 zjp
             Map<String, Object> outputMap = MapUtils.get(resultBaseMap, "output");
 
             // 参保信息列表（节点标识insuinfo）

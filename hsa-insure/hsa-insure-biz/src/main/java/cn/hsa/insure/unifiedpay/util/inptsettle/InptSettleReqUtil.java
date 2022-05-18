@@ -101,6 +101,10 @@ public class InptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUti
 
         dataMap.put("insuplc_admdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         dataMap.put("mdtrtarea_admvs",insureIndividualVisitDTO.getMdtrtareaAdmvs());
+        dataMap.put("med_type",insureIndividualVisitDTO.getAka130());
+        dataMap.put("mdtrt_mode","0");
+        dataMap.put("hcard_basinfo",insureIndividualVisitDTO.getHcardBasinfo());
+        dataMap.put("hcard_chkinfo",insureIndividualVisitDTO.getHcardChkinfo());
 
         HashMap commParam = new HashMap();
         checkRequest(commParam);

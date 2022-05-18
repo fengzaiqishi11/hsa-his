@@ -220,6 +220,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
         insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (ObjectUtil.isEmpty(insureConfigurationDTO)) {
+            throw new AppException("未获取到医保配置信息,请检查！hospCode:"+hospCode+",orgCode:"+insureIndividualVisitDTO.getMedicineOrgCode()+",code:"+insureIndividualVisitDTO.getInsureRegCode());
+        }
         /**
          * 公共入参
          */
@@ -374,8 +377,6 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                 objectMap.put("hosp_appr_flag", "0");
             }
 
-            String insureItemType = MapUtils.get(item,"insureItemType");
-            String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");// 是否限制级用药
             // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销（103-中药饮片）
             if (isCompound && "1".equals(huNanSpecial) && Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(insureItemType)) {
                 objectMap.put("hosp_appr_flag", "1");
@@ -875,7 +876,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
-
+        //读卡原始信息赋值
+        InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
+        if (ObjectUtil.isNotEmpty(visitDTO)) {
+            insureIndividualVisitDTO.setHcardChkinfo(visitDTO.getHcardChkinfo());
+            insureIndividualVisitDTO.setHcardBasinfo(visitDTO.getHcardBasinfo());
+        }
 
         //判断医保费用是否上传
         inptVisitDTO.setHospCode(hospCode);

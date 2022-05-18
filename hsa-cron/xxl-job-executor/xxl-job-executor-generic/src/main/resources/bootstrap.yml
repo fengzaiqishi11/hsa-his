@@ -24,7 +24,7 @@ dubbo:
   consumer:
     timeout: 30000
   application:
-    name: hsa-insure
+    name: hsa-cron
   protocol:
     name: dubbo
     port: 20898

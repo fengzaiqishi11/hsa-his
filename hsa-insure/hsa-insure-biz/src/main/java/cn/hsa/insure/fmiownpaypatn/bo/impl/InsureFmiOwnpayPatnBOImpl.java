@@ -959,6 +959,36 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         return PageDTO.of(resultList);
     }
 
+    @Override
+    public Boolean insertInsureInputCost(InsureSettleInfoDTO insureSettleInfoDTO) {
+        // 1.先判断是否选择了医保机构
+        InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
+        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+        //查询费用
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        mapList = handlerInptCostFee(insureSettleInfoDTO);
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
+        paramMap.put("mapList",mapList);
+        paramMap.put("visitId", insureSettleInfoDTO.getId());
+        paramMap.put("hospCode",insureSettleInfoDTO.getHospCode());
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", Constants.SF.F);
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_INPUT_UPLOD.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        interfaceParamDTO.setIsHospital(insureSettleInfoDTO.getLx());
+        interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
+        // 调用统一支付平台接口
+        insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_INPUT_UPLOD, interfaceParamDTO);
+
+        insertHandlerInsureCost(mapList, insureSettleInfoDTO);
+        return true;
+    }
+
     /**
      * @Method insertHandlerInsureCost
      * @Desrciption 处理自费病人明细数据

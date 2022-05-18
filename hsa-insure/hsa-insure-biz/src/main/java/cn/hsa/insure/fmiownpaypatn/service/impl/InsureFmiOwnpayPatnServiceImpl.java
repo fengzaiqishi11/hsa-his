@@ -131,5 +131,10 @@ public class InsureFmiOwnpayPatnServiceImpl extends HsafService implements Insur
         return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayDiseListDetail(MapUtils.get(map, "insureSettleInfoDTO")));
     }
 
+    @Override
+    public WrapperResponse insertInsureInputCost(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertInsureInputCost(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
 
 }

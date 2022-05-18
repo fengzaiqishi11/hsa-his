@@ -17,7 +17,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

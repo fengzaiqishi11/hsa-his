@@ -1,7 +1,8 @@
 package cn.hsa.util;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

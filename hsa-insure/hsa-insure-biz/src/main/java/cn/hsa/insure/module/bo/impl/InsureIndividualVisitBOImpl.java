@@ -18,8 +18,10 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -38,6 +40,7 @@ import java.util.Map;
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
 @Component
+@Slf4j
 public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndividualVisitBO {
 
     @Resource
@@ -319,42 +322,55 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
          * 如果是走医保统一支付平台，需要判断是否重复登记（根据就诊id，医院编码查询insure_individual_visit表）
          */
 //        if (sysParameterDTO != null && Constants.SF.S.equals(sysParameterDTO.getValue())) {
+        InsureIndividualVisitDTO responseData = new InsureIndividualVisitDTO();
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
-            /**
-             * 医保登记成功以后，也就是身份验证以后 上传诊断信息
-             *
-             */
-            Map<String, Object> paramMap = new HashMap<>();
-            paramMap.put("hospCode", hospCode);
-            paramMap.put("crteId",crteId);
-            paramMap.put("crteName",crteName);
-            paramMap.put("visitId", visitId);
-            paramMap.put("jsonArray", jsonArray);
-            /**
-             * 对接医保统一支付平台： 门诊挂号、登记
-             * 医保登记成功以后保存医保唯一返回流水号
-             */
-            if (!"qrcode".equals(info.get("bka895"))) {  // 不是电子凭证才执行
-                InsureIndividualVisitDTO responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
-                insureIndividualVisitDAO.updateInsureMedicalRegNo(responseData);
-            }
-            Map<String, Object> outptVisitMap = new HashMap<>();
-            outptVisitDTO = new OutptVisitDTO();
-            outptVisitDTO.setHospCode(hospCode);
-            outptVisitDTO.setId(visitId);
-            outptVisitDTO.setDoctorId(doctorId);
-            outptVisitDTO.setDoctorName(doctorName);
-            outptVisitDTO.setPatientCode(patientCode);
-            outptVisitDTO.setPreferentialTypeId(preferentialTypeId);
-            outptVisitMap.put("hospCode", hospCode);
-            outptVisitMap.put("outptVisitDTO", outptVisitDTO);
-            paramMap.put("crteName",crteName);
-            paramMap.put("crteId",crteId);
-            paramMap.put("visitId",visitId);
-            paramMap.put("outptVisitDTO", outptVisitDTO);
-            outptVisitService_consumer.updateOutptVisit(outptVisitMap).getData();
-            if (!"qrcode".equals(info.get("bka895"))) {
-                insureUnifiedPayOutptService.UP_2203(paramMap);
+            try {
+                /**
+                 * 医保登记成功以后，也就是身份验证以后 上传诊断信息
+                 *
+                 */
+                Map<String, Object> paramMap = new HashMap<>();
+                paramMap.put("hospCode", hospCode);
+                paramMap.put("crteId",crteId);
+                paramMap.put("crteName",crteName);
+                paramMap.put("visitId", visitId);
+                paramMap.put("jsonArray", jsonArray);
+                /**
+                 * 对接医保统一支付平台： 门诊挂号、登记
+                 * 医保登记成功以后保存医保唯一返回流水号
+                 */
+                if (!"qrcode".equals(info.get("bka895"))) {  // 不是电子凭证才执行
+                    responseData = insureUnifiedPayOutptService.UP_2201(paramMap).getData();
+                    insureIndividualVisitDAO.updateInsureMedicalRegNo(responseData);
+                }
+                Map<String, Object> outptVisitMap = new HashMap<>();
+                outptVisitDTO = new OutptVisitDTO();
+                outptVisitDTO.setHospCode(hospCode);
+                outptVisitDTO.setId(visitId);
+                outptVisitDTO.setDoctorId(doctorId);
+                outptVisitDTO.setDoctorName(doctorName);
+                outptVisitDTO.setPatientCode(patientCode);
+                outptVisitDTO.setPreferentialTypeId(preferentialTypeId);
+                outptVisitMap.put("hospCode", hospCode);
+                outptVisitMap.put("outptVisitDTO", outptVisitDTO);
+                paramMap.put("crteName",crteName);
+                paramMap.put("crteId",crteId);
+                paramMap.put("visitId",visitId);
+                paramMap.put("outptVisitDTO", outptVisitDTO);
+                outptVisitService_consumer.updateOutptVisit(outptVisitMap).getData();
+                if (!"qrcode".equals(info.get("bka895"))) {
+                    insureUnifiedPayOutptService.UP_2203(paramMap);
+                }
+            } catch (Exception e) {
+                log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage());
+                log.error("=======调门诊挂号撤销开始=======");
+                Map<String, Object> rollbackMap = new HashMap<>();
+                rollbackMap.put("psn_no",aac001);
+                rollbackMap.put("mdtrt_id",responseData.getMedicalRegNo());
+                rollbackMap.put("ipt_otp_no",responseData.getVisitNo());
+                log.error("调门诊挂号撤销入参为：{}", JSON.toJSONString(rollbackMap));
+                insureUnifiedPayOutptService.UP_2202(rollbackMap);
+                log.error("=======调门诊挂号撤销结束=======");
             }
         }
         return insureIndividualVisitDO;

@@ -706,7 +706,9 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         reqMap.put("hospCode", insureSettleInfoDTO.getHospCode());
         reqMap.put("inptVisitDTO", inptVisitDTO);
         inptVisitDTO = inptVisitService_consumer.getInptVisitById(reqMap).getData();
-
+        if(inptVisitDTO == null){
+            throw new AppException("未查到该患者的就诊信息");
+        }
         String insureOrgCode = insureConfigurationDTO.getRegCode();
         inptVisitDTO.setInsureRegCode(insureOrgCode);
         List<String> diagnoseList = Stream.of("101","102","201","202","203","303","204").collect(Collectors.toList());

@@ -35,12 +35,10 @@ public class FmiOwnpayPatnFinishReqUtil<T> extends InsureCommonUtil implements B
     public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         checkRequest(map);
-        Map<String, Object> inputMap1 = new HashMap<>();
-        inputMap1.put("fixmedins_mdtrt_id",map.get("visitId"));
-        inputMap1.put("fixmedins_code",map.get("configRegCode"));
-        inputMap1.put("cplt_flag",map.get("cpltFlag"));
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("input",inputMap1);
+        inputMap.put("fixmedins_mdtrt_id",map.get("visitId"));
+        inputMap.put("fixmedins_code",map.get("configRegCode"));
+        inputMap.put("cplt_flag",map.get("cpltFlag"));
         map.put("input",inputMap);
         map.put("infno",Constant.UnifiedPay.REGISTER.UP_4203);
         return getInsurCommonParam(map);

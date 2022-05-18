@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -135,4 +137,13 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
         return WrapperResponse.success(outptVisitBO.updateOutptAcctPay(outptSettleDO));
     }
 
+    @Override
+    public List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param) {
+        return outptVisitBO.queryOutptVisitSelfFeePatient(param);
+    }
+
+    @Override
+    public List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap) {
+        return outptVisitBO.queryOutptCostByvisitIds(reqMap);
+    }
 }

@@ -3,9 +3,11 @@ package cn.hsa.module.insure.fmiownpaypatn;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureOutptMedicTreatMentDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -302,6 +304,66 @@ public class InsureFmiOwnpayPatnController extends BaseController {
         return insureFmiOwnpayPatnService_consumer.insertInsureFinish(map);
     }
 
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 查询自费病人门诊就医信息
+     * @param outptVisitDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @GetMapping("/queryInsureOutptMedicTreatMent")
+    public WrapperResponse<PageDTO> queryInsureOutptMedicTreatMent(OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        outptVisitDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",outptVisitDTO);
+        return insureFmiOwnpayPatnService_consumer.queryInsureOutptMedicTreatMent(param);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 上传自费病人门诊就医信息【4205】
+     * @param insureSettleInfoDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/insertOutptMedicTreatMent")
+    public WrapperResponse insertOutptMedicTreatMent(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.insertOutptMedicTreatMent(param);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 删除自费病人门诊就医信息【4206】
+     * @param insureSettleInfoDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/deleteOutptMedicTreatMent")
+    public WrapperResponse deleteOutptMedicTreatMent(@RequestBody  InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.deleteOutptMedicTreatMent(param);
+    }
     /**
      * @Method insertInsureFmiOwnPayPatnCost
      * @Desrciption 自费病人费用明细信息删除

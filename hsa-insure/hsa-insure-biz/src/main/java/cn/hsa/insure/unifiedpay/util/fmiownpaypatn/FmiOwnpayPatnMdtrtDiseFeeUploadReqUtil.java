@@ -6,11 +6,10 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
-import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.XzFmiOwnpayPatnMdtrtDDTO;
-import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
@@ -34,20 +33,19 @@ import java.util.stream.Collectors;
  * @Date 2021/3/10 10:33
  * @Version 1.0
  **/
-@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_4202)
-public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
-
+@Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_4205)
+public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
     @Resource
     private SysParameterService sysParameterService_consumer;
-
     @Override
     public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         BigDecimal medfeeSumamt = (BigDecimal) map.get("medfeeSumamt");
         InsureConfigurationDTO insureConfigurationDTO =  (InsureConfigurationDTO) map.get("insureConfigurationDTO");
-        InptVisitDTO inptVisitDTO = (InptVisitDTO) map.get("inptVisitDTO");
-        List<InptDiagnoseDTO> inptDiagnoseDTOList = (List<InptDiagnoseDTO>) map.get("inptDiagnoseDTOList");
-        List<InptDiagnoseDTO> inptMatchDiagnoseDTOList = (List<InptDiagnoseDTO>) map.get("inptMatchDiagnoseDTOList");
+        OutptVisitDTO outptVisitDTO = (OutptVisitDTO) map.get("outptVisitDTO");
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = (List<OutptDiagnoseDTO>) map.get("outptDiagnoseDTOList");
+        List< OutptDiagnoseDTO> outptMatchDiagnoseDTOList = (List<OutptDiagnoseDTO>) map.get("outptMatchDiagnoseDTOList");
+        List<Map<String, Object>> outptCostDTOList = (List<Map<String, Object>>) map.get("outptCostDTOList");
 
 
         InsureSettleInfoDTO insureSettleInfoDTO = (InsureSettleInfoDTO) map.get("insureSettleInfoDTO");
@@ -63,16 +61,16 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put("ownPayPatnMdtrtD", HumpUnderlineUtils.humpToUnderline(initMdtrtDDTO(inptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt)));
-        dataMap.put("ownPayPatnDiagListD", HumpUnderlineUtils.humpToUnderlineArray(initInptDiseListDDTOS(inptDiagnoseDTOList, inptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue())));
-
+        dataMap.put("mdtrtinfo", initMdtrtDDTO(outptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt));
+        dataMap.put("diseinfo", initInptDiseListDDTOS(outptDiagnoseDTOList, outptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue()));
+        dataMap.put("feedetail", initFeeListDDTO(insureSettleInfoDTO, outptCostDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
 
         HashMap commParam = new HashMap();
         checkRequest(dataMap);
         commParam.put("input", dataMap);
-        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4202);
+        commParam.put("infno",Constant.UnifiedPay.REGISTER.UP_4205);
 
-        commParam.put("msgId",MapUtils.get(map,"msgId"));
+        commParam.put("msgId", MapUtils.get(map,"msgId"));
         commParam.put("opter",MapUtils.get(map,"opter"));
         commParam.put("opter_name",MapUtils.get(map,"opter_name"));
         commParam.put("insuplcAdmdvs",MapUtils.get(map,"insuplcAdmdvs"));
@@ -82,63 +80,52 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
         commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
         return getInsurCommonParam(commParam);
     }
-
-    private XzFmiOwnpayPatnMdtrtDDTO initMdtrtDDTO(InptVisitDTO inptVisitDTO, InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName,InsureSettleInfoDTO insureSettleInfoDTO
-    ,BigDecimal medfeeSumamt) {
+    private XzFmiOwnpayPatnMdtrtDDTO initMdtrtDDTO(OutptVisitDTO outptVisitDTO, InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName, InsureSettleInfoDTO insureSettleInfoDTO
+            , BigDecimal medfeeSumamt) {
 
         //就诊信息参数mdtrtinfo
         XzFmiOwnpayPatnMdtrtDDTO mdtrtinfoMap = new XzFmiOwnpayPatnMdtrtDDTO();
-        mdtrtinfoMap.setFixmedinsMdtrtId(inptVisitDTO.getVisitId());
+        mdtrtinfoMap.setFixmedinsMdtrtId(outptVisitDTO.getVisitId());
         mdtrtinfoMap.setFixmedinsCode(insureConfigurationDTO.getOrgCode());
         mdtrtinfoMap.setFixmedinsName(fixmedinsName);
 
         // 证件类型
-        mdtrtinfoMap.setPsnCertType(inptVisitDTO.getCertCode());
-        mdtrtinfoMap.setCertno(inptVisitDTO.getCertNo());//	证件号码
+        mdtrtinfoMap.setPsnCertType(outptVisitDTO.getCertCode());
+        mdtrtinfoMap.setCertno(outptVisitDTO.getCertNo());//	证件号码
         // 人员姓名
-        mdtrtinfoMap.setPsnName(inptVisitDTO.getName());
-        mdtrtinfoMap.setGend(inptVisitDTO.getGenderCode());//	性别
-        mdtrtinfoMap.setBrdy(DateUtils.format(inptVisitDTO.getBirthday(),DateUtils.Y_M_DH_M_S));//	出生日期
-        mdtrtinfoMap.setAge(String.valueOf(inptVisitDTO.getAge()));
-        mdtrtinfoMap.setConerName(inptVisitDTO.getContactName());
-        mdtrtinfoMap.setTel(inptVisitDTO.getContactPhone());//	联系电话
-        mdtrtinfoMap.setAddr(inptVisitDTO.getContactAddress());//	联系地址
+        mdtrtinfoMap.setPsnName(outptVisitDTO.getName());
+        mdtrtinfoMap.setGend(outptVisitDTO.getGenderCode());//	性别
+        mdtrtinfoMap.setBrdy(DateUtils.format(outptVisitDTO.getBirthday(),DateUtils.Y_M_DH_M_S));//	出生日期
+        mdtrtinfoMap.setAge(String.valueOf(outptVisitDTO.getAge()));
+        mdtrtinfoMap.setConerName(outptVisitDTO.getContactName());
+        mdtrtinfoMap.setTel(outptVisitDTO.getContactPhone());//	联系电话
+        mdtrtinfoMap.setAddr(outptVisitDTO.getContactAddress());//	联系地址
 
 
-        mdtrtinfoMap.setBegntime(DateUtils.format(inptVisitDTO.getInTime(),DateUtils.Y_M_D));//	开始时间
-        if(null != inptVisitDTO.getOutTime()){
-            mdtrtinfoMap.setEndtime(DateUtils.format(inptVisitDTO.getOutTime(),DateUtils.Y_M_D));
-        }
+        mdtrtinfoMap.setBegntime(DateUtils.format(outptVisitDTO.getVisitTime(),DateUtils.Y_M_D));//	开始时间
 
 
         mdtrtinfoMap.setMedType("2101");//	医疗类别
-        mdtrtinfoMap.setIptOpNo(inptVisitDTO.getInNo());//	住院/门诊号
 
         mdtrtinfoMap.setMedrcdno(null);
 
-        mdtrtinfoMap.setChfpdrCode(inptVisitDTO.getPracCertiNo());//inptVisitDTO.getZzDoctorId());//	主治医生编码
-        mdtrtinfoMap.setChfpdrName(inptVisitDTO.getZzDoctorName());//inptVisitDTO.getZzDoctorName());//	主治医师姓名
+        mdtrtinfoMap.setChfpdrCode(outptVisitDTO.getPracCertiNo());//inptVisitDTO.getZzDoctorId());//	主治医生编码
 
-        mdtrtinfoMap.setAdmDiseDscr(inptVisitDTO.getInDiseaseName());//	入院诊断描述
-        mdtrtinfoMap.setAdmDeptCode( inptVisitDTO.getInDeptId());//	入院科室编码
-        mdtrtinfoMap.setAdmDeptName( inptVisitDTO.getInDeptName());//	入院科室名称
-        mdtrtinfoMap.setAdmBed( inptVisitDTO.getBedName());//	入院床位
+        mdtrtinfoMap.setAdmDiseDscr(outptVisitDTO.getInDiseaseName());//	入院诊断描述
+        mdtrtinfoMap.setAdmDeptCode( outptVisitDTO.getInDeptId());//	入院科室编码
+        mdtrtinfoMap.setAdmDeptName( outptVisitDTO.getInDeptName());//	入院科室名称
         mdtrtinfoMap.setWardareaBed(null);
 
         mdtrtinfoMap.setTrafDeptFlag(null);
 
-        mdtrtinfoMap.setDscgMaindiagCode(inptVisitDTO.getInDiseaseId());//	住院主诊断代码
-        mdtrtinfoMap.setDscgMaindiagName(inptVisitDTO.getInDiseaseName());//	住院主诊断名称
+        mdtrtinfoMap.setDscgMaindiagCode(outptVisitDTO.getInDiseaseId());//	住院主诊断代码
+        mdtrtinfoMap.setDscgMaindiagName(outptVisitDTO.getInDiseaseName());//	住院主诊断名称
 
-        mdtrtinfoMap.setDscgDeptCode(inptVisitDTO.getOutDeptId());
-        mdtrtinfoMap.setDscgDeptName(inptVisitDTO.getOutDeptName());
-        mdtrtinfoMap.setDscgBed(inptVisitDTO.getBedName());
-        mdtrtinfoMap.setDscgWay(inptVisitDTO.getOutModeCode());
 
-        mdtrtinfoMap.setMainCondDesc(inptVisitDTO.getInDiseaseName());
+        mdtrtinfoMap.setMainCondDesc(outptVisitDTO.getInDiseaseName());
 
-        String diseCode = inptVisitDTO.getInDiseaseId();
-        String diseCodeName = inptVisitDTO.getInDiseaseName();
+        String diseCode = outptVisitDTO.getInDiseaseId();
+        String diseCodeName = outptVisitDTO.getInDiseaseName();
         if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
             mdtrtinfoMap.setDiseNo("");//	病种编码
         }else{
@@ -153,15 +140,12 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
         mdtrtinfoMap.setOprnOprtCode(null);//	手术操作代码
         mdtrtinfoMap.setOprnOprtName(null);//	手术操作名称
 
-        mdtrtinfoMap.setOpDiseInfo(inptVisitDTO.getOutptDiseaseName());
-        mdtrtinfoMap.setInhospStas(inptVisitDTO.getStatusCode());
-        mdtrtinfoMap.setDieDate(inptVisitDTO.getDietType());
-        mdtrtinfoMap.setIptDays(inptVisitDTO.getTotalIn());
+        mdtrtinfoMap.setOpDiseInfo(outptVisitDTO.getOutptDiseaseName());
 
         mdtrtinfoMap.setFpscNo(null);//	计划生育服务证号
-        if("52".equals(inptVisitDTO.getPatientCode())){
+        if("52".equals(outptVisitDTO.getPatientCode())){
             mdtrtinfoMap.setMatnType("1");//	生育类别
-            if(inptVisitDTO.getAge().compareTo(23) ==1){
+            if(outptVisitDTO.getAge().compareTo(23) ==1){
                 mdtrtinfoMap.setLatechbFlag("1");//	晚育标志
             }else{
                 mdtrtinfoMap.setLatechbFlag("0");//	晚育标志
@@ -195,7 +179,7 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
     }
 
 
-    private List<FmiOwnpayPatnDiseListDDTO> initInptDiseListDDTOS(List<InptDiagnoseDTO> inptDiagnoseDTOList,List<InptDiagnoseDTO> inptMatchDiagnoseDTOList,
+    private List<FmiOwnpayPatnDiseListDDTO> initInptDiseListDDTOS(List< OutptDiagnoseDTO> inptDiagnoseDTOList,List< OutptDiagnoseDTO> inptMatchDiagnoseDTOList,
                                                                   InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName) {
         List<FmiOwnpayPatnDiseListDDTO> diseinfoList = new ArrayList<FmiOwnpayPatnDiseListDDTO>();
         commonHandlerDisease(inptMatchDiagnoseDTOList,inptDiagnoseDTOList,null);
@@ -228,8 +212,8 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
 
             diseinfoMap.setDiagType(type);//	诊断类别
             diseinfoMap.setMaindiagFlag(inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
-            diseinfoMap.setDiagCode(inptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
-            diseinfoMap.setDiagName(inptMatchDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+            diseinfoMap.setDiagCode(inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
+            diseinfoMap.setDiagName(inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
 
             diseinfoMap.setAdmCond(null);//	入院病情
             diseinfoMap.setDiagDept(inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
@@ -255,13 +239,13 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
      * @Date   2021/9/2 9:01
      * @Return
      **/
-    private void commonHandlerDisease(List<InptDiagnoseDTO> inptDiagnoseDTOList,List<InptDiagnoseDTO> data,String type) {
+    private void commonHandlerDisease(List< OutptDiagnoseDTO> inptDiagnoseDTOList,List< OutptDiagnoseDTO> data,String type) {
 
-        List<InptDiagnoseDTO> list = data.stream().filter(inptDiagnoseDTO ->
+        List<OutptDiagnoseDTO> list = data.stream().filter(inptDiagnoseDTO ->
                 Constants.SF.S.equals(inptDiagnoseDTO.getIsMain())).collect(Collectors.toList());
         if(inptDiagnoseDTOList.size() != data.size()){
-            List<String> dataCollect = data.stream().map(InptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
-            List<String> inptDataCollect = inptDiagnoseDTOList.stream().map(InptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
+            List<String> dataCollect = data.stream().map(OutptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
+            List<String> inptDataCollect = inptDiagnoseDTOList.stream().map(OutptDiagnoseDTO::getDiseaseName).distinct().collect(Collectors.toList());
             List<String> collect = dataCollect.stream().filter(item -> !inptDataCollect.contains(item)).collect(Collectors.toList());
             StringBuilder stringBuilder = new StringBuilder();
             if(!ListUtils.isEmpty(collect)) {
@@ -272,11 +256,84 @@ public class FmiOwnpayPatnDiseUploadReqUtil<T> extends InsureCommonUtil implemen
             }
         }
     }
+    private Object initFeeListDDTO(InsureSettleInfoDTO insureSettleInfoDTO,List<Map<String, Object>> feeList, InsureConfigurationDTO insureConfigurationDTO
+            , String fixmedinsName) {
+        List<FmiOwnpayPatnFeeListDDTO> listMap = new ArrayList<>();
+        if (!ListUtils.isEmpty(feeList)) {
+            for (Map<String, Object> item : feeList) {
+                // 医保上传
+                FmiOwnpayPatnFeeListDDTO feedetail = new FmiOwnpayPatnFeeListDDTO();
+                String doctorId = MapUtils.get(item, "doctorId");
+                String doctorName = MapUtils.get(item, "doctorName");
 
+                feedetail.setBkkpSn(MapUtils.get(item, "id"));
+
+                if (insureSettleInfoDTO.getLx().equals("1")) {
+
+                    feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("costTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
+
+                } else if (insureSettleInfoDTO.getLx().equals("0")) {
+                    feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
+
+                }
+                feedetail.setFixmedinsCode(insureConfigurationDTO.getOrgCode());
+                feedetail.setFixmedinsName(fixmedinsName);
+                BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);
+                BigDecimal price = BigDecimalUtils.scale((BigDecimal) item.get("price"), 4);
+                feedetail.setCnt(cnt); // 数量
+                feedetail.setPric(price); // 单价
+
+                DecimalFormat df1 = new DecimalFormat("0.00");
+                String realityPrice = df1.format(BigDecimalUtils.convert(item.get("realityPrice").toString()));
+                BigDecimal convertPrice = BigDecimalUtils.convert(realityPrice);
+                feedetail.setDetItemFeeSumamt(convertPrice); // 明细项目费用总额
+
+                feedetail.setMedListCodg(item.get("insureItemCode") == null ? "" : item.get("insureItemCode").toString()); // 医疗目录编码
+                feedetail.setMedinsListCodg(item.get("hospItemCode") == null ? "" : item.get("hospItemCode").toString()); // 医药机构目录编码
+                feedetail.setMedinsListName(MapUtils.get(item, "insureItemName")); // 医药机构目录名称
+                feedetail.setMedChrgitmType(MapUtils.get(item, "insureItemType")); // 医疗收费项目类别
+                feedetail.setProdname(MapUtils.get(item, "insureItemName")); // 商品名
+
+                feedetail.setBilgDeptCodg(MapUtils.get(item, "deptId")); // 开单科室编码
+                feedetail.setBilgDeptName(MapUtils.get(item, "deptName")); // 开单科室名称
+
+                if (StringUtils.isEmpty(MapUtils.get(item, "deptId"))) {
+                    feedetail.setBilgDrCodg( doctorId); // 开单医生编码
+                } else {
+                    feedetail.setBilgDrCodg( MapUtils.get(item, "deptId")); // 开单医生编码
+                }
+                if (StringUtils.isEmpty(MapUtils.get(item, "doctorName"))) {
+                    feedetail.setBilgDrName( doctorName); // 开单医生编码
+                } else {
+                    feedetail.setBilgDrName( MapUtils.get(item, "doctorName")); // 开单医生姓名
+                }
+
+                feedetail.setOrdersDeptCode(null);
+                feedetail.setOrdersDeptName(null);
+                feedetail.setOrdersDrCode(null);
+                feedetail.setOrdersDrName(null);
+
+                feedetail.setTcmdrugUsedWay(null);
+                feedetail.setExtinsFlag(null);
+                feedetail.setExtinsHospCode(null);
+
+                feedetail.setDscgTkdrugFlag(null);
+                feedetail.setSinDosDscr(null);
+                feedetail.setUsedFrquDscr(null);
+                feedetail.setPrdDays(null);
+                feedetail.setMedcWayDscr(null);
+                feedetail.setMemo(null);
+
+                listMap.add(feedetail);
+            }
+
+        }
+
+        return listMap;
+    }
 
     @Override
     public boolean checkRequest(Map param) {
-        return true;
+        return false;
     }
-
 }

@@ -1302,9 +1302,13 @@
         <if test="medType != null and medType != '' ">
             and e.aka130 = #{medType}
         </if>
+        <if test="isHospital != null and isHospital != '' ">
+            and t.is_hospital = #{isHospital}
+        </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
         </if>
+
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>

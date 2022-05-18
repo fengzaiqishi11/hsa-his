@@ -36,14 +36,7 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.util.BigDecimalUtils;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.HttpConnectUtil;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -656,48 +649,29 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
-        // 2.组装医保接口查询条件参数
-        Map<String,Object> paramMap = new HashMap<>();
-        logger.info("参数信息"+insureSettleInfoDTO);
-        paramMap.put("fixmedins_mdtrt_id",insureSettleInfoDTO.getFixmedinsMdtrtId());
-        paramMap.put("fixmedins_code",insureSettleInfoDTO.getFixmedinsCode());
-        paramMap.put("page_num",insureSettleInfoDTO.getPageNo());
-        paramMap.put("page_size",insureSettleInfoDTO.getPageSize());
-
-        /**
-         * 公共入参
-         */
-        Map param = new HashMap();
-        param.put("infno", Constant.UnifiedPay.REGISTER.UP_4207);  //交易编号
-        param.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
-        param.put("insuplc_admdvs", ""); //参保地医保区划分
-        param.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
-        param.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
-        param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
-        param.put("input", paramMap);  //交易输入
-        String json = JSONObject.toJSONString(param);
-        logger.info("自费病人就医费用明细查询条件传输入参:" + json);
-        String url = insureConfigurationDTO.getUrl();
-        String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
-        logger.info("自费病人就医费用明细查询结果传输回参:" + resultJson);
-        Map<String,Object> resultMap = MapUtils.get(JSONObject.parseObject(resultJson, Map.class), "output");
-        List<FmiOwnpayPatnMdtrtDDTO> resultLists = new ArrayList<>();
+        // 2.组装医保交易接口参数
+        Map<String, Object> paramMap = new HashMap<>();
+        logger.info("参数信息" + insureSettleInfoDTO + paramMap.toString());
+        paramMap.put("psn_cert_type", insureSettleInfoDTO.getPsnCertType());
+        paramMap.put("certno", insureSettleInfoDTO.getCertNo());
+        paramMap.put("psn_name", insureSettleInfoDTO.getPsnName());
+        paramMap.put("begntime", insureSettleInfoDTO.getBegntime());
+        paramMap.put("endtime", insureSettleInfoDTO.getEndtime());
+        paramMap.put("medfee_sumamt", insureSettleInfoDTO.getMedfeeSumamt());
+        paramMap.put("elec_billno_code", insureSettleInfoDTO.getElecBillnoCode());
+        paramMap.put("cplt_flag", insureSettleInfoDTO.getCpltFlag());
+        paramMap.put("page_num", insureSettleInfoDTO.getPageNo());
+        paramMap.put("page_size", insureSettleInfoDTO.getPageSize());
+        //公共入参，调用医保接口
+        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(insureSettleInfoDTO.getHospCode(), insureSettleInfoDTO.getInsureRegCode(), Constant.UnifiedPay.REGISTER.UP_4208, paramMap);
         //取出交易输出
-        if(resultMap.get("output") instanceof List){
-           resultLists = MapUtils.get(resultMap, "data");
-        }else{
-            throw new AppException(resultMap.get("output").toString());
+        Map<String, Object> resultMap = MapUtils.get(stringObjectMap, "output");
+        List<FmiOwnpayPatnMdtrtDDTO> resultList = new ArrayList<>();
+        if (!MapUtils.isEmpty(resultMap)) {
+            resultList = MapUtils.get(resultMap, "data");
         }
-        if (StringUtils.isEmpty(resultJson)) {
-            throw new AppException("查询失败");
-        }
-        if ("999".equals(MapUtils.get(resultMap, "code"))) {
-            throw new AppException((String) resultMap.get("msg"));
-        }
-        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
-            throw new AppException((String) resultMap.get("err_msg"));
-        }
-        return PageDTO.of(resultLists);
+
+        return PageDTO.of(resultList);
     }
 
     @Override
@@ -713,12 +687,13 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("page_num", insureSettleInfoDTO.getPageNo());
         paramMap.put("page_size", insureSettleInfoDTO.getPageSize());
 
-        //公共入参 并调用医保接口
-        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(insureSettleInfoDTO.getHospCode(), insureSettleInfoDTO.getInsureRegCode(), Constant.UnifiedPay.REGISTER.UP_4208, paramMap);
+        //公共入参，调用医保接口
+        Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(insureSettleInfoDTO.getHospCode(), insureSettleInfoDTO.getInsureRegCode(), Constant.UnifiedPay.REGISTER.UP_4207, paramMap);
         //取出交易输出
-        Map<String,Object> outputMap = MapUtils.get(stringObjectMap, "output");
-        List<FmiOwnpayPatnFeeListDDTO> resultList = MapUtils.get(outputMap, "data");
-        return PageDTO.of(resultList);
+        Map<String, Object> resultMap = MapUtils.get(stringObjectMap, "output");
+        List<FmiOwnpayPatnFeeListDDTO> resultLists = new ArrayList<>();
+        resultLists = MapUtils.get(resultMap, "data");
+        return PageDTO.of(resultLists);
     }
 
     @Override
@@ -726,31 +701,19 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
-        // 2.组装医保交易接口参数
+        // 2.组装医保接口查询条件参数
         Map<String, Object> paramMap = new HashMap<>();
         logger.info("参数信息" + insureSettleInfoDTO);
-        paramMap.put("psn_cert_type", insureSettleInfoDTO.getPsnCertType());
-        paramMap.put("certno", insureSettleInfoDTO.getCertNo());
-        paramMap.put("psn_name", insureSettleInfoDTO.getPsnName());
-        paramMap.put("begntime", insureSettleInfoDTO.getBegntime());
-        paramMap.put("endtime", insureSettleInfoDTO.getEndtime());
-        paramMap.put("medfee_sumamt", insureSettleInfoDTO.getMedfeeSumamt());
-        paramMap.put("elec_billno_code", insureSettleInfoDTO.getElecBillnoCode());
-        paramMap.put("cplt_flag", insureSettleInfoDTO.getCpltFlag());
+        paramMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getFixmedinsMdtrtId());
+        paramMap.put("fixmedins_code", insureSettleInfoDTO.getFixmedinsCode());
         paramMap.put("page_num", insureSettleInfoDTO.getPageNo());
         paramMap.put("page_size", insureSettleInfoDTO.getPageSize());
 
-        //公共入参，调用医保接口
+        //公共入参 并调用医保接口
         Map<String, Object> stringObjectMap = unifiedCommon.commonInsureUnified(insureSettleInfoDTO.getHospCode(), insureSettleInfoDTO.getInsureRegCode(), Constant.UnifiedPay.REGISTER.UP_4209, paramMap);
         //取出交易输出
-        Map<String,Object> resultMap = MapUtils.get(stringObjectMap, "output");
-        List<FmiOwnpayPatnDiseListDDTO> resultList = new ArrayList<>();
-        if (resultMap.get("output") instanceof List) {
-            resultList = MapUtils.get(resultMap, "data");
-        } else {
-            throw new AppException(resultMap.get("output").toString());
-        }
-
+        Map<String, Object> outputMap = MapUtils.get(stringObjectMap, "output");
+        List<FmiOwnpayPatnDiseListDDTO> resultList = MapUtils.get(outputMap, "data");
         return PageDTO.of(resultList);
     }
 

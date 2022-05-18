@@ -51,22 +51,20 @@
         </dependency>
 
         <!--4.对象存储组件-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-fsstore</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
+<!--        </dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-ali-fsstore</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-ali-fsstore</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
-
-        <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-gateway</artifactId>
-        </dependency>
-
         <!-- 6.分布式数据库 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -80,11 +78,6 @@
         </dependency>
 
         <!--数据库连接驱动-->
-        <!--本地模拟用-->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

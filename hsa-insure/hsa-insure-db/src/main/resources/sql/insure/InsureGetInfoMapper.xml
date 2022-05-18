@@ -1823,7 +1823,7 @@
             insure_individual_basic
         set ipt_psn_sp_flag_type = #{iptPsnSpFlagType},
             ipt_psn_sp_flag =#{iptPsnSpFlag},
-            ipt_psn_sp_flag_detl_id= = #{iptPsnSpFlagDetlId}
+            ipt_psn_sp_flag_detl_id = #{iptPsnSpFlagDetlId}
         where hosp_code = #{hospCode} and aac001 = #{aac001} and aac002 = #{mdtrtCertNo}
     </update>
 </mapper>

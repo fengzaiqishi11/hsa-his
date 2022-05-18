@@ -55,7 +55,7 @@ public class InsureSpecialAttributeController extends BaseController {
         Map map =new HashMap<>();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-        insureSpecialAttributeService_consumer.uploadInsureSpecialAttribute(map);
+        insureSpecialAttributeService_consumer.UPloadInsureSpecialAttribute(map);
         return WrapperResponse.success("上传成功");
     }
     /**
@@ -67,7 +67,7 @@ public class InsureSpecialAttributeController extends BaseController {
      * @Return
      **/
     @PostMapping("/qureyInsureSpecialAttribute")
-    public WrapperResponse<PageDTO> qureyInsureSpecialAttribute(@RequestBody InsureIndividualVisitDTO insureIndividualVisitDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<List<Map<String, Object>>> qureyInsureSpecialAttribute(@RequestBody InsureIndividualVisitDTO insureIndividualVisitDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         insureIndividualVisitDTO.setHospCode(sysUserDTO.getHospCode());
         Map map =new HashMap<>();

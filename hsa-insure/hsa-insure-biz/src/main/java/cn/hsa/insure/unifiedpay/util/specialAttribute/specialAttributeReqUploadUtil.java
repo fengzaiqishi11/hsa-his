@@ -26,7 +26,7 @@ public class specialAttributeReqUploadUtil<T> extends InsureCommonUtil implement
         Map map = (Map) param;
         checkRequest(map);
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("IptPsnSpFlagRegIn",map);
+        dataMap.put("data",map);
         Map resultMap = new HashMap();
         resultMap.put("hospCode",MapUtils.get(map,"hospCode"));
         resultMap.put("configCode", MapUtils.get(map,"configCode"));

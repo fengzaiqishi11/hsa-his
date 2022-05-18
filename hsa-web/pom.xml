@@ -157,10 +157,10 @@
         <!--工作流结束-->
 
         <!--工具类-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.google.guava</groupId>-->
+<!--            <artifactId>guava</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -169,10 +169,10 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-collections4</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
@@ -206,10 +206,10 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger-ui</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -228,17 +228,21 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.bestwu</groupId>-->
+<!--            <artifactId>fastdfs-client-java</artifactId>-->
+<!--            <version>1.27</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;4.对象存储组件&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
+<!--        </dependency>-->
+        <!-- hsaf-core参数校验 -->
         <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
-        <!--4.对象存储组件-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-fsstore</artifactId>
-        </dependency>
-
         <!-- session存储 -->
         <dependency>
             <groupId>org.springframework.session</groupId>

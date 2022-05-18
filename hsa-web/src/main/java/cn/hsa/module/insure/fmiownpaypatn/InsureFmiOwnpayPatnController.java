@@ -178,7 +178,7 @@ public class InsureFmiOwnpayPatnController extends BaseController {
       * @method queryFmiOwnPayInfoDetail
       * @author wangqiao
       * @date 2022/5/17 15:12
-      *	@description 自费病人就医就诊信息查询
+      *	@description 自费病人就医就诊信息查询[4208]
       * @param  insureSettleInfoDTO, req, res
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
       *
@@ -197,10 +197,33 @@ public class InsureFmiOwnpayPatnController extends BaseController {
     }
 
     /**
+     * @method queryFmiOwnPayDiseListDetail
+     * @author wangqiao
+     * @date 2022/5/17 15:13
+     *	@description 自费病人就医诊断信息查询[4209]
+     * @param  insureSettleInfoDTO, req, res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     *
+     **/
+    @PostMapping("queryFmiOwnPayDiseListDetail")
+    public WrapperResponse queryFmiOwnPayDiseListDetail(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+
+
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO", insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayDiseListDetail(map);
+    }
+
+    /**
       * @method queryFmiOwnPayPatnFeeListDetail
       * @author wangqiao
       * @date 2022/5/17 15:13
-      *	@description 自费病人就医就诊信息查询
+      *	@description 自费病人就医费用明细查询[4207]
       * @param  insureSettleInfoDTO, req, res
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
       *
@@ -217,29 +240,6 @@ public class InsureFmiOwnpayPatnController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("insureSettleInfoDTO", insureSettleInfoDTO);
         return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayPatnFeeListDetail(map);
-    }
-
-    /**
-      * @method queryFmiOwnPayDiseListDetail
-      * @author wangqiao
-      * @date 2022/5/17 15:13
-      *	@description 自费病人就医诊断信息查询
-      * @param  insureSettleInfoDTO, req, res
-      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
-      *
-     **/
-    @PostMapping("queryFmiOwnPayDiseListDetail")
-    public WrapperResponse queryFmiOwnPayDiseListDetail(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res) {
-        SysUserDTO sysUserDTO = getSession(req, res);
-        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
-        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
-        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
-
-
-        Map map = new HashMap();
-        map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("insureSettleInfoDTO", insureSettleInfoDTO);
-        return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayDiseListDetail(map);
     }
     /**
      * @Method queryFmiOwnPayPatnReconciliationInfo

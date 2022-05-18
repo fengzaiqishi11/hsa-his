@@ -81,7 +81,7 @@ public interface InsureFmiOwnpayPatnBO {
 
     Boolean deleteOutptMedicTreatMent(InsureSettleInfoDTO insureSettleInfoDTO);
     /**
-      * 自费病人就医就诊信息查询
+      * 自费病人就医就诊信息查询 4208
       * @method queryFmiOwnPayInfoDetail
       * @author WANGQIAO
       * @date 2022/5/17 9:45
@@ -92,7 +92,7 @@ public interface InsureFmiOwnpayPatnBO {
     PageDTO queryFmiOwnPayInfoDetail(InsureSettleInfoDTO insureSettleInfoDTO);
 
     /**
-      * 自费病人就医就诊信息查询
+      * 自费病人就医费用明细查询 4207
       * @method queryFmiOwnPayPatnFeeListDetail
       * @author WANGQIAO
       * @date 2022/5/17 9:45
@@ -103,7 +103,7 @@ public interface InsureFmiOwnpayPatnBO {
     PageDTO queryFmiOwnPayPatnFeeListDetail(InsureSettleInfoDTO insureSettleInfoDTO);
 
     /**
-      * 自费病人就医诊断信息查询
+      * 自费病人就医诊断信息查询 4209
       * @method queryFmiOwnPayDiseListDetail
       * @author WANGQIAO
       * @date 2022/5/17 9:29

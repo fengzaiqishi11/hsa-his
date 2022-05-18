@@ -356,7 +356,7 @@
         (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
         where ic.source_ia_id = ia.id
         and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
-        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        and ifnull(ic.is_positive, ia.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
         union all
         select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'
@@ -453,7 +453,7 @@
         (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
         where ic.source_ia_id = ia.id
         and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
-        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        and ifnull(ic.is_positive, ia.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
         union all
         select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'

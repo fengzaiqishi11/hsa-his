@@ -365,6 +365,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
                 log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage());
                 log.error("=======调门诊挂号撤销开始=======");
                 Map<String, Object> rollbackMap = new HashMap<>();
+                rollbackMap.put("hospCode", hospCode);
                 rollbackMap.put("psn_no",aac001);
                 rollbackMap.put("mdtrt_id",responseData.getMedicalRegNo());
                 rollbackMap.put("ipt_otp_no",responseData.getVisitNo());

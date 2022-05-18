@@ -750,6 +750,9 @@ public interface Constant {
             public static final String UP_1317 = "1317"; // 医药机构目录匹配信息查询
             public static final String UP_1319 = "1319"; // 医保目录先自付比例信息查询
 
+            public static final String UP_4206 = "4206"; // 自费病人门诊就医信息删除
+
+
             public static final String UP_5101 = "5101"; // 科室信息查询
             public static final String UP_5401 = "5401"; // 项目互认信息查询
             public static final String UP_5102 = "5102"; // 医执人员信息查询
@@ -817,6 +820,7 @@ public interface Constant {
             public static final String UP_4201 = "4201"; // 自费病人费用信息上传
             public static final String UP_4204 = "4204"; // 自费病人费用信息上传
             public static final String UP_4202 = "4202"; // 自费病人住院就诊和诊断信息上传
+            public static final String UP_4205 = "4205"; // 自费病人门诊就医信息上传
             public static final String UP_4203 = "4203"; // 自费病人就诊以及费用明细上传完成
             public static final String UP_4207 = "4207"; // 自费病人就医费用明细查询
             public static final String UP_4208 = "4208"; // 自费病人就医就诊信息查询

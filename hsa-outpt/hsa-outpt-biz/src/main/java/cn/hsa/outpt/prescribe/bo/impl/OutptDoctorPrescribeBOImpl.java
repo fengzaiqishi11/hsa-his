@@ -4131,6 +4131,16 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         return outptDoctorPrescribeDAO.getBaseDrug(outptPrescribeDetailsDTO);
     }
 
+    @Override
+    public List<OutptDiagnoseDTO> queryOutptDiagnoseByVisitIds(OutptVisitDTO outptVisitDTO) {
+        return outptDoctorPrescribeDAO.queryOutptDiagnoseByVisitIds(outptVisitDTO);
+    }
+
+    @Override
+    public List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO) {
+        return outptDoctorPrescribeDAO.queryOutptMatchDiagnose(outptVisitDTO);
+    }
+
     /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode

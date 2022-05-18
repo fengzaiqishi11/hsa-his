@@ -96,6 +96,22 @@ public class InsureFmiOwnpayPatnServiceImpl extends HsafService implements Insur
     }
 
     @Override
+    public WrapperResponse insertOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse deleteOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.deleteOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse<PageDTO> queryInsureOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryInsureOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+
+    @Override
     public WrapperResponse insertInsureFinish(Map map) {
         return WrapperResponse.success(insureFmiOwnpayPatnBO.insertInsureFinish(MapUtils.get(map,"insureSettleInfoDTO")));
     }

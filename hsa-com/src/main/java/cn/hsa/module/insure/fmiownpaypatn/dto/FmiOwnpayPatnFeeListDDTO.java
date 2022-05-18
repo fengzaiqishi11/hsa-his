@@ -133,5 +133,9 @@ public class FmiOwnpayPatnFeeListDDTO {
      * 	有效标志	字符型	3		Y	不传默认1有效
      */
     private String valiFlag;
+    /**
+     * 	医药机构就诊 ID
+     */
+    private String fixmedinsMdtrtId;
 
 }

@@ -89,4 +89,6 @@ public interface InsureFmiOwnpayPatnService {
     WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(Map map);
 
     WrapperResponse<PageDTO> queryFeeInfoDetailPage(Map<String, Object> param);
+
+    WrapperResponse<Boolean> insertInsureInputCost(Map<String, Object> param);
 }

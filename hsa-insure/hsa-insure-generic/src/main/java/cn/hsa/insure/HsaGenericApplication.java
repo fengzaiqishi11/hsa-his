@@ -18,7 +18,7 @@ import org.springframework.context.annotation.ImportResource;
  **/
 @EnableCaching
 @ImportResource("classpath*:config/spring.xml")
-@MapperScan({"cn.hsa.module.insure.*.dao"})
+@MapperScan({"cn.hsa.module.insure.*.dao","cn.hsa.module.outpt.*.dao"})
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
 @EnableEncryptableProperties
 public class HsaGenericApplication {

@@ -1,8 +1,10 @@
 package cn.hsa.module.insure.fmiownpaypatn.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.module.dto.InsureOutptMedicTreatMentDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.Map;
 
@@ -73,6 +75,11 @@ public interface InsureFmiOwnpayPatnBO {
      **/
     Boolean insertInsureCost(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    PageDTO queryInsureOutptMedicTreatMent(OutptVisitDTO outptVisitDTO);
+
+    Boolean insertOutptMedicTreatMent(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean deleteOutptMedicTreatMent(InsureSettleInfoDTO insureSettleInfoDTO);
     /**
       * 自费病人就医就诊信息查询
       * @method queryFmiOwnPayInfoDetail

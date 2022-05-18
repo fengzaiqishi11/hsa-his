@@ -51,6 +51,8 @@ public class OnlinePayController  extends BaseController {
     Map<String, Object> map = new HashMap<>();
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("onlinePayFeeDTO", dto);
+    map.put("crteName",sysUserDTO.getName());
+    map.put("crteId",sysUserDTO.getUsId());
     return outptTmakePriceFormService_consumer.uploadOnlineFeeDetail(map);
   }
 

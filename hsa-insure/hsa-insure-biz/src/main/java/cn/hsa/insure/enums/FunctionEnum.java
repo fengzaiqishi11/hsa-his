@@ -77,6 +77,7 @@ public enum FunctionEnum {
     FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
     FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
     FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),
+    FMI_OWNPAY_PATN_INPUT_UPLOD(Constant.UnifiedPay.REGISTER.UP_4201A, "自费病人住院费用明细信息上传"),
     FMI_OWNPAY_PATN_DISE_UPLOD(Constant.UnifiedPay.REGISTER.UP_4202, "自费病人住院就诊和诊断信息上传"),
     FMI_OWNPAY_PATN_FINISH(Constant.UnifiedPay.REGISTER.UP_4203, "自费病人就诊以及费用明细上传完成"),
     FMI_OWNPAY_PATN_DISE_FEE_UPLOD(Constant.UnifiedPay.REGISTER.UP_4205, "自费病人门诊就医信息上传"),

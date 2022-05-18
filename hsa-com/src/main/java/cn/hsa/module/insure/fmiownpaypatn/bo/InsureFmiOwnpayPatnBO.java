@@ -116,4 +116,6 @@ public interface InsureFmiOwnpayPatnBO {
     Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO);
 
     PageDTO queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean insertInsureInputCost(InsureSettleInfoDTO insureSettleInfoDTO);
 }

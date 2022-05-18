@@ -161,5 +161,4 @@ public class FmiOwnpayPatnFeeListDDTO {
      * 	处方号 字符型 30
      */
     private String rxno;
-
 }

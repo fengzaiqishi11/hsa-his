@@ -33,7 +33,7 @@
         <dependency>
             <groupId>cn.hsa.dynamic</groupId>
             <artifactId>hsa-dynamic</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 

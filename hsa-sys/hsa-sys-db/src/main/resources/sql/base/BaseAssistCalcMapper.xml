@@ -32,10 +32,11 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="BaseAssistMap">
         select
-        a.id, a.hosp_code, a.code, a.name, a.usage_code, a.type_code, a.biz_code, a.way_code, a.is_valid, a.crte_id,
+        a.id, a.hosp_code, a.code, a.name, a.usage_code, a.type_code, bd.good_name as biz_code, a.way_code, a.is_valid, a.crte_id,
         a.crte_name, a.crte_time ,b.name as dept_code_name,a.dept_code, a.is_first
         from base_assist a
         LEFT JOIN base_dept b on a.dept_code=b.code
+        LEFT JOIN base_drug bd  on a.biz_code  = bd.code
         <where>
                 and a.hosp_code = #{hospCode}
             <if test="name != null and name != ''">

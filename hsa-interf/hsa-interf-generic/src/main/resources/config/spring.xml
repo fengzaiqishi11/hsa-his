@@ -31,6 +31,6 @@
     <!--参数校验拦截器-->
 <!--    <import resource="classpath:config/validate/spring-validate.xml"/>-->
     <!-- api权限过滤 -->
-    <import resource="classpath:config/security/consumer.xml"/>
+<!--    <import resource="classpath:config/security/consumer.xml"/>-->
 
 </beans>

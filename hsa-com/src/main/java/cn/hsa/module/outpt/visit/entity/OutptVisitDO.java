@@ -231,4 +231,8 @@ public class OutptVisitDO extends PageDO implements Serializable {
      * 联系人姓名
      */
     private String contactName;
+    /**
+     * 自费病人上传完成标志
+     */
+    private String cpltFlag;
 }

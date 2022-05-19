@@ -371,7 +371,17 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
              * zhSpecial : '1' 珠海
              * huNanSpecial : '1' 湖南
              */
-            objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
+            String insureItemType = MapUtils.get(item,"insureItemType");
+            String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");// 是否限制级用药
+            //如果当前项目为限制用药，医院审批标志取isReimburse的值，否则取配置的hospApprFlag值
+            if ("1".equals(lmtUserFlag)) {
+                if (ObjectUtil.isEmpty(isReimburse)) {
+                    throw new RuntimeException("【"+MapUtil.getStr(item,"hospItemName")+"】为限制用药，是否报销标志【isReimburse】不能为空，请检查！费用id为："+feedetlSn);
+                }
+                objectMap.put("hosp_appr_flag", isReimburse); // 医院审批标志
+            }else {
+                objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
+            }
             // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
             if("1".equals(zhSpecial) && "0".equals(isReimburse)) {
                 objectMap.put("hosp_appr_flag", "0");
@@ -408,6 +418,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                         break;
                     default:
                         break;
+                }
+            }
+            //广东省接口医院审批标志只认1和2，【1：审批通过，2审批不通过】，这里做一下转换
+            if ("440".startsWith(insureConfigurationDTO.getRegCode())) {
+                if ("0".equals(MapUtil.getStr(objectMap, "hosp_appr_flag"))) {
+                    objectMap.put("hosp_appr_flag","2");
                 }
             }
 

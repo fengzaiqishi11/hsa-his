@@ -30,6 +30,12 @@
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
+
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="VARCHAR"/>
+        <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
+        <result property="checkPrice" column="checkPrice" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
@@ -190,19 +196,19 @@
     <!--通过医嘱编码查询项目信息数据-->
     <select id="queryItemByAdviceCode" resultMap="BaseAdviceDetailMap">
          select
-          b.id, b.hosp_code, b.advice_code, b.type_code, b.item_code, b.item_name, b.num, b.unit_code, b.price, b.spec, b.use_code,
+          b.id, b.hosp_code, b.advice_code, b.type_code, b.item_code, b.item_name, b.num,a.split_unit_code,a.split_price,a.unit_code,a.price, b.unit_code as checkUnitCode, b.price as checkPrice, b.spec, b.use_code,
            b.total_price, b.is_alone_cost, b.is_frist_cost, b.is_appoint_rate, b.rate_code, b.insure_list_code,a.itemName,a.itemTypeCode,a.typeCode,
           a.out_dept_code,a.in_dept_code,a.inDeptName,a.outDeptName,a.id as itemId,(select name from base_rate where base_rate.hosp_code = #{hospCode} and b.rate_code = base_rate.code)as rateName
 					from base_advice_detail b
 					left join
-					(select id,`name` as itemName,code,itemTypeCode,out_dept_code,in_dept_code,hosp_code,inDeptName,outDeptName,typeCode
+					(select id,`name` as itemName,code,unit_code, price,split_unit_code,split_price,itemTypeCode,out_dept_code,in_dept_code,hosp_code,inDeptName,outDeptName,typeCode
 					from
-                        (select id,`name`,code,type_code as itemTypeCode,out_dept_code,in_dept_code,
+                        (select id,`name`,code,unit_code, price,unit_code as split_unit_code, price as split_price,type_code as itemTypeCode,out_dept_code,in_dept_code,
                             hosp_code,(select name from base_dept where code = out_dept_code)as outDeptName,
                             (select name from base_dept where code = in_dept_code)as inDeptName,'3' as typeCode
 					    from base_item where  is_valid = '1' and hosp_code = #{hospCode}
 					    union all
-					    select id,`name`,code,type_code as itemTypeCode,'','',hosp_code,'','','2' as typeCode
+					    select id,`name`,code,unit_code , price,split_unit_code,split_price,type_code as itemTypeCode,'','',hosp_code,'','','2' as typeCode
 					    from base_material where is_valid = '1' and hosp_code = #{hospCode}
 					    )mAndi
 					) a
@@ -476,7 +482,7 @@ WHERE
         spec, use_code, total_price, is_alone_cost, is_frist_cost, is_appoint_rate, rate_code, insure_list_code)
         values
         <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id},#{item.hospCode}, #{item.adviceCode}, #{item.typeCode}, #{item.itemCode}, #{item.itemName}, #{item.num}, #{item.unitCode}, #{item.price}, #{item.spec}, #{item.useCode},
+            (#{item.id},#{item.hospCode}, #{item.adviceCode}, #{item.typeCode}, #{item.itemCode}, #{item.itemName}, #{item.num}, #{item.checkUnitCode}, #{item.checkPrice}, #{item.spec}, #{item.useCode},
             #{item.totalPrice}, #{item.isAloneCost}, #{item.isFristCost}, #{item.isAppointRate}, #{item.rateCode}, #{item.insureListCode})
         </foreach>
     </insert>
@@ -492,8 +498,8 @@ WHERE
                 item_code = #{item.itemCode},
                 item_name = #{item.itemName},
                 num = #{item.num},
-                unit_code = #{item.unitCode},
-                price = #{item.price},
+                unit_code = #{item.checkUnitCode},
+                price = #{item.checkPrice},
                 spec = #{item.spec},
                 use_code = #{item.useCode},
                 total_price = #{item.totalPrice},

@@ -94,4 +94,6 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
     private String nationName;
 
     private String isValid ;
+    private String  checkUnitCode;
+    private String  checkPrice;
 }

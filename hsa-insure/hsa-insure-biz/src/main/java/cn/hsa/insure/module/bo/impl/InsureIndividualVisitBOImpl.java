@@ -364,17 +364,35 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
             } catch (Exception e) {
                 log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage());
                 log.error("=======调门诊挂号撤销开始=======");
-                Map<String, Object> rollbackMap = new HashMap<>();
-                rollbackMap.put("hospCode", hospCode);
-                rollbackMap.put("psn_no",aac001);
-                rollbackMap.put("mdtrt_id",responseData.getMedicalRegNo());
-                rollbackMap.put("ipt_otp_no",responseData.getVisitNo());
-                log.error("调门诊挂号撤销入参为：{}", JSON.toJSONString(rollbackMap));
-                insureUnifiedPayOutptService.UP_2202(rollbackMap);
+                Map<String, Object> httpParam = initBackParam(personinfo, crteId, crteName, aac001, insureConfigurationDTO, responseData);
+                log.error("调门诊挂号撤销入参为：{}", JSON.toJSONString(httpParam));
+                String s = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), JSON.toJSONString(httpParam));
                 log.error("=======调门诊挂号撤销结束=======");
             }
         }
         return insureIndividualVisitDO;
+    }
+
+    private Map<String, Object> initBackParam(Map<String, String> personinfo, String crteId, String crteName, String aac001, InsureConfigurationDTO insureConfigurationDTO, InsureIndividualVisitDTO responseData) {
+        Map<String, Object> inputMap = new HashMap<>();
+        inputMap.put("psn_no",aac001);
+        inputMap.put("mdtrt_id",responseData.getMedicalRegNo());
+        inputMap.put("ipt_otp_no",responseData.getVisitNo());
+
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("data",inputMap);
+
+        Map<String, Object> httpParam = new HashMap<>();
+        httpParam.put("infno","2202");// 交易编号
+        httpParam.put("insuplc_admdvs",personinfo.get("insuplc_admdvs"));// 参保地医保区划
+        httpParam.put("medins_code",insureConfigurationDTO.getOrgCode());// 定点医药机构编号
+        httpParam.put("insur_code",insureConfigurationDTO.getRegCode());// 医保中心编码
+        httpParam.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
+        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        httpParam.put("opter",crteId);
+        httpParam.put("opter_name",crteName);
+        httpParam.put("input", JSON.toJSON(dataMap));
+        return httpParam;
     }
 
     /**

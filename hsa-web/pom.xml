@@ -255,6 +255,11 @@
             <artifactId>truelicense-core</artifactId>
             <version>1.33</version>
         </dependency>
+        <!-- 应用监控相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
        <build>

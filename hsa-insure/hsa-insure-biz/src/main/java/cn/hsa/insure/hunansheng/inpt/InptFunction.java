@@ -779,6 +779,7 @@ public class InptFunction {
         httpParam.put("fin_disease1_his","");//医疗机构第一副诊断（医疗机构疾病编码）
         httpParam.put("fin_disease2_his","");//医疗机构第二副诊断（医疗机构疾病编码））
         httpParam.put("aka999","1"); // 是否垫付伙食费(默认是)
+        httpParam.put("visitId",inptVisitDTO.getId()); // 就诊ID
 
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setRegCode(inptVisitDTO.getInsureOrgCode());

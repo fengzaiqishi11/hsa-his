@@ -53,6 +53,7 @@
         <result property="advancePayment" column="advance_payment" jdbcType="NUMERIC"/>
         <result property="sourceTjCode" column="source_tj_code" jdbcType="VARCHAR"/>
         <result property="sourceTjRemark" column="source_tj_remark" jdbcType="VARCHAR"/>
+        <result property="cpltFlag" column="cplt_flag" jdbcType="VARCHAR"/>
     </resultMap>
 
     <insert id="insertInsureSettleInfo" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO" >
@@ -663,6 +664,7 @@
           is_first_visit,
           crte_id,
           crte_name,
+          cplt_flag,
           crte_time
         FROM
           outpt_visit
@@ -922,4 +924,15 @@
         from outpt_cost where visit_id =#{visitId} and hosp_code=#{hospCode}
         )
     </select>
+    <update id="updateUplod">
+        update
+        outpt_visit
+        <set >
+            <if test="cpltFlag != null and cpltFlag != ''">
+                cplt_flag = #{cpltFlag,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code =#{hospCode}
+    </update>
 </mapper>

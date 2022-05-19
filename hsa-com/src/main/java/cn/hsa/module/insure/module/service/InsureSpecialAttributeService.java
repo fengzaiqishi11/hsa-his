@@ -36,7 +36,7 @@ public interface InsureSpecialAttributeService {
      * @Date   2022/5/15 10:03
      * @Return
      **/
-    void uploadInsureSpecialAttribute(Map map);
+    void UPloadInsureSpecialAttribute(Map map);
 
-    WrapperResponse<PageDTO> qureyInsureSpecialAttribute(Map map);
+    WrapperResponse<List<Map<String, Object>>> qureyInsureSpecialAttribute(Map map);
 }

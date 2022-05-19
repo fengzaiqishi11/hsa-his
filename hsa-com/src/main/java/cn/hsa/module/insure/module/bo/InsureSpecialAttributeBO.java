@@ -34,8 +34,8 @@ public interface InsureSpecialAttributeBO {
      * @Date   2022/5/15 10:03
      * @Return
      **/
-    void uploadInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
+    void UPloadInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
 
-    PageDTO qureyInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
+    List<Map<String, Object>> qureyInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

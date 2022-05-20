@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.DictStandardMapDAO">
+
+    <!--查询科室字典映射-->
+    <select id="listDeptDictMap" resultType="cn.hsa.module.interf.healthInfo.entity.TbKsys">
+        select null from dual
+    </select>
+    <!--查询药品字典映射-->
+    <select id="listDrugDictMap" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpys">
+        select null from dual
+    </select>
+    <!--查询疾病字典映射-->
+    <select id="listDiseaseDictMap" resultType="cn.hsa.module.interf.healthInfo.entity.TbJbys">
+        select null from dual
+    </select>
+    <!--查询诊间项目映射-->
+    <select id="listClinicProjectMap" resultType="cn.hsa.module.interf.healthInfo.entity.TbZlxmys">
+        select null from dual
+    </select>
+    <!--查询收费明细类型映射-->
+    <select id="listChargeDetailTypeMap" resultType="cn.hsa.module.interf.healthInfo.entity.TbFylbys">
+        select null from dual
+    </select>
+</mapper>

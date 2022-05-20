@@ -428,8 +428,8 @@
         <if test="startTime != null and startTime != '' ">
             and date(in_time) &gt;= date(#{startTime})
         </if>
-        <if test="endTime != null and endTime != ''">
-            and date(in_time) &lt;= date(#{endDate})
+        <if test="endtime != null and endtime != ''">
+            and date(in_time) &lt;= date(#{endtime})
         </if>
         order by crte_time ) m
         union all
@@ -447,8 +447,8 @@
         <if test="startTime != null and startTime != '' ">
             and date(visit_time) &gt;= date(#{startTime})
         </if>
-        <if test="endTime != null and endTime != ''">
-            and date(visit_time) &lt;= date(#{endTime})
+        <if test="endtime != null and endtime != ''">
+            and date(visit_time) &lt;= date(#{endtime})
         </if>
         order by crte_time ) n
         )A

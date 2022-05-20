@@ -1800,7 +1800,8 @@
             resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         select
             iiv.id,iiv.medical_reg_no,iiv.aac001,iv.cert_code,iv.cert_no,iib.aac003,iib.aac004,iiv.visit_id,iiv.crte_time,iiv.visit_no,iiv.insuplc_admdvs,iv.name,
-        iiv.mdtrt_cert_type,iiv.mdtrt_cert_no,iib.ipt_psn_sp_flag_type,iib.ipt_psn_sp_flag,iiv.insure_org_code,iiv.insure_reg_code,iiv.medicine_org_code
+        iiv.mdtrt_cert_type,iiv.mdtrt_cert_no,iib.ipt_psn_sp_flag_type,iib.ipt_psn_sp_flag,iiv.aka130,iiv.aka130_name,
+        iiv.insure_org_code,iiv.insure_reg_code,iiv.medicine_org_code,iib.ipt_psn_sp_flag_detl_id
         from
             insure_individual_visit iiv
                 left join inpt_visit iv on
@@ -1809,9 +1810,9 @@
                 left join insure_individual_basic iib on
                     iiv.hosp_code = iib.hosp_code
                     and iiv.mib_id = iib.id
-        where iiv.hosp_code = #{hospCode}
+        where iiv.hosp_code = #{hospCode} and iiv.is_hospital = '1'
         <if test="insureOrgCode != null and insureOrgCode != ''">
-            and iiv.insure_org_code &gt;= #{insureOrgCode}
+            and iiv.insure_org_code = #{insureOrgCode}
         </if>
         <if test="startDate != null">
             and iiv.crte_time &gt;= #{startDate}
@@ -1839,4 +1840,11 @@
             ipt_psn_sp_flag_detl_id = #{iptPsnSpFlagDetlId}
         where hosp_code = #{hospCode} and aac001 = #{aac001} and aac002 = #{mdtrtCertNo}
     </update>
+
+    <delete id="deleteFmiOwnPayPatnCost">
+        DELETE FROM insure_upload_cost WHERE hosp_code = #{hospCode} and feedetl_sn IN
+        <foreach collection="feeIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

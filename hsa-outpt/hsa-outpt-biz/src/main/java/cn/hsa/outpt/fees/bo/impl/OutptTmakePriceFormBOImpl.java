@@ -4368,7 +4368,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         throw new AppException("请传入就诊ID!");
       }
       //就诊id
-      String visitId = MapUtils.get(map, "id");
+      String visitId = onlinePayFeeDTO.getId();
       Map<String, Object> insureVisitParam = new HashMap<String, Object>();
       insureVisitParam.put("id", visitId);
       insureVisitParam.put("hospCode", hospCode);
@@ -4378,7 +4378,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       // 调用 统一支付平台-【6201】费用明细上传
-      Map<String, Object> result = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6201(map).getData();
+      insureUnifiedPayOutptService_consumer.UP6201(map).getData();
       return true;
     }
 
@@ -4866,7 +4866,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       String hospCode = map.get("hospCode").toString();
       //个人基本信息
       OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");
-      SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "SetlRefundQueryDTO");
       if (ObjectUtil.isEmpty(outptSettleDTO.getVisitId())) {
         throw new AppException("请传入就诊ID!");
       }

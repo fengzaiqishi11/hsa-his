@@ -146,4 +146,9 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     public List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap) {
         return outptVisitBO.queryOutptCostByvisitIds(reqMap);
     }
+
+    @Override
+    public WrapperResponse<Boolean> updateUplod(Map<String, Object> map) {
+        return WrapperResponse.success(outptVisitBO.updateUplod(MapUtils.get(map,"outptVisitDTO")));
+    }
 }

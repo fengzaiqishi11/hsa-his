@@ -222,4 +222,6 @@ public interface OutptVisitDAO {
     List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
 
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    int updateUplod(OutptVisitDTO outptVisitDTO);
 }

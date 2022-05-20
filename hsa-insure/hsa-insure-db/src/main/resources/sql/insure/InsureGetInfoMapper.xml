@@ -418,17 +418,24 @@
         select A.* from (
         select m.* from (
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
+        is_uplod_cost,is_uplod_dise,cplt_flag,DATE_FORMAT(in_time, "%Y-%m-%d") as visitDate,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
         patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
         </if>
+        <if test="startTime != null and startTime != '' ">
+            and date(in_time) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(in_time) &lt;= date(#{endDate})
+        </if>
         order by crte_time ) m
         union all
         select n.* from (
         select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age,
-        ov.age_unit_code,ov.hosp_code,
+        ov.age_unit_code,ov.hosp_code,'1' as is_uplod_cost,'1' as is_uplod_dise,cplt_flag,DATE_FORMAT(visit_time, "%Y-%m-%d") as visitDate,
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
@@ -436,6 +443,12 @@
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date(visit_time) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(visit_time) &lt;= date(#{endTime})
         </if>
         order by crte_time ) n
         )A

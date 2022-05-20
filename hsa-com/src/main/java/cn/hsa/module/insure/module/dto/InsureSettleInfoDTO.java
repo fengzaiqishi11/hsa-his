@@ -330,6 +330,14 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String medfeeSumamt; //医疗总费用
     private String medType; //医疗类型
     private String elecBillnoCode; //电子票据号码
+    /**
+     * 开始时间
+     */
+    private String startTime;
+    /**
+     * 结束时间
+     */
+    private String endTime;
 
 
 }

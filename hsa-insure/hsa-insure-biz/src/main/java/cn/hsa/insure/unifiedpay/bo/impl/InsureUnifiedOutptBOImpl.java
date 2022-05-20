@@ -590,13 +590,14 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       //医保配置信息
       InsureConfigurationDTO insureConfigurationDTO = MapUtils.get(map, "insureConfigurationDTO");
       //页面上传费用信息
-      List<OutptCostDTO> outptCostDTOList = (List<OutptCostDTO>) map.get("outptCostDTOList");//患者费用
+      List<OutptCostDTO> outptCostDTOList = onlinePayFeeDTO.getOutptCostDTOList();//患者费用
       //诊断信息
       List<DiseInfoDTO> diseList = onlinePayFeeDTO.getDiseinfoList();
       //费用信息
       List<FeeDetailDTO> feedetailList = onlinePayFeeDTO.getFeedetailList();
       //判断住院还是门诊 1住院
       InptVisitDTO inptVisitDTO = new InptVisitDTO();
+      map.put("visitId",insureIndividualVisitDTO.getVisitId());
       if ("1".equals(insureIndividualVisitDTO.getIsHospital())) {
         inptVisitDTO = inptVisitService.getInptVisitById(map).getData();
         //费用类别 02 住院
@@ -615,6 +616,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         outptPrescribeDTO.setHospCode(MapUtils.get(map, "hospCode"));
         outptPrescribeDTO.setVisitId(MapUtils.get(map, "visitId"));
         tempMap.put("outptPrescribeDTO",outptPrescribeDTO);
+        tempMap.put("hospCode",MapUtils.get(map, "hospCode"));
         diseList = handleOutptDiseInfo(tempMap);
       }
       onlinePayFeeDTO.setDiseinfoList(diseList);

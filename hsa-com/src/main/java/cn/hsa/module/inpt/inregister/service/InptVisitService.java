@@ -215,4 +215,6 @@ public interface InptVisitService {
      **/
     @PostMapping("/service/inpt/visit/getBabyInfoByVisitId")
     WrapperResponse<List<InptBabyDTO>> getBabyInfoByVisitId(Map<String, Object> paramMap);
+
+    WrapperResponse<Boolean> updateUplod(Map<String, Object> map);
 }

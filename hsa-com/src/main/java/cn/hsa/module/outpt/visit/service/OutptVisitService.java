@@ -108,4 +108,6 @@ public interface OutptVisitService {
     List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
 
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    WrapperResponse<Boolean> updateUplod(Map<String, Object> map);
 }

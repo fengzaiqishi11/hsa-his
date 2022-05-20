@@ -206,6 +206,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         String treatmentCode = inptVisitDTO.getTreatmentCode();
         String isMidWaySettle = inptVisitDTO.getIsMidWaySettle();  // 医保中途结算标识 1：中途结算 0：出院结算
         String medicalRegNo = inptVisitDTO.getMedicalRegNo();
+        InsureIndividualBasicDTO insureBasicDTO = inptVisitDTO.getInsureIndividualBasicDTO();
         // 获取系统参数 是否开启大人婴儿合并结算
         SysParameterDTO mergeParameterDTO =null;
         Map<String, Object> isMergeParam = new HashMap<>();
@@ -379,6 +380,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     insureIndividualVisitDTO = insureIndividualVisitService.selectInsureInfo(insureVisitParam).getData();
                 }
 
+                //读卡信息赋值
+                if (ObjectUtil.isNotNull(insureBasicDTO)) {
+                    insureIndividualVisitDTO.setHcardBasinfo(insureBasicDTO.getHcardBasinfo());
+                    insureIndividualVisitDTO.setHcardChkinfo(insureBasicDTO.getHcardChkinfo());
+                }
                 // 根据医院编码、医保注册编码查询医保配置信息
                 InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
                 configDTO.setHospCode(hospCode); //医院编码

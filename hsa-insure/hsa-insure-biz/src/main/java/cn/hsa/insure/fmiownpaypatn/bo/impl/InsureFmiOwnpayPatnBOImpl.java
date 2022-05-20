@@ -604,7 +604,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
          * 2.开了的诊断是否已经匹配
          */
         outptMatchDiagnoseDTOList = outptDoctorPrescribeService.queryOutptMatchDiagnose(reqMap).getData();
-       // mapList = handlerOutptCostFee(insureSettleInfoDTO);
+        mapList = handlerOutptCostFee(insureSettleInfoDTO);
         BigDecimal sum = new BigDecimal(0);
         if(!mapList.isEmpty() && mapList.size() > 0) {
             for(Map<String, Object> item : mapList){
@@ -1133,7 +1133,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
      **/
     private List<Map<String, Object>> handlerOutptCostFee(InsureSettleInfoDTO insureSettleInfoDTO) {
 
-        String insureRegCode = insureSettleInfoDTO.getOrgCode();
+        String insureRegCode = insureSettleInfoDTO.getInsureRegCode();
         //判断是否有传输费用信息
         Map<String, Object> insureCostParam = new HashMap<String, Object>();
         insureCostParam.put("hospCode", insureSettleInfoDTO.getHospCode());//医院编码

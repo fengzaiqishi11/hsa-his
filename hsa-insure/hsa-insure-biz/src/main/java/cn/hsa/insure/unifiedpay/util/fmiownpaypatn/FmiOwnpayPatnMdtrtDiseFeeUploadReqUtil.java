@@ -61,9 +61,9 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put("mdtrtinfo", initMdtrtDDTO(outptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt));
-        dataMap.put("diseinfo", initInptDiseListDDTOS(outptDiagnoseDTOList, outptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue()));
-        dataMap.put("feedetail", initFeeListDDTO(insureSettleInfoDTO, outptCostDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
+        dataMap.put("mdtrtinfo",  HumpUnderlineUtils.humpToUnderline(initMdtrtDDTO(outptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt)));
+        dataMap.put("diseinfo", HumpUnderlineUtils.humpToUnderlineArray(initInptDiseListDDTOS(outptDiagnoseDTOList, outptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue())));
+        dataMap.put("feedetail",  HumpUnderlineUtils.humpToUnderlineArray(initFeeListDDTO(insureSettleInfoDTO, outptCostDTOList,insureConfigurationDTO,sysParameterDTO.getValue())));
 
         HashMap commParam = new HashMap();
         checkRequest(dataMap);
@@ -258,7 +258,7 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
             }
         }
     }
-    private Object initFeeListDDTO(InsureSettleInfoDTO insureSettleInfoDTO,List<Map<String, Object>> feeList, InsureConfigurationDTO insureConfigurationDTO
+    private List<FmiOwnpayPatnFeeListDDTO> initFeeListDDTO(InsureSettleInfoDTO insureSettleInfoDTO, List<Map<String, Object>> feeList, InsureConfigurationDTO insureConfigurationDTO
             , String fixmedinsName) {
         List<FmiOwnpayPatnFeeListDDTO> listMap = new ArrayList<>();
         if (!ListUtils.isEmpty(feeList)) {

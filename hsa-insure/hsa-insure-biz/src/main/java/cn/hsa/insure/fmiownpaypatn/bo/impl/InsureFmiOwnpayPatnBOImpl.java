@@ -855,7 +855,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
     public Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO) {
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO  insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
-        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+//        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
         //1.查询是否有自费就诊记录
         List<InsureUploadCostDTO> costDTOList = insureIndividualCostDAO.queryFeeInfoDetailPage(insureSettleInfoDTO);
         if(ListUtils.isEmpty(costDTOList)){

@@ -21,6 +21,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String mdtrtId; // 就诊id *
 
+    private String visitId; // his就诊id *
+
     private String setlId; // 结算id *
 
     private String fixmedinsName; // 定点医疗机构名称 *

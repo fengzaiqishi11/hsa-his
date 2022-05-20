@@ -828,8 +828,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("hospCode", insureSettleInfoDTO.getHospCode());
         paramMap.put("configRegCode",insureConfigurationDTO.getRegCode());
         //处理流水号
+        List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
         if(insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
-            List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
             List<String> bkkpSnList = new ArrayList<>();
             for (InsureUploadCostDTO insureUploadCostDTO : costDTOList) {
                 if(feeIdList.contains(insureUploadCostDTO.getId())){
@@ -846,6 +846,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         Map<String, Object> res = insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DELETE, interfaceParamDTO);
+        //删除本地数据
+        insureGetInfoDAO.deleteFmiOwnPayPatnCost(feeIdList,insureSettleInfoDTO.getHospCode());
         return true;
     }
 

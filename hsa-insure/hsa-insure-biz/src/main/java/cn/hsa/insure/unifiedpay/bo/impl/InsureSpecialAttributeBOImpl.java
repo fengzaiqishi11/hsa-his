@@ -165,9 +165,8 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
         Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.SPECIAL_ATTRIBUTE_QUERY, interfaceParamDTO);
         //获取回参
         Map<String,Object> outMap = MapUtils.get(stringObjectMap,"output");
-        Map<String, Object> resultDataMap  = MapUtils.get(outMap,"data");
-        List<Map<String, Object>> resultDataList = new ArrayList<>();
-        resultDataList.add(resultDataMap);
+        Map<String, Object> resultDataMap  = MapUtils.get(outMap,"IptPsnSpFlagReg");
+        List<Map<String, Object>> resultDataList = MapUtils.get(resultDataMap,"data");
         return resultDataList;
     }
 

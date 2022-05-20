@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.MedicalImageDAO">
+
+    <!--查询医学影像检查报告表-通用检查报告格式-->
+    <select id="listUniversalReportFormat" resultType="cn.hsa.module.interf.healthInfo.entity.TbJctybg">
+        select null from dual
+    </select>
+
+    <!--查询医学影像检查报告表-常见检查报告格式-->
+    <select id="listNormalReportFormat" resultType="cn.hsa.module.interf.healthInfo.entity.TbJcbg">
+        select null from dual
+    </select>
+</mapper>

@@ -220,6 +220,8 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
             diseinfoMap.setDiagDrCode(inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
             diseinfoMap.setDiagDrName(inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
             diseinfoMap.setDiagTime(DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+            diseinfoMap.setValiFlag("1");
+
 
             diseinfoMap.setPoolarea(null);
 
@@ -268,14 +270,16 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
 
                 feedetail.setBkkpSn(MapUtils.get(item, "id"));
 
-                if (insureSettleInfoDTO.getLx().equals("1")) {
+                feedetail.setFeeOcurTime( "2022-03-10 09:24:55"); // 费用发生时间
+
+               /* if (insureSettleInfoDTO.getLx().equals("1")) {
 
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("costTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
 
                 } else if (insureSettleInfoDTO.getLx().equals("0")) {
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
 
-                }
+                }*/
                 feedetail.setFixmedinsCode(insureConfigurationDTO.getOrgCode());
                 feedetail.setFixmedinsName(fixmedinsName);
                 BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);

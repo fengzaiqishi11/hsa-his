@@ -28,15 +28,14 @@ public class FmiOwnpayPatnFeeDeteleReqUtil<T> extends InsureCommonUtil implement
     @Override
     public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("feedetail", map);
-        if(!MapUtils.isEmpty(map,"bkkp_sn")){
-            dataMap.put("feedetl",MapUtils.get(map,"bkkp_sn"));
-        }
-        checkRequest(dataMap);
-        map.put("input", dataMap);
-        map.put("infno",Constant.UnifiedPay.REGISTER.UP_4204);
-        return getInsurCommonParam(map);
+        checkRequest(map);
+        Map<String, Object> reMap = new HashMap<>();
+        reMap.put("hospCode",MapUtils.get(map,"hospCode"));
+        reMap.put("orgCode", MapUtils.get(map,"orgCode"));
+        reMap.put("configRegCode", MapUtils.get(map,"configRegCode"));
+        reMap.put("input", map);
+        reMap.put("infno",Constant.UnifiedPay.REGISTER.UP_4204);
+        return getInsurCommonParam(reMap);
     }
 
 

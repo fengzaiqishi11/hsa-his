@@ -863,21 +863,27 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         }
         //2.调用接口
         Map paramMap = new HashMap();
-        paramMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
-        paramMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
-        paramMap.put("orgCode", insureSettleInfoDTO.getOrgCode());
-        paramMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("hospCode", insureConfigurationDTO.getHospCode());
         paramMap.put("configRegCode",insureConfigurationDTO.getRegCode());
+        //处理其他入参
+        Map<String, Object> feedetailMap = new HashMap<>();
+        feedetailMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
+        feedetailMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
+        paramMap.put("feedetail",feedetailMap);
         //处理流水号
         List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
-        if(insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
-            List<String> bkkpSnList = new ArrayList<>();
-            for (InsureUploadCostDTO insureUploadCostDTO : costDTOList) {
-                if(feeIdList.contains(insureUploadCostDTO.getId())){
-                    bkkpSnList.add(insureUploadCostDTO.getFeedetlSn());
-                }
+        if(feeIdList == null ){
+            throw new AppException("没有需要删除的费用！");
+        }
+        if(feeIdList != null && insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
+            List<Map<String,Object>> bkkpSnList = new ArrayList<>();
+            for (String s : feeIdList) {
+                Map<String,Object> bkkpMap = new HashMap<>();
+                bkkpMap.put("bkkp_sn",s);
+                bkkpSnList.add(bkkpMap);
             }
-            paramMap.put("bkkp_sn",bkkpSnList);
+            paramMap.put("feedetl",bkkpSnList);
         }
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_DELETE.getCode());

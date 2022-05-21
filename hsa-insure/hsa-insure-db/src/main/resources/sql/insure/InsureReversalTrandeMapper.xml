@@ -1572,6 +1572,7 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND ifnull(t.is_one_settle,0) != '1'
         AND e.insure_price > 0
         AND t.insuplc_admdvs = ia.admdvs_code
         <if test="isValidOneSettle == '1'.toString()">

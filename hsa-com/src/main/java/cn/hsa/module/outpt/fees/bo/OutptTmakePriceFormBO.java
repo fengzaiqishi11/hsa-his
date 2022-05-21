@@ -401,7 +401,7 @@ public interface OutptTmakePriceFormBO {
      * @Date 2022-05-09 15:15
      * @return cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO
      */
-    SeltSucCallbackDTO queryInsureSetlResult(Map map);
+    WrapperResponse queryInsureSetlResult(Map map);
 
     /**
      *【6401】费用明细上传撤销
@@ -411,4 +411,13 @@ public interface OutptTmakePriceFormBO {
      * @return java.lang.Boolean
      */
     Boolean insureFeeRevoke(Map map);
+
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 15:59
+     * @return java.lang.Boolean
+     */
+    Boolean insureRefund(Map map);
 }

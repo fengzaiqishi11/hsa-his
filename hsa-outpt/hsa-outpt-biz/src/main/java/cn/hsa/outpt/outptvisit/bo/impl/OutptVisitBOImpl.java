@@ -2,6 +2,7 @@ package cn.hsa.outpt.outptvisit.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -103,6 +105,22 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
     @Override
     public OutptVisitDTO selectOutptVisitById(Map<String, Object> map) {
         return outptVisitDAO.selectOutptVisitById(map);
+    }
+
+    @Override
+    public List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param) {
+        return outptVisitDAO.queryOutptVisitSelfFeePatient(param);
+    }
+
+    @Override
+    public List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap) {
+        return outptVisitDAO.queryOutptCostByvisitIds(reqMap);
+    }
+
+    @Override
+    public Boolean updateUplod(OutptVisitDTO outptVisitDTO) {
+        outptVisitDAO.updateUplod(outptVisitDTO);
+        return true;
     }
 
     /**

@@ -1,5 +1,6 @@
 package cn.hsa.module.outpt.visit.dao;
 
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
@@ -11,6 +12,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -209,4 +211,17 @@ public interface OutptVisitDAO {
     void deleteCostByIds(@Param("hospCode") String hospCode, @Param("costIds") List<String> costIds);
 
     void updateCaretoMedic(Map map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 9:33
+     * @Description 查询全自费病人门诊就诊信息
+     * @param param
+     * @return java.util.List<cn.hsa.module.outpt.visit.dto.OutptVisitDTO>
+     */
+    List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
+
+    List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    int updateUplod(OutptVisitDTO outptVisitDTO);
 }

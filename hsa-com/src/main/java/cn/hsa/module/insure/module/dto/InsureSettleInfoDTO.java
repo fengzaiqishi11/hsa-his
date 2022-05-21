@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -19,6 +20,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String keywords;
 
     private String mdtrtId; // 就诊id *
+
+    private String visitId; // his就诊id *
 
     private String setlId; // 结算id *
 
@@ -311,5 +314,26 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private Date dscgTime;
     // 单位邮编
     private String poscode;
+    private List<String> feeIdList; // 自费上传明细id集合
+    //修改状态
+    private String stasType;
+    //完成标志
+    private String cpltFlag;
+
+    private String fixmedinsMdtrtId;//医药机构就诊ID
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String begntime; //开始时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String endtime; //结束时间
+    private String medfeeSumamt; //医疗总费用
+    private String medType; //医疗类型
+    private String elecBillnoCode; //电子票据号码
+    /**
+     * 开始时间
+     */
+    private String startTime;
+
 
 }

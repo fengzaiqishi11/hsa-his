@@ -1,7 +1,10 @@
 package cn.hsa.module.insure.fmiownpaypatn.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.module.dto.InsureOutptMedicTreatMentDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.Map;
 
@@ -57,6 +60,10 @@ public interface InsureFmiOwnpayPatnBO {
 
     Map<String, Object> queryFmiOwnPayPatnReconciliationInfo(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    Boolean insertInsureMdtrtAndDiag(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean insertInsureFinish(InsureSettleInfoDTO insureSettleInfoDTO);
+
     /**
      * @Method queryInsureCost
      * @Desrciption
@@ -68,4 +75,47 @@ public interface InsureFmiOwnpayPatnBO {
      **/
     Boolean insertInsureCost(InsureSettleInfoDTO insureSettleInfoDTO);
 
+    PageDTO queryInsureOutptMedicTreatMent(OutptVisitDTO outptVisitDTO);
+
+    Boolean insertOutptMedicTreatMent(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean deleteOutptMedicTreatMent(InsureSettleInfoDTO insureSettleInfoDTO);
+    /**
+      * 自费病人就医就诊信息查询 4208
+      * @method queryFmiOwnPayInfoDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:45
+      * @param  insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayInfoDetail(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+      * 自费病人就医费用明细查询 4207
+      * @method queryFmiOwnPayPatnFeeListDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:45
+      * @param  insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayPatnFeeListDetail(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    /**
+      * 自费病人就医诊断信息查询 4209
+      * @method queryFmiOwnPayDiseListDetail
+      * @author WANGQIAO
+      * @date 2022/5/17 9:29
+      * @param insureSettleInfoDTO
+      * @return cn.hsa.base.PageDTO
+      *
+     **/
+    PageDTO queryFmiOwnPayDiseListDetail(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    PageDTO queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO);
+
+    Boolean insertInsureInputCost(InsureSettleInfoDTO insureSettleInfoDTO);
 }

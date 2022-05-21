@@ -1,10 +1,12 @@
 package cn.hsa.module.outpt.visit.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,5 +98,9 @@ public interface OutptVisitBO {
      */
     OutptVisitDTO selectOutptVisitById(Map<String, Object> map);
 
+    List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
 
+    List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    Boolean updateUplod(OutptVisitDTO outptVisitDTO);
 }

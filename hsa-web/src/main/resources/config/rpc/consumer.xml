@@ -529,5 +529,6 @@
     <dubbo:reference id="insureUnifiedEmrService_comsumer" interface="cn.hsa.module.insure.emr.service.InsureUnifiedEmrService" check="false"/>
 
     <dubbo:reference id="insurePolicyService_consumer" interface="cn.hsa.module.insure.other.service.InsurePolicyService" check="false"/>
+    <dubbo:reference id="insureSpecialAttributeService_consumer" interface="cn.hsa.module.insure.module.service.InsureSpecialAttributeService" check="false"/>
 </beans>
 

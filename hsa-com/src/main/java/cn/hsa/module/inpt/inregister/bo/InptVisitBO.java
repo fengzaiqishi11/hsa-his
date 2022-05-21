@@ -227,4 +227,7 @@ public interface InptVisitBO {
      * @Return: cn.hsa.module.inpt.doctor.dto.InptVisitDTO
      **//*
     Boolean inRegisterByArtificial(InptVisitDTO inptVisitDTO);*/
+
+
+    Boolean updateUplod(InptVisitDTO inptVisitDTO);
 }

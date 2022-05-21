@@ -53,6 +53,7 @@
         <result property="advancePayment" column="advance_payment" jdbcType="NUMERIC"/>
         <result property="sourceTjCode" column="source_tj_code" jdbcType="VARCHAR"/>
         <result property="sourceTjRemark" column="source_tj_remark" jdbcType="VARCHAR"/>
+        <result property="cpltFlag" column="cplt_flag" jdbcType="VARCHAR"/>
     </resultMap>
 
     <insert id="insertInsureSettleInfo" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO" >
@@ -663,6 +664,7 @@
           is_first_visit,
           crte_id,
           crte_name,
+          cplt_flag,
           crte_time
         FROM
           outpt_visit
@@ -847,5 +849,90 @@
             </if>
         </set>
         where id = #{careToMedicId}
+    </update>
+
+    <select id="queryOutptVisitSelfFeePatient"   parameterType="java.util.Map" resultMap="OutptVisitResultMap">
+        select id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code,
+               age, age_unit_code, birthday, marry_code, nation_code, cert_code, cert_no, phone,
+               now_address, visit_no, visit_code, patient_code,
+               source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+               insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time,
+               is_visit, is_first_visit, tran_in_code, in_cert_time, in_dept_id,
+               in_disease_id, in_remark, advance_payment,
+               crte_id, crte_name, crte_time,
+        from outpt_visit where  patient_code ='0'
+        <if test="hospCode!=null and hospCode!=''">
+            and hosp_code =#{hospCode}
+        </if>
+
+
+    </select>
+
+    <select id="queryOutptCostByvisitIds"  resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select  id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+        from outpt_cost where visit_id =#{visitId} and hosp_code=#{hospCode}
+        )
+    </select>
+    <update id="updateUplod">
+        update
+        outpt_visit
+        <set >
+            <if test="cpltFlag != null and cpltFlag != ''">
+                cplt_flag = #{cpltFlag,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code =#{hospCode}
     </update>
 </mapper>

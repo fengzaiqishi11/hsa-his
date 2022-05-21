@@ -423,7 +423,7 @@ public interface OutptTmakePriceFormService {
      * @Date 2022-05-09 15:14
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
      */
-    WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(Map<String, Object> map);
+    WrapperResponse<Map<String, Object>> queryInsureSetlResult(Map<String, Object> map);
 
     /**
      * 【6401】费用明细上传撤销
@@ -433,4 +433,13 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map);
+
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 15:57
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> insureRefund(Map<String, Object> map);
 }

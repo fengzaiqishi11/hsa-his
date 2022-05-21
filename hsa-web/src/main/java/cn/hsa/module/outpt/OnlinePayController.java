@@ -51,6 +51,8 @@ public class OnlinePayController  extends BaseController {
     Map<String, Object> map = new HashMap<>();
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("onlinePayFeeDTO", dto);
+    map.put("crteName",sysUserDTO.getName());
+    map.put("crteId",sysUserDTO.getUsId());
     return outptTmakePriceFormService_consumer.uploadOnlineFeeDetail(map);
   }
 
@@ -64,7 +66,7 @@ public class OnlinePayController  extends BaseController {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
    */
   @PostMapping("/queryInsureSetlResult")
-  public WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(@RequestBody Map<String,Object> param,
+  public WrapperResponse<Map<String, Object>> queryInsureSetlResult(@RequestBody Map<String,Object> param,
                                                                    HttpServletRequest req, HttpServletResponse res) {
     //获取个人信息
     OutptVisitDTO outptVisitDTO = JSON.parseObject (JSON.toJSONString(param.get("outptVisit")),OutptVisitDTO.class) ;
@@ -142,9 +144,13 @@ public class OnlinePayController  extends BaseController {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
    */
   @PostMapping("/insureRefund")
-  public WrapperResponse<Boolean> insureRefund(@RequestBody SetlResultQueryDTO dto,
+  public WrapperResponse<Boolean> insureRefund(@RequestBody SetlRefundQueryDTO dto,
                                                   HttpServletRequest req,
                                                   HttpServletResponse res) {
-    return null;
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlRefundQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.insureRefund(map);
   }
 }

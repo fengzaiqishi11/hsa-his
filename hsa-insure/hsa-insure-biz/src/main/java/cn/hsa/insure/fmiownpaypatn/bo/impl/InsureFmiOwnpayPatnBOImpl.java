@@ -788,7 +788,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         }
         // 2.判断是门诊自费病人 还是 住院自费病人  查询费用数据
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
-        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();;
+        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
 
         if (insureSettleInfoDTO.getLx().equals("1")) {
             inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
@@ -823,13 +823,13 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_FINISH, interfaceParamDTO);
         //修改状态
-        if(inptVisitDTO != null){
+        if(insureSettleInfoDTO.getLx().equals("1")){
             Map<String, Object> updateMap = new HashMap<>();
             updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
             updateMap.put("inptVisitDTO", inptVisitDTO);
             inptVisitService_consumer.updateUplod(updateMap);
         }
-        if(outptVisitDTO != null){
+        if(insureSettleInfoDTO.getLx().equals("0")){
             Map<String, Object> updateMap = new HashMap<>();
             updateMap.put("id",insureSettleInfoDTO.getId());
             updateMap.put("hospCode",insureSettleInfoDTO.getHospCode());
@@ -855,7 +855,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
     public Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO) {
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO  insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
-        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+//        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
         //1.查询是否有自费就诊记录
         List<InsureUploadCostDTO> costDTOList = insureIndividualCostDAO.queryFeeInfoDetailPage(insureSettleInfoDTO);
         if(ListUtils.isEmpty(costDTOList)){

@@ -79,16 +79,6 @@ public class ItemProfitStatisticsDTO extends StroStockDetailDO implements Serial
     private String itemSpec;
 
     /**
-     * 项目结算数量
-     */
-    private BigDecimal settleCount;
-
-    /**
-     * 项目退费数量
-     */
-    private BigDecimal backCount;
-
-    /**
      * 销售数量 = 结算数量-退费数量
      */
     private BigDecimal sellCount;

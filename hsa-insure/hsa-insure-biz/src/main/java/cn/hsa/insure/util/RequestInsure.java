@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
+import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
@@ -49,6 +50,9 @@ public class RequestInsure {
 
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private InsureUnifiedLogService insureUnifiedLogService_consumer;
 
 
     /**
@@ -281,7 +285,27 @@ public class RequestInsure {
      * @Return java.util.Map
      */
     public Map callHNS(String hospCode,String insureRegCode,Map<String,Object> param){
+          //封装医保接口日志表数据
+          Map<String, Object> params = new HashMap<>();
         try{
+            params.put("hospCode", hospCode);
+            // 定点医药机构编号
+            params.put("medisCode", MapUtils.get(param,"oper_hospitalid"));
+            // 医保中心编码
+            params.put("regCode", MapUtils.get(param,"oper_centerid"));
+            // 就医地医保区划
+            params.put("mdtrtareaAdmvs", "0000");
+            // 交易编号
+            params.put("infno", MapUtils.get(param,"function_id"));
+            params.put("msgId", StringUtils.createMsgId(MapUtils.get(param,"oper_hospitalid")));
+            params.put("msgInfo", MapUtils.get(param,"function_id"));
+            //表要求必填，目前接口都未传 ，直接传id
+            params.put("msgName", MapUtils.get(param,"function_id"));
+            params.put("crteId", MapUtils.get(param,"staff_id"));
+            params.put("crteName", MapUtils.get(param,"staff_name"));
+            params.put("visitId", MapUtils.get(param,"visitId"));
+            params.put("isHospital", "0");
+
             toLoginHNS(hospCode,insureRegCode);
             InsureConfigurationDO insureConfigurationDO = toConfig(hospCode, insureRegCode);
             //请求参数
@@ -299,15 +323,19 @@ public class RequestInsure {
             // 获取系统参数是直连医保还是走消息队列连接，默认消息队列
             SysParameterDTO sysParamDTO = this.getSysParamDTO(hospCode, "DIRECT_OR_QUEUE");
             if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
-                // 直连医保
-                logger.debug("*****开始【湖南省医保调用】直连方法*****");
-                logger.debug("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
+              // 直连医保
+                logger.info("*****开始【湖南省医保调用】直连方法*****");
+                logger.info("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
+                String paramMapJson = JSON.toJSONString(paramObj);
+                params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 4000 ? paramMapJson.substring(0, 4000) : paramMapJson);
                 String doPost = HttpConnectUtil.doPost(paramObj);
-                logger.debug("【湖南省医保调用】直连返参字符串：" + doPost);
-                logger.debug("开始解析xml");
+                logger.info("【湖南省医保调用】直连返参字符串：" + doPost);
+                logger.info("开始解析xml");
                 resultData = HygeiaUtil.xml2map(doPost);
-                logger.debug("【湖南省医保调用】直连返参XML解析：" + resultData);
-                logger.debug("*****结束【湖南省医保调用】直连方法*****");
+                params.put("resultStr", resultData);
+                params.put("infcode", "1");
+                logger.info("【湖南省医保调用】直连返参XML解析：" + resultData);
+                logger.info("*****结束【湖南省医保调用】直连方法*****");
             } else {
                 // 默认消息队列
                 Map<String,Object> resultObj = new HashMap<>();
@@ -316,9 +344,15 @@ public class RequestInsure {
                 String activityCode = SnowflakeUtils.getId();//交易号
                 httpParam.put("activityCode",activityCode);
                 httpParam.put("data", paramObj);
-                resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,activityCode);
+                String paramMapJson = JSON.toJSONString(httpParam);
+                params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 4000 ? paramMapJson.substring(0, 4000) : paramMapJson);
+                resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,
+                    activityCode);
+                params.put("resultStr", resultObj);
+                params.put("infcode", "1");
                 Integer code = (Integer) resultObj.get("code");
                 if (code < 0) {
+                    params.put("infcode", "0");
                     throw new AppException((String) resultObj.get("msg"));
                 }
                 resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
@@ -329,7 +363,12 @@ public class RequestInsure {
             }
             return resultData;
         } catch (Exception e){
+          //调接口后，请求失败插入医保人员信息获取日志
+           params.put("resultStr", e.getMessage() == null ? "null" : e.getMessage().length() > 4000 ?
+              e.getMessage().substring(0, 4000) : e.getMessage());
             throw new AppException("调用医保提示【"+e.getMessage()+"】");
+        }finally {
+          insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
         }
     }
 

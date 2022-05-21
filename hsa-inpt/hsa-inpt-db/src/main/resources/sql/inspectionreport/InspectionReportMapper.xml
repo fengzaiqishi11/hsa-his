@@ -23,46 +23,46 @@
 
     <select id="getPatientsTreeOfDepartment" resultMap="patientListTree">
         SELECT
-        a.id,
-        '' as visit_id,
-        a.label,
-        a.parentId
+            a.id,
+            '' as visit_id,
+            a.label,
+            a.parentId
         FROM
-        (
-        SELECT
-        bd.CODE id,
-        bd.NAME label,
-        ifnull( bd.up_dept_code, '-2' ) parentId
-        FROM
-        base_dept bd
-        WHERE
-        bd.is_valid = '1'
-        AND bd.CODE != 'B30'
+            (
+                SELECT
+                    bd.CODE id,
+                    bd.NAME label,
+                    ifnull( bd.up_dept_code, '-2' ) parentId
+                FROM
+                    base_dept bd
+                WHERE
+                    bd.is_valid = '1'
+                  AND bd.CODE != 'B30'
         AND bd.type_code = #{deptType}
-        AND bd.hosp_code = #{hospCode}
-        ) a UNION ALL
+                  AND bd.hosp_code = #{hospCode}
+            ) a UNION ALL
         SELECT
-        bd.`code` id,
-        '' as visit_id,
-        bd.`name` label,
-        '-2' parentId
+            bd.`code` id,
+            '' as visit_id,
+            bd.`name` label,
+            '-2' parentId
         FROM
-        base_dept bd
+            base_dept bd
         WHERE
-        bd.CODE in (
-        SELECT
-        IFNULL(
-        up_dept_code,#{code})
+                bd.CODE in (
+                SELECT
+                    IFNULL(
+                            up_dept_code,#{code})
 
-        FROM
-        base_dept inbd
-        WHERE
-        inbd.is_valid = '1'
-        AND inbd.type_code =#{deptType}
-        AND inbd.CODE != 'B30'
-        AND inbd.hosp_code = #{hospCode}
-        )
-        AND bd.up_dept_code IS NULL
+                FROM
+                    base_dept inbd
+                WHERE
+                    inbd.is_valid = '1'
+                  AND inbd.type_code =#{deptType}
+                  AND inbd.CODE != 'B30'
+          AND inbd.hosp_code = #{hospCode}
+            )
+          AND bd.up_dept_code IS NULL
 
     </select>
 
@@ -202,9 +202,9 @@
         left join inpt_advice_detail b on a.hosp_code = b.hosp_code and a.opd_id = b.id
         left join base_advice c on a.hosp_code = b.hosp_code  and  b.ba_id =c.id
         WHERE
-            a.hosp_code=#{hospCode}
-          and a.type_code= #{typeCode}
-          and	a.in_no = #{inNo}
+        a.hosp_code=#{hospCode}
+        and a.type_code= #{typeCode}
+        and	a.in_no = #{inNo}
         <if test="startTime != null and startTime != ''">
             and a.crte_Time &gt; #{startTime}
         </if>
@@ -304,7 +304,7 @@
     </select>
     <select id="getDepartmentById" parameterType="map" resultType="map">
         select id from base_dept where hosp_code = #{hospCode}
-            and id = #{deptId} and (type_code = '1' or type_code = '2');
+                                   and id = #{deptId} and (type_code = '1' or type_code = '2');
     </select>
 
     <select id="getHospitalInfo" resultType="map" parameterType="map" >

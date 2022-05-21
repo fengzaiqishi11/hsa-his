@@ -216,7 +216,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
      **/
     private void getYfSyData(Map<String, Object> praMap, Map<String, Object> resultMap) {
         //今日业务：查询出药房当日的业务情况
-        Map<String,Object> ywMap = baseHomeDao.getYfdrYwData(praMap);
+        //Map<String,Object> ywMap = baseHomeDao.getYfdrYwData(praMap);
         //今日预警:统计库存数量低于库存下线，高于库存上线的数据
         Map<String,Object> yjMap = baseHomeDao.getKcSxxxYjData(praMap);
         //待办事项：查询出药房当日待办的事项
@@ -237,7 +237,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //饼图数据：将药房饼图数据转化为前端可识别的数据
         Map<String, Object> btMap = handYfBtData(mzfytyMap, zyfytyMap);
 
-        resultMap.put("ywMap",ywMap);//今日业务
+        resultMap.put("ywMap",null);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
 //        resultMap.put("dbMap",null);//待办事项
         resultMap.put("csMap",csMap);//矩形趋势图数据

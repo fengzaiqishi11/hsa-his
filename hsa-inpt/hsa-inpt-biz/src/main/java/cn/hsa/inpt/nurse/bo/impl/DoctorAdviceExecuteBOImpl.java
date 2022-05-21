@@ -187,15 +187,13 @@ public class DoctorAdviceExecuteBOImpl extends HsafBO implements DoctorAdviceExe
       list.add(inptAdviceDTO);
     });
     //批量更新医嘱
-    int aCount = inptAdviceDao.updateInptAdviceBatch(list);
+    inptAdviceDao.updateInptAdviceBatch(list);
     //更新原医嘱表是否阳性,医嘱内容
-    if(map1 != null && map1.size() > 0 && !ListUtils.isEmpty(adviceList)){
-      for(String key : map1.keySet()){
-        for (int j = 0; j < adviceList.size(); j++) {
-          if(!StringUtils.isEmpty(key) && key.equals(adviceList.get(j).getId())){
-            adviceList.get(j).setContent(adviceList.get(j).getContent() + map1.get(key).split("_")[0]);
-            adviceList.get(j).setIsPositive(map1.get(key).split("_")[1]);
-          }
+    if(!map1.isEmpty() && !ListUtils.isEmpty(adviceList)){
+      for(InptAdviceDTO inptAdviceDTO :adviceList){
+        if(map1.get(inptAdviceDTO.getSourceIaId()) != null){
+          inptAdviceDTO.setContent(inptAdviceDTO.getContent() + map1.get(inptAdviceDTO.getSourceIaId()).split("_")[0]);
+          inptAdviceDTO.setIsPositive(map1.get(inptAdviceDTO.getSourceIaId()).split("_")[1]);
         }
       }
       inptAdviceExecDao.updateIsPositive(adviceList);

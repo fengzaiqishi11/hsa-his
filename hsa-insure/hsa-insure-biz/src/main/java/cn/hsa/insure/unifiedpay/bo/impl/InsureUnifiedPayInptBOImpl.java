@@ -220,6 +220,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
         insureConfigurationDTO.setCode(insureIndividualVisitDTO.getInsureRegCode()); // 医保机构编码
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (ObjectUtil.isEmpty(insureConfigurationDTO)) {
+            throw new AppException("未获取到医保配置信息,请检查！hospCode:"+hospCode+",orgCode:"+insureIndividualVisitDTO.getMedicineOrgCode()+",code:"+insureIndividualVisitDTO.getInsureRegCode());
+        }
         /**
          * 公共入参
          */
@@ -368,14 +371,22 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
              * zhSpecial : '1' 珠海
              * huNanSpecial : '1' 湖南
              */
-            objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
+            String insureItemType = MapUtils.get(item,"insureItemType");
+            String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");// 是否限制级用药
+            //如果当前项目为限制用药，医院审批标志取isReimburse的值，否则取配置的hospApprFlag值
+            if ("1".equals(lmtUserFlag)) {
+                if (ObjectUtil.isEmpty(isReimburse)) {
+                    throw new RuntimeException("【"+MapUtil.getStr(item,"hospItemName")+"】为限制用药，是否报销标志【isReimburse】不能为空，请检查！费用id为："+feedetlSn);
+                }
+                objectMap.put("hosp_appr_flag", isReimburse); // 医院审批标志
+            }else {
+                objectMap.put("hosp_appr_flag", hospApprFlag); // 医院审批标志
+            }
             // 珠海 + （药品和材料） + 限制级用药标志为 0 ，hosp_appr_flag则使用 0
             if("1".equals(zhSpecial) && "0".equals(isReimburse)) {
                 objectMap.put("hosp_appr_flag", "0");
             }
 
-            String insureItemType = MapUtils.get(item,"insureItemType");
-            String lmtUserFlag = MapUtils.get(item,"lmtUserFlag");// 是否限制级用药
             // 湖南省医保中药饮片中出现了复方药物，则中药饮片全部报销,单方为不报销（103-中药饮片）
             if (isCompound && "1".equals(huNanSpecial) && Constant.UnifiedPay.DOWNLOADTYPE.ZYYP.equals(insureItemType)) {
                 objectMap.put("hosp_appr_flag", "1");
@@ -395,19 +406,25 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             // 当药品本身是限制用药时，医院审批标志传0走住院自付比例，传1时走门诊自付比例
             if (Constants.SF.S.equals(huNanSpecial) && Constants.SF.S.equals(lmtUserFlag) &&
                     (Constant.UnifiedPay.DOWNLOADTYPE.XY.equals(insureItemType) || Constant.UnifiedPay.DOWNLOADTYPE.ZCY.equals(insureItemType))) {
-                if (ObjectUtil.isNotEmpty(isReimburse)) {
-                        throw new RuntimeException("是否报销标志【isReimburse】不能为空！费用id为："+feedetlSn);
+                if (ObjectUtil.isEmpty(isReimburse)) {
+                    throw new RuntimeException("【"+MapUtil.getStr(item,"hospItemName")+"】为限制使用项目，其是否报销标志【isReimburse】不能为空，请检查！费用id为："+feedetlSn);
                 }
-                    switch (isReimburse) {
-                        case Constants.SF.S:
-                            objectMap.put("hosp_appr_flag", "0");
-                            break;
-                        case Constants.SF.F:
-                            objectMap.put("hosp_appr_flag", "2");
-                            break;
-                        default:
-                            break;
-                    }
+                switch (isReimburse) {
+                    case Constants.SF.S:
+                        objectMap.put("hosp_appr_flag", "0");
+                        break;
+                    case Constants.SF.F:
+                        objectMap.put("hosp_appr_flag", "2");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            //广东省接口医院审批标志只认1和2，【1：审批通过，2审批不通过】，这里做一下转换
+            if ("440".startsWith(insureConfigurationDTO.getRegCode())) {
+                if ("0".equals(MapUtil.getStr(objectMap, "hosp_appr_flag"))) {
+                    objectMap.put("hosp_appr_flag","2");
+                }
             }
 
             objectMap.put("etip_flag",Constants.SF.F); // 外检标志
@@ -731,6 +748,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         Map<String, Object> paramMap = new HashMap<>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -812,6 +830,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         Map<String,Object> paramMap = new HashMap<String,Object>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("insureAccoutFlag", inptVisitDTO.getIsUseAccount());
         paramMap.put("costStr", costMap.get("costStr").toString());
@@ -873,7 +892,12 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
-
+        //读卡原始信息赋值
+        InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
+        if (ObjectUtil.isNotEmpty(visitDTO)) {
+            insureIndividualVisitDTO.setHcardChkinfo(visitDTO.getHcardChkinfo());
+            insureIndividualVisitDTO.setHcardBasinfo(visitDTO.getHcardBasinfo());
+        }
 
         //判断医保费用是否上传
         inptVisitDTO.setHospCode(hospCode);
@@ -895,6 +919,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         Map<String,Object> paramMap = new HashMap<String,Object>();
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         paramMap.put("insureAccoutFlag", inptVisitDTO.getIsUseAccount());
         paramMap.put("costStr", costMap.get("costStr").toString());
@@ -999,6 +1024,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
 
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_SETTLE_BACK.getCode());
@@ -1327,6 +1353,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.putAll(map);
         paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualBasicDTO.getInsuplc_admdvs());
         paramMap.put("orgCode", insureIndividualBasicDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualBasicDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualBasicDTO.getInsureRegCode());
@@ -1448,6 +1475,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.putAll(map);
         paramMap.put("inptDiagnoseDTOList",inptDiagnoseDTOList);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -1500,6 +1528,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
         paramMap.putAll(map);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
@@ -1547,6 +1576,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureOrgCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
 
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_IN_BACK.getCode());
@@ -1602,6 +1632,7 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         // 调用统一支付平台接口
         paramMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
         // 参保地医保区划
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());

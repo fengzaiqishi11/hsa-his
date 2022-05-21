@@ -125,6 +125,18 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
     public PageDTO queryVisit(InsureSettleInfoDTO insureSettleInfoDTO) {
         PageHelper.startPage(insureSettleInfoDTO.getPageNo(), insureSettleInfoDTO.getPageSize());
         List<InptVisitDTO> visitDTOList = insureGetInfoDAO.queryVisit(insureSettleInfoDTO);
+        // 获取医院医保编码
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        isInsureUnifiedMap.put("code", "HOSP_INSURE_CODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        if (sysParameterDTO == null) {
+            throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
+        }
+        for(InptVisitDTO inptVisitDTO :visitDTOList){
+            inptVisitDTO.setOrgCode(sysParameterDTO.getValue());
+        }
+
 
         return PageDTO.of(visitDTOList);
 

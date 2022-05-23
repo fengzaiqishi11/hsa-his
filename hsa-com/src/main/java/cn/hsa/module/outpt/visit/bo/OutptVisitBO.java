@@ -103,4 +103,6 @@ public interface OutptVisitBO {
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
 
     Boolean updateUplod(OutptVisitDTO outptVisitDTO);
+
+    void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
 }

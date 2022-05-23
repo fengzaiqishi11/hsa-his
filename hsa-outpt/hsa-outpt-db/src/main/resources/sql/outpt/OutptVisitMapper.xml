@@ -935,4 +935,16 @@
         where
         id = #{id} and hosp_code =#{hospCode}
     </update>
+
+    <update id="updateOutptVisitUploadFlag">
+        update
+        outpt_visit
+        <set >
+            <if test="isUploadDise != null and isUploadDise != ''">
+                is_uplod_dise = #{isUploadDise},
+            </if>
+        </set>
+        where
+        id = #{id} and hosp_code =#{hospCode}
+    </update>
 </mapper>

@@ -651,6 +651,9 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
+        //修改上传状态为已上传
+      /*  outptVisitDTO.setIsUploadDise("1");
+        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);*/
         return true;
     }
 
@@ -691,6 +694,12 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             throw new AppException((String) resultMap.get("err_msg"));
         }
         logger.info("自费病人门诊就医信息删除:" + resultJson);
+
+        //修改上传状态
+        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
+        outptVisitDTO.setIsUploadDise("0");
+        outptVisitDTO.setId(insureSettleInfoDTO.getId());
+        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);
         return true;
     }
 

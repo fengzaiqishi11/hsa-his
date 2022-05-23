@@ -936,7 +936,7 @@
         id = #{id} and hosp_code =#{hospCode}
     </update>
 
-    <update id="updateOutptVisitUploadFlag">
+    <update id="updateOutptVisitUploadFlag" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         update
         outpt_visit
         <set >

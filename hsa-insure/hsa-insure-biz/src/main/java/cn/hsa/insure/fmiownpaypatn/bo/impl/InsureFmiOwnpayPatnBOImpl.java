@@ -640,7 +640,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
         //修改上传状态为已上传
-      /*  outptVisitDTO.setIsUploadDise("1");
+        /*outptVisitDTO.setIsUploadDise("1");
         outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);*/
         return true;
     }

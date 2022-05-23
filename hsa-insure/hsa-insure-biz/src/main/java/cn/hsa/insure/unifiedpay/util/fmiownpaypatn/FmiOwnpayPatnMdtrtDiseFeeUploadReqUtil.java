@@ -276,7 +276,7 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
 
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("costTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
 
-                } else if (insureSettleInfoDTO.getLx().equals("2")) {
+                } else if (insureSettleInfoDTO.getLx().equals("0")) {
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
 
                 }

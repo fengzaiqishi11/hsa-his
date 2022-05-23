@@ -124,8 +124,9 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
     }
 
     @Override
-    public void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO) {
-        outptVisitDAO.updateOutptVisitUploadFlag(outptVisitDTO);
+    public Boolean updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO) {
+         outptVisitDAO.updateOutptVisitUploadFlag(outptVisitDTO);
+        return true;
     }
 
     /**

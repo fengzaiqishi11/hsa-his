@@ -421,19 +421,20 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         map2.put("purcinfo", JSONObject.toJSONString(listMap));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3506, map2);
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        ////2022-05-23 zjp 上传到医保后，医保返回的出参为无，不需要解析医保返回出参
         //上传成功数据
-        JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
-        List<InsureGoodSellBack> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodSellBack.class);
+        //JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
+       /* List<InsureGoodSellBack> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodSellBack.class);
         if (ListUtils.isEmpty(sucessDataList)) {
             throw new AppException("上传失败： 本次上传数据为0");
-        }
+        }*/
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSellBack::getFixmedinsBchno).distinct().collect(Collectors.toList());
+       // List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSellBack::getFixmedinsBchno).distinct().collect(Collectors.toList());
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
-        for (String fixmedinsBchno : fixmedinsBchnoList) {
+        for (InsureGoodSellBack insureGoodSellBack : listInsureGoodSellBack) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
             insureGoodInfoDelete.setId(SnowflakeUtils.getId());
-            insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setFixmedinsBchno(listInsureGoodSellBack.get(0).getVisitId());
             insureGoodInfoDelete.setHospCode(hospCode);
             insureGoodInfoDelete.setInsureType(regCode);
             insureGoodInfoDelete.setInvDataType("4");

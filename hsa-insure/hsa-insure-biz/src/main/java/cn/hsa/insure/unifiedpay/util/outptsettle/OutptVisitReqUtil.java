@@ -101,6 +101,9 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         patientInfo.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());
         // 计划生育手术或生育日期
         patientInfo.put("birctrl_matn_date", insureIndividualVisitDTO.getBirctrlMatnDate());
+        patientInfo.put("geso_val", "");  //孕周数
+        patientInfo.put("ttp_resp", ""); //是否第三方责任申请
+        patientInfo.put("expi_gestation_nub_of_m", "");  //终止妊娠月数
         return patientInfo;
     }
 
@@ -153,6 +156,8 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
             diagnoseMap.put("diag_time", DateUtils.format(diagnoseDTOList.get(i).getCrteTime(), DateUtils.Y_M_DH_M_S));
             // 有效标志
             diagnoseMap.put("vali_flag", Constants.SF.S);
+            // 主诊断标志
+            diagnoseMap.put("maindiag_flag",diagnoseDTOList.get(i).getIsMain());
             mapList.add(diagnoseMap);
         }
         return mapList;

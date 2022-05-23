@@ -1505,8 +1505,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (materialDTO == null){
                         throw new AppException("辅助计费【"+name+"】配置的材料有误!");
                     }
-                    //inptCostDTO.setPrice(materialDTO.getSplitPrice());
-                    //inptCostDTO.setNumUnitCode(materialDTO.getSplitUnitCode());
+
                     //之前是按最小单位算的  但是现在 辅助计费 需要根据 辅助计费明细里面的单位去确定按什么单位收费 -- 2022-05-11
                     if(StringUtils.isNotEmpty(baseAssistCalcDetailDO.getItemUnitCode()) && baseAssistCalcDetailDO.getItemUnitCode().equals(materialDTO.getSplitUnitCode())){
                         inptCostDTO.setPrice(materialDTO.getSplitPrice());
@@ -1717,6 +1716,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 if (materiaDTO == null ){
                     throw new AppException("生成静态计费未获取到材料信息!");
                 }
+                //名称
+                inptAdviceDetailDTO.setItemName(materiaDTO.getName());
 
                 //这里的医嘱明细单位必须从辅助计费中的明细里面取 单位值  -  2022-05-11 彭波
                 if(StringUtils.isNotEmpty(detailDTO.getItemUnitCode()) && detailDTO.getItemUnitCode().equals(materiaDTO.getSplitUnitCode())){
@@ -2152,6 +2153,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             inptCostDTO.setOkName(medicalAdviceDTO.getCheckName());
             inptCostDTO.setOkTime(date);
         }
+
 
         inptCostDTO.setSettleCode("0");
         inptCostDTO.setIsCheck("0");

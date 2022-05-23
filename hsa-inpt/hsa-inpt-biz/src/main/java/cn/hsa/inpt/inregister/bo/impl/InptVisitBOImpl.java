@@ -1034,6 +1034,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 insureRemoteInptRegisterDTO.setBka008(insureIndividualBasicDTO.getBka008());
                 insureRemoteInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001());//单位ID
                 insureRemoteInptRegisterDTO.setInjuryBorthSn(insureInptRegisterDTO.getInjuryBorthSn());
+                insureRemoteInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001());//单位ID
 
                 insureRemoteInptRegisterDTO.setBka036("0"); // 是否读卡
                 if ("iccardno".equals(insureIndividualBasicDTO.getBka895())) {

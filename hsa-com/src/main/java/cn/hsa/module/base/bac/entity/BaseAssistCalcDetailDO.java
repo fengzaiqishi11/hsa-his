@@ -87,7 +87,4 @@ public class BaseAssistCalcDetailDO extends PageDO implements Serializable {
     private Date crteTime;
 
     private String unitCode;
-
-
-
 }

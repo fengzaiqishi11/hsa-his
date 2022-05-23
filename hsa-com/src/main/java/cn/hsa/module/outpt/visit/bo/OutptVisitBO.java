@@ -104,5 +104,5 @@ public interface OutptVisitBO {
 
     Boolean updateUplod(OutptVisitDTO outptVisitDTO);
 
-    void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
+    Boolean updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
 }

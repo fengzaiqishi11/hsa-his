@@ -112,5 +112,5 @@ public interface OutptVisitService {
     WrapperResponse<Boolean> updateUplod(Map<String, Object> map);
 
 
-    void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
+    WrapperResponse<Boolean>  updateOutptVisitUploadFlag(Map<String, Object> map);
 }

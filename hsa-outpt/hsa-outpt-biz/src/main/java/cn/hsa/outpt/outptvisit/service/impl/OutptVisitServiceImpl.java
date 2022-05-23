@@ -153,7 +153,7 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     }
 
     @Override
-    public void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO) {
-         outptVisitBO.updateOutptVisitUploadFlag(outptVisitDTO);
+    public WrapperResponse<Boolean> updateOutptVisitUploadFlag(Map<String, Object> map) {
+        return WrapperResponse.success(outptVisitBO.updateOutptVisitUploadFlag(MapUtils.get(map,"outptVisitDTO")));
     }
 }

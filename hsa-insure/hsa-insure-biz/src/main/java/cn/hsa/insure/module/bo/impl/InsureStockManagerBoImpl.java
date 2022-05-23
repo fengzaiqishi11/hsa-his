@@ -190,18 +190,31 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         //失败数据
         JSONArray failData = MapUtils.getEmptyErr(resultDataMap, "failData", null);
 
-        List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodBuy.class);
+        ////2022-05-23 zjp 上传到医保后，医保返回的出参为无，不需要解析医保返回出参
+
+     /*   List<InsureGoodBuy> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodBuy.class);
         if (ListUtils.isEmpty(sucessDataList)) {
             throw new AppException("上传失败： 本次上传数据为0");
-        }
+        }*/
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        //List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
 
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
-        for (String fixmedinsBchno : fixmedinsBchnoList) {
+        /*for (String fixmedinsBchno : fixmedinsBchnoList) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
             insureGoodInfoDelete.setId(SnowflakeUtils.getId());
             insureGoodInfoDelete.setFixmedinsBchno(fixmedinsBchno);
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
+            insureGoodInfoDelete.setInsureType(regCode);
+            insureGoodInfoDelete.setInvDataType("3");
+            insureGoodInfoDelete.setCertId(certId);
+            listData.add(insureGoodInfoDelete);
+        }*/
+        for (InsureGoodBuyBack insureGoodBuyBack : listInsureGoodBuyBack) {
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(listInsureGoodBuyBack.get(0).getPurcInvoNo());
             insureGoodInfoDelete.setHospCode(hospCode);
             insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
             insureGoodInfoDelete.setInsureType(regCode);

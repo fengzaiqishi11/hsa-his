@@ -4684,7 +4684,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (ObjectUtil.isEmpty(setlResultQueryDTO.getVisitId())) {
         throw new AppException("请传入就诊ID!");
       }
-      String visitId = setlResultQueryDTO.getVisitId();//就诊id
+      //就诊id
+      String visitId = setlResultQueryDTO.getVisitId();
       Map<String, Object> insureVisitParam = new HashMap<String, Object>();
       insureVisitParam.put("id", visitId);
       insureVisitParam.put("hospCode", hospCode);
@@ -4697,7 +4698,22 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       map.put("setlResultQueryDTO",setlResultQueryDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6401(map).getData();
-      return null;
+      Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+      String success = MapUtils.get(outptMap, "data");
+      //撤销成功
+      if ("true".equals(success)){
+        //删除医保费用表
+        insureIndividualCostService_consumer.deleteOutptInsureCost(insureVisitParam);
+        //医保就诊表payOrdId
+        Map map1 = new HashMap();
+        map1.put("payToken", "");
+        map1.put("payOrdId", "");
+        map1.put("hospCode", hospCode);
+        outptSettleDAO.updateIndividualVisitToken(map1);
+        return true;
+      }else{
+        return false;
+      }
     }
 
   /**

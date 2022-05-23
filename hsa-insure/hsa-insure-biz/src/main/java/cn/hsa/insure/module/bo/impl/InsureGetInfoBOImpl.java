@@ -1148,9 +1148,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(MapUtils.isEmpty(baseInfoMap)){
             throw new AppException("结算清单的基本信息数据为空，请先维护数据");
         }
-        if(MapUtils.isEmpty(mriBaseInfo)){
-            throw new AppException("病案首页的信息数据为空，请先维护数据");
-        }
+//        if(MapUtils.isEmpty(mriBaseInfo)){
+//            throw new AppException("病案首页的信息数据为空，请先维护数据");
+//        }
         for (String key : setlinfoMap.keySet()) {
             if ("-".equals(MapUtils.get(setlinfoMap, key))) {
                 setlinfoMap.put(key,"");
@@ -1161,9 +1161,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 baseInfoMap.put(key,"");
             }
         }
-        for (String key : mriBaseInfo.keySet()) {
-            if ("-".equals(MapUtils.get(mriBaseInfo, key))) {
-                mriBaseInfo.put(key,"");
+        if(mriBaseInfo != null){
+            for (String key : mriBaseInfo.keySet()) {
+                if ("-".equals(MapUtils.get(mriBaseInfo, key))) {
+                    mriBaseInfo.put(key,"");
+                }
             }
         }
 

@@ -383,7 +383,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
         inptAdviceDTO.setItemId(dto.getItemId());
         inptAdviceDTO.setPharId(dto.getPharId());
         inptAdviceDTO.setTotalNum(dto.getAllNum());
-        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        inptAdviceDTO.setUnitCode(dto.getCurrUnitCode());
         //判断库存,如果库存为空就移除
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
           it.remove();

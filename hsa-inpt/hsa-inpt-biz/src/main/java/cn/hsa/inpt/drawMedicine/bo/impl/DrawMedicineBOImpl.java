@@ -454,7 +454,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         inptAdviceDTO.setItemId(dto.getItemId());
         inptAdviceDTO.setPharId(dto.getPharId());
         inptAdviceDTO.setTotalNum(dto.getAllNum());
-        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        inptAdviceDTO.setUnitCode(dto.getCurrUnitCode());
         //判断库存,如果库存为空就弄成红色
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
           dto.setColor(Constants.COLOR.RED);

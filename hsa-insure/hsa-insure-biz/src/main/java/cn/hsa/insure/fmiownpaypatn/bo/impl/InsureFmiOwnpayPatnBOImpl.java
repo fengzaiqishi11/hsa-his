@@ -878,7 +878,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         //处理其他入参
         Map<String, Object> feedetailMap = new HashMap<>();
         feedetailMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
-        feedetailMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
+        feedetailMap.put("fixmedins_code", insureConfigurationDTO.getOrgCode());
         paramMap.put("feedetail",feedetailMap);
         //处理流水号
         List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();

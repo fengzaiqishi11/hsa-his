@@ -7,26 +7,28 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.*;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.inpt.inregister.service.InptVisitService;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
+import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
-import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
-import cn.hsa.module.insure.module.dto.InsureUploadCostDTO;
-import cn.hsa.module.insure.module.dto.ItemInfoDTO;
-import cn.hsa.module.insure.module.dto.PayInfoDTO;
+import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import cn.hsa.module.insure.fmiownpaypatn.bo.InsureFmiOwnpayPatnBO;
+import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
+import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
@@ -43,9 +45,13 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.jetty.server.handler.gzip.GzipHttpOutputInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -94,6 +100,19 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 
     @Resource
     private BaseReqUtilFactory baseReqUtilFactory;
+
+    @Resource
+    private UnifiedCommon unifiedCommon;
+
+    @Resource
+    private OutptVisitDAO outptVisitDAO;
+
+    @Resource
+    private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    @Resource
+    private OutptCostDAO outptCostDAO;
+
     /**
      * @Method queryVisit
      * @Desrciption
@@ -632,9 +651,6 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
-        //修改上传状态为已上传
-      /*  outptVisitDTO.setIsUploadDise("1");
-        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);*/
         return true;
     }
 
@@ -675,12 +691,6 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             throw new AppException((String) resultMap.get("err_msg"));
         }
         logger.info("自费病人门诊就医信息删除:" + resultJson);
-
-        //修改上传状态
-       /* OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
-        outptVisitDTO.setIsUploadDise("0");
-        outptVisitDTO.setId(insureSettleInfoDTO.getId());
-        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);*/
         return true;
     }
 
@@ -871,7 +881,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         //处理其他入参
         Map<String, Object> feedetailMap = new HashMap<>();
         feedetailMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
-        feedetailMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
+        feedetailMap.put("fixmedins_code", insureConfigurationDTO.getOrgCode());
         paramMap.put("feedetail",feedetailMap);
         //处理流水号
         List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
@@ -1120,7 +1130,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
         }
         if (insureSettleInfoDTO.getInsureRegCode() == null) {
-            throw new AppException("请先选择要上传的医保机构");
+            throw new AppException("请先选择医保机构");
         }
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureSettleInfoDTO.getHospCode());
@@ -1143,7 +1153,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
      **/
     private List<Map<String, Object>> handlerOutptCostFee(InsureSettleInfoDTO insureSettleInfoDTO) {
 
-        String insureRegCode = insureSettleInfoDTO.getOrgCode();
+        String insureRegCode = insureSettleInfoDTO.getInsureRegCode();
         //判断是否有传输费用信息
         Map<String, Object> insureCostParam = new HashMap<String, Object>();
         insureCostParam.put("hospCode", insureSettleInfoDTO.getHospCode());//医院编码

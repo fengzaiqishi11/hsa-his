@@ -6,6 +6,8 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.entity.InptCostDO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
+import cn.hsa.module.insure.module.dto.InsureUploadCostDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
 import org.apache.ibatis.annotations.Param;
 
@@ -416,4 +418,6 @@ public interface InsureIndividualCostDAO {
      * @Return
      */
     InsureIndividualCostDTO selectFeeStartAndEndTime(Map<String, Object> map);
+
+    List<InsureUploadCostDTO> queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO);
 }

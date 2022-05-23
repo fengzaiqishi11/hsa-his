@@ -386,6 +386,18 @@ public class InptVisitDO extends PageDO implements Serializable {
      * 担保金额
      */
     private BigDecimal guaranteeBalance;
+    /**
+     * 自费病人是否上传费用
+     */
+    private String isUplodCost;
+    /**
+     * 自费病人是否诊断和就诊信息
+     */
+    private String isUplodDise;
+    /**
+     * 自费病人上传完成标志
+     */
+    private String cpltFlag;
 
     private Integer totalInDays; // 住院天数
 

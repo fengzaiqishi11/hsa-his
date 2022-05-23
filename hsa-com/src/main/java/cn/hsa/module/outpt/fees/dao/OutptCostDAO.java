@@ -666,4 +666,13 @@ public interface OutptCostDAO {
      * @Date: 2022/2/23
      */
     List<OutptCostDTO> queryCostByIds(@Param("hospCode") String hospCode,@Param("costIds") List<String> costIds);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 10:33
+     * @Description 根据门诊就诊ids查询门诊费用明细信息
+     * @param ids
+     * @return java.util.List<cn.hsa.module.inpt.doctor.dto.OutptCostDTO>
+     */
+    List<cn.hsa.module.inpt.doctor.dto.OutptCostDTO> queryOutptCostByvisitIds(List<String> ids);
 }

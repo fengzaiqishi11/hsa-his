@@ -971,7 +971,7 @@
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
         '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, '' as nation_code, '' as nation_name, a.reimbursement_ratio as reimbursement_ratio
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.name as nation_name, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
@@ -2336,6 +2336,37 @@
     <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select * from outpt_cost where hosp_code = #{hospCode} and op_id = #{id} and status_code = '0'
     </select>
+    <select id="queryOutptDiagnoseByVisitIds" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode, a.is_main isMain, b.name diseaseName,a.custom_disease as customDisease,
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName,a.crte_time as crteTime, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName
+        from outpt_diagnose a
+        join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+        <if test="diagnoseList != null and diagnoseList.size() > 0">
+            and a.type_code in
+            <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 
+    <select id="queryOutptMatchDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO" >
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,
+        a.is_main isMain, b.name diseaseName,b.code diseaseCode,a.crte_time
+        ,a.crte_id zzDoctorId,c.crte_name zzDoctorName,
+        iim.insure_illness_code as insureInllnessCode ,iim.insure_illness_name as insureInllnessName
+        from outpt_diagnose a
+        join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+        join outpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
+        join insure_disease_match iim  on a.disease_id = iim.hosp_illness_id and a.hosp_code = iim.hosp_code
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode} and iim.insure_reg_code =#{insureRegCode}
+        and  iim.insure_illness_name is not null
+        <if test="diagnoseList != null and diagnoseList.size() > 0">
+            and a.type_code in
+            <foreach collection="diagnoseList" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 
 </mapper>

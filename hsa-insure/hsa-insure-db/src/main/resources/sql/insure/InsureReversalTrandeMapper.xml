@@ -1098,6 +1098,7 @@
     <select id="queryYZSDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT DISTINCT
         c.aac003 AS psnName,
+        c.aac004 AS gend,
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
         c.bka008 insureUnit,
@@ -1128,13 +1129,16 @@
         e.thb_pay AS thbPay,
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
-        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
+        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0)
+        +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull(e.maf_pay,0.00) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         e.clr_optins AS clrOptins,
         e.clr_type AS clrType,
-        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type = value ) as clrTypeName,
-        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type =
+        value ) as clrTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 =
+        value ) as medTypeName,
         e.medicine_org_code AS medicineOrgCode,
         t.insure_reg_code AS setlOptins,
         t.aac001 AS psnNo,
@@ -1151,7 +1155,9 @@
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
-        (select name from insure_dict where value = t.psn_idet_type and code = 'PSN_IDET_TYPE' and insure_reg_code = t.insure_reg_code and hosp_code = t.hosp_code limit 1) as psnAttrName
+        (select admdvs_name from insure_admdvs i where i.admdvs_code=t.insuplc_admdvs) as insuplcAdmdvsName,
+        (select name from insure_dict where value = t.psn_idet_type and code = 'PSN_IDET_TYPE' and insure_reg_code =
+        t.insure_reg_code and hosp_code = t.hosp_code limit 1) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,

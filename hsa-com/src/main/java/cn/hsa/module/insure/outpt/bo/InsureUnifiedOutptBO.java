@@ -62,4 +62,6 @@ public interface InsureUnifiedOutptBO {
      * @return java.util.Map<java.lang.String,java.lang.Object>
      */
     Map<String, Object> UP_6401(Map<String, Object> map);
+
+    Map<String, Object> UP_6203(Map<String, Object> map);
 }

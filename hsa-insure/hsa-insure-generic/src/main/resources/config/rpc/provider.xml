@@ -83,4 +83,6 @@
     <dubbo:service interface="cn.hsa.module.insure.other.service.InsurePolicyService" ref="insurePolicyService_provider"/>
     <!--明细审核分析服务-->
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureDetailAuditService" ref="insureDetailAuditService"/>
+    <!--明细审核分析服务-->
+    <dubbo:service interface="cn.hsa.module.insure.module.service.InsureSpecialAttributeService" ref="insureSpecialAttributeService_provider"/>
 </beans>

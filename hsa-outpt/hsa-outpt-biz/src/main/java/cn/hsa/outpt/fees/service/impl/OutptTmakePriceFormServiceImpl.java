@@ -524,8 +524,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
    */
   @Override
-  public WrapperResponse<SeltSucCallbackDTO> queryInsureSetlResult(Map<String, Object> map) {
-    return WrapperResponse.success(outptTmakePriceFormBO.queryInsureSetlResult(map));
+  public WrapperResponse queryInsureSetlResult(Map<String, Object> map) {
+    return outptTmakePriceFormBO.queryInsureSetlResult(map);
   }
 
     /**
@@ -538,6 +538,18 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     @Override
     public WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map) {
       return WrapperResponse.success(outptTmakePriceFormBO.insureFeeRevoke(map));
+    }
+
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 15:58
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> insureRefund(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.insureRefund(map));
     }
 
 }

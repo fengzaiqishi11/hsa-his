@@ -418,17 +418,30 @@
         select A.* from (
         select m.* from (
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
+        is_uplod_cost,is_uplod_dise,cplt_flag,DATE_FORMAT(in_time, "%Y-%m-%d") as visitDate,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
         patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
         </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date(in_time) &gt;= date(#{startTime})
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and date(in_time) &lt;= date(#{endtime})
+        </if>
         order by crte_time ) m
         union all
         select n.* from (
         select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age,
-        ov.age_unit_code,ov.hosp_code,
+        ov.age_unit_code,ov.hosp_code,'1' as is_uplod_cost,'1' as is_uplod_dise,cplt_flag,DATE_FORMAT(visit_time, "%Y-%m-%d") as visitDate,
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
@@ -436,6 +449,18 @@
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
+        </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
+        </if>
+        <if test="startTime != null and startTime != '' ">
+            and date(visit_time) &gt;= date(#{startTime})
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and date(visit_time) &lt;= date(#{endtime})
         </if>
         order by crte_time ) n
         )A
@@ -1455,7 +1480,7 @@
         limit 1
     </select>
     <select id="querySettlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
-        select settle_no
+        select settle_no,stas_type
         from insure_setl_info
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -1775,4 +1800,63 @@
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}
     </update>
+    <update id="updateStasType">
+        update insure_setl_info
+        set stas_type = #{stasType}
+        where insure_settle_id = #{insureSettleId}
+          and hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
+
+    <select id="queryInsureSpecialAttributeInfoPage"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select
+            iiv.id,iiv.medical_reg_no,iiv.aac001,iv.cert_code,iv.cert_no,iib.aac003,iib.aac004,iiv.visit_id,iiv.crte_time,iiv.visit_no,iiv.insuplc_admdvs,iv.name,
+        iiv.mdtrt_cert_type,iiv.mdtrt_cert_no,iib.ipt_psn_sp_flag_type,iib.ipt_psn_sp_flag,iiv.aka130,iiv.aka130_name,
+        iiv.insure_org_code,iiv.insure_reg_code,iiv.medicine_org_code,iib.ipt_psn_sp_flag_detl_id
+        from
+            insure_individual_visit iiv
+                left join inpt_visit iv on
+                    iiv.hosp_code = iv.hosp_code
+                    and iiv.visit_id = iv.id
+                left join insure_individual_basic iib on
+                    iiv.hosp_code = iib.hosp_code
+                    and iiv.mib_id = iib.id
+        where iiv.hosp_code = #{hospCode} and iiv.is_hospital = '1'
+        <if test="insureOrgCode != null and insureOrgCode != ''">
+            and iiv.insure_org_code = #{insureOrgCode}
+        </if>
+        <if test="startDate != null">
+            and iiv.crte_time &gt;= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and iiv.crte_time &lt;= #{endDate}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( iib.aac003 like concat('%',#{keyword},'%')
+            or iiv.medical_reg_no like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
+    <select id="queryVisitById" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select * from insure_individual_visit where
+            hosp_code = #{hospCode}  and medical_reg_no=#{medicalRegNo} and aac001 = #{aac001}
+    </select>
+
+    <update id="updateSpecialAttribute">
+        update
+            insure_individual_basic
+        set ipt_psn_sp_flag_type = #{iptPsnSpFlagType},
+            ipt_psn_sp_flag =#{iptPsnSpFlag},
+            ipt_psn_sp_flag_detl_id = #{iptPsnSpFlagDetlId}
+        where hosp_code = #{hospCode} and aac001 = #{aac001} and aac002 = #{mdtrtCertNo}
+    </update>
+
+    <delete id="deleteFmiOwnPayPatnCost">
+        DELETE FROM insure_upload_cost WHERE hosp_code = #{hospCode} and feedetl_sn IN
+        <foreach collection="feeIdList" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

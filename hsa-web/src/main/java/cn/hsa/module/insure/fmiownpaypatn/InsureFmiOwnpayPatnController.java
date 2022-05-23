@@ -3,15 +3,14 @@ package cn.hsa.module.insure.fmiownpaypatn;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureOutptMedicTreatMentDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService;
+import cn.hsa.module.insure.module.service.InsureGetInfoService;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +34,9 @@ public class InsureFmiOwnpayPatnController extends BaseController {
     // 信息采集数据上传配置维护
     @Resource
     private InsureFmiOwnpayPatnService insureFmiOwnpayPatnService_consumer;
+
+    @Resource
+    private InsureGetInfoService insureGetInfoService_consumer;
 
 
 
@@ -168,7 +170,257 @@ public class InsureFmiOwnpayPatnController extends BaseController {
         return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayPatnReconciliationInfo(map);
     }
 
+    /**
+      * @method queryFmiOwnPayInfoDetail
+      * @author wangqiao
+      * @date 2022/5/17 15:12
+      *	@description 自费病人就医就诊信息查询[4208]
+      * @param  insureSettleInfoDTO, req, res
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @PostMapping("queryFmiOwnPayInfoDetail")
+    public WrapperResponse queryFmiOwnPayInfoDetail(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO", insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayInfoDetail(map);
+    }
+
+    /**
+     * @method queryFmiOwnPayDiseListDetail
+     * @author wangqiao
+     * @date 2022/5/17 15:13
+     *	@description 自费病人就医诊断信息查询[4209]
+     * @param  insureSettleInfoDTO, req, res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     *
+     **/
+    @PostMapping("queryFmiOwnPayDiseListDetail")
+    public WrapperResponse queryFmiOwnPayDiseListDetail(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
 
 
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO", insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayDiseListDetail(map);
+    }
+
+    /**
+      * @method queryFmiOwnPayPatnFeeListDetail
+      * @author wangqiao
+      * @date 2022/5/17 15:13
+      *	@description 自费病人就医费用明细查询[4207]
+      * @param  insureSettleInfoDTO, req, res
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @PostMapping("queryFmiOwnPayPatnFeeListDetail")
+    public WrapperResponse queryFmiOwnPayPatnFeeListDetail(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+
+
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO", insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFmiOwnPayPatnFeeListDetail(map);
+    }
+    /**
+     * @Method queryFmiOwnPayPatnReconciliationInfo
+     * @Desrciption 西藏 -- 4201自费病人费用明细信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/insertInsureCost")
+    public WrapperResponse insertInsureCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureGetInfoService_consumer.insertInsureCost(map);
+    }
+
+    /**
+     * @Method queryFmiOwnPayPatnReconciliationInfo
+     * @Desrciption 西藏 -- 4202自费病人住院就诊和诊断信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/insertInsureMdtrtAndDiag")
+    public WrapperResponse insertInsureMdtrtAndDiag(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.insertInsureMdtrtAndDiag(map);
+    }
+
+    /**
+     * @Method queryFmiOwnPayPatnReconciliationInfo
+     * @Desrciption 西藏 -- 4203自费病人就诊以及费用明细上传完成
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/insertInsureFinish")
+    public WrapperResponse insertInsureFinish(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.insertInsureFinish(map);
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 查询自费病人门诊就医信息
+     * @param outptVisitDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @GetMapping("/queryInsureOutptMedicTreatMent")
+    public WrapperResponse<PageDTO> queryInsureOutptMedicTreatMent(OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        outptVisitDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",outptVisitDTO);
+        return insureFmiOwnpayPatnService_consumer.queryInsureOutptMedicTreatMent(param);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 上传自费病人门诊就医信息【4205】
+     * @param insureSettleInfoDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/insertOutptMedicTreatMent")
+    public WrapperResponse insertOutptMedicTreatMent(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.insertOutptMedicTreatMent(param);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 8:58
+     * @Description 删除自费病人门诊就医信息【4206】
+     * @param insureSettleInfoDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/deleteOutptMedicTreatMent")
+    public WrapperResponse deleteOutptMedicTreatMent(@RequestBody  InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        param.put("hospName",sysUserDTO.getHospName());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospName(sysUserDTO.getHospName());
+        param.put("outptVisitDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.deleteOutptMedicTreatMent(param);
+    }
+    /**
+     * @Method insertInsureFmiOwnPayPatnCost
+     * @Desrciption 自费病人费用明细信息删除
+     * 1.查询是否有自费就诊记录
+     * 2.查询自费上传表是否有数据
+     * 3.调用医保接口
+     * 4.删除本地数据
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author yuelong.chen
+     * @Date   2022-05-17 13:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/deleteInsureFmiOwnPayPatnCost")
+    public WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.deleteInsureFmiOwnPayPatnCost(map);
+    }
+    /**
+     * @Method queryUnMatchPage
+     * @Desrciption  查询自费病人上传费用数据集合
+     * @Param
+     * @Author yuelong.chen
+     * @Date   2022/05/18 10:58
+     * @Return
+     **/
+    @GetMapping("/queryFeeInfoDetailPage")
+    public WrapperResponse<PageDTO> queryFeeInfoDetailPage(InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> param = new HashMap<String,Object>();
+        param.put("hospCode",sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        param.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.queryFeeInfoDetailPage(param);
+    }
+
+    /**
+     * @Method queryFmiOwnPayPatnReconciliationInfo
+     * @Desrciption 西藏 -- 4201A自费病人费用明细信息上传
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:51
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/insertInsureInputCost")
+    public WrapperResponse insertInsureInputCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        insureSettleInfoDTO.setCrteId(sysUserDTO.getId());
+        insureSettleInfoDTO.setCrteName(sysUserDTO.getName());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        return insureFmiOwnpayPatnService_consumer.insertInsureInputCost(map);
+    }
 
 }

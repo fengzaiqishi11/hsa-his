@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.HealthDiagnoseDAO">
+    <select id="queryInptDiagnoseInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZdmx">
+    select * from
+    (select
+	b.id as zyzdlsh,
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.profile_id as hzjgnwyid,
+    b.visit_id  as jzlsh,
+    '3' as hzlxdm,
+    a.name as xm,
+    a.gender_code as xbdm,
+    '' as xbmc,
+    a.age as nl,
+    c.type_code as zdlxqf,
+    b.type_code as zdlb,
+    b.crte_time as zdsj,
+    c.code as zdbm,
+    c.name as zdmc,
+    0 as zdsx,
+    '' as zdsm,
+    b.is_main as cyzdbz,
+    '' as yzdbz,
+    '1' as validflag,
+    a.crte_time  as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from
+    inpt_visit a
+	join inpt_diagnose b on a.id =b.visit_id and a.hosp_code =b.hosp_code
+	left join base_disease c on b.disease_id =c.id and b.hosp_code =c.hosp_code
+	where b.crte_time &gt;= date(#{startTime})
+    and b.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    and b.hosp_code =#{hospCode}
+	union all
+	select
+	b.id as zyzdlsh,
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.profile_id as hzjgnwyid,
+    b.visit_id  as jzlsh,
+    '1' as hzlxdm,
+    a.name as xm,
+    a.gender_code as xbdm,
+    '' as xbmc,
+    a.age as nl,
+    c.type_code as zdlxqf,
+    b.type_code as zdlb,
+    b.crte_time as zdsj,
+    c.code as zdbm,
+    c.name as zdmc,
+    0 as zdsx,
+    '' as zdsm,
+    b.is_main as cyzdbz,
+    '' as yzdbz,
+    '1' as validflag,
+    a.crte_time  as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from
+    outpt_visit  a
+	join outpt_diagnose b on a.id =b.visit_id and a.hosp_code =b.hosp_code
+	left join base_disease c on b.disease_id =c.id and b.hosp_code =c.hosp_code
+	where b.crte_time &gt;= date(#{startTime})
+    and b.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    and b.hosp_code =#{hospCode}
+    ) dd
+    order by dd.appetime asc
+    </select>
+</mapper>

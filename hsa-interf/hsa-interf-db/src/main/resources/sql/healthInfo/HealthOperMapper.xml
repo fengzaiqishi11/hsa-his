@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.HealthOperDAO">
+    <select id="queryInptOperInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbSsmx">
+    select
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	b.id as ssmxlsh,
+	a.profile_id as hzjgnwyid,
+	a.id as jzlsh,
+	'1' as hzlxdm,
+	a.name as xm,
+	a.gender_code as xbdm,
+	'' as xbmc,
+	a.age as nl,
+	'' as dzsqdbh,
+	a.in_dept_id  as ksdm,
+	a.in_dept_name as ksmc,
+	a.in_ward_id as bqmc,
+	'' as bfh,
+	a.bed_name as bch,
+	'' as rjssbz,
+	b.`rank` as sslx,
+	b.oper_disease_icd9 as sslx,
+	b.oper_disease_name as ssczmc,
+	b.in_disease_icd10 as ssqzd,
+	'' as sshzd,
+	b.oper_plan_time as sskssj,
+	b.oper_end_time as ssjssj,
+	b.doctor_id as ssysbm,
+	b.doctor_name as ssysxm,
+	b.assistant_id1 as ssysz1bm,
+	b.assistant_name1 as ssysz1xm,
+	b.assistant_id2 as ssysz2bm,
+	b.assistant_name2 as ssysz2xm,
+	b.ana_id1 as mzysbm,
+	b.ana_name1 as mzysxm,
+	b.ana_code as mzfsdm,
+	'' as mzfsmc,
+	b.heal_code as qkyhdj,
+	b.oper_dept_id as ssjbh,
+	b.`rank` as ssjbdm,
+	'' as jrwmc,
+	'' as sstwdm,
+	b.content as ssgcms,
+	'' as sssbz,
+	'' as pfxdms,
+	'' as ssqkms,
+	'' as cxl,
+	'' as syl,
+	'' as sxl,
+	'' as sqyy,
+	'' as szyy,
+	'' as sxfybz,
+	b.qx_nurse_name  as qxhsxm,
+	b.qx_nurse_id as qxhsbm,
+	b.xh_nurse_name as xthsxm,
+	b.xh_nurse_id as xthsbm,
+	'' as ssmbbwmc,
+	'' as ssjczff,
+	null as ssjczcs,
+	b.notched_code as ssqklbdm,
+	'' as ssgc,
+	'' as ylclmc,
+	'' as ylclsm,
+	'' as fzbw,
+	'1' as validflag,
+    a.crte_time  as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+	from
+	inpt_visit a
+	join oper_info_record b on a.hosp_code = b.hosp_code and a.id = b.visit_id
+    where b.crte_time &gt;= date(#{startTime})
+    and b.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    and b.hosp_code =#{hospCode}
+    </select>
+</mapper>

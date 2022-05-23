@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.HealthInptDAO">
+    <select id="queryInptVisitInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyjzjl">
+    select
+	a.id as zylsh,
+	(select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	a.profile_id as hzjgnwyid,
+	a.in_no as zyh,
+	a.total_in_count as zycs,
+	'' as klx,
+	'' as kh,
+	a.in_ward_id as bq,
+	'' as bfh,
+	a.bed_name as bch,
+	a.name as xm,
+	a.cert_no as sfzhm,
+	a.gender_code as xbdm,
+	'' as xbmc,
+	a.age as nl,
+	a.patient_code as ylbxlbdm,
+	(select	name from sys_code_detail scd where	scd.value = a.patient_code and scd.c_code = 'BRLX'	and scd.hosp_code = a.hosp_code	limit 1) as ylbxlbmc,
+	'' as ywlx,
+	(select	su.prac_certi_no from sys_user su where	su.id = a.outpt_doctor_id and su.hosp_code = a.hosp_code limit 1) as mzysbm,
+	a.outpt_doctor_name as mzysxm,
+	a.in_mode_code as rytjbm,
+	'' as rytjmc,
+	'' as ryyybm,
+	a.in_remark as ryyymc,
+	a.in_time as rysj,
+	a.in_dept_id as ryksdm,
+	a.in_dept_name as ryksmc,
+	(select	bd.code	from base_disease bd where	bd.id = a.in_disease_id	and bd.hosp_code = a.hosp_code	limit 1) as ryzdbm,
+	a.in_disease_name as ryzdmc,
+	a.in_situation_code as ryqkdm,
+	'' as ryqkmc,
+	a.crte_id as rydjygh,
+	a.crte_name as rydjyxm,
+	null as ryhqzsj,
+	a.in_situation_code as bqzgdm,
+	a.out_mode_code as lyfsdm,
+	'' as lyfsmc,
+	a.out_time as cysj,
+	a.out_dept_id as cyksdm,
+	a.out_dept_name as cyksmc,
+	'' as wdbz,
+	'' as txbz,
+	(select	bd.code	from base_disease bd where	bd.id = a.out_disease_id and bd.hosp_code = a.hosp_code	limit 1) as cyzdbm,
+	a.out_disease_name as cyzdmc,
+	(select	su.prac_certi_no from sys_user su where	su.id = a.zz_doctor_id and su.hosp_code = a.hosp_code limit 1) as zyysbm,
+	a.zz_doctor_name as zyysxm,
+	(select su.prac_certi_no from sys_user su where su.id = a.resp_nurse_id and su.hosp_code = a.hosp_code limit 1) as zrhsbm,
+	a.resp_nurse_name as zrhsmc,
+	a.in_dept_id as dqksdm,
+	a.in_dept_name as dqksmc,
+	a.status_code as zyztdm,
+	case when a.status_code = '7' then '1' else '0' end as jsbz,
+	a.out_time as jssj,
+	'1' as VALIDFLAG,
+	a.crte_time as APPETIME,
+	a.crte_time as MODIFYTIME,
+	a.crte_id as MODIFYTCODE,
+	a.crte_name as MODIFYTNAME
+    from
+	inpt_visit a
+	where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+        order by a.crte_time asc
+    </select>
+    <select id="queryInptTurnDeptInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZkjl">
+    select
+	(select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	a.visit_id as zylsh,
+	a.crte_time as zksj,
+	(select bd.code from base_dept bd where bd.id=a.after_dept_id and bd.hosp_code = a.hosp_code limit 1) as zrksdm,
+	a.after_dept_name as zrksmc,
+	(select bd.code from base_dept bd where bd.id=a.before_dept_id  and bd.hosp_code = a.hosp_code limit 1) as zcksdm,
+	a.before_dept_name  as zcksmc,
+	'1' as VALIDFLAG,
+	a.crte_time as APPETIME,
+	a.crte_time as MODIFYTIME,
+	a.crte_id as MODIFYTCODE,
+	a.crte_name as MODIFYTNAME
+    from
+	inpt_bed_change a
+	where a.change_code ='3' and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+        order by a.crte_time asc
+    </select>
+    <select id="queryInptAdviceInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyyzmx">
+  select
+  (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+  a.id as yzid,
+  b.profile_id as hzjgnwyid,
+  a.visit_id as zylsh,
+  b.name as xm,
+  b.gender_code as xbdm,
+  '' as xbmc,
+  b.age as nl,
+  a.type_code as yzlb,
+  a.group_no as yzzh,
+  a.group_seq_no as yzxh,
+  c.id as yzmxbm,
+  c.item_name as yzmxmc,
+  a.content as yznr,
+  a.remark as yzsm,
+  (case when a.cancel_id !=null and a.cancel_id !='' then '1' else '0' end) as cxbz,
+  (select bd.code from base_dept bd where bd.id=a.dept_id and bd.hosp_code = a.hosp_code limit 1) as klksbm,
+  (select bd.name from base_dept bd where bd.id=a.dept_id and bd.hosp_code = a.hosp_code limit 1) as klksmc,
+  (select su.prac_certi_no from sys_user su where su.id = a.crte_id and su.hosp_code = a.hosp_code limit 1) as klrbm,
+  a.crte_name as klrxm,
+  a.crte_time as yzklsj,
+  (select bd.code from base_dept bd where bd.id=a.exec_dept_id and bd.hosp_code = a.hosp_code limit 1) as zxksbm,
+  (select bd.name from base_dept bd where bd.id=a.exec_dept_id and bd.hosp_code = a.hosp_code limit 1) as zxksmc,
+  (select su.prac_certi_no from sys_user su where su.id = a.exec_id and su.hosp_code = a.hosp_code limit 1) as zxrbm,
+  a.exec_name as zxrxm,
+  a.last_exec_time as yzzxsj,
+  c.item_code as yzxmlxdm,
+  a.long_start_time as yzjhksr,
+  a.plan_stop_time as yzjhjsrq,
+  a.submit_name  as yzshrqm,
+  (select su.prac_certi_no from sys_user su where su.id = a.submit_id and su.hosp_code = a.hosp_code limit 1) as hdyzhsqm,
+  a.submit_time as yzshrqsj,
+    a.check_name  as yzshrqm,
+  (select su.prac_certi_no from sys_user su where su.id = a.check_id  and su.hosp_code = a.hosp_code limit 1) as hdyzhsbm,
+  a.check_time as yzhdrqsj,
+    a.stop_doctor_name  as tzyzzqm,
+  (select su.prac_certi_no from sys_user su where su.id = a.stop_doctor_id  and su.hosp_code = a.hosp_code limit 1) as tzyzzbm,
+  a.stop_time  as yzzzsj,
+    a.cancel_name  as qxyzzqm,
+  (select su.prac_certi_no from sys_user su where su.id = a.cancel_id and su.hosp_code = a.hosp_code limit 1) as qxyzzbm,
+  a.cancel_time as yzqxrqsj,
+  a.spec as ypgg,
+  a.usage_code  as yptjdm,
+  '' as ywsytjmc,
+  a.rate_id as yypd,
+  a.dosage as jl,
+  a.dosage_unit_code as jldw,
+  a.num as sysl,
+  a.unit_code as sysldw,
+  a.use_days as yyts,
+  a.is_skin as sfps,
+  a.total_num as ypsl,
+  a.price as dj,
+  a.total_price as zj,
+  '' as sftycgypjy,
+  d.antibacterial_code as kjywbz,
+  d.ph_code as tsypfl,
+  d.basic_code as yllb,
+  d.ddd as ddd,
+  d.is_lvp as jmsybz,
+  a.total_num_unit_code as fysldw,
+  a.herb_use_code as zyjzff,
+  a.baby_id as yexh,
+  a.herb_num as zyfs,
+  '' as jcbw,
+  a.is_submit as yzzt,
+  '1' as validflag,
+  a.crte_time as appetime,
+  a.crte_time as modifytime,
+  a.crte_id  as modifytcode,
+  a.crte_name as modifytname
+  from inpt_advice a
+  left join inpt_advice_detail c on a.id = c.ia_id and a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
+  left join inpt_visit b on a.visit_id =b.id and a.hosp_code = b.hosp_code
+  left join base_drug d on c.item_id = d.id and c.hosp_code =d.hosp_code
+  where  a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+  order by a.crte_time asc
+    </select>
+  <select id="queryInptAdviceExecuteInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyyzzxjl">
+      select
+  (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+  b.id as zxdh,
+  '1' as zxcs,
+  '' as yzxh,
+  b.advice_id as yzid,
+  c.profile_id as hzjgnwyid,
+  c.name as xm,
+  a.visit_id as zylsh,
+  b.advice_detail_id as yzmxbm,
+  a.group_no as yzzh,
+  (select su.prac_certi_no from sys_user su where su.id = b.exec_id and su.hosp_code = a.hosp_code limit 1) as zxrbm,
+  b.exec_name as zxrxm,
+  b.exec_time as zxsj,
+  b.remark as zxsm,
+  '' as pyrbm,
+  '' as pyrxm,
+  null as pysj,
+  (select su.prac_certi_no from sys_user su where su.id = b.crte_id and su.hosp_code = a.hosp_code limit 1) as czrbm,
+  b.crte_name as czrxm,
+  b.crte_time as czsj,
+  a.usage_code as yf,
+  '1' as validflag,
+  b.crte_time as appetime,
+  b.crte_time as modifytime,
+  b.crte_id  as modifytcode,
+  b.crte_name as modifytname
+  from inpt_advice a
+  join inpt_advice_exec b on a.id = b.advice_id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+  left join inpt_visit c on a.visit_id = c.id and a.hosp_code =c.hosp_code
+  where  b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}) and b.hosp_code =#{hospCode}
+  order by b.crte_time asc
+  </select>
+
+    <select id="queryInptCostInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZysfmx">
+        select
+  (select value from sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+  (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+  a.id as sfmxid,
+  a.status_code as tfbz,
+  b.name as hzjgnwyid,
+  a.settle_id as zyjsdh,
+  b.name as xm,
+  b.gender_code as xbdm,
+  '' as xbmc,
+  b.age as nl,
+  a.visit_id as zylsh,
+  a.iat_id as yzid,
+  d.in_code as mxfylb,
+  a.crte_time as stfsj,
+  a.item_code as mxxmbm,
+  a.item_name as mxxmmc,
+  a.num_unit_code as mxxmdw,
+  a.price  as mxxmdj,
+  a.total_num  as mxxmsl,
+  a.total_price as mxxmje,
+  a.item_name as ylmxxmc,
+  a.crte_time as kdsj,
+  (select bd.code from base_dept bd where bd.id=a.dept_id and bd.hosp_code = a.hosp_code limit 1) as kdksdm,
+  (select bd.name from base_dept bd where bd.id=a.dept_id and bd.hosp_code = a.hosp_code limit 1) as kdksmc,
+  (select su.prac_certi_no from sys_user su where su.id = a.doctor_id  and su.hosp_code = a.hosp_code limit 1) as kdysdm,
+  a.doctor_name  as kdysmc,
+  '' as sfksdm,
+  '' as sfksmc,
+  (select su.prac_certi_no from sys_user su where su.id = c.crte_id  and su.hosp_code = a.hosp_code limit 1) as sfysdm,
+  c.crte_name as sfysmc,
+  (select bd.code from base_dept bd where bd.id=a.exec_dept_id and bd.hosp_code = a.hosp_code limit 1) as zxksdm,
+  (select bd.name from base_dept bd where bd.id=a.exec_dept_id and bd.hosp_code = a.hosp_code limit 1) as zxksmc,
+  (select su.prac_certi_no from sys_user su where su.id = a.exec_id and su.hosp_code = a.hosp_code limit 1)  as zxrdm,
+  a.exec_name as zxrmc,
+  '1' as validflag,
+   a.crte_time as appetime,
+   a.crte_time as modifytime,
+   a.crte_id  as modifytcode,
+   a.crte_name as modifytname
+   from inpt_cost a
+   join inpt_visit b on a.visit_id=b.id
+   join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id and c.hosp_code = a.hosp_code
+   left join base_finance_classify d on a.bfc_id = d.id and a.hosp_code = d.hosp_code
+   where a.crte_time &gt;= date(#{startTime})
+   and a.crte_time &lt;= date(#{endTime})
+   and a.hosp_code =#{hospCode}
+   and b.hosp_code =#{hospCode}
+   and c.hosp_code =#{hospCode}
+   order by a.crte_time asc
+    </select>
+    <select id="queryInptSettleInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZysfjs">
+    select
+	(select value from sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+    a.id as zyjsdh,
+    a.visit_id as zylsh,
+    b.profile_id as hzjgnwyid,
+    a.daily_settle_id as jkdh,
+    b.name as xm,
+    b.gender_code as xbdm,
+    '' as xbmc,
+    b.age as nl,
+    a.settle_time as jssj,
+    a.patient_code as ylfkfsbm,
+    ifnull(a.total_price,0.00) as zyfyje,
+    (select group_concat(c.pay_code) from inpt_pay c where  a.id = c.settle_id and a.hosp_code = b.hosp_code) as zyfyjsfsbm,
+    '' as zyfyjsfsmc,
+    ifnull(a.mi_price,0.00) as ybzfyyje,
+    ifnull((a.total_price-a.reality_price),0.00) as zffyje,
+    ifnull(a.hosp_jm_price,0.00) as yhje,
+    ifnull(a.ap_total_price,0.00) as ap_total_price,
+    a.crte_id as jsybm,
+    a.crte_name as jsymc,
+    '1' as validflag,
+    a.crte_time as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from
+	inpt_settle a
+	join inpt_visit b on b.id =a.visit_id and a.hosp_code = b.hosp_code
+	where a.crte_time &gt;= date(#{startTime})
+    and a.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    and b.hosp_code =#{hospCode}
+    and a.is_settle ='1' and a.status_code ='0'
+    order by a.crte_time asc
+    </select>
+
+    <select id="queryInptThirdMeasurementInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbHlscdjl">
+    select
+	a.id as scdjlmxxh,
+	(select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	b.in_no as zylsh,
+	b.profile_id as hzjgnwyid,
+	b.name as xm,
+	b.gender_code as xbdm,
+	'' as xbmc,
+	b.age as nl,
+	b.in_dept_id as zyksdm,
+	b.in_dept_name as zyksmc,
+	b.in_ward_id as bqmc,
+	b.in_profile as bah,
+	b.bed_name as bch,
+	b.in_time as ryrqsj,
+    '' as fmrs,
+    a.record_time as hljlsj,
+    b.total_in_days as zyrs,
+    a.operation_days as ssrs,
+    a.temperature as tw,
+    a.pulse  as mb,
+    a.breath as hxz,
+    a.am_bp as xyDy,
+    a.am_bp as xyGy,
+    a.intake as rl,
+    a.output as cl,
+    a.excrement_code as xb,
+    a.pee_code as db,
+    a.weight as tz,
+    '' as niaol,
+    a.height as sg,
+    a.forty_up_remark as twnr,
+    '' as ypgmmc,
+    a.id as hlhsbm,
+    a.temperature_code as twclyb,
+    a.temperature_retest as twzcclz,
+    a.heart_rate as xl,
+    a.baby_id as yexh,
+    a.is_operation as drsfss,
+    '' as sfcl,
+    a.pm_bp as xyfcGy,
+    a.pm_bp as xyfcDy,
+    a.is_ventilator as sfsyhxj,
+    a.remark as qtbz,
+    '1' as validflag,
+    a.crte_time as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from
+	inpt_nurse_third a
+    join inpt_visit b on a.visit_id = b.id 	and a.hosp_code = b.hosp_code
+    where a.crte_time &gt;= date(#{startTime})
+    and a.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    and b.hosp_code =#{hospCode}
+    order by a.crte_time asc
+    </select>
+
+    <select id="queryEmrIndexInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbDzblsyxx">
+        select c.id as blwdlsh,
+       (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	   (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	   a.patient_code as hzlxdm,
+	   b.visit_id as jzlsh,
+	   d.type_code as wdlxbm,
+	   a.profile_id as hzjgnwyid,
+	   a.name as xm,
+	   a.cert_no as sfzh,
+	   a.contact_phone as lxdh,
+	   a.gender_code as xbdm,
+	   '' as xbmc,
+	   a.age as nl,
+	   a.cert_code as zjlx,
+	   a.cert_no as zjh,
+	   a.birthday as csrq,
+	   d.doc_code as blwdlxbm,
+	   d.name as blwdbt,
+	   c.crte_time as sxsj,
+	   a.crte_name as blsxysxm,
+	   a.crte_id as blsxysdm,
+	   a.in_dept_id as jzksbm,
+	   a.in_dept_name as jzksmc,
+	   a.zz_doctor_id as zzysbm,
+	   a.zz_doctor_name as zzysmc,
+	   a.jz_doctor_id as jzysbm,
+	   a.jz_doctor_name as jzysmc,
+	   b.audit_code as sxzt,
+	   '1' as yxbz,
+	   a.in_time as jzrq,
+	   '' as blxtcsbz,
+	   '' as blbggs,
+	   c.html as blbg,
+	   '' as blwjlj,
+	   '' as blwjzm,
+	   '' as blwjhzm,
+	   '1' as validflag,
+       c.crte_time as appetime,
+       c.crte_time as modifytime,
+       c.crte_id  as modifytcode,
+       c.crte_name as modifytname
+      from inpt_visit a
+      join emr_patient b on  b.visit_id=a.id and a.hosp_code =b.hosp_code
+      JOIN emr_classify_template et on b.classify_template_id = et.id and b.dept_id =et.dept_id and et.hosp_code =#{hospCode}
+      join emr_patient_html c on b.patient_html_id = c.id and c.hosp_code =#{hospCode}
+      join emr_classify d on et.classify_code=d.code and et.dept_id = d.dept_id and  d.hosp_code =#{hospCode}
+      where c.crte_time &gt;= date(#{startTime})
+      and c.crte_time &lt;= date(#{endTime})
+      and a.hosp_code =#{hospCode}
+      order by c.crte_time asc
+    </select>
+    <select id="queryInptNurseRecordInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbEmrYbhljl">
+     select
+	 (select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+	 (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	 b.id as ybhljllsh,
+	 a.id as zylsh,
+	 a.in_dept_name as ksmc,
+	 a.in_dept_id as ksbm,
+	 '' as bqmc,
+	 a.in_profile as bfh,
+	 a.bed_name as bch,
+	 a.name as hzxm,
+	 a.gender_code as xbdm,
+	 case when a.age_unit_code='1' THEN a.age else null END as nls,
+	 case when a.age_unit_code='2' THEN a.age else null END as nly,
+	 '' as gms,
+	 b.item_010 as xybhd,
+	 '' as zbdmbdbz,
+	 '' as ysqkdm,
+	 '' as yszddm,
+	 '' as jybq,
+	 '' as fcssaqhdbz,
+	 '' as shssaqhdbz,
+	 '' as fcssfxpgbz,
+	 '' as shssfxpgbz,
+	 '' as glbz,
+	 '' as glzldm,
+	 b.first_nurse_name as hsqm,
+	 b.first_nurse_id as hsbm,
+	 b.crte_time as qmrqsj,
+	 a.nursing_code as hldjdm,
+	 '' as hllxdm,
+	 '' as dghlms,
+	 '' as qghldm,
+	 '' as twhl,
+	 '' as pfhl,
+	 '' as yyhl,
+	 '' as xlhldm,
+	 '' as aqhldm,
+	 '' as sfyhlgc,
+	 '' as sfyhlcz,
+	 '1' as sfysmtzjcl,
+	 a.in_disease_id as jbzdbm,
+	 a.in_disease_name as jbzdmc,
+	 '' as tz,
+	 b.item_006 as tw,
+	 b.item_008 as fxpl,
+	 b.item_008 as ml,
+	 b.item_009 as ssy,
+	 b.item_009 as szy,
+	 '' as ysqk,
+	 '' as qghl,
+	 '' as yszd,
+	 '' as xlhlmc,
+	 '' as aqhlmc,
+	 '' as hlgcxmmc,
+	 '' as hlgcjgmc,
+	 '' as hlczmc,
+	 '' as hlczxmlmmc,
+	 '' as hlczjg,
+	 b.item_011 as sz,
+	 b.item_012 as tk,
+	 b.item_020 as ww,
+	 b.item_016 as rlxm,
+	 b.item_017 as rl,
+	 null as dbcl,
+	 null as xbcl,
+	 b.item_019 as zcl,
+	 '' as xt,
+	 '' as wh,
+	 '' as hxdhl,
+	 '' as kqhl,
+	 '' as hyhl,
+	 '' as spo2,
+	 '' as cvp,
+	 '' as xtz,
+	 null as ztkdx,
+	 '' as ztkdgfs,
+	 null as ytkdx,
+	 '' as ytkdgfs,
+	 b.item_018 as clxm,
+	 b.item_019 as clds,
+	 '' as ylxm,
+	 null as ylds,
+	 '' as gdhxm,
+	 '' as gdhlzxqk,
+	 '' as jkjy,
+	 b.item_030 as xl,
+	 b.item_025 as cyysxz,
+	 '1' as validflag,
+     b.crte_time as appetime,
+     b.crte_time as modifytime,
+     b.crte_id  as modifytcode,
+     b.crte_name as modifytname
+    from
+	inpt_visit a
+	join inpt_nurse_record b on a.id= b.visit_id and a.hosp_code = b.hosp_code
+	join base_nurse_order d on b.bno_id = d.id and a.hosp_code = b.hosp_code
+	where d.code ='hljld'
+	and b.crte_time &gt;= date(#{startTime})
+    and b.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    order by b.crte_time asc
+    </select>
+
+    <select id="queryInptEmrOutInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbEmrCyxj">
+    select
+	a.id as zylsh,
+    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+    a.in_dept_id as ksbm,
+    a.in_dept_name as ksmc,
+    a.bed_name as ch,
+    a.name as xm,
+    a.gender_code as xb,
+    a.age as nl,
+    a.total_in_days as zyts,
+    a.outpt_disease_name as mzzd,
+    a.in_disease_name as ryzd,
+    a.outpt_disease_name as cyzd,
+    a.in_remark as ryzztz,
+    '' as jchz,
+    '' as tsjc,
+    '' as zlgc,
+    '' as hbz,
+    a.out_situation_code as cyqk,
+    a.out_remark as cyyz,
+    a.out_mode_code as zljg,
+    a.zz_doctor_id as zzysbm,
+    a.zz_doctor_name as zzysxm,
+    a.jz_doctor_id as zyysbm,
+    a.jz_doctor_name as zyysxm,
+    '' as yyztb1,
+    '' as yyztb2,
+    a.in_ward_id as bqmc,
+    '' as bfh,
+    a.occupation_code as zylbdm,
+    a.phone as hzdhhm,
+    b.ana_code as mzffdm,
+    a.out_remark as cyszzytz,
+    '' as bqzgdm,
+    '0' as sfyzysz,
+    case when b.id is null then '0' else '1' end as sfyssjl,
+    '' as jmjkdabm,
+    case when a.age_unit_code='1' THEN a.age else null END as nls,
+	case when a.age_unit_code='2' THEN a.age else null END as nly,
+	a.marry_code as hyzkdm,
+	'03' as dzlbdm,
+	a.address as dzs,
+	'' as dzsq,
+	'' as dzx,
+	'' as dzxz,
+	'' as dzc,
+	'' as dzmph,
+	'' as yb,
+	a.contact_name as lxrxm,
+	a.contact_phone as lxrdhhm,
+	a.in_time as ryrq,
+	a.out_time as cyrq,
+	a.in_situation_code as ryqk,
+	'' as yxfzjjg,
+	'' as zyszgcjg,
+	a.in_disease_id as ryzdXyzdbm,
+	'' as ryzdZybmdm,
+	'' as ryzdZyhzdm,
+	a.out_disease_id as cyzdXyzdbm,
+	'' as cyzdZybmdm,
+	'' as cyzdZyhzdm,
+	b.notched_code as ssqklbdm,
+	b.heal_code as qkyhdjdm,
+	b.oper_disease_icd9 as ssjczbm,
+	b.oper_plan_time as ssczrq,
+	b.content as ssgc,
+	'' as zzfz,
+	'' as zyjzff,
+	'' as zyyyff,
+	'' as zlgcms,
+	'' as zljgdm,
+	a.jz_doctor_name as zyysqm,
+	a.zz_doctor_name as sjysqm,
+	a.out_time as qmrqsj,
+	'1' as validflag,
+    a.out_time as appetime,
+    a.out_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from inpt_visit a
+    left join oper_info_record b on a.id = b.visit_id and a.hosp_code = b.hosp_code
+    where a.status_code ='7' and a.out_time &gt;= date(#{startTime})
+    and a.out_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    order by a.out_time asc
+    </select>
+    <select id="queryInptBedInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZycwjl">
+    select
+   (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+   (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+	a.after_dept_id as ksbm,
+    b.code as cwbm,
+    a.after_dept_name as ksmc,
+    b.name as cwmc,
+    b.status_code as bczyzt,
+    a.visit_id as zylsh,
+    null as cwtjsj,
+    b.remark as bclx,
+    d.price as cwfy,
+    '1' as validflag,
+    a.crte_time  as appetime,
+    a.crte_time as modifytime,
+    a.crte_id  as modifytcode,
+    a.crte_name as modifytname
+    from
+	inpt_bed_change a
+    join base_bed b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
+    join base_bed_item c on	b.hosp_code =c.hosp_code and b.code = c.bed_code
+    left join base_item d on c.hosp_code = d.hosp_code and c.item_code = d.code and d.is_valid ='1'
+    where a.change_code ='0'
+    and d.type_code ='1109'
+    and a.crte_time &gt;= date(#{startTime})
+    and a.crte_time &lt;= date(#{endTime})
+    and a.hosp_code =#{hospCode}
+    order by a.crte_time asc
+    </select>
+
+</mapper>

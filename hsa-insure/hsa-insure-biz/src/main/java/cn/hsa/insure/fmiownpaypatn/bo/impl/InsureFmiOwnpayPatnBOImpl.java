@@ -831,8 +831,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         }
         if(insureSettleInfoDTO.getLx().equals("0")){
             Map<String, Object> updateMap = new HashMap<>();
-            updateMap.put("id",insureSettleInfoDTO.getId());
-            updateMap.put("hospCode",insureSettleInfoDTO.getHospCode());
+            updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            updateMap.put("outptVisitDTO",outptVisitDTO);
             outptVisitService_consumer.updateUplod(updateMap);
         }
         return true;

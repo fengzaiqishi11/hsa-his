@@ -319,6 +319,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String stasType;
     //完成标志
     private String cpltFlag;
+    //就医信息是否上传
+    private String isUplodDise;
 
     private String fixmedinsMdtrtId;//医药机构就诊ID
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

@@ -425,6 +425,12 @@
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
         </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
+        </if>
         <if test="startTime != null and startTime != '' ">
             and date(in_time) &gt;= date(#{startTime})
         </if>
@@ -443,6 +449,12 @@
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
+        </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
         </if>
         <if test="startTime != null and startTime != '' ">
             and date(visit_time) &gt;= date(#{startTime})

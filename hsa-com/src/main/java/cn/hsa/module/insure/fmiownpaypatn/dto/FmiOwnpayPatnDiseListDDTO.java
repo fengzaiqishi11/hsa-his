@@ -75,7 +75,10 @@ public class FmiOwnpayPatnDiseListDDTO {
     /**
      * 	统筹区编号	字符型	6
      */
-    private String poolarea;
+    private String poolarea;  /**
+     * 有效标志	不传默认1有效
+     */
+    private String valiFlag;
     /**
       * 医药机构就诊id 字符型 30
      **/

@@ -53,13 +53,13 @@ public class InsureSpecialAttributeServiceImpl implements InsureSpecialAttribute
      * @Return
      **/
     @Override
-    public void uploadInsureSpecialAttribute(Map map) {
+    public void UPloadInsureSpecialAttribute(Map map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
-        insureSpecialAttributeBO.uploadInsureSpecialAttribute(insureIndividualVisitDTO);
+        insureSpecialAttributeBO.UPloadInsureSpecialAttribute(insureIndividualVisitDTO);
     }
 
     @Override
-    public WrapperResponse<PageDTO> qureyInsureSpecialAttribute(Map map) {
+    public WrapperResponse<List<Map<String, Object>>> qureyInsureSpecialAttribute(Map map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
         return WrapperResponse.success(insureSpecialAttributeBO.qureyInsureSpecialAttribute(insureIndividualVisitDTO));
     }

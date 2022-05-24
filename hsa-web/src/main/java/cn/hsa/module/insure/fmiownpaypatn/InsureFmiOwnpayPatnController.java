@@ -10,11 +10,7 @@ import cn.hsa.module.insure.module.service.InsureGetInfoService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -377,7 +373,7 @@ public class InsureFmiOwnpayPatnController extends BaseController {
      * @Date   2022-05-17 13:51
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
      **/
-    @PostMapping("deleteInsureFmiOwnPayPatnCost")
+    @PostMapping("/deleteInsureFmiOwnPayPatnCost")
     public WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(@RequestBody InsureSettleInfoDTO insureSettleInfoDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         insureSettleInfoDTO.setHospCode(sysUserDTO.getHospCode());
@@ -392,8 +388,8 @@ public class InsureFmiOwnpayPatnController extends BaseController {
      * @Method queryUnMatchPage
      * @Desrciption  查询自费病人上传费用数据集合
      * @Param
-     * @Author qiang.fan
-     * @Date   2022/04/08 10:58
+     * @Author yuelong.chen
+     * @Date   2022/05/18 10:58
      * @Return
      **/
     @GetMapping("/queryFeeInfoDetailPage")

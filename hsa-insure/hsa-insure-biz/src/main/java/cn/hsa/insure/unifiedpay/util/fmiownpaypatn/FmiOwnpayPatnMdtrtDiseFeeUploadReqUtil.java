@@ -61,9 +61,9 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
 
         Map<String, Object> dataMap = new HashMap<>(3);
 
-        dataMap.put("mdtrtinfo", initMdtrtDDTO(outptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt));
-        dataMap.put("diseinfo", initInptDiseListDDTOS(outptDiagnoseDTOList, outptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue()));
-        dataMap.put("feedetail", initFeeListDDTO(insureSettleInfoDTO, outptCostDTOList,insureConfigurationDTO,sysParameterDTO.getValue()));
+        dataMap.put("mdtrtinfo",  HumpUnderlineUtils.humpToUnderline(initMdtrtDDTO(outptVisitDTO, insureConfigurationDTO, sysParameterDTO.getValue(),insureSettleInfoDTO,medfeeSumamt)));
+        dataMap.put("diseinfo", HumpUnderlineUtils.humpToUnderlineArray(initInptDiseListDDTOS(outptDiagnoseDTOList, outptMatchDiagnoseDTOList, insureConfigurationDTO, sysParameterDTO.getValue())));
+        dataMap.put("feedetail",  HumpUnderlineUtils.humpToUnderlineArray(initFeeListDDTO(insureSettleInfoDTO, outptCostDTOList,insureConfigurationDTO,sysParameterDTO.getValue())));
 
         HashMap commParam = new HashMap();
         checkRequest(dataMap);
@@ -183,17 +183,17 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
                                                                   InsureConfigurationDTO insureConfigurationDTO, String fixmedinsName) {
         List<FmiOwnpayPatnDiseListDDTO> diseinfoList = new ArrayList<FmiOwnpayPatnDiseListDDTO>();
         commonHandlerDisease(inptMatchDiagnoseDTOList,inptDiagnoseDTOList,null);
-        for(int i=0;i<inptDiagnoseDTOList.size();i++){
+        for(int i=0;i<inptMatchDiagnoseDTOList.size();i++){
             FmiOwnpayPatnDiseListDDTO diseinfoMap = new FmiOwnpayPatnDiseListDDTO();
 
             diseinfoMap.setFixmedinsCode(insureConfigurationDTO.getOrgCode());
             diseinfoMap.setFixmedinsName(fixmedinsName);
             diseinfoMap.setDiagSrtNo(i);//	诊断排序号
-            diseinfoMap.setDiagInfoId(inptDiagnoseDTOList.get(i).getId());
-            diseinfoMap.setMdtrtId(inptDiagnoseDTOList.get(i).getVisitId());
+            diseinfoMap.setDiagInfoId(inptMatchDiagnoseDTOList.get(i).getId());
+            diseinfoMap.setMdtrtId(inptMatchDiagnoseDTOList.get(i).getVisitId());
 //            diseinfoMap.setInoutDiagType("");
 
-            String type = inptDiagnoseDTOList.get(i).getTypeCode();
+            String type = inptMatchDiagnoseDTOList.get(i).getTypeCode();
             switch(type){
                 case "204" :
                 case "303" :
@@ -211,15 +211,17 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
             }
 
             diseinfoMap.setDiagType(type);//	诊断类别
-            diseinfoMap.setMaindiagFlag(inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
-            diseinfoMap.setDiagCode(inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
-            diseinfoMap.setDiagName(inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+            diseinfoMap.setMaindiagFlag(inptMatchDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
+            diseinfoMap.setDiagCode(inptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
+            diseinfoMap.setDiagName(inptMatchDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
 
             diseinfoMap.setAdmCond(null);//	入院病情
-            diseinfoMap.setDiagDept(inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
-            diseinfoMap.setDiagDrCode(inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
-            diseinfoMap.setDiagDrName(inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
-            diseinfoMap.setDiagTime(DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+            diseinfoMap.setDiagDept(inptMatchDiagnoseDTOList.get(i).getInDeptName());//	诊断科室
+            diseinfoMap.setDiagDrCode(inptMatchDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
+            diseinfoMap.setDiagDrName(inptMatchDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
+            diseinfoMap.setDiagTime(DateUtils.format(inptMatchDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+            diseinfoMap.setValiFlag("1");
+
 
             diseinfoMap.setPoolarea(null);
 
@@ -256,7 +258,7 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
             }
         }
     }
-    private Object initFeeListDDTO(InsureSettleInfoDTO insureSettleInfoDTO,List<Map<String, Object>> feeList, InsureConfigurationDTO insureConfigurationDTO
+    private List<FmiOwnpayPatnFeeListDDTO> initFeeListDDTO(InsureSettleInfoDTO insureSettleInfoDTO, List<Map<String, Object>> feeList, InsureConfigurationDTO insureConfigurationDTO
             , String fixmedinsName) {
         List<FmiOwnpayPatnFeeListDDTO> listMap = new ArrayList<>();
         if (!ListUtils.isEmpty(feeList)) {
@@ -268,6 +270,8 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
 
                 feedetail.setBkkpSn(MapUtils.get(item, "id"));
 
+                //feedetail.setFeeOcurTime( "2022-03-10 09:24:55"); // 费用发生时间
+
                 if (insureSettleInfoDTO.getLx().equals("1")) {
 
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("costTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
@@ -276,6 +280,7 @@ public class FmiOwnpayPatnMdtrtDiseFeeUploadReqUtil<T> extends InsureCommonUtil 
                     feedetail.setFeeOcurTime( DateUtils.format((Date) item.get("crteTime"), DateUtils.Y_M_DH_M_S)); // 费用发生时间
 
                 }
+                feedetail.setFixmedinsMdtrtId(MapUtils.get(item, "visitId"));
                 feedetail.setFixmedinsCode(insureConfigurationDTO.getOrgCode());
                 feedetail.setFixmedinsName(fixmedinsName);
                 BigDecimal cnt = BigDecimalUtils.scale((BigDecimal) item.get("totalNum"), 4);

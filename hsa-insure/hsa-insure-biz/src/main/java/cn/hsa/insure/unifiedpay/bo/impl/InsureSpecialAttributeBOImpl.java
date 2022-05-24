@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
      * @Return
      **/
     @Override
-    public void uploadInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO) {
+    public void UPloadInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         //参数校验
         if(StringUtils.isEmpty(insureIndividualVisitDTO.getMedicalRegNo())){
             throw new BizRtException(InsureExecCodesEnum.PARAM_CHANGE_ERROR,new Object[]{HsaSrvEnum.HSA_INSURE.getDesc(),"visitId就医流水号"});
@@ -99,12 +100,13 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
         interfaceParamDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
         interfaceParamDTO.setIsHospital(Constants.SF.S);
         interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        interfaceParamDTO.setInsuplc_admdvs(insureIndividualVisitDTO.getInsuplcAdmdvs());
         // 调用统一支付平台接口
         Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.SPECIAL_ATTRIBUTE_UPLOAD, interfaceParamDTO);
         //获取回参，并写回数据库
         Map<String,Object> outMap = MapUtils.get(stringObjectMap,"output");
-        Map<String,Object> IptPsnSpFlagRegOut = MapUtils.get(outMap,"IptPsnSpFlagRegOut");
-        String detlId = MapUtils.get(IptPsnSpFlagRegOut,"ipt_psn_sp_flag_detl_id");
+        Map<String,Object> data = MapUtils.get(outMap,"data");
+        String detlId = MapUtils.get(data,"ipt_psn_sp_flag_detl_id");
         if(StringUtils.isEmpty(detlId)){
             throw new AppException("未接收到回参，请重新上传！");
         }
@@ -121,9 +123,7 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
      * @Return
      **/
     @Override
-    public PageDTO qureyInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO) {
-        //设置分页信息
-        PageHelper.startPage(insureIndividualVisitDTO.getPageNo(), insureIndividualVisitDTO.getPageSize());
+    public List<Map<String, Object>> qureyInsureSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         //获取医保配置
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
@@ -150,6 +150,7 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
         paramMap.put("ipt_otp_no",insureIndividualVisitDTO.getVisitNo());
         paramMap.put("ipt_psn_sp_flag_type",insureIndividualVisitDTO.getIptPsnSpFlagType());
         paramMap.put("ipt_psn_sp_flag",insureIndividualVisitDTO.getIptPsnSpFlag());
+        paramMap.put("admdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
         paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
         paramMap.put("configCode", insureConfigurationDTO.getCode());
@@ -161,11 +162,12 @@ public class InsureSpecialAttributeBOImpl implements InsureSpecialAttributeBO {
         interfaceParamDTO.setIsHospital(Constants.SF.S);
         interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         // 调用统一支付平台接口
-        Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.SPECIAL_ATTRIBUTE_UPLOAD, interfaceParamDTO);
+        Map<String, Object> stringObjectMap = insureItfBO.executeInsur(FunctionEnum.SPECIAL_ATTRIBUTE_QUERY, interfaceParamDTO);
         //获取回参
         Map<String,Object> outMap = MapUtils.get(stringObjectMap,"output");
-        List<InsureIndividualVisitDTO> individualVisitDTOList  = MapUtils.get(outMap,"IptPsnSpFlagReg");
-        return PageDTO.of(individualVisitDTOList);
+        Map<String, Object> resultDataMap  = MapUtils.get(outMap,"IptPsnSpFlagReg");
+        List<Map<String, Object>> resultDataList = MapUtils.get(resultDataMap,"data");
+        return resultDataList;
     }
 
     private Map<String, Object> uploadparam(InsureIndividualVisitDTO insureIndividualVisitDTO) {

@@ -21,6 +21,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
 
     private String mdtrtId; // 就诊id *
 
+    private String visitId; // his就诊id *
+
     private String setlId; // 结算id *
 
     private String fixmedinsName; // 定点医疗机构名称 *
@@ -317,6 +319,8 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String stasType;
     //完成标志
     private String cpltFlag;
+    //就医信息是否上传
+    private String isUplodDise;
 
     private String fixmedinsMdtrtId;//医药机构就诊ID
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -328,6 +332,10 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String medfeeSumamt; //医疗总费用
     private String medType; //医疗类型
     private String elecBillnoCode; //电子票据号码
+    /**
+     * 开始时间
+     */
+    private String startTime;
 
 
 }

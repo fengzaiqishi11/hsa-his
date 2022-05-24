@@ -604,7 +604,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
          * 2.开了的诊断是否已经匹配
          */
         outptMatchDiagnoseDTOList = outptDoctorPrescribeService.queryOutptMatchDiagnose(reqMap).getData();
-       // mapList = handlerOutptCostFee(insureSettleInfoDTO);
+        mapList = handlerOutptCostFee(insureSettleInfoDTO);
         BigDecimal sum = new BigDecimal(0);
         if(!mapList.isEmpty() && mapList.size() > 0) {
             for(Map<String, Object> item : mapList){
@@ -639,6 +639,12 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
+        //修改上传状态为已上传
+        outptVisitDTO.setIsUploadDise("1");
+        Map paramMap1 = new HashMap();
+        paramMap1.put("hospCode",insureSettleInfoDTO.getHospCode());
+        paramMap1.put("outptVisitDTO",outptVisitDTO);
+        outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
         return true;
     }
 
@@ -679,6 +685,14 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             throw new AppException((String) resultMap.get("err_msg"));
         }
         logger.info("自费病人门诊就医信息删除:" + resultJson);
+
+        //修改上传状态
+        Map paramMap1 = new HashMap();
+        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
+        outptVisitDTO.setIsUploadDise("0");
+        outptVisitDTO.setId(insureSettleInfoDTO.getId());
+        paramMap1.put("outptVisitDTO",outptVisitDTO);
+        outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
         return true;
     }
 
@@ -759,6 +773,13 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_UPLOD, interfaceParamDTO);
+
+        //修改状态
+        inptVisitDTO.setIsUplodDise("1");
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        updateMap.put("inptVisitDTO", inptVisitDTO);
+        inptVisitService_consumer.updateUplod(updateMap);
         return true;
     }
 
@@ -779,6 +800,27 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         if(StringUtils.isEmpty(insureSettleInfoDTO.getCpltFlag())){
             throw new AppException("请选择完成标志");
         }
+        // 2.判断是门诊自费病人 还是 住院自费病人  查询费用数据
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
+
+        if (insureSettleInfoDTO.getLx().equals("1")) {
+            inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+            inptVisitDTO.setId(insureSettleInfoDTO.getId());
+            Map<String, Object> reqMap = new HashMap<>();
+            reqMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            reqMap.put("inptVisitDTO", inptVisitDTO);
+            inptVisitDTO = inptVisitService_consumer.getInptVisitById(reqMap).getData();
+            inptVisitDTO.setCpltFlag("1");
+
+        } else if (insureSettleInfoDTO.getLx().equals("0")) {
+            Map<String, String> visitMap = new HashMap();
+            visitMap.put("id",insureSettleInfoDTO.getId());
+            visitMap.put("hospCode",insureSettleInfoDTO.getHospCode());
+
+            outptVisitDTO = outptVisitService_consumer.queryByVisitID(visitMap);
+            outptVisitDTO.setCpltFlag("1");
+        }
         paramMap.put("insureConfigurationDTO",insureConfigurationDTO);
         paramMap.put("cpltFlag", insureSettleInfoDTO.getCpltFlag());
         paramMap.put("visitId", insureSettleInfoDTO.getId());
@@ -794,6 +836,19 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_FINISH, interfaceParamDTO);
+        //修改状态
+        if(insureSettleInfoDTO.getLx().equals("1")){
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            updateMap.put("inptVisitDTO", inptVisitDTO);
+            inptVisitService_consumer.updateUplod(updateMap);
+        }
+        if(insureSettleInfoDTO.getLx().equals("0")){
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            updateMap.put("outptVisitDTO",outptVisitDTO);
+            outptVisitService_consumer.updateUplod(updateMap);
+        }
         return true;
     }
 
@@ -814,7 +869,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
     public Boolean deleteInsureFmiOwnPayPatnCost(InsureSettleInfoDTO insureSettleInfoDTO) {
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO  insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
-        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+//        insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
         //1.查询是否有自费就诊记录
         List<InsureUploadCostDTO> costDTOList = insureIndividualCostDAO.queryFeeInfoDetailPage(insureSettleInfoDTO);
         if(ListUtils.isEmpty(costDTOList)){
@@ -822,21 +877,27 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         }
         //2.调用接口
         Map paramMap = new HashMap();
-        paramMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
-        paramMap.put("fixmedins_code", insureSettleInfoDTO.getOrgCode());
-        paramMap.put("orgCode", insureSettleInfoDTO.getOrgCode());
-        paramMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("hospCode", insureConfigurationDTO.getHospCode());
         paramMap.put("configRegCode",insureConfigurationDTO.getRegCode());
+        //处理其他入参
+        Map<String, Object> feedetailMap = new HashMap<>();
+        feedetailMap.put("fixmedins_mdtrt_id", insureSettleInfoDTO.getVisitId());
+        feedetailMap.put("fixmedins_code", insureConfigurationDTO.getOrgCode());
+        paramMap.put("feedetail",feedetailMap);
         //处理流水号
-        if(insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
-            List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
-            List<String> bkkpSnList = new ArrayList<>();
-            for (InsureUploadCostDTO insureUploadCostDTO : costDTOList) {
-                if(feeIdList.contains(insureUploadCostDTO.getId())){
-                    bkkpSnList.add(insureUploadCostDTO.getFeedetlSn());
-                }
+        List<String> feeIdList = insureSettleInfoDTO.getFeeIdList();
+        if(feeIdList == null ){
+            throw new AppException("没有需要删除的费用！");
+        }
+        if(feeIdList != null && insureSettleInfoDTO.getFeeIdList().size() != costDTOList.size()){
+            List<Map<String,Object>> bkkpSnList = new ArrayList<>();
+            for (String s : feeIdList) {
+                Map<String,Object> bkkpMap = new HashMap<>();
+                bkkpMap.put("bkkp_sn",s);
+                bkkpSnList.add(bkkpMap);
             }
-            paramMap.put("bkkp_sn",bkkpSnList);
+            paramMap.put("feedetl",bkkpSnList);
         }
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_DELETE.getCode());
@@ -846,6 +907,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         Map<String, Object> res = insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DELETE, interfaceParamDTO);
+        //删除本地数据
+        insureGetInfoDAO.deleteFmiOwnPayPatnCost(feeIdList,insureSettleInfoDTO.getHospCode());
         return true;
     }
 
@@ -935,6 +998,17 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 1.先判断是否选择了医保机构
         InsureConfigurationDTO insureConfigurationDTO = checkInsureConfig(insureSettleInfoDTO);
         insureSettleInfoDTO.setOrgCode(insureConfigurationDTO.getCode());
+        //查询患者信息
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        inptVisitDTO.setId(insureSettleInfoDTO.getId());
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        reqMap.put("inptVisitDTO", inptVisitDTO);
+        inptVisitDTO = inptVisitService_consumer.getInptVisitById(reqMap).getData();
+        if(inptVisitDTO == null){
+            throw new AppException("未查到该患者的就诊信息");
+        }
         //查询费用
         List<Map<String, Object>> mapList = new ArrayList<>();
         mapList = handlerInptCostFee(insureSettleInfoDTO);
@@ -956,6 +1030,12 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_INPUT_UPLOD, interfaceParamDTO);
 
+        //修改状态
+        inptVisitDTO.setIsUplodCost("1");
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        updateMap.put("inptVisitDTO", inptVisitDTO);
+        inptVisitService_consumer.updateUplod(updateMap);
         insertHandlerInsureCost(mapList, insureSettleInfoDTO);
         return true;
     }
@@ -1075,7 +1155,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
      **/
     private List<Map<String, Object>> handlerOutptCostFee(InsureSettleInfoDTO insureSettleInfoDTO) {
 
-        String insureRegCode = insureSettleInfoDTO.getOrgCode();
+        String insureRegCode = insureSettleInfoDTO.getInsureRegCode();
         //判断是否有传输费用信息
         Map<String, Object> insureCostParam = new HashMap<String, Object>();
         insureCostParam.put("hospCode", insureSettleInfoDTO.getHospCode());//医院编码

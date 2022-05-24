@@ -101,4 +101,8 @@ public interface OutptVisitBO {
     List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
 
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    Boolean updateUplod(OutptVisitDTO outptVisitDTO);
+
+    Boolean updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
 }

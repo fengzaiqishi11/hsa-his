@@ -117,6 +117,18 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
         return outptVisitDAO.queryOutptCostByvisitIds(reqMap);
     }
 
+    @Override
+    public Boolean updateUplod(OutptVisitDTO outptVisitDTO) {
+        outptVisitDAO.updateUplod(outptVisitDTO);
+        return true;
+    }
+
+    @Override
+    public Boolean updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO) {
+         outptVisitDAO.updateOutptVisitUploadFlag(outptVisitDTO);
+        return true;
+    }
+
     /**
      * @param outptSettleDO
      * @Method updateOutptAcctPay

@@ -26,7 +26,7 @@ public class specialAttributeReqQueryUtil<T> extends InsureCommonUtil implements
         Map map = (Map) param;
         checkRequest(map);
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("QIptPsnSpFlagReg",map);
+        dataMap.put("data",map);
         Map resultMap = new HashMap();
         resultMap.put("hospCode", MapUtils.get(map,"hospCode"));
         resultMap.put("configCode", MapUtils.get(map,"configCode"));

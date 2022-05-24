@@ -1909,5 +1909,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         return messageInfoDTOList;
     }
 
+    public Boolean updateUplod(InptVisitDTO inptVisitDTO) {
+        inptVisitDAO.updateUplod(inptVisitDTO);
+        return true;
+    }
 
 }

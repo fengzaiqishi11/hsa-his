@@ -790,4 +790,6 @@ public interface InsureGetInfoDAO {
     InsureIndividualVisitDTO queryVisitById(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     void updateSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    void deleteFmiOwnPayPatnCost(@Param("feeIdList")List<String> feeIdList,@Param("hospCode")String hospCode);
 }

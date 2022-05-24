@@ -703,6 +703,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setIsUploadDise("0");
         outptVisitDTO.setId(insureSettleInfoDTO.getId());
+        outptVisitDTO.setHospCode(hospCode);
         paramMap1.put("outptVisitDTO",outptVisitDTO);
         paramMap1.put("hospCode",hospCode);
         outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);

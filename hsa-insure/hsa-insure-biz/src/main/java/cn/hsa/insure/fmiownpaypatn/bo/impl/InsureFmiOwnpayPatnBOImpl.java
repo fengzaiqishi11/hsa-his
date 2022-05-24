@@ -928,6 +928,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
         inptVisitDTO.setId(insureSettleInfoDTO.getVisitId());
         inptVisitDTO.setIsUplodCost("0");
+        inptVisitDTO.setCpltFlag("0");
         Map<String, Object> updateMap = new HashMap<>();
         updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
         updateMap.put("inptVisitDTO", inptVisitDTO);
@@ -1056,6 +1057,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
 
         //修改状态
         inptVisitDTO.setIsUplodCost("1");
+        inptVisitDTO.setCpltFlag("0");
         Map<String, Object> updateMap = new HashMap<>();
         updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
         updateMap.put("inptVisitDTO", inptVisitDTO);

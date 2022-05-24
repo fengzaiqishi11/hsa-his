@@ -3656,4 +3656,12 @@
         </foreach>
         )
     </select>
+
+    <update id="updateCostSettleId" parameterType="list">
+        update outpt_cost set settle_id = #{settleId},one_settle_id = #{settleId},settle_code = '2' where
+        id in
+        <foreach collection="list" separator="," item="item" open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
 </mapper>

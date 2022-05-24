@@ -374,7 +374,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       //医保信息
       InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
       //入参信息
-      SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
+      OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
       String hospCode = MapUtils.get(map, "hospCode");
       String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
       if (StringUtils.isEmpty(insureRegCode)) {
@@ -394,10 +394,10 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       dto.setPayOrdId(insureIndividualVisitDTO.getPayOrdId());
       dto.setOrgCodg(insureConfigurationDTO.getOrgCode());
       dto.setPayToken(insureIndividualVisitDTO.getPayToken());
-      dto.setIdNo(setlResultQueryDTO.getIdNo());
-      dto.setIdType(setlResultQueryDTO.getIdType());
-      dto.setUserName(setlResultQueryDTO.getUserName());
-      map1.put("data",map1);
+      dto.setIdNo(outptVisitDTO.getCertNo());
+      dto.setIdType(outptVisitDTO.getCertCode());
+      dto.setUserName(outptVisitDTO.getName());
+      map1.put("data",dto);
       // 调用统一支付平台接口
       /*map1.put("payOrdId",insureIndividualVisitDTO.getPayOrdId());
       map1.put("orgCodg",insureConfigurationDTO.getOrgCode());
@@ -532,8 +532,8 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       query.setAppRefdTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
       //应用退费流水号
       query.setAppRefdSn(SnowflakeUtils.getId());
-      //现金支付
-      query.setCashRefdAmt(outptSettleDTO.getXjzf());
+      //现金支付  todo
+      query.setCashRefdAmt(new BigDecimal(0));
       //电子凭证授权Token
       query.setEcToken(outptSettleDTO.getEcToken());
       //支付订单号

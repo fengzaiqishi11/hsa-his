@@ -41,6 +41,10 @@ public class HealthInfoUniversalController {
     @Resource
     private PhysBusinessService physBusinessService;
 
+    //药房药库及药品类统计分析
+    @Resource
+    private DrugBusinessService drugBusinessService;
+
     /**
      * 查询实验室报告相关数据接口
      * @Author liudawen
@@ -107,7 +111,18 @@ public class HealthInfoUniversalController {
     }
 
 
-
+    /**
+     * 查询药品库存，使用情况业务相关数据接口
+     * @Author liudawen
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 11:02
+     **/
+    @GetMapping("/getDrugBusiness")
+    public WrapperResponse getDrugBusiness(@RequestParam Map map){
+        return universalMethodInvoke(map,DrugBusinessService.class,drugBusinessService);
+    }
 
 
     /**

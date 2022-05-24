@@ -123,6 +123,12 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
         return true;
     }
 
+    @Override
+    public Boolean updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO) {
+         outptVisitDAO.updateOutptVisitUploadFlag(outptVisitDTO);
+        return true;
+    }
+
     /**
      * @param outptSettleDO
      * @Method updateOutptAcctPay

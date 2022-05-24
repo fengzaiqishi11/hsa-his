@@ -224,4 +224,6 @@ public interface OutptVisitDAO {
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
 
     int updateUplod(OutptVisitDTO outptVisitDTO);
+
+    int updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
 }

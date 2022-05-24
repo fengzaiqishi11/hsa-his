@@ -110,4 +110,7 @@ public interface OutptVisitService {
     List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
 
     WrapperResponse<Boolean> updateUplod(Map<String, Object> map);
+
+
+    WrapperResponse<Boolean>  updateOutptVisitUploadFlag(Map<String, Object> map);
 }

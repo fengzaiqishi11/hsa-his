@@ -425,6 +425,12 @@
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
         </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
+        </if>
         <if test="startTime != null and startTime != '' ">
             and date(in_time) &gt;= date(#{startTime})
         </if>
@@ -435,7 +441,7 @@
         union all
         select n.* from (
         select ov.id,'0' as lx,ov.register_no as visitNo, ov.name, ov.gender_code, ov.age,
-        ov.age_unit_code,ov.hosp_code,'1' as is_uplod_cost,'1' as is_uplod_dise,cplt_flag,DATE_FORMAT(visit_time, "%Y-%m-%d") as visitDate,
+        ov.age_unit_code,ov.hosp_code,'1' as is_uplod_cost,is_uplod_dise,cplt_flag,DATE_FORMAT(visit_time, "%Y-%m-%d") as visitDate,
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
@@ -443,6 +449,12 @@
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
+        </if>
+        <if test="isUplodDise != null and isUplodDise != '' ">
+            and is_uplod_dise = #{isUplodDise}
+        </if>
+        <if test="cpltFlag != null and cpltFlag != '' ">
+            and cplt_flag = #{cpltFlag}
         </if>
         <if test="startTime != null and startTime != '' ">
             and date(visit_time) &gt;= date(#{startTime})

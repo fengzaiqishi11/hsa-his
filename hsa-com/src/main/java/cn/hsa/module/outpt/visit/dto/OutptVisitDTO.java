@@ -278,5 +278,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     // 医保机构编号
     private String insureRegCode;
 
+    private String isUploadDise;
+
    private List<String> diagnoseList;
 }

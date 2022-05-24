@@ -640,8 +640,11 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
         //修改上传状态为已上传
-      /*  outptVisitDTO.setIsUploadDise("1");
-        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);*/
+        outptVisitDTO.setIsUploadDise("1");
+        Map paramMap1 = new HashMap();
+        paramMap1.put("hospCode",insureSettleInfoDTO.getHospCode());
+        paramMap1.put("outptVisitDTO",outptVisitDTO);
+        outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
         return true;
     }
 
@@ -671,8 +674,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("fixmedins_code",insureConfigurationDTO.getOrgCode()); //定点医疗机构编号
 
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("data", paramMap);
-        httpParam.put("input", inputMap);
+        //inputMap.put("data", paramMap);
+        httpParam.put("input", paramMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("自费病人门诊就医信息删除:" + json);
         String url = insureConfigurationDTO.getUrl();
@@ -684,10 +687,13 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         logger.info("自费病人门诊就医信息删除:" + resultJson);
 
         //修改上传状态
+        Map paramMap1 = new HashMap();
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setIsUploadDise("0");
         outptVisitDTO.setId(insureSettleInfoDTO.getId());
-        outptVisitService_consumer.updateOutptVisitUploadFlag(outptVisitDTO);
+        paramMap1.put("outptVisitDTO",outptVisitDTO);
+        paramMap1.put("hospCode",hospCode);
+        outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
         return true;
     }
 

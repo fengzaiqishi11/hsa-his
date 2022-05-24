@@ -225,5 +225,5 @@ public interface OutptVisitDAO {
 
     int updateUplod(OutptVisitDTO outptVisitDTO);
 
-    void updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
+    int updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
 }

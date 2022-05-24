@@ -653,6 +653,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DISE_FEE_UPLOD, interfaceParamDTO);
         //修改上传状态为已上传
         outptVisitDTO.setIsUploadDise("1");
+        outptVisitDTO.setCpltFlag("0");
         Map paramMap1 = new HashMap();
         paramMap1.put("hospCode",insureSettleInfoDTO.getHospCode());
         paramMap1.put("outptVisitDTO",outptVisitDTO);
@@ -702,6 +703,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         Map paramMap1 = new HashMap();
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
         outptVisitDTO.setIsUploadDise("0");
+        outptVisitDTO.setCpltFlag("0");
         outptVisitDTO.setId(insureSettleInfoDTO.getId());
         outptVisitDTO.setHospCode(hospCode);
         paramMap1.put("outptVisitDTO",outptVisitDTO);

@@ -373,6 +373,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
                     String s = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), JSON.toJSONString(httpParam));
                     log.error("=======调门诊挂号撤销结束=======");
                 }
+                throw new AppException("门诊登记调医保接口失败！"+e.getMessage());
             }
         }
         return insureIndividualVisitDO;

@@ -18,6 +18,7 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -363,11 +364,15 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
                 }
             } catch (Exception e) {
                 log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage());
-                log.error("=======调门诊挂号撤销开始=======");
-                Map<String, Object> httpParam = initBackParam(personinfo, crteId, crteName, aac001, insureConfigurationDTO, responseData);
-                log.error("调门诊挂号撤销入参为：{}", JSON.toJSONString(httpParam));
-                String s = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), JSON.toJSONString(httpParam));
-                log.error("=======调门诊挂号撤销结束=======");
+                if (ObjectUtil.isNotEmpty(responseData)
+                        && ObjectUtil.isNotEmpty(responseData.getMedicalRegNo())
+                        && ObjectUtil.isNotEmpty(responseData.getVisitNo())) {
+                    log.error("=======调门诊挂号撤销开始=======");
+                    Map<String, Object> httpParam = initBackParam(personinfo, crteId, crteName, aac001, insureConfigurationDTO, responseData);
+                    log.error("调门诊挂号撤销入参为：{}", JSON.toJSONString(httpParam));
+                    String s = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), JSON.toJSONString(httpParam));
+                    log.error("=======调门诊挂号撤销结束=======");
+                }
             }
         }
         return insureIndividualVisitDO;

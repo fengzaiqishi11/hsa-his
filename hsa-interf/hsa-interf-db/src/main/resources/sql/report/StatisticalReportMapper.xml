@@ -351,6 +351,7 @@
         hospPrice,
         personPrice,
         apTotalPrice,
+        comPay,
         ynyh,
         remark,
         mafPay,
@@ -380,6 +381,7 @@
         ( a.total_price - a.reality_price ) AS ynyh,
         b.remark,
         ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.com_pay, 0.00) as comPay,
         ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
@@ -414,6 +416,7 @@
         a.hosp_jm_price AS ynyh,
         b.remark,
         ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.com_pay, 0.00) as comPay,
         ifnull(b.personal_price, 0.00) as personalPrice
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
@@ -470,6 +473,7 @@
         SUM(hospPrice)as hospPriceSum,
         SUM(personPrice)as personPriceSum,
         SUM(apTotalPrice)as apTotalPriceSum,
+        SUM(comPay)as comPay,
         SUM(ynyh)as ynyhSum from(
         SELECT
         ywlx,
@@ -489,6 +493,7 @@
         hospPrice,
         personPrice,
         apTotalPrice,
+        comPay,
         ynyh,
         remark
         FROM
@@ -510,6 +515,7 @@
         b.retire_price AS retirePrice,
         b.hosp_price AS hospPrice,
         b.person_price AS personPrice,
+        b.com_pay AS comPay,
         0.00 AS apTotalPrice,
         ( a.total_price - a.reality_price ) AS ynyh,
         b.remark
@@ -538,6 +544,7 @@
         b.retire_price AS retirePrice,
         b.hosp_price AS hospPrice,
         b.person_price AS personPrice,
+        b.com_pay AS comPay,
         a.ap_total_price AS apTotalPrice,
         a.hosp_jm_price AS ynyh,
         b.remark
@@ -590,6 +597,7 @@
         SUM(hospPrice)as hospPriceSum,
         SUM(personPrice)as personPriceSum,
         SUM(apTotalPrice)as apTotalPriceSum,
+        SUM(comPay) AS comPay,
         SUM(ynyh)as ynyhSum from(
         SELECT
         ywlx,
@@ -602,6 +610,7 @@
         SUM( ss.hospPrice ) AS hospPrice,
         SUM( ss.personPrice ) AS personPrice,
         SUM( ss.apTotalPrice ) AS apTotalPrice,
+        SUM( ss.comPay) AS comPay,
         SUM( ss.ynyh ) AS ynyh
         FROM
         (
@@ -616,6 +625,7 @@
         IFNULL( b.retire_price, 0 ) AS retirePrice,
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
+        ifnull(b.com_pay, 0) as comPay,
         0 AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
         FROM
@@ -638,6 +648,7 @@
         IFNULL( b.retire_price, 0 ) AS retirePrice,
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
+        ifnull( b.com_pay, 0) as comPay,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh
         FROM
@@ -683,6 +694,7 @@
         SUM( ss.apTotalPrice ) AS apTotalPrice,
         SUM( ss.ynyh ) AS ynyh,
         SUM( ss.mafPay) AS mafPay,
+        SUM( ss.comPay ) AS mapPay,
         SUM( ss.personalPrice) as personalPrice
         FROM
         (
@@ -700,6 +712,7 @@
         0 AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.com_pay, 0.00) as comPay,
         ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         outpt_settle a,
@@ -727,6 +740,7 @@
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
+        ifnull(b.com_pay, 0.00) as comPay,
         ifnull(b.personal_price, 0.00) as personalPrice
         FROM
         inpt_settle a,

@@ -115,11 +115,9 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             // 传值05 或 04
             visitMap.put("psn_cert_type", insureIndividualBasicDTO.getBka895());
             // 传值证件号码
-            if ("null".equals(insureIndividualBasicDTO.getAac002()) || StringUtils.isEmpty(insureIndividualBasicDTO.getAac002())) {
-                // 传值证件号码
+            if (StringUtils.isEmpty(insureIndividualBasicDTO.getAac002()) || "null".equals(insureIndividualBasicDTO.getAac002())) {
                 visitMap.put("certno", insureIndividualBasicDTO.getBka896());
             } else {
-                // 传值证件号码
                 visitMap.put("certno", insureIndividualBasicDTO.getAac002());
             }
             // 传值姓名

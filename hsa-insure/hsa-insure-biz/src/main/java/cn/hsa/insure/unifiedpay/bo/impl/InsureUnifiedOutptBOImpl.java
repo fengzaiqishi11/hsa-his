@@ -532,8 +532,8 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       query.setAppRefdTime(new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()));
       //应用退费流水号
       query.setAppRefdSn(SnowflakeUtils.getId());
-      //现金支付  todo
-      query.setCashRefdAmt(new BigDecimal(0));
+      //现金支付  todo 订单查询接口获取到现金支付的钱  填写到医保结算表的restsPrice字段
+      query.setCashRefdAmt(insureIndividualSettleDTO.getRestsPrice());
       //电子凭证授权Token
       query.setEcToken(outptSettleDTO.getEcToken());
       //支付订单号

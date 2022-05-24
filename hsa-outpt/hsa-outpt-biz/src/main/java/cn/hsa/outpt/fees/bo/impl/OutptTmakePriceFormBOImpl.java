@@ -49,6 +49,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -4471,16 +4472,26 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         String settleId = SnowflakeUtils.getId();//结算id
 
         //先判断是否已经调用过接口，并返回成功，则不再更新表操作
+        OutptSettleDTO outptSettleDTO1 = new OutptSettleDTO();
+        outptSettleDTO1.setHospCode(outptVisitDTO.getHospCode());
+        outptSettleDTO1.setVisitId(visitId);
         Map<String, Object> settleMap = new HashMap<>();
         settleMap.put("id", settleId);
         settleMap.put("hospCode", outptVisitDTO.getHospCode());
-        OutptSettleDTO dto = outptSettleDAO.getById(settleMap);
-        if ("1".equals(dto.getIsSettle())){
+        List<OutptSettleDTO> list = outptSettleDAO.findByCondition(outptSettleDTO1);
+        if (CollectionUtil.isNotEmpty(list)){
           JSONObject result = new JSONObject();
           result.put("outptVisit", outptVisitDTO);//个人信息
-          result.put("settleNo", dto.getSettleNo());
+          result.put("settleNo", list.get(0).getSettleNo());
           result.put("resultCode","6");
           return result;
+          /*if ("1".equals(dto.getIsSettle())){
+            JSONObject result = new JSONObject();
+            result.put("outptVisit", outptVisitDTO);//个人信息
+            result.put("settleNo", dto.getSettleNo());
+            result.put("resultCode","6");
+            return result;
+          }*/
         }
         //发票制单
         saveInvoiceInfo(outptSettleDTO);
@@ -4922,7 +4933,14 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 删除his的医保费用表数据
         outptSettleDAO.deleteInsureCost(map);
         outptSettleDAO.updateIndividualVisitToken(map);
-        //todo 结算表状态
+        //todo 结算表状态 删除结算表数据
+        outptSettleDAO.deleteById(outptSettleDTO.getId());
+        //医保结算表删除数据
+        Map<String, String> delIndividualSettleParam = new HashMap<String, String>();
+        delIndividualSettleParam.put("hospCode", hospCode);//医院编码
+        delIndividualSettleParam.put("visitId", outptSettleDTO.getVisitId());//就诊id
+        delIndividualSettleParam.put("settleState", Constants.YBJSZT.JS);//结算标志 = 结算
+        insureIndividualSettleService.delInsureIndividualSettleByVisitId(delIndividualSettleParam);
         return true;
       }else{
         throw new AppException("医保退费失败！");

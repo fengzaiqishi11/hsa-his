@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.DrugBusinessDAO">
+
+    <!--诊后随访表-->
+    <select id="getTbZhsfData" resultType="cn.hsa.module.interf.healthInfo.entity.TbZhsfDO">
+        select * from (
+            select
+            '机构编码' as YLJGDM,
+            '医疗机构名称' as YLJGMC ,
+            '随访单号' as SSDH,
+            '随访类型' as SFLX,
+            '随访方式' as SFFS,
+            '就诊科室编码' as JZKSBM,
+            '就诊科室名称' as JZKSMC,
+            '就诊时间' as JZSJ,
+            '就诊记录流水号' as JZJLLSH,
+            '姓名' as XM,
+            '身份证号码' as SFZHM,
+            '性别代码' as XBDM,
+            '年龄' as NL,
+            '诊断编码' as ZDBM,
+            '诊断名称' as ZDMC,
+            '联系电话' as LXDH,
+            now() as SFSJ,
+            '随访医生编码' as SFYSBM,
+            '随访医生姓名' as SFYSXM,
+            '随访结果' as SFJG
+            from
+            base_assist ba where 1=2
+        ) a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.sfsj) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.sfsj) &lt;= date(#{endTime})
+        </if>
+
+
+    </select>
+    <!--药品出入库信息-->
+    <select id="getTbYprkxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYprkxxDO">
+        select * from (
+            select
+            so.hosp_code as YLJGDM ,
+            sod.id as CRKMXXH,
+            '1' as CRKBZ,
+            -- 1出库,2入库
+            '' as SZBWLSH,
+            bd.code as YPBM,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            '发票号' as FPH,
+            '开票日期' as KPRQ ,
+            '到票日期' as DPRQ,
+            bd.dan as PZWH,
+            null as SCRQ,
+            sod.expiry_date as YXQ,
+            sod.buy_price_all as PFJ,
+            sod.sell_price_all as LSJ,
+            sod.buy_price_all as GJJ ,
+            sod.buy_price_all * sod.num as GJZJE,
+            sod.num as SL,
+            '交易前库存' as JYQKC,
+            '交易后库存' as JYHKC,
+            '供方交易前库存' as GFJYQKC,
+            '供方交易后库存' as GFJYHKC,
+            '供方交易时单位' as GFJYSDW ,
+            '需方交易前库存' as XFJYQKC,
+            '需方交易后库存' as XFJYHKC,
+            '需方交易时单位' as XFJYSJ,
+            so.crte_time as CRKSJ,
+            so.crte_id as CZRYBM,
+            so.crte_name as CZRYXM
+            from
+            stro_out so,
+            stro_out_detail sod ,
+            base_drug bd
+            where
+            so.hosp_code = sod.hosp_code
+            and so.id = sod.out_id
+            and sod.hosp_code = bd.hosp_code
+            and sod.item_id = bd.id
+            and so.out_code in ('4', '5')
+            union
+            select
+            sin.hosp_code as YLJGDM ,
+            sid.id as CRKMXXH,
+            '2' as CRKBZ,
+            -- 1出库,2入库
+            '' as SZBWLSH,
+            bd.code as YPBM,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            '发票号' as FPH,
+            '开票日期' as KPRQ ,
+            '到票日期' as DPRQ,
+            bd.dan as PZWH,
+            null as SCRQ,
+            sid.expiry_date as YXQ,
+            sid.buy_price_all as PFJ,
+            sid.sell_price_all as LSJ,
+            sid.buy_price_all as GJJ ,
+            sid.buy_price_all * sid.num as GJZJE,
+            sid.num as SL,
+            '交易前库存' as JYQKC,
+            '交易后库存' as JYHKC,
+            '供方交易前库存' as GFJYQKC,
+            '供方交易后库存' as GFJYHKC,
+            '供方交易时单位' as GFJYSDW ,
+            '需方交易前库存' as XFJYQKC,
+            '需方交易后库存' as XFJYHKC,
+            '需方交易时单位' as XFJYSJ,
+            sin.crte_time as CRKSJ,
+            sin.crte_id as CZRYBM,
+            sin.crte_name as CZRYXM
+            from
+            stro_in sin,
+            stro_in_detail sid ,
+            base_drug bd
+            where
+            sin.hosp_code = sid.hosp_code
+            and sin.id = sid.in_id
+            and sid.hosp_code = bd.hosp_code
+            and sid.item_id = bd.id
+            and sin.in_code in ('2', '1')
+        )a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.CRKSJ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.CRKSJ) &lt;= date(#{endTime})
+        </if>
+    </select>
+    <!--药品库存信息-->
+    <select id="getTbYpkcxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpkcxxDO">
+        select * from (
+            select
+            ss.hosp_code as YLJGDM,
+            bd.code as YPBM,
+            bde.name as KCWZ,
+            '省招标网流水号' as SZBWLSH,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            bp.name as SCQY,
+            bd.spec as GG,
+            ss.num as BZSL,
+            ss.unit_code as DW,
+            ss.num as KCSL,
+            ss.stock_max as ZDCL,
+            null as BJCL,
+            ss.stock_min as ZXCL,
+            ss.buy_price_all as PFJ,
+            ss.sell_price_all as LSJ,
+            now() as SXRQ
+            from
+            stro_stock ss,
+            base_drug bd ,
+            base_dept bde ,
+            base_product bp
+            where
+            ss.hosp_code = bd.hosp_code
+            and ss.item_id = bd.id
+            and ss.hosp_code = bde.hosp_code
+            and ss.biz_id = bde.id
+            and bd.hosp_code = bp.hosp_code
+            and bd.prod_code = bp.code
+        )a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.SXRQ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.SXRQ) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <!--药品销售信息-->
+    <select id="getTbYpxxssData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpxxssDO">
+        select *
+        from (select
+        ic.hosp_code yljgdm,
+        bd.code ypdm,
+        ic.visit_id jzh,
+        '1' ywlx,
+        ic.phar_id yfdm,
+        '' szbwlsh,
+        bd.usual_name ypmc,
+        bd.good_name spm,
+        bp.name scqy,
+        bd.prep_code ypjxms,
+        bd.spec ypgg,
+        ic.total_num bzl,
+        ic.total_num_unit_code dw,
+        '' cgj,
+        ic.price xsjg,
+        ic.total_num xssl,
+        ic.total_price xsje,
+        bd.ph_code ypsx,
+        bd.durg_code xplx,
+        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
+        bd.durg_code kjyjb,
+        ic.cost_time xssj,
+        bd2.code xsksdm,
+        bd2.name xsksmc,
+        su.code xsysdm,
+        su.name xsysmc,
+        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
+        from
+        inpt_cost ic ,
+        base_drug bd ,
+        base_product bp ,
+        base_dept bd2 ,sys_user su
+        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
+        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
+        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
+        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
+
+        union
+
+        select
+        ic.hosp_code yljgdm,
+        bd.code ypdm,
+        ic.visit_id jzh,
+        '2' ywlx,
+        ic.phar_id yfdm,
+        '' szbwlsh,
+        bd.usual_name ypmc,
+        bd.good_name spm,
+        bp.name scqy,
+        bd.prep_code ypjxms,
+        bd.spec ypgg,
+        ic.total_num bzl,
+        ic.num_unit_code dw,
+        '' cgj,
+        ic.price xsjg,
+        ic.total_num xssl,
+        ic.total_price xsje,
+        bd.ph_code ypsx,
+        bd.durg_code xplx,
+        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
+        bd.durg_code kjyjb,
+        ic.crte_time xssj,
+        bd2.code xsksdm,
+        bd2.name xsksmc,
+        su.code xsysdm,
+        su.name xsysmc,
+        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
+        from
+        outpt_cost ic ,
+        base_drug bd ,
+        base_product bp ,
+        base_dept bd2 ,sys_user su
+        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
+        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
+        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
+        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code )a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.xssj) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.xssj) &lt;= date(#{endTime})
+        </if>
+    </select>
+    <!--抗菌药物基本情况统计-->
+    <select id="getTbKjywjbjktjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywjbjktjDO">
+        select * from (
+            select ic.hosp_code as YLJGDM,
+            bd.code as YPDM,
+            '1' as YWLX,
+            ic.cost_time as JSRQ,
+            '抗菌药物使用标识总和' as KJYWSYBSZH,
+            '限定日剂量总和' as XDRJLZH,
+            '中药总剂量' as ZYZJL,
+            'I类切口手术抗菌药物预防使用标识' as ILQKSSKJYW,
+            '特殊抗菌药物dd值总和' as TSKJYWDDZZH,
+            '特殊抗菌药物使用标识总和' as TSKJYWSYBSZH ,
+            iv.total_in_days as ZYTS,
+            bd2.code as JZKSDM,
+            bd2.name as JZKSMC,
+            ic.doctor_id as YSDM,
+            ic.doctor_name as YSMC,
+            '唯一码' as WYM,
+            'ddds' as DDDS,
+            '特殊ddds' as TSDDDS,
+            '业务编码' as YWBM,
+            bd.good_name as YPMC,
+            '静脉使用标识' as JMSYBS,
+            IC.iat_id as CFLSH ,
+            iv.in_time as RYRQ,
+            iv.out_time as CYRQ,
+            bd.spec as YPGG,
+            '招标流水号' as ZBLSH,
+            bd.dosage_unit_code as YPJLDW,
+            bd.usual_name as YPTYMC,
+            bp.name as YPCJ,
+            bd.price as DJ,
+            '包装量' as BZL,
+            ic.total_num as SYSL,
+            ic.prep_code as YPJX,
+            ic.total_price as JE,
+            bd.dosage as YPDJL
+            from
+            inpt_cost ic,
+            inpt_visit iv ,
+            base_drug bd ,
+            base_dept bd2,
+            base_product bp
+            where
+            ic.hosp_code = iv.hosp_code
+            and ic.visit_id = iv.id
+            and ic.hosp_code = bd.hosp_code
+            and ic.item_id = bd.id
+            and ic.hosp_code = bd2.hosp_code
+            and ic.dept_id = bd2.id
+            and bd.hosp_code = bp.hosp_code
+            and bd.prod_code = bp.code
+        )a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.JSRQ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.JSRQ) &lt;= date(#{endTime})
+        </if>
+    </select>
+    <!--抗菌药物各品种统计-->
+    <select id="getTbKjywgpztjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywgpztjDO">
+        select * from (
+            select
+            ic.hosp_code as YLJGDM,
+            ic.item_code as YPDM,
+            ic.item_name as YPMC,
+            '1' as YWLX,
+            -- 0是门诊,1是住院
+            ic.item_name as ZDXMMC,
+            bd.spec as YPGG,
+            bd.prep_code as YPJXMS,
+            ic.total_num as BZSL,
+            ic.dosage_unit_code as JLDW,
+            ic.price as DJ,
+            ic.total_price as SYJE,
+            bd.antibacterial_code as GLJB,
+            '招标网流水号' as ZBWLSH,
+            bd.prep_code as SCQY,
+            bd.antibacterial_code as KJYWGLJB,
+            ic.num as SL,
+            ic.num_unit_code as DW,
+            ic.total_price as JE,
+            '业务编码' as YWDM,
+            '抗菌药物标识' as KJYWBS,
+            '限定日dd值' as XDDDZ,
+            bd2.code as KFKSBM,
+            ic.exec_time as ZXRQ,
+            '唯一标识码' as WYBSM,
+            bd2.name as KFKSMC,
+            ic.doctor_id as YSBM,
+            ic.doctor_name as YSMC,
+            bd.good_name as SPM
+            from
+            inpt_cost ic ,
+            base_drug bd,
+            base_dept bd2
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.item_id = bd.id
+            and ic.hosp_code = bd2.hosp_code
+            and ic.dept_id = bd2.id
+            and ifnull(bd.antibacterial_code ,'') != ''
+        )a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.ZXRQ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.ZXRQ) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <select id="getTbSxzzData" resultType="cn.hsa.module.interf.healthInfo.entity.TbSxzzDO">
+        select * from (
+            select '转诊机构编码' as YLJGDM,
+            '转诊单号' as ZZDH,
+            '转诊机构名称' as YLJGMC,
+            '转诊科室编码' as KSBM ,
+            '转诊科室名称' as KSMC ,
+            '申请医生姓名' as SQYSXM ,
+            '患者姓名' as XM,
+            '性别代码' as XBDM ,
+            '身份证号码' as SFZHM,
+            ' 联系电话' as LXDH ,
+            '诊断编码' as ZDBM ,
+            '诊断名称' as ZDMC,
+            '转诊类型' as ZZLX ,
+            '申请转诊时间' as SQZZSJ,
+            '转诊原因说明' as ZZYYSM ,
+            '转诊状态' as ZZZT,
+            '接收机构编码' as JSJGBM,
+            '接收机构名称' as JSJGMC,
+            '接收科室编码' as JSKSBM,
+            '接收科室名称' as JSKSMC,
+            '接收医生姓名' as JSYSXM,
+            now() as JSSJ,
+            '是否有效' as SFYX from inpt_visit where 1=2
+        ) a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.JSSJ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.JSSJ) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <select id="getTbWzlqjlData" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzlqjlDO">
+        select * from (
+            select '物资领取单号' as lqdh,
+            '物资领取序号' as lqdhxh,
+            '机构编码' as jgbm,
+            '物资编码 ' aswzbm,
+            '物资名称' as wzmc,
+            '物资类型编码' as wzlxbm,
+            '物资类型名称' as wzlxmc,
+            '机构名称' as jgmc,
+            '领取科室编码' as lqksbm,
+            '领取科室名称' as lqksmc,
+            '领取数量' as lqsl,
+            '物资规格' as wzgg,
+            '物资单位' as wzdw,
+            '物资单价' as wzdj,
+            now() as sqsj,
+            now() as lqsj,
+            '进货价格' as jhjg,
+            '领取人编码' as lqrbm,
+            ' 领取人名称' as lqrmc ,
+            '发放人编码' as ffrbm ,
+            '发放人名称' as ffrmc,
+            '患者住院流水号' as zylsh,
+            '物资库位' as wzkw ,
+            '物资批号' as wzph,
+            '诊疗项目编码' as zlxmbm,
+            '诊疗项目名称' as zlxmmc,
+            '诊疗项目价格' as zlxmjg,
+            '生产厂家名称' as sccj,
+            '是否高值耗材' as sfgzhc from inpt_visit iv where 1=2
+        ) a where a.jgbm = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.lqsj) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.lqsj) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <select id="getTbYwlReportData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYwlReportDO">
+        select * from (
+            select
+            '医疗机构代码' as YLJGDM,
+            '科室编码' as KSBM,
+            '医院科室名称' as KSMC,
+             now() as YWSJ,
+            '门诊人次' as MZRC,
+            '急诊人次' as JZRC,
+            '入院人次' as RYRC,
+            '期内结算(出院)人次' as CYRC,
+            '在院人数' as ZYRS,
+            '实有床位数' as SYCWS,
+            '门急诊医疗费用' as MJZYLFY,
+            '住院医疗费用' as ZYYLFY,
+            '门急诊药品费用' as MJZYPFY,
+            '住院药品费用' as ZYYPFY,
+            '门急诊医保医疗费用' as MJZYBYLFY,
+            '住院医保医疗费用' as ZYYBYLFY,
+            '门急诊医保药品费用' as MJZYBYPFY,
+            '住院医保药品费用' as ZYYBYPFY,
+            '住院实际发生费用' as ZYSJFSYS,
+            '预留统计字段 1' as TJYL1,
+            '预留统计字段 2' as TJYL2,
+            '预留统计字段 3' as TJYL3,
+            '预留统计字段 4' as TJYL4,
+            '预留统计字段 5' as TJYL5,
+            '预留统计字段 6' as TJYL6,
+            '预留统计字段 7' as TJYL7,
+            '预留统计字段 8' as TJYL8,
+            '修改标志' as XGBZ
+            from
+            inpt_advice ia
+        ) a where a.YLJGDM = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and date(a.YWSJ) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.YWSJ) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+</mapper>

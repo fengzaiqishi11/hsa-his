@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.base.dept.entity.BaseDeptDO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
@@ -25,6 +26,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.module.sys.user.entity.SysUserDO;
 import cn.hsa.util.*;
 import cn.hutool.core.util.IdcardUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -251,7 +253,9 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
                     if (matchDTOs.size() > 1) {
                         throw new AppException(-1,"存在多条匹配信息，请检查！疾病编码：【"+mzzd.getIcdcode()+"】");
                     }
-                    outptDiagnoseDTO.setDiseaseId(matchDTOs.get(0).getId());
+                    outptDiagnoseDTO.setDiseaseId(matchDTOs.get(0).getHospIllnessId());
+                    outptDiagnoseDTO.setDiseaseCode(mzzd.getIcdcode());
+                    outptDiagnoseDTO.setDiseaseName(mzzd.getIcdname());
                     break;
                 }
             }
@@ -458,6 +462,21 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         }
         outptVisitDTO.setOutProfile(yjRcDTO.getOutProfile());
         outptVisitDTO.setPatientCode(MapUtils.get(list.get(0),"patCode"));
+        //【ID1003296】增加医生姓名、科室、科别赋值
+        outptVisitDTO.setOutptDoctorId(yjRcDTO.getMzysid());
+        outptVisitDTO.setDeptId(yjRcDTO.getJzksid());
+        outptVisitDTO.setDoctorId(yjRcDTO.getMzysid());
+        SysUserDO user = outptPrescribeDao.getUserById(yjRcDTO);
+        if (ObjectUtil.isNotEmpty(user)) {
+            outptVisitDTO.setOutptDoctorName(user.getName());
+            outptVisitDTO.setDoctorName(user.getName());
+        }
+
+        BaseDeptDO dept = outptPrescribeDao.getDeptById(yjRcDTO);
+        if (ObjectUtil.isNotEmpty(dept)) {
+            outptVisitDTO.setDeptName(dept.getName());
+            outptVisitDTO.setCaty(dept.getName());
+        }
         return outptVisitDTO;
     }
 
@@ -567,8 +586,16 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptPrescribeDTO.setOrderNo(this.getOrderNo(yjRcDTO.getSign(), Constants.ORDERRULE.CFDH));
         //开方医生
         outptPrescribeDTO.setDoctorId(yjRcDTO.getJzysid());
+        SysUserDO user = outptPrescribeDao.getUserById(yjRcDTO);
+        if (ObjectUtil.isNotEmpty(user)) {
+            outptPrescribeDTO.setDoctorName(user.getName());
+        }
         //开发科室
         outptPrescribeDTO.setDeptId(yjRcDTO.getJzksid());
+        BaseDeptDO dept = outptPrescribeDao.getDeptById(yjRcDTO);
+        if (ObjectUtil.isNotEmpty(dept)) {
+            outptPrescribeDTO.setDoctorName(dept.getName());
+        }
         //处方类别
         outptPrescribeDTO.setTypeCode("1");
         //处方类型

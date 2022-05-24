@@ -416,7 +416,17 @@ public class DateUtils {
         }
         return false;
     }
-    
+    /**
+     * @Author gory 开始时间小于等于
+     * @Date 2022/5/10 19:40
+     * @Param [beginTime, endTime]
+     **/
+    public static boolean dateCompareAndEquals(Date beginTime, Date endTime) {
+        if (beginTime.before(endTime) || beginTime.equals(endTime)) {
+            return true;
+        }
+        return false;
+    }
     /**
      * @Method 截断时间
      * @Description 

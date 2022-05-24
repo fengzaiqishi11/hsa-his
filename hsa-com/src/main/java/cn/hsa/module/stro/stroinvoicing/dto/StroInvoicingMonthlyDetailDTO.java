@@ -1,10 +1,9 @@
 package cn.hsa.module.stro.stroinvoicing.dto;
 
 import cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -23,9 +22,13 @@ import java.util.List;
 public class StroInvoicingMonthlyDetailDTO extends StroInvoicingMonthlyDetailDO implements Serializable {
     private String monthly;
     // 当前时间
-    private Date date;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date nowDate;
     // itemids
     private List<String> itemIds;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifyTime;
 
 }

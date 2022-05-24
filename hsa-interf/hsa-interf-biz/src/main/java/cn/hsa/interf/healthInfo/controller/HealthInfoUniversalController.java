@@ -40,6 +40,19 @@ public class HealthInfoUniversalController {
     private MedicalImageService medicalImageService;
     @Resource
     private PhysBusinessService physBusinessService;
+    @Resource
+    private HealthInptInfoService healthInptInfoService; // 住院
+    @Resource
+    private HealthOutptInfoService healthOutptInfoService; // 门诊
+    @Resource
+    private HealthMrisInfoService healthMrisInfoService; // 病案
+    @Resource
+    private HealthDiagnoseInfoService healthDiagnoseInfoService; // 诊断
+    @Resource
+    private HealthOperInfoService healthOperInfoService; // 手术
+    @Resource
+    private HealthSettleInfoService healthSettleInfoService; // 财务报告
+
 
     //药房药库及药品类统计分析
     @Resource
@@ -110,7 +123,85 @@ public class HealthInfoUniversalController {
         return universalMethodInvoke(map,PhysBusinessService.class,physBusinessService);
     }
 
+    /**
+     * 查询门诊业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:52
+     **/
+    @GetMapping("/getOutptInfo")
+    public WrapperResponse getOutptInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthOutptInfoService.class,healthOutptInfoService);
+    }
 
+
+
+    /**
+     * 查询住院业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:52
+     **/
+    @GetMapping("/getInptInfo")
+    public WrapperResponse getInptInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthInptInfoService.class,healthInptInfoService);
+    }
+
+    /**
+     * 查询病案首页业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:56
+     **/
+    @GetMapping("/getMrisInfo")
+    public WrapperResponse getMrisInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthMrisInfoService.class,healthMrisInfoService);
+    }
+
+    /**
+     * 查询病案首页业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:56
+     **/
+    @GetMapping("/getDiagnoseInfo")
+    public WrapperResponse getDiagnoseInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthDiagnoseInfoService.class,healthDiagnoseInfoService);
+    }
+
+    /**
+     * 查询手术业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:57
+     **/
+    @GetMapping("/getOperInfo")
+    public WrapperResponse getOperInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthOperInfoService.class,healthOperInfoService);
+    }
+
+    /**
+     * 查询手术业务相关数据接口
+     * @Author liuliyun
+     * @Param [map]
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Throws
+     * @Date 2022/5/20 16:57
+     **/
+    @GetMapping("/getSettleInfo")
+    public WrapperResponse getSettleInfo(@RequestParam Map map){
+        return universalMethodInvoke(map,HealthSettleInfoService.class,healthSettleInfoService);
+    }
     /**
      * 查询药品库存，使用情况业务相关数据接口
      * @Author liudawen

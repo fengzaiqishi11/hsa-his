@@ -1,10 +1,12 @@
 package cn.hsa.module.phar.pharoutdistribute.dto;
 
 import cn.hsa.module.phar.pharoutdistribute.entity.PharOutDistributeDetailDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -33,6 +35,7 @@ public class PharOutDistributeDetailDTO extends PharOutDistributeDetailDO implem
 
     // 进销存目标名称
     private String invoicingTargetName;
-
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date crteTime;
 }

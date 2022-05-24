@@ -1570,10 +1570,10 @@
         bd.unit_code as itemUnitCode,
     CASE
             WHEN bd.type_code = '3' THEN
-            b.id
+                b.id
             WHEN bd.type_code = '2' THEN
-            c.id
-        END itemId,
+                c.id
+            END itemId,
     CASE
 
             WHEN bd.type_code = '3' THEN

@@ -527,5 +527,7 @@
 
     <!-- *************************************************** 医保电子病历 *************************************************************** -->
     <dubbo:reference id="insureUnifiedEmrService_comsumer" interface="cn.hsa.module.insure.emr.service.InsureUnifiedEmrService" check="false"/>
+    <!-- *************************************************** 月度进销存 *************************************************************** -->
+    <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false" retries="0"/>
 </beans>
 

@@ -9,6 +9,7 @@ import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 门诊处方主信息实体类(TbMzcfzxx) *
@@ -56,7 +57,7 @@ public class TbMzcfzxx extends PageDO implements Serializable {
     private String BZ; // 备注信息
     private  String VALIDFLAG; // 数据有效状态
     private  String APPETIME; // 数据产生时间
-    private DateTime MODIFYTIME; // 最后修改时间
+    private Date MODIFYTIME; // 最后修改时间
     private String MODIFYTCODE;//修改人编码
     private String MODIFYTNAME;//修改人名称
 }

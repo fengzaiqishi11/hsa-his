@@ -674,8 +674,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         paramMap.put("fixmedins_code",insureConfigurationDTO.getOrgCode()); //定点医疗机构编号
 
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("data", paramMap);
-        httpParam.put("input", inputMap);
+        //inputMap.put("data", paramMap);
+        httpParam.put("input", paramMap);
         String json = JSONObject.toJSONString(httpParam);
         logger.info("自费病人门诊就医信息删除:" + json);
         String url = insureConfigurationDTO.getUrl();
@@ -692,6 +692,7 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         outptVisitDTO.setIsUploadDise("0");
         outptVisitDTO.setId(insureSettleInfoDTO.getId());
         paramMap1.put("outptVisitDTO",outptVisitDTO);
+        paramMap1.put("hospCode",hospCode);
         outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
         return true;
     }

@@ -280,7 +280,14 @@
         <if test='zgbrQuery =="1"'>
             and v.zg_doctor_id = #{zgDoctorId}
         </if>
-        order by v.bed_name+0 asc,v.in_time desc
+        <choose>
+            <when test="statusCode != null and statusCode != ''and statusCode == '7'.toString()">
+                order by v.out_time desc
+            </when>
+            <otherwise>
+                order by v.bed_name+0 asc,v.in_time desc
+            </otherwise>
+        </choose>
     </select>
 
     <select id="selectOutptVisits" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">

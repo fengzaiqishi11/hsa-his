@@ -306,8 +306,7 @@ public class RequestInsure {
             params.put("visitId", MapUtils.get(param,"visitId"));
             params.put("isHospital", "0");
 
-            //暂时屏蔽 方便测试
-            //toLoginHNS(hospCode,insureRegCode);
+            toLoginHNS(hospCode,insureRegCode);
             InsureConfigurationDO insureConfigurationDO = toConfig(hospCode, insureRegCode);
             //请求参数
             Map<String, Object> parameters = new HashMap<String,Object>();

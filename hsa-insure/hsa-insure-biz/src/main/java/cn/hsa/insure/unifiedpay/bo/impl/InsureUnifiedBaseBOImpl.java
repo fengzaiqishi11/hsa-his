@@ -1626,7 +1626,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
         String code = MapUtils.get(map, "hosp_dept_codg");
         String deptName = MapUtils.get(map, "hosp_dept_name");
-        String startTime = MapUtils.get(map, "begntime");
+        String startTime = Long.toString(MapUtils.get(map, "begntime"));
 
         BaseDeptDTO deptDTO = new BaseDeptDTO();
         deptDTO.setHospCode(hospCode);

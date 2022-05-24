@@ -904,6 +904,16 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         Map<String, Object> res = insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_DELETE, interfaceParamDTO);
         //删除本地数据
         insureGetInfoDAO.deleteFmiOwnPayPatnCost(feeIdList,insureSettleInfoDTO.getHospCode());
+        //修改自费病人费用上传状态
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        inptVisitDTO.setId(insureSettleInfoDTO.getVisitId());
+        inptVisitDTO.setIsUplodCost("0");
+        Map<String, Object> updateMap = new HashMap<>();
+        updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+        updateMap.put("inptVisitDTO", inptVisitDTO);
+        inptVisitService_consumer.updateUplod(updateMap);
+
         return true;
     }
 

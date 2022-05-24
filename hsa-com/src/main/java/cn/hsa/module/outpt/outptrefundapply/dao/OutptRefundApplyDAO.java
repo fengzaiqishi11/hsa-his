@@ -37,7 +37,7 @@ public interface OutptRefundApplyDAO {
 	 * @Date 2021/3/10 10:32
 	 * @Return 
 	 */
-	void deleteOutptRefundApplyByCostId(@Param("costIdList") List<String> costIdList);
+	void deleteOutptRefundApplyByCostId(@Param("hospCode") String hospCode,@Param("costIdList") List<String> costIdList);
 
 	List<Map<String, Object>> queryOutChargePage(OutptSettleDTO outptSettleDTO);
 

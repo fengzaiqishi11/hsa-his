@@ -33,7 +33,7 @@
 
     <!-- 批量删除门诊退费申请数据 -->
     <delete id="deleteOutptRefundApplyByCostId" parameterType="java.util.List">
-        delete from outpt_refund_apply where cost_id in
+        delete from outpt_refund_apply where hosp_code = #{hospCode} and cost_id in
         <foreach collection="costIdList" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>
@@ -108,10 +108,12 @@
             c.name as bfc_name,
             d.name as phar_name,
             e.name as exec_dept_name,
-            b.content
+            b.content,
+            op.type_code as prescriptionCategory
         FROM
             outpt_cost a
             left join outpt_prescribe_detail b ON a.opd_id = b.id
+            left join outpt_prescribe op on op.id = b.op.id
             left join base_finance_classify c on a.bfc_id = c.id
             left join base_dept d on a.phar_id = d.id
             left join base_dept e on a.exec_dept_id = e.id

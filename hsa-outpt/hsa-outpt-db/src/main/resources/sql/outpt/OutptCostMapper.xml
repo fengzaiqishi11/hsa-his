@@ -3597,5 +3597,13 @@
             id = #{item.id} and hosp_code = #{item.hospCode}
         </foreach>
     </update>
+    <!--批量修改确费状态为申请退费状态-->
+    <update id="updateIsTechnologyOkByContans">
+        update outpt_cost set is_technology = #{status} where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="lisAndPasCostIds" open="(" separator="," close=")" index="index">
+            #{index}
+        </foreach>
+    </update>
 
 </mapper>

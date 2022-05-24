@@ -64,4 +64,7 @@ public class TcmMrisDiagnoseDO implements Serializable {
      */
     private String inSituationCode;
 
+    // 行号
+    private String columnsNum;
+
 }

@@ -195,25 +195,124 @@
 
     <!--通过医嘱编码查询项目信息数据-->
     <select id="queryItemByAdviceCode" resultMap="BaseAdviceDetailMap">
-         select
-          b.id, b.hosp_code, b.advice_code, b.type_code, b.item_code, b.item_name, b.num,a.split_unit_code,a.split_price,a.unit_code,a.price, b.unit_code as checkUnitCode, b.price as checkPrice, b.spec, b.use_code,
-           b.total_price, b.is_alone_cost, b.is_frist_cost, b.is_appoint_rate, b.rate_code, b.insure_list_code,a.itemName,a.itemTypeCode,a.typeCode,
-          a.out_dept_code,a.in_dept_code,a.inDeptName,a.outDeptName,a.id as itemId,(select name from base_rate where base_rate.hosp_code = #{hospCode} and b.rate_code = base_rate.code)as rateName
-					from base_advice_detail b
-					left join
-					(select id,`name` as itemName,code,unit_code, price,split_unit_code,split_price,itemTypeCode,out_dept_code,in_dept_code,hosp_code,inDeptName,outDeptName,typeCode
-					from
-                        (select id,`name`,code,unit_code, price,unit_code as split_unit_code, price as split_price,type_code as itemTypeCode,out_dept_code,in_dept_code,
-                            hosp_code,(select name from base_dept where code = out_dept_code)as outDeptName,
-                            (select name from base_dept where code = in_dept_code)as inDeptName,'3' as typeCode
-					    from base_item where  is_valid = '1' and hosp_code = #{hospCode}
-					    union all
-					    select id,`name`,code,unit_code , price,split_unit_code,split_price,type_code as itemTypeCode,'','',hosp_code,'','','2' as typeCode
-					    from base_material where is_valid = '1' and hosp_code = #{hospCode}
-					    )mAndi
-					) a
-					on b.item_code = a.code and b.hosp_code = a.hosp_code and a.typeCode =b.type_code
-					where b.hosp_code = #{hospCode} and b.advice_code = #{code}
+<!--         select-->
+<!--          b.id, b.hosp_code, b.advice_code, b.type_code, b.item_code, b.item_name, b.num,a.split_unit_code,a.split_price,a.unit_code,a.price, b.unit_code as checkUnitCode, b.price as checkPrice, b.spec, b.use_code,-->
+<!--           b.total_price, b.is_alone_cost, b.is_frist_cost, b.is_appoint_rate, b.rate_code, b.insure_list_code,a.itemName,a.itemTypeCode,a.typeCode,-->
+<!--          a.out_dept_code,a.in_dept_code,a.inDeptName,a.outDeptName,a.id as itemId,(select name from base_rate where base_rate.hosp_code = #{hospCode} and b.rate_code = base_rate.code)as rateName-->
+<!--					from base_advice_detail b-->
+<!--					left join-->
+<!--					(select id,`name` as itemName,code,unit_code, price,split_unit_code,split_price,itemTypeCode,out_dept_code,in_dept_code,hosp_code,inDeptName,outDeptName,typeCode-->
+<!--					from-->
+<!--                        (select id,`name`,code,unit_code, price,unit_code as split_unit_code, price as split_price,type_code as itemTypeCode,out_dept_code,in_dept_code,-->
+<!--                            hosp_code,(select name from base_dept where code = out_dept_code)as outDeptName,-->
+<!--                            (select name from base_dept where code = in_dept_code)as inDeptName,'3' as typeCode-->
+<!--					    from base_item where  is_valid = '1' and hosp_code = #{hospCode}-->
+<!--					    union all-->
+<!--					    select id,`name`,code,unit_code , price,split_unit_code,split_price,type_code as itemTypeCode,'','',hosp_code,'','','2' as typeCode-->
+<!--					    from base_material where is_valid = '1' and hosp_code = #{hospCode}-->
+<!--					    )mAndi-->
+<!--					) a-->
+<!--					on b.item_code = a.code and b.hosp_code = a.hosp_code and a.typeCode =b.type_code-->
+<!--					where b.hosp_code = #{hospCode} and b.advice_code = #{code}-->
+        select
+        b.id,
+        b.hosp_code,
+        b.advice_code,
+        b.type_code,
+        b.item_code,
+        b.item_name,
+        b.num,
+        b.unit_code as checkUnitCode,
+        b.price as checkPrice,
+        b.spec,
+        b.use_code,
+        b.total_price,
+        b.is_alone_cost,
+        b.is_frist_cost,
+        b.is_appoint_rate,
+        b.rate_code,
+        b.insure_list_code,
+        case
+        b.type_code when '3' then bi.id
+        else bm.id
+        end itemId,
+<!--        case-->
+<!--        b.type_code when '3' then bi.name-->
+<!--        else bm.name-->
+<!--        end itemName,-->
+        case
+        b.type_code when '3' then bi.unit_code
+        else bm.unit_code
+        end unit_code,
+        case
+        b.type_code when '3' then bi.price
+        else bm.price
+        end price,
+        case
+        b.type_code when '3' then bi.unit_code
+        else bm.split_unit_code
+        end split_unit_code,
+        case
+        b.type_code when '3' then bi.price
+        else bm.split_price
+        end split_price,
+        case
+        b.type_code when '3' then bi.type_code
+        else bm.type_code
+        end itemTypeCode,
+        case
+        b.type_code when '3' then bi.out_dept_code
+        else ''
+        end out_dept_code,
+        case
+        b.type_code when '3' then bi.in_dept_code
+        else ''
+        end in_dept_code,
+        case
+        b.type_code when '3' then (
+        select
+        name
+        from
+        base_dept
+        where
+        code = bi.out_dept_code)
+        else ''
+        end outDeptName,
+        case
+        b.type_code when '3' then (
+        select
+        name
+        from
+        base_dept
+        where
+        code = bi.in_dept_code)
+        else ''
+        end inDeptName,
+        case
+        b.type_code when '3' then '3'
+        else '2'
+        end typeCode,
+        (
+        select
+        name
+        from
+        base_rate
+        where
+        base_rate.hosp_code = #{hospCode}
+        and b.rate_code = base_rate.code)as rateName
+        from
+        base_advice_detail b
+        left join base_item bi on
+        b.item_code = bi.code
+        and bi.is_valid = '1'
+        and b.hosp_code = bi.hosp_code
+        left join base_material bm on
+        b.item_code = bm.code
+        and bm.is_valid = '1'
+        and b.hosp_code = bm.hosp_code
+        where
+        b.hosp_code = #{hospCode}
+        and b.advice_code = #{code}
     </select>
 
     <!--通过医嘱编码查询医嘱详细数据-->

@@ -239,7 +239,14 @@
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
 			and iv.in_time BETWEEN #{Stime} and #{Etime}
 		</if>
-		order by bb.seq_no asc
+		<choose>
+			<when test="statusCode != null and statusCode != ''and statusCode == '5'.toString()">
+				order by iv.out_time desc
+			</when>
+			<otherwise>
+				order by bb.seq_no asc
+			</otherwise>
+		</choose>
 	</select>
 
 	<!--分页查询-->

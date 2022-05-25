@@ -75,7 +75,17 @@
         <if test="regCode != null and regCode !=''  ">
             and iiv.insure_reg_code =#{regCode}
         </if>
-        order by a.in_time desc
+        <choose>
+            <when test="statusCode != null and statusCode !='' and statusCode == '5'.toString()">
+                order by a.out_time desc
+            </when>
+            <when test="statusCode != null and statusCode !='' and statusCode == '7'.toString()">
+                order by a.out_time desc
+            </when>
+            <otherwise>
+                order by a.in_time desc
+            </otherwise>
+        </choose>
     </select>
 
     <!--分页查询已出院患者信息(珠海)-->

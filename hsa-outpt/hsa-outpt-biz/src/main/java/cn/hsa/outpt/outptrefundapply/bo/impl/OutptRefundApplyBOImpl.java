@@ -200,7 +200,7 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 			throw new AppException("门诊医生取消退费申请失败");
 		}
 		String hospCode = (String) param.get("hospCode");
-		String settleId = (String) param.get("settleId");
+		String settleId = outptSettleDTO.getId();
 		String key = hospCode + settleId + "refund";
 		if (!redisUtils.setIfAbsent(key,key,600)){
 			throw new AppException("当前结算单号正在进行申请退费或者医技确费操作，请稍等");
@@ -228,8 +228,10 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 		int result;
 		try {
 			// 确费状态弄成未确费
-			outptCostDAO.updateIsTechnologyOkByContans(Constants.TechnologyStatus.NOTCONFIRMCOST,
-					outptSettleDTO.getHospCode(), lisAndPasCostIds);
+			if (!ListUtils.isEmpty(lisAndPasCostIds)){
+				outptCostDAO.updateIsTechnologyOkByContans(Constants.TechnologyStatus.NOTCONFIRMCOST,
+						outptSettleDTO.getHospCode(), lisAndPasCostIds);
+			}
 			result = outptRefundApplyDAO.deleteOutptRefundAppy(outptSettleDTO);
 		}finally {
 			redisUtils.del(key);

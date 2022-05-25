@@ -113,7 +113,7 @@
         FROM
             outpt_cost a
             left join outpt_prescribe_detail b ON a.opd_id = b.id
-            left join outpt_prescribe op on op.id = b.op.id
+            left join outpt_prescribe op on op.id = b.op_id
             left join base_finance_classify c on a.bfc_id = c.id
             left join base_dept d on a.phar_id = d.id
             left join base_dept e on a.exec_dept_id = e.id

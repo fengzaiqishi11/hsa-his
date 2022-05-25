@@ -351,8 +351,8 @@ public class RequestInsure {
                 params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 4000 ? paramMapJson.substring(0, 4000) : paramMapJson);
                 resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,
                     activityCode);
-              String resultStr = JSONObject.toJSONString(resultObj);
-              params.put("resultStr", resultStr == null ? "null" : resultStr.length() > 4000 ? resultStr.substring(0, 4000) : resultStr);
+                String resultStr = JSONObject.toJSONString(resultObj);
+                params.put("resultStr", resultStr == null ? "null" : resultStr.length() > 4000 ? resultStr.substring(0, 4000) : resultStr);
                 params.put("infcode", "1");
                 Integer code = (Integer) resultObj.get("code");
                 if (code < 0) {
@@ -372,7 +372,9 @@ public class RequestInsure {
               e.getMessage().substring(0, 4000) : e.getMessage());
             throw new AppException("调用医保提示【"+e.getMessage()+"】");
         }finally {
+          logger.info("*****调用省工伤接口保存日志记录开始*****");
           insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
+          logger.info("*****调用省工伤接口保存日志记录结束*****");
         }
     }
 

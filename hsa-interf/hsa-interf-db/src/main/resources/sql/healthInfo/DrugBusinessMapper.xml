@@ -6,26 +6,26 @@
     <select id="getTbZhsfData" resultType="cn.hsa.module.interf.healthInfo.entity.TbZhsfDO">
         select * from (
             select
-            '机构编码' as YLJGDM,
-            '医疗机构名称' as YLJGMC ,
-            '随访单号' as SSDH,
-            '随访类型' as SFLX,
-            '随访方式' as SFFS,
-            '就诊科室编码' as JZKSBM,
-            '就诊科室名称' as JZKSMC,
-            '就诊时间' as JZSJ,
-            '就诊记录流水号' as JZJLLSH,
-            '姓名' as XM,
-            '身份证号码' as SFZHM,
-            '性别代码' as XBDM,
-            '年龄' as NL,
-            '诊断编码' as ZDBM,
-            '诊断名称' as ZDMC,
-            '联系电话' as LXDH,
-            now() as SFSJ,
-            '随访医生编码' as SFYSBM,
-            '随访医生姓名' as SFYSXM,
-            '随访结果' as SFJG
+            '' as YLJGDM,
+            '' as YLJGMC ,
+            '' as SSDH,
+            '' as SFLX,
+            '' as SFFS,
+            '' as JZKSBM,
+            '' as JZKSMC,
+            '' as JZSJ,
+            '' as JZJLLSH,
+            '' as XM,
+            '' as SFZHM,
+            '' as XBDM,
+            '' as NL,
+            '' as ZDBM,
+            '' as ZDMC,
+            '' as LXDH,
+            '' as SFSJ,
+            '' as SFYSBM,
+            '' as SFYSXM,
+            '' as SFJG
             from
             base_assist ba where 1=2
         ) a where a.YLJGDM = #{hospCode}
@@ -50,9 +50,9 @@
             bd.code as YPBM,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
-            '发票号' as FPH,
-            '开票日期' as KPRQ ,
-            '到票日期' as DPRQ,
+            '' as FPH,
+            '' as KPRQ ,
+            '' as DPRQ,
             bd.dan as PZWH,
             null as SCRQ,
             sod.expiry_date as YXQ,
@@ -61,14 +61,14 @@
             sod.buy_price_all as GJJ ,
             sod.buy_price_all * sod.num as GJZJE,
             sod.num as SL,
-            '交易前库存' as JYQKC,
-            '交易后库存' as JYHKC,
-            '供方交易前库存' as GFJYQKC,
-            '供方交易后库存' as GFJYHKC,
-            '供方交易时单位' as GFJYSDW ,
-            '需方交易前库存' as XFJYQKC,
-            '需方交易后库存' as XFJYHKC,
-            '需方交易时单位' as XFJYSJ,
+            '' as JYQKC,
+            '' as JYHKC,
+            '' as GFJYQKC,
+            '' as GFJYHKC,
+            '' as GFJYSDW ,
+            '' as XFJYQKC,
+            '' as XFJYHKC,
+            '' as XFJYSJ,
             so.crte_time as CRKSJ,
             so.crte_id as CZRYBM,
             so.crte_name as CZRYXM
@@ -92,9 +92,9 @@
             bd.code as YPBM,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
-            '发票号' as FPH,
-            '开票日期' as KPRQ ,
-            '到票日期' as DPRQ,
+            '' as FPH,
+            '' as KPRQ ,
+            '' as DPRQ,
             bd.dan as PZWH,
             null as SCRQ,
             sid.expiry_date as YXQ,
@@ -103,14 +103,14 @@
             sid.buy_price_all as GJJ ,
             sid.buy_price_all * sid.num as GJZJE,
             sid.num as SL,
-            '交易前库存' as JYQKC,
-            '交易后库存' as JYHKC,
-            '供方交易前库存' as GFJYQKC,
-            '供方交易后库存' as GFJYHKC,
-            '供方交易时单位' as GFJYSDW ,
-            '需方交易前库存' as XFJYQKC,
-            '需方交易后库存' as XFJYHKC,
-            '需方交易时单位' as XFJYSJ,
+            '' as JYQKC,
+            '' as JYHKC,
+            '' as GFJYQKC,
+            '' as GFJYHKC,
+            '' as GFJYSDW ,
+            '' as XFJYQKC,
+            '' as XFJYHKC,
+            '' as XFJYSJ,
             sin.crte_time as CRKSJ,
             sin.crte_id as CZRYBM,
             sin.crte_name as CZRYXM
@@ -137,34 +137,44 @@
         select * from (
             select
             ss.hosp_code as YLJGDM,
+            ssd.item_id ,
             bd.code as YPBM,
-            bde.name as KCWZ,
-            '省招标网流水号' as SZBWLSH,
+            (select bde.name from base_dept bde where ss.hosp_code = bde.hosp_code and ss.biz_id = bde.id) as KCWZ,
+            '' as SZBWLSH,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
-            bp.name as SCQY,
+            (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code) as SCQY,
             bd.spec as GG,
-            ss.num as BZSL,
-            ss.unit_code as DW,
-            ss.num as KCSL,
+            sum(ssd.num) as BZSL,
+            ssd.unit_code as DW,
+            sum(ssd.num) as KCSL,
             ss.stock_max as ZDCL,
             null as BJCL,
             ss.stock_min as ZXCL,
-            ss.buy_price_all as PFJ,
-            ss.sell_price_all as LSJ,
-            now() as SXRQ
+            ssd.buy_price_all as PFJ,
+            ssd.sell_price_all as LSJ,
+            ssd.expiry_date as SXRQ
             from
             stro_stock ss,
-            base_drug bd ,
-            base_dept bde ,
-            base_product bp
+            stro_stock_detail ssd,
+            base_drug bd
             where
-            ss.hosp_code = bd.hosp_code
+            ss.item_id = ssd.item_id
+            and ss.hosp_code = ssd.hosp_code
+            and ss.hosp_code = bd.hosp_code
             and ss.item_id = bd.id
-            and ss.hosp_code = bde.hosp_code
-            and ss.biz_id = bde.id
-            and bd.hosp_code = bp.hosp_code
-            and bd.prod_code = bp.code
+            group by
+            ss.hosp_code,
+            bd.code ,
+            bd.usual_name,
+            bd.good_name,
+            bd.spec,
+            ssd.unit_code,
+            ss.stock_max,
+            ss.stock_min,
+            ssd.buy_price_all,
+            ssd.sell_price_all,
+            ssd.expiry_date
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.SXRQ) &gt;= date(#{startTime})
@@ -176,84 +186,93 @@
 
     <!--药品销售信息-->
     <select id="getTbYpxxssData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpxxssDO">
-        select *
-        from (select
-        ic.hosp_code yljgdm,
-        bd.code ypdm,
-        ic.visit_id jzh,
-        '1' ywlx,
-        ic.phar_id yfdm,
-        '' szbwlsh,
-        bd.usual_name ypmc,
-        bd.good_name spm,
-        bp.name scqy,
-        bd.prep_code ypjxms,
-        bd.spec ypgg,
-        ic.total_num bzl,
-        ic.total_num_unit_code dw,
-        '' cgj,
-        ic.price xsjg,
-        ic.total_num xssl,
-        ic.total_price xsje,
-        bd.ph_code ypsx,
-        bd.durg_code xplx,
-        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
-        bd.durg_code kjyjb,
-        ic.cost_time xssj,
-        bd2.code xsksdm,
-        bd2.name xsksmc,
-        su.code xsysdm,
-        su.name xsysmc,
-        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
-        from
-        inpt_cost ic ,
-        base_drug bd ,
-        base_product bp ,
-        base_dept bd2 ,sys_user su
-        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
-        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
-        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
-        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
+        select * from (
+            select
+            ic.hosp_code yljgdm,
+            bd.code ypdm,
+            ic.visit_id jzh,
+            '2' ywlx,
+            ic.phar_id yfdm,
+            '' szbwlsh,
+            bd.usual_name ypmc,
+            bd.good_name spm,
+            bp.name scqy,
+            bd.prep_code ypjxms,
+            bd.spec ypgg,
+            ic.total_num bzl,
+            ic.total_num_unit_code dw,
+            '' cgj,
+            ic.price xsjg,
+            ic.total_num xssl,
+            ic.total_price xsje,
+            ( case when bd.ph_code ='1' then '2'
+            when bd.ph_code ='2' then '3'
+            when bd.ph_code ='3' or bd.ph_code ='6'  then '4'
+            when bd.ph_code ='4' then '5'
+            when bd.ph_code ='5' then '1' end) ypsx,
+            null xplx,
+            (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
+            bd.durg_code kjyjb,
+            ic.cost_time xssj,
+            bd2.code xsksdm,
+            bd2.name xsksmc,
+            su.code xsysdm,
+            su.name xsysmc,
+            (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
+            from
+            inpt_cost ic ,
+            base_drug bd ,
+            base_product bp ,
+            base_dept bd2 ,sys_user su
+            where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
+            and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
+            and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
+            and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
 
-        union
+            union
 
-        select
-        ic.hosp_code yljgdm,
-        bd.code ypdm,
-        ic.visit_id jzh,
-        '2' ywlx,
-        ic.phar_id yfdm,
-        '' szbwlsh,
-        bd.usual_name ypmc,
-        bd.good_name spm,
-        bp.name scqy,
-        bd.prep_code ypjxms,
-        bd.spec ypgg,
-        ic.total_num bzl,
-        ic.num_unit_code dw,
-        '' cgj,
-        ic.price xsjg,
-        ic.total_num xssl,
-        ic.total_price xsje,
-        bd.ph_code ypsx,
-        bd.durg_code xplx,
-        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
-        bd.durg_code kjyjb,
-        ic.crte_time xssj,
-        bd2.code xsksdm,
-        bd2.name xsksmc,
-        su.code xsysdm,
-        su.name xsysmc,
-        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
-        from
-        outpt_cost ic ,
-        base_drug bd ,
-        base_product bp ,
-        base_dept bd2 ,sys_user su
-        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
-        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
-        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
-        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code )a where a.YLJGDM = #{hospCode}
+            select
+            ic.hosp_code yljgdm,
+            bd.code ypdm,
+            ic.visit_id jzh,
+            '1' ywlx,
+            ic.phar_id yfdm,
+            '' szbwlsh,
+            bd.usual_name ypmc,
+            bd.good_name spm,
+            bp.name scqy,
+            bd.prep_code ypjxms,
+            bd.spec ypgg,
+            ic.total_num bzl,
+            ic.num_unit_code dw,
+            '' cgj,
+            ic.price xsjg,
+            ic.total_num xssl,
+            ic.total_price xsje,
+            ( case when bd.ph_code ='1' then '2'
+            when bd.ph_code ='2' then '3'
+            when bd.ph_code ='3' or bd.ph_code ='6'  then '4'
+            when bd.ph_code ='4' then '5'
+            when bd.ph_code ='5' then '1' end) ypsx,
+            null xplx,
+            (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
+            bd.durg_code kjyjb,
+            ic.crte_time xssj,
+            bd2.code xsksdm,
+            bd2.name xsksmc,
+            su.code xsysdm,
+            su.name xsysmc,
+            (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
+            from
+            outpt_cost ic ,
+            base_drug bd ,
+            base_product bp ,
+            base_dept bd2 ,sys_user su
+            where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
+            and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
+            and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
+            and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
+        )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.xssj) &gt;= date(#{startTime})
         </if>
@@ -266,35 +285,35 @@
         select * from (
             select ic.hosp_code as YLJGDM,
             bd.code as YPDM,
-            '1' as YWLX,
+            '2' as YWLX,
             ic.cost_time as JSRQ,
-            '抗菌药物使用标识总和' as KJYWSYBSZH,
-            '限定日剂量总和' as XDRJLZH,
-            '中药总剂量' as ZYZJL,
-            'I类切口手术抗菌药物预防使用标识' as ILQKSSKJYW,
-            '特殊抗菌药物dd值总和' as TSKJYWDDZZH,
-            '特殊抗菌药物使用标识总和' as TSKJYWSYBSZH ,
-            iv.total_in_days as ZYTS,
+            '' as KJYWSYBSZH,
+            '' as XDRJLZH,
+            '' as ZYZJL,
+            '' as ILQKSSKJYW,
+            '' as TSKJYWDDZZH,
+            '' as TSKJYWSYBSZH ,
+            (case when ifnull(datediff(ifnull(iv.out_time, now()),iv.in_time),0) = 0 then 1 else datediff(ifnull(iv.out_time, now()),iv.in_time) end) as ZYTS,
             bd2.code as JZKSDM,
             bd2.name as JZKSMC,
             ic.doctor_id as YSDM,
             ic.doctor_name as YSMC,
-            '唯一码' as WYM,
-            'ddds' as DDDS,
-            '特殊ddds' as TSDDDS,
-            '业务编码' as YWBM,
+            '' as WYM,
+            bd.ddd  as DDDS,
+            '' as TSDDDS,
+            '' as YWBM,
             bd.good_name as YPMC,
-            '静脉使用标识' as JMSYBS,
+            '' as JMSYBS,
             IC.iat_id as CFLSH ,
             iv.in_time as RYRQ,
             iv.out_time as CYRQ,
             bd.spec as YPGG,
-            '招标流水号' as ZBLSH,
+            '' as ZBLSH,
             bd.dosage_unit_code as YPJLDW,
             bd.usual_name as YPTYMC,
             bp.name as YPCJ,
             bd.price as DJ,
-            '包装量' as BZL,
+            ic.total_num as BZL,
             ic.total_num as SYSL,
             ic.prep_code as YPJX,
             ic.total_price as JE,
@@ -314,6 +333,7 @@
             and ic.dept_id = bd2.id
             and bd.hosp_code = bp.hosp_code
             and bd.prod_code = bp.code
+            and ifnull(bd.antibacterial_code ,'') != ''
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.JSRQ) &gt;= date(#{startTime})
@@ -329,8 +349,7 @@
             ic.hosp_code as YLJGDM,
             ic.item_code as YPDM,
             ic.item_name as YPMC,
-            '1' as YWLX,
-            -- 0是门诊,1是住院
+            '2' as YWLX,
             ic.item_name as ZDXMMC,
             bd.spec as YPGG,
             bd.prep_code as YPJXMS,
@@ -339,18 +358,18 @@
             ic.price as DJ,
             ic.total_price as SYJE,
             bd.antibacterial_code as GLJB,
-            '招标网流水号' as ZBWLSH,
+            '' as ZBWLSH,
             bd.prep_code as SCQY,
             bd.antibacterial_code as KJYWGLJB,
             ic.num as SL,
             ic.num_unit_code as DW,
             ic.total_price as JE,
-            '业务编码' as YWDM,
-            '抗菌药物标识' as KJYWBS,
-            '限定日dd值' as XDDDZ,
+            '2' as YWDM,
+            '1' as KJYWBS,
+            bd.ddd as XDDDZ,
             bd2.code as KFKSBM,
             ic.exec_time as ZXRQ,
-            '唯一标识码' as WYBSM,
+            ic.id  as WYBSM,
             bd2.name as KFKSMC,
             ic.doctor_id as YSBM,
             ic.doctor_name as YSMC,
@@ -410,35 +429,45 @@
 
     <select id="getTbWzlqjlData" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzlqjlDO">
         select * from (
-            select '物资领取单号' as lqdh,
-            '物资领取序号' as lqdhxh,
-            '机构编码' as jgbm,
-            '物资编码 ' aswzbm,
-            '物资名称' as wzmc,
-            '物资类型编码' as wzlxbm,
-            '物资类型名称' as wzlxmc,
-            '机构名称' as jgmc,
-            '领取科室编码' as lqksbm,
-            '领取科室名称' as lqksmc,
-            '领取数量' as lqsl,
-            '物资规格' as wzgg,
-            '物资单位' as wzdw,
-            '物资单价' as wzdj,
-            now() as sqsj,
-            now() as lqsj,
-            '进货价格' as jhjg,
-            '领取人编码' as lqrbm,
-            ' 领取人名称' as lqrmc ,
-            '发放人编码' as ffrbm ,
-            '发放人名称' as ffrmc,
-            '患者住院流水号' as zylsh,
-            '物资库位' as wzkw ,
-            '物资批号' as wzph,
-            '诊疗项目编码' as zlxmbm,
-            '诊疗项目名称' as zlxmmc,
-            '诊疗项目价格' as zlxmjg,
-            '生产厂家名称' as sccj,
-            '是否高值耗材' as sfgzhc from inpt_visit iv where 1=2
+            select pir.order_no  as lqdh,
+            '' as lqdhxh,
+            pir.hosp_code  as jgbm,
+            (case when pird.item_code = '1' then bd.code  when pird.item_code = '2' then bm.code  when pird.item_code = '3' then bi.code  else '' end) as wzbm,
+            (case when pird.item_code = '1' then bd.usual_name  when pird.item_code = '2' then bm.name  when pird.item_code = '3' then bi.name  else '' end)as wzmc,
+            '' as wzlxbm,
+            '' as wzlxmc,
+            (select value from sys_parameter sp where sp.hosp_code= pird.hosp_code and sp.code = 'JG_NAME') as jgmc,
+            bd3.code  as lqksbm,
+            bd3.name  as lqksmc,
+            pird.num as lqsl,
+            pird.spec as wzgg,
+            pird.unit_code  as wzdw,
+            pird.price  as wzdj,
+            pir.assign_time  as sqsj,
+            pir.dist_time  as lqsj,
+            pird.price as jhjg,
+            pir.crte_id  as lqrbm,
+            pir.crte_name  as lqrmc,
+            pir.assign_user_id  as ffrbm,
+            pir.assign_user_name  as ffrmc,
+            pird.visit_id  as zylsh,
+            bd2.name  as wzkw,
+            '' as wzph,
+            '' as zlxmbm,
+            '' as zlxmmc,
+            '' as zlxmjg,
+            (case when pird.item_code = '1' then bp1.name  when pird.item_code = '2' then bp2.name  else '' end) as sccj,
+            '0' as sfgzhc
+            from
+            phar_in_receive pir
+            left join phar_in_receive_detail pird on pird .hosp_code  = pir.hosp_code  and pir.id  = pird.receive_id
+            left join base_drug bd  on pird .hosp_code  = bd.hosp_code  and bd.id  = pird.item_id
+            left join base_material bm on pird .hosp_code  = bm.hosp_code  and bm.id  = pird.item_id
+            left join base_item bi     on pird .hosp_code  = bi.hosp_code  and bi.id  = pird.item_id
+            left join base_dept bd2    on pir .hosp_code  = bd2.hosp_code  and bd2.id  = pir.phar_id
+            left join base_dept bd3    on pir .hosp_code  = bd3.hosp_code  and bd3.id  = pir.dept_id
+            left join base_product bp1 on bp1.hosp_code= bd.hosp_code and bp1.code = bd.prod_code
+            left join base_product bp2 on bp2.hosp_code= bm.hosp_code and bp2.code = bm.prod_code
         ) a where a.jgbm = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.lqsj) &gt;= date(#{startTime})

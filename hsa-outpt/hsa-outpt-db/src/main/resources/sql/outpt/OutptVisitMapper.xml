@@ -943,6 +943,9 @@
             <if test="isUploadDise != null and isUploadDise != ''">
                 is_uplod_dise = #{isUploadDise,jdbcType=VARCHAR},
             </if>
+            <if test="cpltFlag != null and cpltFlag != ''">
+                cplt_flag = #{cpltFlag,jdbcType=VARCHAR},
+            </if>
         </set>
         where
         id = #{id} and hosp_code =#{hospCode}

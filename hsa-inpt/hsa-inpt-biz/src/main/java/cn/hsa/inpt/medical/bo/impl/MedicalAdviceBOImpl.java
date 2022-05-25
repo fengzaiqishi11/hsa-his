@@ -3327,19 +3327,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     costDTO.setBackNum(BigDecimal.valueOf(Math.ceil(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum).doubleValue())));
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }else{
-                    Map map = new HashMap();
-                    map.put("hospCode",inptAdviceDTO.getHospCode());
-                    BaseRateDTO baseRateDTO = new BaseRateDTO();
-                    baseRateDTO.setHospCode(inptAdviceDTO.getHospCode());
-                    baseRateDTO.setId(inptAdviceDTO.getRateId());
-                    map.put("baseRateDTO",baseRateDTO);
-                    baseRateDTO = baseRateService_consumer.getById(map).getData();
-                    if(baseRateDTO == null){
-                        throw new AppException("【"+inptAdviceDTO.getItemName()+"】频率有误");
-                    }
-
-                    //总数量 - （总数量*停止次数/每日次数）
-                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),baseRateDTO.getDailyTimes())));
+                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }
 

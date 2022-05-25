@@ -560,6 +560,10 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         BaseAdviceDTO baseAdviceDTO = new BaseAdviceDTO();
         Map map = new HashMap();
         //获取诊断信息
+        //华夏医院至铭医药接口传的是jzid，转换一下
+        if (ObjectUtil.isEmpty(yjRcDTO.getVisitId())) {
+            yjRcDTO.setVisitId(yjRcDTO.getJzid());
+        }
         OutptDiagnoseDTO outptptDiagnose = outptPrescribeDao.getOutptDiagnose(yjRcDTO);
         //平均处方主表数据
         OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
@@ -586,6 +590,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptPrescribeDTO.setOrderNo(this.getOrderNo(yjRcDTO.getSign(), Constants.ORDERRULE.CFDH));
         //开方医生
         outptPrescribeDTO.setDoctorId(yjRcDTO.getJzysid());
+        yjRcDTO.setMzysid(yjRcDTO.getJzysid());
         SysUserDO user = outptPrescribeDao.getUserById(yjRcDTO);
         if (ObjectUtil.isNotEmpty(user)) {
             outptPrescribeDTO.setDoctorName(user.getName());
@@ -594,7 +599,7 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptPrescribeDTO.setDeptId(yjRcDTO.getJzksid());
         BaseDeptDO dept = outptPrescribeDao.getDeptById(yjRcDTO);
         if (ObjectUtil.isNotEmpty(dept)) {
-            outptPrescribeDTO.setDoctorName(dept.getName());
+            outptPrescribeDTO.setDeptName(dept.getName());
         }
         //处方类别
         outptPrescribeDTO.setTypeCode("1");

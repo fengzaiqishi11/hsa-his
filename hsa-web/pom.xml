@@ -139,23 +139,6 @@
             <artifactId>hsaf-cache-redis</artifactId>
         </dependency>
 
-        <!--定时任务-->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
-        <!--工作流依赖-->
-<!--        <dependency>-->
-<!--            &lt;!&ndash;-->
-<!--            <groupId>cn.hsa.hsaf.workflow</groupId>-->
-<!--            <artifactId>workflow-sdk</artifactId>-->
-<!--            &ndash;&gt;-->
-<!--            <groupId>cn.hsa.cep.wfc</groupId>-->
-<!--            <artifactId>hsa-cep-wfc-sdk</artifactId>-->
-<!--        </dependency>-->
-        <!--工作流结束-->
-
         <!--工具类-->
 <!--        <dependency>-->
 <!--            <groupId>com.google.guava</groupId>-->

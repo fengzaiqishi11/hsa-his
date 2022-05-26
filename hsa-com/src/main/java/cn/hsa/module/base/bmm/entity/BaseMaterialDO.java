@@ -95,4 +95,6 @@ public class BaseMaterialDO extends PageDO implements Serializable {
     private String isOffical;
 
     private String reimbursementRatio;
+
+    private String outptUseCode;
 }

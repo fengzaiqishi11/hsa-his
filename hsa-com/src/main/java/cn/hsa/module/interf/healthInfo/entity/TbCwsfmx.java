@@ -1,30 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 财务结算-收费明细(TbCwsfmx)实体类
  *
- * @author makejava
- * @since 2022-05-20 15:41:39
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbCwsfmx implements Serializable {
-    private static final long serialVersionUID = 413320769972075823L;
+    private static final long serialVersionUID = 775980903722993869L;
     /**
      * 医疗机构编码
      */
@@ -60,6 +58,8 @@ public class TbCwsfmx implements Serializable {
     /**
      * 缴款日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date jkrq;
     /**
      * 缴款班次号
@@ -92,7 +92,7 @@ public class TbCwsfmx implements Serializable {
     /**
      * 金额
      */
-    private Double je;
+    private BigDecimal je;
     /**
      * 摘要
      */
@@ -128,10 +128,14 @@ public class TbCwsfmx implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -144,3 +148,4 @@ public class TbCwsfmx implements Serializable {
 
 
 }
+

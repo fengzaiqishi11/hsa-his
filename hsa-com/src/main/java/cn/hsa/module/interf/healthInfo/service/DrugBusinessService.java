@@ -16,62 +16,62 @@ public interface DrugBusinessService {
      * @param map
      * @return
      */
-    WrapperResponse<List<TbZhsfDO>> getTbZhsfData(Map map);
+    WrapperResponse<List<TbZhsf>> getTbZhsfData(Map map);
 
     /**
      * 4.2.1.1 药品出入库信息（TB_YPRKXX）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbYprkxxDO>> getTbYprkxxData(Map map);
+    WrapperResponse<List<TbYprkxx>> getTbYprkxxData(Map map);
 
     /**
      * 4.2.1.2 药品库存信息（TB_YPKCXX）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbYpkcxxDO>> getTbYpkcxxData(Map map);
+    WrapperResponse<List<TbYpkcxx>> getTbYpkcxxData(Map map);
 
     /**
      *4.2.1.3 药品销售信息（TB_YPXSXX）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbYpxxssDO>> getTbYpxxssData(Map map);
+    WrapperResponse<List<TbYpxsxx>> getTbYpxxssData(Map map);
 
     /**
      *4.2.1.4 抗菌药物基本情况统计（TB_KJYWJBJKTJ）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbKjywjbjktjDO>> getTbKjywjbjktjData(Map map);
+    WrapperResponse<List<TbKjywjbjktj>> getTbKjywjbjktjData(Map map);
 
     /**
      *4.2.1.5 抗菌药物各品种统计（TB_KJYWGPZTJ）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbKjywgpztjDO>> getTbKjywgpztjData(Map map);
+    WrapperResponse<List<TbKjywgpztj>> getTbKjywgpztjData(Map map);
 
     /**
      *4.4.1.1 双向转诊表（TB_SXZZ）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbSxzzDO>> getTbSxzzData(Map map);
+    WrapperResponse<List<TbSxzz>> getTbSxzzData(Map map);
 
     /**
      *4.3.1.1 物资领取记录表（TB_WZLQJL）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbWzlqjlDO>> getTbWzlqjlData(Map map);
+    WrapperResponse<List<TbWzlqjl>> getTbWzlqjlData(Map map);
 
     /**
      *2.9.1.1 业务量、收入统计表（TB_YWL_REPORT）
      * @param map
      * @return
      */
-    WrapperResponse<List<TbYwlReportDO>> getTbYwlReportData(Map map);
+    WrapperResponse<List<TbYwlReport>> getTbYwlReportData(Map map);
 
 }

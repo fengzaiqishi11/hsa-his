@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 医护人员基本信息表(TbYhryjbxx)实体类
+ * 双向转诊表(TbSxzz)实体类
  *
  * @author liudawen
  * @date 2022-05-24 14:43:02
@@ -20,22 +20,34 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-public class TbYhryjbxx implements Serializable {
-    private static final long serialVersionUID = 523447949366955588L;
+public class TbSxzz implements Serializable {
+    private static final long serialVersionUID = -21403669454915589L;
     /**
-     * 医生编码
-     */
-    private String ysbm;
-    /**
-     * 机构编码
+     * 转诊机构编码
      */
     private String yljgdm;
     /**
-     * 注册名称
+     * 转诊单号
      */
-    private String zcm;
+    private String zzdh;
     /**
-     * 姓名
+     * 转诊机构名称
+     */
+    private String yljgmc;
+    /**
+     * 转诊科室编码
+     */
+    private String ksbm;
+    /**
+     * 转诊科室名称
+     */
+    private String ksmc;
+    /**
+     * 申请医生姓名
+     */
+    private String sqysxm;
+    /**
+     * 患者姓名
      */
     private String xm;
     /**
@@ -43,65 +55,69 @@ public class TbYhryjbxx implements Serializable {
      */
     private String xbdm;
     /**
-     * 身份证号
+     * 身份证号码
      */
-    private String sfzh;
+    private String sfzhm;
     /**
      * 联系电话
      */
     private String lxdh;
     /**
-     * 科室编码
+     * 诊断编码
      */
-    private String ksbm;
+    private String zdbm;
     /**
-     * 职务编码
+     * 诊断名称
      */
-    private String zwdm;
+    private String zdmc;
     /**
-     * 职务名称
+     * 转诊类型
      */
-    private String zhiw;
+    private String zzlx;
     /**
-     * 职称编码
-     */
-    private String zcdm;
-    /**
-     * 职称名称
-     */
-    private String zhic;
-    /**
-     * 入职日期
+     * 申请转诊时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date rzsj;
+    private Date sqzzsj;
     /**
-     * 出生日期
+     * 转诊原因说明
+     */
+    private String zzyysm;
+    /**
+     * 转诊状态
+     */
+    private String zzzt;
+    /**
+     * 接收机构编码
+     */
+    private String jsjgbm;
+    /**
+     * 接收机构名称
+     */
+    private String jsjgmc;
+    /**
+     * 接收科室编码
+     */
+    private String jsksbm;
+    /**
+     * 接收科室名称
+     */
+    private String jsksmc;
+    /**
+     * 接收医生姓名
+     */
+    private String jsysxm;
+    /**
+     * 接收时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date csrq;
+    private Date jssj;
     /**
-     * 人员类别
+     * 是否有效
      */
-    private String lb;
-    /**
-     * 专业代码
-     */
-    private String zydm;
-    /**
-     * 专业名称
-     */
-    private String zymc;
-    /**
-     * 文化程度代码
-     */
-    private String whcddm;
-    /**
-     * 文化程度名称
-     */
-    private String whcdmc;
+    private String sfyx;
     /**
      * 数据有效标志
      */

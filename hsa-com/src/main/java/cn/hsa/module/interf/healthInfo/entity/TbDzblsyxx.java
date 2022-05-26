@@ -1,29 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 电子病历索引表信息实体类(TbDzblsyxx)
- * @author liuliyun
- * @since 2022-05-16 11:43:59
+ * 电子病历索引表信息(TbDzblsyxx)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbDzblsyxx implements Serializable {
-    private static final long serialVersionUID = 194403374321870347L;
+    private static final long serialVersionUID = 921900268574070870L;
     /**
      * 病历文档流水号
      */
@@ -87,6 +85,8 @@ public class TbDzblsyxx implements Serializable {
     /**
      * 出生日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date csrq;
     /**
      * 病历文档类型编码
@@ -99,6 +99,8 @@ public class TbDzblsyxx implements Serializable {
     /**
      * 书写时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sxsj;
     /**
      * 病历书写医生姓名
@@ -143,6 +145,8 @@ public class TbDzblsyxx implements Serializable {
     /**
      * 入院日期/就诊日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date jzrq;
     /**
      * 病历系统厂商标识
@@ -155,7 +159,7 @@ public class TbDzblsyxx implements Serializable {
     /**
      * 病历报告（内容）
      */
-    private byte[] blbg;
+    private Byte[] blbg;
     /**
      * 病历文件路径
      */
@@ -175,10 +179,14 @@ public class TbDzblsyxx implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -191,3 +199,4 @@ public class TbDzblsyxx implements Serializable {
 
 
 }
+

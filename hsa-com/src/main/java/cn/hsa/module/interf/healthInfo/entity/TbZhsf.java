@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 医护人员基本信息表(TbYhryjbxx)实体类
+ * 诊后随访表(TbZhsf)实体类
  *
  * @author liudawen
  * @date 2022-05-24 14:43:02
@@ -20,88 +20,92 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-public class TbYhryjbxx implements Serializable {
-    private static final long serialVersionUID = 523447949366955588L;
-    /**
-     * 医生编码
-     */
-    private String ysbm;
+public class TbZhsf implements Serializable {
+    private static final long serialVersionUID = 583672634242721833L;
     /**
      * 机构编码
      */
     private String yljgdm;
     /**
-     * 注册名称
+     * 随访单号
      */
-    private String zcm;
+    private String ssdh;
+    /**
+     * 机构名称
+     */
+    private String yljgmc;
+    /**
+     * 随访类型
+     */
+    private String sflx;
+    /**
+     * 随访方式
+     */
+    private String sffs;
+    /**
+     * 就诊科室编码
+     */
+    private String jzksbm;
+    /**
+     * 就诊科室名称
+     */
+    private String jzksmc;
+    /**
+     * 就诊时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date jzsj;
+    /**
+     * 就诊记录流水号
+     */
+    private String jzjllsh;
     /**
      * 姓名
      */
     private String xm;
     /**
+     * 身份证号码
+     */
+    private String sfzhm;
+    /**
      * 性别代码
      */
     private String xbdm;
     /**
-     * 身份证号
+     * 年龄
      */
-    private String sfzh;
+    private String nl;
+    /**
+     * 诊断编码
+     */
+    private String zdbm;
+    /**
+     * 诊断名称
+     */
+    private String zdmc;
     /**
      * 联系电话
      */
     private String lxdh;
     /**
-     * 科室编码
-     */
-    private String ksbm;
-    /**
-     * 职务编码
-     */
-    private String zwdm;
-    /**
-     * 职务名称
-     */
-    private String zhiw;
-    /**
-     * 职称编码
-     */
-    private String zcdm;
-    /**
-     * 职称名称
-     */
-    private String zhic;
-    /**
-     * 入职日期
+     * 随访时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date rzsj;
+    private Date sfsj;
     /**
-     * 出生日期
+     * 随访医生编码
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date csrq;
+    private String sfysbm;
     /**
-     * 人员类别
+     * 随访医生姓名
      */
-    private String lb;
+    private String sfysxm;
     /**
-     * 专业代码
+     * 随访结果
      */
-    private String zydm;
-    /**
-     * 专业名称
-     */
-    private String zymc;
-    /**
-     * 文化程度代码
-     */
-    private String whcddm;
-    /**
-     * 文化程度名称
-     */
-    private String whcdmc;
+    private String sfjg;
     /**
      * 数据有效标志
      */

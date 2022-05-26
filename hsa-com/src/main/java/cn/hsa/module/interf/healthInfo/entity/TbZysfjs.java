@@ -1,31 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 住院收费结算表实体类(TbZysfjs)
+ * 住院收费结算表(TbZysfjs)实体类
  *
- * @author liuliyun
- * @since 2022-05-13 14:56:21
+ * @author liudawen
+ * @date 2022-05-24 14:43:03
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbZysfjs extends PageDO implements Serializable {
-    private static final long serialVersionUID = -74436561223400590L;
+public class TbZysfjs implements Serializable {
+    private static final long serialVersionUID = -74997966976928610L;
     /**
      * 医疗机构代码
      */
@@ -65,6 +62,8 @@ public class TbZysfjs extends PageDO implements Serializable {
     /**
      * 结算日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date jssj;
     /**
      * 医疗付款方式编码
@@ -113,10 +112,14 @@ public class TbZysfjs extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -129,3 +132,4 @@ public class TbZysfjs extends PageDO implements Serializable {
 
 
 }
+

@@ -75,8 +75,10 @@
             ma.visit_id as hzjgnwyid, -- 患者机构内唯一id
             ma.content as fzxmmc -- 分组项目名称
         from medic_apply ma
-                 left join inpt_advice_detail iad on iad.id = ma.opd_id and iad.hosp_code =#{hospCode}
-                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id and opd.hosp_code =#{hospCode}
+                 left join inpt_advice_detail iad on iad.id = ma.opd_id
+                      and iad.item_id is not null and iad.hosp_code =#{hospCode}
+                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id
+                      and opd.item_id is not null and opd.hosp_code =#{hospCode}
                  left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
         where
             ma.hosp_code=#{hospCode}
@@ -114,8 +116,10 @@
             ma.remark as jybgbz -- 检验报告备注
         from medic_result mr
                  left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
-                 left join inpt_advice_detail iad on iad.id = ma.opd_id and iad.hosp_code =#{hospCode}
-                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id and opd.hosp_code =#{hospCode}
+                 left join inpt_advice_detail iad on iad.id = ma.opd_id
+                      and iad.item_id is not null and iad.hosp_code =#{hospCode}
+                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id
+                      and opd.item_id is not null and opd.hosp_code =#{hospCode}
                  left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
         where
             mr.hosp_code =#{hospCode}
@@ -134,8 +138,8 @@
             sp.value as yljgdm, -- 医疗机构代码
             mr.visit_id as hzjgnwyid, -- 患者机构内唯一id
             ma.id as jybgjlls, -- 检验报告记录流水号
-            '' as bysj, -- 培养时间
-            '' as bgsj, -- 报告日期时间
+            null as bysj, -- 培养时间
+            null as bgsj, -- 报告日期时间
             '' as xjdh, -- 细菌代号
             '' as xjmc, -- 细菌名称
             '' as jljs, -- 菌落计数
@@ -168,7 +172,7 @@
             sp.value as yljgdm, -- 医疗机构代码
             mr.visit_id as hzjgnwyid, -- 患者机构内唯一id
             ma.id as jybgjllsh, -- 检验报告记录流水号
-            '' as bgsj, -- 报告日期时间
+            null as bgsj, -- 报告日期时间
             '' as xjdh, -- 细菌代号
             '' as ymdm, -- 药敏代码
             '' as ymmc, -- 药敏名称

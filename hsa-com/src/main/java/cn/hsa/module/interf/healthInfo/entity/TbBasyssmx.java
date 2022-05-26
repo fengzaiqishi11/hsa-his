@@ -1,30 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * 病案首页-手术操作明细实体类(TbBasyssmx)
- * @author liuliyun
- * @since 2022-05-18 11:15:21
+ * 病案首页-手术操作明细(TbBasyssmx)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:42:59
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbBasyssmx extends PageDO implements Serializable {
-    private static final long serialVersionUID = 837158014999417655L;
+public class TbBasyssmx implements Serializable {
+    private static final long serialVersionUID = -93182584301827879L;
     /**
      * 住院就诊流水号
      */
@@ -44,6 +41,8 @@ public class TbBasyssmx extends PageDO implements Serializable {
     /**
      * 手术及操作日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date ssjczrq;
     /**
      * 手术切口类别代码
@@ -92,10 +91,14 @@ public class TbBasyssmx extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -108,3 +111,4 @@ public class TbBasyssmx extends PageDO implements Serializable {
 
 
 }
+

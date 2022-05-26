@@ -157,4 +157,6 @@ public class TcmMrisOperInfoDO implements Serializable {
 
     private String otherOperTime; //择期手术时间
 
+    private String isOtherOper;  // 是否择期手术
+
 }

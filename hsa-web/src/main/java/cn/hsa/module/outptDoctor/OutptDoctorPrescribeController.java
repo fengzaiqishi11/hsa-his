@@ -793,6 +793,10 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     //查询数据
     paramMap.put("outptPrescribeDTO", outptPrescribeDTO);
+    //校验删除权限
+    if(!StringUtils.isEmpty(outptPrescribeDTO.getDoctorId()) && !outptPrescribeDTO.getDoctorId().equals(sysUserDTO.getId())){
+          return WrapperResponse.error(200,"只能由开方医生删除！",null);
+    }
     return outptDoctorPrescribeService_consumer.deleteOutptPrescribe(paramMap);
   }
 

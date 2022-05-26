@@ -200,4 +200,6 @@ public class BaseDrugDTO extends BaseDrugDO implements Serializable {
     private String technologyCode;
     /** 是否只能开检查项目 **/
     private String onlyOpenItem;
+    /**门诊用药性质（YYXZ） **/
+    private String outptUseCode;
 }

@@ -9687,6 +9687,35 @@ ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_05` USI
 ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_06` USING BTREE(`is_settle`);
 ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_06` USING BTREE(`crte_time`);
 
+    -- 表结构
+-- 自费病人上传新增字段
+ALTER TABLE inpt_visit ADD COLUMN `is_uplod_cost` varchar(3) DEFAULT '0' COMMENT '自费病人是否上传费用';
+ALTER TABLE inpt_visit ADD COLUMN `is_uplod_dise` varchar(3) DEFAULT '0' COMMENT '自费病人是否诊断和就诊信息';
+ALTER TABLE inpt_visit ADD COLUMN `cplt_flag` varchar(3) DEFAULT '0' COMMENT '自费病人上传完成标志';
+ALTER TABLE outpt_visit ADD COLUMN `cplt_flag` varchar(3) DEFAULT '0' COMMENT '自费病人上传完成标志';
+-- 中医病案首页诊断新增字段
+ALTER TABLE tcm_mris_diagnose ADD COLUMN columns_num varchar(4) NULL COMMENT '诊断行号';
+-- 就医信息是否上传标志
+ALTER TABLE outpt_visit ADD is_uplod_dise varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '就医信息上传标志';
+-- 住院人员特殊信息
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag_type varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识类型';
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag_detl_id varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识';
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag varchar(32)CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识id';
+-- 医嘱国家编码增加字段
+ALTER TABLE base_advice ADD union_nation_code varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）';
+
+-- 码表
+-- 住院人员特殊标识类型
+INSERT INTO insure_dict (id,hosp_code,insure_reg_code,code,name,value,remark,crte_id,crte_name,crte_time,ext01,ext02,ext03,medicine_org_code) VALUES
+	 ('1527199752754868224',{hospCode},'540329','IPT_PSN_SP_FLAG_TYPE','连续住院','01','住院人员特殊标识类型','1290816158941450240','管理员','2022-05-19 16:09:30',NULL,NULL,NULL,NULL);
+ -- 住院人员特殊标识
+INSERT INTO insure_dict
+(id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03, medicine_org_code)
+VALUES('1527199305952440320', {hospCode}, '540329', 'IPT_PSN_SP_FLAG', '无效', '0', '住院人员特殊标识', '1290816158941450240', '管理员', '2022-05-19 16:07:43', NULL, NULL, NULL, NULL);
+INSERT INTO insure_dict
+(id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03, medicine_org_code)
+VALUES('1527199436886028288', {hospCode}, '540329', 'IPT_PSN_SP_FLAG', '有效', '1', '住院人员特殊标识', '1290816158941450240', '管理员', '2022-05-19 16:08:14', NULL, NULL, NULL, NULL);
+
 
 
 

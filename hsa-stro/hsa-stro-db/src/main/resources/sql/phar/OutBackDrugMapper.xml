@@ -63,6 +63,7 @@
         <result property="oldDistId" column="old_dist_id" jdbcType="VARCHAR"/>
         <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
         <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
 <!--    门诊退药的sql-->

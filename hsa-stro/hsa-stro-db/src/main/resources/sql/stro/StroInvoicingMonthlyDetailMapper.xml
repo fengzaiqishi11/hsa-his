@@ -81,13 +81,13 @@
     select 
     <include refid="Base_Column_List" />
     from stro_invoicing_monthly_detail
-    where id = #{item.id}
+    where id = #{id} and hosp_code = #{hospCode}
   </select>
   <!--查询当日进销存-->
   <select id="getAllStroInvoicingByDate"
           resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO">
    SELECT
-     #{item.date} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
+     #{nowDate} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
      '1' as stroPhar,
     a.item_id itemId,
     a.hosp_code hospCode,
@@ -95,19 +95,19 @@
     /*itemCode暂时不加，先看看查询的性能*/
     max(a.item_name) itemName,
     max(a.unit_code) unitCode,
-    (select b.name from base_dept b where b.id = max(a.biz_id) and b.hosp_code = #{item.hospCode}) deptName,
+    (select b.name from base_dept b where b.id = max(a.biz_id) and b.hosp_code = #{hospCode}) deptName,
     ifnull((select d.up_sell_price_all/d.up_surplus_num from stro_invoicing d
                 where d.item_id = a.item_id and d.id = min(a.id)),0)upSellPrice, /*上期零售价格*/
     (select d.sell_price from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) sellPrice,/*零售价格*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPrice,/*零售价格*/
     (select d.surplus_num from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) surplusNum,/*本期数量*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) surplusNum,/*本期数量*/
     (select d.sell_price_all from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) sellPriceAll,/*零售总金额*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPriceAll,/*零售总金额*/
     (select d.up_surplus_num from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = min(a.id)) upSurplusNum, /*上期数量*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)) upSurplusNum, /*上期数量*/
     ifnull((select d.up_sell_price_all from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = min(a.id)),0) upSellPriceAll, /*上期零售总金额*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upSellPriceAll, /*上期零售总金额*/
     sum(if( a.outin_code='2',a.sell_price * a.num,0)) stroInNumPriceAll,  /*直接入库零售总金额*/
     sum(if( a.outin_code='2',a.num,0)) stroInNum, /*直接入库数量*/
     sum(if( a.outin_code='3',a.sell_price * a.num,0)) returnSuplPriceAll, /*退供应商零售总金额*/
@@ -130,11 +130,11 @@
     sum(if( a.outin_code='7' and a.num > 0, a.num,0)) takeStrockAddNum,/*盘盈数量*/
     /*按购进价*/
     (select d.buy_price from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
     (select d.buy_price_all from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
     ifnull((select d.up_buy_price_all from stro_invoicing d
-                where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = min(a.id)),0) upBuyPriceAll,
+                where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll,
     sum(if( a.outin_code='2',a.buy_price * a.num,0)) stroInNumBuyPriceAll,
     sum(if( a.outin_code='3',a.buy_price * a.num,0)) returnSuplBuyPriceAll,
     sum(if( a.outin_code='4',a.buy_price * a.num,0)) stroToDeptBuyPriceAll,
@@ -146,19 +146,19 @@
     sum(if( a.outin_code='7' and a.num &lt; 0,a.buy_price * a.num,0)) takeStrockSubtractBuyPriceAll,
     sum(if( a.outin_code='7' and a.num &gt; 0,a.buy_price * a.num,0)) takeStrockAddBuyPriceAll
     from stro_invoicing a
-    left join (select item_id,hosp_code from stro_stock GROUP BY item_id) si on a.item_id = si.item_id
-    where a.hosp_code = #{item.hospCode}
+    left join (select item_id,hosp_code from stro_stock where hosp_code = #{hospCode} GROUP BY item_id) si on a.item_id = si.item_id
+    where a.hosp_code = #{hospCode}
 		and a.hosp_code = si.hosp_code
-		and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = #{item.date}
+		and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = DATE_FORMAT(#{nowDate},'%Y-%m-%d')
 		and a.outin_code in ('2','3','4','5','7','8','21','24')
-		and a.biz_id in (select p.id from base_dept p where  p.type_code in ("13","3") and p.hosp_code = #{item.hospCode})
+		and a.biz_id in (select p.id from base_dept p where  p.type_code in ('13','3') and p.hosp_code = #{hospCode})
 		<if test="itemId != null and itemId != ''">
             a.item_id = #{itemId}
         </if>
     group by a.item_id,a.biz_id
   </select>
   <select id="queryItemIdList" resultType="java.lang.String">
-    select item_id from stro_stock group by item_id
+    select item_id from stro_stock where hosp_code = #{hospCode} group by item_id
     <if test="itemId != null and item_id != ''">
         having item_id = #{itemId}
     </if>
@@ -166,103 +166,76 @@
   <select id="getRecentlyStroInvoicingByDate"
           resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO">
     SELECT
-    #{item.date} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
+    #{nowDate} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
     '1' as stroPhar,
     a.item_id itemId,
     a.hosp_code hospCode,
     a.biz_id bizId,
-    /*itemCode暂时不加，先看看查询的性能*/
+    a.item_code as itemCode,
     a.item_name itemName,
     a.unit_code unitCode,
-    (select b.name from base_dept b where b.id = a.biz_id and b.hosp_code = #{item.hospCode}) deptName,
-    ifnull((select d.up_sell_price_all/d.up_surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.id = a.id),0)upSellPrice, /*上期零售价格*/
+    (select b.name from base_dept b where b.id = a.biz_id and b.hosp_code = #{hospCode}) deptName,
+    ifnull((select d.sell_price from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0)upSellPrice, /*上期零售价格*/
     (select d.sell_price from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) sellPrice,/*零售价格*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) sellPrice,/*零售价格*/
     (select d.surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) surplusNum,/*本期数量*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) surplusNum,/*本期数量*/
     (select d.sell_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) sellPriceAll,/*零售总金额*/
-    (select d.up_surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) upSurplusNum, /*上期数量*/
-    ifnull((select d.up_sell_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id),0) upSellPriceAll, /*上期零售总金额*/
-    if( a.outin_code='2',a.sell_price * a.num,0) stroInNumPriceAll,  /*直接入库零售总金额*/
-    if( a.outin_code='2',a.num,0) stroInNum, /*直接入库数量*/
-    if( a.outin_code='3',a.sell_price * a.num,0) returnSuplPriceAll, /*退供应商零售总金额*/
-    if( a.outin_code='3',a.num,0)  returnSuplNum,    /*退供应商数量*/
-    if( a.outin_code='4',a.sell_price * a.num,0) stroToDeptPriceAll,   /*出库到科室零售总金额*/
-    if( a.outin_code='4',a.num,0) stroToDeptNum, /*出库到科室数量*/
-    if( a.outin_code='5',a.sell_price * a.num,0) stroToPharPriceAll,  /*采购计划零售总金额*/
-    if( a.outin_code='5',a.num,0) stroToPharNum,    /*采购计划数量*/
-    if( a.outin_code='8',a.sell_price * a.num,0) reportLossesPriceAll,    /*报损零售总金额*/
-    if( a.outin_code='8',a.num,0) reportLossesNum,    /*报损数量*/
-    if( a.outin_code='21',a.sell_price * a.num,0) pharReturnStroPriceAll,    /*药房退库零售总金额*/
-    if( a.outin_code='21',a.num,0) pharReturnStroNum,    /*药房退库数量*/
-    /*调盈零售总金额*/
-    if( a.outin_code='24' and a.sell_price_all > a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0) adjustProfitPriceAll,
-    /*调亏零售总金额*/
-    if( a.outin_code='24' and a.sell_price_all > a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0) adjustLossPriceAll,
-    if( a.outin_code='7' and a.num &lt; 0,a.sell_price * a.num,0) takeStrockSubtractPriceAll,/*盘亏零售总金额*/
-    if( a.outin_code='7' and a.num &lt; 0,a.num,0) takeStrockSubtractNum,/*盘亏数量*/
-    if( a.outin_code='7' and a.num > 0,a.sell_price * a.num,0) takeStrockAddPriceAll,/*盘盈零售总金额*/
-    if( a.outin_code='7' and a.num > 0, a.num,0) takeStrockAddNum,/*盘盈数量*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) sellPriceAll,/*零售总金额*/
+    (select d.surplus_num from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) upSurplusNum, /*上期数量*/
+    ifnull((select d.sell_price_all from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll, /*上期零售总金额*/
     /*按购进价*/
     (select d.buy_price from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) buyPrice,/*购进单价*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
     (select d.buy_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) buyPriceAll,/*购进总价*/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
     ifnull((select d.up_buy_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id),0) upBuyPriceAll,
-    if( a.outin_code='2',a.buy_price * a.num,0) stroInNumBuyPriceAll,
-    if( a.outin_code='3',a.buy_price * a.num,0) returnSuplBuyPriceAll,
-    if( a.outin_code='4',a.buy_price * a.num,0) stroToDeptBuyPriceAll,
-    if( a.outin_code='5',a.buy_price * a.num,0) stroToPharBuyPriceAll,
-    if( a.outin_code='8',a.buy_price * a.num,0) reportLossesBuyPriceAll,
-    if( a.outin_code='21',a.buy_price * a.num,0) pharReturnStroBuyPriceAll,
-    if( a.outin_code='24' and a.buy_price_all > a.up_buy_price_all,a.buy_price_all - a.up_buy_price_all,0) adjustProfitBuyPriceAll,
-    if( a.outin_code='24' and a.buy_price_all &lt;  a.up_buy_price_all, a.buy_price_all - a.up_buy_price_all,0) adjustLossBuyPriceAll,
-    if( a.outin_code='7' and a.num &lt; 0,a.buy_price * a.num,0) takeStrockSubtractBuyPriceAll,
-    if( a.outin_code='7' and a.num > 0,a.buy_price * a.num,0) takeStrockAddBuyPriceAll
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll
     from (
     select a.num,a.buy_price,a.item_id,a.outin_code,a.id,a.buy_price_all,
         a.up_buy_price_all,a.hosp_code,a.sell_price_all,a.up_sell_price_all,a.biz_id,a.item_name,a.item_code,a.unit_code,
         a.sell_price
     from stro_invoicing a
     left join ( select item_id,hosp_code from stro_stock GROUP BY item_id) si on a.item_id = si.item_id
-    where a.hosp_code = #{item.hospCode} and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt; #{item.date}
+    where a.hosp_code = #{hospCode} and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt; #{nowDate}
     and a.outin_code in ('2','3','4','5','7','8','21','24')
-    and a.biz_id in (select p.id from base_dept p where p.type_code in ('13','3') and p.hosp_code = #{item.hospCode})
+    and a.biz_id in (select p.id from base_dept p where p.type_code in ('13','3') and p.hosp_code = #{hospCode})
     and a.item_id in
     <foreach collection="itemIds" separator="," open="(" close=")" item="item">
-      #{item.item}
+      #{item}
     </foreach>
     order by a.crte_time desc limit 10000000) a
-    where a.hosp_code = #{item.hospCode}
+    where a.hosp_code = #{hospCode}
     group by a.item_id,a.biz_id
-
   </select>
   <select id="getAllPharStroInvoicingByDate"
           resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO">
       SELECT
-      #{item.date} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
+      #{nowDate} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
       '2' as stroPhar,
       a.item_id itemId,
+      a.biz_id bizId,
+      a.hosp_code as hospCode,
       max(a.item_name) itemName,
       max(a.unit_code) unitCode,
-      (select b.name from base_dept b where b.id = max(a.biz_id) and b.hosp_code = #{item.hospCode}) deptName,
+      (select b.name from base_dept b where b.id = max(a.biz_id) and b.hosp_code = #{hospCode}) deptName,
       ifnull((select d.up_sell_price_all/d.up_surplus_num from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and id = min(a.id)),0)upSellPrice,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and id = min(a.id)),0)upSellPrice,
       (select d.new_price from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) sellPrice,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPrice,
       (select d.surplus_num from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) num,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) num,
+      (select d.surplus_num from stro_invoicing d
+       where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) surplusNum,
       (select d.sell_price_all from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = max(a.id)) sellPriceAll,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) sellPriceAll,
       (select d.up_surplus_num from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = min(a.id)) upSurplusNum,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)) upSurplusNum,
       ifnull((select d.up_sell_price_all from stro_invoicing d
-            where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = min(a.id)),0) upSellPriceAll,
+            where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upSellPriceAll,
       sum(if( a.outin_code='20',a.sell_price * a.num,0)) stroInNumPriceAll,    /**药房入库确认总金额**/
       sum(if( a.outin_code='20',a.num,0)) stroInNum,                           /**药房入库确认总数量**/
       sum(if( a.outin_code='8',a.sell_price * a.num,0)) reportLossesPriceAll,    /**药房报损总金额**/
@@ -283,6 +256,12 @@
       a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriceAll,   /**调盈**/
       sum(if( a.outin_code='24' and a.sell_price_all &lt; a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0)) adjustLossPriceAll,   /**调亏**/
       /**按购进价**/
+      (select d.buy_price from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+      (select d.buy_price_all from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+      ifnull((select d.up_buy_price_all from stro_invoicing d
+              where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll,
       sum(if( a.outin_code='20',a.buy_price * a.num,0)) stroInNumBuyPriceAll,    /**入库购进总金额**/
       sum(if( a.outin_code='8',a.buy_price * a.num,0)) reportLossesBuyPriceAll,    /**药房购进总金额**/
       sum(if( a.outin_code='6',a.buy_price * a.num,0)) pharReturnStroBuyPriceAll, /**药房退药库购进总金额**/
@@ -293,62 +272,43 @@
       sum(if( a.outin_code='4',a.sell_price * a.num,0)) stroToDeptBuyPriceAll /**药房出库科室购进总金额**/
       FROM
       stro_invoicing a
-      left join (select item_id,hosp_code from stro_stock GROUP BY item_id) si on a.item_id = si.item_id
-      where a.hosp_code = #{item.hospCode}
+      left join (select item_id,hosp_code from stro_stock where hosp_code = #{hospCode} GROUP BY item_id) si on a.item_id = si.item_id
+      where a.hosp_code = #{hospCode}
       and a.outin_code in ( '7', '8', '20', '23', '25','6', '27', '28','24','4' )
-      and a.biz_id in (select p.id from base_dept p where p.type_code in ('4','5') and p.hosp_code = #{item.hospCode})
-      and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = #{item.date}
+      and a.biz_id in (select p.id from base_dept p where p.type_code in ('4','5') and p.hosp_code = #{hospCode})
+      and DATE_FORMAT(a.crte_time,'%Y-%m-%d') = DATE_FORMAT(#{nowDate},'%Y-%m-%d')
       group by a.item_id,a.biz_id
   </select>
   <select id="getRecentlyStroPharInvoicingByDate"
           resultType="cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO">
     SELECT
-    #{item.date} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
+    #{nowDate} as crteTime,/*为了在Java层不再遍历list去set这个创建时间*/
     '2' as stroPhar,
     a.item_id itemId,
+    a.hosp_code hospCode,
+    a.biz_id bizId,
+    a.item_code as itemCode,
     a.item_name itemName,
     a.unit_code unitCode,
-    (select b.name from base_dept b where b.id = a.biz_id and b.hosp_code = #{item.hospCode}) deptName,
-    ifnull((select d.up_sell_price_all/d.up_surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and id = a.id),0)upSellPrice,
-    (select d.new_price from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) sellPrice,
+    (select b.name from base_dept b where b.id = a.biz_id and b.hosp_code = #{hospCode}) deptName,
+    ifnull((select d.sell_price from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0)upSellPrice, /*上期零售价格*/
+    (select d.sell_price from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) sellPrice,/*零售价格*/
     (select d.surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) num,
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) surplusNum,/*本期数量*/
     (select d.sell_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) sellPriceAll,
-    (select d.up_surplus_num from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id) upSurplusNum,
-    ifnull((select d.up_sell_price_all from stro_invoicing d
-    where d.item_id = a.item_id and d.hosp_code = #{item.hospCode} and d.id = a.id),0) upSellPriceAll,
-    if( a.outin_code='20',a.sell_price * a.num,0) stroInNumPriceAll,    /**药房入库确认总金额**/
-    if( a.outin_code='20',a.num,0) stroInNum,                           /**药房入库确认总数量**/
-    if( a.outin_code='8',a.sell_price * a.num,0) reportLossesPriceAll,    /**药房报损总金额**/
-    if( a.outin_code='8',a.num,0) reportLossesNum,                      /**药房报损总数量**/
-    if( a.outin_code='6',a.sell_price * a.num,0) pharReturnStroPriceAll, /**药房退药库库总金额**/
-    if( a.outin_code='6',a.num,0) pharReturnStroNum,                   /**药房退药库总数量**/
-    if( a.outin_code='7' and a.num &lt; 0,a.sell_price * a.num,0) takeStrockSubtractPriceAll,  /**药房盘亏总金额**/
-    if( a.outin_code='7' and a.num &lt; 0,a.num,0) takeStrockSubtractNum,                    /**药房盘亏总数量**/
-    if( a.outin_code='7' and a.num > 0,a.sell_price * a.num,0) takeStrockAddPriceAll, /**药房盘盈总金额**/
-    if( a.outin_code='7' and a.num > 0, a.num,0) takeStrockAddNum,                   /**药房盘盈总数量**/
-    if((a.outin_code='23' or a.outin_code='25'),a.sell_price * a.num,0) outSalesPriceAll,    /**门诊销售总金额**/
-    if((a.outin_code='23' or a.outin_code='25'),a.num,0) outSalesNum,                  /**门诊销售总数量**/
-    if((a.outin_code='27' or a.outin_code='28'),a.sell_price * a.num,0) inSalesPriceAll,     /**住院销售总金额**/
-    if((a.outin_code='27' or a.outin_code='28'),a.num,0) inSalesNum,                   /**住院销售总数量**/
-    if( a.outin_code='4',a.sell_price * a.num,0) stroToDeptPriceAll, /**药房出库科室总金额**/
-    if( a.outin_code='4',a.num,0) stroToDeptNum,                  /**药房出库科室总数量**/
-    if( a.outin_code='24' and a.sell_price_all >
-    a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0) adjustProfitPriceAll,   /**调盈**/
-    if( a.outin_code='24' and a.sell_price_all &lt; a.up_sell_price_all, a.sell_price_all - a.up_sell_price_all,0) adjustLossPriceAll,   /**调亏**/
-    /**按购进价**/
-    if( a.outin_code='20',a.buy_price * a.num,0) stroInNumBuyPriceAll,    /**入库购进总金额**/
-    if( a.outin_code='8',a.buy_price * a.num,0) reportLossesBuyPriceAll,    /**药房购进总金额**/
-    if( a.outin_code='6',a.buy_price * a.num,0) pharReturnStroBuyPriceAll, /**药房退药库购进总金额**/
-    if( a.outin_code='7' and a.num &lt; 0,a.buy_price * a.num,0) takeStrockSubtractBuyPriceAll,  /**药房盘亏购进总金额**/
-    if( a.outin_code='7' and a.num > 0,a.buy_price * a.num,0) takeStrockAddBuyPriceAll, /**药房盘盈购进总金额**/
-    if((a.outin_code='23' or a.outin_code='25'),a.buy_price * a.num,0) outSalesBuyPriceAll,    /**门诊销售购进总金额**/
-    if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0) inSalesBuyPriceAll,     /**住院销售购进总金额**/
-    if( a.outin_code='4',a.sell_price * a.num,0) stroToDeptBuyPriceAll /**药房出库科室购进总金额**/
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) sellPriceAll,/*零售总金额*/
+    (select d.surplus_num from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id) upSurplusNum, /*上期数量*/
+    ifnull((select d.sell_price_all from stro_invoicing d
+    where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = a.id),0) upSellPriceAll, /*上期零售总金额*/
+    (select d.buy_price from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPrice,/*购进单价*/
+    (select d.buy_price_all from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = max(a.id)) buyPriceAll,/*购进总价*/
+    ifnull((select d.up_buy_price_all from stro_invoicing d
+      where d.item_id = a.item_id and d.hosp_code = #{hospCode} and d.id = min(a.id)),0) upBuyPriceAll
     from
     (
     select a.num,a.buy_price,a.item_id,a.outin_code,a.id,a.buy_price_all,
@@ -356,23 +316,33 @@
     a.sell_price
     from stro_invoicing a
     left join ( select item_id,hosp_code from stro_stock GROUP BY item_id) si on a.item_id = si.item_id
-    where a.hosp_code = #{item.hospCode} and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt; #{item.date}
+    where a.hosp_code = #{hospCode} and DATE_FORMAT(a.crte_time,'%Y-%m-%d') &lt; #{nowDate}
     and a.outin_code in  ( '7', '8', '20', '23', '25','6', '27', '28','24','4' )
-    and a.biz_id in (select p.id from base_dept p where p.type_code in ('4','5') and p.hosp_code = #{item.hospCode})
+    and a.biz_id in (select p.id from base_dept p where p.type_code in ('4','5') and p.hosp_code = #{hospCode})
     and a.item_id in
     <foreach collection="itemIds" separator="," open="(" close=")" item="item">
-      #{item.item}
+      #{item}
     </foreach>
     order by a.crte_time desc limit 10000000) a
-    where a.hosp_code = #{item.hospCode}
+    where a.hosp_code = #{hospCode}
     group by a.item_id,a.biz_id
   </select>
+    <select id="queryDetailByMonthlyId"
+           resultMap="BaseResultMap">
+        select *from  stro_invoicing_monthly_detail
+        where hosp_code = #{hospCode} and crte_time = #{nowDate}
+    </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from stro_invoicing_monthly_detail
-    where id = #{item.id}
+    where id = #{id} AND monthly_id = #{id}
   </delete>
-  <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO" useGeneratedKeys="true">
+
+    <delete id="deleteBatch">
+        delete from stro_invoicing_monthly_detail
+        where hosp_code = #{hospCode} and crte_time = #{nowDate}
+    </delete>
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO" useGeneratedKeys="true">
     insert into stro_invoicing_monthly_detail (hosp_code, biz_id, item_code, 
       item_id, item_name, num, 
       unit_code, curr_unit_code, sell_price, 
@@ -396,29 +366,29 @@
       out_sales_num, out_sales_price_all, out_sales_buy_price_all, 
       in_sales_buy_price_all, in_sales_price_all, in_sales_num, 
       monthly_id)
-    values (#{item.hospCode}, #{item.bizId}, #{item.itemCode}, 
-      #{item.itemId}, #{item.itemName}, #{item.num}, 
-      #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice}, 
-      #{item.buyPrice}, #{item.splitRatio}, #{item.splitPrice}, 
-      #{item.splitNum}, #{item.splitUnitCode}, #{item.upSurplusNum}, 
-      #{item.surplusNum}, #{item.upBuyPriceAll}, #{item.buyPriceAll}, 
-      #{item.upSellPriceAll}, #{item.sellPriceAll}, #{item.crteTime}, 
-      #{item.newPrice}, #{item.newSplitPrice}, #{item.stroInNum}, 
-      #{item.stroInNumPriceAll}, #{item.returnSuplNum}, #{item.returnSuplPriceAll}, 
-      #{item.stroToDeptNum}, #{item.stroToDeptPriceAll}, #{item.stroToPharNum}, 
-      #{item.stroToPharPriceAll}, #{item.reportLossesNum}, #{item.reportLossesPriceAll}, 
-      #{item.pharReturnStroNum}, #{item.pharReturnStroPriceAll}, 
-      #{item.adjustProfitPriceAll}, #{item.adjustLossPriceAll}, 
-      #{item.takeStrockSubtractNum}, #{item.takeStrockSubtractPriceAll}, 
-      #{item.takeStrockAddNum}, #{item.takeStrockAddPriceAll}, 
-      #{item.stroInNumBuyPriceAll}, #{item.returnSuplBuyPriceAll}, 
-      #{item.stroToDeptBuyPriceAll}, #{item.stroToPharBuyPriceAll}, 
-      #{item.reportLossesBuyPriceAll}, #{item.pharReturnStroBuyPriceAll}, 
-      #{item.adjustProfitBuyPriceAll}, #{item.adjustLossBuyPriceAll}, 
-      #{item.takeStrockSubtractBuyPriceAll}, #{item.takeStrockAddBuyPriceAll}, 
-      #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll}, 
-      #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum}, 
-      #{item.monthlyId})
+    values (#{hospCode}, #{bizId}, #{itemCode}, 
+      #{itemId}, #{itemName}, #{num}, 
+      #{unitCode}, #{currUnitCode}, #{sellPrice}, 
+      #{buyPrice}, #{splitRatio}, #{splitPrice}, 
+      #{splitNum}, #{splitUnitCode}, #{upSurplusNum}, 
+      #{surplusNum}, #{upBuyPriceAll}, #{buyPriceAll}, 
+      #{upSellPriceAll}, #{sellPriceAll}, #{crteTime}, 
+      #{newPrice}, #{newSplitPrice}, #{stroInNum}, 
+      #{stroInNumPriceAll}, #{returnSuplNum}, #{returnSuplPriceAll}, 
+      #{stroToDeptNum}, #{stroToDeptPriceAll}, #{stroToPharNum}, 
+      #{stroToPharPriceAll}, #{reportLossesNum}, #{reportLossesPriceAll}, 
+      #{pharReturnStroNum}, #{pharReturnStroPriceAll}, 
+      #{adjustProfitPriceAll}, #{adjustLossPriceAll}, 
+      #{takeStrockSubtractNum}, #{takeStrockSubtractPriceAll}, 
+      #{takeStrockAddNum}, #{takeStrockAddPriceAll}, 
+      #{stroInNumBuyPriceAll}, #{returnSuplBuyPriceAll}, 
+      #{stroToDeptBuyPriceAll}, #{stroToPharBuyPriceAll}, 
+      #{reportLossesBuyPriceAll}, #{pharReturnStroBuyPriceAll}, 
+      #{adjustProfitBuyPriceAll}, #{adjustLossBuyPriceAll}, 
+      #{takeStrockSubtractBuyPriceAll}, #{takeStrockAddBuyPriceAll}, 
+      #{outSalesNum}, #{outSalesPriceAll}, #{outSalesBuyPriceAll}, 
+      #{inSalesBuyPriceAll}, #{inSalesPriceAll}, #{inSalesNum}, 
+      #{monthlyId})
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO" useGeneratedKeys="true">
     insert into stro_invoicing_monthly_detail
@@ -600,182 +570,182 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="hospCode != null">
-        #{item.hospCode},
+        #{hospCode},
       </if>
       <if test="bizId != null">
-        #{item.bizId},
+        #{bizId},
       </if>
       <if test="itemCode != null">
-        #{item.itemCode},
+        #{itemCode},
       </if>
       <if test="itemId != null">
-        #{item.itemId},
+        #{itemId},
       </if>
       <if test="itemName != null">
-        #{item.itemName},
+        #{itemName},
       </if>
       <if test="num != null">
-        #{item.num},
+        #{num},
       </if>
       <if test="unitCode != null">
-        #{item.unitCode},
+        #{unitCode},
       </if>
       <if test="currUnitCode != null">
-        #{item.currUnitCode},
+        #{currUnitCode},
       </if>
       <if test="sellPrice != null">
-        #{item.sellPrice},
+        #{sellPrice},
       </if>
       <if test="buyPrice != null">
-        #{item.buyPrice},
+        #{buyPrice},
       </if>
       <if test="splitRatio != null">
-        #{item.splitRatio},
+        #{splitRatio},
       </if>
       <if test="splitPrice != null">
-        #{item.splitPrice},
+        #{splitPrice},
       </if>
       <if test="splitNum != null">
-        #{item.splitNum},
+        #{splitNum},
       </if>
       <if test="splitUnitCode != null">
-        #{item.splitUnitCode},
+        #{splitUnitCode},
       </if>
       <if test="upSurplusNum != null">
-        #{item.upSurplusNum},
+        #{upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        #{item.surplusNum},
+        #{surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        #{item.upBuyPriceAll},
+        #{upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        #{item.buyPriceAll},
+        #{buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        #{item.upSellPriceAll},
+        #{upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        #{item.sellPriceAll},
+        #{sellPriceAll},
       </if>
       <if test="crteTime != null">
-        #{item.crteTime},
+        #{crteTime},
       </if>
       <if test="newPrice != null">
-        #{item.newPrice},
+        #{newPrice},
       </if>
       <if test="newSplitPrice != null">
-        #{item.newSplitPrice},
+        #{newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        #{item.stroInNum},
+        #{stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        #{item.stroInNumPriceAll},
+        #{stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        #{item.returnSuplNum},
+        #{returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        #{item.returnSuplPriceAll},
+        #{returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        #{item.stroToDeptNum},
+        #{stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        #{item.stroToDeptPriceAll},
+        #{stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        #{item.stroToPharNum},
+        #{stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        #{item.stroToPharPriceAll},
+        #{stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        #{item.reportLossesNum},
+        #{reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        #{item.reportLossesPriceAll},
+        #{reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        #{item.pharReturnStroNum},
+        #{pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        #{item.pharReturnStroPriceAll},
+        #{pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        #{item.adjustProfitPriceAll},
+        #{adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        #{item.adjustLossPriceAll},
+        #{adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        #{item.takeStrockSubtractNum},
+        #{takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        #{item.takeStrockSubtractPriceAll},
+        #{takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        #{item.takeStrockAddNum},
+        #{takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        #{item.takeStrockAddPriceAll},
+        #{takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        #{item.stroInNumBuyPriceAll},
+        #{stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        #{item.returnSuplBuyPriceAll},
+        #{returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        #{item.stroToDeptBuyPriceAll},
+        #{stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        #{item.stroToPharBuyPriceAll},
+        #{stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        #{item.reportLossesBuyPriceAll},
+        #{reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        #{item.pharReturnStroBuyPriceAll},
+        #{pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        #{item.adjustProfitBuyPriceAll},
+        #{adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        #{item.adjustLossBuyPriceAll},
+        #{adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        #{item.takeStrockSubtractBuyPriceAll},
+        #{takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        #{item.takeStrockAddBuyPriceAll},
+        #{takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        #{item.outSalesNum},
+        #{outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        #{item.outSalesPriceAll},
+        #{outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        #{item.outSalesBuyPriceAll},
+        #{outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        #{item.inSalesBuyPriceAll},
+        #{inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        #{item.inSalesPriceAll},
+        #{inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        #{item.inSalesNum},
+        #{inSalesNum},
       </if>
       <if test="monthlyId != null">
-        #{item.monthlyId},
+        #{monthlyId},
       </if>
     </trim>
   </insert>
-    <insert id="insertBatch">
+    <insert id="insertBatch" parameterType="java.util.List" >
          insert into stro_invoicing_monthly_detail (id,hosp_code, biz_id, item_code,
       item_id, item_name, num,
       unit_code, curr_unit_code, sell_price,
@@ -800,7 +770,8 @@
       in_sales_buy_price_all, in_sales_price_all, in_sales_num,
       monthly_id)
     values
-    <foreach collection="stroInvoicingDetails" open="(" separator="," close=")" item="item">
+    <foreach collection="stroInvoicingDetails"  separator="," item="item">
+        (
         #{item.id},#{item.hospCode}, #{item.bizId}, #{item.itemCode},
         #{item.itemId}, #{item.itemName}, #{item.num},
         #{item.unitCode}, #{item.currUnitCode}, #{item.sellPrice},
@@ -824,253 +795,249 @@
         #{item.outSalesNum}, #{item.outSalesPriceAll}, #{item.outSalesBuyPriceAll},
         #{item.inSalesBuyPriceAll}, #{item.inSalesPriceAll}, #{item.inSalesNum},
         #{item.monthlyId}
+        )
     </foreach>
-        on duplicate key update
-        item_id     = values(item_id) ,
-        biz_id   = values(biz_id) ,
-        crete_time   = values(crete_time) ,
-        stro_phar  = values(stro_phar)
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO">
     update stro_invoicing_monthly_detail
     <set>
       <if test="hospCode != null">
-        hosp_code = #{item.hospCode},
+        hosp_code = #{hospCode},
       </if>
       <if test="bizId != null">
-        biz_id = #{item.bizId},
+        biz_id = #{bizId},
       </if>
       <if test="itemCode != null">
-        item_code = #{item.itemCode},
+        item_code = #{itemCode},
       </if>
       <if test="itemId != null">
-        item_id = #{item.itemId},
+        item_id = #{itemId},
       </if>
       <if test="itemName != null">
-        item_name = #{item.itemName},
+        item_name = #{itemName},
       </if>
       <if test="num != null">
-        num = #{item.num},
+        num = #{num},
       </if>
       <if test="unitCode != null">
-        unit_code = #{item.unitCode},
+        unit_code = #{unitCode},
       </if>
       <if test="currUnitCode != null">
-        curr_unit_code = #{item.currUnitCode},
+        curr_unit_code = #{currUnitCode},
       </if>
       <if test="sellPrice != null">
-        sell_price = #{item.sellPrice},
+        sell_price = #{sellPrice},
       </if>
       <if test="buyPrice != null">
-        buy_price = #{item.buyPrice},
+        buy_price = #{buyPrice},
       </if>
       <if test="splitRatio != null">
-        split_ratio = #{item.splitRatio},
+        split_ratio = #{splitRatio},
       </if>
       <if test="splitPrice != null">
-        split_price = #{item.splitPrice},
+        split_price = #{splitPrice},
       </if>
       <if test="splitNum != null">
-        split_num = #{item.splitNum},
+        split_num = #{splitNum},
       </if>
       <if test="splitUnitCode != null">
-        split_unit_code = #{item.splitUnitCode},
+        split_unit_code = #{splitUnitCode},
       </if>
       <if test="upSurplusNum != null">
-        up_surplus_num = #{item.upSurplusNum},
+        up_surplus_num = #{upSurplusNum},
       </if>
       <if test="surplusNum != null">
-        surplus_num = #{item.surplusNum},
+        surplus_num = #{surplusNum},
       </if>
       <if test="upBuyPriceAll != null">
-        up_buy_price_all = #{item.upBuyPriceAll},
+        up_buy_price_all = #{upBuyPriceAll},
       </if>
       <if test="buyPriceAll != null">
-        buy_price_all = #{item.buyPriceAll},
+        buy_price_all = #{buyPriceAll},
       </if>
       <if test="upSellPriceAll != null">
-        up_sell_price_all = #{item.upSellPriceAll},
+        up_sell_price_all = #{upSellPriceAll},
       </if>
       <if test="sellPriceAll != null">
-        sell_price_all = #{item.sellPriceAll},
+        sell_price_all = #{sellPriceAll},
       </if>
       <if test="crteTime != null">
-        crte_time = #{item.crteTime},
+        crte_time = #{crteTime},
       </if>
       <if test="newPrice != null">
-        new_price = #{item.newPrice},
+        new_price = #{newPrice},
       </if>
       <if test="newSplitPrice != null">
-        new_split_price = #{item.newSplitPrice},
+        new_split_price = #{newSplitPrice},
       </if>
       <if test="stroInNum != null">
-        stro_in_num = #{item.stroInNum},
+        stro_in_num = #{stroInNum},
       </if>
       <if test="stroInNumPriceAll != null">
-        stro_in_num_price_all = #{item.stroInNumPriceAll},
+        stro_in_num_price_all = #{stroInNumPriceAll},
       </if>
       <if test="returnSuplNum != null">
-        return_supl_num = #{item.returnSuplNum},
+        return_supl_num = #{returnSuplNum},
       </if>
       <if test="returnSuplPriceAll != null">
-        return_supl_price_all = #{item.returnSuplPriceAll},
+        return_supl_price_all = #{returnSuplPriceAll},
       </if>
       <if test="stroToDeptNum != null">
-        stro_to_dept_num = #{item.stroToDeptNum},
+        stro_to_dept_num = #{stroToDeptNum},
       </if>
       <if test="stroToDeptPriceAll != null">
-        stro_to_dept_price_all = #{item.stroToDeptPriceAll},
+        stro_to_dept_price_all = #{stroToDeptPriceAll},
       </if>
       <if test="stroToPharNum != null">
-        stro_to_phar_num = #{item.stroToPharNum},
+        stro_to_phar_num = #{stroToPharNum},
       </if>
       <if test="stroToPharPriceAll != null">
-        stro_to_phar_price_all = #{item.stroToPharPriceAll},
+        stro_to_phar_price_all = #{stroToPharPriceAll},
       </if>
       <if test="reportLossesNum != null">
-        report_losses_num = #{item.reportLossesNum},
+        report_losses_num = #{reportLossesNum},
       </if>
       <if test="reportLossesPriceAll != null">
-        report_losses_price_all = #{item.reportLossesPriceAll},
+        report_losses_price_all = #{reportLossesPriceAll},
       </if>
       <if test="pharReturnStroNum != null">
-        phar_return_stro_num = #{item.pharReturnStroNum},
+        phar_return_stro_num = #{pharReturnStroNum},
       </if>
       <if test="pharReturnStroPriceAll != null">
-        phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
+        phar_return_stro_price_all = #{pharReturnStroPriceAll},
       </if>
       <if test="adjustProfitPriceAll != null">
-        adjust_profit_price_all = #{item.adjustProfitPriceAll},
+        adjust_profit_price_all = #{adjustProfitPriceAll},
       </if>
       <if test="adjustLossPriceAll != null">
-        adjust_loss_price_all = #{item.adjustLossPriceAll},
+        adjust_loss_price_all = #{adjustLossPriceAll},
       </if>
       <if test="takeStrockSubtractNum != null">
-        take_strock_subtract_num = #{item.takeStrockSubtractNum},
+        take_strock_subtract_num = #{takeStrockSubtractNum},
       </if>
       <if test="takeStrockSubtractPriceAll != null">
-        take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
+        take_strock_subtract_price_all = #{takeStrockSubtractPriceAll},
       </if>
       <if test="takeStrockAddNum != null">
-        take_strock_add_num = #{item.takeStrockAddNum},
+        take_strock_add_num = #{takeStrockAddNum},
       </if>
       <if test="takeStrockAddPriceAll != null">
-        take_strock_add_price_all = #{item.takeStrockAddPriceAll},
+        take_strock_add_price_all = #{takeStrockAddPriceAll},
       </if>
       <if test="stroInNumBuyPriceAll != null">
-        stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
+        stro_in_num_buy_price_all = #{stroInNumBuyPriceAll},
       </if>
       <if test="returnSuplBuyPriceAll != null">
-        return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
+        return_supl_buy_price_all = #{returnSuplBuyPriceAll},
       </if>
       <if test="stroToDeptBuyPriceAll != null">
-        stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
+        stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll},
       </if>
       <if test="stroToPharBuyPriceAll != null">
-        stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
+        stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll},
       </if>
       <if test="reportLossesBuyPriceAll != null">
-        report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
+        report_losses_buy_price_all = #{reportLossesBuyPriceAll},
       </if>
       <if test="pharReturnStroBuyPriceAll != null">
-        phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
+        phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll},
       </if>
       <if test="adjustProfitBuyPriceAll != null">
-        adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
+        adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll},
       </if>
       <if test="adjustLossBuyPriceAll != null">
-        adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
+        adjust_loss_buy_price_all = #{adjustLossBuyPriceAll},
       </if>
       <if test="takeStrockSubtractBuyPriceAll != null">
-        take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
+        take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll},
       </if>
       <if test="takeStrockAddBuyPriceAll != null">
-        take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
+        take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll},
       </if>
       <if test="outSalesNum != null">
-        out_sales_num = #{item.outSalesNum},
+        out_sales_num = #{outSalesNum},
       </if>
       <if test="outSalesPriceAll != null">
-        out_sales_price_all = #{item.outSalesPriceAll},
+        out_sales_price_all = #{outSalesPriceAll},
       </if>
       <if test="outSalesBuyPriceAll != null">
-        out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
+        out_sales_buy_price_all = #{outSalesBuyPriceAll},
       </if>
       <if test="inSalesBuyPriceAll != null">
-        in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
+        in_sales_buy_price_all = #{inSalesBuyPriceAll},
       </if>
       <if test="inSalesPriceAll != null">
-        in_sales_price_all = #{item.inSalesPriceAll},
+        in_sales_price_all = #{inSalesPriceAll},
       </if>
       <if test="inSalesNum != null">
-        in_sales_num = #{item.inSalesNum},
+        in_sales_num = #{inSalesNum},
       </if>
       <if test="monthlyId != null">
-        monthly_id = #{item.monthlyId},
+        monthly_id = #{monthlyId},
       </if>
     </set>
-    where id = #{item.id}
+    where id = #{id}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO">
     update stro_invoicing_monthly_detail
-    set hosp_code = #{item.hospCode},
-      biz_id = #{item.bizId},
-      item_code = #{item.itemCode},
-      item_id = #{item.itemId},
-      item_name = #{item.itemName},
-      num = #{item.num},
-      unit_code = #{item.unitCode},
-      curr_unit_code = #{item.currUnitCode},
-      sell_price = #{item.sellPrice},
-      buy_price = #{item.buyPrice},
-      split_ratio = #{item.splitRatio},
-      split_price = #{item.splitPrice},
-      split_num = #{item.splitNum},
-      split_unit_code = #{item.splitUnitCode},
-      up_surplus_num = #{item.upSurplusNum},
-      surplus_num = #{item.surplusNum},
-      up_buy_price_all = #{item.upBuyPriceAll},
-      buy_price_all = #{item.buyPriceAll},
-      up_sell_price_all = #{item.upSellPriceAll},
-      sell_price_all = #{item.sellPriceAll},
-      crte_time = #{item.crteTime},
-      new_price = #{item.newPrice},
-      new_split_price = #{item.newSplitPrice},
-      stro_in_num = #{item.stroInNum},
-      stro_in_num_price_all = #{item.stroInNumPriceAll},
-      return_supl_num = #{item.returnSuplNum},
-      return_supl_price_all = #{item.returnSuplPriceAll},
-      stro_to_dept_num = #{item.stroToDeptNum},
-      stro_to_dept_price_all = #{item.stroToDeptPriceAll},
-      stro_to_phar_num = #{item.stroToPharNum},
-      stro_to_phar_price_all = #{item.stroToPharPriceAll},
-      report_losses_num = #{item.reportLossesNum},
-      report_losses_price_all = #{item.reportLossesPriceAll},
-      phar_return_stro_num = #{item.pharReturnStroNum},
-      phar_return_stro_price_all = #{item.pharReturnStroPriceAll},
-      adjust_profit_price_all = #{item.adjustProfitPriceAll},
-      adjust_loss_price_all = #{item.adjustLossPriceAll},
-      take_strock_subtract_num = #{item.takeStrockSubtractNum},
-      take_strock_subtract_price_all = #{item.takeStrockSubtractPriceAll},
-      take_strock_add_num = #{item.takeStrockAddNum},
-      take_strock_add_price_all = #{item.takeStrockAddPriceAll},
-      stro_in_num_buy_price_all = #{item.stroInNumBuyPriceAll},
-      return_supl_buy_price_all = #{item.returnSuplBuyPriceAll},
-      stro_to_dept_buy_price_all = #{item.stroToDeptBuyPriceAll},
-      stro_to_phar_buy_price_all = #{item.stroToPharBuyPriceAll},
-      report_losses_buy_price_all = #{item.reportLossesBuyPriceAll},
-      phar_return_stro_buy_price_all = #{item.pharReturnStroBuyPriceAll},
-      adjust_profit_buy_price_all = #{item.adjustProfitBuyPriceAll},
-      adjust_loss_buy_price_all = #{item.adjustLossBuyPriceAll},
-      take_strock_subtract_buy_price_all = #{item.takeStrockSubtractBuyPriceAll},
-      take_strock_add_buy_price_all = #{item.takeStrockAddBuyPriceAll},
-      out_sales_num = #{item.outSalesNum},
-      out_sales_price_all = #{item.outSalesPriceAll},
-      out_sales_buy_price_all = #{item.outSalesBuyPriceAll},
-      in_sales_buy_price_all = #{item.inSalesBuyPriceAll},
-      in_sales_price_all = #{item.inSalesPriceAll},
-      in_sales_num = #{item.inSalesNum},
-      monthly_id = #{item.monthlyId}
-    where id = #{item.id}
+    set hosp_code = #{hospCode},
+      biz_id = #{bizId},
+      item_code = #{itemCode},
+      item_id = #{itemId},
+      item_name = #{itemName},
+      num = #{num},
+      unit_code = #{unitCode},
+      curr_unit_code = #{currUnitCode},
+      sell_price = #{sellPrice},
+      buy_price = #{buyPrice},
+      split_ratio = #{splitRatio},
+      split_price = #{splitPrice},
+      split_num = #{splitNum},
+      split_unit_code = #{splitUnitCode},
+      up_surplus_num = #{upSurplusNum},
+      surplus_num = #{surplusNum},
+      up_buy_price_all = #{upBuyPriceAll},
+      buy_price_all = #{buyPriceAll},
+      up_sell_price_all = #{upSellPriceAll},
+      sell_price_all = #{sellPriceAll},
+      crte_time = #{crteTime},
+      new_price = #{newPrice},
+      new_split_price = #{newSplitPrice},
+      stro_in_num = #{stroInNum},
+      stro_in_num_price_all = #{stroInNumPriceAll},
+      return_supl_num = #{returnSuplNum},
+      return_supl_price_all = #{returnSuplPriceAll},
+      stro_to_dept_num = #{stroToDeptNum},
+      stro_to_dept_price_all = #{stroToDeptPriceAll},
+      stro_to_phar_num = #{stroToPharNum},
+      stro_to_phar_price_all = #{stroToPharPriceAll},
+      report_losses_num = #{reportLossesNum},
+      report_losses_price_all = #{reportLossesPriceAll},
+      phar_return_stro_num = #{pharReturnStroNum},
+      phar_return_stro_price_all = #{pharReturnStroPriceAll},
+      adjust_profit_price_all = #{adjustProfitPriceAll},
+      adjust_loss_price_all = #{adjustLossPriceAll},
+      take_strock_subtract_num = #{takeStrockSubtractNum},
+      take_strock_subtract_price_all = #{takeStrockSubtractPriceAll},
+      take_strock_add_num = #{takeStrockAddNum},
+      take_strock_add_price_all = #{takeStrockAddPriceAll},
+      stro_in_num_buy_price_all = #{stroInNumBuyPriceAll},
+      return_supl_buy_price_all = #{returnSuplBuyPriceAll},
+      stro_to_dept_buy_price_all = #{stroToDeptBuyPriceAll},
+      stro_to_phar_buy_price_all = #{stroToPharBuyPriceAll},
+      report_losses_buy_price_all = #{reportLossesBuyPriceAll},
+      phar_return_stro_buy_price_all = #{pharReturnStroBuyPriceAll},
+      adjust_profit_buy_price_all = #{adjustProfitBuyPriceAll},
+      adjust_loss_buy_price_all = #{adjustLossBuyPriceAll},
+      take_strock_subtract_buy_price_all = #{takeStrockSubtractBuyPriceAll},
+      take_strock_add_buy_price_all = #{takeStrockAddBuyPriceAll},
+      out_sales_num = #{outSalesNum},
+      out_sales_price_all = #{outSalesPriceAll},
+      out_sales_buy_price_all = #{outSalesBuyPriceAll},
+      in_sales_buy_price_all = #{inSalesBuyPriceAll},
+      in_sales_price_all = #{inSalesPriceAll},
+      in_sales_num = #{inSalesNum},
+      monthly_id = #{monthlyId}
+    where id = #{id}
   </update>
 </mapper>

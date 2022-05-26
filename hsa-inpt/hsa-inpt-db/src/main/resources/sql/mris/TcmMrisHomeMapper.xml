@@ -914,7 +914,7 @@
             resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO">
             SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
                    md.icd_version, md.disease_icd10, md.disease_icd10_name,
-                   md.in_situation_code
+                   md.in_situation_code,md.columns_num
             FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
             WHERE md.hosp_code = #{hospCode}
             AND md.visit_id = #{id} order by md.disease_code desc
@@ -945,7 +945,7 @@
     <insert id="insertTcmMrisDiagnoseBatch" parameterType="list">
         INSERT INTO tcm_mris_diagnose (
         id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version, disease_icd10,
-        disease_icd10_name,in_situation_code
+        disease_icd10_name,in_situation_code,columns_num
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -958,7 +958,8 @@
             #{item.icdVersion},
             #{item.diseaseIcd10},
             #{item.diseaseIcd10Name},
-            #{item.inSituationCode}
+            #{item.inSituationCode},
+            #{item.columnsNum}
             )
         </foreach>
     </insert>
@@ -999,7 +1000,7 @@
         id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
         notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
         assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
-        ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,columns_num,other_oper_time
+        ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,columns_num,other_oper_time,is_other_oper
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -1036,7 +1037,8 @@
             #{item.operPosition},
             #{item.operPositionName},
             #{item.columnsNum},
-            #{item.otherOperTime}
+            #{item.otherOperTime},
+            #{item.isOtherOper}
             )
         </foreach>
     </insert>
@@ -1268,7 +1270,7 @@
             id, hosp_code, mbi_id, visit_id, oper_disease_id, oper_disease_icd9, oper_disease_name, notched_code,
             notched_name, heal_code, heal_name, ana_code, ana_name, oper_doctor_id, oper_doctor_name, oper_time,
             assistant_id4, assistant_name1, assistant_id2, assistant_name2, assistant_id3, assistant_name3, ana_id1, ana_name1,
-            ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,other_oper_time
+            ana_id2, ana_name2, ana_id3, ana_name3, oper_code, oper_name, oper_position, oper_position_name,other_oper_time,is_other_oper
         ) VALUES (
             #{id},
             #{hospCode},
@@ -1302,7 +1304,8 @@
             #{operName},
             #{operPosition},
             #{operPositionName},
-            #{otherOperTime}
+            #{otherOperTime},
+            #{isOtherOper}
         )
     </insert>
 
@@ -1402,6 +1405,9 @@
             </if>
             <if test="otherOperTime != null">
                 other_oper_time = #{otherOperTime}
+            </if>
+            <if test="isOtherOper != null">
+                is_other_oper = #{isOtherOper}
             </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}

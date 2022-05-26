@@ -191,6 +191,12 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
                 listReturn = this.savePrescribe(yjRcDTO);
             }
         }
+        // 新增处方（华夏医院）
+        else if(YjConstants.YWLX.CFSC.equals(yjRcDTO.getYwid())){
+            if (StringUtils.isNotEmpty(yjRcDTO.getBrid())){
+                listReturn = this.savePrescribeHx(yjRcDTO);
+            }
+        }
         // 删除处方
         else if(YjConstants.YWLX.SCCF.equals(yjRcDTO.getYwid())){
             yjRcDTO.setHospCode(hospCode);
@@ -560,6 +566,201 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         BaseAdviceDTO baseAdviceDTO = new BaseAdviceDTO();
         Map map = new HashMap();
         //获取诊断信息
+        OutptDiagnoseDTO outptptDiagnose = outptPrescribeDao.getOutptDiagnose(yjRcDTO);
+        //平均处方主表数据
+        OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
+        List<OutptPrescribeDetailsDTO> outptPrescribeDetailsDTOList = new ArrayList<>();
+        //处方主表
+        outptPrescribeDTO.setId(SnowflakeUtils.getId());
+        // 诊断id集
+        map.put("hospCode", yjRcDTO.getHospCode());
+        map.put("code", "YJ_ZDID");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)) {
+            throw new AppException(-1,"未查询的对应的诊断配置！医院编码为【"+yjRcDTO.getHospCode()+"】");
+        }
+        outptPrescribeDTO.setDiagnoseIds(sysParameterDTO.getValue());
+        //就诊ID
+        outptPrescribeDTO.setVisitId(yjRcDTO.getJzid());
+        //医院编码
+        outptPrescribeDTO.setHospCode(yjRcDTO.getSign());
+        //是否有诊断
+        if(ObjectUtil.isEmpty(outptPrescribeDTO.getDiagnoseIds())){
+            outptPrescribeDTO.setDiagnoseIds(outptptDiagnose.getDiseaseId());
+        }
+        //就诊号
+        outptPrescribeDTO.setOrderNo(this.getOrderNo(yjRcDTO.getSign(), Constants.ORDERRULE.CFDH));
+        //开方医生
+        outptPrescribeDTO.setDoctorId(yjRcDTO.getJzysid());
+        //开发科室
+        outptPrescribeDTO.setDeptId(yjRcDTO.getJzksid());
+        //处方类别
+        outptPrescribeDTO.setTypeCode("1");
+        //处方类型
+        outptPrescribeDTO.setPrescribeTypeCode("1");
+        //创建人
+        outptPrescribeDTO.setCrteId(yjRcDTO.getJzysid());
+        //创建时间
+        outptPrescribeDTO.setCrteTime(DateUtils.getNow());
+        //是否关闭
+        outptPrescribeDTO.setIsCancel(Constants.SF.F);
+        //是否结算
+        outptPrescribeDTO.setIsSettle(Constants.SF.F);
+        //是否提交
+        outptPrescribeDTO.setIsSubmit(Constants.SF.F);
+        // 处方明细josn转list
+        JSONArray josnarray = JSONArray.parseArray(yjRcDTO.getCfxxList());
+        for(Object jsonObject : josnarray){
+            JSONObject aaa = (JSONObject)jsonObject;
+            YjRcDTODetail yjRcDTODetail = JSON.toJavaObject(aaa, YjRcDTODetail.class);
+            OutptPrescribeDetailsDTO outptPrescribeDetailsDTO = new OutptPrescribeDetailsDTO();
+            //处方明细ID
+            outptPrescribeDetailsDTO.setId(SnowflakeUtils.getId());
+            //医院编码
+            outptPrescribeDetailsDTO.setHospCode(yjRcDTO.getSign());
+            //就诊id
+            outptPrescribeDetailsDTO.setVisitId(yjRcDTO.getJzid());
+            //处方主表数据
+            outptPrescribeDetailsDTO.setOpId(outptPrescribeDTO.getId());
+            //组号
+            outptPrescribeDetailsDTO.setGroupNo(yjRcDTODetail.getZh());
+            //组内序号
+            outptPrescribeDetailsDTO.setGroupSeqNo(yjRcDTODetail.getCfxh());
+            //项目ID
+            if (StringUtils.isNotEmpty(yjRcDTODetail.getYpxmid())){
+                outptPrescribeDetailsDTO.setItemId(yjRcDTODetail.getYpxmid());
+            } else {
+                throw new AppException("项目、药品、材料id不能为空");
+            }
+            outptPrescribeDetailsDTO.setItemId(yjRcDTODetail.getYpxmid());
+            //频率
+            outptPrescribeDetailsDTO.setRateId(yjRcDTODetail.getYyjgid());
+            //速度
+            outptPrescribeDetailsDTO.setSpeedCode(yjRcDTODetail.getSpeed());
+            //执行天数
+            outptPrescribeDetailsDTO.setUseDays(yjRcDTODetail.getZxts());
+            // 用量
+            outptPrescribeDetailsDTO.setNum(yjRcDTODetail.getYcyl());
+            //总数量
+            outptPrescribeDetailsDTO.setTotalNum(yjRcDTODetail.getSl());
+            //项目ID
+            yjRcDTO.setItemId(yjRcDTODetail.getYpxmid());
+            //科室id
+            yjRcDTO.setDeptId(yjRcDTO.getJzksid());
+            //医院编码
+            yjRcDTO.setHospCode(yjRcDTO.getSign());
+            //药品
+            if("1".equals(yjRcDTODetail.getYpxmlx())){
+                if(StringUtils.isEmpty(yjRcDTODetail.getYfdm())){
+                    throw new AppException("用法不能为空");
+                }
+                if(StringUtils.isEmpty(yjRcDTODetail.getYyjgid())){
+                    throw new AppException("频率不能为空");
+                }
+                if(StringUtils.isEmpty(yjRcDTO.getJzksid())){
+                    throw new AppException("开方科室不能为空");
+                }
+                baseDrugDTO = outptPrescribeDao.getBaseDrug(yjRcDTO);
+
+                baseRateDTO = outptPrescribeDao.getDayTimes(yjRcDTODetail.getYyjgid());
+
+                // 剂量
+                outptPrescribeDetailsDTO.setDosage(yjRcDTODetail.getYcyl());
+                //（用量）
+                outptPrescribeDetailsDTO.setNum(BigDecimalUtils.divide(yjRcDTODetail.getYcyl(), baseDrugDTO.getDosage()).setScale(2, BigDecimal.ROUND_HALF_UP));
+                //项目名称
+                outptPrescribeDetailsDTO.setItemName(baseDrugDTO.getGoodName());
+
+                // 执行次数
+                outptPrescribeDetailsDTO.setExecNum((outptPrescribeDetailsDTO.getUseDays() * baseRateDTO.getDailyTimes().intValue()));
+                //价格
+                outptPrescribeDetailsDTO.setPrice(baseDrugDTO.getSplitPrice());
+                //规格
+                outptPrescribeDetailsDTO.setSpec(baseDrugDTO.getSpec());
+                //用法
+                outptPrescribeDetailsDTO.setUsageCode(yjRcDTODetail.getYfdm());
+                //单位
+                outptPrescribeDetailsDTO.setNumUnitCode(baseDrugDTO.getSplitUnitCode());
+                //财务分类
+                outptPrescribeDetailsDTO.setBfcId(baseDrugDTO.getBfcId());
+                //领药药房
+                outptPrescribeDetailsDTO.setPharId(baseDrugDTO.getPharId());
+                //常规
+                outptPrescribeDetailsDTO.setUseCode("1");
+                //项目类型
+                outptPrescribeDetailsDTO.setItemCode(yjRcDTODetail.getYpxmlx());
+                // 项目类型
+                outptPrescribeDetailsDTO.setItemCode("1");
+                this.check(outptPrescribeDetailsDTO); // 校验库存
+            }
+            //材料
+            else if("3".equals(yjRcDTODetail.getYpxmlx())){
+                baseMaterialDTO = outptPrescribeDao.getBaseMaterial(yjRcDTO);
+                //材料名称
+                outptPrescribeDetailsDTO.setItemName(baseMaterialDTO.getName());
+                //价格
+                outptPrescribeDetailsDTO.setPrice(baseMaterialDTO.getSplitPrice());
+                //规格
+                outptPrescribeDetailsDTO.setSpec(baseMaterialDTO.getSpec());
+                //单位
+                outptPrescribeDetailsDTO.setNumUnitCode(baseMaterialDTO.getSplitUnitCode());
+                //批次
+                outptPrescribeDetailsDTO.setBfcId(baseMaterialDTO.getBfcId());
+                //领药药房
+                outptPrescribeDetailsDTO.setPharId(yjRcDTO.getJzksid());
+                //用法
+                outptPrescribeDetailsDTO.setUseCode("3");
+                // 项目类型
+                outptPrescribeDetailsDTO.setItemCode("2");
+            }
+            //项目
+            else if("2".equals(yjRcDTODetail.getYpxmlx())){
+                baseAdviceDTO = outptPrescribeDao.getAdvice(yjRcDTO);
+                //项目名称
+                outptPrescribeDetailsDTO.setItemName(baseAdviceDTO.getName());
+                //价格
+                outptPrescribeDetailsDTO.setPrice(baseAdviceDTO.getPrice());
+                //单位
+                outptPrescribeDetailsDTO.setNumUnitCode(baseAdviceDTO.getUnitCode());
+                // 项目类型
+                outptPrescribeDetailsDTO.setItemCode("4");
+            }
+            //是否提交
+            outptPrescribeDetailsDTO.setContent(outptPrescribeDetailsDTO.getItemName() + "" + outptPrescribeDetailsDTO.getTotalNum());
+            //是否皮试
+            outptPrescribeDetailsDTO.setIsSkin(Constants.SF.F);
+            //执行科室
+            outptPrescribeDetailsDTO.setExecDeptId(yjRcDTO.getJzksid());
+
+            outptPrescribeDetailsDTOList.add(outptPrescribeDetailsDTO);
+        }
+        //保存处方
+        outptPrescribeDao.insertPrescribe(outptPrescribeDTO);
+        //保存处方明细
+        outptPrescribeDao.insertPrescribeDetail(outptPrescribeDetailsDTOList);
+        Map<String,Object> mapResult = new HashMap<>();
+        mapResult.put("jzid",yjRcDTO.getJzid());
+        mapResult.put("cfdh",outptPrescribeDTO.getOrderNo());
+        List<Map<String, Object>> result = new ArrayList<>();
+        result.add(mapResult);
+        listReturn = result;
+        return listReturn;
+    }
+
+
+    /**
+     * 保存就诊处方信息(华夏医院)
+     * @param yjRcDTO
+     * @return
+     */
+    public List<Map<String, Object>> savePrescribeHx(YjRcDTO yjRcDTO){
+        List<Map<String, Object>> listReturn = new ArrayList<>();
+        BaseDrugDTO baseDrugDTO = new BaseDrugDTO();
+        BaseRateDTO baseRateDTO = new BaseRateDTO();
+        BaseMaterialDTO baseMaterialDTO = new BaseMaterialDTO();
+        BaseAdviceDTO baseAdviceDTO = new BaseAdviceDTO();
+        Map map = new HashMap();
+        //获取诊断信息
         //华夏医院至铭医药接口传的是jzid，转换一下
         if (ObjectUtil.isEmpty(yjRcDTO.getVisitId())) {
             yjRcDTO.setVisitId(yjRcDTO.getJzid());
@@ -753,7 +954,6 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         listReturn = result;
         return listReturn;
     }
-
     /**
      * 保存处方
      * @param outptPrescribeDTO

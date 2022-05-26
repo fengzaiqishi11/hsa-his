@@ -467,13 +467,13 @@
     <select id="queryYbSettleReportByMXSum" parameterType="java.util.Map" resultType="java.util.Map">
         select SUM(totalPrice) as totalPriceSum,
         SUM(planPrice)as  planPriceSum,
-        SUM(civilPrice)as planPriceSum,
+        SUM(civilPrice)as civilPrice,
         SUM(seriousPrice)as seriousPriceSum,
         SUM(retirePrice)as retirePriceSum,
         SUM(hospPrice)as hospPriceSum,
         SUM(personPrice)as personPriceSum,
         SUM(apTotalPrice)as apTotalPriceSum,
-        SUM(comPay)as comPay,
+        SUM(comPay)as comPaySum,
         SUM(ynyh)as ynyhSum from(
         SELECT
         ywlx,
@@ -591,13 +591,13 @@
     <select id="queryYbSettleReportByBRLXSum" parameterType="java.util.Map" resultType="java.util.Map">
         select SUM(totalPrice) as totalPriceSum,
         SUM(planPrice)as  planPriceSum,
-        SUM(civilPrice)as planPriceSum,
+        SUM(civilPrice)as civilPrice,
         SUM(seriousPrice)as seriousPriceSum,
         SUM(retirePrice)as retirePriceSum,
         SUM(hospPrice)as hospPriceSum,
         SUM(personPrice)as personPriceSum,
         SUM(apTotalPrice)as apTotalPriceSum,
-        SUM(comPay) AS comPay,
+        SUM(comPay) AS comPaySUM,
         SUM(ynyh)as ynyhSum from(
         SELECT
         ywlx,
@@ -694,7 +694,7 @@
         SUM( ss.apTotalPrice ) AS apTotalPrice,
         SUM( ss.ynyh ) AS ynyh,
         SUM( ss.mafPay) AS mafPay,
-        SUM( ss.comPay ) AS mapPay,
+        SUM( ss.comPay ) AS comPay,
         SUM( ss.personalPrice) as personalPrice
         FROM
         (

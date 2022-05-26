@@ -26,7 +26,7 @@
         '确费'
         WHEN c.is_ok = '0' THEN
         '未确费'
-        WHEN c.is_ok = '2' THEN
+        WHEN (c.is_ok = '2') THEN
         '已申请退费'
         WHEN c.is_ok = '3' THEN
         '已退费'
@@ -49,7 +49,6 @@
         AND d.id = c.dept_id
         AND ma.hosp_code = #{hospCode}
         AND ma.type_code = #{typeCode}
-        AND c.status_code = '0'
         <if test="execDeptId != null and execDeptId != ''">
             and c.exec_dept_id = #{execDeptId}
         </if>
@@ -68,12 +67,17 @@
         <if test="keyword != null and keyword != ''">
             and v.name like concat('%', #{keyword}, '%' )
         </if>
-        <if test="isOk != null and isOk != '0'">
-            and c.is_ok = #{isOk}
-        </if>
-        <if test="isOk == null or isOk == '0'">
-            and (c.is_ok = #{isOk} or c.is_ok is null)
-        </if>
+        <choose>
+            <when test="isOk == null or isOk == '0'.toString()">
+                and (c.is_ok = #{isOk} or c.is_ok is null) and  c.status_code = '0'
+            </when>
+            <when test="isOk != null and isOk == '3'.toString()"> /*查询已退费状态的医技*/
+               and  c.status_code = '1'
+            </when>
+            <otherwise>
+                and c.is_ok = #{isOk}  and  c.status_code = '0'
+            </otherwise>
+        </choose>
         ) a
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
     </select>
@@ -144,12 +148,14 @@
             C.technology_ok_name AS technologyOkName,
             C.technology_ok_time AS technologyOkTime,
             CASE
-                WHEN c.is_technology_ok = '1' THEN
+                WHEN (c.is_technology_ok = '1'and c.status_code = '0') THEN
                     '确费'
-                WHEN c.is_technology_ok = '0' THEN
+                WHEN (c.is_technology_ok = '0'and c.status_code = '0') THEN
                     '未确费'
-                WHEN c.is_technology_ok = '2' THEN
+                WHEN (c.is_technology_ok = '2' and c.status_code = '0') THEN
                 '已申请退费'
+                WHEN c.status_code = '1' THEN
+                '已退费'
                 WHEN c.is_technology_ok = '3' THEN
                 '已退费'
                 ELSE '未确费'
@@ -171,8 +177,7 @@
           AND d.id = c.dept_id
         AND ma.hosp_code = #{hospCode}
         AND ma.type_code = #{typeCode}
-          AND ma.is_inpt = '0'
-          AND c.status_code = '0'
+        AND ma.is_inpt = '0'
         <if test="execDeptId != null and execDeptId != ''">
             and c.exec_dept_id = #{execDeptId}
         </if>
@@ -191,12 +196,17 @@
         <if test="keyword != null and keyword != ''">
             and v.name like concat('%', #{keyword}, '%' )
         </if>
-        <if test="isOk != null and isOk != '0'">
-           and  c.is_technology_ok = #{isOk}
-        </if>
-        <if test="isOk == null or isOk == '0'">
-            and  (c.is_technology_ok = #{isOk} or c.is_technology_ok is null)
-        </if>
+        <choose>
+            <when test="isOk == null or isOk == '0'.toString()">
+                and (c.is_technology_ok = #{isOk} or c.is_technology_ok is null) and  c.status_code = '0'
+            </when>
+            <when test="isOk != null and isOk == '3'.toString()"> /*查询已退费状态的医技*/
+                and  c.status_code = '1'
+            </when>
+            <otherwise>
+                and c.is_technology_ok = #{isOk}  and  c.status_code = '0'
+            </otherwise>
+        </choose>
     </select>
     <select id="getParameterValue" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
         select  a.id, a.hosp_code hospCode, a.name, a.code, a.remark, a.pym, a.wbm, a.value
@@ -270,8 +280,8 @@
     </select>
     <!--获取不是未确费的费用-->
     <select id="getAlreadyCostByCostIds" resultType="java.lang.Integer">
-        select count(0) from outpt_cost where hosp_code = #{hospCode} and id in
-                                        <foreach collection="ids" item="item" open="(" separator="," close=")">
+        select count(0) from outpt_cost where hosp_code = #{hospCode} and (is_technology_ok != '0' and is_technology_ok is not null) and id in
+                                        <foreach collection="list" item="item" open="(" separator="," close=")">
                                             #{item}
                                         </foreach>
     </select>

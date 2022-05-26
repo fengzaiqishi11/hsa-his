@@ -1750,5 +1750,4 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
     }
 
-
 }

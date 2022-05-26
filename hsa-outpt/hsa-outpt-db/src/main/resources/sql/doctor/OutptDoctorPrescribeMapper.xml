@@ -725,7 +725,8 @@
                ( CASE WHEN a.item_code = '1' THEN c.usual_name WHEN a.item_code = '2' THEN g.other_name WHEN a.item_code = '3' THEN it.other_name WHEN a.item_code = '4' THEN ad.other_name END ) bName,
                case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
                case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
-               i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
+               i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, a.use_days as herbNum,
+               phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
         from  outpt_prescribe_detail a
                   left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
                   left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'

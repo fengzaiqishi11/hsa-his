@@ -1975,7 +1975,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         }
         // 就诊人的参保地区划和就医地区划不一致就是异地
         //就诊人的参保地区划和就医地区划不一致就是异地(省内不算异地，省外才算)
-        if (mdtrtareaAdmvs.substring(0, 3).equals(insuplcAdmdvs.substring(0, 3))) {
+        if (mdtrtareaAdmvs.substring(0, 2).equals(insuplcAdmdvs.substring(0, 2))) {
             dataMap.put("setl_id", setlId);//结算ID
             dataMap.put("psn_no", psnNo);//人员编号
             dataMap.put("mdtrt_id", mdtrtId);//就医登记号

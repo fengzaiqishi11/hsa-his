@@ -7,7 +7,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.sync.syncdisease.bo.SyncDiseaseBO;
 import cn.hsa.module.sync.syncdisease.dto.SyncDiseaseDTO;
 import cn.hsa.module.sync.syncdisease.service.SyncDiseaseService;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

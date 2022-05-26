@@ -43,7 +43,7 @@
 
     <!-- for redisTemplate-->
     <bean id="distributedJedisConnectionFactory"
-          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" primary="true">
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" primary="false">
         <constructor-arg name="standaloneConfig">
             <bean class="cn.hsa.hsaf.cache.redis.DistributedRedisStandaloneConfiguration">
                 <constructor-arg name="clusterNodes" value="${cache.cluster0.nodes}"/>
@@ -76,5 +76,27 @@
         <property name="hashValueSerializer">
             <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
         </property>
+    </bean>
+
+    <!-- for spring-session -->
+    <bean id="springRedisSessionConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" primary="true">
+        <constructor-arg name="standaloneConfig">
+            <bean class="org.springframework.data.redis.connection.RedisStandaloneConfiguration">
+                <property name="hostName" value="${session.redis.host}"/>
+                <property name="port" value="${session.redis.port}"/>
+                <property name="password" value="${session.redis.password}"/>
+                <property name="database" value="${session.redis.database}"/>
+            </bean>
+        </constructor-arg>
+        <constructor-arg name="clientConfig">
+            <bean class="cn.hsa.hsaf.cache.redis.DistributedJedisClientConfiguration">
+                <constructor-arg name="clientName" value="distributedJedisClientConfiguration"/>
+                <constructor-arg name="usePooling" value="true"/>
+                <constructor-arg name="poolConfig" ref="distributedJedisPoolConfig"/>
+                <property name="connectTimeout" value="3000"/>
+                <property name="readTimeout" value="3000"/>
+            </bean>
+        </constructor-arg>
     </bean>
 </beans>

@@ -48,6 +48,7 @@
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
         <result property="isOffical" column="is_offical" jdbcType="VARCHAR"/>
         <result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
+        <result property="outptUseCode" column="outpt_use_code" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -58,7 +59,7 @@
            (select count(0) from stro_stock e where e.item_code = '2' and e.item_id = base_material.id ) as stockFlag,
            (select name from base_product  where base_product.hosp_code = #{hospCode} and prod_code = code) as prodName,
            (select id from base_finance_classify where hosp_code=base_material.hosp_code and code=base_material.bfc_code) bfcId,
-           is_offical, reimbursement_ratio
+           is_offical, reimbursement_ratio,outpt_use_code
         from base_material
         where id = #{id}  and hosp_code = #{hospCode}
     </select>
@@ -150,7 +151,7 @@
                a.spec, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price,
           a.is_supp_curtain, a.use_code, a.remark, a.prod_code, a.reg_cert_no, a.pym, a.wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
           a.last_buy_price,a.last_split_buy_price,a.avg_buy_price,a.avg_sell_price,model,a.other_name,
-          '2' as itemCode,a.reimbursement_ratio
+          '2' as itemCode,a.reimbursement_ratio,a.outpt_use_code
         from base_material a
         <where>
             <if test="id != null">
@@ -236,12 +237,12 @@
         (id,hosp_code, type_code, bfc_code, code,nation_code, name, spec, price, unit_code, split_ratio, split_unit_code,
         split_price, is_supp_curtain, use_code, remark, prod_code, reg_cert_no, pym, wbm,last_buy_price,
         last_split_buy_price,avg_buy_price,avg_sell_price, reimbursement_ratio,
-        is_valid,crte_id, crte_name, crte_time,model,other_name,is_offical)
+        is_valid,crte_id, crte_name, crte_time,model,other_name,is_offical,outpt_use_code)
 
 values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{name}, #{spec}, #{price}, #{unitCode},#{splitRatio}, #{splitUnitCode},
         #{splitPrice}, #{isSuppCurtain}, #{useCode}, #{remark}, #{prodCode}, #{regCertNo}, #{pym}, #{wbm}, #{lastBuyPrice},
         #{lastSplitBuyPrice},#{avgBuyPrice},#{avgSellPrice},#{reimbursementRatio},
-        #{isValid},#{crteId}, #{crteName}, #{crteTime},#{model},#{otherName}, #{isOffical})
+        #{isValid},#{crteId}, #{crteName}, #{crteTime},#{model},#{otherName}, #{isOffical},#{outptUseCode})
 
     </insert>
 
@@ -276,7 +277,8 @@ values (#{id},#{hospCode}, #{typeCode}, #{bfcCode}, #{code},#{nationCode}, #{nam
                 model = #{model},
                 other_name = #{otherName},
                 is_offical = #{isOffical},
-                reimbursement_ratio = #{reimbursementRatio}
+                reimbursement_ratio = #{reimbursementRatio},
+                outpt_use_code = #{outptUseCode}
         </set>
             where id = #{id}  and hosp_code = #{hospCode}
     </update>

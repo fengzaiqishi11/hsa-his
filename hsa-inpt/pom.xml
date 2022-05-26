@@ -23,21 +23,21 @@
 <!--        <module>hsa-inpt-tencent</module>-->
 <!--        <module>hsa-inpt-ali</module>-->
     </modules>
+    <dependencyManagement>
+        <dependencies>
+            <!--公共包依赖-->
+            <dependency>
+                <groupId>cn.hsa.com</groupId>
+                <artifactId>hsa-com</artifactId>
+                <version>1.0.0</version>
+            </dependency>
 
-    <dependencies>
-        <!--公共包依赖-->
-        <dependency>
-            <groupId>cn.hsa.com</groupId>
-            <artifactId>hsa-com</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
-        <!--动态数据源-->
-        <dependency>
-            <groupId>cn.hsa.dynamic</groupId>
-            <artifactId>hsa-dynamic</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-    </dependencies>
-
+            <!--动态数据源-->
+            <dependency>
+                <groupId>cn.hsa.dynamic</groupId>
+                <artifactId>hsa-dynamic</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>

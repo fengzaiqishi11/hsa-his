@@ -9,7 +9,8 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
 import cn.hsa.util.MapUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

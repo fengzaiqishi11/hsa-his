@@ -18,7 +18,8 @@ import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 

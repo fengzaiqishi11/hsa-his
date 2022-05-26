@@ -8,7 +8,8 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.interf.outpt.dto.YjRcDTO;
 import cn.hsa.module.interf.outpt.service.OutptPrescribeService;
 import cn.hsa.util.StringUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;

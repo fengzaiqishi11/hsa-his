@@ -14,7 +14,8 @@ import cn.hsa.module.center.nationstandarddrug.service.NationStandardDrugService
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

@@ -1,4 +1,4 @@
-package cn.hsa.module.elasticsearch;
+package cn.hsa.elasticsearch;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

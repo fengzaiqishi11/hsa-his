@@ -104,28 +104,51 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--定时任务-->
+        <!--公共包依赖-->
         <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-examples</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.albfernandez</groupId>
+                    <artifactId>javadbf</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.poi</groupId>
+                    <artifactId>poi-ooxml</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!--动态数据源-->
+        <dependency>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
         </dependency>
 
-        <!--工作流依赖-->
-        <dependency>
-            <!--
-            <groupId>cn.hsa.hsaf.workflow</groupId>
-            <artifactId>workflow-sdk</artifactId>
-            -->
-            <groupId>cn.hsa.cep.wfc</groupId>
-            <artifactId>hsa-cep-wfc-sdk</artifactId>
-        </dependency>
-        <!--工作流结束-->
-
-        <!--工具类-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -133,10 +156,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-fileupload</groupId>

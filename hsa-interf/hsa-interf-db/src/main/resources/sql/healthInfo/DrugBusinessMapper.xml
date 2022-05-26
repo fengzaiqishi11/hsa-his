@@ -479,37 +479,334 @@
 
     <select id="getTbYwlReportData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYwlReportDO">
         select * from (
-            select
-            '医疗机构代码' as YLJGDM,
-            '科室编码' as KSBM,
-            '医院科室名称' as KSMC,
-             now() as YWSJ,
-            '门诊人次' as MZRC,
-            '急诊人次' as JZRC,
-            '入院人次' as RYRC,
-            '期内结算(出院)人次' as CYRC,
-            '在院人数' as ZYRS,
-            '实有床位数' as SYCWS,
-            '门急诊医疗费用' as MJZYLFY,
-            '住院医疗费用' as ZYYLFY,
-            '门急诊药品费用' as MJZYPFY,
-            '住院药品费用' as ZYYPFY,
-            '门急诊医保医疗费用' as MJZYBYLFY,
-            '住院医保医疗费用' as ZYYBYLFY,
-            '门急诊医保药品费用' as MJZYBYPFY,
-            '住院医保药品费用' as ZYYBYPFY,
-            '住院实际发生费用' as ZYSJFSYS,
-            '预留统计字段 1' as TJYL1,
-            '预留统计字段 2' as TJYL2,
-            '预留统计字段 3' as TJYL3,
-            '预留统计字段 4' as TJYL4,
-            '预留统计字段 5' as TJYL5,
-            '预留统计字段 6' as TJYL6,
-            '预留统计字段 7' as TJYL7,
-            '预留统计字段 8' as TJYL8,
-            '修改标志' as XGBZ
+            select bd3.YLJGDM  as YLJGDM,
+            bd3.KSBM  as KSBM,
+            bd3.name  as KSMC,
+            bd3.ywsj as YWSJ,
+            ifnull(a.mzrc,0)  as MZRC,
+            ifnull(b.jzrc,0)  as JZRC,
+            ifnull(c.RYRC,0)  as RYRC,
+            ifnull(d.CYRC,0)  as CYRC,
+            ifnull(e.zyrs,0)  as ZYRS,
+            ifnull(f.SYCWS,0)  as SYCWS,
+            ifnull(n.MJZYLFY,0)  as MJZYLFY,
+            ifnull(l.MJZYPFY,0)  as MJZYPFY,
+            ifnull(j.MJZYBYLFY,0)  as MJZYBYLFY,
+            ifnull(i.MJZYBYPFY,0)  as MJZYBYPFY,
+            ifnull(m.ZYYLFY,0)  as ZYYLFY,
+            ifnull(k.ZYYPFY,0)  as ZYYPFY,
+            ifnull(h.ZYYBYLFY,0)  as ZYYBYLFY,
+            ifnull(g.ZYYBYPFY,0)  as ZYYBYPFY,
+            ifnull(m.ZYYLFY ,0) + ifnull(k.ZYYPFY,0)+ifnull(h.ZYYBYLFY,0)+ifnull(g.ZYYBYPFY,0) as ZYSJFSYS,
+            '' as TJYL1,
+            '' as TJYL2,
+            '' as TJYL3,
+            '' as TJYL4,
+            '' as TJYL5,
+            '' as TJYL6,
+            '' as TJYL7,
+            '' as TJYL8,
+            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.id as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
+            DATE_FORMAT(ADDDATE('2022-05-15', INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
+            FROM base_dept bd
+            LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
+            WHERE
+            DATE_FORMAT(ADDDATE('2022-05-15', INTERVAL @dateAdd DAY),'%Y-%m-%d') &lt; DATE_FORMAT('2022-05-30','%Y-%m-%d') )b on 1=1 where bd.type_code in ('1','2') )bd3
+            left JOIN (select
+            ov.hosp_code as YLJGDM ,
+            ov.dept_id as KSBM,
+            ov.dept_name as KSMC,
+            date(ov.visit_time) as YWSJ,
+            count(1) as MZRC
             from
-            inpt_advice ia
+            outpt_visit ov
+            group by
+            ov.hosp_code ,
+            ov.dept_id ,
+            ov.dept_name,
+            date(ov.visit_time)) a   on a.YLJGDM = bd3.YLJGDM  and a.ksbm = bd3.ksbm and bd3.YWSJ = a.YWSJ
+            -- 急诊人次
+            left join (
+            select
+            ov.hosp_code  as YLJGDM,
+            ov.dept_id as KSBM,
+            ov.dept_name as KSMC,
+            date(ov.visit_time) as YWSJ,
+            count(1) as JZRC
+            from
+            outpt_visit ov
+            where ov.visit_code ='02'
+            and date(ov.visit_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ov.hosp_code ,
+            ov.dept_id ,
+            ov.dept_name,
+            date(ov.visit_time)) b	on bd3.YLJGDM = b.YLJGDM and bd3.ksbm = b.ksbm and bd3.ywsj = b.ywsj
+            -- 入院人次
+            left join (select
+            ov.hosp_code  as YLJGDM,
+            ov.in_dept_id as KSBM ,
+            ov.in_dept_name as KSMC,
+            date(ov.in_time) as YWSJ,
+            count(1) as RYRC
+            from
+            inpt_visit ov
+            where ov.status_code  !='8'
+            and date(ov.in_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ov.hosp_code ,
+            ov.in_dept_id ,
+            ov.in_dept_name,
+            date(ov.in_time)) c on bd3.YLJGDM = c.YLJGDM and bd3.ksbm = c.ksbm and bd3.ywsj = c.ywsj
+            -- 出院人次
+            left join (select
+            ov.hosp_code   as YLJGDM,
+            ov.in_dept_id  as KSBM,
+            ov.in_dept_name as KSMC,
+            date(ov.out_time) as YWSJ,
+            count(1) as CYRC
+            from
+            inpt_visit ov
+            where ov.status_code  ='7'
+            and date(ov.out_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ov.hosp_code ,
+            ov.in_dept_id ,
+            ov.in_dept_name,
+            date(ov.out_time)) d on bd3.YLJGDM = d.YLJGDM and bd3.ksbm = d.ksbm and bd3.ywsj = d.ywsj
+            -- 住院人次
+            left join (select
+            c.YLJGDM,
+            c.KSBM ,
+            c.YWSJ  ,
+            COUNT(1) as ZYRS
+            from
+            (
+            select
+            l_tab.YLJGDM,
+            l_tab.KSBM,
+            l_tab.YWSJ
+            from
+            (
+            select
+            iv.hosp_code  as YLJGDM,
+            iv.in_dept_id  as KSBM,
+            date(iv.in_time) as YWSJ
+            from
+            inpt_visit iv
+            where
+            DATE(iv.in_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            iv.hosp_code ,
+            iv.in_dept_id,
+            DATE(iv.in_time)) l_tab
+            inner join
+            (
+            select
+            hosp_code  as YLJGDM,
+            in_dept_id as KSBM,
+            DATE(in_time) as YWSJ
+            from
+            inpt_visit
+            where
+            DATE(in_time) between date('2022-05-01') and date('2022-05-31')) r_tab
+            on
+            l_tab.YWSJ >= r_tab.YWSJ
+            and l_tab.YLJGDM = r_tab.YLJGDM
+            and l_tab.KSBM = r_tab.KSBM) c
+            group by
+            c.YLJGDM,
+            c.KSBM ,
+            c.YWSJ) e on bd3.YLJGDM = e.YLJGDM and bd3.ksbm = e.ksbm and bd3.ywsj = e.ywsj
+            -- 床位数
+            left join (select bb.hosp_code  as YLJGDM,bd2.id as ksbm,count(1) SYCWS
+            from base_bed bb ,base_dept bd2
+            where bb.is_valid = '1' and bb.hosp_code = bd2.hosp_code and bb.dept_code  = bd2.code
+            ) f  on  bd3.YLJGDM = f.YLJGDM and bd3.ksbm = f.ksbm
+            -- 住院医保药品费用
+            left join (select
+            iiv.hosp_code  as YLJGDM,
+            iiv.visit_drpt_id   as KSBM,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as ZYYBYPFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='1'
+            and iim.hosp_item_type  ='1'
+            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) g  on bd3.YLJGDM = g.YLJGDM and bd3.ksbm = g.ksbm and bd3.ywsj = g.ywsj
+            -- 住院医保治疗项目费用
+            left join (select
+            iiv.hosp_code as YLJGDM,
+            iiv.visit_drpt_id  as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as ZYYBYLFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='1'
+            and iim.hosp_item_type  !='1'
+            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) h on bd3.YLJGDM = h.YLJGDM and bd3.ksbm = h.ksbm and bd3.ywsj = h.ywsj
+            -- 门诊医保药品费用
+            left join (select
+            iiv.hosp_code as YLJGDM,
+            iiv.visit_drpt_id  as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as MJZYBYPFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='0'
+            and iim.hosp_item_type  ='1'
+            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) i on bd3.YLJGDM = i.YLJGDM and bd3.ksbm = i.ksbm and bd3.ywsj = i.ywsj
+            -- 门诊医保治疗项目费用
+            left join (select
+            iiv.hosp_code  as YLJGDM,
+            iiv.visit_drpt_id   as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as MJZYBYLFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='0'
+            and iim.hosp_item_type  !='1'
+            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) j on bd3.YLJGDM = j.YLJGDM and bd3.ksbm = j.ksbm and bd3.ywsj = j.ywsj
+            -- 住院药品费用
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id  as KSBM,
+            bd.name as KSMC ,
+            date(ic.cost_time) as YWSJ,
+            sum(ic.reality_price) as ZYYPFY
+            from
+            inpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code ='1'
+            and date(ic.cost_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.cost_time) ) k on bd3.YLJGDM = k.YLJGDM and bd3.ksbm = k.ksbm and bd3.ywsj = k.ywsj
+            -- 住院医疗费用
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id  as KSBM,
+            bd.name as KSMC ,
+            date(ic.cost_time) as YWSJ,
+            sum(ic.reality_price) as ZYYLFY
+            from
+            inpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code !='1'
+            and date(ic.cost_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.cost_time)) m on bd3.YLJGDM = m.YLJGDM and bd3.ksbm = m.ksbm and bd3.ywsj = m.ywsj
+            -- 门诊药品费用
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id as KSBM,
+            bd.name  as KSMC,
+            date(ic.crte_time) as YWSJ ,
+            sum(ic.reality_price) as MJZYPFY
+            from
+            outpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code ='1'
+            and date(ic.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.crte_time)) l on bd3.YLJGDM = l.YLJGDM and bd3.ksbm = l.ksbm and bd3.ywsj = l.ywsj
+            -- 门诊医疗费用
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id as KSBM,
+            bd.name  as KSMC,
+            date(ic.crte_time) as YWSJ ,
+            sum(ic.reality_price) as MJZYLFY
+            from
+            outpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code !='1'
+            and date(ic.crte_time) between date('2022-05-01') and date('2022-05-31')
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.crte_time)) n on bd3.YLJGDM = n.YLJGDM and bd3.ksbm = n.ksbm and bd3.ywsj = n.ywsj
         ) a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.YWSJ) &gt;= date(#{startTime})

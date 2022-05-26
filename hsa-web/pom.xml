@@ -90,7 +90,7 @@
             <artifactId>spring-cloud-dependencies</artifactId>
             <version>Hoxton.SR10</version>
             <type>pom</type>
-            <scope>import</scope>
+            <scope>compile</scope>
         </dependency>
 
         <!--数据库访问 开始-->
@@ -139,28 +139,11 @@
             <artifactId>hsaf-cache-redis</artifactId>
         </dependency>
 
-        <!--定时任务-->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
-        <!--工作流依赖-->
-<!--        <dependency>-->
-<!--            &lt;!&ndash;-->
-<!--            <groupId>cn.hsa.hsaf.workflow</groupId>-->
-<!--            <artifactId>workflow-sdk</artifactId>-->
-<!--            &ndash;&gt;-->
-<!--            <groupId>cn.hsa.cep.wfc</groupId>-->
-<!--            <artifactId>hsa-cep-wfc-sdk</artifactId>-->
-<!--        </dependency>-->
-        <!--工作流结束-->
-
         <!--工具类-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.google.guava</groupId>-->
+<!--            <artifactId>guava</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -169,10 +152,10 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.apache.commons</groupId>-->
+<!--            <artifactId>commons-collections4</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
@@ -206,10 +189,10 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger-ui</artifactId>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -228,17 +211,21 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.bestwu</groupId>-->
+<!--            <artifactId>fastdfs-client-java</artifactId>-->
+<!--            <version>1.27</version>-->
+<!--        </dependency>-->
+<!--        &lt;!&ndash;4.对象存储组件&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
+<!--        </dependency>-->
+        <!-- hsaf-core参数校验 -->
         <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
         </dependency>
-        <!--4.对象存储组件-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-fsstore</artifactId>
-        </dependency>
-
         <!-- session存储 -->
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -250,6 +237,11 @@
             <groupId>de.schlichtherle.truelicense</groupId>
             <artifactId>truelicense-core</artifactId>
             <version>1.33</version>
+        </dependency>
+        <!-- 应用监控相关 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 
@@ -343,14 +335,6 @@
                        </resources>
                    </configuration>
                </plugin>-->
-               <plugin>
-                   <groupId>org.springframework.boot</groupId>
-                   <artifactId>spring-boot-maven-plugin</artifactId>
-                   <configuration>
-                       <fork>true</fork>
-                       <addResources>true</addResources>
-                   </configuration>
-               </plugin>
            </plugins>
        </build>
 

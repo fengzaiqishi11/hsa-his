@@ -1186,6 +1186,9 @@
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
         </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
+        </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
@@ -1307,6 +1310,9 @@
         </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
         </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
@@ -1448,6 +1454,9 @@
         </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
         </if>
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}

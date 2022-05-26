@@ -1,7 +1,8 @@
 package cn.hsa.util;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.kafka.common.protocol.types.Field;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +104,7 @@ public class HttpConnectUtil {
                 System.out.println(resultMap.get("code"));
             }
         } catch (Exception e) {
+            logger.error("http 调用发生了异常: "+ e);
             throw new RuntimeException(e);
         }
         return resultMap;
@@ -205,6 +206,7 @@ public class HttpConnectUtil {
             }
 //            }
         } catch (Exception e) {
+            logger.error("http 调用发生了异常: "+ e);
             throw new AppException("请求失败:"+e.getMessage());
         }finally {
             // 关闭所有通道
@@ -254,6 +256,7 @@ public class HttpConnectUtil {
                 result += line;
             }
         } catch (Exception e) {
+            logger.error("http 调用发生了异常: "+ e);
             throw new AppException("请求失败:"+e.getMessage());
         }
         // 使用finally块来关闭输入流
@@ -316,7 +319,7 @@ public class HttpConnectUtil {
             //固定多线程的话，如果不disconnect，链接会增多，直到收发不出信息。写上disconnect后正常一些。
             conn.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("http 调用发生了异常: "+ e);
             throw new AppException("doPost异常：" + e.getMessage());
         }
 

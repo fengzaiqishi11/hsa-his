@@ -68,7 +68,7 @@ public interface DrugBusinessService {
     WrapperResponse<List<TbWzlqjlDO>> getTbWzlqjlData(Map map);
 
     /**
-     *2.9.1.1 业务量、收入统计表（TB_YWL_Report）
+     *2.9.1.1 业务量、收入统计表（TB_YWL_REPORT）
      * @param map
      * @return
      */

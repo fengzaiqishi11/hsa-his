@@ -515,7 +515,7 @@
         a.optd_group_no optdGroupNo,  a.optd_group_seq_no optdGroupSeqNo, a.optd_id optdId, a.group_no groupNo, a.group_seq_no groupSeqNo,
         a.item_code itemCode, a.item_id itemId, a.item_name itemName,
         a.price , a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage dosage,
-        a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,
+        a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,a.use_days as herbNum,
         a.speed_code speedCode, a.use_days useDays, a.num num, a.num_unit_code numUnitCode, a.total_num totalNum,
         a.herb_note_code herbNoteCode, a.is_skin isSkin, a.is_positive isPositive, a.content content, a.phar_id pharId, a.bfc_id bfcId,
         a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,

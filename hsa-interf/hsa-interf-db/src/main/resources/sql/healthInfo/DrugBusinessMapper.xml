@@ -507,11 +507,11 @@
             '' as TJYL7,
             '' as TJYL8,
             '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.id as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
-            DATE_FORMAT(ADDDATE('2022-05-15', INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
+            DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
             FROM base_dept bd
             LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
             WHERE
-            DATE_FORMAT(ADDDATE('2022-05-15', INTERVAL @dateAdd DAY),'%Y-%m-%d') &lt; DATE_FORMAT('2022-05-30','%Y-%m-%d') )b on 1=1 where bd.type_code in ('1','2') )bd3
+            DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd DAY),'%Y-%m-%d') &lt; DATE_FORMAT(#{endTime},'%Y-%m-%d') )b on 1=1 where bd.type_code in ('1','2') )bd3
             left JOIN (select
             ov.hosp_code as YLJGDM ,
             ov.dept_id as KSBM,
@@ -536,7 +536,7 @@
             from
             outpt_visit ov
             where ov.visit_code ='02'
-            and date(ov.visit_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ov.visit_time) between date(#{startTime}) and date(#{endTime})
             group by
             ov.hosp_code ,
             ov.dept_id ,
@@ -552,7 +552,7 @@
             from
             inpt_visit ov
             where ov.status_code  !='8'
-            and date(ov.in_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ov.in_time) between date(#{startTime}) and date(#{endTime})
             group by
             ov.hosp_code ,
             ov.in_dept_id ,
@@ -568,7 +568,7 @@
             from
             inpt_visit ov
             where ov.status_code  ='7'
-            and date(ov.out_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ov.out_time) between date(#{startTime}) and date(#{endTime})
             group by
             ov.hosp_code ,
             ov.in_dept_id ,
@@ -595,7 +595,7 @@
             from
             inpt_visit iv
             where
-            DATE(iv.in_time) between date('2022-05-01') and date('2022-05-31')
+            DATE(iv.in_time) between date(#{startTime}) and date(#{endTime})
             group by
             iv.hosp_code ,
             iv.in_dept_id,
@@ -609,7 +609,7 @@
             from
             inpt_visit
             where
-            DATE(in_time) between date('2022-05-01') and date('2022-05-31')) r_tab
+            DATE(in_time) between date(#{startTime}) and date(#{endTime})) r_tab
             on
             l_tab.YWSJ >= r_tab.YWSJ
             and l_tab.YLJGDM = r_tab.YLJGDM
@@ -643,7 +643,7 @@
             and  iic.visit_id = iis.visit_id
             and iiv.is_hospital ='1'
             and iim.hosp_item_type  ='1'
-            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             iiv.hosp_code ,
             iiv.visit_drpt_id ,
@@ -669,7 +669,7 @@
             and  iic.visit_id = iis.visit_id
             and iiv.is_hospital ='1'
             and iim.hosp_item_type  !='1'
-            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             iiv.hosp_code ,
             iiv.visit_drpt_id ,
@@ -695,7 +695,7 @@
             and  iic.visit_id = iis.visit_id
             and iiv.is_hospital ='0'
             and iim.hosp_item_type  ='1'
-            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             iiv.hosp_code ,
             iiv.visit_drpt_id ,
@@ -721,7 +721,7 @@
             and  iic.visit_id = iis.visit_id
             and iiv.is_hospital ='0'
             and iim.hosp_item_type  !='1'
-            and date(iiv.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             iiv.hosp_code ,
             iiv.visit_drpt_id ,
@@ -741,7 +741,7 @@
             ic.hosp_code = bd.hosp_code
             and ic.dept_id = bd.id
             and ic.item_code ='1'
-            and date(ic.cost_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
             group by
             ic.hosp_code ,
             ic.dept_id,
@@ -761,7 +761,7 @@
             ic.hosp_code = bd.hosp_code
             and ic.dept_id = bd.id
             and ic.item_code !='1'
-            and date(ic.cost_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
             group by
             ic.hosp_code ,
             ic.dept_id,
@@ -781,7 +781,7 @@
             ic.hosp_code = bd.hosp_code
             and ic.dept_id = bd.id
             and ic.item_code ='1'
-            and date(ic.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             ic.hosp_code ,
             ic.dept_id,
@@ -801,7 +801,7 @@
             ic.hosp_code = bd.hosp_code
             and ic.dept_id = bd.id
             and ic.item_code !='1'
-            and date(ic.crte_time) between date('2022-05-01') and date('2022-05-31')
+            and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
             group by
             ic.hosp_code ,
             ic.dept_id,

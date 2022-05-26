@@ -77,22 +77,22 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
     @Override
     public boolean insertInsureFunctionLog(Map<String,Object> map) {
 
-        String hospCode = MapUtils.get(map,"hospCode");
-        String crteId = MapUtils.get(map,"crteId");
-        String crteName = MapUtils.get(map,"crteName");
-        String visitId = MapUtils.get(map,"visitId");
-        String msgId = MapUtils.get(map,"msgId");
-        String msgInfo = MapUtils.get(map,"msgInfo");
-        String msgName = MapUtils.get(map,"msgName");
-        String isHospital = MapUtils.get(map,"isHospital");
-        String paramMapJson = MapUtils.get(map,"paramMapJson");
-        String medisCode = MapUtils.get(map,"medisCode");
-        String resultStr = MapUtils.get(map,"resultStr");
-//        Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-        String resultCode = MapUtils.get(map,"infcode","");
         TransactionStatus status = null;
         boolean functionLog = false;
         try {
+            String hospCode = MapUtils.get(map,"hospCode");
+            String crteId = MapUtils.get(map,"crteId");
+            String crteName = MapUtils.get(map,"crteName");
+            String visitId = MapUtils.get(map,"visitId");
+            String msgId = MapUtils.get(map,"msgId");
+            String msgInfo = MapUtils.get(map,"msgInfo");
+            String msgName = MapUtils.get(map,"msgName");
+            String isHospital = MapUtils.get(map,"isHospital");
+            String paramMapJson = MapUtils.get(map,"paramMapJson");
+            String medisCode = MapUtils.get(map,"medisCode");
+            String resultStr = MapUtils.get(map,"resultStr");
+  //        Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
+            String resultCode = MapUtils.get(map,"infcode","");
             // 开启独立新事务
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

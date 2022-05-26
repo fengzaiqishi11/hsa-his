@@ -322,7 +322,9 @@ public class RequestInsure {
             Map<String,Object> resultData = new HashMap<>();
             // 获取系统参数是直连医保还是走消息队列连接，默认消息队列
             SysParameterDTO sysParamDTO = this.getSysParamDTO(hospCode, "DIRECT_OR_QUEUE");
-            if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
+          //请求省工伤医保接口日志记录
+          logger.info("医保业务功能号 {},请求参数-{}", param.get("function_id"), JSON.toJSONString(paramObj));
+          if (sysParamDTO != null && StringUtils.isNotEmpty(sysParamDTO.getValue()) && "1".equals(sysParamDTO.getValue())) {
               // 直连医保
                 logger.info("*****开始【湖南省医保调用】直连方法*****");
                 logger.info("【湖南省医保调用】直连入参：" + JSON.toJSONString(paramObj));
@@ -332,7 +334,8 @@ public class RequestInsure {
                 logger.info("【湖南省医保调用】直连返参字符串：" + doPost);
                 logger.info("开始解析xml");
                 resultData = HygeiaUtil.xml2map(doPost);
-                params.put("resultStr", resultData);
+                String resultStr = JSONObject.toJSONString(resultData);
+                params.put("resultStr", resultStr == null ? "null" : resultStr.length() > 4000 ? resultStr.substring(0, 4000) : resultStr);
                 params.put("infcode", "1");
                 logger.info("【湖南省医保调用】直连返参XML解析：" + resultData);
                 logger.info("*****结束【湖南省医保调用】直连方法*****");
@@ -348,7 +351,8 @@ public class RequestInsure {
                 params.put("paramMapJson", paramMapJson == null ? "null" : paramMapJson.length() > 4000 ? paramMapJson.substring(0, 4000) : paramMapJson);
                 resultObj = this.sendMessage(insureConfigurationDO.getRemark(),hospCode,httpParam,
                     activityCode);
-                params.put("resultStr", resultObj);
+                String resultStr = JSONObject.toJSONString(resultObj);
+                params.put("resultStr", resultStr == null ? "null" : resultStr.length() > 4000 ? resultStr.substring(0, 4000) : resultStr);
                 params.put("infcode", "1");
                 Integer code = (Integer) resultObj.get("code");
                 if (code < 0) {
@@ -368,7 +372,9 @@ public class RequestInsure {
               e.getMessage().substring(0, 4000) : e.getMessage());
             throw new AppException("调用医保提示【"+e.getMessage()+"】");
         }finally {
+          logger.info("*****调用省工伤接口保存日志记录开始*****");
           insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
+          logger.info("*****调用省工伤接口保存日志记录结束*****");
         }
     }
 

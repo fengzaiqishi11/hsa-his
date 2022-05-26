@@ -73,8 +73,8 @@
 	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=bpf.hosp_code limit 1) as yljgdm,
 	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = bpf.hosp_code limit 1) as yljgmc,
 	name,
-	gender_code,
-	'' as gender_name,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as gender_code,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as gender_name,
 	'' as GRJKDABM,
 	'' as JMJKKH,
 	'' as	SBKH,
@@ -104,10 +104,10 @@
 	nation_code,
 	nationality_cation,
 	native_place,
-	education_code,
-	occupation_code,
-	marry_code,
-	cert_code,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4658-2006' and hb.cm_value =bpf.education_code limit 1) as education_code,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.4-2003' and hb.cm_value =bpf.occupation_code limit 1) as occupation_code,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.2-2003' and hb.cm_value =bpf.marry_code limit 1) as marry_code,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV02.01.101' and hb.cm_value =bpf.cert_code limit 1) as cert_code,
 	cert_no,
 	phone,
 	email,
@@ -123,7 +123,7 @@
 	native_address,
 	native_post_code,
 	contact_name,
-	contact_rela_code,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4761-2008' and hb.cm_value =bpf.contact_rela_code  limit 1) as contact_rela_code,
 	contact_phone,
 	contact_post_code,
 	contact_address,
@@ -177,12 +177,11 @@
        '' as KLX,
        '' as KH,
        a.name as XM,
-       a.gender_code as XBDM,
-       (select name from sys_code_detail scd
-       where scd .c_code ='XB' and scd .value=a.gender_code) as XBMC,
+       (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBDM,
+       (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBMC,
        a.age as NL,
        a.register_time as GTHSJ,
-       a.visit_code as GHLB,
+       (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.002' and hb.cm_value =a.visit_code  limit 1) as GHLB,
        '' as YLBXLBDM,
        '' as YLBXLBMC,
        a.dept_id as KSBM,
@@ -194,8 +193,8 @@
        '' as GHZT,
        a.doctor_id as GHYSBM,
        a.doctor_name as GHYSXM,
-       a.occupation_code as GHYSZCDM,
-       (select name from sys_code_detail scd where scd.c_code ='ZY' and scd.value=a.gender_code limit 1) as GHYSZCMC,
+       '' as GHYSZCDM,
+       '' as GHYSZCMC,
        a.is_cancel as VALIDFLAG,
        a.crte_time as APPETIME,
        a.crte_time as MODIFYTIME,
@@ -219,14 +218,12 @@
     '' as KH,
     a.name as XM,
     a.cert_no as SFZHM,
-    a.gender_code as XBDM,
-    (select name from sys_code_detail scd
-    where scd .c_code ='XB' and scd .value=a.gender_code limit 1) as XBMC,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBDM,
+    (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBMC,
     a.age as NL,
-    a.visit_code as JZLX,
-    a.patient_code as YLBXLBDM,
-    (select name from sys_code_detail scd
-    where scd .c_code ='BRLX' and scd .value=a.patient_code limit 1) as YLBXLBMC,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.002' and hb.cm_value =a.visit_code  limit 1) as JZLX,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV07.10.003' and hb.cm_value =ss.remark  limit 1) as YLBXLBDM,
+   (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='CV07.10.003' and hb.cm_value =ss.remark  limit 1) as YLBXLBMC,
     '' as TXBZ,
     '' as WDBZ,
     a.dept_id as JZKSBM,
@@ -250,7 +247,8 @@
     a.crte_id as MODIFYTCODE,
     a.crte_name as MODIFYTNAME
     from outpt_visit a
-    left join outpt_diagnose od on a.id= od.visit_id and a.hosp_code and od.hosp_code and od.is_main ='1'
+    left join outpt_diagnose od on a.id= od.visit_id and a.hosp_code = od.hosp_code and od.is_main ='1'
+    left join sys_code_detail ss on a.patient_code =ss.value and ss.hosp_code = a.hosp_code and ss.c_code ='BRLX'
     where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
     order by a.crte_time asc
 	</select>
@@ -264,16 +262,16 @@
    a.order_no as CFH,
    a.visit_id as MZLSH,
    b.name as XM,
-   b.gender_code as XBDM,
-   '' as XBMC,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =b.gender_code  limit 1) as XBDM,
+   (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =b.gender_code  limit 1) as XBMC,
    b.age as NL,
-   '' as YLFYLYLBDM,
-   '' as YLFYLYLBMC,
-   a.type_code as CFLB,
-   a.prescribe_type_code as CFLX,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV07.10.003' and hb.cm_value =ss.remark  limit 1) as YLFYLYLBDM,
+   (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='CV07.10.003' and hb.cm_value =ss.remark  limit 1) as YLFYLYLBMC,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.009' and hb.cm_value =a.type_code  limit 1) as CFLB,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.010' and hb.cm_value =a.prescribe_type_code  limit 1) as CFLX,
    a.dept_id as KFKSDM,
    a.dept_name as KFKSMC,
-    (select su.duties_code from sys_user su where su.id =a.doctor_id and su.hosp_code=a.hosp_code limit 1) as KFYSBM,
+    a.doctor_id as KFYSBM,
     a.doctor_name as KFYSXM,
     a.crte_name as KFSJ,
     a.diagnose_ids as ZDBM,
@@ -298,6 +296,7 @@
    from outpt_prescribe a
    left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
    left join outpt_prescribe_detail opd on opd.op_id=a.id and opd.hosp_code =a.hosp_code
+   left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX'
     where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
     group by a.id
     order by a.crte_time asc
@@ -326,7 +325,7 @@
    a.total_price as JE,
    a.num_unit_code as YPDW,
    a.group_no as YZZH,
-   '' as SFYP,
+   case when bd.id is null then '0' else '1' end as SFYP,
    '' as YL,
    a.rate_id as SYPC,
    a.speed_code as YYSD,
@@ -338,8 +337,8 @@
    a.dosage_unit_code as DW,
    '' as MCSL,
    '' as MCDW,
-   a.usage_code as YYTJDM,
-   '' as YYTJMC,
+   ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1),a.usage_code) as YYTJDM,
+   (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1) as YYTJMC,
    a.prep_code as YWJX,
    a.remark as ZYYPJZF,
    a.usage_code as ZYYYFF,
@@ -347,7 +346,7 @@
    ''  as TJ,
    '' as ZZZF,
    a.herb_note_code as ZYSYLBDM,
-   '0' as KJYWBZ,
+   case when bd.antibacterial_code is null then '0' else '1' end as KJYWBZ,
    bd.durg_code as JBYWBZ,
    bd.ph_code as TSYPFL,
    bd.is_lvp  as JMSYBZ,
@@ -392,7 +391,7 @@
         d.exec_id as czrbm,
         d.exec_name as czrxm,
         d.exec_time  as czsj,
-        a.usage_code as yf,
+        ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1),a.usage_code) as yf,
         c.is_cancel as VALIDFLAG,
         c.crte_time as APPETIME,
         c.crte_time as MODIFYTIME,
@@ -416,8 +415,8 @@
         (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
         a.visit_id as mzlsh,
         c.name as xm,
-        c.gender_code as xbdm,
-        '' as xbmc,
+        (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =c.gender_code  limit 1) as xbdm,
+        (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =c.gender_code  limit 1) as xbmc,
         c.age as nl,
         b.invoice_no as fph,
         ifnull(a.total_price,0.00) as fyze,
@@ -447,8 +446,8 @@
         (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
         b.register_id as mzlsh,
         f.name as xm,
-        f.gender_code as xbdm,
-        '' as xbmc,
+        (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =f.gender_code  limit 1) as xbdm,
+        (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =f.gender_code  limit 1) as xbmc,
         f.age as nl,
         c.invoice_no as fph,
         ifnull(b.total_price,0.00) as fyze,
@@ -465,9 +464,9 @@
         a.crte_name as MODIFYTNAME
         FROM
         outpt_register_settle b
-        LEFT JOIN outpt_register a ON a.id = b.register_id
+        LEFT JOIN outpt_register a ON a.id = b.register_id and a.hosp_code=b.hosp_code
         LEFT JOIN outin_invoice_detail c ON ( b.hosp_code = c.hosp_code and b.bill_id = c.invoice_id AND b.bill_no = c.invoice_no )
-        LEFT JOIN outpt_visit f ON f.id = a.visit_id
+        LEFT JOIN outpt_visit f ON f.id = a.visit_id and f.hosp_code=a.hosp_code
         where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
         order by a.crte_time asc)
 	</select>

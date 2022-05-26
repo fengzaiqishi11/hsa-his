@@ -725,7 +725,8 @@
                ( CASE WHEN a.item_code = '1' THEN c.usual_name WHEN a.item_code = '2' THEN g.other_name WHEN a.item_code = '3' THEN it.other_name WHEN a.item_code = '4' THEN ad.other_name END ) bName,
                case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
                case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
-               i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
+               i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, a.use_days as herbNum,
+               phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
         from  outpt_prescribe_detail a
                   left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
                   left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'
@@ -865,7 +866,7 @@
         <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
         case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
         a.antibacterial_code, a.is_skin,
-        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,
+        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,null outptUseCode,
         case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
         case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
         ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
@@ -924,7 +925,7 @@
         split_unit_code,
         a.split_price split_price, null is_lvp,null usage_code, null ddd, null durg_code, '1' ph_code,null
         antibacterial_code, null is_skin,
-        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code, '2' type, '2' itemCode,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code,a.outpt_use_code outptUseCode, '2' type, '2' itemCode,
         b.clf pharId, null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
         a.split_unit_code ouUtnitCode,
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
@@ -966,7 +967,7 @@
         null dosage_unit_code, a.unit_code, null rate_code, a.price,'1' split_ratio, a.unit_code split_unit_code,
         a.price split_price, null is_lvp, null usage_code, null ddd, null durg_code,'1' ph_code,null
         antibacterial_code,null is_skin,
-        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,null outptUseCode,
         case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type, '4' itemCode, ''
         pharId, '' rateId, '' bfcId, b.id execDeptId,
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,

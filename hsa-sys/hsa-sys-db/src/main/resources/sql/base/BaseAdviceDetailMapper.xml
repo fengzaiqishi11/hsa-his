@@ -71,7 +71,7 @@
 
     <!-- 查询出医院的项目和有库存的材料信息（typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码） -->
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
-        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode,a.code as itemCode,a.use_code,
+        select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode as split_unit_code,a.code as itemCode,a.use_code,
         a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name
         FROM
         ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
@@ -90,7 +90,7 @@
         </if>
         UNION ALL
         select a.id,a.`name`,a.type_code as itemTypeCode,a.price,a.unit_code,
-        a.split_unit_code as splitUnitCode,a.spec,'','',a.hosp_code,a.code,a.use_code,
+        a.split_unit_code  ,a.spec,'','',a.hosp_code,a.code,a.use_code,
         '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName, a.nation_code, a.nation_name
         from base_material a
         left join(

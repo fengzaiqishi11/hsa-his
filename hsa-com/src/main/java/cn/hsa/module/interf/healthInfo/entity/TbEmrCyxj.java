@@ -1,29 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 出院小结实体类(TbEmrCyxj)
- * @author liuliyun
- * @since 2022-05-16 17:08:02
+ * 出院小结(TbEmrCyxj)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbEmrCyxj extends PageDO implements Serializable {
-    private static final long serialVersionUID = 974920471933291723L;
+public class TbEmrCyxj implements Serializable {
+    private static final long serialVersionUID = -68519131673261815L;
     /**
      * 住院就诊流水号
      */
@@ -223,10 +221,14 @@ public class TbEmrCyxj extends PageDO implements Serializable {
     /**
      * 入院日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date ryrq;
     /**
      * 出院日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date cyrq;
     /**
      * 入院情况
@@ -279,6 +281,8 @@ public class TbEmrCyxj extends PageDO implements Serializable {
     /**
      * 手术及操作开始日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date ssczrq;
     /**
      * 手术过程
@@ -315,6 +319,8 @@ public class TbEmrCyxj extends PageDO implements Serializable {
     /**
      * 签名日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date qmrqsj;
     /**
      * 数据有效标志
@@ -323,10 +329,14 @@ public class TbEmrCyxj extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -339,3 +349,4 @@ public class TbEmrCyxj extends PageDO implements Serializable {
 
 
 }
+

@@ -20,7 +20,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbZhsfDO> getTbZhsfData(Map map) {
+    public List<TbZhsf> getTbZhsfData(Map map) {
         return drugBusinessDAO.getTbZhsfData(map);
     }
 
@@ -31,7 +31,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbYprkxxDO> getTbYprkxxData(Map map) {
+    public List<TbYprkxx> getTbYprkxxData(Map map) {
         return drugBusinessDAO.getTbYprkxxData(map);
     }
 
@@ -42,7 +42,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbYpkcxxDO> getTbYpkcxxData(Map map) {
+    public List<TbYpkcxx> getTbYpkcxxData(Map map) {
         return drugBusinessDAO.getTbYpkcxxData(map);
     }
 
@@ -53,7 +53,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbYpxxssDO> getTbYpxxssData(Map map) {
+    public List<TbYpxsxx> getTbYpxxssData(Map map) {
         return drugBusinessDAO.getTbYpxxssData(map);
     }
 
@@ -64,7 +64,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbKjywjbjktjDO> getTbKjywjbjktjData(Map map) {
+    public List<TbKjywjbjktj> getTbKjywjbjktjData(Map map) {
         return drugBusinessDAO.getTbKjywjbjktjData(map);
     }
 
@@ -75,7 +75,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbKjywgpztjDO> getTbKjywgpztjData(Map map) {
+    public List<TbKjywgpztj> getTbKjywgpztjData(Map map) {
         return drugBusinessDAO.getTbKjywgpztjData(map);
     }
 
@@ -86,7 +86,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbSxzzDO> getTbSxzzData(Map map) {
+    public List<TbSxzz> getTbSxzzData(Map map) {
         return drugBusinessDAO.getTbSxzzData(map);
     }
 
@@ -97,7 +97,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbWzlqjlDO> getTbWzlqjlData(Map map) {
+    public List<TbWzlqjl> getTbWzlqjlData(Map map) {
         return drugBusinessDAO.getTbWzlqjlData(map);
     }
 
@@ -108,7 +108,7 @@ public class DrugBusinessServiceBOImpl implements DrugBusinessServiceBO {
      * @return
      */
     @Override
-    public List<TbYwlReportDO> getTbYwlReportData(Map map) {
+    public List<TbYwlReport> getTbYwlReportData(Map map) {
         return drugBusinessDAO.getTbYwlReportData(map);
     }
 }

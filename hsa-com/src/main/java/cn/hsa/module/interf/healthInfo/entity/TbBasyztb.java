@@ -1,28 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 住院病案首页主体表实体类(TbBasyztb)
- * @author liuliyun
- * @since 2022-05-17 14:57:36
+ * 住院病案首页主体表(TbBasyztb)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbBasyztb extends PageDO implements Serializable {
-    private static final long serialVersionUID = 734110862197271974L;
+public class TbBasyztb implements Serializable {
+    private static final long serialVersionUID = 790789092507817522L;
     /**
      * 住院就诊流水号
      */
@@ -290,6 +290,8 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 入院时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rysj;
     /**
      * 入院途径代码
@@ -322,6 +324,8 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 出院时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date cysj;
     /**
      * 保险类型
@@ -386,6 +390,8 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 确诊日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date qzrq;
     /**
      * 门（急诊）诊断
@@ -462,7 +468,7 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 产后出血量
      */
-    private Double chcyl;
+    private BigDecimal chcyl;
     /**
      * 新生儿性别
      */
@@ -546,6 +552,8 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 质控日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date zkrq;
     /**
      * 病理号
@@ -558,6 +566,8 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 死亡时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date swsj;
     /**
      * 门诊医师编码
@@ -598,163 +608,163 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 住院费
      */
-    private Double zyf;
+    private BigDecimal zyf;
     /**
      * 诊疗费
      */
-    private Double zlf;
+    private BigDecimal zlf;
     /**
      * 治疗费
      */
-    private Double zhf;
+    private BigDecimal zhf;
     /**
      * 护理费
      */
-    private Double hlf;
+    private BigDecimal hlf;
     /**
      * 手术费
      */
-    private Double ssclf;
+    private BigDecimal ssclf;
     /**
      * 检查费
      */
-    private Double jcf;
+    private BigDecimal jcf;
     /**
      * 化验费
      */
-    private Double hyf;
+    private BigDecimal hyf;
     /**
      * 透视费
      */
-    private Double tsf;
+    private BigDecimal tsf;
     /**
      * 摄片费
      */
-    private Double spf;
+    private BigDecimal spf;
     /**
      * 输血费
      */
-    private Double sxf;
+    private BigDecimal sxf;
     /**
      * 输氧费
      */
-    private Double syf;
+    private BigDecimal syf;
     /**
      * 西药费
      */
-    private Double xyf;
+    private BigDecimal xyf;
     /**
      * 中成药费
      */
-    private Double zcyf;
+    private BigDecimal zcyf;
     /**
      * 中草药费
      */
-    private Double zcaf;
+    private BigDecimal zcaf;
     /**
      * 其他费用
      */
-    private Double qtf;
+    private BigDecimal qtf;
     /**
      * 总费用
      */
-    private Double zfy;
+    private BigDecimal zfy;
     /**
      * 自付金额
      */
-    private Double zfje;
+    private BigDecimal zfje;
     /**
      * 一般医疗服务费
      */
-    private Double ylfwf;
+    private BigDecimal ylfwf;
     /**
      * 一般治疗操作费
      */
-    private Double zlczf;
+    private BigDecimal zlczf;
     /**
      * 病理诊断费
      */
-    private Double blzdf;
+    private BigDecimal blzdf;
     /**
      * 实验室诊断费
      */
-    private Double syszdf;
+    private BigDecimal syszdf;
     /**
      * 影像学诊断费
      */
-    private Double yxxzdf;
+    private BigDecimal yxxzdf;
     /**
      * 临床诊断项目费
      */
-    private Double lczdxmf;
+    private BigDecimal lczdxmf;
     /**
      * 非手术治疗项目费
      */
-    private Double fsszlxmf;
+    private BigDecimal fsszlxmf;
     /**
      * 临床物理治疗费
      */
-    private Double lcwlzlf;
+    private BigDecimal lcwlzlf;
     /**
      * 手术治疗费
      */
-    private Double sszlf;
+    private BigDecimal sszlf;
     /**
      * 麻醉费
      */
-    private Double mzf;
+    private BigDecimal mzf;
     /**
      * 手术费
      */
-    private Double ssf;
+    private BigDecimal ssf;
     /**
      * 康复费
      */
-    private Double kff;
+    private BigDecimal kff;
     /**
      * 中医治疗费
      */
-    private Double zyzlf;
+    private BigDecimal zyzlf;
     /**
      * 抗菌药物费用
      */
-    private Double kjywfy;
+    private BigDecimal kjywfy;
     /**
      * 血费
      */
-    private Double xf;
+    private BigDecimal xf;
     /**
      * 白蛋白类制品费
      */
-    private Double bdbzpf;
+    private BigDecimal bdbzpf;
     /**
      * 球蛋白类制品费
      */
-    private Double qdbzpf;
+    private BigDecimal qdbzpf;
     /**
      * 凝血因子类制品费
      */
-    private Double nxyzzpf;
+    private BigDecimal nxyzzpf;
     /**
      * 细胞因子类制品费
      */
-    private Double xbyzzpf;
+    private BigDecimal xbyzzpf;
     /**
      * 检查用一次性医用材料费
      */
-    private Double jcyyclf;
+    private BigDecimal jcyyclf;
     /**
      * 治疗用一次性医用材料费
      */
-    private Double zlyyclf;
+    private BigDecimal zlyyclf;
     /**
      * 手术用一次性医用材料费
      */
-    private Double ssyyclf;
+    private BigDecimal ssyyclf;
     /**
      * 其他费
      */
-    private Double qtf1;
+    private BigDecimal qtf1;
     /**
      * 治疗类别代码
      */
@@ -898,47 +908,47 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 综合医疗服务费-一般医疗服务费-中医辨证论治费
      */
-    private Double zybzlzf;
+    private BigDecimal zybzlzf;
     /**
      * 综合医疗服务费-一般医疗服务费-中医辨证论治会诊费
      */
-    private Double zybzlhzf;
+    private BigDecimal zybzlhzf;
     /**
      * 中医类-中医诊断费
      */
-    private Double zyzdf;
+    private BigDecimal zyzdf;
     /**
      * 中医类-中医治疗费-中医外治费
      */
-    private Double zywzf;
+    private BigDecimal zywzf;
     /**
      * 中医类-中医治疗费-中医骨伤费
      */
-    private Double gsf;
+    private BigDecimal gsf;
     /**
      * 中医类-中医治疗费-针刺与灸法费
      */
-    private Double zcyjff;
+    private BigDecimal zcyjff;
     /**
      * 中医类-中医治疗费-中医推拿治疗费
      */
-    private Double zytnzlf;
+    private BigDecimal zytnzlf;
     /**
      * 中医类-中医治疗费-中医肛肠治疗费
      */
-    private Double zygczlf;
+    private BigDecimal zygczlf;
     /**
      * 中医类-中医治疗费-中医特殊治疗费
      */
-    private Double zytxzlf;
+    private BigDecimal zytxzlf;
     /**
      * 中医类-中医其他费
      */
-    private Double zyqtf;
+    private BigDecimal zyqtf;
     /**
      * 中医类-中医其他费-中药特殊调配加工
      */
-    private Double zytxtpjg;
+    private BigDecimal zytxtpjg;
     /**
      * 中医类-中医其他费-辨证施膳费
      */
@@ -946,7 +956,7 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 中药类-中成药费-医疗机构中药制剂费
      */
-    private Double yljgzyzjf;
+    private BigDecimal yljgzyzjf;
     /**
      * 病情转归代码
      */
@@ -1062,7 +1072,7 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 中医骨伤费
      */
-    private Double zygsf;
+    private BigDecimal zygsf;
     /**
      * 病理诊断
      */
@@ -1078,7 +1088,7 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 辩证施膳
      */
-    private Double bzss;
+    private BigDecimal bzss;
     /**
      * 数据有效标志
      */
@@ -1086,10 +1096,14 @@ public class TbBasyztb extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -1102,3 +1116,4 @@ public class TbBasyztb extends PageDO implements Serializable {
 
 
 }
+

@@ -1,63 +1,186 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import cn.hutool.core.date.DateTime;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 门诊处方主信息实体类(TbMzcfzxx) *
- * @author liuliyun
- * @since 2022-05-11 14:54:26
+ * 门诊处方主信息表(TbMzcfzxx)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:01
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@ToString
 @Accessors(chain = true)
-public class TbMzcfzxx extends PageDO implements Serializable {
-    private String CFLSH; // 处方流水号
-    private String YLJGDM; // 医疗机构编码
-    private String YLJGMC; // 医疗机构名称
-    private String HZJGNWYID; // 患者机构内唯一 i d
-    private String CFH; // 处方号
-    private String MZLSH; // 门诊流水号
-    private String XM; // 姓名
-    private String XBDM; // 性别代码
-    private String XBMC; // 性别名称
-    private String NL; // 年龄
-    private String YLFYLYLBDM; // 医疗费用来源编码
-    private String YLFYLYLBMC; // 医疗费用来源类别名称
-    private String CFLB; // 处方类别（按药物种类分）
-    private String CFLX; // 处方类型
-    private String KFKSDM; // 开方科室代码
-    private String KFKSMC; // 开方科室名称
-    private String KFYSBM; // 开方医生编码
-    private String KFYSXM; // 开方医生名称
-    private String KFSJ; // 开方时间
-    private String ZDBM; // 诊断编码
-    private String ZDMC; // 诊断名称
-    private String DPYSBM; // 调配药师编码
-    private String DPYSXM; // 调配药师名称
-    private String HDYSBM; // 核对药师编码
-    private String HDYSXM; // 核对药师名称
-    private String FYYSBM; // 发药药师编码
-    private String FYYSXM; // 发药药师姓名
-    private String CFSHYJSQM; // 处方审核药剂师签名
-    private String CFJE; // 处方金额
-    private String ZFYSBM; // 作废医生编码
-    private String ZFYSMC; // 作废医生名称
-    private String ZFBZ; // 处方状态
-    private String BZ; // 备注信息
-    private  String VALIDFLAG; // 数据有效状态
-    private  String APPETIME; // 数据产生时间
-    private Date MODIFYTIME; // 最后修改时间
-    private String MODIFYTCODE;//修改人编码
-    private String MODIFYTNAME;//修改人名称
+@ToString
+public class TbMzcfzxx implements Serializable {
+    private static final long serialVersionUID = -52060781774480551L;
+    /**
+     * 处方流水号
+     */
+    private String cflsh;
+    /**
+     * 医疗机构代码
+     */
+    private String yljgdm;
+    /**
+     * 患者机构内唯一id
+     */
+    private String hzjgnwyid;
+    /**
+     * 处方号
+     */
+    private String cfh;
+    /**
+     * 门诊就诊流水号
+     */
+    private String mzlsh;
+    /**
+     * 患者姓名
+     */
+    private String xm;
+    /**
+     * 性别代码
+     */
+    private String xbdm;
+    /**
+     * 性别名称
+     */
+    private String xbmc;
+    /**
+     * 年龄
+     */
+    private String nl;
+    /**
+     * 医疗费用来源类别代码
+     */
+    private String ylfylylbdm;
+    /**
+     * 医疗费用来源类别名称
+     */
+    private String ylfylylbmc;
+    /**
+     * 处方类别（按药物种类分）
+     */
+    private String cflb;
+    /**
+     * 处方类型（药物分类）
+     */
+    private String cflx;
+    /**
+     * 开方科室代码
+     */
+    private String kfksdm;
+    /**
+     * 开方科室名称
+     */
+    private String kfksmc;
+    /**
+     * 开方医生编码
+     */
+    private String kfysbm;
+    /**
+     * 开方医生姓名
+     */
+    private String kfysxm;
+    /**
+     * 开方时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date kfsj;
+    /**
+     * 诊断编码
+     */
+    private String zdbm;
+    /**
+     * 诊断名称
+     */
+    private String zdmc;
+    /**
+     * 调配药师编码
+     */
+    private String dpysbm;
+    /**
+     * 调配药师姓名
+     */
+    private String dpysxm;
+    /**
+     * 核对药师编码
+     */
+    private String hdysbm;
+    /**
+     * 核对药师姓名
+     */
+    private String hdysxm;
+    /**
+     * 发药药师编码
+     */
+    private String fyysbm;
+    /**
+     * 发药药师姓名
+     */
+    private String fyysxm;
+    /**
+     * 付数（中药）
+     */
+    private Integer fs;
+    /**
+     * 处方审核药剂师签名
+     */
+    private String cfshyjsqm;
+    /**
+     * 处方金额
+     */
+    private Integer cfje;
+    /**
+     * 作废医生编码
+     */
+    private String zfysbm;
+    /**
+     * 作废医生名称
+     */
+    private String zfysmc;
+    /**
+     * 处方状态
+     */
+    private String zfbz;
+    /**
+     * 备注信息
+     */
+    private String bz;
+    /**
+     * 数据有效标志
+     */
+    private String validflag;
+    /**
+     * 数据产生时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date appetime;
+    /**
+     * 最后修改时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date modifytime;
+    /**
+     * 最后修改人编码
+     */
+    private String modifytcode;
+    /**
+     * 最后修改人名称
+     */
+    private String modifytname;
+
+
 }
+

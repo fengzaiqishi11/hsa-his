@@ -1,29 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * —般护理记录实体类 (TbEmrYbhljl)*
- * @author liuliyun
- * @since 2022-05-16 14:37:40
+ * —般护理记录(TbEmrYbhljl)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbEmrYbhljl extends PageDO implements Serializable {
-    private static final long serialVersionUID = 736465736686559785L;
+public class TbEmrYbhljl implements Serializable {
+    private static final long serialVersionUID = 451664999828873441L;
     /**
      * 医疗机构代码
      */
@@ -79,7 +78,7 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 血氧饱和度（％)
      */
-    private String xybhd;
+    private Integer xybhd;
     /**
      * 足背动脉搏动标志
      */
@@ -131,6 +130,8 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 签名日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date qmrqsj;
     /**
      * 护理等级代码
@@ -195,11 +196,11 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 体重(kg)
      */
-    private Double tz;
+    private BigDecimal tz;
     /**
      * 体温（℃）
      */
-    private Double tw;
+    private BigDecimal tw;
     /**
      * 呼吸频率(次/min)
      */
@@ -211,11 +212,11 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 收缩压(mmHg)
      */
-    private String ssy;
+    private Integer ssy;
     /**
      * 舒张压（mmHg)
      */
-    private String szy;
+    private Integer szy;
     /**
      * 饮食情况
      */
@@ -323,7 +324,7 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 左瞳孔大小
      */
-    private Double ztkdx;
+    private BigDecimal ztkdx;
     /**
      * 左瞳孔对光反射
      */
@@ -331,7 +332,7 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 右瞳孔大小
      */
-    private Double ytkdx;
+    private BigDecimal ytkdx;
     /**
      * 右瞳孔对光反射
      */
@@ -343,7 +344,7 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 出量多少(ML)
      */
-    private Double clds;
+    private BigDecimal clds;
     /**
      * 氧疗项目
      */
@@ -351,7 +352,7 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 氧疗多少
      */
-    private Double ylds;
+    private BigDecimal ylds;
     /**
      * 管道护理项目
      */
@@ -379,10 +380,14 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -395,3 +400,4 @@ public class TbEmrYbhljl extends PageDO implements Serializable {
 
 
 }
+

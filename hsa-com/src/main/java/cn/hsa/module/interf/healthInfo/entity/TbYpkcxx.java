@@ -8,10 +8,11 @@ import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 医护人员基本信息表(TbYhryjbxx)实体类
+ * 药品库存信息(TbYpkcxx)实体类
  *
  * @author liudawen
  * @date 2022-05-24 14:43:02
@@ -20,88 +21,78 @@ import java.util.Date;
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-public class TbYhryjbxx implements Serializable {
-    private static final long serialVersionUID = 523447949366955588L;
+public class TbYpkcxx implements Serializable {
+    private static final long serialVersionUID = 386118355180413671L;
     /**
-     * 医生编码
-     */
-    private String ysbm;
-    /**
-     * 机构编码
+     * 医疗机构编码
      */
     private String yljgdm;
     /**
-     * 注册名称
+     * 药品编码
      */
-    private String zcm;
+    private String ypbm;
     /**
-     * 姓名
+     * 药品库位
      */
-    private String xm;
+    private String kcwz;
     /**
-     * 性别代码
+     * 省招标网流水号
      */
-    private String xbdm;
+    private String szbwlsh;
     /**
-     * 身份证号
+     * 药品通用名称
      */
-    private String sfzh;
+    private String ypmc;
     /**
-     * 联系电话
+     * 药品商品名称
      */
-    private String lxdh;
+    private String ypspmc;
     /**
-     * 科室编码
+     * 生产企业
      */
-    private String ksbm;
+    private String scqy;
     /**
-     * 职务编码
+     * 规格
      */
-    private String zwdm;
+    private String gg;
     /**
-     * 职务名称
+     * 包装数量
      */
-    private String zhiw;
+    private BigDecimal bzsl;
     /**
-     * 职称编码
+     * 单位
      */
-    private String zcdm;
+    private String dw;
     /**
-     * 职称名称
+     * 库存数量
      */
-    private String zhic;
+    private BigDecimal kcsl;
     /**
-     * 入职日期
+     * 最大储量
+     */
+    private BigDecimal zdcl;
+    /**
+     * 报警储量
+     */
+    private BigDecimal bjcl;
+    /**
+     * 最小储量
+     */
+    private BigDecimal zxcl;
+    /**
+     * 药品批发价
+     */
+    private BigDecimal pfj;
+    /**
+     * 药品零售价
+     */
+    private BigDecimal lsj;
+    /**
+     * 药品失效日期
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date rzsj;
-    /**
-     * 出生日期
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date csrq;
-    /**
-     * 人员类别
-     */
-    private String lb;
-    /**
-     * 专业代码
-     */
-    private String zydm;
-    /**
-     * 专业名称
-     */
-    private String zymc;
-    /**
-     * 文化程度代码
-     */
-    private String whcddm;
-    /**
-     * 文化程度名称
-     */
-    private String whcdmc;
+    private Date sxrq;
     /**
      * 数据有效标志
      */

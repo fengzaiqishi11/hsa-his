@@ -68,9 +68,9 @@
         <result property="MODIFYTNAME" column="crte_name" jdbcType="VARCHAR"/>
     </resultMap>
     <select id="queryBaseProfile" resultMap="basePaitentProfileMap" parameterType="java.util.Map">
-	select
-	id,
-	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=bpf.hosp_code limit 1) as yljgdm,
+        select
+            id,
+            (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=bpf.hosp_code limit 1) as yljgdm,
 	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = bpf.hosp_code limit 1) as yljgmc,
 	name,
 	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as gender_code,
@@ -96,8 +96,8 @@
 	'' as XZZXZ_XZQHDM,
 	'' as XZZC_XZQHDM,
 	'' as XZZC_MC,
-	'' as CJGZRQ,
-	'' as SWRQHRQ,
+	null as CJGZRQ,
+	null as SWRQHRQ,
 	'' as LXRYHZGXMC,
 	age,
 	birthday,
@@ -162,15 +162,49 @@
 	crte_name,
 	crte_time,
 	age_unit_code
-	from base_profile_file bpf
-	where bpf.crte_time &gt;= date(#{startTime}) and bpf.crte_time &lt;= date(#{endTime}) and bpf.hosp_code =#{hospCode}
-	order by bpf.crte_time asc
+        from base_profile_file bpf
+        where bpf.crte_time &gt;= date(#{startTime}) and bpf.crte_time &lt;= date(#{endTime}) and bpf.hosp_code =#{hospCode}
+        order by bpf.crte_time asc
 	</select>
     <select id="queryRegisterInfo" resultType="cn.hsa.module.interf.healthInfo.entity.TbMzgh"
             parameterType="java.util.Map">
-	    select
-       a.id as MZLSH,
-       (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+        select
+        a.id as MZLSH,
+        (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+        (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
+        a.visit_id as HZJGNWYID,
+        a.register_no as MZH,
+        '' as KLX,
+        '' as KH,
+        a.name as XM,
+        (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBDM,
+        (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBMC,
+        a.age as NL,
+        a.register_time as GTHSJ,
+        (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.002' and hb.cm_value =a.visit_code  limit 1) as GHLB,
+        '' as YLBXLBDM,
+        '' as YLBXLBMC,
+        a.dept_id as KSBM,
+        a.dept_name as KSMC,
+        ifnull(sum(b.total_price),0) as ZFZLF,
+        a.source_bz_code as GHFS,
+        '' as TXBZ,
+        '' as WDBZ,
+        '' as GHZT,
+        a.doctor_id as GHYSBM,
+        a.doctor_name as GHYSXM,
+        '' as GHYSZCDM,
+        '' as GHYSZCMC,
+        a.is_cancel as VALIDFLAG,
+        a.crte_time as APPETIME,
+        a.crte_time as MODIFYTIME,
+        a.crte_id  as MODIFYTCODE,
+        a.crte_name as MODIFYTNAME
+        from outpt_register a
+        left join outpt_register_detail b on a.id = b.register_id  and a.hosp_code =b.hosp_code
+        select
+            a.id as MZLSH,
+            (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
        (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
        a.visit_id as HZJGNWYID,
        a.register_no as MZH,
@@ -200,10 +234,13 @@
        a.crte_time as MODIFYTIME,
        a.crte_id  as MODIFYTCODE,
        a.crte_name as MODIFYTNAME
-       from outpt_register a
-       left join outpt_register_detail b on a.id = b.register_id  and a.hosp_code =b.hosp_code
-       where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
-       order by a.crte_time asc
+        from outpt_register a
+            left join outpt_register_detail b on a.id = b.register_id  and a.hosp_code =b.hosp_code
+        where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+        order by a.crte_time asc
+
+        group by a.id
+        order by a.crte_time asc
     </select>
     <select id="queryOutptVisitInfo" resultType="cn.hsa.module.interf.healthInfo.entity.TbMzjzjl"
             parameterType="java.util.Map">
@@ -254,8 +291,8 @@
 	</select>
     <select id="queryPrescribeInfo" parameterType="java.util.Map"
             resultType="cn.hsa.module.interf.healthInfo.entity.TbMzcfzxx">
-	select
-   (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as YLJGDM,
+        select
+            (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as YLJGDM,
    a.id as CFLSH,
    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
    b.profile_id as HZJGNWYID,
@@ -273,7 +310,7 @@
    a.dept_name as KFKSMC,
     a.doctor_id as KFYSBM,
     a.doctor_name as KFYSXM,
-    a.crte_name as KFSJ,
+    a.crte_time as KFSJ,
     a.diagnose_ids as ZDBM,
     '' as ZDMC,
     '' as DPYSBM,
@@ -293,14 +330,15 @@
     a.crte_time  as MODIFYTIME,
     a.crte_id as MODIFYTCODE,
     a.crte_name as MODIFYTNAME
-   from outpt_prescribe a
-   left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
-   left join outpt_prescribe_detail opd on opd.op_id=a.id and opd.hosp_code =a.hosp_code
-   left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX'
-    where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
-    group by a.id
-    order by a.crte_time asc
-	</select>
+        from outpt_prescribe a
+            left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
+            left join outpt_prescribe_detail opd on opd.op_id=a.id and opd.hosp_code =a.hosp_code
+            left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX'
+        where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+        group by a.id
+        order by a.crte_time asc
+
+    </select>
 
     <select id="queryOutptPrescribeDetailInfo" parameterType="java.util.Map"
             resultType="cn.hsa.module.interf.healthInfo.entity.TbMzcfmx">
@@ -373,7 +411,7 @@
 		  select
         (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
         d.id as zxdh,
-        1 as zxcs,
+        floor(RAND()*1000) as zxcs,
         c.id as cflsh,
         b.id as cfmxh,
         e.profile_id as hzjgnwyid,
@@ -403,11 +441,12 @@
         join outpt_prescribe_exec d on b.id=d.opd_id  and b.hosp_code = d.hosp_code and b.visit_id = d.visit_id
         left join outpt_visit e on a.hosp_code = e.hosp_code and a.visit_id = e.id
         where d.exec_time &gt;= date(#{startTime}) and d.exec_time &lt;= date(#{endTime}) and d.hosp_code =#{hospCode}
+        and a.usage_code is not null
         order by d.exec_time asc
 	</select>
     <select id="queryOutptSettleInfo" parameterType="java.util.Map"
             resultType="cn.hsa.module.interf.healthInfo.entity.TbMzsfhz">
-		(SELECT DISTINCT
+        (SELECT DISTINCT
         a.id as MZSFJSDH,
         (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1 ) as yljgdm,
         c.profile_id as hzjgnwyid,
@@ -418,7 +457,7 @@
         (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =c.gender_code  limit 1) as xbdm,
         (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =c.gender_code  limit 1) as xbmc,
         c.age as nl,
-        b.invoice_no as fph,
+        (select b.invoice_no from outpt_settle_invoice b where b.hosp_code = a.hosp_code AND b.visit_id = a.visit_id  and a.id = b.settle_id limit 1) as fph,
         ifnull(a.total_price,0.00) as fyze,
         ifnull(a.mi_price,0.00) as bcze,
         ifnull(a.self_price,0.00) as zfze,
@@ -432,13 +471,13 @@
         a.crte_id  as MODIFYTCODE,
         a.crte_name as MODIFYTNAME
         FROM
-        outpt_settle_invoice b
-        right JOIN outpt_settle a ON b.hosp_code = a.hosp_code AND b.visit_id = a.visit_id  and a.id = b.settle_id
+        outpt_settle a
         LEFT JOIN outpt_visit c ON a.hosp_code = c.hosp_code and a.visit_id = c.id
         where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
         order by a.crte_time asc)
         union all
         (select
+        DISTINCT
         b.id as MZSFJSDH,
         (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
         f.profile_id as hzjgnwyid,

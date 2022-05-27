@@ -1,29 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 护理三测单记录实体类(TbHlscdjl) *
- * @author liuliyun
- * @since 2022-05-16 09:51:34
+ * 护理三测单记录(TbHlscdjl)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbHlscdjl extends PageDO implements Serializable {
-    private static final long serialVersionUID = -96359657690254568L;
+public class TbHlscdjl implements Serializable {
+    private static final long serialVersionUID = 567137199590458271L;
     /**
      * 护理三测单记录明细序号
      */
@@ -83,6 +82,8 @@ public class TbHlscdjl extends PageDO implements Serializable {
     /**
      * 入院日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date ryrqsj;
     /**
      * 分娩日数
@@ -91,6 +92,8 @@ public class TbHlscdjl extends PageDO implements Serializable {
     /**
      * 护理记录时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date hljlsj;
     /**
      * 住院日数
@@ -103,11 +106,11 @@ public class TbHlscdjl extends PageDO implements Serializable {
     /**
      * 体温
      */
-    private Double tw;
+    private BigDecimal tw;
     /**
      * 脉搏
      */
-    private Double mb;
+    private BigDecimal mb;
     /**
      * 呼吸值
      */
@@ -167,11 +170,11 @@ public class TbHlscdjl extends PageDO implements Serializable {
     /**
      * 体温再次测量值
      */
-    private Double twzcclz;
+    private BigDecimal twzcclz;
     /**
      * 心率
      */
-    private Double xl;
+    private BigDecimal xl;
     /**
      * 婴儿序号
      */
@@ -207,10 +210,14 @@ public class TbHlscdjl extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -223,3 +230,4 @@ public class TbHlscdjl extends PageDO implements Serializable {
 
 
 }
+

@@ -54,4 +54,6 @@ public class PharInDistributeAllDetailDTO extends PharInDistributeAllDetailDO im
   private String code;
   //生产厂家
   private String prodName;
+  //材料药品分类
+  private String typeCode;
 }

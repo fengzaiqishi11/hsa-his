@@ -393,6 +393,7 @@
          (ifnull(( SELECT NAME FROM sys_code_detail WHERE c_code = 'NLDW' AND VALUE = c.age_unit_code AND hosp_code =
          c.hosp_code ), '岁' )))) as patientInfo,b.dept_name,
         case when a.item_code = '1' then bd.code  when a.item_code = '2' then d.code end code,
+        (case when a.item_code = '1' then bd.type_code  when a.item_code = '2' then d.type_code end) typeCode,
         CASE a.item_code
         WHEN '1' THEN
         ( SELECT NAME FROM base_product WHERE CODE = bd.prod_code AND hosp_code = bd.hosp_code )
@@ -445,6 +446,7 @@
                (select bd.name from base_dept bd where bd.id = b.dept_id and bd.hosp_code = b.hosp_code) as deptName,
                c.status_code,
                case when a.item_code = '1' then bd.code  when a.item_code = '2' then d.code end code,
+               (case when a.item_code = '1' then bd.type_code  when a.item_code = '2' then d.type_code end) typeCode,
                 CASE a.item_code
                 WHEN '1' THEN
                 ( SELECT NAME FROM base_product WHERE CODE = bd.prod_code AND hosp_code = bd.hosp_code )

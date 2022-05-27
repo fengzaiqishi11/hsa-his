@@ -28,6 +28,7 @@
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
         <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
         <result property="profitLossType" column="profit_loss_type" jdbcType="VARCHAR"/>
     </resultMap>
 
@@ -52,6 +53,7 @@
         when l.item_code = '2' then (select bp.name from base_product bp where bm.prod_code = bp.code and bm.hosp_code = bp.hosp_code) end prodName,
         case when l.item_code='1' then bd.code when l.item_code='2' then bm.code end code,
         case when l.item_code='1' then bd.spec when l.item_code='2' then bm.spec end spec,
+        case when l.item_code='1' then bd.type_code when l.item_code='2' then bm.type_code end typeCode,
         case when l.item_code='2' then bm.model end model
         from stro_incdec_detail l
         left join base_drug bd on bd.id = l.item_id and bd.hosp_code = #{hospCode}

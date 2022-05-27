@@ -82,11 +82,11 @@ public class TbBasyztb implements Serializable {
     /**
      * 年龄（岁）
      */
-    private Integer nls;
+    private String nls;
     /**
      * 年龄（月）
      */
-    private Integer nly;
+    private String nly;
     /**
      * 身份证号码
      */
@@ -596,7 +596,7 @@ public class TbBasyztb implements Serializable {
     /**
      * 是否有出院31天内再住院计划
      */
-    private String zzyjh31;
+    private String zzyjh_31;
     /**
      * 颅脑损伤患者入院前昏迷时间
      */
@@ -764,7 +764,7 @@ public class TbBasyztb implements Serializable {
     /**
      * 其他费
      */
-    private BigDecimal qtf1;
+    private BigDecimal qtf_1;
     /**
      * 治疗类别代码
      */

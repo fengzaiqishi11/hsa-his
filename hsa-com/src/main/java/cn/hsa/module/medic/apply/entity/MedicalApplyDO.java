@@ -91,4 +91,5 @@ public class MedicalApplyDO extends PageDO implements Serializable {
 
     // 费用id
     private String costId;
+
 }

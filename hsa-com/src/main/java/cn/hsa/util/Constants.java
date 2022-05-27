@@ -24,6 +24,13 @@ public interface Constants {
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
     }
+
+    class TechnologyStatus {
+        public static final String NOTCONFIRMCOST = "0"; // 未确费
+        public static final String CONFIRMCOST = "1"; // 已确费
+        public static final String REFUNDCOST = "2"; // 申请退费
+        public static final String ALREADYREFUND = "3"; // 已退费
+    }
     /**
      * 颜色（color）
      */

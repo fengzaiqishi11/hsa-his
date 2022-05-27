@@ -4,6 +4,8 @@ import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.healthInfo.service.*;
 import cn.hsa.util.MapUtils;
+import cn.hutool.core.map.MapBuilder;
+import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -30,31 +32,64 @@ public class HealthInfoUniversalController {
 
     @Value("${rsa.private.key}")
     private String privateKey;
+    /**
+     * 字典标准映射
+     */
     @Resource
     private DictStandardMapService dictStandardMapService;
+    /**
+     * 实验室检验报告
+     */
     @Resource
     private LabSurveyReportService labSurveyReportService;
+    /**
+     * 本地字典
+     */
     @Resource
     private LocalBasicDictService localBasicDictService;
+    /**
+     * 医学影像
+     */
     @Resource
     private MedicalImageService medicalImageService;
+    /**
+     * 体检业务
+     */
     @Resource
     private PhysBusinessService physBusinessService;
+    /**
+     *  住院
+     */
     @Resource
-    private HealthInptInfoService healthInptInfoService; // 住院
+    private HealthInptInfoService healthInptInfoService;
+    /**
+     * 门诊
+     */
     @Resource
-    private HealthOutptInfoService healthOutptInfoService; // 门诊
+    private HealthOutptInfoService healthOutptInfoService;
+    /**
+     * 病案
+     */
     @Resource
-    private HealthMrisInfoService healthMrisInfoService; // 病案
+    private HealthMrisInfoService healthMrisInfoService;
+    /**
+     * 诊断
+     */
     @Resource
-    private HealthDiagnoseInfoService healthDiagnoseInfoService; // 诊断
+    private HealthDiagnoseInfoService healthDiagnoseInfoService;
+    /**
+     * 手术
+     */
     @Resource
-    private HealthOperInfoService healthOperInfoService; // 手术
+    private HealthOperInfoService healthOperInfoService;
+    /**
+     * 财务报告
+     */
     @Resource
-    private HealthSettleInfoService healthSettleInfoService; // 财务报告
-
-
-    //药房药库及药品类统计分析
+    private HealthSettleInfoService healthSettleInfoService;
+    /**
+     * 药房药库及药品类统计分析
+     */
     @Resource
     private DrugBusinessService drugBusinessService;
 
@@ -136,8 +171,6 @@ public class HealthInfoUniversalController {
         return universalMethodInvoke(map,HealthOutptInfoService.class,healthOutptInfoService);
     }
 
-
-
     /**
      * 查询住院业务相关数据接口
      * @Author liuliyun
@@ -202,6 +235,7 @@ public class HealthInfoUniversalController {
     public WrapperResponse getSettleInfo(@RequestParam Map map){
         return universalMethodInvoke(map,HealthSettleInfoService.class,healthSettleInfoService);
     }
+
     /**
      * 查询药品库存，使用情况业务相关数据接口
      * @Author liudawen
@@ -214,7 +248,6 @@ public class HealthInfoUniversalController {
     public WrapperResponse getDrugBusiness(@RequestParam Map map){
         return universalMethodInvoke(map,DrugBusinessService.class,drugBusinessService);
     }
-
 
     /**
      * 接口服务方法统一调用入口

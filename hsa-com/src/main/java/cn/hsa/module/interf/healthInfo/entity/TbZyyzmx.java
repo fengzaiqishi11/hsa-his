@@ -1,31 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
- * 住院医嘱明细表实体类(TbZyyzmx)
- * @author liuliyun
- * @Email: liyun.liu@powersi.com
- * @since 2022-05-12 15:19:33
+ * 住院医嘱明细表(TbZyyzmx)实体类
+ *
+ * @author liudawen
+ * @date 2022-05-24 14:43:03
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbZyyzmx extends PageDO implements Serializable {
-    private static final long serialVersionUID = -46955148601617961L;
+public class TbZyyzmx implements Serializable {
+    private static final long serialVersionUID = -61831630997697215L;
     /**
      * 医疗机构代码
      */
@@ -109,6 +106,8 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 医嘱开立时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzklsj;
     /**
      * 执行科室编码
@@ -129,6 +128,8 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 医嘱执行时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzzxsj;
     /**
      * 医嘱项目类型代码
@@ -137,10 +138,14 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 医嘱计划开始日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzjhksr;
     /**
      * 医嘱计划结束日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzjhjsrq;
     /**
      * 医嘱审核人姓名
@@ -153,6 +158,8 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 医嘱审核日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzshrqsj;
     /**
      * 核对医嘱护士姓名
@@ -165,6 +172,8 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 医嘱核对日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzhdrqsj;
     /**
      * 停止医嘱者姓名
@@ -177,10 +186,14 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 停止医嘱时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzzzsj;
     /**
      * 医嘱取消日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date yzqxrqsj;
     /**
      * 取消医嘱者姓名
@@ -209,7 +222,7 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 每次使用剂量
      */
-    private Double jl;
+    private BigDecimal jl;
     /**
      * 每次使用剂量单位
      */
@@ -217,7 +230,7 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 每次使用数量
      */
-    private Double sysl;
+    private BigDecimal sysl;
     /**
      * 每次使用数量单位
      */
@@ -225,7 +238,7 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 用药天数
      */
-    private Double yyts;
+    private BigDecimal yyts;
     /**
      * 是否皮试
      */
@@ -233,15 +246,15 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 发药数量
      */
-    private Double ypsl;
+    private BigDecimal ypsl;
     /**
      * 单价
      */
-    private Double dj;
+    private BigDecimal dj;
     /**
      * 总价
      */
-    private Double zj;
+    private BigDecimal zj;
     /**
      * 基药标识
      */
@@ -261,7 +274,7 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 限定日剂量（DDD）
      */
-    private Double ddd;
+    private BigDecimal ddd;
     /**
      * 抗菌药物等级代码
      */
@@ -281,7 +294,7 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 婴儿序号
      */
-    private String yexh;
+    private Integer yexh;
     /**
      * 中药付数
      */
@@ -301,10 +314,14 @@ public class TbZyyzmx extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -317,3 +334,4 @@ public class TbZyyzmx extends PageDO implements Serializable {
 
 
 }
+

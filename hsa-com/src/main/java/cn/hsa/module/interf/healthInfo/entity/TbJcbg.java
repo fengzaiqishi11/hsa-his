@@ -1,30 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医学影像检查报告表—常见检查报告格式(TbJcbg)实体类
  *
  * @author liudawen
- * @date 2022-05-18 10:42:41
+ * @date 2022-05-24 14:43:00
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbJcbg implements Serializable {
-    private static final long serialVersionUID = 726603539302033766L;
+    private static final long serialVersionUID = -65118134234948046L;
     /**
      * 检查号
      */
@@ -252,18 +249,26 @@ public class TbJcbg implements Serializable {
     /**
      * 检查日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date jcrqsj;
     /**
      * 申请日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date sqrqsj;
     /**
      * 审核日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date shrqsj;
     /**
      * 报告日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date bgrqsj;
     /**
      * 麻醉方法代码
@@ -296,7 +301,7 @@ public class TbJcbg implements Serializable {
     /**
      * 影像图片报告
      */
-    private Object yxtpbg;
+    private Byte[] yxtpbg;
     /**
      * 影像文件路径
      */
@@ -316,10 +321,14 @@ public class TbJcbg implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码

@@ -1,31 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import cn.hsa.base.PageDO;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 诊断明细表(TbZdmx)实体类
  *
- * @author makejava
- * @since 2022-05-19 10:23:29
+ * @author liudawen
+ * @date 2022-05-24 14:43:02
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class TbZdmx extends PageDO implements Serializable {
-    private static final long serialVersionUID = 505902109811125519L;
+public class TbZdmx implements Serializable {
+    private static final long serialVersionUID = -39050410796575911L;
     /**
      * 诊断流水号
      */
@@ -73,6 +69,8 @@ public class TbZdmx extends PageDO implements Serializable {
     /**
      * 诊断时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date zdsj;
     /**
      * 诊断编码
@@ -105,10 +103,14 @@ public class TbZdmx extends PageDO implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -121,3 +123,4 @@ public class TbZdmx extends PageDO implements Serializable {
 
 
 }
+

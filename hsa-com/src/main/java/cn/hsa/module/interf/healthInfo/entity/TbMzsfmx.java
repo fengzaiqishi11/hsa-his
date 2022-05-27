@@ -1,31 +1,28 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
 /**
  * 门诊收费明细表(TbMzsfmx)实体类
  *
- * @author makejava
- * @since 2022-05-11 17:20:12
+ * @author liudawen
+ * @date 2022-05-24 14:43:01
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbMzsfmx implements Serializable {
-    private static final long serialVersionUID = 974907614638378692L;
+    private static final long serialVersionUID = -29105879000535059L;
     /**
      * 收费明细ID
      */
@@ -69,6 +66,8 @@ public class TbMzsfmx implements Serializable {
     /**
      * 收费/退费时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date stfsj;
     /**
      * 明细项目编码
@@ -89,7 +88,7 @@ public class TbMzsfmx implements Serializable {
     /**
      * 明细项目数量
      */
-    private BigDecimal mxxmsl; 
+    private BigDecimal mxxmsl;
     /**
      * 明细项目金额
      */
@@ -121,6 +120,8 @@ public class TbMzsfmx implements Serializable {
     /**
      * 开方时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date kfsj;
     /**
      * 开方科室代码
@@ -149,6 +150,8 @@ public class TbMzsfmx implements Serializable {
     /**
      * 发药时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date fysj;
     /**
      * 发药标志
@@ -161,10 +164,14 @@ public class TbMzsfmx implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码
@@ -177,3 +184,4 @@ public class TbMzsfmx implements Serializable {
 
 
 }
+

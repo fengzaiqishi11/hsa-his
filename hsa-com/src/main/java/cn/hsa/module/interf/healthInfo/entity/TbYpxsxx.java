@@ -8,110 +8,131 @@ import lombok.experimental.Accessors;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- * 住院医嘱执行记录(TbZyyzzxjl)实体类
+ * 药品销售信息(TbYpxsxx)实体类
  *
  * @author liudawen
- * @date 2022-05-24 14:43:03
+ * @date 2022-05-24 14:43:02
  */
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-public class TbZyyzzxjl implements Serializable {
-    private static final long serialVersionUID = 390680371541466500L;
+public class TbYpxsxx implements Serializable {
+    private static final long serialVersionUID = 438920038190472971L;
     /**
      * 医疗机构代码
      */
     private String yljgdm;
     /**
-     * 执行单号
+     * 药品代码
      */
-    private String zxdh;
+    private String ypdm;
     /**
-     * 执行次数/序号
+     * 就诊号
      */
-    private Integer zxcs;
+    private String jzh;
     /**
-     * 医嘱序号
+     * 业务类型
      */
-    private String yzxh;
+    private String ywlx;
     /**
-     * 医嘱ID
+     * 药房代码
      */
-    private String yzid;
+    private String yfdm;
     /**
-     * 患者机构内唯一id
+     * 省招标网流水号
      */
-    private String hzjgnwyid;
+    private String szbwlsh;
     /**
-     * 病人姓名
+     * 药品名称
      */
-    private String xm;
+    private String ypmc;
     /**
-     * 住院就诊流水号
+     * 商品名
      */
-    private String zylsh;
+    private String spm;
     /**
-     * 医嘱明细编码
+     * 生产企业
      */
-    private String yzmxbm;
+    private String scqy;
     /**
-     * 医嘱组号
+     * 剂型
      */
-    private String yzzh;
+    private String ypjxms;
     /**
-     * 执行人
+     * 规格
      */
-    private String zxrbm;
+    private String ypgg;
     /**
-     * 执行人姓名
+     * 包装量
      */
-    private String zxrxm;
+    private BigDecimal bzl;
     /**
-     * 执行时间
+     * 单位
+     */
+    private String dw;
+    /**
+     * 采购价格
+     */
+    private String cgj;
+    /**
+     * 销售价格
+     */
+    private String xsjg;
+    /**
+     * 销售数量
+     */
+    private BigDecimal xssl;
+    /**
+     * 销售金额
+     */
+    private BigDecimal xsje;
+    /**
+     * 药品属性
+     */
+    private String ypsx;
+    /**
+     * 药品类型
+     */
+    private String xplx;
+    /**
+     * 抗菌药物标志
+     */
+    private String kjybz;
+    /**
+     * 抗菌药物级别
+     */
+    private String kjyjb;
+    /**
+     * 销售时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date zxsj;
+    private Date xssj;
     /**
-     * 执行说明
+     * 销售科室代码
      */
-    private String zxsm;
+    private String xsksdm;
     /**
-     * 配药人编码
+     * 销售科室名称
      */
-    private String pyrbm;
+    private String xsksmc;
     /**
-     * 配药人姓名
+     * 销售医生代码
      */
-    private String pyrxm;
+    private String xsysdm;
     /**
-     * 配药时间
+     * 销售医生名称
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date pysj;
+    private String xsysmc;
     /**
-     * 操作人编码
+     * 医疗机构名称
      */
-    private String czrbm;
-    /**
-     * 操作人姓名
-     */
-    private String czrxm;
-    /**
-     * 操作时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date czsj;
-    /**
-     * 用法
-     */
-    private String yf;
+    private String yljgmc;
     /**
      * 数据有效标志
      */

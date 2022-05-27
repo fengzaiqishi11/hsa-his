@@ -1,30 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 细菌结果(TbJyxjjg)实体类
  *
  * @author liudawen
- * @date 2022-05-12 14:34:18
+ * @date 2022-05-24 14:43:01
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbJyxjjg implements Serializable {
-    private static final long serialVersionUID = 959407008822875090L;
+    private static final long serialVersionUID = 271490489029434487L;
     /**
      * 细菌结果流水号
      */
@@ -48,6 +45,8 @@ public class TbJyxjjg implements Serializable {
     /**
      * 报告日期时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date bgsj;
     /**
      * 细菌代号
@@ -104,10 +103,14 @@ public class TbJyxjjg implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码

@@ -582,4 +582,11 @@ public interface InptCostDAO {
      * @Date: 2022/4/20
      */
     void updateInWaitStatus(PharInWaitReceiveDTO updateInwait);
+    /**
+     * @Author gory
+     * @Description 更新住院费用为已申请退费
+     * @Date 2022/5/25 17:16
+     * @Param [inptCostDTO]
+     **/
+    void updateInptCostIsOkByIds(InptCostDTO inptCostDTO);
 }

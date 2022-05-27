@@ -3,16 +3,14 @@ package cn.hsa.outpt.outptrefundapply.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.outptrefundapply.bo.OutptRefundApplyBO;
 import cn.hsa.module.outpt.outptrefundapply.dao.OutptRefundApplyDAO;
 import cn.hsa.module.outpt.outptrefundapply.dto.OutptRefundApplyDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
-import cn.hsa.util.BigDecimalUtils;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.*;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +37,10 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 
 	@Resource
 	private OutptRefundApplyDAO outptRefundApplyDAO;
-
+	@Resource
+	private OutptCostDAO outptCostDAO;
+	@Resource
+	private RedisUtils redisUtils;
 
 	/**
 	 * @Description: 门诊医生退费申请保存
@@ -54,11 +55,20 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 		List<OutptCostDTO> outptCostDTOList = JSON.parseArray(JSON.toJSONString(map.get("outptCostDTOList")),OutptCostDTO.class);
 		OutptSettleDTO outptSettleDTO = JSON.parseObject(JSON.toJSONString(map.get("outptSettleDTO")),OutptSettleDTO.class);
 		String settleId = outptSettleDTO.getId();
+		String hospCode = (String) map.get("hospCode");
+		if (StringUtils.isEmpty(hospCode)){
+			throw new AppException("申请退费：医院编码不能为空");
+		}
+		String key = hospCode + settleId + "refund";
+		if (!redisUtils.setIfAbsent(key,key,600)){
+			throw new AppException("当前结算单号正在进行申请退费或者医技确费操作，请稍等");
+		}
 		String crteId = MapUtils.get(map, "crteId");
 		String crteName = MapUtils.get(map, "crteName");
 		String refundXplain = MapUtils.get(map, "refundXplain"); // 退费说明
 		List<OutptRefundApplyDTO> list = new ArrayList<>();
 		List<String> costIdList = new ArrayList();
+		List<String> lisAndPasCostIds = new ArrayList<>();
 		if (outptCostDTOList != null && outptCostDTOList.size() > 0) {
 			for (OutptCostDTO dto : outptCostDTOList) {
 				costIdList.add(dto.getId());
@@ -76,12 +86,31 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 					applyDTO.setSettleId(settleId);
 					applyDTO.setOneSettleId(dto.getOneSettleId());
 					list.add(applyDTO);
+					if (Constants.CFLB.LIS.equals(dto.getPrescriptionCategory())
+							|| Constants.CFLB.PACS.equals(dto.getPrescriptionCategory()) ) {// 如果是医技
+						if (Constants.TechnologyStatus.CONFIRMCOST.equals(dto.getIsTechnologyOk())) { //已经确费的不允许申请退费
+							throw new AppException("项目：" + dto.getItemName() + "已经确费，请先取消确费");
+						} else {
+							lisAndPasCostIds.add(dto.getId());
+						}
+					}
+
 				}
 			}
 		}
-		// 需要将原来的数据删除再新增
-		outptRefundApplyDAO.deleteOutptRefundApplyByCostId(costIdList);
-		int result = outptRefundApplyDAO.saveOutptRefundAppy(list);
+		int result;
+		try {
+			// 修改确费状态为2 退费
+			if (!ListUtils.isEmpty(lisAndPasCostIds)){
+				outptCostDAO.updateIsTechnologyOkByContans(Constants.TechnologyStatus.REFUNDCOST,hospCode,lisAndPasCostIds);
+			}
+			// 需要将原来的数据删除再新增
+			outptRefundApplyDAO.deleteOutptRefundApplyByCostId(hospCode,costIdList);
+			result =  outptRefundApplyDAO.saveOutptRefundAppy(list);
+		}finally {
+			redisUtils.del(key);
+		}
+
 		return result > 0;
 	}
 
@@ -170,11 +199,21 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 		if (outptSettleDTO == null) {
 			throw new AppException("门诊医生取消退费申请失败");
 		}
+		String hospCode = (String) param.get("hospCode");
+		String settleId = outptSettleDTO.getId();
+		String key = hospCode + settleId + "refund";
+		if (!redisUtils.setIfAbsent(key,key,600)){
+			throw new AppException("当前结算单号正在进行申请退费或者医技确费操作，请稍等");
+		}
 		List<String> costIdList = new ArrayList();
+		List<String> lisAndPasCostIds = new ArrayList();
 		if (outptCostDTOList != null && outptCostDTOList.size() > 0) {
 			for (OutptCostDTO dto : outptCostDTOList) {
 				if (!BigDecimalUtils.isZero(dto.getBackNum())) {
 					costIdList.add(dto.getId());
+					if (Constants.TechnologyStatus.REFUNDCOST.equals(dto.getIsTechnologyOk())) { //申请退费的
+						lisAndPasCostIds.add(dto.getId());
+					}
 				}
 			}
 		}
@@ -186,6 +225,17 @@ public class OutptRefundApplyBOImpl implements OutptRefundApplyBO {
 		if (outptCostDTOS==null || outptCostDTOS.size() ==0){
 			throw new AppException("该申请已进行退费，不能取消申请");
 		}
-		return outptRefundApplyDAO.deleteOutptRefundAppy(outptSettleDTO) > 0;
+		int result;
+		try {
+			// 确费状态弄成未确费
+			if (!ListUtils.isEmpty(lisAndPasCostIds)){
+				outptCostDAO.updateIsTechnologyOkByContans(Constants.TechnologyStatus.NOTCONFIRMCOST,
+						outptSettleDTO.getHospCode(), lisAndPasCostIds);
+			}
+			result = outptRefundApplyDAO.deleteOutptRefundAppy(outptSettleDTO);
+		}finally {
+			redisUtils.del(key);
+		}
+		return result > 0;
 	}
 }

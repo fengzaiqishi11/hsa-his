@@ -32,6 +32,26 @@
                     <artifactId>slf4j-log4j12</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-examples</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-clients</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -39,43 +59,13 @@
         <dependency>
             <groupId>cn.hsa.hsaf.core</groupId>
             <artifactId>hsaf-core</artifactId>
-            <!--            <exclusions>-->
-            <!--                <exclusion>-->
-            <!--                    <groupId>com.alibaba</groupId>-->
-            <!--                    <artifactId>fastjson</artifactId>-->
-            <!--                </exclusion>-->
-            <!--            </exclusions>-->
         </dependency>
 
-        <!--适配包-->
-        <!--分布式服务-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-        <!--            <artifactId>hsaf-ali-rpc</artifactId>-->
-        <!--            <version>${hsaf-ali-rpc.version}</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>cn.hsa.hsaf.adapt</groupId>
             <artifactId>hsaf-generic-rpc</artifactId>
             <version>${hsaf-generic-rpc.version}</version>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-        <!--            <artifactId>hsaf-tencent-rpc</artifactId>-->
-        <!--            <version>${hsaf-tencent-rpc.version}</version>-->
-        <!--        </dependency>-->
-
-        <!--ID唯一生成-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.core</groupId>-->
-        <!--            <artifactId>hsaf-idgenerator</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- 认证安全组件 -->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.auth.security</groupId>-->
-        <!--            <artifactId>hsaf-auth-security</artifactId>-->
-        <!--        </dependency>-->
 
         <!--MVC框架-->
         <dependency>

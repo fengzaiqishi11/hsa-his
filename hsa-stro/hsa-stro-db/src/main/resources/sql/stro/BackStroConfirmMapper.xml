@@ -46,6 +46,7 @@
         <result property="splitPrice" column="split_price" jdbcType="OTHER"/>
         <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
         <result property="batchNo" column="batch_no" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
         <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
     </resultMap>
 
@@ -84,6 +85,7 @@
         a.dosage_unit_code, a.buy_price, a.sell_price, a.buy_price_all, a.sell_price_all, a.split_ratio,
         a.split_num, a.split_price, a.split_unit_code, a.batch_no, a.expiry_date,
         case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+        case when a.item_code='1' then bd.type_code when a.item_code='2' then bm.type_code end type_code,
         case when a.item_code = '1' then (select bp.name from base_product bp where bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code)
         when a.item_code = '2' then (select bp.name from base_product bp where bd.code = bm.prod_code and bp.hosp_code = bm.hosp_code) end prodName
       from stro_out_detail a

@@ -793,15 +793,18 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 	 */
 	@Override
 	public OutptCostDTO getCostInventory(Map<String, Object> map) {
+		String inventoryType = "1";
 		// 查询门诊结算费用
 		List<OutptCostDTO> list = outinInvoiceDao.getCostInventory(map);  // 1、默认查询门诊的项目材料结算数据
 		if (list.size() == 0) { // 2、没有查询到门诊的项目材料结算数据，则查询门诊挂号数据
 			// 查询门诊挂号数据
 			list = outinInvoiceDao.getMZGHCostInventory(map);
+			inventoryType="0";
 		}
 		if (list.size() == 0) { // 3、既不是门诊挂号，也不是门诊项目材料，则认为需要查询住院数据
 			// 查询住院数据
 			list = outinInvoiceDao.getZyCostInventory(map);
+			inventoryType="2";
 		}
 		OutptCostDTO dto = new OutptCostDTO();
 		if (list != null && list.size() > 0) {
@@ -861,6 +864,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			dto.setTotalFy(totalMoney.toString());
 			dto.setDxTotalFy(MoneyUtils.convert(totalMoney.doubleValue()));
 			dto.setZuoBiaoCostData(zuoBiaoCostData);
+			dto.setInventoryType(inventoryType);  // 收据类型 0: 挂号；1：门诊；2：住院   2022/5/30 10:09 lly
 		}
 
 		return dto;

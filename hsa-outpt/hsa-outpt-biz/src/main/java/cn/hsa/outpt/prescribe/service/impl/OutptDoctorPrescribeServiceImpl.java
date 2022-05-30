@@ -705,4 +705,12 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
     public WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap) {
         return WrapperResponse.success(outptDoctorPrescribeBO.getBaseDrug(MapUtils.get(parmMap, "outptPrescribeDetailsDTO")));
     }
+
+    @Override
+    public WrapperResponse<PageDTO> getCfData2(Map paramMap) {
+        BaseDrugDTO baseDrugDTO = MapUtils.get(paramMap, "baseDrugDTO");
+        baseDrugDTO.setPageNo(1);
+        baseDrugDTO.setPageSize(9999);
+        return WrapperResponse.success(outptDoctorPrescribeBO.getCfData2(baseDrugDTO));
+    }
 }

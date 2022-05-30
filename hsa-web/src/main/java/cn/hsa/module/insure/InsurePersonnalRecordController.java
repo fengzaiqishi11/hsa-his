@@ -9,6 +9,8 @@ import cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
 
+import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
 import cn.hsa.module.insure.module.service.InsurePersonnalRecordService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
@@ -364,5 +366,45 @@ public class InsurePersonnalRecordController extends BaseController {
         map.put("insureSpecialRecordDTO",insureSpecialRecordDTO);
         return insurePersonnalRecordService_consumer.queryPageSpecialRecord(map);
     }
-
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @GetMapping("/queryPageInsureAccidentInjureRecord")
+    public WrapperResponse<PageDTO> queryPageInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO, HttpServletRequest req, HttpServletResponse res){
+        Map<String,Object> map = new HashMap<>();
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String hospCode = sysUserDTO.getHospCode();
+        insureAccidentalInjuryDTO.setHospCode(hospCode);
+        map.put("hospCode",hospCode);
+        map.put("insureAccidentalInjuryDTO",insureAccidentalInjuryDTO);
+        return insurePersonnalRecordService_consumer.queryPageInsureAccidentInjureRecord(map);
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @param req
+     * @param res
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/insertInsureAccidentInjureRecord")
+    public  WrapperResponse<Boolean> insertInsureAccidentInjureRecord(@RequestBody InsureAccidentalInjuryDTO insureAccidentalInjuryDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureAccidentalInjuryDTO.setHospCode(sysUserDTO.getHospCode());
+        insureAccidentalInjuryDTO.setHospName(sysUserDTO.getHospName());
+        insureAccidentalInjuryDTO.setCrteId(sysUserDTO.getId());
+        insureAccidentalInjuryDTO.setCrteName(sysUserDTO.getName());
+        insureAccidentalInjuryDTO.setCrteTime(DateUtils.getNow());
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("insureAccidentalInjuryDTO",insureAccidentalInjuryDTO);
+        return insurePersonnalRecordService_consumer.insertInsureAccidentInjureRecord(map);
+    }
 }

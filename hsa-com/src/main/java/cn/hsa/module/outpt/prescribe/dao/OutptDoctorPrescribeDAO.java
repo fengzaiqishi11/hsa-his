@@ -892,5 +892,17 @@ public interface OutptDoctorPrescribeDAO {
      */
     List<BaseDrugDTO> getCfDataOnlyOpenItem(BaseDrugDTO baseDrugDTO);
 
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-17 10:17
+     * @Description 根据门诊就诊ids查询门诊诊断信息
+     * @param outptVisitDTO
+     * @return java.util.List<cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO>
+     */
+    List<OutptDiagnoseDTO> queryOutptDiagnoseByVisitIds(OutptVisitDTO outptVisitDTO);
+
+
+    List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
+
     List<BaseDrugDTO> getCfData2(BaseDrugDTO baseDrugDTO);
 }

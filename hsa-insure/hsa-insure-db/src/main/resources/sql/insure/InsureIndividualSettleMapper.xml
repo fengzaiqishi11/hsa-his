@@ -75,7 +75,7 @@
         <result property="preselfpayAmt" column="preselfpayAmt" jdbcType="NUMERIC"/>
         <result property="inscpScpAmt" column="inscp_scp_amt" jdbcType="NUMERIC"/>
         <result property="poolPropSelfpay" column="pool_prop_selfpay" jdbcType="NUMERIC"/>
-        <result property="coacctMulaidPaymPay" column="acct_mulaid_pay" jdbcType="NUMERIC"/>
+        <result property="acctMulaidPay" column="acct_mulaid_pay" jdbcType="NUMERIC"/>
         <result property="acctInjPay" column="acct_inj_pay" jdbcType="NUMERIC"/>
         <result property="retAcctInjPay" column="ret_acct_injPay" jdbcType="NUMERIC"/>
         <result property="governmentPay" column="government_pay" jdbcType="NUMERIC"/>

@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -704,6 +705,18 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
     @Override
     public WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap) {
         return WrapperResponse.success(outptDoctorPrescribeBO.getBaseDrug(MapUtils.get(parmMap, "outptPrescribeDetailsDTO")));
+    }
+
+    @Override
+    public WrapperResponse<List<OutptDiagnoseDTO>> queryOutptDiagnoseByVisitIds(Map map) {
+        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+        return WrapperResponse.success(outptDoctorPrescribeBO.queryOutptDiagnoseByVisitIds(outptVisitDTO));
+    }
+
+    @Override
+    public WrapperResponse<List<OutptDiagnoseDTO>> queryOutptMatchDiagnose(Map<String, Object> reqMap) {
+        OutptVisitDTO outptVisitDTO = MapUtils.get(reqMap, "outptVisitDTO");
+        return WrapperResponse.success(outptDoctorPrescribeBO.queryOutptMatchDiagnose(outptVisitDTO));
     }
 
     @Override

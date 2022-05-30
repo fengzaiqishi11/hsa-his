@@ -820,6 +820,12 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public PageDTO getCfData(BaseDrugDTO baseDrugDTO) {
         PageHelper.startPage(baseDrugDTO.getPageNo(),baseDrugDTO.getPageSize());
+//        List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
+//        if(!StringUtils.isEmpty(baseDrugDTO.getPharId())){
+//          List<BaseDrugDTO> BaseDrugDTOList = outptDoctorPrescribeDAO.getNewCfData(baseDrugDTO);
+//          return PageDTO.of(BaseDrugDTOList);
+//        }
+
         List<BaseDrugDTO> baseDrugDTOList = outptDoctorPrescribeDAO.getCfData(baseDrugDTO);
         baseDrugDTOList.stream().forEach(x->{
             if (StringUtils.isEmpty(x.getNationCode())) {
@@ -4123,6 +4129,16 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             return null;
         }
         return outptDoctorPrescribeDAO.getBaseDrug(outptPrescribeDetailsDTO);
+    }
+
+    @Override
+    public List<OutptDiagnoseDTO> queryOutptDiagnoseByVisitIds(OutptVisitDTO outptVisitDTO) {
+        return outptDoctorPrescribeDAO.queryOutptDiagnoseByVisitIds(outptVisitDTO);
+    }
+
+    @Override
+    public List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO) {
+        return outptDoctorPrescribeDAO.queryOutptMatchDiagnose(outptVisitDTO);
     }
 
     @Override

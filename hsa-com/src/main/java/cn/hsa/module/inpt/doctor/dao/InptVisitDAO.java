@@ -540,4 +540,6 @@ public interface InptVisitDAO {
      * @Return: int
      **/
     int getInCnt(Map map);
+
+    int updateUplod(InptVisitDTO inptVisitDTO);
 }

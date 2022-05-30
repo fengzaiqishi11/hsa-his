@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.fmiownpaypatn.bo.InsureFmiOwnpayPatnBO;
 import cn.hsa.module.insure.fmiownpaypatn.service.InsureFmiOwnpayPatnService;
+import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -77,6 +78,62 @@ public class InsureFmiOwnpayPatnServiceImpl extends HsafService implements Insur
     @Override
     public WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map) {
         return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayPatnReconciliationInfo(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(Map map) {
+        return  WrapperResponse.success(insureFmiOwnpayPatnBO.deleteInsureFmiOwnPayPatnCost(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse<PageDTO> queryFeeInfoDetailPage(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFeeInfoDetailPage(MapUtils.get(param,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse insertInsureMdtrtAndDiag(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertInsureMdtrtAndDiag(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse insertOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse deleteOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.deleteOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse<PageDTO> queryInsureOutptMedicTreatMent(Map<String, Object> param) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryInsureOutptMedicTreatMent(MapUtils.get(param,"outptVisitDTO")));
+    }
+
+
+    @Override
+    public WrapperResponse insertInsureFinish(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertInsureFinish(MapUtils.get(map,"insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayInfoDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayInfoDetail(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayPatnFeeListDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayPatnFeeListDetail(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse queryFmiOwnPayDiseListDetail(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.queryFmiOwnPayDiseListDetail(MapUtils.get(map, "insureSettleInfoDTO")));
+    }
+
+    @Override
+    public WrapperResponse insertInsureInputCost(Map map) {
+        return WrapperResponse.success(insureFmiOwnpayPatnBO.insertInsureInputCost(MapUtils.get(map, "insureSettleInfoDTO")));
     }
 
 

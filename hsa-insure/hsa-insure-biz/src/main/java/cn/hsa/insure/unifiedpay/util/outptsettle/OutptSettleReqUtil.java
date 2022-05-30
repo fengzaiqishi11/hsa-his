@@ -87,6 +87,10 @@ public class OutptSettleReqUtil<T> extends InsureCommonUtil implements BaseReqUt
         settleMap.put("inscp_scp_amt", "");
         // 公立医院改革标志
         settleMap.put("pub_hosp_rfom_flag", "");
+        //就诊方式  广州接口字段
+        settleMap.put("mdtrt_mode", "0");
+        //中途结算标志 广州接口字段 0-否，1-是,用于门诊多批次结算
+        settleMap.put("mid_setl_flag", "0");
 
         HashMap commParam = new HashMap();
         checkRequest(settleMap);

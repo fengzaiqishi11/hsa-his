@@ -39,7 +39,15 @@ public class InsureNHPatientBOImpl extends HsafBO implements InsureNHPatientBO {
 		String kafkaIp = MapUtils.get(map, "KAFKA_IP");
 		String url = MapUtils.get(map, "url");
 		Map<String,Object> paramObj = map;
-		requestInsure.saveNHPatientToLocal(hospCode, kafkaIp, url, paramObj);
+		/*
+		 * @Author black
+		 * @Method saveNHPatientToLocal
+		 * @Description //TODO 注释kafka 解决广丰连接池报错，堆栈信息 504,cn.hsa.insure.module.bo.impl.InsureNHPatientBOImpl.saveNHPatientToLocal
+		 * @Date 下午5:33 2022/5/27
+		 * @Param [map]
+		 * @return java.lang.Boolean
+		 **/
+//		requestInsure.saveNHPatientToLocal(hospCode, kafkaIp, url, paramObj);
 		return null;
 	}
 

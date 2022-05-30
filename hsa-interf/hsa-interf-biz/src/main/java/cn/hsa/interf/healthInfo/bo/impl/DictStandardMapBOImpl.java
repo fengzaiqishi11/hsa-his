@@ -30,7 +30,7 @@ public class DictStandardMapBOImpl implements DictStandardMapBO {
      **/
     @Override
     public List<TbKsys> listDeptDictMap(Map map) {
-        return dictStandardMapDAO.listDeptDictMap(map);
+        return null;
     }
 
     /**
@@ -43,7 +43,7 @@ public class DictStandardMapBOImpl implements DictStandardMapBO {
      **/
     @Override
     public List<TbYpys> listDrugDictMap(Map map) {
-        return dictStandardMapDAO.listDrugDictMap(map);
+        return null;
     }
 
     /**
@@ -56,7 +56,7 @@ public class DictStandardMapBOImpl implements DictStandardMapBO {
      **/
     @Override
     public List<TbJbys> listDiseaseDictMap(Map map) {
-        return dictStandardMapDAO.listDiseaseDictMap(map);
+        return null;
     }
 
     /**
@@ -69,7 +69,7 @@ public class DictStandardMapBOImpl implements DictStandardMapBO {
      **/
     @Override
     public List<TbZlxmys> listClinicProjectMap(Map map) {
-        return dictStandardMapDAO.listClinicProjectMap(map);
+        return null;
     }
 
     /**
@@ -82,6 +82,6 @@ public class DictStandardMapBOImpl implements DictStandardMapBO {
      **/
     @Override
     public List<TbFylbys> listChargeDetailTypeMap(Map map) {
-        return dictStandardMapDAO.listChargeDetailTypeMap(map);
+        return null;
     }
 }

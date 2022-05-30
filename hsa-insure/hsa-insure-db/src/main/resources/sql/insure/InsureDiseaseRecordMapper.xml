@@ -14,6 +14,13 @@
                 #{hospIdeDate}, #{diagDrCodg}, #{diagDrName}, #{begndate}, #{enddate}, #{trtDclaDetlSn}, #{memo},
                 #{crteId}, #{crteName}, #{crteTime}, #{regCode})
     </insert>
+    <insert id="insertRecordAccidentInjury" parameterType="cn.hsa.module.insure.module.dto.InsureAccidentalInjuryDTO">
+      INSERT INTO insure_accidental_injury
+(id, hosp_code, dcla_souc, insutype, psn_no, psn_insurlts_id, psn_cert_type, certno, psn_name, gend, naty, brdy, tel, addr, insu_admdvs, emp_no, emp_name, mdtrtarea_admdvs, fixmedins_code, fixmedins_name, hosplv, adm_time, trum_time, trum_site, trum_rea, chk_pay_flag, agnter_name, agnter_cert_type, agnter_certno, agnter_tel, agnter_addr, agnter_rlts, begndate, enddate, memo, crte_id, crte_name, crte_time)
+VALUES( #{id}, #{hosp_code}, #{dcla_souc}, #{insutype}, #{psn_no}, #{psn_insurlts_id},
+                #{psn_cert_type}, #{certno}, #{psn_name}, #{gend}, #{naty}, #{brdy}, #{tel},
+                #{crteId}, #{crteName}, #{crteTime}, #{regCode})
+    </insert>
     <insert id="insertInsureFixPersonnalRecord"
             parameterType="cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO">
         insert into insure_fix_record (id, hosp_code, psn_no, tel, addr,

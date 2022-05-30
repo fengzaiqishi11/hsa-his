@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.bo.InsurePersonnalRecordBO;
+import cn.hsa.module.insure.module.dto.InsureAccidentalInjuryDTO;
 import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
 import cn.hsa.module.insure.module.service.InsurePersonnalRecordService;
 import cn.hsa.util.MapUtils;
@@ -260,5 +261,29 @@ public class InsurePersonnalRecordServiceImpl extends HsafService implements Ins
     public WrapperResponse<PageDTO> queryPageSpecialRecord(Map<String, Object> map) {
         InsureSpecialRecordDTO insureSpecialRecordDTO = MapUtils.get(map,"insureSpecialRecordDTO");
         return WrapperResponse.success(insurePersonnalRecordBO.queryPageSpecialRecord(insureSpecialRecordDTO));
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:32
+     * @Description 人员意外伤害备案
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryPageInsureAccidentInjureRecord(Map<String, Object> map) {
+        InsureAccidentalInjuryDTO insureAccidentalInjuryDTO = MapUtils.get(map,"insureAccidentalInjuryDTO");
+        return WrapperResponse.success(insurePersonnalRecordBO.queryPageInsureAccidentInjureRecord(insureAccidentalInjuryDTO));
+    }
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public WrapperResponse<Boolean> insertInsureAccidentInjureRecord(Map map) {
+        return WrapperResponse.success(insurePersonnalRecordBO.insertInsureAccidentInjureRecord(MapUtils.get(map,"insureAccidentalInjuryDTO")));
     }
 }

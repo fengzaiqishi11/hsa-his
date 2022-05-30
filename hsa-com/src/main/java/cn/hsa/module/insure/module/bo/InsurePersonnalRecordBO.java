@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.module.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.module.dto.InsureAccidentalInjuryDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
@@ -198,4 +199,21 @@ public interface InsurePersonnalRecordBO {
      * @Return
      */
     PageDTO queryPageSpecialRecord(InsureSpecialRecordDTO insureSpecialRecordDTO);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:33
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @return cn.hsa.base.PageDTO
+     */
+    PageDTO queryPageInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO);
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-07 10:27
+     * @Description 人员意外伤害备案
+     * @param insureAccidentalInjuryDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    Boolean insertInsureAccidentInjureRecord(InsureAccidentalInjuryDTO insureAccidentalInjuryDTO);
 }

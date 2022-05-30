@@ -917,7 +917,7 @@
                    md.in_situation_code,md.columns_num
             FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
             WHERE md.hosp_code = #{hospCode}
-            AND md.visit_id = #{id} order by md.disease_code desc
+            AND md.visit_id = #{id} order by md.columns_num asc
     </select>
 
     <!--查询病案诊断信息-->

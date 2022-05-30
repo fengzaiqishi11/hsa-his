@@ -2,6 +2,7 @@ package cn.hsa.module.outpt.visit.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -10,6 +11,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,4 +104,13 @@ public interface OutptVisitService {
     **/
     WrapperResponse<Boolean> updateOutptAcctPay(Map<String,Object> map);
 
+
+    List<OutptVisitDTO> queryOutptVisitSelfFeePatient(Map<String, String> param);
+
+    List<OutptCostDTO> queryOutptCostByvisitIds(Map<String, Object> reqMap);
+
+    WrapperResponse<Boolean> updateUplod(Map<String, Object> map);
+
+
+    WrapperResponse<Boolean>  updateOutptVisitUploadFlag(Map<String, Object> map);
 }

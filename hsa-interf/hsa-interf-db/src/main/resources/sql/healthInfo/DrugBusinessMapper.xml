@@ -482,7 +482,7 @@
             select bd3.YLJGDM  as YLJGDM,
             bd3.KSBM  as KSBM,
             bd3.name  as KSMC,
-            bd3.ywsj as YWSJ,
+            date_format(bd3.ywsj,'%Y%m%d') as YWSJ,
             ifnull(a.mzrc,0)  as MZRC,
             ifnull(b.jzrc,0)  as JZRC,
             ifnull(c.RYRC,0)  as RYRC,
@@ -506,7 +506,7 @@
             '' as TJYL6,
             '' as TJYL7,
             '' as TJYL8,
-            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.id as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
+            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.code as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
             DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
             FROM base_dept bd
             LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1

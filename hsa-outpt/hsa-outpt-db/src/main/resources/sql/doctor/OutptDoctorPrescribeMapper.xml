@@ -683,7 +683,7 @@
     <!--  获取处方主表、明细表记录 -->
     <select id="getPrescribeAllDetailBySettleNo" resultMap="outptPrescribeDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.*,a.crte_time as crteTime, c.diagnose_ids, c.disease_names,
-        (select visit_no from outpt_visit where hosp_code = #{hospCode} and visit_id = a.visit_id limit 1) as visitNo
+        (select visit_no from outpt_visit where hosp_code = #{hospCode} and id = a.visit_id limit 1) as visitNo
         from outpt_prescribe a
         join outpt_settle b on a.hosp_code=b.hosp_code and a.settle_id=b.id
         join(

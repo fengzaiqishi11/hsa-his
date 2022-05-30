@@ -54,6 +54,7 @@ public class PharOutDistributeAllDetailDTO extends PharOutDistributeAllDetailDO 
     //生产厂家
     private String prodName;
 
-
+    //材料药品分类
+    private String typeCode;
 
 }

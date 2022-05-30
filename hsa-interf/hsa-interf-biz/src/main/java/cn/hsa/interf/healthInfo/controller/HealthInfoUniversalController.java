@@ -4,8 +4,6 @@ import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.healthInfo.service.*;
 import cn.hsa.util.MapUtils;
-import cn.hutool.core.map.MapBuilder;
-import cn.hutool.core.map.MapUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;

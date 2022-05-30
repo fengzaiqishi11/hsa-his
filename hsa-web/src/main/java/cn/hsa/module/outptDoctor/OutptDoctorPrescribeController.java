@@ -580,7 +580,22 @@ public class OutptDoctorPrescribeController extends BaseController {
     paramMap.put("baseDrugDTO", baseDrugDTO);
     return outptDoctorPrescribeService_consumer.getCfData(paramMap);
   }
-
+  @PostMapping("/getCfData2")
+  public WrapperResponse<PageDTO> getCfData2(@RequestBody BaseDrugDTO baseDrugDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map paramMap = new HashMap();
+    //医院编码
+    paramMap.put("hospCode",sysUserDTO.getHospCode());
+    //医院编码
+    baseDrugDTO.setHospCode(sysUserDTO.getHospCode());
+    //登录科室
+    baseDrugDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+    // 是否只能开检查项目
+    baseDrugDTO.setOnlyOpenItem(sysUserDTO.getOnlyOpenItem());
+    //查询数据
+    paramMap.put("baseDrugDTO", baseDrugDTO);
+    return outptDoctorPrescribeService_consumer.getCfData2(paramMap);
+  }
   /**
    * @Menthod OutptRegisterDTO
    * @Desrciption  保存处方信息

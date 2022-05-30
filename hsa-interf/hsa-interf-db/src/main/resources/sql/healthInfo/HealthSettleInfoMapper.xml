@@ -24,11 +24,11 @@
     a.crte_name as MODIFYTNAME
     from
 	outin_daily a
-    join outin_daily_pay d on
+    left join outin_daily_pay d on
 	a.id = d.daily_id
 	and d.type_code = '2'
 	and d.hosp_code = #{hospCode}
-    join (select
+    left join (select
 		count(d.id)as num,
 		ss.daily_settle_id
 	from
@@ -63,11 +63,11 @@
     a.crte_name as MODIFYTNAME
     from
 	outin_daily a
-    join outin_daily_pay d on
+    left join outin_daily_pay d on
 	a.id = d.daily_id
 	and d.type_code = '1'
 	and d.hosp_code = #{hospCode}
-    join (select
+    left join (select
 		count(d.id)as num,
 		ss.daily_settle_id
 	from
@@ -102,11 +102,11 @@
     a.crte_name as MODIFYTNAME
     from
 	outin_daily a
-    join outin_daily_pay d on
+    left join outin_daily_pay d on
 	a.id = d.daily_id
 	and d.type_code = '0'
 	and d.hosp_code = #{hospCode}
-    join (select
+    left join (select
 		count(d.id)as num,
 		ss.daily_settle_id
 	from
@@ -156,7 +156,7 @@
    from
 	outin_daily a
     join inpt_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
-    join inpt_settle_invoice c on b.id = c.settle_id and b.hosp_code = c.hosp_code
+    left join inpt_settle_invoice c on b.id = c.settle_id and b.hosp_code = c.hosp_code
     join inpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '2' and a.hosp_code =#{hospCode}
     and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
@@ -185,7 +185,7 @@
     '1' as ywlx,
     b.crte_id as sfrybm,
     b.crte_name as sfryxm,
-    c.invoice_no as fph,
+    (select c.invoice_no from outpt_settle_invoice  c where b.id = c.settle_id and b.hosp_code = c.hosp_code limit 1) as fph,
     '1' as validflag,
    b.crte_time as appetime,
    b.crte_time as modifytime,
@@ -194,7 +194,6 @@
    from
 	outin_daily a
     join outpt_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
-    join outpt_settle_invoice  c on b.id = c.settle_id and b.hosp_code = c.hosp_code
     join outpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '1' and a.hosp_code =#{hospCode}
     and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
@@ -232,7 +231,7 @@
    from
 	outin_daily a
     join outpt_register_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
-    join outpt_settle_invoice  c on b.id = c.settle_id and b.hosp_code = c.hosp_code
+    left join outpt_settle_invoice  c on b.id = c.settle_id and b.hosp_code = c.hosp_code
     join outpt_register d on b.register_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '0' and a.hosp_code =#{hospCode}
     and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))

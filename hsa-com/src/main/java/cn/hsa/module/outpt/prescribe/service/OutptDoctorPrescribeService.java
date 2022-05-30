@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -15,6 +16,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
+import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -495,4 +497,12 @@ public interface OutptDoctorPrescribeService {
      **/
     @PostMapping("/service/outpt/outptDoctorPrescribe/getBaseDrug")
     WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap);
+    @GetMapping("/web/outpt/outptDoctorPrescribeService/getCfData2")
+    WrapperResponse<PageDTO> getCfData2(Map paramMap);
+
+    @PostMapping("/web/outpt/outptDoctorPrescribeService/queryOutptDiagnoseByVisitIds")
+    WrapperResponse<List<OutptDiagnoseDTO>> queryOutptDiagnoseByVisitIds(Map map);
+
+    @PostMapping("/web/outpt/outptDoctorPrescribeService/queryOutptMatchDiagnose")
+    WrapperResponse<List<OutptDiagnoseDTO>> queryOutptMatchDiagnose(Map<String, Object> reqMap);
 }

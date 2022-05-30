@@ -1,170 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hsa.module.interf.healthInfo.dao.HealthOutptDAO">
-    <resultMap type="cn.hsa.module.interf.healthInfo.entity.TbHzjbxx" id="basePaitentProfileMap">
-        <result property="HZJGNWYID" column="id" jdbcType="VARCHAR"/>
-        <result property="YLJGDM" column="YLJGDM" jdbcType="VARCHAR"/>
-        <result property="YLJGMC" column="YLJGMC" jdbcType="VARCHAR"/>
-        <result property="XM" column="name" jdbcType="VARCHAR"/>
-        <result property="XBDM" column="gender_code" jdbcType="VARCHAR"/>
-        <result property="XBMC" column="gender_name" jdbcType="VARCHAR"/>
-        <result property="GRJKDABM" column="GRJKDABM" jdbcType="VARCHAR"/>
-        <result property="JMJKKH" column="JMJKKH" jdbcType="VARCHAR"/>
-        <result property="SBKH" column="SBKH" jdbcType="VARCHAR"/>
-        <result property="YBKH" column="YBKH" jdbcType="VARCHAR"/>
-        <result property="XNHKH" column="XNHKH" jdbcType="VARCHAR"/>
-        <result property="YNZLKH" column="YNZLKH" jdbcType="VARCHAR"/>
-        <result property="SFZH" column="cert_no" jdbcType="VARCHAR"/>
-        <result property="ZJLX" column="cert_code" jdbcType="VARCHAR"/>
-        <result property="ZJHM" column="cert_no" jdbcType="VARCHAR"/>
-        <result property="HYZKDM" column="marry_code" jdbcType="VARCHAR"/>
-        <result property="HYZKMC" column="HYZKMC" jdbcType="VARCHAR"/>
-        <result property="WHCDDM" column="education_code" jdbcType="VARCHAR"/>
-        <result property="WHCDMC" column="WHCDMC" jdbcType="VARCHAR"/>
-        <result property="ZYLBDM" column="occupation_code" jdbcType="VARCHAR"/>
-        <result property="ZYLBMC" column="ZYLBMC" jdbcType="VARCHAR"/>
-        <result property="LXDH" column="phone" jdbcType="VARCHAR"/>
-        <result property="CSDXZQHDM" column="native_place" jdbcType="VARCHAR"/>
-        <result property="CSDMC" column="CSDMC" jdbcType="VARCHAR"/>
-        <result property="MZDM" column="nation_code" jdbcType="VARCHAR"/>
-        <result property="MZMC" column="MZMC" jdbcType="VARCHAR"/>
-        <result property="GMS" column="allergy_disease" jdbcType="VARCHAR"/>
-        <result property="JBS" column="past_disease" jdbcType="VARCHAR"/>
-        <result property="XXDM" column="blood_code" jdbcType="VARCHAR"/>
-        <result property="XXMC" column="XXMC" jdbcType="VARCHAR"/>
-        <result property="Rh_D_XXDM" column="Rh_D_XXDM" jdbcType="VARCHAR"/>
-        <result property="Rh_D_XXMC" column="Rh_D_XXMC" jdbcType="VARCHAR"/>
-        <result property="GJDM" column="nationality_cation" jdbcType="VARCHAR"/>
-        <result property="GJMC" column="GJMC" jdbcType="VARCHAR"/>
-        <result property="XZZ" column="now_address" jdbcType="VARCHAR"/>
-        <result property="XZZYZBM" column="now_post_code" jdbcType="VARCHAR"/>
-        <result property="XZZS_XZQHDM" column="now_prov" jdbcType="VARCHAR"/>
-        <result property="XZZS_MC" column="XZZS_MC" jdbcType="VARCHAR"/>
-        <result property="XZZSZ_XZQHDM" column="native_city" jdbcType="VARCHAR"/>
-        <result property="XZZSZ_MC" column="XZZSZ_MC" jdbcType="VARCHAR"/>
-        <result property="XZZXQ_XZQHDM" column="now_area" jdbcType="VARCHAR"/>
-        <result property="XZZXQ_MC" column="XZZXQ_MC" jdbcType="VARCHAR"/>
-        <result property="XZZXZ_XZQHDM" column="XZZXZ_XZQHDM" jdbcType="VARCHAR"/>
-        <result property="XZZXZ_MC" column="XZZXZ_MC" jdbcType="VARCHAR"/>
-        <result property="XZZC_XZQHDM" column="XZZC_XZQHDM" jdbcType="VARCHAR"/>
-        <result property="XZZC_MC" column="XZZC_MC" jdbcType="VARCHAR"/>
-        <result property="GZDWYB" column="work_post_code" jdbcType="VARCHAR"/>
-        <result property="GZDWMC" column="work" jdbcType="VARCHAR"/>
-        <result property="GZDWDZ" column="work_address" jdbcType="VARCHAR"/>
-        <result property="GZDWDHHM" column="work_phone" jdbcType="VARCHAR"/>
-        <result property="CJGZRQ" column="CJGZRQ" jdbcType="VARCHAR"/>
-        <result property="SWRQHRQ" column="SWRQHRQ" jdbcType="VARCHAR"/>
-        <result property="LXRXM" column="contact_name" jdbcType="VARCHAR"/>
-        <result property="LXRYHZGXDM" column="contact_rela_code" jdbcType="VARCHAR"/>
-        <result property="LXRYHZGXMC" column="LXRYHZGXMC" jdbcType="VARCHAR"/>
-        <result property="LXRDZ" column="contact_address" jdbcType="VARCHAR"/>
-        <result property="LXRYB" column="contact_post_code" jdbcType="VARCHAR"/>
-        <result property="LXRDH" column="contact_phone" jdbcType="VARCHAR"/>
-        <result property="JDZXM" column="crte_name" jdbcType="VARCHAR"/>
-        <result property="JDRQSJ" column="crte_time" jdbcType="VARCHAR"/>
-        <result property="VALIDFLAG" column="is_valid" jdbcType="VARCHAR"/>
-        <result property="APPETIME" column="crte_time" jdbcType="VARCHAR"/>
-        <result property="MODIFYTCODE" column="crte_id" jdbcType="VARCHAR"/>
-        <result property="MODIFYTNAME" column="crte_name" jdbcType="VARCHAR"/>
-    </resultMap>
-    <select id="queryBaseProfile" resultMap="basePaitentProfileMap" parameterType="java.util.Map">
-        select
-            id,
-            (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=bpf.hosp_code limit 1) as yljgdm,
+    <select id="queryBaseProfile" resultType="cn.hsa.module.interf.healthInfo.entity.TbHzjbxx" parameterType="java.util.Map">
+    select
+    id as hzjgnwyid,
+    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=bpf.hosp_code limit 1) as yljgdm,
 	(select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = bpf.hosp_code limit 1) as yljgmc,
-	name,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as gender_code,
-	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as gender_name,
-	'' as GRJKDABM,
-	'' as JMJKKH,
-	'' as	SBKH,
-	'' as	YBKH,
-	'' as	XNHKH,
-	'' as	YNZLKH,
-	'' as HYZKMC,
-	'' as WHCDMC,
-	'' as ZYLBMC,
-	'' as CSDMC,
-	'' as MZMC,
-	'' as XXMC,
-	'' as Rh_D_XXDM,
-	'' as Rh_D_XXMC,
-	'' as GJMC,
-	'' as XZZS_MC,
-	'' as XZZSZ_MC,
-	'' as XZZXQ_MC,
-	'' as XZZXZ_XZQHDM,
-	'' as XZZC_XZQHDM,
-	'' as XZZC_MC,
-	null as CJGZRQ,
-	null as SWRQHRQ,
-	'' as LXRYHZGXMC,
-	age,
-	birthday,
-	nation_code,
-	nationality_cation,
-	native_place,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4658-2006' and hb.cm_value =bpf.education_code limit 1) as education_code,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.4-2003' and hb.cm_value =bpf.occupation_code limit 1) as occupation_code,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.2-2003' and hb.cm_value =bpf.marry_code limit 1) as marry_code,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV02.01.101' and hb.cm_value =bpf.cert_code limit 1) as cert_code,
-	cert_no,
-	phone,
-	email,
-	often_code,
-	now_prov,
-	now_city,
-	now_area,
-	now_address,
-	now_post_code,
-	native_prov,
-	native_city,
-	native_area,
-	native_address,
-	native_post_code,
-	contact_name,
-	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4761-2008' and hb.cm_value =bpf.contact_rela_code  limit 1) as contact_rela_code,
-	contact_phone,
-	contact_post_code,
-	contact_address,
-	take_name,
-	take_rela_code,
-	take_cert_no,
-	take_phone,
-	`work`,
-	work_phone,
+	name as xm,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as xbdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =bpf.gender_code limit 1) as xbmc,
+	birthday as csrq,
+	'' as grjkdabm,
+	'' as jmjkkh,
+	'' as	sbkh,
+	'' as	ybkh,
+	'' as	xnhkh,
+	'' as	ynzlkh,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV02.01.101' and hb.cm_value =bpf.cert_code limit 1) as zjlx,
+	cert_no as sfzh,
+	cert_no as zjhm,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.2-2003' and hb.cm_value =bpf.marry_code limit 1) as hyzkdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.2-2003' and hb.cm_value =bpf.marry_code limit 1) as hyzkmc,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4658-2006' and hb.cm_value =bpf.education_code limit 1) as whcddm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 4658-2006' and hb.cm_value =bpf.education_code limit 1) as whcdmc,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.4-2003' and hb.cm_value =bpf.occupation_code limit 1) as zylbdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.4-2003' and hb.cm_value =bpf.occupation_code limit 1) as zylbmc,
+	phone as lxdh,
+	'' as csdxzqhd,
+	'' as csdmc,
+	nation_code as mzdm,
+	'' as mzmc,
+	nationality_cation as gjdm,
+	'' as gjmc,
+	allergy_disease as gms,
+	past_disease as jbs,
+	blood_code as xxdm,
+	'' as xxmc,
+	'' as rhDXxd,
+	'' as rhDXxm,
+	now_address as xzz,
+	now_post_code as xzzyzbm,
+	bpf.now_prov as xzzsXzq,
+	'' as xzzsMc,
+	bpf.now_city  as xzzszXz,
+	'' as xzzszMc,
+	bpf.now_area as xzzxqXz,
+	'' as xzzxqMc,
+	'' as xzzxzXz,
+	bpf.now_address as xzzxzMc,
+	'' as xzzcXzq,
+	'' as xzzcMc,
+	`work` as gzdwmc,
+	work_phone as gzdwdhhm,
 	work_post_code,
-	work_address,
-	blood_code,
-	family_disease,
-	expose_disease,
-	heredity_disease,
-	allergy_disease,
-	past_disease,
-	past_oper,
-	past_trauma,
-	past_blood,
-	past_remark,
-	allergy_remark,
-	source_tj_code,
-	source_tj_remark,
-	pym,
-	wbm,
-	total_out,
-	total_in,
-	outpt_last_visit_time,
-	inpt_last_visit_time,
-	patient_code,
-	preferential_type_id,
-	remark,
-	is_valid,
-	crte_id,
-	crte_name,
-	crte_time,
-	age_unit_code
-        from base_profile_file bpf
-        where bpf.crte_time &gt;= date(#{startTime}) and bpf.crte_time &lt;= date(#{endTime}) and bpf.hosp_code =#{hospCode}
-        order by bpf.crte_time asc
+	work_address as gzdwdz,
+	null as cjgzrq,
+	null as swrqhrq,
+	contact_name as lxrxm,
+	(select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 4761-2008' and hb.cm_value =bpf.contact_rela_code  limit 1) as lxryhzgxdm,
+	(select hb.c_meaning  from healthinfo_base_code hb where hb.c_code ='GB/T 4761-2008' and hb.cm_value =bpf.contact_rela_code  limit 1) as lxryhzgxmc,
+	contact_address as lxrdz,
+	contact_post_code as lxryb,
+	contact_phone as lxrdh,
+	crte_name as jdzxm,
+	crte_time as jdrqsj,
+	is_valid as validflag,
+	bpf.crte_time as APPETIME,
+    bpf.crte_time  as MODIFYTIME,
+    bpf.crte_id as MODIFYTCODE,
+    bpf.crte_name as MODIFYTNAME
+    from base_profile_file bpf
+    where bpf.crte_time &gt;= date(#{startTime}) and bpf.crte_time &lt;= date(#{endTime}) and bpf.hosp_code =#{hospCode}
+    order by bpf.crte_time asc
 	</select>
     <select id="queryRegisterInfo" resultType="cn.hsa.module.interf.healthInfo.entity.TbMzgh"
             parameterType="java.util.Map">
@@ -202,43 +109,7 @@
         a.crte_name as MODIFYTNAME
         from outpt_register a
         left join outpt_register_detail b on a.id = b.register_id  and a.hosp_code =b.hosp_code
-        select
-            a.id as MZLSH,
-            (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
-       (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
-       a.visit_id as HZJGNWYID,
-       a.register_no as MZH,
-       '' as KLX,
-       '' as KH,
-       a.name as XM,
-       (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBDM,
-       (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =a.gender_code  limit 1) as XBMC,
-       a.age as NL,
-       a.register_time as GTHSJ,
-       (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.002' and hb.cm_value =a.visit_code  limit 1) as GHLB,
-       '' as YLBXLBDM,
-       '' as YLBXLBMC,
-       a.dept_id as KSBM,
-       a.dept_name as KSMC,
-       ifnull(b.total_price,0) as ZFZLF,
-       a.source_bz_code as GHFS,
-       '' as TXBZ,
-       '' as WDBZ,
-       '' as GHZT,
-       a.doctor_id as GHYSBM,
-       a.doctor_name as GHYSXM,
-       '' as GHYSZCDM,
-       '' as GHYSZCMC,
-       a.is_cancel as VALIDFLAG,
-       a.crte_time as APPETIME,
-       a.crte_time as MODIFYTIME,
-       a.crte_id  as MODIFYTCODE,
-       a.crte_name as MODIFYTNAME
-        from outpt_register a
-            left join outpt_register_detail b on a.id = b.register_id  and a.hosp_code =b.hosp_code
         where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
-        order by a.crte_time asc
-
         group by a.id
         order by a.crte_time asc
     </select>

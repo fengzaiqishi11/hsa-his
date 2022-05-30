@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.clinica.dao.InsureDrugsensitiveReportDAO">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.hsa.module.insure.clinica.entity.InsureDrugsensitiveReportDO">
+        <id column="uuid" property="uuid" />
+        <result column="hosp_code" property="hospCode" />
+        <result column="mdtrt_sn" property="mdtrtSn" />
+        <result column="mdtrt_id" property="mdtrtId" />
+        <result column="psn_no" property="psnNo" />
+        <result column="visit_no" property="visitNo" />
+        <result column="appy_no" property="appyNo" />
+        <result column="rpotc_no" property="rpotcNo" />
+        <result column="germ_code" property="germCode" />
+        <result column="germ_name" property="germName" />
+        <result column="sstb_code" property="sstbCode" />
+        <result column="sstb_name" property="sstbName" />
+        <result column="reta_rslt_code" property="retaRsltCode" />
+        <result column="reta_rslt_name" property="retaRsltName" />
+        <result column="ref_val" property="refVal" />
+        <result column="exam_mtd" property="examMtd" />
+        <result column="exam_rslt" property="examRslt" />
+        <result column="exam_org_name" property="examOrgName" />
+        <result column="vali_flag" property="valiFlag" />
+        <result column="is_uplod" property="isUplod" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        uuid, hosp_code, mdtrt_sn, mdtrt_id, psn_no, visit_no, appy_no, rpotc_no, germ_code, germ_name, sstb_code, sstb_name, reta_rslt_code, reta_rslt_name, ref_val, exam_mtd, exam_rslt, exam_org_name, vali_flag, is_uplod, create_time, update_time
+    </sql>
+
+    <select id="queryPageInsureDrugsensitiveReport" resultType="cn.hsa.module.insure.clinica.dto.InsureDrugsensitiveReportDTO">
+        select <include refid="Base_Column_List"/>
+        from insure_drugsensitive_report
+        <where>
+            and vali_flag = '1'
+            <if test="visitNo != null and mdtrtSn != '' ">
+                and visit_no like concat('%', #{visitNo,jdbcType=VARCHAR}, '%')
+            </if>
+            <if test="appyNo != null and appyNo != '' ">
+                and appy_no like concat('%', #{appyNo,jdbcType=VARCHAR}, '%')
+            </if>
+        </where>
+    </select>
+
+    <select id="queryByUuid" resultType="cn.hsa.module.insure.clinica.dto.InsureDrugsensitiveReportDTO">
+        select <include refid="Base_Column_List"/>
+        from insure_drugsensitive_report
+        where uuid = #{uuid}
+    </select>
+
+    <select id="queryByMdtrtSn" resultType="cn.hsa.module.insure.clinica.dto.InsureDrugsensitiveReportDTO">
+        select <include refid="Base_Column_List"/>
+        from insure_drugsensitive_report
+        where mdtrt_sn = #{mdtrtSn}
+    </select>
+
+    <insert id="insertInsureDrugsensitiveReport" parameterType="cn.hsa.module.insure.clinica.dto.InsureDrugsensitiveReportDTO" >
+        insert into insure_drugsensitive_report (uuid, mdtrt_sn, mdtrt_id,
+        psn_no, visit_no, appy_no,rpotc_no,
+        germ_code, germ_name, sstb_code,
+        sstb_name, reta_rslt_code, reta_rslt_name,
+        ref_val,exam_mtd, exam_rslt,exam_org_name, vali_flag,
+        is_uplod,create_time, update_time, hosp_code
+        )
+        values (#{uuid,jdbcType=BIGINT}, #{mdtrtSn,jdbcType=VARCHAR}, #{mdtrtId,jdbcType=VARCHAR},
+        #{psnNo,jdbcType=VARCHAR}, #{visitNo,jdbcType=VARCHAR},#{appyNo,jdbcType=VARCHAR},
+        #{rpotcNo,jdbcType=VARCHAR}, #{germCode,jdbcType=VARCHAR}, #{germName,jdbcType=VARCHAR},
+        #{sstbCode,jdbcType=VARCHAR}, #{sstbName,jdbcType=VARCHAR},#{retaRsltCode,jdbcType=VARCHAR},
+        #{retaRsltName,jdbcType=VARCHAR},#{refVal,jdbcType=VARCHAR},#{examMtd,jdbcType=VARCHAR},#{examRslt,jdbcType=VARCHAR},
+        #{examOrgName,jdbcType=VARCHAR}, #{valiFlag,jdbcType=VARCHAR},#{isUplod,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},#{hospCode,jdbcType=VARCHAR})
+    </insert>
+
+    <update id="updateSelective" parameterType="map" >
+        update insure_drugsensitive_report
+        <set >
+            <if test="mdtrtSn != null" >
+                mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
+            </if>
+            <if test="mdtrtId != null" >
+                mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
+            </if>
+            <if test="psnNo != null" >
+                psn_no = #{psnNo,jdbcType=VARCHAR},
+            </if>
+            <if test="visitNo != null" >
+                visit_no = #{visitNo,jdbcType=VARCHAR},
+            </if>
+            <if test="appyNo != null" >
+                appy_no = #{appyNo,jdbcType=VARCHAR},
+            </if>
+            <if test="rpotcNo != null" >
+                rpotc_no = #{rpotcNo,jdbcType=VARCHAR},
+            </if>
+            <if test="germCode != null" >
+                germ_code = #{germCode,jdbcType=VARCHAR},
+            </if>
+            <if test="germName != null" >
+                germ_name = #{germName,jdbcType=DECIMAL},
+            </if>
+            <if test="colyCntg != null" >
+                coly_cntg = #{colyCntg,jdbcType=VARCHAR},
+            </if>
+            <if test="clteMedm != null" >
+                clte_medm = #{clteMedm,jdbcType=VARCHAR},
+            </if>
+            <if test="clteTime != null" >
+                clte_time = #{clteTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="clteCond != null" >
+                clte_cond = #{clteCond,jdbcType=VARCHAR},
+            </if>
+            <if test="examRslt != null" >
+                exam_rslt = #{examRslt,jdbcType=VARCHAR},
+            </if>
+            <if test="fndWay != null" >
+                fnd_way = #{fndWay,jdbcType=VARCHAR},
+            </if>
+            <if test="examOrgName != null" >
+                exam_org_name = #{examOrgName,jdbcType=VARCHAR},
+            </if>
+            <if test="valiFlag != null" >
+                vali_flag = #{valiFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="isUplod != null" >
+                is_uplod = #{isUplod,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="hospCode != null" >
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where uuid = #{uuid}
+    </update>
+
+</mapper>

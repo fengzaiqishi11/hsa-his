@@ -32,7 +32,7 @@ public class PhysBusinessBOImpl implements PhysBusinessBO {
      **/
     @Override
     public List<TbYlTjbgsy> listPhysReportFront(Map map) {
-        return physBusinessDAO.listPhysReportFront(map);
+        return null;
     }
 
     /**
@@ -45,7 +45,7 @@ public class PhysBusinessBOImpl implements PhysBusinessBO {
      **/
     @Override
     public List<TbYlTjfzbg> listPhysGroupingReport(Map map) {
-        return physBusinessDAO.listPhysGroupingReport(map);
+        return null;
     }
 
     /**
@@ -58,6 +58,6 @@ public class PhysBusinessBOImpl implements PhysBusinessBO {
      **/
     @Override
     public List<TbYlTjmx> listPhysItemDetail(Map map) {
-        return physBusinessDAO.listPhysItemDetail(map);
+        return null;
     }
 }

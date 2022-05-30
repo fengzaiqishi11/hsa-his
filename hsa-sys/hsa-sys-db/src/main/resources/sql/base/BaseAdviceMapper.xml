@@ -417,10 +417,10 @@
             and ov.visit_no like concat('%',#{visitNo},'%')
         </if>
         <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
+            and ma.apply_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
+            and ma.apply_time &lt;= #{endDate}
         </if>
         <if test="queryType != null and queryType == 'zy'.toString()">
             and 1=2
@@ -482,10 +482,10 @@
             and iv.in_no like concat('%',#{visitNo},'%')
         </if>
         <if test="startDate != null and startDate != '' ">
-            and ma.crte_time >= DATE_ADD(#{startDate},INTERVAL 0 day)
+            and ma.apply_time >= #{startDate}
         </if>
         <if test="endDate != null and endDate != '' ">
-            and ma.crte_time &lt; DATE_ADD(#{endDate},INTERVAL 1 day)
+            and ma.apply_time &lt;= #{endDate}
         </if>
         <if test="queryType != null and queryType == 'mz'.toString()">
             and 1=2

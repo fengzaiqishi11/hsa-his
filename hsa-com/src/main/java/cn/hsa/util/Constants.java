@@ -24,6 +24,13 @@ public interface Constants {
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
     }
+
+    class TechnologyStatus {
+        public static final String NOTCONFIRMCOST = "0"; // 未确费
+        public static final String CONFIRMCOST = "1"; // 已确费
+        public static final String REFUNDCOST = "2"; // 申请退费
+        public static final String ALREADYREFUND = "3"; // 已退费
+    }
     /**
      * 颜色（color）
      */
@@ -69,8 +76,14 @@ public interface Constants {
      * @Date 2020/8/26 11:03
      */
     class SF{
-        public static final String S = "1"; //是
-        public static final String F = "0"; //否
+        /**
+         * 是
+         */
+        public static final String S = "1";
+        /**
+         * 否
+         */
+        public static final String F = "0";
     }
 
     /**

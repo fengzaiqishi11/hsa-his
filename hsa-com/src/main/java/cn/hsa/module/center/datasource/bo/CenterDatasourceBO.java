@@ -9,6 +9,7 @@ import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.TableStructureSyncDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.center.datasource.bo
@@ -151,4 +152,13 @@ public interface CenterDatasourceBO {
     WrapperResponse updateIsGuide();
 
     void addDataUser(CenterHospitalDTO centerHospitalDTO);
+
+    /**
+     * @Description: 导出医院数据（SaaS导出）
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    WrapperResponse exportHospitalData(String startDate,String endDate);
 }

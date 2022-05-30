@@ -383,7 +383,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
         inptAdviceDTO.setItemId(dto.getItemId());
         inptAdviceDTO.setPharId(dto.getPharId());
         inptAdviceDTO.setTotalNum(dto.getAllNum());
-        inptAdviceDTO.setUnitCode(dto.getUnitCode());
+        inptAdviceDTO.setUnitCode(dto.getCurrUnitCode());
         //判断库存,如果库存为空就移除
         if (ListUtils.isEmpty(doctorAdviceBO.checkStock(inptAdviceDTO))) {
           it.remove();
@@ -455,7 +455,16 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       int update = inptPrintDAO.updateAdvicePrint(updateList);
     }
     inptAdvicePrintDTO.setIsValid("1");
-    return inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
+    List<InptAdvicePrintDTO> inptAdvicePrintDTOS1 = inptPrintDAO.queryAdvicePrintByVisitId(inptAdvicePrintDTO);
+    for (InptAdvicePrintDTO advicePrintDTO : inptAdvicePrintDTOS1) {
+      if(!StringUtils.isEmpty(advicePrintDTO.getDosage())){
+        String dosage = advicePrintDTO.getDosage();
+        String [] low = dosage.split("\\.");
+        dosage = Integer.parseInt(low[1])<=0?low[0]:dosage;
+        advicePrintDTO.setDosage(dosage);
+      }
+    }
+    return inptAdvicePrintDTOS1;
   }
 
   /**

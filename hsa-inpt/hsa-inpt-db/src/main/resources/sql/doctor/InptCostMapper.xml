@@ -2250,6 +2250,13 @@
             #{id}
         </foreach>
     </update>
+    <!--更新住院费用为已申请退费-->
+    <update id="updateInptCostIsOkByIds">
+        update inpt_cost set is_ok = '2' where hosp_code = #{hospCode} and id in
+                                         <foreach collection="ids" item="item" open="(" separator="," close=")">
+                                             #{item}
+                                         </foreach>
+    </update>
 
 
     <!--单个新增-->

@@ -34,4 +34,6 @@
     <dubbo:reference id="insureDiseaseMatchService_consumer" interface="cn.hsa.module.insure.module.service.InsureDiseaseMatchService" check="false"/>
     <!-- 医保管理子系统 -> 医保配置信息 -->
     <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
+    <!-- 用户密码修改记录服务-->
+    <dubbo:reference id="centerPasswordModifyLogService_consumer" interface="cn.hsa.module.center.log.service.CenterPasswordModifyLogService" check="false"/>
 </beans>

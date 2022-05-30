@@ -579,7 +579,18 @@
         iim.manufacturer manufacturer,
         iim.tcmdrug_used_way tcmdrugUsedWay,
         iim.lmt_user_flag lmtUserFlag,
-        ic.is_reimburse isReimburse
+        ic.is_reimburse isReimburse,
+        iim.hilist_lv hilistLv,-- 医保目录等级
+        iim.chrg_type chrgType,-- 收费等级
+        iic.fulamt_ownpay_amt fulamtOwnpayAmt,-- 自费金额
+        iic.preselfpay_amt preselfpayAmt,-- 自付金额
+        ia.iatd_group_no iatdGroupNo,-- 医嘱组号
+        ia.exec_dept_id execDeptId,-- 执行科室
+        ia.long_start_time longStartTime,-- 医嘱开始时间
+        ia.crte_id crteId,-- 开嘱医生id
+        ia.crte_name crteName,-- 开嘱医生姓名
+        ia.is_long isLong,-- 是否临时医嘱
+        (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ia.exec_dept_id) as execDeptName-- 执行科室名称
         FROM
         inpt_cost ic
         JOIN insure_item_match iim
@@ -590,6 +601,7 @@
         LEFT JOIN insure_individual_cost iic
         ON ic.`id` = iic.`cost_id`
         AND ic.`hosp_code` = iic.`hosp_code`
+        left join inpt_advice ia on ic.iat_id = ia.id
         WHERE ic.`hosp_code` = #{hospCode}
         <if test='settle_code == "2" '>
             AND ic.`settle_code` IN ('0', '1','2')
@@ -1347,4 +1359,148 @@
           and insure_register_no = #{medicalRegNo}
           and insure_settle_id is null order by crte_time desc limit 1
     </select>
+
+    <select id="queryFeeInfoDetailPage" resultType="cn.hsa.module.insure.module.dto.InsureUploadCostDTO">
+        select * from insure_upload_cost where hosp_code =#{hospCode} and visit_id =#{visitId}
+    </select>
+
+    <!--    &lt;!&ndash; 根据就诊id查询所有已上传医保的费用明细信息&ndash;&gt;-->
+<!--    <select id="queryInsureCostByVisit" parameterType="java.util.HashMap" resultType="java.util.HashMap">-->
+<!--        SELECT-->
+<!--        ic.id id,-->
+<!--        ic.hosp_code hospCode,-->
+<!--        ic.visit_id visitId,-->
+<!--        ic.baby_id babyId,-->
+<!--        ic.iat_id iatId,-->
+<!--        ic.iatd_group_no iatdGroupNo,-->
+<!--        ic.iatd_seq_no iatdSeqNo,-->
+<!--        ic.advice_exec_id adviceExecId,-->
+<!--        ic.source_code sourceCode,-->
+<!--        ic.source_id sourceId,-->
+<!--        ic.old_cost_id oldCostId,-->
+<!--        ic.source_dept_id sourceDeptId,-->
+<!--        ic.in_dept_id inDeptId,-->
+<!--        ic.bfc_id bfcId,-->
+<!--        ic.item_code itemCode,-->
+<!--        ic.item_id itemId,-->
+<!--        ic.item_name itemName,-->
+<!--        ic.price price,-->
+<!--        ic.num num,-->
+<!--        ic.spec spec,-->
+<!--        ic.prep_code prepCode,-->
+<!--        ic.dosage dosage,-->
+<!--        ic.dosage_unit_code dosageUnitCode,-->
+<!--        ic.usage_code usageCode,-->
+<!--        ic.rate_id rateId,-->
+<!--        ic.speed_code speedCode,-->
+<!--        ic.use_days useDays,-->
+<!--        ic.num_unit_code numUnitCode,-->
+<!--        ic.total_num totalNum,-->
+<!--        ic.total_num_unit_code totalNumUnitCode,-->
+<!--        ic.herb_note_code herbNoteCode,-->
+<!--        ic.use_code useCode,-->
+<!--        ic.herb_num herbNum,-->
+<!--        ic.total_price totalPrice,-->
+<!--        ic.preferential_price preferentialPrice,-->
+<!--        ic.reality_price realityPrice,-->
+<!--        ic.back_num backNum,-->
+<!--        ic.back_code backCode,-->
+<!--        ic.doctor_id doctorId,-->
+<!--        (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo,-->
+<!--        ic.doctor_name doctorName,-->
+<!--        ic.dept_id deptId,-->
+<!--        (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ic.dept_id) as deptName,-->
+<!--        ic.phar_id pharId,-->
+<!--        ic.is_dist isDist,-->
+<!--        ic.is_give isGive,-->
+<!--        ic.is_ok isOk,-->
+<!--        ic.ok_id okId,-->
+<!--        ic.ok_name okName,-->
+<!--        ic.ok_time okTime,-->
+<!--        ic.crte_time crteTime,-->
+<!--        ic.cost_time costTime,-->
+<!--        ic.status_code statusCode,-->
+<!--        iic.cost_id costId,-->
+<!--        iic.feedetl_sn feedetlSn,-->
+<!--        iim.item_code insureMatchItemCode,-->
+<!--        iim.insure_reg_code insureRegCode,-->
+<!--        iim.molss_item_id molssItemId,-->
+<!--        iim.pqcc_item_id pqccItemId,-->
+<!--        iim.hosp_item_id hospItemId,-->
+<!--        iim.hosp_item_name hospItemName,-->
+<!--        iim.hosp_item_code hospItemCode,-->
+<!--        iim.hosp_item_type hospItemType,-->
+<!--        iim.hosp_item_spec hospItemSpec,-->
+<!--        iim.hosp_item_unit_code hospItemUnitCode,-->
+<!--        iim.hosp_item_prep_code hospItemPrepCode,-->
+<!--        iim.hosp_item_price hospItemPrice,-->
+<!--        iim.insure_item_name insureItemName,-->
+<!--        iim.insure_item_code insureItemCode,-->
+<!--        iim.insure_item_type insureItemType,-->
+<!--        iim.insure_item_spec insureItemSpec,-->
+<!--        iim.insure_item_unit_code insureItemUnitCode,-->
+<!--        iim.insure_item_prep_code insureItemPrepCode,-->
+<!--        iim.insure_item_price insureItemPrice,-->
+<!--        iim.deductible deductible,-->
+<!--        iim.standard_code standardCode,-->
+<!--        iim.check_price checkCode,-->
+<!--        iim.manufacturer manufacturer,-->
+<!--        iim.tcmdrug_used_way tcmdrugUsedWay,-->
+<!--        iim.lmt_user_flag lmtUserFlag,-->
+<!--        ic.is_reimburse isReimburse,-->
+<!--        iim.hilist_lv hilistLv,&#45;&#45; 医保目录等级-->
+<!--        iim.chrg_type chrgType,&#45;&#45; 收费等级-->
+<!--        iic.fulamt_ownpay_amt fulamtOwnpayAmt,&#45;&#45; 自费金额-->
+<!--        iic.preselfpay_amt preselfpayAmt,&#45;&#45; 自付金额-->
+<!--        ia.iatd_group_no iatdGroupNo,&#45;&#45; 医嘱组号-->
+<!--        ia.exec_dept_id execDeptId,&#45;&#45; 执行科室-->
+<!--        ia.long_start_time longStartTime,&#45;&#45; 医嘱开始时间-->
+<!--        ia.crte_id crteId,&#45;&#45; 开嘱医生id-->
+<!--        ia.crte_name crteName,&#45;&#45; 开嘱医生姓名-->
+<!--        ia.is_long isLong,&#45;&#45; 是否临时医嘱-->
+<!--        (select bd.name from base_dept bd where bd.hosp_code = ic.hosp_code and bd.id = ia.exec_dept_id) as execDeptName&#45;&#45; 执行科室名称-->
+<!--        FROM-->
+<!--        inpt_cost ic-->
+<!--        JOIN insure_item_match iim-->
+<!--        ON ic.`item_id` = iim.`hosp_item_id`-->
+<!--        AND ic.`item_code` = iim.`hosp_item_type`-->
+<!--        AND iim.`is_valid` = '1'-->
+<!--        AND ic.`hosp_code` = iim.`hosp_code`-->
+<!--        LEFT JOIN insure_individual_cost iic-->
+<!--        ON ic.`id` = iic.`cost_id`-->
+<!--        AND ic.`hosp_code` = iic.`hosp_code`-->
+<!--        left join inpt_advice ia on ic.iat_id = ia.id-->
+<!--        WHERE ic.`hosp_code` = #{hospCode}-->
+<!--        <if test='settle_code == "2" '>-->
+<!--            AND ic.`settle_code` IN ('0', '1','2')-->
+<!--        </if>-->
+<!--        <if test='settle_code != "2" '>-->
+<!--            AND ic.`settle_code` IN ('0', '1')-->
+<!--        </if>-->
+<!--        AND ic.`visit_id` = #{visitId}-->
+<!--        AND IFNULL(iim.`is_match`, '0') = #{isMatch}-->
+<!--        <if test="transmitCode != null and transmitCode !='' ">-->
+<!--            AND IFNULL(iic.transmit_code, '0') = #{transmitCode}-->
+<!--        </if>-->
+<!--        AND iim.insure_reg_code = #{insureRegCode}-->
+<!--        <if test="queryBaby != null and queryBaby =='N'.toString() ">-->
+<!--            and (ic.baby_id is null or trim(ic.baby_id) = '')-->
+<!--        </if>-->
+<!--        <if test="isHalfSettle == '1'.toString() ">-->
+<!--            <if test="feeStartDate != null and feeStartDate != '' ">-->
+<!--                and date(ic.cost_time) &gt;= STR_TO_DATE(#{feeStartDate},'%Y-%m-%d')-->
+<!--            </if>-->
+<!--            /*结束日期*/-->
+<!--            <if test="feeEndDate != null and feeEndDate != ''">-->
+<!--                and date(ic.cost_time) &lt;= STR_TO_DATE(#{feeEndDate},'%Y-%m-%d')-->
+<!--            </if>-->
+<!--        </if>-->
+<!--        <if test="attributionCode != null and attributionCode != '' and attributionCode != '0'.toString()">-->
+<!--            AND ic.attribution_code = #{attributionCode}-->
+<!--        </if>-->
+<!--        <if test="attributionCode == null or attributionCode == '' or attributionCode == '0'.toString()">-->
+<!--            AND (ic.attribution_code = '0' or ic.attribution_code is null or ic.attribution_code = '')-->
+<!--        </if>-->
+<!--        order by ic.total_price desc-->
+<!--    </select>-->
 </mapper>

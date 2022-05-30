@@ -45,3 +45,5 @@ nbdist/
 
 *.log
 tmp/
+
+hsa-dynamic/

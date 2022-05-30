@@ -98,5 +98,9 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
     private String tcmSyndromesId; // 中医症候id
     private String tcmSyndromesName; // 中医症候名称
     private String diagnoseType; // 诊断类型: 0 西医; 1 中医
+    private String nationCode; //
+    private String nationName; //
+    private String isValid;// 是否有效
+    private String visitNo;//就诊号
 }
 

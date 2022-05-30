@@ -16,9 +16,10 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.outpt.service.InsureVisitInfoService;
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
-import com.github.pagehelper.Page;
+
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.common.logger.Logger;
 import org.apache.dubbo.common.logger.LoggerFactory;
 import org.springframework.stereotype.Component;

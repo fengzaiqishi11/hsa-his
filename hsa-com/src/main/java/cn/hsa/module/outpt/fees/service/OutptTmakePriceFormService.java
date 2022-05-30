@@ -2,7 +2,9 @@ package cn.hsa.module.outpt.fees.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.SetlResultQueryDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -404,4 +406,40 @@ public interface OutptTmakePriceFormService {
      **/
     @PostMapping("/servcie/outpt/tmakePriceForm/updateCreditQueryInovicePrint")
     WrapperResponse<Boolean> updateCreditQueryInovicePrint(Map paramMap);
+
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 15:32
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> uploadOnlineFeeDetail(Map<String, Object> map);
+
+    /**
+     * 医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 15:14
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
+     */
+    WrapperResponse<Map<String, Object>> queryInsureSetlResult(Map<String, Object> map);
+
+    /**
+     * 【6401】费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:48
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map);
+
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 15:57
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    WrapperResponse<Boolean> insureRefund(Map<String, Object> map);
 }

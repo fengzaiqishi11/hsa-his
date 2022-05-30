@@ -6,7 +6,8 @@ import cn.hsa.module.outpt.infectious.dao.OutptInfectiousDiseaDao;
 import cn.hsa.module.outpt.infectious.dto.InfectiousDiseaseDto;
 import cn.hsa.module.outpt.infectious.entity.InfectiousDiseaseDO;
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

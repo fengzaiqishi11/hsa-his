@@ -3597,5 +3597,72 @@
             id = #{item.id} and hosp_code = #{item.hospCode}
         </foreach>
     </update>
+    <select id="queryOutptCostByvisitIds" parameterType="java.util.List" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO">
+        select  id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time
+        from outpt_cost where visit_id in(
+        <foreach collection="ids" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </select>
+    <!--批量修改确费状态为申请退费状态-->
+    <update id="updateIsTechnologyOkByContans">
+        update outpt_cost set is_technology_ok = #{status} where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="lisAndPasCostIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
 
 </mapper>

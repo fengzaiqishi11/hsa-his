@@ -70,7 +70,7 @@ public class OutptPreSettleReqUtil<T> extends InsureCommonUtil implements BaseRe
         // 就诊id
         preSettleMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         batchNo = StringUtils.isEmpty(batchNo) ? "0" : batchNo;
-        // 就诊id
+        // 收费批次号
         preSettleMap.put("chrg_bchno", batchNo);
         // 个人账户使用标志
         preSettleMap.put("acct_used_flag", outptVisitDTO.getIsUseAccount());
@@ -78,6 +78,8 @@ public class OutptPreSettleReqUtil<T> extends InsureCommonUtil implements BaseRe
         preSettleMap.put("insutype", insureIndividualVisitDTO.getAae140());
         // 公立医院改革标志
         preSettleMap.put("pub_hosp_rfom_flag", null);
+        //就诊方式 广州接口字段
+        preSettleMap.put("mdtrt_mode", "0");
 
         HashMap commParam = new HashMap();
         checkRequest(preSettleMap);

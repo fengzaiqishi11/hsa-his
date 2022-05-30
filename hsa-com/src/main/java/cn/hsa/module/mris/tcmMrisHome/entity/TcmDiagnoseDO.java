@@ -72,4 +72,7 @@ public class TcmDiagnoseDO implements Serializable {
      */
     private String tcmSyndromesName;
 
+    // 行号
+    private String columnsNum;
+
 }

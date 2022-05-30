@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.HealthSettleInfoDAO">
+    <select id="queryCwSettleInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbCwjsxx">
+    select * from
+    ( (select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	a.id as jsdh,
+	a.crte_time,
+	0 as fjzs,
+	a.total_price as je,
+	dd.num as sfmxts,
+	count(d.id) as sffsts,
+	a.id as jkrybm,
+	a.crte_name as jkryxm,
+	a.type_code as ywlx,
+	'' as zy,
+	(select count(e.id) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no and e.hosp_code =#{hospCode}) as fpzzs,
+	(select concat(min(e.start_no),'-',max(e.end_no)) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no  and e.hosp_code =#{hospCode}) as fpd,
+    '1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+    join outin_daily_pay d on
+	a.id = d.daily_id
+	and d.type_code = '2'
+	and d.hosp_code = #{hospCode}
+    join (select
+		count(d.id)as num,
+		ss.daily_settle_id
+	from
+		inpt_settle ss
+	join inpt_cost_settle d on
+		ss.id =d.settle_id and d.hosp_code = ss.hosp_code
+		and ss.hosp_code = #{hospCode}
+		group by ss.daily_settle_id
+	) dd on	a.id = dd.daily_settle_id
+    where a.type_code = '2' and a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+	group by a.id) 
+	union 
+	(select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	a.id as jsdh,
+	a.crte_time,
+	0 as fjzs,
+	a.total_price as je,
+	dd.num as sfmxts,
+	count(d.id) as sffsts,
+	a.id as jkrybm,
+	a.crte_name as jkryxm,
+	a.type_code as ywlx,
+	'' as zy,
+	(select count(e.id) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no  and e.hosp_code =#{hospCode}) as fpzzs,
+	(select concat(min(e.start_no),'-',max(e.end_no)) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no  and e.hosp_code =#{hospCode}) as fpd,
+    '1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+    join outin_daily_pay d on
+	a.id = d.daily_id
+	and d.type_code = '1'
+	and d.hosp_code = #{hospCode}
+    join (select
+		count(d.id)as num,
+		ss.daily_settle_id
+	from
+		outpt_settle ss
+	join outpt_cost d on
+		ss.id =d.settle_id and d.hosp_code = ss.hosp_code
+		and ss.hosp_code = #{hospCode}
+		group by ss.daily_settle_id
+	) dd on	a.id = dd.daily_settle_id
+    where a.type_code = '1' and a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+	group by a.id)
+	union 
+	(select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	a.id as jsdh,
+	a.crte_time,
+	0 as fjzs,
+	a.total_price as je,
+	dd.num as sfmxts,
+	count(d.id) as sffsts,
+	a.id as jkrybm,
+	a.crte_name as jkryxm,
+	a.type_code as ywlx,
+	'' as zy,
+	(select count(e.id) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no and e.hosp_code =#{hospCode}) as fpzzs,
+	(select concat(min(e.start_no),'-',max(e.end_no)) from outin_daily_invoice e where e.daily_id = a.id and e.daily_no =a.daily_no and e.hosp_code =#{hospCode}) as fpd,
+    '1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+    join outin_daily_pay d on
+	a.id = d.daily_id
+	and d.type_code = '0'
+	and d.hosp_code = #{hospCode}
+    join (select
+		count(d.id)as num,
+		ss.daily_settle_id
+	from
+		outpt_register_settle ss
+	join outpt_register d on
+		d.id = ss.register_id and d.hosp_code = ss.hosp_code
+		and ss.hosp_code = #{hospCode}
+		group by ss.daily_settle_id
+	) dd on	a.id = dd.daily_settle_id
+    where a.type_code = '0' and a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+	group by a.id)
+    ) cc
+    order by cc.appetime asc
+    </select>
+	<select id="queryCwSettleDetailInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbCwsfmx">
+	select * from ((select
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.id as jsdh,
+    b.id as sfmxid,
+    b.visit_id as jzlsh,
+    '3' as hzlxdm,
+    d.name as hzxm,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbmc,
+    a.ok_time as jkrq,
+    a.daily_no as jkbch,
+    '' as sfxmdm,
+    '' as sfxmmc,
+    d.in_dept_id as jzksbm,
+    d.in_dept_name as jzksmc,
+    '2' as sflxdm,
+    '住院收费' as sflxmc,
+    b.total_price as je,
+    '' as zy,
+    d.zz_doctor_id  as kdysbm,
+    d.zz_doctor_name as kdysxm,
+    '2' as ywlx,
+    b.crte_id as sfrybm,
+    b.crte_name as sfryxm,
+    c.invoice_no as fph,
+    '1' as validflag,
+   b.crte_time as appetime,
+   b.crte_time as modifytime,
+   b.crte_id  as modifytcode,
+   b.crte_name as modifytname
+   from
+	outin_daily a
+    join inpt_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
+    join inpt_settle_invoice c on b.id = c.settle_id and b.hosp_code = c.hosp_code
+    join inpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
+    where a.type_code = '2' and a.hosp_code =#{hospCode}
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    union
+    (select
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.id as jsdh,
+    b.id as sfmxid,
+    b.visit_id as jzlsh,
+    '1' as hzlxdm,
+    d.name as hzxm,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbmc,
+    a.ok_time as jkrq,
+    a.daily_no as jkbch,
+    '' as sfxmdm,
+    '' as sfxmmc,
+    d.dept_id as jzksbm,
+    d.dept_name as jzksmc,
+    '1' as sflxdm,
+    '门诊收费' as sflxmc,
+    b.total_price as je,
+    '' as zy,
+    d.doctor_id  as kdysbm,
+    d.doctor_name as kdysxm,
+    '1' as ywlx,
+    b.crte_id as sfrybm,
+    b.crte_name as sfryxm,
+    (select c.invoice_no from outpt_settle_invoice  c where b.id = c.settle_id and b.hosp_code = c.hosp_code limit 1) as fph,
+    '1' as validflag,
+   b.crte_time as appetime,
+   b.crte_time as modifytime,
+   b.crte_id  as modifytcode,
+   b.crte_name as modifytname
+   from
+	outin_daily a
+    join outpt_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
+    join outpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
+    where a.type_code = '1' and a.hosp_code =#{hospCode}
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    union
+    (select
+	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.id as jsdh,
+    b.id as sfmxid,
+    b.register_id as jzlsh,
+    '1' as hzlxdm,
+    d.name as hzxm,
+    (select hb.c_value from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbdm,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB/T 2261.1-2003' and hb.cm_value =d.gender_code limit 1) as xbmc,
+    a.ok_time as jkrq,
+    a.daily_no as jkbch,
+    '01' as sfxmdm,
+    '挂号费' as sfxmmc,
+    d.dept_id as jzksbm,
+    d.dept_name as jzksmc,
+    '1' as sflxdm,
+    '门诊收费' as sflxmc,
+    b.total_price as je,
+    '' as zy,
+    d.doctor_id  as kdysbm,
+    d.doctor_name as kdysxm,
+    '1' as ywlx,
+    b.crte_id as sfrybm,
+    b.crte_name as sfryxm,
+    c.invoice_no as fph,
+    '1' as validflag,
+   b.crte_time as appetime,
+   b.crte_time as modifytime,
+   b.crte_id  as modifytcode,
+   b.crte_name as modifytname
+   from
+	outin_daily a
+    join outpt_register_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
+    join outpt_settle_invoice  c on b.id = c.settle_id and b.hosp_code = c.hosp_code
+    join outpt_register d on b.register_id = d.id and b.hosp_code = d.hosp_code
+    where a.type_code = '0' and a.hosp_code =#{hospCode}
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    union
+    (select
+    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+    a.id as jsdh,
+    b.id as sfmxid,
+    b.visit_id as jzlsh,
+    '3' as hzlxdm,
+    d.name as hzxm,
+    d.gender_code as xbdm,
+    '' as xbmc,
+    a.ok_time as jkrq,
+    a.daily_no as jkbch,
+    '' as sfxmdm,
+    '' as sfxmmc,
+    d.in_dept_id as jzksbm,
+    d.in_dept_name as jzksmc,
+    '2' as sflxdm,
+    '住院收费' as sflxmc,
+    b.price as je,
+    '' as zy,
+    d.zz_doctor_id  as kdysbm,
+    d.zz_doctor_name as kdysxm,
+    '2' as ywlx,
+    b.crte_id as sfrybm,
+    b.crte_name as sfryxm,
+    '' as fph,
+    '1' as validflag,
+   b.crte_time as appetime,
+   b.crte_time as modifytime,
+   b.crte_id  as modifytcode,
+   b.crte_name as modifytname
+   from
+	outin_daily a
+    join inpt_advance_pay b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
+    join inpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
+    where a.type_code = '2' and a.hosp_code =#{hospCode}
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}) )
+    ) dd order by dd.appetime asc
+	</select>
+    <select id="queryCwPayInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbCwsffs">
+    select * from (
+    (select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	b.id as jsfs,
+	a.id as jsdh,
+	ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV07.10.004' and hb.cm_value =b.pay_code limit 1),b.pay_code)as jsfsdm,
+	'' as jsfsmc,
+	a.crte_time as jkrq,
+	b.total_price as je,
+	'1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+	join outin_daily_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
+	where a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+	union
+	(select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	b.id as jsfs,
+	a.id as jsdh,
+	ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV07.10.004' and hb.cm_value =b.pay_code limit 1),b.pay_code)as jsfsdm,
+	'' as jsfsmc,
+	a.crte_time as jkrq,
+	b.total_price as je,
+	'1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+	join outin_daily_advance_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
+	where a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+	union
+	(select
+	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
+	b.id as jsfs,
+	a.id as jsdh,
+	ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV07.10.004' and hb.cm_value =b.pay_code limit 1),b.pay_code)as jsfsdm,
+	'' as jsfsmc,
+	a.crte_time as jkrq,
+	b.total_price as je,
+	'1' as VALIDFLAG,
+    a.crte_time as APPETIME,
+    a.crte_time as MODIFYTIME,
+    a.crte_id as MODIFYTCODE,
+    a.crte_name as MODIFYTNAME
+    from
+	outin_daily a
+	join outin_daily_card_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
+	where a.hosp_code =#{hospCode}
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+    ) dd order by dd.appetime asc
+    </select>
+</mapper>

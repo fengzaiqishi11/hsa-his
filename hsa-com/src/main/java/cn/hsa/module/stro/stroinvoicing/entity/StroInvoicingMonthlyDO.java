@@ -5,11 +5,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import cn.hsa.base.PageDO;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * stro_invoicing_monthly
@@ -127,6 +126,8 @@ public class StroInvoicingMonthlyDO extends PageDO implements Serializable {
     /**
      * 创建时间（操作）
      */
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date crteTime;
 
     /**

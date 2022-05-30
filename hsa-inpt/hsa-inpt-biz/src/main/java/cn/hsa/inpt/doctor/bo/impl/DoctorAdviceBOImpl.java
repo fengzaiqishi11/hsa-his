@@ -320,6 +320,11 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDTO.setIsPrint(Constants.SF.F);
 
 
+            //只有LIS  才有采血时间
+            if(!"3".equals(inptAdviceDTO.getTypeCode())){
+                inptAdviceDTO.setCollectBloodTime(null);
+            }
+
             //是否皮试
             if(StringUtils.isEmpty(inptAdviceDTO.getIsSkin())){
                 //是否皮试
@@ -1364,7 +1369,6 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
             inptAdviceDtoParm.setUseCode("1");
             inptAdviceDtoParm.setUsageCode(inptAdviceDTO.getUsageCode());
             inptAdviceDtoParm.setLongStartTime(DateUtils.getNow());
-            inptAdviceDtoParm.setCollectBloodTime(DateUtils.getNow());
             inptAdviceDtoParm.setIsLong(Constants.SF.F);
             inptAdviceDtoParm.setCrteId(inptAdviceDTO.getCrteId());
             inptAdviceDtoParm.setCrteName(inptAdviceDTO.getCrteName());

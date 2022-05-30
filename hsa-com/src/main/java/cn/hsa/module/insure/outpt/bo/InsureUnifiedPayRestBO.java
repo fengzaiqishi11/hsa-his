@@ -251,4 +251,13 @@ public interface InsureUnifiedPayRestBO {
      * @Return
      */
     Boolean insertUnifiedItem(InsureItemDTO insureItemDTO);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-05 11:38
+     * @Description 分页查询所有民族药品目录信息
+     * @param insureUnifiedNationDrugDO
+     * @return cn.hsa.base.PageDTO
+     */
+    PageDTO queryPageInsureUnifiedNationDrug(InsureUnifiedNationDrugDO insureUnifiedNationDrugDO);
 }

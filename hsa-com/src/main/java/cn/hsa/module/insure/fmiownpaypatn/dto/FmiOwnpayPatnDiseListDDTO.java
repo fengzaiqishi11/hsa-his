@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * @ClassName FmiOwnpayPatnDiseListDDTO
- * @Description TODO
+ * @Description TODO 自费病人就医诊断信息【4209】
  * @Author qiang.fan
  * @Date 2022/4/6 11:18
  * @Version 1.0
@@ -75,6 +75,12 @@ public class FmiOwnpayPatnDiseListDDTO {
     /**
      * 	统筹区编号	字符型	6
      */
-    private String poolarea;
-
+    private String poolarea;  /**
+     * 有效标志	不传默认1有效
+     */
+    private String valiFlag;
+    /**
+      * 医药机构就诊id 字符型 30
+     **/
+    private String fixmedinsMdtrtId;
 }

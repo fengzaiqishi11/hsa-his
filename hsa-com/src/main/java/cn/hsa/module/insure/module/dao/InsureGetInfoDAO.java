@@ -506,6 +506,8 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     void updateInsureGetInfo(Map<String, Object> map);
+
+    void updateStasType(Map<String, Object> map);
     
     /**
      * @Method  查询医疗保障结算信息
@@ -782,4 +784,12 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     List<InptDiagnoseDTO> selectMriInptDiagNose(Map<String, Object> map);
+
+    List<InsureIndividualVisitDTO> queryInsureSpecialAttributeInfoPage(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    InsureIndividualVisitDTO queryVisitById(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    void updateSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    void deleteFmiOwnPayPatnCost(@Param("feeIdList")List<String> feeIdList,@Param("hospCode")String hospCode);
 }

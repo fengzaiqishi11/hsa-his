@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.outpt.fees.bo.OutptTmakePriceFormBO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
@@ -501,6 +502,54 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     public WrapperResponse<Boolean> updateCreditQueryInovicePrint(Map paramMap) {
         Boolean status = outptTmakePriceFormBO.updateCreditQueryInovicePrint(MapUtils.get(paramMap,"outinInvoiceDTO"));
         return WrapperResponse.success(status);
+    }
+
+    /**
+     * 【6201】费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-25 16:04
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+  @Override
+  public WrapperResponse<Boolean> uploadOnlineFeeDetail(Map<String, Object> map) {
+    return WrapperResponse.success(outptTmakePriceFormBO.uploadOnlineFeeDetail(map));
+  }
+
+  /**
+   * 医保订单结算结果查询
+   * @param map
+   * @Author 医保开发二部-湛康
+   * @Date 2022-05-09 15:15
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO>
+   */
+  @Override
+  public WrapperResponse queryInsureSetlResult(Map<String, Object> map) {
+    return outptTmakePriceFormBO.queryInsureSetlResult(map);
+  }
+
+    /**
+     * 【6401】费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 13:50
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> insureFeeRevoke(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.insureFeeRevoke(map));
+    }
+
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 15:58
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> insureRefund(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.insureRefund(map));
     }
 
 }

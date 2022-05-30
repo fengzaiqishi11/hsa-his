@@ -158,4 +158,40 @@ public interface InsureUnifiedPayOutptService {
 	 * @Return:
 	 **/
     WrapperResponse<Map<String, Object>> UP4302(Map<String, Object> map);
+
+    /**
+     * 医保统一支付平台：线上费用明细上传
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-04-26 9:34
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6201(Map<String, Object> map);
+
+    /**
+     * 医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 16:38
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6301(Map<String, Object> map);
+
+    /**
+     * 费用明细上传撤销
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-10 14:07
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6401(Map<String, Object> map);
+
+    /**
+     * 医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-17 10:00
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6203(Map<String, Object> map);
 }

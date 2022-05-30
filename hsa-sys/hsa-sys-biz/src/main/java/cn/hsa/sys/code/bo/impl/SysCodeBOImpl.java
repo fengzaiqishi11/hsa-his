@@ -447,6 +447,34 @@ public class SysCodeBOImpl extends HsafBO implements SysCodeBO {
         }
         return sysCodeDao.getCodeDetailByValue(sysCodeDetailDTO);
     }
+    /**
+     * @Author gory
+     * @Description 启用作废的值域明细
+     * @Date 2022/5/9 16:32
+     * @Param [sysCodeDetailDTO]
+     **/
+    @Override
+    public Boolean updateStatus(SysCodeDetailDTO sysCodeDetailDTO) {
+        // 查看启用的值域是否已经存在
+        sysCodeDetailDTO.setIsValid(Constants.SF.F);
+        List<SysCodeDetailDTO> codeDetailByIds = sysCodeDao.getCodeDetailByIds(sysCodeDetailDTO);
+        if (!ListUtils.isEmpty(codeDetailByIds)){
+            SysCodeDetailDTO newCodeDetailDTO = new SysCodeDetailDTO();
+            List<String> valueList = codeDetailByIds.stream().map(SysCodeDetailDTO::getValue).collect(Collectors.toList());
+            newCodeDetailDTO.setValueList(valueList);
+            newCodeDetailDTO.setHospCode(sysCodeDetailDTO.getHospCode());
+            newCodeDetailDTO.setCode(codeDetailByIds.get(0).getCode());
+            newCodeDetailDTO.setIsValid(Constants.SF.S);
+            List<SysCodeDetailDTO> codeDetails = sysCodeDao.getCodeDetailByValues(newCodeDetailDTO);
+            List<String> erroMessageList = codeDetails.stream().map(SysCodeDetailDTO::getValue).collect(Collectors.toList());
+            if (!ListUtils.isEmpty(erroMessageList)){
+                throw new AppException("以下值域明细已存在" + String.join(",", erroMessageList));
+            }
+        }
+
+        int i = sysCodeDao.updateStatus(sysCodeDetailDTO);
+        return i >0;
+    }
 
     /**
      * @Method findParentTreeNode

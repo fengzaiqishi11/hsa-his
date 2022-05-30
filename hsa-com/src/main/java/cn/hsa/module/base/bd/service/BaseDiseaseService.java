@@ -170,4 +170,6 @@ public interface BaseDiseaseService {
      **/
     @GetMapping("/service/base/baseDisease/queryAllInfectious")
     WrapperResponse<List<BaseDiseaseDTO>> queryAllInfectious(Map map);
+
+    WrapperResponse<Boolean> updateDisease(Map<String, Object> map);
 }

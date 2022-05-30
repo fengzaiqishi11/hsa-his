@@ -46,6 +46,8 @@ public enum FunctionEnum {
     INPATIENT_UPDATE(Constant.UnifiedPay.REGISTER.UP_2403, "入院变更"),
     INPATIENT_IN_BACK(Constant.UnifiedPay.REGISTER.UP_2404, "入院撤销"),
     INPATIENT_OUT_BACK(Constant.UnifiedPay.REGISTER.UP_2405, "出院办理撤销"),
+    SPECIAL_ATTRIBUTE_UPLOAD(Constant.UnifiedPay.REGISTER.UP_2406, "就医特殊属性上传"),
+    SPECIAL_ATTRIBUTE_QUERY(Constant.UnifiedPay.REGISTER.UP_2407, "就医特殊属性查询"),
     TRANS_HOSP_RECORD_UPLOAD(Constant.UnifiedPay.REGISTER.UP_2501, "转院备案"),
     TRANS_HOSP_RECORD_REVOCATION(Constant.UnifiedPay.REGISTER.UP_2502, "转院备案撤销"),
     OPSP_RECORD_UPLOAD(Constant.UnifiedPay.REGISTER.UP_2503, "人员慢特病备案"),
@@ -71,10 +73,14 @@ public enum FunctionEnum {
 //    CLR_APPR_DETAIL("3704", "获取拨付单信息"),
 
 //    MR_PATIENT_SETTL_UPLOAD("4101", "上传结算清单信息"),
-
+    FMI_OWNPAY_PATN_DELETE(Constant.UnifiedPay.REGISTER.UP_4204, "自费病人住院费用明细删除"),
     FMI_OWNPAY_PATN_UPLOD(Constant.UnifiedPay.REGISTER.UP_4261, "自费病人信息上传"),
     FMI_OWNPAY_PATN_LEDGER(Constant.UnifiedPay.REGISTER.UP_4262, "自费病人信息对账"),
     FMI_OWNPAY_PATN_LEDGER_DETAIL(Constant.UnifiedPay.REGISTER.UP_4263, "自费病人零报金额不符查询"),
+    FMI_OWNPAY_PATN_INPUT_UPLOD(Constant.UnifiedPay.REGISTER.UP_4201A, "自费病人住院费用明细信息上传"),
+    FMI_OWNPAY_PATN_DISE_UPLOD(Constant.UnifiedPay.REGISTER.UP_4202, "自费病人住院就诊和诊断信息上传"),
+    FMI_OWNPAY_PATN_FINISH(Constant.UnifiedPay.REGISTER.UP_4203, "自费病人就诊以及费用明细上传完成"),
+    FMI_OWNPAY_PATN_DISE_FEE_UPLOD(Constant.UnifiedPay.REGISTER.UP_4205, "自费病人门诊就医信息上传"),
 
 
     OUTPATIENT_DIAGNOSIS_TREATMENT_INFO (Constant.UnifiedPay.OUTPT.UP_4301, "门急诊诊疗记录"),
@@ -86,6 +92,12 @@ public enum FunctionEnum {
     MR_PATIENT_SETTL_UPLOAD_UPDATE(Constant.UnifiedPay.REGISTER.UP_4102, "上传结算清单信息状态修改"),
     INSUR_MRI_UPLOAD(Constant.UnifiedPay.INPT.UP_4401, "住院病案首页上传"),
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
+
+    CLINICAL_EXAMINATION_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4501,"临床检查报告记录"),
+    CLINICAL_CHECKOUT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4502,"临床检验报告记录"),
+    BACTERIAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4503,"细菌培养报告记录"),
+    DRUGSENSITIVE_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4504,"药敏记录报告记录"),
+    PATHOLOGICAL_REPORT_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4505,"病理检查报告记录"),
 
     INSUR_DETP_INFO(Constant.UnifiedPay.REGISTER.UP_5101, "医保科室信息查询"),
     INSUR_PSN_INFO(Constant.UnifiedPay.REGISTER.UP_5102, "医保人员信息查询"),
@@ -103,9 +115,15 @@ public enum FunctionEnum {
     IN_HOSP_INFO(Constant.UnifiedPay.REGISTER.UP_5303, "在院信息查询"),
     TRANS_HOSP_INFO(Constant.UnifiedPay.REGISTER.UP_5304, "转院信息查询"),
     PSN_POLICY(Constant.UnifiedPay.REGISTER.UP_100001, "政策项查询"),
+    ONLINE_FEE_PAY(Constant.UnifiedPay.REGISTER.UP_6201, "线上费用明细上传"),
+    ORD_QUERY_PAY(Constant.UnifiedPay.REGISTER.UP_6301, "医保订单结算结果查询"),
+    ONLINE_FEE_REVOKE(Constant.UnifiedPay.REGISTER.UP_6401, "医保订单结算结果查询"),
+    INSURE_REFUND(Constant.UnifiedPay.REGISTER.UP_6203, "医保退费"),
     //接口功能号 请按顺序填写
 
-    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载");
+    LOCAL_SETTLE_DOWNLOAD("999999", "本地结算单下载"),
+
+    POLICY_ITEM_INFO("100001", "政策项查询");
     private final String code;
     private final String desc;
 

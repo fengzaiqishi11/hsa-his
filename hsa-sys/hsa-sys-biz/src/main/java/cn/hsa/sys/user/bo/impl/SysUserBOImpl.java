@@ -2,6 +2,7 @@ package cn.hsa.sys.user.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.event.PasswordModifyEvent;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -23,6 +24,8 @@ import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -52,6 +55,8 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Resource
     private SysRoleDao sysRoleDao;
 
+    @Resource
+    private ApplicationEventPublisher publisher;
 
     /**
      * 单据生成规则dubbo消费者接口
@@ -510,7 +515,12 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         if (StringUtils.isEmpty(id) || StringUtils.isEmpty(newPasswordByMd5) || StringUtils.isEmpty(hospCode)) {
             throw new AppException("数据不能为空！");
         }
-        return sysUserDAO.updatePassWord(id, newPasswordByMd5, hospCode);
+
+        // 发布密码更新事件异步插入中心端数据库
+        publisher.publishEvent(new PasswordModifyEvent(this,map));
+        map.put("lastUsedPassword",map.get("oldPassWord"));
+        int affectRows = sysUserDAO.updatePassWord(map);
+        return affectRows > 0;
     }
 
     /**
@@ -782,5 +792,13 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public Boolean updateIsGuide(SysUserDTO sysUserDTO) {
         return sysUserDAO.updateIsGuide(sysUserDTO);
+    }
+
+    @Override
+    public WrapperResponse<Boolean> updatePassWordUnified(Map changePassWordParam) {
+        int affectedRows = sysUserDAO.updatePassWordUnified(changePassWordParam);
+        if(affectedRows > 0)
+            return WrapperResponse.success(true);
+        return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "用户不存在，请检查输入是否有误",false);
     }
 }

@@ -763,7 +763,7 @@
         sum(if((a.outin_code='23' or a.outin_code='25'),a.num,0)) outSalesNum,                  /**门诊销售总数量**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0)) inSalesPriAll,     /**住院销售总金额**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) inSalesNum,                   /**住院销售总数量**/
-        sum(if( a.outin_code='4',a.sell_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
+        sum(if( a.outin_code='4',a.buy_price * a.num,0)) pharOutStroPriAll, /**药房出库科室总金额**/
         sum(if( a.outin_code='4',a.num,0)) pharOutStroNum,                  /**药房出库科室总数量**/
         sum(if( a.outin_code='24' and a.sell_price_all >
         a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all,0)) adjustProfitPriAll,   /**调盈**/
@@ -812,6 +812,7 @@
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
         (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
         '门诊病人' as statusCode,
+        (case a.item_code when '1' then bd.type_code when '2' then c.type_code end ) typeCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',ifnull(v.age,''),
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a

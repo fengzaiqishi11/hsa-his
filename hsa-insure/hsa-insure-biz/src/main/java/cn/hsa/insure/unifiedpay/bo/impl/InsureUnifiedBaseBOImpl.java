@@ -28,6 +28,7 @@ import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -128,7 +129,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","科室信息查询");
         map.put("isHospital","");
         map.put("visitId","");
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_5101, dataMap,map);
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_5101, dataMap,map);
         logger.debug("统一支付平台【科室信息查询5101】返参：" + JSONObject.toJSONString(resultMap));
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "feedetail");
@@ -148,6 +149,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     public Map<String, Object> queryDoctorInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String orgCode = MapUtils.get(map, "regCode");
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "pracPsnType"))) {
+            throw new AppException("执业人员分类【pracPsnType】不能为空！");
+        }
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> paramMap = new HashMap<>();
 
@@ -747,7 +751,25 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
             map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
             String setlTime = MapUtils.get(setlinfo,"setl_time");
-            Map<String,Object> resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
+            ////////////2022-05-18 zjp
+            // 人员信息获取-1101, 请求失败,错误原因：调用就诊凭证返回异常，异常信息：无效token
+            //使用电子凭证方式查询人员信息报错，改为使用身份证方式
+            //根据医保登记表中个人基本信息表id获取身份证号码
+            Map<String,Object> checkMap = map;
+            Map<String,Object> resultBaseMap = new HashMap<>();
+            if("01".equals(insureIndividualVisitDTO.getMdtrtCertType())){
+                InsureIndividualBasicDTO basicDTO = new InsureIndividualBasicDTO();
+                basicDTO.setId(insureIndividualVisitDTO.getMibId());
+                basicDTO.setHospCode(hospCode);
+                basicDTO = insureIndividualBasicDAO.getById(basicDTO);
+                insureIndividualVisitDTO.setMdtrtCertType("02");
+                insureIndividualVisitDTO.setMdtrtCertNo(basicDTO.getAac002());
+                checkMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+                resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(checkMap).getData();
+            }else{
+                resultBaseMap =  insureUnifiedBaseService_consumer.checkOneSettle(map).getData();
+            }
+            //////////////2022-05-18 zjp
             Map<String, Object> outputMap = MapUtils.get(resultBaseMap, "output");
 
             // 参保信息列表（节点标识insuinfo）
@@ -987,6 +1009,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      **/
     @Override
     public Map<String, Object> queryItemConfirm(Map<String, Object> map) {
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "psnNo"))) {
+            throw new AppException("人员编号【psnNo】不能为空！");
+        }
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
         /**
@@ -1008,7 +1033,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("exam_item_code", MapUtils.get(map, "examItemCode"));
         dataMap.put("exam_item_name", MapUtils.get(map, "examItemName"));
         paramMap.put("data", dataMap);
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getMedicineOrgCode(), "5401", paramMap,map);
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureRegCode(), "5401", paramMap,map);
         List<Map<String, Object>> resultDataMap= MapUtils.get(resultMap, "bilgiteminfo");
         map.put("resultDataMap", resultDataMap);
         return map;
@@ -1093,6 +1118,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      */
     @Override
     public Map<String, Object> queryReportDetails(Map<String, Object> map) {
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "psnNo"))) {
+            throw new AppException("人员编号【psnNo】不能为空！");
+        }
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "fixmedinsCode"))) {
+            throw new AppException("医院编号【fixmedinsCode】不能为空！");
+        }
         String hospCode = MapUtils.get(map, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
         /**
@@ -1567,10 +1598,10 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> resultMap = new HashMap<>();
         if (deptDTOList.size() == 1) {
             log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap,map);
+            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap,map);
         } else if (deptDTOList.size() > 1) {
             log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap,map);
+            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap,map);
         }
 
         // 上传完成后，更新本地科室表上传状态
@@ -1595,7 +1626,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
         String code = MapUtils.get(map, "hosp_dept_codg");
         String deptName = MapUtils.get(map, "hosp_dept_name");
-        String startTime = MapUtils.get(map, "begntime");
+        String startTime = Long.toString(MapUtils.get(map, "begntime"));
 
         BaseDeptDTO deptDTO = new BaseDeptDTO();
         deptDTO.setHospCode(hospCode);
@@ -1627,7 +1658,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","撤销科室信息");
         map.put("isHospital","");
         map.put("visitId","");
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getOrgCode(), Constant.UnifiedPay.REGISTER.UP_3403, paramMap,map);
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3403, paramMap,map);
 
         // 科室上传撤销后，更改上传状态为未上传
         List<BaseDeptDTO> deptDTOList = new ArrayList<>();

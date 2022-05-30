@@ -7,7 +7,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.profilefile.bo.CenterProfileFileBO;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 

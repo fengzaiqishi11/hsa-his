@@ -1,6 +1,8 @@
 package cn.hsa.module.insure.inpt.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.clinica.dto.*;
+import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 
 import java.util.Map;
 
@@ -24,19 +26,19 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateNoStructReportRecord(Map<String,Object> map);
+    boolean updateNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO);
 
 
     /**
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
+     * @Desrciption 病理检查报告记录 -- 上传到医保
      * @Param
      *
      * @Author fuhui
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updatePathologicalReportRecord(Map<String,Object>map);
+    boolean updatePathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO);
 
     /**
      * @Method updateBacterialReportRecord
@@ -47,7 +49,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateBacterialReportRecord(Map<String,Object>map);
+    boolean updateBacterialReportRecord(InsureBacterialReportDTO insureBacterialReportDTO);
 
     /**
      * @Method updateDrugSensitivityReportRecord
@@ -58,7 +60,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateDrugSensitivityReportRecord(Map<String,Object>map);
+    boolean updateDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO);
 
     /**
      * @Method updateClinicalReportRecord
@@ -69,7 +71,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateClinicalReportRecord(Map<String,Object>map);
+    boolean updateClinicalReportRecord(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO);
 
     /**
      * @Method updateClinicalReportRecord
@@ -80,10 +82,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    boolean updateClinicalExaminationReportRecord(Map<String,Object>map);
+    boolean updateClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 
     /**
-     * @param map
+     * @param insureNoStructReportDO
      * @Method updateNoStructReportRecord
      * @Desrciption 非结构化报告记录--新增数据
      * @Param
@@ -91,7 +93,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertNoStructReportRecord(Map<String, Object> map);
+    boolean insertNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDO);
 
     /**
      * @param map
@@ -102,21 +104,21 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPageNoStructReportRecord(Map<String, Object> map);
+    PageDTO queryPageNoStructReportRecord(InsureNoStructReportDTO insureNoStructReportDTO);
 
     /**
-     * @param map
+     * @param
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录---上传到医保
+     * @Desrciption 病理检查报告记录---保存到his库
      * @Param
      * @Author fuhui
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertPathologicalReportRecord(Map<String, Object> map);
+    boolean insertPathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO);
 
     /**
-     * @param map
+     * @param
      * @Method queryPagePathologicalReportRecord
      * @Desrciption 病理检查报告记录---分页查询
      * @Param
@@ -124,10 +126,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPagePathologicalReportRecord(Map<String, Object> map);
+    PageDTO queryPagePathologicalReportRecord(InsurePathologicalReportDTO insurePathologicalReportDTO);
 
     /**
-     * @param map
+     * @param
      * @Method insertBacterialReportRecord
      * @Desrciption 细菌培养报告记录 -- 保存到his数据库
      * @Param
@@ -135,10 +137,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertBacterialReportRecord(Map<String, Object> map);
+    boolean insertBacterialReportRecord(InsureBacterialReportDTO insureBacterialReportDTO);
 
     /**
-     * @param map
+     * @param
      * @Method queryPageBacterialReportRecord
      * @Desrciption 细菌培养报告记录 -- 保存到his数据库
      * @Param
@@ -146,7 +148,7 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPageBacterialReportRecord(Map<String, Object> map);
+    PageDTO queryPageBacterialReportRecord(InsureBacterialReportDTO insureBacterialReportDTO);
 
     /**
      * @param map
@@ -157,10 +159,21 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertDrugSensitivityReportRecord(Map<String, Object> map);
+    boolean insertDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO);
 
     /**
-     * @param map
+     * @param
+     * @Method insertDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录  ----保存到his数据库
+     * @Param
+     * @Author fuhui
+     * @Date 2021/9/2 10:18
+     * @Return
+     */
+    PageDTO queryDrugSensitivityReportRecord(InsureDrugsensitiveReportDTO insureDrugsensitiveReportDTO);
+
+    /**
+     * @param
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检验报告记录 -- 保存到his数据库
      * @Param
@@ -168,10 +181,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertClinicalReportRecord(Map<String, Object> map);
+    boolean insertClinicalReportRecord(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO);
 
     /**
-     * @param map
+     * @param
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检验报告记录 -- 分页查询his数据
      * @Param
@@ -179,10 +192,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean queryPageClinicalReportRecord(Map<String, Object> map);
+    PageDTO queryPageClinicalReportRecord(InsureClinicalCheckoutDTO insureClinicalCheckoutDTO);
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 保存到his数据库
      * @Param
@@ -190,10 +203,10 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    boolean insertClinicalExaminationReportRecord(Map<String, Object> map);
+    boolean insertClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 
     /**
-     * @param map
+     * @param clinicalExaminationInfoDTO
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检查报告记录  -- 分页查询
      * @Param
@@ -201,5 +214,5 @@ public interface InsureUnifiedClinicalBO  {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    PageDTO queryPageClinicalExaminationReportRecord(Map<String, Object> map);
+    PageDTO queryPageClinicalExaminationReportRecord(ClinicalExaminationInfoDTO clinicalExaminationInfoDTO);
 }

@@ -133,7 +133,7 @@
         case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.usage_code end bigUnitCode,
         case when f.id is null then '0' else '1' end isWz,
         case when a.item_code = '1' then (case when c.is_in = '0' then '1' else '0' end)
-             when a.item_code = '4' then (case when e.use_scope_code = '1' then '0' else '1' end)
+             when a.item_code = '4' then (case when e.use_scope_code = '1' then '1' else '0' end)
              else '0'
              end color
         from inpt_advice_temp_detail a

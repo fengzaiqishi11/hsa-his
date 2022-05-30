@@ -599,17 +599,8 @@
         )c on a.id = c.id and a.hosp_code = c.hosp_code
                  left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
                  left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
-                    <if test="isValid != null and isValid != ''"> /*降低对其他功能的影响*/
-                        and e.is_valid = '1'
-                    </if>
                  left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
-                    <if test="isValid != null and isValid != ''">/*降低对其他功能的影响*/
-                        and f.is_valid = '1'
-                    </if>
                  left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
-                    <if test="isValid != null and isValid != ''">/*降低对其他功能的影响*/
-                        and g.is_valid = '1'
-                    </if>
                  left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
                  left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and h.code = parameter.value and h.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
                  left join (
@@ -626,6 +617,9 @@
             group by a.id,a.hosp_code
         )j on a.id = j.id and a.hosp_code = j.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+        <if test="isValid != null and isValid != ''"> /*降低对其他功能的影响*/
+            and (f.is_valid = '1' or g.is_valid = '1' or h.is_valid = '1')
+        </if>
         order by a.crte_time desc
     </select>
 
@@ -1634,8 +1628,8 @@
             case when a.item_code = '1' then c.unit_code when a.item_code = '2' then d.unit_code else a.unit_code end bigUnitCode,
             c.drug_remark drugRemark, c.drug_img_path drugImgPath,
             case when a.item_code = '1' then '1' when a.item_code = '2' then '15' else e.type_code end typeCode,
-            case when a.item_code = '1' then (case when c.is_in = '0' then '1' else '0' end)
-                 when a.item_code = '4' then (case when e.use_scope_code = '2' then '0' else '1' end)
+            case when a.item_code = '1' then (case when c.is_out = '0' then '1' else '0' end)
+                 when a.item_code = '4' then (case when e.use_scope_code = '2' then '1' else '0' end)
                  else '0'
                 end color,
             case when parameter.id is null then '0' else '1' end isWz

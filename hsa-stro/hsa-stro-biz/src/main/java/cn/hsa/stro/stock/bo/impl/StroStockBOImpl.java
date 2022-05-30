@@ -1723,7 +1723,9 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
      **/
     @Override
     public PageDTO queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO) {
+        // 1：门诊，2：住院
         String bizCode = itemProfitStatisticsDTO.getBizCode();
+        // 1:业务类型/项目/医生  2:业务类型/科室
         String sumCode = itemProfitStatisticsDTO.getSumCode();
         if (StringUtils.isEmpty(bizCode)){
             throw new AppException("请选择需要查询的业务类型");

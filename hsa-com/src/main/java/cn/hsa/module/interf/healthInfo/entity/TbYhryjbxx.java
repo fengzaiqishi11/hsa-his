@@ -1,30 +1,27 @@
 package cn.hsa.module.interf.healthInfo.entity;
 
-import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 医护人员基本信息表(TbYhryjbxx)实体类
  *
  * @author liudawen
- * @date 2022-05-13 14:11:51
+ * @date 2022-05-24 14:43:02
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
 @ToString
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TbYhryjbxx implements Serializable {
-    private static final long serialVersionUID = 230073908534389649L;
+    private static final long serialVersionUID = 523447949366955588L;
     /**
      * 医生编码
      */
@@ -76,10 +73,14 @@ public class TbYhryjbxx implements Serializable {
     /**
      * 入职日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date rzsj;
     /**
      * 出生日期
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date csrq;
     /**
      * 人员类别
@@ -108,10 +109,14 @@ public class TbYhryjbxx implements Serializable {
     /**
      * 数据产生时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date appetime;
     /**
      * 最后修改时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date modifytime;
     /**
      * 最后修改人编码

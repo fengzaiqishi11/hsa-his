@@ -37,6 +37,7 @@ public class LoginFilter implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         excludeList.add("/web/login/authCode");
         excludeList.add("/web/login/doLogin");
+        excludeList.add("/monitor/health");
     }
 
     @Override

@@ -1,6 +1,5 @@
 package cn.hsa.module.interf.healthInfo.dao;
 
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.healthInfo.entity.*;
 
 import java.util.List;
@@ -13,60 +12,60 @@ public interface DrugBusinessDAO {
      * @param map
      * @return
      */
-    List<TbZhsfDO> getTbZhsfData(Map map);
+    List<TbZhsf> getTbZhsfData(Map map);
 
     /**
      * 4.2.1.1 药品出入库信息（TB_YPRKXX）
      * @param map
      * @return
      */
-    List<TbYprkxxDO> getTbYprkxxData(Map map);
+    List<TbYprkxx> getTbYprkxxData(Map map);
 
     /**
      * 4.2.1.2 药品库存信息（TB_YPKCXX）
      * @param map
      * @return
      */
-    List<TbYpkcxxDO> getTbYpkcxxData(Map map);
+    List<TbYpkcxx> getTbYpkcxxData(Map map);
 
     /**
      *4.2.1.3 药品销售信息（TB_YPXSXX）
      * @param map
      * @return
      */
-    List<TbYpxxssDO> getTbYpxxssData(Map map);
+    List<TbYpxsxx> getTbYpxxssData(Map map);
 
     /**
      *4.2.1.4 抗菌药物基本情况统计（TB_KJYWJBJKTJ）
      * @param map
      * @return
      */
-    List<TbKjywjbjktjDO> getTbKjywjbjktjData(Map map);
+    List<TbKjywjbjktj> getTbKjywjbjktjData(Map map);
 
     /**
      *4.2.1.5 抗菌药物各品种统计（TB_KJYWGPZTJ）
      * @param map
      * @return
      */
-    List<TbKjywgpztjDO> getTbKjywgpztjData(Map map);
+    List<TbKjywgpztj> getTbKjywgpztjData(Map map);
 
     /**
      *4.4.1.1 双向转诊表（TB_SXZZ）
      * @param map
      * @return
      */
-    List<TbSxzzDO> getTbSxzzData(Map map);
+    List<TbSxzz> getTbSxzzData(Map map);
 
     /**
      *4.3.1.1 物资领取记录表（TB_WZLQJL）
      * @param map
      * @return
      */
-    List<TbWzlqjlDO> getTbWzlqjlData(Map map);
+    List<TbWzlqjl> getTbWzlqjlData(Map map);
     /**
      *2.9.1.1 业务量、收入统计表（TB_YWL_Report）
      * @param map
      * @return
      */
-    List<TbYwlReportDO> getTbYwlReportData(Map map);
+    List<TbYwlReport> getTbYwlReportData(Map map);
 }

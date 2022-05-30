@@ -61,6 +61,68 @@ public class BaseHomeController extends BaseController {
         //
         map.put("loginDeptType",  sysUserDTO.getLoginBaseDeptDTO().getTypeCode());
 
+        for(int i=0;i< 200; i++) {
+            new Thread(() -> {
+                map.put("hospCode", "1000001");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0115");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0006");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+
+            new Thread(() -> {
+                map.put("hospCode", "0020");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "00107");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+
+            new Thread(() -> {
+                map.put("hospCode", "0109");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+
+            new Thread(() -> {
+                map.put("hospCode", "0111");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0110");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0004");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "1000003");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0003");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0007");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            new Thread(() -> {
+                map.put("hospCode", "0064");
+                baseHomeService_consumer.queryHomeShowData(map);
+            }).start();
+            try {
+                Thread.sleep(150);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         WrapperResponse<Map<String, Object>> mapWrapperResponse = baseHomeService_consumer.queryHomeShowData(map);
 
         return mapWrapperResponse;

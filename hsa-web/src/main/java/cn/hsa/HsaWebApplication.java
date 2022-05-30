@@ -6,6 +6,8 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.session.FlushMode;
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * @Package_name: cn.hsa
@@ -21,6 +23,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ServletComponentScan(basePackages = {"cn.hsa.filter"})
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
 @EnableScheduling
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 7200,redisNamespace = "spring:session",flushMode = FlushMode.ON_SAVE)
 public class HsaWebApplication {
     /**
      * @Method 前端接口模块启动函数

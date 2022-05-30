@@ -120,12 +120,14 @@
         </triggeringPolicy>
     </appender>
 
+
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
         </root>
-
     </springProfile>
 
     <!-- 其他环境日志级别为INFO -->
@@ -133,18 +135,9 @@
         <root level="INFO">
             <appender-ref ref="ROLLING_FILE"/>
             <appender-ref ref="ROLLING_ERROR_FILE"/>
-            <appender-ref ref="GELF"/>
         </root>
         <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
-            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
         </logger>
     </springProfile>
-
-    <!-- 日志输出级别 -->
-    <!--
-    <root level="INFO">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
-    -->
 </configuration>

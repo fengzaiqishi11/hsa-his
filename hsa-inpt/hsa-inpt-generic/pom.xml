@@ -50,28 +50,32 @@
             <groupId>cn.hsa.hsaf.adapt</groupId>
             <artifactId>hsaf-cache-redis</artifactId>
         </dependency>
-
-        <!--3.分布式消息队列组件-->
+        <!-- 应用监控相关 -->
         <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-mq</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+<!--        &lt;!&ndash;3.分布式消息队列组件&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-generic-mq</artifactId>-->
+<!--        </dependency>-->
 
-        <!--4.对象存储组件-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-fsstore</artifactId>
-        </dependency>
+<!--        &lt;!&ndash;4.对象存储组件&ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
+<!--        </dependency>-->
 
         <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-ali-gateway</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-tencent-gateway</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-ali-gateway</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
+<!--            <artifactId>hsaf-tencent-gateway</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>cn.hsa.hsaf.adapt</groupId>
             <artifactId>hsaf-generic-gateway</artifactId>
@@ -90,12 +94,6 @@
         </dependency>
 
         <!--数据库连接驱动-->
-        <!--本地模拟用-->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${com-h2database-version}</version>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -107,10 +105,10 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger-ui</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 

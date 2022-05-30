@@ -51,4 +51,11 @@ public interface MedicalTechnologyDAO {
     List<SysParameterDTO> getParameterValue(@Param("hospCode") String hospCode, @Param("code") String[] code);
 
     InptVisitDTO getVisitDTOById(InptVisitDTO inptVisitDTO);
+	/**
+	 * @Author gory
+	 * @Description 获取不是未确费的费用
+	 * @Date 2022/5/25 15:19
+	 * @Param [list]
+	 **/
+	int getAlreadyCostByCostIds(@Param("hospCode")String hospCode,@Param("list") List<String> list);
 }

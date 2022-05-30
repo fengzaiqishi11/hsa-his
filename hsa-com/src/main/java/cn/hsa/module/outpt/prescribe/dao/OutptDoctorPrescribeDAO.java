@@ -891,4 +891,6 @@ public interface OutptDoctorPrescribeDAO {
      * @Date: 2021/12/16
      */
     List<BaseDrugDTO> getCfDataOnlyOpenItem(BaseDrugDTO baseDrugDTO);
+
+    List<BaseDrugDTO> getCfData2(BaseDrugDTO baseDrugDTO);
 }

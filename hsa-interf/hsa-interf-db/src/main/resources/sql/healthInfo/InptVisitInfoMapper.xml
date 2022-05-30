@@ -91,7 +91,7 @@
     <select id="queryInptAdviceInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyyzmx">
   select
   (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
-  a.id as yzid,
+  ifnull(c.id,a.id) as yzid,
   b.profile_id as hzjgnwyid,
   a.visit_id as zylsh,
   b.name as xm,
@@ -172,7 +172,7 @@
       select
   (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
   b.id as zxdh,
-  '1' as zxcs,
+  floor(RAND()*1000) as zxcs,
   '' as yzxh,
   b.advice_id as yzid,
   c.profile_id as hzjgnwyid,
@@ -409,7 +409,7 @@
       order by c.crte_time asc
     </select>
     <select id="queryInptNurseRecordInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbEmrYbhljl">
-     select
+     select distinct
 	 (select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
 	 (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
 	 b.id as ybhljllsh,

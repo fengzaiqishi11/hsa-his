@@ -31,6 +31,7 @@
         <result property="model" column="model" jdbcType="VARCHAR"/>
         <result property="invoicingTargetId" column="invoicingTargetId" jdbcType="VARCHAR"/>
         <result property="invoicingTargetName" column="invoicingTargetName" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -61,6 +62,7 @@
             case when a.item_code='1' then bd.split_ratio when a.item_code='2' then bm.split_ratio end splitRatio,
             case when a.item_code='1' then bd.spec when a.item_code='2' then bm.spec end spec,
             case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+            case when a.item_code='1' then bd.type_code when a.item_code='2' then bm.type_code end typeCode,
             case when a.item_code='2' then bm.model end model
             from stro_inventory_detail a
             left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}

@@ -3,7 +3,7 @@
 <mapper namespace="cn.hsa.module.interf.healthInfo.dao.DrugBusinessDAO">
 
     <!--诊后随访表-->
-    <select id="getTbZhsfData" resultType="cn.hsa.module.interf.healthInfo.entity.TbZhsfDO">
+    <select id="getTbZhsfData" resultType="cn.hsa.module.interf.healthInfo.entity.TbZhsf">
         select * from (
             select
             '' as YLJGDM,
@@ -39,7 +39,7 @@
 
     </select>
     <!--药品出入库信息-->
-    <select id="getTbYprkxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYprkxxDO">
+    <select id="getTbYprkxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYprkxx">
         select * from (
             select
             so.hosp_code as YLJGDM ,
@@ -133,7 +133,7 @@
         </if>
     </select>
     <!--药品库存信息-->
-    <select id="getTbYpkcxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpkcxxDO">
+    <select id="getTbYpkcxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpkcxx">
         select * from (
             select
             ss.hosp_code as YLJGDM,
@@ -185,7 +185,7 @@
     </select>
 
     <!--药品销售信息-->
-    <select id="getTbYpxxssData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpxxssDO">
+    <select id="getTbYpxxssData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpxsxx">
         select * from (
             select
             ic.hosp_code yljgdm,
@@ -281,7 +281,7 @@
         </if>
     </select>
     <!--抗菌药物基本情况统计-->
-    <select id="getTbKjywjbjktjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywjbjktjDO">
+    <select id="getTbKjywjbjktjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywjbjktj">
         select * from (
             select ic.hosp_code as YLJGDM,
             bd.code as YPDM,
@@ -343,7 +343,7 @@
         </if>
     </select>
     <!--抗菌药物各品种统计-->
-    <select id="getTbKjywgpztjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywgpztjDO">
+    <select id="getTbKjywgpztjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywgpztj">
         select * from (
             select
             ic.hosp_code as YLJGDM,
@@ -393,7 +393,7 @@
         </if>
     </select>
 
-    <select id="getTbSxzzData" resultType="cn.hsa.module.interf.healthInfo.entity.TbSxzzDO">
+    <select id="getTbSxzzData" resultType="cn.hsa.module.interf.healthInfo.entity.TbSxzz">
         select * from (
             select '转诊机构编码' as YLJGDM,
             '转诊单号' as ZZDH,
@@ -427,7 +427,7 @@
         </if>
     </select>
 
-    <select id="getTbWzlqjlData" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzlqjlDO">
+    <select id="getTbWzlqjlData" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzlqjl">
         select * from (
             select pir.order_no  as lqdh,
             '' as lqdhxh,
@@ -477,7 +477,7 @@
         </if>
     </select>
 
-    <select id="getTbYwlReportData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYwlReportDO">
+    <select id="getTbYwlReportData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYwlReport">
         select * from (
             select bd3.YLJGDM  as YLJGDM,
             bd3.KSBM  as KSBM,

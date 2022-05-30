@@ -17,7 +17,8 @@ import cn.hsa.module.stro.stock.service.StroStockService;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

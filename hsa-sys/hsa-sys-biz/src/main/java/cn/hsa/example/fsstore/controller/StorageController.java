@@ -27,7 +27,7 @@ import java.io.OutputStream;
 @Slf4j
 public class StorageController {
 
-    @Autowired
+    @Autowired(required = false)
     private FSManager fsManager;
 
     @Value("${fsstore.url}")

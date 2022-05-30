@@ -1,7 +1,6 @@
 package cn.hsa.interf.healthInfo.service.impl;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.interf.healthInfo.bo.DictStandardMapBO;
 import cn.hsa.module.interf.healthInfo.bo.DrugBusinessServiceBO;
 import cn.hsa.module.interf.healthInfo.entity.*;
 import cn.hsa.module.interf.healthInfo.service.DrugBusinessService;
@@ -24,7 +23,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbZhsfDO>> getTbZhsfData(Map map) {
+    public WrapperResponse<List<TbZhsf>> getTbZhsfData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbZhsfData(map));
     }
 
@@ -35,7 +34,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbYprkxxDO>> getTbYprkxxData(Map map) {
+    public WrapperResponse<List<TbYprkxx>> getTbYprkxxData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbYprkxxData(map));
     }
 
@@ -46,7 +45,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbYpkcxxDO>> getTbYpkcxxData(Map map) {
+    public WrapperResponse<List<TbYpkcxx>> getTbYpkcxxData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbYpkcxxData(map));
     }
 
@@ -57,7 +56,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbYpxxssDO>> getTbYpxxssData(Map map) {
+    public WrapperResponse<List<TbYpxsxx>> getTbYpxxssData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbYpxxssData(map));
     }
 
@@ -68,7 +67,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbKjywjbjktjDO>> getTbKjywjbjktjData(Map map) {
+    public WrapperResponse<List<TbKjywjbjktj>> getTbKjywjbjktjData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbKjywjbjktjData(map));
     }
 
@@ -79,7 +78,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbKjywgpztjDO>> getTbKjywgpztjData(Map map) {
+    public WrapperResponse<List<TbKjywgpztj>> getTbKjywgpztjData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbKjywgpztjData(map));
     }
 
@@ -90,7 +89,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbSxzzDO>> getTbSxzzData(Map map) {
+    public WrapperResponse<List<TbSxzz>> getTbSxzzData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbSxzzData(map));
     }
 
@@ -101,7 +100,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbWzlqjlDO>> getTbWzlqjlData(Map map) {
+    public WrapperResponse<List<TbWzlqjl>> getTbWzlqjlData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbWzlqjlData(map));
     }
 
@@ -112,7 +111,7 @@ public class DrugBusinessServiceImpl implements DrugBusinessService {
      * @return
      */
     @Override
-    public WrapperResponse<List<TbYwlReportDO>> getTbYwlReportData(Map map) {
+    public WrapperResponse<List<TbYwlReport>> getTbYwlReportData(Map map) {
         return WrapperResponse.success(drugBusinessServiceBO.getTbYwlReportData(map));
     }
 }

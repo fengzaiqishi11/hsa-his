@@ -31,7 +31,7 @@ public class MedicalImageBOImpl implements MedicalImageBO {
      **/
     @Override
     public List<TbJctybg> listUniversalReportFormat(Map map) {
-        return medicalImageDAO.listUniversalReportFormat(map);
+        return null;
     }
 
     /**
@@ -44,6 +44,6 @@ public class MedicalImageBOImpl implements MedicalImageBO {
      **/
     @Override
     public List<TbJcbg> listNormalReportFormat(Map map) {
-        return medicalImageDAO.listNormalReportFormat(map);
+        return null;
     }
 }

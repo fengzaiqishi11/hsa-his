@@ -5,11 +5,11 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.medictocare.bo.OutptMedicalCareConfigurationBO;
 import cn.hsa.module.outpt.medictocare.dto.OutptMedicalCareConfigurationDTO;
-import cn.hsa.module.outpt.medictocare.entity.OutptMedicalCareConfigurationDO;
+
 import cn.hsa.module.outpt.medictocare.service.OutptMedicalCareConfigurationService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
+
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

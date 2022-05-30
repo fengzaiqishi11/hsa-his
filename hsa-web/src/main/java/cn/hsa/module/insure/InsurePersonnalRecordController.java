@@ -2,19 +2,19 @@ package cn.hsa.module.insure;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
-import cn.hsa.hsaf.core.framework.util.DateUtil;
+
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureDiseaseRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureFixPersonnalRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRecordDTO;
 import cn.hsa.module.insure.module.dto.InsureSpecialRecordDTO;
-import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
+
 import cn.hsa.module.insure.module.service.InsurePersonnalRecordService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import scala.collection.immutable.Page;
+
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;

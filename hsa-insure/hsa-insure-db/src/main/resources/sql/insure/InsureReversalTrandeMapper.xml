@@ -1489,6 +1489,7 @@
         c.aac003 AS psnName,
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
+        TIMESTAMPDIFF(YEAR,c.aac006 ,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S')) as age,
         c.bka008 insureUnit,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteTime,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,

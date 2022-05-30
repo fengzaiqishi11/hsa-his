@@ -88,7 +88,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         visitDTO.setCrteName(insureIndividualVisitDTO.getCrteName());
 
         String hospCode = visitDTO.getHospCode();
-        String orgCode = visitDTO.getInsureOrgCode();
+        String orgCode = visitDTO.getInsureRegCode();
 
         String insureRegCode = visitDTO.getInsureRegCode();
         // 根据医保机构编码查询医保配置信息
@@ -128,7 +128,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             paramMapList = handlerParamter(visitDTO,adviceDTOList);
             Map<String,Object> paramDataMap = new HashMap<>();
             paramDataMap.put("data",paramMapList);
-            commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.INPT.UP_4402, paramDataMap);
+            commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.INPT.UP_4402, paramDataMap);
         }
         /*else{
             List<Map<String, Object>> prescribeMapList = new ArrayList<>();

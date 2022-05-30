@@ -38,6 +38,7 @@
         <result property="tcmDiseaseId" column="tcmDiseaseId" jdbcType="VARCHAR"></result>
         <result property="tcmDiseaseName" column="tcmDiseaseName" jdbcType="VARCHAR"></result>
         <result property="diagnoseType" column="diagnoseType" jdbcType="VARCHAR"></result>
+        <result property="visitNo" column="visitNo" jdbcType="VARCHAR"></result>
         <collection property="outptPrescribeDetailsDTOList" ofType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO" javaType="java.util.List">
             <id property="id" column="idDetail" jdbcType="VARCHAR"></id>
             <result property="opId" column="op_id" jdbcType="VARCHAR"></result>
@@ -598,8 +599,17 @@
         )c on a.id = c.id and a.hosp_code = c.hosp_code
                  left join base_dept d on b.exec_dept_id = d.id and b.hosp_code = d.hosp_code
                  left join base_drug e on b.skin_durg_id = e.id and b.hosp_code = e.hosp_code
+                    <if test="isValid != null and isValid != ''"> /*降低对其他功能的影响*/
+                        and e.is_valid = '1'
+                    </if>
                  left join base_drug f on b.item_id = f.id and b.hosp_code = f.hosp_code and b.item_code = '1'
+                    <if test="isValid != null and isValid != ''">/*降低对其他功能的影响*/
+                        and f.is_valid = '1'
+                    </if>
                  left join base_material g on b.item_id = g.id and b.hosp_code = g.hosp_code and b.item_code = '2'
+                    <if test="isValid != null and isValid != ''">/*降低对其他功能的影响*/
+                        and g.is_valid = '1'
+                    </if>
                  left join base_advice h on b.item_id = h.id and b.hosp_code = h.hosp_code and b.item_code = '4'
                  left join sys_parameter parameter on parameter.code = 'WZYZ_YZCODE' and h.code = parameter.value and h.hosp_code = parameter.hosp_code and parameter.is_valid = '1'
                  left join (
@@ -672,7 +682,8 @@
 
     <!--  获取处方主表、明细表记录 -->
     <select id="getPrescribeAllDetailBySettleNo" resultMap="outptPrescribeDTOMaps" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select a.*,a.crte_time as crteTime, c.diagnose_ids, c.disease_names
+        select a.*,a.crte_time as crteTime, c.diagnose_ids, c.disease_names,
+        (select visit_no from outpt_visit where hosp_code = #{hospCode} and visit_id = a.visit_id limit 1) as visitNo
         from outpt_prescribe a
         join outpt_settle b on a.hosp_code=b.hosp_code and a.settle_id=b.id
         join(
@@ -2342,6 +2353,175 @@
     <select id="selectCost" resultType="cn.hsa.module.outpt.fees.dto.OutptCostDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select * from outpt_cost where hosp_code = #{hospCode} and op_id = #{id} and status_code = '0'
     </select>
+    <select id="getCfData2" resultType="cn.hsa.module.base.drug.dto.BaseDrugDTO" parameterType="cn.hsa.module.base.drug.dto.BaseDrugDTO">
+        select a.*
+        from (
+        select a.id, a.hosp_code, a.bfc_code, a.code, a.good_name,a.usual_name as bName, a.spec, a.prep_code, a.dosage,
+        a.dosage_unit_code, a.unit_code, a.rate_code,
+        case when #{operType} = '1' and a.out_unit_code = a.unit_code then a.price when #{operType} = '1' and a.out_unit_code = a.split_unit_code then a.split_price
+        when #{operType} = '2' and a.in_unit_code = a.unit_code then a.price when #{operType} = '2' and a.in_unit_code = a.split_unit_code then a.split_price end price,
+        a.split_ratio, a.split_unit_code,
+        a.split_price, a.is_lvp, a.usage_code, a.ddd, a.durg_code,
+        <!-- 5:普通 1/2/3：毒性/麻醉/精一 6:精二 4：贵重-->
+        case when a.ph_code = '5' then '1' when a.ph_code = '1' or a.ph_code = '2' or a.ph_code = '3' then '4' when a.ph_code = '6' then '5' when a.ph_code = '4' then '6' else '1' end ph_code,
+        a.antibacterial_code, a.is_skin,
+        a.is_basic, a.basic_code, a.good_pym, a.good_wbm, null use_code,null outptUseCode,
+        case when a.big_type_code = '2' then  '3' when a.big_type_code = '3' then '7' else '1' end type, '1' itemCode,
+        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end pharId,
+        ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
+        <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
+        '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
+        a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, ifnull(a.nation_name,a.good_name)  nation_name, a.reimbursement_ratio
+        from base_drug a
+        left join(
+        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
+        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+        from base_dept a
+        join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+        join base_dept c on c.hosp_code = b.hosp_code
+        <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+        </if>
+        where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+        )b on 1 = 1
+        join stro_stock stock on (
+        case when a.big_type_code = '2' then b.cyf when a.big_type_code = '1' then b.zcf when a.big_type_code = '0' or a.big_type_code = '3' then b.xyf end
+        ) = stock.biz_id  and a.id = stock.item_id and a.hosp_code = stock.hosp_code
+        left join base_rate c on a.rate_code = c.code and a.hosp_code = c.hosp_code
+        left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+        left join base_outpt_exec e on find_in_set(a.usage_code , e.usage_codes) and FIND_IN_SET(#{loginDeptId} ,e.dept_ids) and a.hosp_code = e.hosp_code
+        left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+        <if test="operType == '1'.toString() ">
+            left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        <if test="operType == '2'.toString() ">
+            left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        where a.hosp_code = #{hospCode}
+        <if test="yzmlType != null and yzmlType != ''" >
+            and  '2' = #{yzmlType}
+        </if>
+        and (
+        ((#{operType} = '1' and ifnull(a.is_out,'1') = '1' and (a.out_unit_code = a.unit_code or a.out_unit_code = a.split_unit_code or ifnull(a.out_unit_code,'')='') )
+        or (#{operType} = '2' and ifnull(a.is_in,'1') = '1' and (a.in_unit_code = a.unit_code or a.in_unit_code = a.split_unit_code or ifnull(a.in_unit_code,'')='')))
+        <if test="visitId != null and visitId != ''">
+            and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+            (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9') or a.gender_code = '' or visit.gender_code = '')
+        </if>
+        )
+        <if test="onlyOpenItem != null and onlyOpenItem == '1'.toString()">
+            and 1 = 2
+        </if>
+        and a.is_valid = '1' and (stock.num - ifnull(stock.stock_occupy,0)/stock.split_ratio) > 0
+        union all
+
+        select a.id, a.hosp_code, a.bfc_code, a.code, a.name good_name,a.other_name as bName, a.spec, null prep_code, null dosage,
+        null dosage_unit_code, a.unit_code,null rate_code,a.split_price price, '1' split_ratio, a.split_unit_code
+        split_unit_code,
+        a.split_price split_price, null is_lvp,null usage_code, null ddd, null durg_code, '1' ph_code,null
+        antibacterial_code, null is_skin,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, a.use_code,a.outpt_use_code outptUseCode, '2' type, '2' itemCode,
+        b.clf pharId, null rateId, d.id bfcId, null execDeptId, '15' typeCode,#{loginDeptId} outDeptId,
+        a.split_unit_code ouUtnitCode,
+        a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
+        drugRemark, '' drugImgPath,
+        f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
+        a.pym usual_pym ,'' as technology_code,a.nation_code, ifnull(a.nation_name,a.name) nation_name, a.reimbursement_ratio
+        from base_material a
+        left join(
+        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
+        '3',c.id,'0')) cyf,
+        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+        from base_dept a
+        join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+        join base_dept c on c.hosp_code = b.hosp_code
+        <if test="pharId == null or pharId == ''">
+            and SUBSTRING_INDEX(b.drugstore_code,',',1) = c.code
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and c.id = #{pharId}
+        </if>
+        where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
+        )b on 1 = 1
+        left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
+        <if test="pharId != null and pharId != ''">
+            and stock.biz_id = #{pharId}
+        </if>
+        <if test="pharId == null or pharId == ''">
+            and b.clf = stock.biz_id
+        </if>
+        left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
+        left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
+        <if test="yzmlType != null and yzmlType != ''" >
+            and  '3' = #{yzmlType}
+        </if>
+        union all
+
+        select a.id, a.hosp_code, null bfc_code, a.code, a.name good_name,a.other_name as bName, null spec, null prep_code, null dosage,
+        null dosage_unit_code, a.unit_code, null rate_code, a.price,'1' split_ratio, a.unit_code split_unit_code,
+        a.price split_price, null is_lvp, null usage_code, null ddd, null durg_code,'1' ph_code,null
+        antibacterial_code,null is_skin,
+        null is_basic, null basic_code, a.pym good_pym, a.wbm good_wbm, null use_code,null outptUseCode,
+        case when a.type_code = '3' then '4' when a.type_code = '12' then '5' else '6' end type, '4' itemCode, ''
+        pharId, '' rateId, '' bfcId, b.id execDeptId,
+        a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
+        a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
+        '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.name as nation_name, a.reimbursement_ratio as reimbursement_ratio
+        from base_advice a
+        left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
+        left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code
+        left join sys_parameter e on e.code = 'WZYZ_YZCODE' and a.code = e.value and a.hosp_code = e.hosp_code and e.is_valid = '1'
+        <if test="operType == '1'.toString() ">
+            left join outpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        <if test="operType == '2'.toString() ">
+            left join inpt_visit visit on visit.id = #{visitId} and a.hosp_code = visit.hosp_code
+        </if>
+        left join base_dept f on f.id = #{loginDeptId} and a.hosp_code = f.hosp_code
+        where a.hosp_code = #{hospCode}
+        <if test="yzmlType != null and yzmlType != '' and yzmlType == '1'.toString()" >
+            and  '1' = #{yzmlType}
+        </if>
+        <if test="yzmlType != null and yzmlType != '' and yzmlType == '4'.toString()" >
+            and  e.id is not null
+        </if>
+        <if test="pharId != null and pharId != ''">
+            and 1 = 2
+        </if>
+        <if test="yzmlType != null and yzmlType != '' and yzmlType != '1'.toString() and yzmlType != '4'.toString()" >
+            and  '1' = #{yzmlType}
+        </if>
+        and (FIND_IN_SET(f.code ,a.dept_code) or ifnull(a.dept_code,'') = '') and a.is_valid = '1' and (
+        (#{operType} = a.use_scope_code or ifnull(a.use_scope_code,'0') = '0')
+        <if test="visitId != null and visitId != ''">
+            and visit.age between ifnull(a.min_age,0) and ifnull(a.max_age,1000) and
+            (visit.gender_code = a.gender_code or ifnull(visit.gender_code,'0') in ('0','9') or ifnull(a.gender_code,'0') in ('0','9')
+            or ifnull(visit.gender_code,'0') = '' or ifnull(a.gender_code,'0') = '')
+        </if>
+        )
+        )a
+        where 1=1
+        <if test="keyword != null and keyword != ''">
+            and (
+            a.good_pym like concat('%',#{keyword},'%') or a.good_wbm like concat('%',#{keyword},'%') or a.good_name like concat('%',#{keyword},'%') or
+            a.usual_name like concat('%',#{keyword},'%') or a.usual_pym like concat('%',#{keyword},'%') or a.usual_wbm like concat('%',#{keyword},'%')
+            or a.bName like concat('%',#{keyword},'%')
+            )
+        </if>
+        <if test="ids!=null and ids.size()> 0">
+            and a.id in
+            <foreach collection="ids" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
 
 
 </mapper>

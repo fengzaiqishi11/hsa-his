@@ -26,7 +26,7 @@
         <result property="model" column="model" jdbcType="VARCHAR"/>
         <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
         <result property="bizName" column="bizName" jdbcType="VARCHAR"/>
-
+        <result property="typeCode" column="typeCode" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--单个查询-->
@@ -46,6 +46,7 @@
         case when l.item_code='1' then bd.code when l.item_code='2' then bm.code end code,
         case when l.item_code='1' then bd.spec when l.item_code='2' then bm.spec end spec,
         case when l.item_code='2' then bm.model end model,
+        (case l.item_code when '1' then bd.type_code when '2' then bm.type_code end ) typeCode,
         (l.num * after_price) as afterPriceAll,
         (l.num * before_price) as beforePriceAll,
         (select name from base_dept where id = l.biz_id) as bizName

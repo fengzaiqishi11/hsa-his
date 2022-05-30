@@ -454,4 +454,6 @@ public interface OutptDoctorPrescribeBO {
      * @Return:
      **/
     BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
+
+    PageDTO getCfData2(BaseDrugDTO baseDrugDTO);
 }

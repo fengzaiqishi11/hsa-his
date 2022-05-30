@@ -111,4 +111,7 @@ public class StroStockDTO extends StroStockDO implements Serializable {
     //国家编码
     private String insureItemCode;
     private String insureItemName;
+    //材料药品分类
+    private String typeCode;
+    private String bigTypeCode;
 }

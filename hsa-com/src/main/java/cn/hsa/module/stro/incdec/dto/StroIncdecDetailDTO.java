@@ -36,4 +36,6 @@ public class StroIncdecDetailDTO extends StroIncdecDetailDO implements Serializa
     private String code;
     // 材料型号
     private String model;
+    //分类
+    private String typeCode;
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.PhysBusinessDAO">
+
+    <!--查询体检报告首页-->
+    <select id="listPhysReportFront" resultType="cn.hsa.module.interf.healthInfo.entity.TbYlTjbgsy">
+        select null from dual
+    </select>
+    <!--查询体检分组报告-->
+    <select id="listPhysGroupingReport" resultType="cn.hsa.module.interf.healthInfo.entity.TbYlTjfzbg">
+        select null from dual
+    </select>
+    <!--查询体检项目明细-->
+    <select id="listPhysItemDetail" resultType="cn.hsa.module.interf.healthInfo.entity.TbYlTjmx">
+        select null from dual
+    </select>
+</mapper>

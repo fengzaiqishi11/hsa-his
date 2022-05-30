@@ -213,4 +213,11 @@ public interface SysCodeBO {
      * @Return: SysCodeDetailDTO
      **/
     SysCodeDetailDTO getCodeDetailByValue(SysCodeDetailDTO sysCodeDetailDTO);
+    /**
+     * @Author gory
+     * @Description 启用作废的值域明细
+     * @Date 2022/5/9 16:31
+     * @Param [sysCodeDetailDTO]
+     **/
+    Boolean updateStatus(SysCodeDetailDTO sysCodeDetailDTO);
 }

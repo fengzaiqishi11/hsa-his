@@ -186,4 +186,8 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     private Date endDate;
     // 是否医保类型
     private String SF;
+    // 处方类别
+    private String prescriptionCategory;
+    // 收据类型 0: 挂号；1：门诊；2：住院
+    private String inventoryType;
 }

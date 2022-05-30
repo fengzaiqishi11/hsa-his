@@ -8,7 +8,8 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.outpt.collblood.bo.OutptCollBloodBO;
 import cn.hsa.module.outpt.collblood.service.OutptCollBloodService;
 import cn.hsa.util.MapUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

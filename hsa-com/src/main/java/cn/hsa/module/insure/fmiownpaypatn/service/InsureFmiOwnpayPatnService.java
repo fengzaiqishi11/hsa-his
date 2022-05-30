@@ -2,7 +2,9 @@ package cn.hsa.module.insure.fmiownpaypatn.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Map;
@@ -63,5 +65,30 @@ public interface InsureFmiOwnpayPatnService {
     @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnReconciliationInfo")
     WrapperResponse queryFmiOwnPayPatnReconciliationInfo(Map map);
 
+    @GetMapping("/service/insure/insureSettleInfo/queryInsureOutptMedicTreatMent")
+    WrapperResponse<PageDTO> queryInsureOutptMedicTreatMent(Map<String, Object> param);
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayInfoDetail")
+    WrapperResponse queryFmiOwnPayInfoDetail(Map map);
 
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayPatnFeeListDetail")
+    WrapperResponse queryFmiOwnPayPatnFeeListDetail(Map map);
+
+    @PostMapping("/service/insure/insureSettleInfo/queryFmiOwnPayDiseListDetail")
+    WrapperResponse queryFmiOwnPayDiseListDetail(Map map);
+    @PostMapping("/service/insure/insureSettleInfo/insertInsureMdtrtAndDiag")
+    WrapperResponse insertInsureMdtrtAndDiag(Map map);
+
+    @PostMapping("/service/insure/insureSettleInfo/insertOutptMedicTreatMent")
+    WrapperResponse insertOutptMedicTreatMent(Map<String, Object> param);
+    @PostMapping("/service/insure/insureSettleInfo/deleteOutptMedicTreatMent")
+    WrapperResponse deleteOutptMedicTreatMent(Map<String, Object> param);
+    @PostMapping("/service/insure/insureSettleInfo/insertInsureFinish")
+    WrapperResponse insertInsureFinish(Map map);
+
+
+    WrapperResponse<Boolean> deleteInsureFmiOwnPayPatnCost(Map map);
+
+    WrapperResponse<PageDTO> queryFeeInfoDetailPage(Map<String, Object> param);
+
+    WrapperResponse<Boolean> insertInsureInputCost(Map<String, Object> param);
 }

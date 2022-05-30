@@ -437,6 +437,16 @@ WHERE
         </foreach>
     </select>
 
+    <!--  根据id查询职工信息 -->
+    <select id="getUserById" parameterType="cn.hsa.module.interf.outpt.dto.YjRcDTO" resultType="cn.hsa.module.sys.user.entity.SysUserDO" >
+        select * from sys_user where id = #{mzysid}
+    </select>
+
+    <!--  根据id查询科室信息 -->
+    <select id="getDeptById" parameterType="cn.hsa.module.interf.outpt.dto.YjRcDTO" resultType="cn.hsa.module.base.dept.entity.BaseDeptDO" >
+        select * from base_dept where id = #{jzksid}
+    </select>
+
 
 
 </mapper>

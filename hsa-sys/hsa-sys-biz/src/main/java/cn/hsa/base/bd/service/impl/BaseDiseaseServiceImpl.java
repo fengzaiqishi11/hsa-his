@@ -9,7 +9,8 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO;
 import cn.hsa.module.base.bd.service.BaseDiseaseService;
 import cn.hsa.util.MapUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -198,5 +199,15 @@ public class BaseDiseaseServiceImpl extends HsafService implements BaseDiseaseSe
     public WrapperResponse<List<BaseDiseaseDTO>> queryAllInfectious(Map map) {
         BaseDiseaseDTO baseDiseaseDTO=MapUtils.get(map,"baseDiseaseDTO");
         return WrapperResponse.success(baseDiseaseBO.queryAllInfectious(baseDiseaseDTO));
+    }
+
+    @Override
+    public WrapperResponse<Boolean> updateDisease(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map,"hospCode");
+        String insureRegCode =  MapUtils.get(map,"insureRegCode");
+        BaseDiseaseDTO baseDiseaseDTO = new BaseDiseaseDTO();
+        baseDiseaseDTO.setHospCode(hospCode);
+        baseDiseaseDTO.setInsureRegCode(insureRegCode);
+        return WrapperResponse.success(baseDiseaseBO.updateDisease(baseDiseaseDTO));
     }
 }

@@ -7,7 +7,8 @@ import cn.hsa.module.center.admdvs.bo.CenterInsureAdmdvsBO;
 import cn.hsa.module.center.admdvs.dao.CenterInsureAdmdvsDAO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

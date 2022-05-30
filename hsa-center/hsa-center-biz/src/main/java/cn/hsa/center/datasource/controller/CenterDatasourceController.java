@@ -232,4 +232,16 @@ public class CenterDatasourceController extends CenterBaseController {
         return centerDatasourceService_consumer.updateIsGuide();
     }
 
+    /**
+     * @Description: SaaS导出
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    @GetMapping(value = "/exportHospitalData")
+    public WrapperResponse exportHospitalData(@RequestParam String startDate,@RequestParam String endDate){
+        return centerDatasourceService_consumer.exportHospitalData(startDate,endDate);
+    }
+
 }

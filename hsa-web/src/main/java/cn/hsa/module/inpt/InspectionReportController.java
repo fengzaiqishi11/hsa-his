@@ -63,6 +63,7 @@ public class InspectionReportController extends BaseController {
         examinationItem.setInNo(inspectItem.getInNo());
         examinationItem.setAdviceId(inspectItem.getOpdId());
         examinationItem.setApplyNo(inspectItem.getApplyNo());
+        examinationItem.setZhId(inspectItem.getZhId());
         map.put("examinationItem",examinationItem);
         map.put("hospCode", sysUserDTO.getHospCode());
         InspectionReportDTO inspectionReportDTO = inspectionReportService.getInspectionReportInfo(map).getData();

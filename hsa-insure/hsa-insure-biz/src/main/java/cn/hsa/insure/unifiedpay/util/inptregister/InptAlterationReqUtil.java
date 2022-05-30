@@ -76,6 +76,7 @@ public class InptAlterationReqUtil<T> extends InsureCommonUtil implements BaseRe
                 diseinfoMap.put("dise_dor_no",  inptDiagnoseDTOList.get(i).getPracCertiNo());//	诊断医生编码
                 diseinfoMap.put("dise_dor_name",  inptDiagnoseDTOList.get(i).getZzDoctorName());//	诊断医生姓名
                 diseinfoMap.put("diag_time",  DateUtils.format(inptDiagnoseDTOList.get(i).getCrteTime(),DateUtils.Y_M_DH_M_S));//	诊断时间
+                diseinfoMap.put("vali_flag", "1");//	有效标志
 //                diseinfoMap.put("medins_diag_code",orgCode);//	医疗机构诊断编码
                 diseinfoList.add(diseinfoMap);
             }
@@ -103,17 +104,19 @@ public class InptAlterationReqUtil<T> extends InsureCommonUtil implements BaseRe
         Map<String, Object> adminfoMap = new HashMap<String, Object>();
         adminfoMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());//	就诊ID
         adminfoMap.put("psn_no", insureIndividualVisitDTO.getAac001());//	人员编号
+        adminfoMap.put("insutype", insureIndividualVisitDTO.getAae140());//	险种类型
         adminfoMap.put("coner_name", null);//	联系人姓名
         adminfoMap.put("tel", null);//	联系电话
         adminfoMap.put("begntime", DateUtils.format(insureIndividualVisitDTO.getCrteTime(),DateUtils.Y_M_DH_M_S));//	开始时间
         adminfoMap.put("endtime", null);//	结束时间
         adminfoMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType());//	就诊凭证类型
+        adminfoMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo());//	就诊凭证号码
         adminfoMap.put("med_type", insureIndividualVisitDTO.getAka130());//	医疗类别
         adminfoMap.put("ipt_otp_no", insureIndividualVisitDTO.getVisitNo());//	住院/门诊号
         adminfoMap.put("medrcdno", null);//	病历号
         adminfoMap.put("atddr_no",insureIndividualVisitDTO.getPracCertiNo());//	主治医生编码
         adminfoMap.put("chfpdr_name", insureIndividualVisitDTO.getZzDoctorName());//	主诊医师姓名
-        adminfoMap.put("adm_diag_dscr", null);//	入院诊断描述
+        adminfoMap.put("adm_diag_dscr", insureIndividualVisitDTO.getVisitDrptName());//	入院诊断描述
         adminfoMap.put("adm_dept_codg", insureIndividualVisitDTO.getVisitDrptId());//	入院科室编码
         adminfoMap.put("adm_dept_name", insureIndividualVisitDTO.getVisitDrptName());//	入院科室名称
         adminfoMap.put("adm_bed", insureIndividualVisitDTO.getVisitBerth());//	入院床位

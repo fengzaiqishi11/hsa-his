@@ -7,7 +7,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.infusionRegister.bo.OutptInfusionRegisterBO;
 import cn.hsa.module.outpt.infusionRegister.service.OutptInfusionRegisterService;
 import cn.hsa.util.MapUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

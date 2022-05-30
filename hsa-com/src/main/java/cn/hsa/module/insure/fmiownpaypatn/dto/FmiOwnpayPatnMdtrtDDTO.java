@@ -4,7 +4,7 @@ import lombok.Data;
 
 /**
  * @ClassName FmiOwnpayPatnMdtrtDDTO
- * @Description TODO
+ * @Description TODO  自费病人就诊信息  【4208】
  * @Author qiang.fan
  * @Date 2022/4/6 11:16
  * @Version 1.0
@@ -16,6 +16,10 @@ public class FmiOwnpayPatnMdtrtDDTO {
      * 医药机构就诊事件ID 机构生成内唯一就诊流水
      */
     private String mdtrtId;
+    /**
+     * 医药机构就诊事件ID 机构生成内唯一就诊流水 字符型 30
+     */
+    private String fixmedinsMdtrtId;
     /**
      * 定点医药机构编号
      */
@@ -81,6 +85,10 @@ public class FmiOwnpayPatnMdtrtDDTO {
      */
     private String iptOpNo;
     /**
+     * 		住院/门诊号	字符型	30	　
+     */
+    private String iptOtpNo;
+    /**
      * 	病历号	字符型	30	　
      */
     private String medrcdno;
@@ -129,6 +137,18 @@ public class FmiOwnpayPatnMdtrtDDTO {
      */
     private String dscgDeptCode;
     /**
+     * 	转科室标志	字符型	30	　
+     */
+    private String trafDeptFlag;
+    /**
+     * 	出院主诊断代码	字符型	30	　
+     */
+    private String dscgMaindiagCode;
+    /**
+     * 	出院科室编码	字符型	30	　
+     */
+    private String dscgDeptCodg;
+    /**
      * 	出院科室名称	字符型	100	　	　	　
      */
     private String dscgDeptName;
@@ -144,6 +164,10 @@ public class FmiOwnpayPatnMdtrtDDTO {
      * 主要病情描述	字符型	1000
      */
     private String mainCondDesc;
+    /**
+     * 主要病情描述	字符型	1000
+     */
+    private String mainCondDscr;
     /**
      * 病种编号	字符型	30
      */
@@ -164,6 +188,10 @@ public class FmiOwnpayPatnMdtrtDDTO {
      * 门诊诊断信息	字符型	200
      */
     private String opDiseInfo;
+    /**
+     * 门诊诊断信息	字符型	200
+     */
+    private String otpDiagInfo;
     /**
      * 在院状态	字符型	3		Y
      */
@@ -228,5 +256,35 @@ public class FmiOwnpayPatnMdtrtDDTO {
      * 备注	字符型	500
      */
     private String memo;
+    /**
+     * 扩展字段
+     */
+    private String expContent;
+    /**
+     * 完成标志
+     */
+    private String cplt_flag;
+    /**
+     * 电子票据校验码
+     */
+    private String elecBillChkcode;
+    /**
+     * 电子票据号码
+     */
+    private String elecBillnoCode;
+    /**
+     * 电子票据代码
+     */
+    private String elecBillCode;
+    /**
+     * 医疗总费用
+     */
+    private String medfeeSumamt;
+    /**
+     * 住院主诊断名称
+     */
+    private String dscgMaindiagName;
+
+
 
 }

@@ -1,9 +1,11 @@
 package cn.hsa.module.insure.module.dao;
 
+import cn.hsa.module.insure.clinica.dto.InsureNoStructReportDTO;
 import cn.hsa.module.insure.module.entity.InsureBactreailReportDO;
 import cn.hsa.module.insure.module.entity.InsureDrugSensitiveReportDO;
 import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 import cn.hsa.module.insure.module.entity.InsurePathologicalReportDO;
+import com.alibaba.fastjson.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -83,7 +85,7 @@ public interface InsureUnifiedClinicalDAO {
      * @Date 2021/9/2 10:18
      * @Return
      */
-    List<InsureNoStructReportDO> queryPageNoStructReportRecord(InsureNoStructReportDO insureNoStructReportDO);
+    List<InsureNoStructReportDTO> queryPageNoStructReportRecord(InsureNoStructReportDO insureNoStructReportDO);
 
     /**
      * @param insurePathologicalReportDO
@@ -139,4 +141,20 @@ public interface InsureUnifiedClinicalDAO {
      * @Return
      */
     boolean insertDrugSensitivityReportRecord(InsureDrugSensitiveReportDO insureDrugSensitiveReportDO);
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-11 20:09
+     * @Description 根据id查询非机构化信息
+     * @param id
+     * @return cn.hsa.module.insure.clinica.dto.InsureNoStructReportDTO
+     */
+    InsureNoStructReportDTO queryById(String id);
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-05-11 20:23
+     * @Description 修改非机构化报告记录
+     * @param parseObject
+     * @return void
+     */
+    void updateInsureNoStructReport(InsureNoStructReportDO insureNoStructReportDO);
 }

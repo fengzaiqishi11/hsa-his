@@ -2,6 +2,7 @@ package cn.hsa.module.base.bd.dao;
 
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO;
+import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -172,4 +173,8 @@ public interface BaseDiseaseDAO {
      * @Return java.util.List<cn.hsa.module.base.bd.dto.BaseDiseaseDTO>
      **/
     List<BaseDiseaseDTO> queryAllInfectious(BaseDiseaseDTO baseDiseaseDTO);
+
+    List<InsureDiseaseMatchDTO> getDiseaseIsMatch(BaseDiseaseDTO baseDiseaseDTO);
+
+    void updateDiseaseMatch(@Param("insureDiseaseMatchDTOList") List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList, @Param("hospCode") String hospCode);
 }

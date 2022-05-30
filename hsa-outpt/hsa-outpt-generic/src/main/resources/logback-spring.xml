@@ -11,7 +11,7 @@
     -->
 
     <springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="./logs/hsa-outpt/"/>
-    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-outpt-generic"/>
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="hsa-outpt"/>
     <springProperty scope="context" name="LOG_SERVER_ADDRESS" source="logging.server.address" defaultValue="172.18.100.104"/>
     <springProperty scope="context" name="LOG_SERVER_PORT" source="logging.server.port" defaultValue="12201"/>
     <!-- Graylog 日志收集 -->
@@ -44,6 +44,55 @@
             <staticField>app_name:hsa-outpt</staticField>
         </encoder>
     </appender>
+
+    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 每天日志归档路径以及格式 -->
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLLING_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.error.log</file>
+        <!--过滤器,只打INFO级别的日志-->
+        <append>true</append>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}.error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>>%d{yyyy-MM-dd HH:mm:ss.SSS} - [%X{traceID}] - [%thread] %-5level %logger{50}.%M\(%line\) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
     <!-- 控制台输出 -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -71,31 +120,24 @@
         </triggeringPolicy>
     </appender>
 
+
     <!-- 开发环境日志级别为DEBUG -->
     <springProfile name="local">
         <root level="INFO">
-            <appender-ref ref="FILE"/>
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
             <appender-ref ref="STDOUT"/>
         </root>
-
     </springProfile>
 
     <!-- 其他环境日志级别为INFO -->
     <springProfile name="!local">
         <root level="INFO">
-            <appender-ref ref="FILE"/>
-            <appender-ref ref="STDOUT"/>
+            <appender-ref ref="ROLLING_FILE"/>
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
         </root>
-        <root level="ERROR">
-            <appender-ref ref="GELF"/>
-        </root>
+        <logger name="com.alibaba.nacos.client.naming" level="error" additivity="false">
+            <appender-ref ref="ROLLING_ERROR_FILE"/>
+        </logger>
     </springProfile>
-
-    <!-- 日志输出级别 -->
-    <!--
-    <root level="INFO">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
-    </root>
-    -->
 </configuration>

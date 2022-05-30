@@ -13,7 +13,7 @@
     <!--分布式关系数据库-->
 <!--    <import resource="classpath:config/db/db.xml"/>-->
     <!--分布式非结构化存储-->
-    <import resource="classpath:config/fsstore/fsstore.xml"/>
+<!--    <import resource="classpath:config/fsstore/fsstore.xml"/>-->
     <!--网关-->
 <!--    <import resource="classpath:config/gateway/gateway.xml"/>-->
     <!--唯一ID生成-->

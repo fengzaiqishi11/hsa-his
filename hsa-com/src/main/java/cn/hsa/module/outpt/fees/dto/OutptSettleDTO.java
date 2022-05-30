@@ -204,4 +204,9 @@ public class OutptSettleDTO extends OutptSettleDO implements Serializable {
         private String registerId;
         private String refundStatus; // 退费状态  0：所有 1：待退费 2：已退费
 
+        /**
+         * 电子凭证授权Token
+         */
+        private String ecToken;
+
 }

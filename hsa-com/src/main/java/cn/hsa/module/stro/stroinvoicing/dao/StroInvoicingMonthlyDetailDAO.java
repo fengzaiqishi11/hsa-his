@@ -4,7 +4,9 @@ package cn.hsa.module.stro.stroinvoicing.dao;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDetailDTO;
 import cn.hsa.module.stro.stroinvoicing.entity.StroInvoicingMonthlyDetailDO;
+import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 public interface StroInvoicingMonthlyDetailDAO {
@@ -76,5 +78,19 @@ public interface StroInvoicingMonthlyDetailDAO {
      * @Author: zhangguorui
      * @Date: 2022/3/29
      */
-    void insertBatch(List<StroInvoicingMonthlyDetailDTO> stroInvoicingDetails);
+    void insertBatch(@Param("stroInvoicingDetails") List<StroInvoicingMonthlyDetailDTO> stroInvoicingDetails);
+    /**
+     * @Author gory
+     * @Description 删除当前日期的数据
+     * @Date 2022/5/11 10:55
+     * @Param [hospCode, nowDate]
+     **/
+    void deleteBatch(@Param("hospCode") String hospCode,@Param("nowDate") Date nowDate);
+    /**
+     * @Author gory
+     * @Description 根据id查询明细数据
+     * @Date 2022/5/11 20:14
+     * @Param [stroInvoicingMonthlyDTO]
+     **/
+    List<StroInvoicingMonthlyDetailDTO> queryDetailByMonthlyId(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO);
 }

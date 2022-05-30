@@ -1098,6 +1098,8 @@
     <select id="queryYZSDeclareInfosPage" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT DISTINCT
         c.aac003 AS psnName,
+        c.aac004 AS gend,
+        (select name from insure_dict where value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
         c.bka008 insureUnit,
@@ -1125,16 +1127,18 @@
         e.person_price AS personPrice,
         e.hosp_price AS hospPrice,
         e.rests_price AS restsPrice,
-        e.thb_pay AS thbPay,
+        ifNull(e.thb_pay, 0) AS thbPay, /*如果值为空 做0处理*/
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
-        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0) +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
+        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0)+ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull(e.maf_pay,0.00) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         e.clr_optins AS clrOptins,
         e.clr_type AS clrType,
-        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type = value ) as clrTypeName,
-        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type =
+        value ) as clrTypeName,
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 =
+        value ) as medTypeName,
         e.medicine_org_code AS medicineOrgCode,
         t.insure_reg_code AS setlOptins,
         t.aac001 AS psnNo,
@@ -1151,7 +1155,9 @@
         e.inscp_scp_amt as inscpScpAmt,
         e.pool_prop_selfpay as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
-        (select name from insure_dict where value = t.psn_idet_type and code = 'PSN_IDET_TYPE' and insure_reg_code = t.insure_reg_code and hosp_code = t.hosp_code limit 1) as psnAttrName
+        (select admdvs_name from insure_admdvs i where i.admdvs_code=t.insuplc_admdvs) as insuplcAdmdvsName,
+        (select name from insure_dict where value = t.psn_idet_type and code = 'PSN_IDET_TYPE' and insure_reg_code =
+        t.insure_reg_code and hosp_code = t.hosp_code limit 1) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1182,6 +1188,9 @@
         </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
         </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
@@ -1302,8 +1311,15 @@
         <if test="medType != null and medType != '' ">
             and e.aka130 = #{medType}
         </if>
+        <if test="isHospital != null and isHospital != '' ">
+            and t.is_hospital = #{isHospital}
+        </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
+        </if>
+
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
         </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
@@ -1446,6 +1462,9 @@
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
         </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
+        </if>
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -1479,6 +1498,7 @@
         c.aac003 AS psnName,
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
+        TIMESTAMPDIFF(YEAR,c.aac006 ,DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%S')) as age,
         c.bka008 insureUnit,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteTime,
         DATE_FORMAT(e.crte_time,'%Y-%m-%d') AS crteDate,
@@ -1562,6 +1582,7 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
+        AND ifnull(t.is_one_settle,0) != '1'
         AND e.insure_price > 0
         AND t.insuplc_admdvs = ia.admdvs_code
         <if test="isValidOneSettle == '1'.toString()">

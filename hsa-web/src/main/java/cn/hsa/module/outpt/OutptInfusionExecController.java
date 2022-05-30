@@ -9,7 +9,8 @@ import cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.StringUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

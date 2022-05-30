@@ -15,7 +15,8 @@ import cn.hsa.module.oper.operInforecord.dao.OperInfoRecordDAO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.util.*;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.dom4j.DocumentException;

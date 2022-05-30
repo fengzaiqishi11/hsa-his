@@ -7,7 +7,7 @@ import cn.hsa.module.outpt.triage.service.OutptTriageVisitService;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 
 import lombok.extern.slf4j.Slf4j;
 

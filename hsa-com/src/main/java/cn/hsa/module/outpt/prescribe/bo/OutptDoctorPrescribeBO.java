@@ -2,6 +2,7 @@ package cn.hsa.module.outpt.prescribe.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
+import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -454,6 +455,12 @@ public interface OutptDoctorPrescribeBO {
      * @Return:
      **/
     BaseDrugDTO getBaseDrug(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
+
+
+    List<OutptDiagnoseDTO> queryOutptDiagnoseByVisitIds(OutptVisitDTO outptVisitDTO);
+
+
+    List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
 
     PageDTO getCfData2(BaseDrugDTO baseDrugDTO);
 }

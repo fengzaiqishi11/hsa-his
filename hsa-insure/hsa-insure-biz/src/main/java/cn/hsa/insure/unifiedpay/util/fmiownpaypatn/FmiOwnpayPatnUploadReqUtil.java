@@ -340,8 +340,8 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
             diseinfoMap.setDiagType(type);//	诊断类别
             diseinfoMap.setMaindiagFlag(inptDiagnoseDTOList.get(i).getIsMain());//	主诊断标志
-            diseinfoMap.setDiagCode(inptDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
-            diseinfoMap.setDiagName(inptDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
+            diseinfoMap.setDiagCode(inptMatchDiagnoseDTOList.get(i).getInsureInllnessCode());//	诊断代码
+            diseinfoMap.setDiagName(inptMatchDiagnoseDTOList.get(i).getInsureInllnessName());//	诊断名称
 
             diseinfoMap.setAdmCond(null);//	入院病情
             diseinfoMap.setDiagDept(inptDiagnoseDTOList.get(i).getInDeptName());//	诊断科室

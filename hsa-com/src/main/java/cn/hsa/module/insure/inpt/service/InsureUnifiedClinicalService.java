@@ -2,6 +2,7 @@ package cn.hsa.module.insure.inpt.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.entity.InsureNoStructReportDO;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.Map;
@@ -33,7 +34,7 @@ public interface InsureUnifiedClinicalService {
 
     /**
      * @Method updatePathologicalReportRecord
-     * @Desrciption 病理检查报告记录
+     * @Desrciption 病理检查报告记录 -- 上传到医保
      * @Param
      *
      * @Author fuhui
@@ -95,7 +96,7 @@ public interface InsureUnifiedClinicalService {
      * @Date   2021/9/2 10:18
      * @Return
      **/
-    WrapperResponse<Boolean> insertNoStructReportRecord(Map<String, Object> map);
+    WrapperResponse<Boolean> insertNoStructReportRecord(Map<String,Object> map);
 
 
     /**
@@ -144,7 +145,7 @@ public interface InsureUnifiedClinicalService {
 
     /**
      * @Method queryPageBacterialReportRecord
-     * @Desrciption 细菌培养报告记录 -- 保存到his数据库
+     * @Desrciption 细菌培养报告记录 -- 分页查询
      * @Param
      *
      * @Author fuhui
@@ -165,6 +166,17 @@ public interface InsureUnifiedClinicalService {
     WrapperResponse<Boolean> insertDrugSensitivityReportRecord(Map<String, Object> map);
 
     /**
+     * @Method insertDrugSensitivityReportRecord
+     * @Desrciption 药敏记录报告记录  ----分页查询
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/9/2 10:18
+     * @Return
+     **/
+    WrapperResponse<PageDTO> queryDrugSensitivityReportRecord(Map<String, Object> map);
+
+    /**
      * @Method insertClinicalReportRecord
      * @Desrciption 临床检验报告记录 -- 上传到医保
      * @Param
@@ -182,7 +194,7 @@ public interface InsureUnifiedClinicalService {
      * @Date 2021/9/2 10:18
      * @Return
      **/
-    WrapperResponse<Boolean> queryPageClinicalReportRecord(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryPageClinicalReportRecord(Map<String, Object> map);
 
     /**
      * @Method insertClinicalReportRecord

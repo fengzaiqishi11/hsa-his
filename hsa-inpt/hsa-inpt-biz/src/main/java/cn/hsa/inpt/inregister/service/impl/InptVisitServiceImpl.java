@@ -271,4 +271,9 @@ public class InptVisitServiceImpl extends HsafService implements InptVisitServic
         inptBabyDTO.setVisitId((String) paramMap.get("visitId"));
         return WrapperResponse.success(inptBabyBO.findByCondition(inptBabyDTO));
     }
+
+    @Override
+    public WrapperResponse<Boolean> updateUplod(Map<String, Object> map) {
+        return WrapperResponse.success(inptVisitBO.updateUplod(MapUtils.get(map, "inptVisitDTO")));
+    }
 }

@@ -713,7 +713,8 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         }
 
         //获取门诊医生、护士、收费站首页今日业务情况
-        Map ywMap = baseHomeDao.getMzywDataByToday(paramMap);
+        //update by yuelong.chen 20220527 屏蔽查询
+//        Map ywMap = baseHomeDao.getMzywDataByToday(paramMap);
 
         //根据登录的系统编码，获取对应的今日代办事项和趋势图、饼图
         Map dbMap = new HashMap();
@@ -779,7 +780,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 
         Map resultMap = new HashMap();
         resultMap.put("system_code",systemCode);
-        resultMap.put("ywMap",ywMap);//今日业务数据
+        resultMap.put("ywMap",null);//今日业务数据
         resultMap.put("dbMap",dbMap); //今日代办事项数据
         resultMap.put("csMap",csMap); //趋势图数据
         resultMap.put("btMap",btMap);//饼图数据

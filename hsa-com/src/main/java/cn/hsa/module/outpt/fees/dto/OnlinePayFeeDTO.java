@@ -38,6 +38,11 @@ public class OnlinePayFeeDTO implements Serializable {
   /**
    * 就诊号
    */
+  private String id;
+
+  /**
+   * 就诊号
+   */
   private String visitId;
 
   /**
@@ -359,6 +364,6 @@ public class OnlinePayFeeDTO implements Serializable {
   /**
    * 界面费用明细集合
    */
-  private List<OutptCostDTO> costList;
+  private List<OutptCostDTO> outptCostDTOList;
 
 }

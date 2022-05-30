@@ -7,12 +7,14 @@ import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.MapUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @ClassName SettlementListUpdateReqUtil
- * @Deacription 医疗保障基金结算清单状态修改-4102
+ * @Deacription 医疗保障基金结算清单状态修改- 4102
  * @Author liuzhuoting
  * @Date 2021/3/10 10:33
  * @Version 1.0
@@ -25,9 +27,9 @@ public class SettlementListUpdateReqUtil<T> extends InsureCommonUtil implements 
         Map map = (Map) param;
         checkRequest(map);
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("psn_no",MapUtils.get(map, "psn_no"));
-        dataMap.put("setl_id",MapUtils.get(map, "setl_id"));
-        dataMap.put("stas_type",MapUtils.get(map, "stas_type"));
+        List<Map<String, Object>> list = new ArrayList<>();
+        list.add((Map)map.get("stastinfo"));
+        dataMap.put("stastinfo",list);
         Map<String, Object> inputMap = new HashMap<>();
         inputMap.put("data",dataMap);
         map.put("input",inputMap);

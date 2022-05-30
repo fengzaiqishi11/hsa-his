@@ -2,6 +2,7 @@ package cn.hsa.module.interf.outpt.dao;
 
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
+import cn.hsa.module.base.dept.entity.BaseDeptDO;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.rate.dto.BaseRateDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
@@ -14,6 +15,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.module.sys.user.entity.SysUserDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -229,5 +231,9 @@ public interface OutptPrescribeDAO {
     List<Map<String, Object>> checkStock(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO);
 
     int insertDiagnose(OutptDiagnoseDTO outptDiagnoseDTO);
+
+    SysUserDO getUserById(YjRcDTO yjRcDTO);
+
+    BaseDeptDO getDeptById(YjRcDTO yjRcDTO);
 
 }

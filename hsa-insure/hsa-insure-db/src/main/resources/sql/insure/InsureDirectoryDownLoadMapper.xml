@@ -313,6 +313,69 @@
 
         </if>
     </select>
+    <insert id="insertInsureNationDrug">
+        INSERT INTO insure_unified_nation_drug
+        (id, hosp_code, med_list_codg, drug_prodname, genname_codg, drug_genname, ethdrug_type, chemname, alis, eng_name, dosform, each_dos, used_frqu, nat_drug_no, used_mtd, ing, chrt, defs, tabo, mnan, stog, drug_spec, prcunt_type, otc_flag, pacmatl, pacspec, min_useunt, min_salunt, manl, rute, begndate, enddate, pham_type, memo, pac_cnt, min_unt, min_pac_cnt, min_pacunt, min_prepunt, drug_expy, efcc_atd, min_prcunt, wubi, pinyin, vali_flag, rid, crte_time, updt_time, crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver)
+       values
+        <foreach collection="unifiedMatchDOList" item="item" index="index" separator=",">
+            (
+           #{item.begndate}, #{item.enddate}, #{item.id},
+            #{item.hospCode},
+            #{item.medListCodg},
+            #{item.drugProdnam},
+            #{item.gennameCodg},
+            #{item.drugGenname},
+            #{item.ethdrugType},
+            #{item.chemname},
+            #{item.alis},
+            #{item.engName},
+            #{item.dosform},
+            #{item.eachDos},
+            #{item.usedFrqu},
+            #{item.natDrugNo},
+            #{item.usedMtd},
+            #{item.ing},
+            #{item.chrt},
+            #{item.defs},
+            #{item.tabo},
+            #{item.mnan},
+            #{item.stog},
+            #{item.drugSpec},
+            #{item.prcuntType},
+            #{item.otcFlag},
+            #{item.pacmatl},
+            #{item.pacspec},
+            #{item.minUseunt},
+            #{item.minSalunt},
+            #{item.manl},
+            #{item.rute},
+            #{item.phamTyp},
+            #{item.memo},
+            #{item.pacCnt},
+            #{item.minUnt},
+            #{item.minPacCnt},
+            #{item.minPacunt},
+            #{item.minPrepunt},
+            #{item.drugExpy},
+            #{item.efccAtd},
+            #{item.minPrcunt},
+            #{item.wubi},
+            #{item.pinyin},
+            #{item.valiFlag},
+            #{item.rid},
+            #{item.crterId},
+            #{item.crterName},
+            #{item.crteOptinsNo},
+            #{item.opterId},
+            #{item.opterName},
+            #{item.optTime},
+            #{item.optinsNo},
+            #{item.ver},
+            #{item.updtTime},
+            #{item.optTime}
+            )
+        </foreach>
+    </insert>
     <select id="queyrAllInsureNationDrug"
             resultType="cn.hsa.module.insure.module.entity.InsureUnifiedNationDrugDO">
             select id, hosp_code, med_list_codg, drug_prodname, genname_codg,
@@ -322,6 +385,18 @@
                    crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver from insure_unified_nation_drug
         <if test="keyword != null and keyword != ''">
             and ( hilist_code like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+    <select id="queryPageInsureUnifiedNationDrug"
+            resultType="cn.hsa.module.insure.module.entity.InsureUnifiedNationDrugDO">
+        select id, hosp_code, med_list_codg, drug_prodname, genname_codg,
+        drug_genname, ethdrug_type, chemname, alis, eng_name, dosform, each_dos, used_frqu,
+        nat_drug_no, used_mtd, ing, chrt, defs, tabo, mnan, stog, drug_spec, prcunt_type, otc_flag,
+        pacmatl, pacspec, min_useunt, min_salunt, manl, rute, begndate, enddate, pham_type, memo, pac_cnt, min_unt, min_pac_cnt, min_pacunt, min_prepunt, drug_expy, efcc_atd, min_prcunt, wubi, pinyin, vali_flag, rid, crte_time, updt_time,
+        crter_id, crter_name, crte_optins_no, opter_id, opter_name, opt_time, optins_no, ver from insure_unified_nation_drug where 1=1
+        <if test="keyword != null and keyword != ''">
+            and ( med_list_codg like concat('%',#{keyword},'%')
             )
         </if>
     </select>

@@ -42,10 +42,10 @@
                   AND bd.hosp_code = #{hospCode}
             ) a UNION ALL
         SELECT
-        bd.code id,
-        '' as visit_id,
-        bd.name label,
-        '-2' parentId
+            bd.`code` id,
+            '' as visit_id,
+            bd.`name` label,
+            '-2' parentId
         FROM
             base_dept bd
         WHERE
@@ -71,7 +71,7 @@
         iv.in_no AS id,
         iv.id as visit_id,
         concat( iv.NAME, '[ ', iv.in_no, ' ]', '(', ifnull( iv.bed_name, '未安床' ), ')' ) AS label,
-        bd.code AS parentId
+        bd.`code` AS parentId
         FROM
         base_dept bd
         inner JOIN inpt_visit iv ON bd.id = iv.in_dept_id
@@ -94,7 +94,7 @@
         </if>
         <if test="patientName != null and patientName != ''">
             <![CDATA[
-                    and iv.name like concat('%',#{patientName},'%')
+                    and iv.`name` like concat('%',#{patientName},'%')
                 ]]>
         </if>
         <if test="deptId != null and deptId != ''">
@@ -105,7 +105,7 @@
         ov.visit_no AS id,
         ov.id AS visit_id,
         concat( ov.NAME, '[ ', ov.visit_no, ' ]', '(', '', ')' ) AS label,
-        bd.code AS parentId
+        bd.`code` AS parentId
         FROM
         base_dept bd
         inner JOIN outpt_visit ov ON bd.id = ov.dept_id
@@ -130,12 +130,12 @@
         </if>
         <if test="patientName != null and patientName != ''">
             <![CDATA[
-                    and ov.name like concat('%',#{patientName},'%')
+                    and ov.`name` like concat('%',#{patientName},'%')
                 ]]>
         </if>
         <if test="deptId != null and deptId != ''">
             <![CDATA[
-                    and ov.dept_id = #{deptId}
+                    and ov.`dept_id` = #{deptId}
                 ]]>
         </if>
 
@@ -147,8 +147,8 @@
             '无' visitNo,
             iv.id,
             iv.NAME,
-            scd.name AS gender,
-            concat( age, ' ', scd2.name ) age,
+            scd.`name` AS gender,
+            concat( age, ' ', scd2.`name` ) age,
             iv.in_no AS inNo,
             iv.bed_name AS bedName,
             iv.zz_doctor_name AS zzDoctorName,
@@ -157,29 +157,29 @@
             iv.out_time AS outTime
         FROM
             inpt_visit iv
-                LEFT JOIN sys_code_detail scd ON iv.gender_code = scd.value
+                LEFT JOIN sys_code_detail scd ON iv.gender_code = scd.`value`
                 AND scd.c_code = 'XB'
-                LEFT JOIN sys_code_detail scd2 ON iv.age_unit_code = scd2.value
+                LEFT JOIN sys_code_detail scd2 ON iv.age_unit_code = scd2.`value`
                 AND scd2.c_code = 'NLDW'
         WHERE
             iv.in_no = #{inVisitNo} UNION ALL
         SELECT
             visit_no AS visitNo,
             ov.id,
-            ov.name,
-            scd.name AS gender,
-            concat( age, ' ', scd2.name ) age,
+            ov.`name`,
+            scd.`name` AS gender,
+            concat( age, ' ', scd2.`name` ) age,
             '无' inNo,
             '无' bedName,
             doctor_name AS zzDoctorName,
             visit_time AS inTime,
-            bd.name AS inDiseaseName,
+            bd.`name` AS inDiseaseName,
             null outTime
         FROM
             outpt_visit ov
-                LEFT JOIN sys_code_detail scd ON ov.gender_code = scd.value
+                LEFT JOIN sys_code_detail scd ON ov.gender_code = scd.`value`
                 AND scd.c_code = 'XB'
-                LEFT JOIN sys_code_detail scd2 ON ov.age_unit_code = scd2.value
+                LEFT JOIN sys_code_detail scd2 ON ov.age_unit_code = scd2.`value`
                 AND scd2.c_code = 'NLDW'
                 LEFT JOIN outpt_diagnose od ON ov.id = od.visit_id and od.is_main='1'
                 LEFT JOIN base_disease bd on od.disease_id = bd.id
@@ -203,8 +203,8 @@
         left join base_advice c on a.hosp_code = b.hosp_code  and  b.ba_id =c.id
         WHERE
         a.hosp_code=#{hospCode}
-          and a.type_code= #{typeCode}
-          and	a.in_no = #{inNo}
+        and a.type_code= #{typeCode}
+        and	a.in_no = #{inNo}
         <if test="startTime != null and startTime != ''">
             and a.crte_Time &gt; #{startTime}
         </if>
@@ -311,11 +311,11 @@
         SELECT
             id,
             hosp_code AS hospCode,
-            NAME as hospName,
-            CODE As parameterCode
+            `NAME` as hospName,
+            `CODE` As parameterCode
         FROM
             sys_parameter sp
-        where sp.code = 'YLJGBM'
+        where sp.`code` = 'YLJGBM'
           and sp.hosp_code = #{hospCode}
             limit 1
     </select>

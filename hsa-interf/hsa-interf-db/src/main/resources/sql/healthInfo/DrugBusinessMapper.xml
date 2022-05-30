@@ -45,14 +45,13 @@
             so.hosp_code as YLJGDM ,
             sod.id as CRKMXXH,
             '1' as CRKBZ,
-            -- 1出库,2入库
             '' as SZBWLSH,
             bd.code as YPBM,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
             '' as FPH,
-            '' as KPRQ ,
-            '' as DPRQ,
+            null as KPRQ ,
+            null as DPRQ,
             bd.dan as PZWH,
             null as SCRQ,
             sod.expiry_date as YXQ,
@@ -87,14 +86,13 @@
             sin.hosp_code as YLJGDM ,
             sid.id as CRKMXXH,
             '2' as CRKBZ,
-            -- 1出库,2入库
             '' as SZBWLSH,
             bd.code as YPBM,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
             '' as FPH,
-            '' as KPRQ ,
-            '' as DPRQ,
+            null as KPRQ ,
+            null as DPRQ,
             bd.dan as PZWH,
             null as SCRQ,
             sid.expiry_date as YXQ,
@@ -482,7 +480,7 @@
             select bd3.YLJGDM  as YLJGDM,
             bd3.KSBM  as KSBM,
             bd3.name  as KSMC,
-            bd3.ywsj as YWSJ,
+            date_format(bd3.ywsj,'%Y%m%d') as YWSJ,
             ifnull(a.mzrc,0)  as MZRC,
             ifnull(b.jzrc,0)  as JZRC,
             ifnull(c.RYRC,0)  as RYRC,
@@ -506,7 +504,7 @@
             '' as TJYL6,
             '' as TJYL7,
             '' as TJYL8,
-            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.id as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
+            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.code as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
             DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
             FROM base_dept bd
             LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
@@ -525,7 +523,6 @@
             ov.dept_id ,
             ov.dept_name,
             date(ov.visit_time)) a   on a.YLJGDM = bd3.YLJGDM  and a.ksbm = bd3.ksbm and bd3.YWSJ = a.YWSJ
-            -- 急诊人次
             left join (
             select
             ov.hosp_code  as YLJGDM,
@@ -542,7 +539,6 @@
             ov.dept_id ,
             ov.dept_name,
             date(ov.visit_time)) b	on bd3.YLJGDM = b.YLJGDM and bd3.ksbm = b.ksbm and bd3.ywsj = b.ywsj
-            -- 入院人次
             left join (select
             ov.hosp_code  as YLJGDM,
             ov.in_dept_id as KSBM ,
@@ -558,7 +554,6 @@
             ov.in_dept_id ,
             ov.in_dept_name,
             date(ov.in_time)) c on bd3.YLJGDM = c.YLJGDM and bd3.ksbm = c.ksbm and bd3.ywsj = c.ywsj
-            -- 出院人次
             left join (select
             ov.hosp_code   as YLJGDM,
             ov.in_dept_id  as KSBM,
@@ -574,7 +569,6 @@
             ov.in_dept_id ,
             ov.in_dept_name,
             date(ov.out_time)) d on bd3.YLJGDM = d.YLJGDM and bd3.ksbm = d.ksbm and bd3.ywsj = d.ywsj
-            -- 住院人次
             left join (select
             c.YLJGDM,
             c.KSBM ,
@@ -618,12 +612,10 @@
             c.YLJGDM,
             c.KSBM ,
             c.YWSJ) e on bd3.YLJGDM = e.YLJGDM and bd3.ksbm = e.ksbm and bd3.ywsj = e.ywsj
-            -- 床位数
             left join (select bb.hosp_code  as YLJGDM,bd2.id as ksbm,count(1) SYCWS
             from base_bed bb ,base_dept bd2
             where bb.is_valid = '1' and bb.hosp_code = bd2.hosp_code and bb.dept_code  = bd2.code
             ) f  on  bd3.YLJGDM = f.YLJGDM and bd3.ksbm = f.ksbm
-            -- 住院医保药品费用
             left join (select
             iiv.hosp_code  as YLJGDM,
             iiv.visit_drpt_id   as KSBM,
@@ -649,7 +641,6 @@
             iiv.visit_drpt_id ,
             iiv.visit_drpt_name,
             date(iiv.crte_time)) g  on bd3.YLJGDM = g.YLJGDM and bd3.ksbm = g.ksbm and bd3.ywsj = g.ywsj
-            -- 住院医保治疗项目费用
             left join (select
             iiv.hosp_code as YLJGDM,
             iiv.visit_drpt_id  as KSBM ,
@@ -675,7 +666,6 @@
             iiv.visit_drpt_id ,
             iiv.visit_drpt_name,
             date(iiv.crte_time)) h on bd3.YLJGDM = h.YLJGDM and bd3.ksbm = h.ksbm and bd3.ywsj = h.ywsj
-            -- 门诊医保药品费用
             left join (select
             iiv.hosp_code as YLJGDM,
             iiv.visit_drpt_id  as KSBM ,
@@ -701,7 +691,6 @@
             iiv.visit_drpt_id ,
             iiv.visit_drpt_name,
             date(iiv.crte_time)) i on bd3.YLJGDM = i.YLJGDM and bd3.ksbm = i.ksbm and bd3.ywsj = i.ywsj
-            -- 门诊医保治疗项目费用
             left join (select
             iiv.hosp_code  as YLJGDM,
             iiv.visit_drpt_id   as KSBM ,
@@ -727,7 +716,6 @@
             iiv.visit_drpt_id ,
             iiv.visit_drpt_name,
             date(iiv.crte_time)) j on bd3.YLJGDM = j.YLJGDM and bd3.ksbm = j.ksbm and bd3.ywsj = j.ywsj
-            -- 住院药品费用
             left join (select
             ic.hosp_code  as YLJGDM ,
             ic.dept_id  as KSBM,
@@ -747,7 +735,6 @@
             ic.dept_id,
             bd.name ,
             date(ic.cost_time) ) k on bd3.YLJGDM = k.YLJGDM and bd3.ksbm = k.ksbm and bd3.ywsj = k.ywsj
-            -- 住院医疗费用
             left join (select
             ic.hosp_code  as YLJGDM ,
             ic.dept_id  as KSBM,
@@ -767,7 +754,6 @@
             ic.dept_id,
             bd.name ,
             date(ic.cost_time)) m on bd3.YLJGDM = m.YLJGDM and bd3.ksbm = m.ksbm and bd3.ywsj = m.ywsj
-            -- 门诊药品费用
             left join (select
             ic.hosp_code  as YLJGDM ,
             ic.dept_id as KSBM,
@@ -787,7 +773,6 @@
             ic.dept_id,
             bd.name ,
             date(ic.crte_time)) l on bd3.YLJGDM = l.YLJGDM and bd3.ksbm = l.ksbm and bd3.ywsj = l.ywsj
-            -- 门诊医疗费用
             left join (select
             ic.hosp_code  as YLJGDM ,
             ic.dept_id as KSBM,

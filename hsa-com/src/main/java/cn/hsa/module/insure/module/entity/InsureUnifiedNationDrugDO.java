@@ -95,5 +95,4 @@ public class InsureUnifiedNationDrugDO extends PageDO implements Serializable {
     private String	ver;
     private String keyword;
     private Integer size;
-
 }

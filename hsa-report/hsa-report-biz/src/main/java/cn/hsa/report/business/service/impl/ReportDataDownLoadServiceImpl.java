@@ -40,7 +40,7 @@ public class ReportDataDownLoadServiceImpl extends HsafService implements Report
     public WrapperResponse<ReportReturnDataDTO> saveBuild(Map map) {
         String hospCode = (String) map.get("hospCode");
         if(StringUtils.isNotEmpty(ureportHospCode)){
-            if(ureportHospCode.contains(hospCode)){
+            if(ureportHospCode.contains(hospCode)&&"settleDeclareDetlSheetBOImpl".equals(map.get("businessType"))){
                 map.put("businessType","settleDeclareDetlSheetmlyBOImpl");
             }
         }

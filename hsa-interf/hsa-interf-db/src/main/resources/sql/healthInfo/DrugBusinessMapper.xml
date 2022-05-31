@@ -5,29 +5,29 @@
     <!--诊后随访表-->
     <select id="getTbZhsfData" resultType="cn.hsa.module.interf.healthInfo.entity.TbZhsf">
         select * from (
-        select
-        '' as YLJGDM,
-        '' as YLJGMC ,
-        '' as SSDH,
-        '' as SFLX,
-        '' as SFFS,
-        '' as JZKSBM,
-        '' as JZKSMC,
-        '' as JZSJ,
-        '' as JZJLLSH,
-        '' as XM,
-        '' as SFZHM,
-        '' as XBDM,
-        '' as NL,
-        '' as ZDBM,
-        '' as ZDMC,
-        '' as LXDH,
-        '' as SFSJ,
-        '' as SFYSBM,
-        '' as SFYSXM,
-        '' as SFJG
-        from
-        base_assist ba where 1=2
+            select
+            '' as YLJGDM,
+            '' as YLJGMC ,
+            '' as SSDH,
+            '' as SFLX,
+            '' as SFFS,
+            '' as JZKSBM,
+            '' as JZKSMC,
+            '' as JZSJ,
+            '' as JZJLLSH,
+            '' as XM,
+            '' as SFZHM,
+            '' as XBDM,
+            '' as NL,
+            '' as ZDBM,
+            '' as ZDMC,
+            '' as LXDH,
+            '' as SFSJ,
+            '' as SFYSBM,
+            '' as SFYSXM,
+            '' as SFJG
+            from
+            base_assist ba where 1=2
         ) a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.sfsj) &gt;= date(#{startTime})
@@ -41,87 +41,87 @@
     <!--药品出入库信息-->
     <select id="getTbYprkxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYprkxx">
         select * from (
-        select
-        so.hosp_code as YLJGDM ,
-        sod.id as CRKMXXH,
-        '1' as CRKBZ,
-        '' as SZBWLSH,
-        bd.code as YPBM,
-        bd.usual_name as YPMC,
-        bd.good_name as YPSPMC,
-        '' as FPH,
-        null as KPRQ ,
-        null as DPRQ,
-        bd.dan as PZWH,
-        null as SCRQ,
-        sod.expiry_date as YXQ,
-        sod.buy_price_all as PFJ,
-        sod.sell_price_all as LSJ,
-        sod.buy_price_all as GJJ ,
-        sod.buy_price_all * sod.num as GJZJE,
-        sod.num as SL,
-        '' as JYQKC,
-        '' as JYHKC,
-        '' as GFJYQKC,
-        '' as GFJYHKC,
-        '' as GFJYSDW ,
-        '' as XFJYQKC,
-        '' as XFJYHKC,
-        '' as XFJYSJ,
-        so.crte_time as CRKSJ,
-        so.crte_id as CZRYBM,
-        so.crte_name as CZRYXM
-        from
-        stro_out so,
-        stro_out_detail sod ,
-        base_drug bd
-        where
-        so.hosp_code = sod.hosp_code
-        and so.id = sod.out_id
-        and sod.hosp_code = bd.hosp_code
-        and sod.item_id = bd.id
-        and so.out_code in ('4', '5')
-        union
-        select
-        sin.hosp_code as YLJGDM ,
-        sid.id as CRKMXXH,
-        '2' as CRKBZ,
-        '' as SZBWLSH,
-        bd.code as YPBM,
-        bd.usual_name as YPMC,
-        bd.good_name as YPSPMC,
-        '' as FPH,
-        null as KPRQ ,
-        null as DPRQ,
-        bd.dan as PZWH,
-        null as SCRQ,
-        sid.expiry_date as YXQ,
-        sid.buy_price_all as PFJ,
-        sid.sell_price_all as LSJ,
-        sid.buy_price_all as GJJ ,
-        sid.buy_price_all * sid.num as GJZJE,
-        sid.num as SL,
-        '' as JYQKC,
-        '' as JYHKC,
-        '' as GFJYQKC,
-        '' as GFJYHKC,
-        '' as GFJYSDW ,
-        '' as XFJYQKC,
-        '' as XFJYHKC,
-        '' as XFJYSJ,
-        sin.crte_time as CRKSJ,
-        sin.crte_id as CZRYBM,
-        sin.crte_name as CZRYXM
-        from
-        stro_in sin,
-        stro_in_detail sid ,
-        base_drug bd
-        where
-        sin.hosp_code = sid.hosp_code
-        and sin.id = sid.in_id
-        and sid.hosp_code = bd.hosp_code
-        and sid.item_id = bd.id
-        and sin.in_code in ('2', '1')
+            select
+            so.hosp_code as YLJGDM ,
+            sod.id as CRKMXXH,
+            '1' as CRKBZ,
+            '' as SZBWLSH,
+            bd.code as YPBM,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            '' as FPH,
+            null as KPRQ ,
+            null as DPRQ,
+            bd.dan as PZWH,
+            null as SCRQ,
+            sod.expiry_date as YXQ,
+            sod.buy_price_all as PFJ,
+            sod.sell_price_all as LSJ,
+            sod.buy_price_all as GJJ ,
+            sod.buy_price_all * sod.num as GJZJE,
+            sod.num as SL,
+            '' as JYQKC,
+            '' as JYHKC,
+            '' as GFJYQKC,
+            '' as GFJYHKC,
+            '' as GFJYSDW ,
+            '' as XFJYQKC,
+            '' as XFJYHKC,
+            '' as XFJYSJ,
+            so.crte_time as CRKSJ,
+            so.crte_id as CZRYBM,
+            so.crte_name as CZRYXM
+            from
+            stro_out so,
+            stro_out_detail sod ,
+            base_drug bd
+            where
+            so.hosp_code = sod.hosp_code
+            and so.id = sod.out_id
+            and sod.hosp_code = bd.hosp_code
+            and sod.item_id = bd.id
+            and so.out_code in ('4', '5')
+            union
+            select
+            sin.hosp_code as YLJGDM ,
+            sid.id as CRKMXXH,
+            '2' as CRKBZ,
+            '' as SZBWLSH,
+            bd.code as YPBM,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            '' as FPH,
+            null as KPRQ ,
+            null as DPRQ,
+            bd.dan as PZWH,
+            null as SCRQ,
+            sid.expiry_date as YXQ,
+            sid.buy_price_all as PFJ,
+            sid.sell_price_all as LSJ,
+            sid.buy_price_all as GJJ ,
+            sid.buy_price_all * sid.num as GJZJE,
+            sid.num as SL,
+            '' as JYQKC,
+            '' as JYHKC,
+            '' as GFJYQKC,
+            '' as GFJYHKC,
+            '' as GFJYSDW ,
+            '' as XFJYQKC,
+            '' as XFJYHKC,
+            '' as XFJYSJ,
+            sin.crte_time as CRKSJ,
+            sin.crte_id as CZRYBM,
+            sin.crte_name as CZRYXM
+            from
+            stro_in sin,
+            stro_in_detail sid ,
+            base_drug bd
+            where
+            sin.hosp_code = sid.hosp_code
+            and sin.id = sid.in_id
+            and sid.hosp_code = bd.hosp_code
+            and sid.item_id = bd.id
+            and sin.in_code in ('2', '1')
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.CRKSJ) &gt;= date(#{startTime})
@@ -133,143 +133,234 @@
     <!--药品库存信息-->
     <select id="getTbYpkcxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpkcxx">
         select * from (
-        select
-        ss.hosp_code as YLJGDM,
-        ssd.item_id ,
-        bd.code as YPBM,
-        (select bde.name from base_dept bde where ss.hosp_code = bde.hosp_code and ss.biz_id = bde.id) as KCWZ,
-        '' as SZBWLSH,
-        bd.usual_name as YPMC,
-        bd.good_name as YPSPMC,
-        (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code) as SCQY,
-        bd.spec as GG,
-        sum(ssd.num) as BZSL,
-        ssd.unit_code as DW,
-        sum(ssd.num) as KCSL,
-        ss.stock_max as ZDCL,
-        null as BJCL,
-        ss.stock_min as ZXCL,
-        ssd.buy_price_all as PFJ,
-        ssd.sell_price_all as LSJ,
-        ssd.expiry_date as SXRQ
-        from
-        stro_stock ss,
-        stro_stock_detail ssd,
-        base_drug bd
-        where
-        ss.item_id = ssd.item_id
-        and ss.hosp_code = ssd.hosp_code
-        and ss.hosp_code = bd.hosp_code
-        and ss.item_id = bd.id
-        group by
-        ss.hosp_code,
-        bd.code ,
-        bd.usual_name,
-        bd.good_name,
-        bd.spec,
-        ssd.unit_code,
-        ss.stock_max,
-        ss.stock_min,
-        ssd.buy_price_all,
-        ssd.sell_price_all,
-        ssd.expiry_date
+            select
+            ss.id,
+            ss.hosp_code as YLJGDM,
+            ss.item_id ,
+            bd.code as YPBM,
+            (select bde.name from base_dept bde where ss.hosp_code = bde.hosp_code and ss.biz_id = bde.id) as KCWZ,
+            '' as SZBWLSH,
+            bd.usual_name as YPMC,
+            bd.good_name as YPSPMC,
+            (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code) as SCQY,
+            bd.spec as GG,
+            sum(ss.num) as BZSL,
+            ss.unit_code as DW,
+            sum(ss.num) as KCSL,
+            ss.stock_max as ZDCL,
+            null as BJCL,
+            ss.stock_min as ZXCL,
+            ss.buy_price_all as PFJ,
+            ss.sell_price_all as LSJ,
+            null as SXRQ
+            from
+            stro_stock ss,
+            base_drug bd
+            where
+            ss.hosp_code = bd.hosp_code
+            and ss.item_id = bd.id
+            group by
+            ss.hosp_code,
+            bd.code ,
+            bd.usual_name,
+            bd.good_name,
+            bd.spec,
+            ss.unit_code,
+            ss.stock_max,
+            ss.stock_min,
+            ss.buy_price_all,
+            ss.sell_price_all
         )a where a.YLJGDM = #{hospCode}
-        <if test="startTime != null and startTime != ''">
-            and date(a.SXRQ) &gt;= date(#{startTime})
-        </if>
-        <if test="endTime != null and endTime != ''">
-            and date(a.SXRQ) &lt;= date(#{endTime})
-        </if>
+<!--        <if test="startTime != null and startTime != ''">-->
+<!--            and date(a.SXRQ) &gt;= date(#{startTime})-->
+<!--        </if>-->
+<!--        <if test="endTime != null and endTime != ''">-->
+<!--            and date(a.SXRQ) &lt;= date(#{endTime})-->
+<!--        </if>-->
     </select>
 
     <!--药品销售信息-->
     <select id="getTbYpxxssData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpxsxx">
         select * from (
-        select
-        ic.hosp_code yljgdm,
-        bd.code ypdm,
-        ic.visit_id jzh,
-        '2' ywlx,
-        ic.phar_id yfdm,
-        '' szbwlsh,
-        bd.usual_name ypmc,
-        bd.good_name spm,
-        bp.name scqy,
-        bd.prep_code ypjxms,
-        bd.spec ypgg,
-        ic.total_num bzl,
-        ic.total_num_unit_code dw,
-        '' cgj,
-        ic.price xsjg,
-        ic.total_num xssl,
-        ic.total_price xsje,
-        ( case when bd.ph_code ='1' then '2'
-        when bd.ph_code ='2' then '3'
-        when bd.ph_code ='3' or bd.ph_code ='6'  then '4'
-        when bd.ph_code ='4' then '5'
-        when bd.ph_code ='5' then '1' end) ypsx,
-        null xplx,
-        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
-        bd.durg_code kjyjb,
-        ic.cost_time xssj,
-        bd2.code xsksdm,
-        bd2.name xsksmc,
-        su.code xsysdm,
-        su.name xsysmc,
-        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
-        from
-        inpt_cost ic ,
-        base_drug bd ,
-        base_product bp ,
-        base_dept bd2 ,sys_user su
-        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
-        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
-        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
-        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
-
-        union
-
-        select
-        ic.hosp_code yljgdm,
-        bd.code ypdm,
-        ic.visit_id jzh,
-        '1' ywlx,
-        ic.phar_id yfdm,
-        '' szbwlsh,
-        bd.usual_name ypmc,
-        bd.good_name spm,
-        bp.name scqy,
-        bd.prep_code ypjxms,
-        bd.spec ypgg,
-        ic.total_num bzl,
-        ic.num_unit_code dw,
-        '' cgj,
-        ic.price xsjg,
-        ic.total_num xssl,
-        ic.total_price xsje,
-        ( case when bd.ph_code ='1' then '2'
-        when bd.ph_code ='2' then '3'
-        when bd.ph_code ='3' or bd.ph_code ='6'  then '4'
-        when bd.ph_code ='4' then '5'
-        when bd.ph_code ='5' then '1' end) ypsx,
-        null xplx,
-        (case when bd.antibacterial_code is not null then '1' else '0' end) kjybz,
-        bd.durg_code kjyjb,
-        ic.crte_time xssj,
-        bd2.code xsksdm,
-        bd2.name xsksmc,
-        su.code xsysdm,
-        su.name xsysmc,
-        (select value from sys_parameter sp where sp.hosp_code= ic.hosp_code and sp.code = 'JG_NAME') yljgmc
-        from
-        outpt_cost ic ,
-        base_drug bd ,
-        base_product bp ,
-        base_dept bd2 ,sys_user su
-        where ic.item_id = bd.id and ic.hosp_code = bd.hosp_code
-        and bd.prod_code = bp.code and bd.hosp_code = bp.hosp_code
-        and ic.phar_id = bd2.id and ic.hosp_code = bd2.hosp_code
-        and ic.doctor_id = su.id and ic.hosp_code = su.hosp_code
+                select
+                yljgdm,
+                ypdm,
+                jzh,
+                ywlx,
+                yfdm,
+                szbwlsh,
+                ypmc,
+                spm,
+                scqy,
+                ypjxms,
+                ypgg,
+                sum(bzl) as bzl,
+                max(dw) as dw,
+                cgj,
+                max(xsjg) as xsjg,
+                sum(xssl) as xssl,
+                sum(xsje) as xsje,
+                ypsx,
+                xplx,
+                kjybz,
+                kjyjb,
+                max(xssj) as xssj,
+                xsksdm,
+                xsksmc,
+                xsysdm,
+                xsysmc,
+                yljgmc
+                from
+                (
+                select
+                ic.hosp_code yljgdm,
+                bd.code ypdm,
+                ic.visit_id jzh,
+                '2' ywlx,
+                null yfdm,
+                '' szbwlsh,
+                bd.usual_name ypmc,
+                bd.good_name spm,
+                bp.name scqy,
+                bd.prep_code ypjxms,
+                bd.spec ypgg,
+                ic.total_num bzl,
+                ic.total_num_unit_code dw,
+                ic.price cgj,
+                ic.price xsjg,
+                ic.total_num xssl,
+                ic.total_price xsje,
+                ( case
+                when bd.ph_code = '1' then '2'
+                when bd.ph_code = '2' then '3'
+                when bd.ph_code = '3'
+                or bd.ph_code = '6' then '4'
+                when bd.ph_code = '4' then '5'
+                when bd.ph_code = '5' then '1'
+                end) ypsx,
+                null xplx,
+                (case
+                when bd.antibacterial_code is not null then '1'
+                else '0'
+                end) kjybz,
+                bd.durg_code kjyjb,
+                is2.settle_time xssj,
+                bd2.code xsksdm,
+                bd2.name xsksmc,
+                su.code xsysdm,
+                su.name xsysmc,
+                (
+                select
+                value
+                from
+                sys_parameter sp
+                where
+                sp.hosp_code = ic.hosp_code
+                and sp.code = 'JG_NAME') yljgmc
+                from
+                inpt_cost ic ,
+                inpt_settle is2,
+                base_drug bd ,
+                base_product bp ,
+                base_dept bd2 ,
+                sys_user su
+                where
+                ic.settle_id = is2.id
+                and ic.hosp_code = is2.hosp_code
+                and ic.item_id = bd.id
+                and ic.hosp_code = bd.hosp_code
+                and bd.prod_code = bp.code
+                and bd.hosp_code = bp.hosp_code
+                and ic.phar_id = bd2.id
+                and ic.hosp_code = bd2.hosp_code
+                and ic.doctor_id = su.id
+                and ic.hosp_code = su.hosp_code
+                union
+                select
+                ic.hosp_code yljgdm,
+                bd.code ypdm,
+                ic.visit_id jzh,
+                '1' ywlx,
+                null yfdm,
+                '' szbwlsh,
+                bd.usual_name ypmc,
+                bd.good_name spm,
+                bp.name scqy,
+                bd.prep_code ypjxms,
+                bd.spec ypgg,
+                ic.total_num bzl,
+                ic.num_unit_code dw,
+                '' cgj,
+                ic.price xsjg,
+                ic.total_num xssl,
+                ic.total_price xsje,
+                ( case
+                when bd.ph_code = '1' then '2'
+                when bd.ph_code = '2' then '3'
+                when bd.ph_code = '3'
+                or bd.ph_code = '6' then '4'
+                when bd.ph_code = '4' then '5'
+                when bd.ph_code = '5' then '1'
+                end) ypsx,
+                null xplx,
+                (case
+                when bd.antibacterial_code is not null then '1'
+                else '0'
+                end) kjybz,
+                bd.durg_code kjyjb,
+                os.settle_time xssj,
+                bd2.code xsksdm,
+                bd2.name xsksmc,
+                su.code xsysdm,
+                su.name xsysmc,
+                (
+                select
+                value
+                from
+                sys_parameter sp
+                where
+                sp.hosp_code = ic.hosp_code
+                and sp.code = 'JG_NAME') yljgmc
+                from
+                outpt_cost ic ,
+                outpt_settle os ,
+                base_drug bd ,
+                base_product bp ,
+                base_dept bd2 ,
+                sys_user su
+                where
+                ic.settle_id = os.id
+                and ic.hosp_code = os.hosp_code
+                and ic.item_id = bd.id
+                and ic.hosp_code = bd.hosp_code
+                and bd.prod_code = bp.code
+                and bd.hosp_code = bp.hosp_code
+                and ic.phar_id = bd2.id
+                and ic.hosp_code = bd2.hosp_code
+                and ic.doctor_id = su.id
+                and ic.hosp_code = su.hosp_code ) aa
+                group by
+                yljgdm,
+                ypdm,
+                jzh,
+                ywlx,
+                yfdm,
+                szbwlsh,
+                ypmc,
+                spm,
+                scqy,
+                ypjxms,
+                ypgg,
+                cgj,
+                ypsx,
+                xplx,
+                kjybz,
+                kjyjb,
+                xsksdm,
+                xsksmc,
+                xsysdm,
+                xsysmc,
+                yljgmc
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.xssj) &gt;= date(#{startTime})
@@ -281,25 +372,67 @@
     <!--抗菌药物基本情况统计-->
     <select id="getTbKjywjbjktjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywjbjktj">
         select * from (
-        select ic.hosp_code as YLJGDM,
+        select
+        YLJGDM,
+        YPDM,
+        max(YWLX) as YWLX,
+        max(JSRQ) as JSRQ,
+        KJYWSYBSZH,
+        XDRJLZH,
+        ZYZJL,
+        ILQKSSKJYW,
+        TSKJYWDDZZH,
+        TSKJYWSYBSZH ,
+        sum(ZYTS) as ZYTS,
+        max(JZKSDM) as JZKSDM ,
+        max(JZKSMC) as JZKSMC ,
+        max(YSDM) as YSDM,
+        max(YSMC) as YSMC ,
+        WYM,
+        DDDS,
+        TSDDDS,
+        max(YWLX) as YWBM,
+        YPMC,
+        JMSYBS,
+        max(CFLSH) as CFLSH ,
+        max(RYRQ) as RYRQ,
+        max(CYRQ) as CYRQ,
+        YPGG,
+        ZBLSH,
+        YPJLDW,
+        YPTYMC,
+        YPCJ,
+        DJ,
+        sum(BZL) as BZL,
+        sum(SYSL) as SYSL,
+        YPJX,
+        sum(JE) as JE,
+        YPDJL
+        from
+        (
+        select
+        ic.hosp_code as YLJGDM,
         bd.code as YPDM,
         '2' as YWLX,
-        ic.cost_time as JSRQ,
+        is2.settle_time as JSRQ,
         '' as KJYWSYBSZH,
         '' as XDRJLZH,
-        '' as ZYZJL,
+        '0' as ZYZJL,
         '' as ILQKSSKJYW,
         '' as TSKJYWDDZZH,
         '' as TSKJYWSYBSZH ,
-        (case when ifnull(datediff(ifnull(iv.out_time, now()),iv.in_time),0) = 0 then 1 else datediff(ifnull(iv.out_time, now()),iv.in_time) end) as ZYTS,
+        (case
+        when ifnull(datediff(ifnull(iv.out_time, now()), iv.in_time), 0) = 0 then 1
+        else datediff(ifnull(iv.out_time, now()), iv.in_time)
+        end) as ZYTS,
         bd2.code as JZKSDM,
         bd2.name as JZKSMC,
         ic.doctor_id as YSDM,
         ic.doctor_name as YSMC,
         '' as WYM,
-        bd.ddd  as DDDS,
-        '' as TSDDDS,
-        '' as YWBM,
+        bd.ddd as DDDS,
+        bd.ddd as TSDDDS,
+        '2' as YWBM,
         bd.good_name as YPMC,
         '' as JMSYBS,
         IC.iat_id as CFLSH ,
@@ -313,17 +446,20 @@
         bd.price as DJ,
         ic.total_num as BZL,
         ic.total_num as SYSL,
-        ic.prep_code as YPJX,
+        bd.prep_code as YPJX,
         ic.total_price as JE,
         bd.dosage as YPDJL
         from
         inpt_cost ic,
+        inpt_settle is2 ,
         inpt_visit iv ,
         base_drug bd ,
         base_dept bd2,
         base_product bp
         where
-        ic.hosp_code = iv.hosp_code
+        ic.hosp_code = is2.hosp_code
+        and ic.settle_id = is2.id
+        and ic.hosp_code = iv.hosp_code
         and ic.visit_id = iv.id
         and ic.hosp_code = bd.hosp_code
         and ic.item_id = bd.id
@@ -331,7 +467,85 @@
         and ic.dept_id = bd2.id
         and bd.hosp_code = bp.hosp_code
         and bd.prod_code = bp.code
-        and ifnull(bd.antibacterial_code ,'') != ''
+        and ifnull(bd.antibacterial_code , '') != ''
+        union
+        select
+        ic.hosp_code as YLJGDM,
+        bd.code as YPDM,
+        '1' as YWLX,
+        is2.settle_time as JSRQ,
+        '' as KJYWSYBSZH,
+        '' as XDRJLZH,
+        '0' as ZYZJL,
+        '' as ILQKSSKJYW,
+        '' as TSKJYWDDZZH,
+        '' as TSKJYWSYBSZH ,
+        0 as ZYTS,
+        bd2.code as JZKSDM,
+        bd2.name as JZKSMC,
+        ic.doctor_id as YSDM,
+        ic.doctor_name as YSMC,
+        '' as WYM,
+        bd.ddd as DDDS,
+        bd.ddd as TSDDDS,
+        '1' as YWBM,
+        bd.good_name as YPMC,
+        '' as JMSYBS,
+        IC.opd_id as CFLSH ,
+        null as RYRQ,
+        null as CYRQ,
+        bd.spec as YPGG,
+        '' as ZBLSH,
+        bd.dosage_unit_code as YPJLDW,
+        bd.usual_name as YPTYMC,
+        bp.name as YPCJ,
+        bd.price as DJ,
+        ic.total_num as BZL,
+        ic.total_num as SYSL,
+        bd.prep_code as YPJX,
+        ic.total_price as JE,
+        bd.dosage as YPDJL
+        from
+        outpt_cost ic,
+        outpt_settle is2 ,
+        outpt_visit iv ,
+        base_drug bd ,
+        base_dept bd2,
+        base_product bp
+        where
+        ic.hosp_code = is2.hosp_code
+        and ic.settle_id = is2.id
+        and ic.hosp_code = iv.hosp_code
+        and ic.visit_id = iv.id
+        and ic.hosp_code = bd.hosp_code
+        and ic.item_id = bd.id
+        and ic.hosp_code = bd2.hosp_code
+        and ic.dept_id = bd2.id
+        and bd.hosp_code = bp.hosp_code
+        and bd.prod_code = bp.code
+        and ifnull(bd.antibacterial_code , '') != '' ) aa
+        group by
+        YLJGDM,
+        YPDM,
+        KJYWSYBSZH,
+        XDRJLZH,
+        ZYZJL,
+        ILQKSSKJYW,
+        TSKJYWDDZZH,
+        TSKJYWSYBSZH ,
+        WYM,
+        DDDS,
+        TSDDDS,
+        YPMC,
+        JMSYBS,
+        YPGG,
+        ZBLSH,
+        YPJLDW,
+        YPTYMC,
+        YPCJ,
+        DJ,
+        YPJX,
+        YPDJL
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.JSRQ) &gt;= date(#{startTime})
@@ -344,8 +558,39 @@
     <select id="getTbKjywgpztjData" resultType="cn.hsa.module.interf.healthInfo.entity.TbKjywgpztj">
         select * from (
         select
+        YLJGDM,
+        YPDM,
+        YPMC,
+        YWLX,
+        ZDXMMC,
+        YPGG,
+        YPJXMS,
+        sum(BZSL) as BZSL,
+        max(JLDW) as JLDW,
+        max(DJ) as DJ,
+        sum(SYJE) as SYJE,
+        GLJB,
+        ZBWLSH,
+        SCQY,
+        KJYWGLJB,
+        sum(SL) as SL,
+        max(DW) as DW,
+        sum(JE),
+        YWDM,
+        KJYWBS,
+        XDDDZ,
+        max(KFKSBM) as KFKSBM,
+        max(ZXRQ) as ZXRQ,
+        max(WYBSM) as WYBSM,
+        max(KFKSMC) as KFKSMC,
+        max(YSBM) as YSBM ,
+        max(YSMC) as YSMC,
+        SPM
+        from
+        (
+        select
         ic.hosp_code as YLJGDM,
-        ic.item_code as YPDM,
+        bd.code as YPDM,
         ic.item_name as YPMC,
         '2' as YWLX,
         ic.item_name as ZDXMMC,
@@ -367,7 +612,7 @@
         bd.ddd as XDDDZ,
         bd2.code as KFKSBM,
         ic.exec_time as ZXRQ,
-        ic.id  as WYBSM,
+        ic.id as WYBSM,
         bd2.name as KFKSMC,
         ic.doctor_id as YSBM,
         ic.doctor_name as YSMC,
@@ -381,7 +626,64 @@
         and ic.item_id = bd.id
         and ic.hosp_code = bd2.hosp_code
         and ic.dept_id = bd2.id
-        and ifnull(bd.antibacterial_code ,'') != ''
+        and ifnull(bd.antibacterial_code , '') != ''
+        union
+        select
+        ic.hosp_code as YLJGDM,
+        bd.code as YPDM,
+        ic.item_name as YPMC,
+        '2' as YWLX,
+        ic.item_name as ZDXMMC,
+        bd.spec as YPGG,
+        bd.prep_code as YPJXMS,
+        ic.total_num as BZSL,
+        ic.dosage_unit_code as JLDW,
+        ic.price as DJ,
+        ic.total_price as SYJE,
+        bd.antibacterial_code as GLJB,
+        '' as ZBWLSH,
+        bd.prep_code as SCQY,
+        bd.antibacterial_code as KJYWGLJB,
+        ic.num as SL,
+        ic.num_unit_code as DW,
+        ic.total_price as JE,
+        '2' as YWDM,
+        '1' as KJYWBS,
+        bd.ddd as XDDDZ,
+        bd2.code as KFKSBM,
+        ic.crte_time as ZXRQ,
+        ic.id as WYBSM,
+        bd2.name as KFKSMC,
+        ic.doctor_id as YSBM,
+        ic.doctor_name as YSMC,
+        bd.good_name as SPM
+        from
+        outpt_cost ic ,
+        base_drug bd,
+        base_dept bd2
+        where
+        ic.hosp_code = bd.hosp_code
+        and ic.item_id = bd.id
+        and ic.hosp_code = bd2.hosp_code
+        and ic.dept_id = bd2.id
+        and ifnull(bd.antibacterial_code , '') != ''
+        ) aa
+        group by
+        YLJGDM,
+        YPDM,
+        YPMC,
+        YWLX,
+        ZDXMMC,
+        YPGG,
+        YPJXMS,
+        GLJB,
+        ZBWLSH,
+        SCQY,
+        KJYWGLJB,
+        YWDM,
+        KJYWBS,
+        XDDDZ,
+        SPM
         )a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.ZXRQ) &gt;= date(#{startTime})
@@ -393,29 +695,29 @@
 
     <select id="getTbSxzzData" resultType="cn.hsa.module.interf.healthInfo.entity.TbSxzz">
         select * from (
-        select '转诊机构编码' as YLJGDM,
-        '转诊单号' as ZZDH,
-        '转诊机构名称' as YLJGMC,
-        '转诊科室编码' as KSBM ,
-        '转诊科室名称' as KSMC ,
-        '申请医生姓名' as SQYSXM ,
-        '患者姓名' as XM,
-        '性别代码' as XBDM ,
-        '身份证号码' as SFZHM,
-        ' 联系电话' as LXDH ,
-        '诊断编码' as ZDBM ,
-        '诊断名称' as ZDMC,
-        '转诊类型' as ZZLX ,
-        '申请转诊时间' as SQZZSJ,
-        '转诊原因说明' as ZZYYSM ,
-        '转诊状态' as ZZZT,
-        '接收机构编码' as JSJGBM,
-        '接收机构名称' as JSJGMC,
-        '接收科室编码' as JSKSBM,
-        '接收科室名称' as JSKSMC,
-        '接收医生姓名' as JSYSXM,
-        now() as JSSJ,
-        '是否有效' as SFYX from inpt_visit where 1=2
+            select '转诊机构编码' as YLJGDM,
+            '转诊单号' as ZZDH,
+            '转诊机构名称' as YLJGMC,
+            '转诊科室编码' as KSBM ,
+            '转诊科室名称' as KSMC ,
+            '申请医生姓名' as SQYSXM ,
+            '患者姓名' as XM,
+            '性别代码' as XBDM ,
+            '身份证号码' as SFZHM,
+            ' 联系电话' as LXDH ,
+            '诊断编码' as ZDBM ,
+            '诊断名称' as ZDMC,
+            '转诊类型' as ZZLX ,
+            '申请转诊时间' as SQZZSJ,
+            '转诊原因说明' as ZZYYSM ,
+            '转诊状态' as ZZZT,
+            '接收机构编码' as JSJGBM,
+            '接收机构名称' as JSJGMC,
+            '接收科室编码' as JSKSBM,
+            '接收科室名称' as JSKSMC,
+            '接收医生姓名' as JSYSXM,
+            now() as JSSJ,
+            '是否有效' as SFYX from inpt_visit where 1=2
         ) a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.JSSJ) &gt;= date(#{startTime})
@@ -427,45 +729,45 @@
 
     <select id="getTbWzlqjlData" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzlqjl">
         select * from (
-        select pir.order_no  as lqdh,
-        '' as lqdhxh,
-        pir.hosp_code  as jgbm,
-        (case when pird.item_code = '1' then bd.code  when pird.item_code = '2' then bm.code  when pird.item_code = '3' then bi.code  else '' end) as wzbm,
-        (case when pird.item_code = '1' then bd.usual_name  when pird.item_code = '2' then bm.name  when pird.item_code = '3' then bi.name  else '' end)as wzmc,
-        '' as wzlxbm,
-        '' as wzlxmc,
-        (select value from sys_parameter sp where sp.hosp_code= pird.hosp_code and sp.code = 'JG_NAME') as jgmc,
-        bd3.code  as lqksbm,
-        bd3.name  as lqksmc,
-        pird.num as lqsl,
-        pird.spec as wzgg,
-        pird.unit_code  as wzdw,
-        pird.price  as wzdj,
-        pir.assign_time  as sqsj,
-        pir.dist_time  as lqsj,
-        pird.price as jhjg,
-        pir.crte_id  as lqrbm,
-        pir.crte_name  as lqrmc,
-        pir.assign_user_id  as ffrbm,
-        pir.assign_user_name  as ffrmc,
-        pird.visit_id  as zylsh,
-        bd2.name  as wzkw,
-        '' as wzph,
-        '' as zlxmbm,
-        '' as zlxmmc,
-        '' as zlxmjg,
-        (case when pird.item_code = '1' then bp1.name  when pird.item_code = '2' then bp2.name  else '' end) as sccj,
-        '0' as sfgzhc
-        from
-        phar_in_receive pir
-        left join phar_in_receive_detail pird on pird .hosp_code  = pir.hosp_code  and pir.id  = pird.receive_id
-        left join base_drug bd  on pird .hosp_code  = bd.hosp_code  and bd.id  = pird.item_id
-        left join base_material bm on pird .hosp_code  = bm.hosp_code  and bm.id  = pird.item_id
-        left join base_item bi     on pird .hosp_code  = bi.hosp_code  and bi.id  = pird.item_id
-        left join base_dept bd2    on pir .hosp_code  = bd2.hosp_code  and bd2.id  = pir.phar_id
-        left join base_dept bd3    on pir .hosp_code  = bd3.hosp_code  and bd3.id  = pir.dept_id
-        left join base_product bp1 on bp1.hosp_code= bd.hosp_code and bp1.code = bd.prod_code
-        left join base_product bp2 on bp2.hosp_code= bm.hosp_code and bp2.code = bm.prod_code
+            select pir.order_no  as lqdh,
+            right(pird.id,8)  as lqdhxh,
+            pir.hosp_code  as jgbm,
+            (case when pird.item_code = '1' then bd.code  when pird.item_code = '2' then bm.code  when pird.item_code = '3' then bi.code  else '' end) as wzbm,
+            (case when pird.item_code = '1' then bd.usual_name  when pird.item_code = '2' then bm.name  when pird.item_code = '3' then bi.name  else '' end)as wzmc,
+            '' as wzlxbm,
+            '' as wzlxmc,
+            (select value from sys_parameter sp where sp.hosp_code= pird.hosp_code and sp.code = 'JG_NAME') as jgmc,
+            bd3.code  as lqksbm,
+            bd3.name  as lqksmc,
+            pird.num as lqsl,
+            pird.spec as wzgg,
+            pird.unit_code  as wzdw,
+            pird.price  as wzdj,
+            pir.assign_time  as sqsj,
+            pir.dist_time  as lqsj,
+            pird.price as jhjg,
+            pir.crte_id  as lqrbm,
+            pir.crte_name  as lqrmc,
+            pir.assign_user_id  as ffrbm,
+            pir.assign_user_name  as ffrmc,
+            pird.visit_id  as zylsh,
+            bd2.name  as wzkw,
+            '' as wzph,
+            '' as zlxmbm,
+            '' as zlxmmc,
+            '' as zlxmjg,
+            (case when pird.item_code = '1' then bp1.name  when pird.item_code = '2' then bp2.name  else '' end) as sccj,
+            '0' as sfgzhc
+            from
+            phar_in_receive pir
+            left join phar_in_receive_detail pird on pird .hosp_code  = pir.hosp_code  and pir.id  = pird.receive_id
+            left join base_drug bd  on pird .hosp_code  = bd.hosp_code  and bd.id  = pird.item_id
+            left join base_material bm on pird .hosp_code  = bm.hosp_code  and bm.id  = pird.item_id
+            left join base_item bi     on pird .hosp_code  = bi.hosp_code  and bi.id  = pird.item_id
+            left join base_dept bd2    on pir .hosp_code  = bd2.hosp_code  and bd2.id  = pir.phar_id
+            left join base_dept bd3    on pir .hosp_code  = bd3.hosp_code  and bd3.id  = pir.dept_id
+            left join base_product bp1 on bp1.hosp_code= bd.hosp_code and bp1.code = bd.prod_code
+            left join base_product bp2 on bp2.hosp_code= bm.hosp_code and bp2.code = bm.prod_code
         ) a where a.jgbm = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.lqsj) &gt;= date(#{startTime})
@@ -477,321 +779,321 @@
 
     <select id="getTbYwlReportData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYwlReport">
         select * from (
-        select bd3.YLJGDM  as YLJGDM,
-        bd3.KSBM  as KSBM,
-        bd3.name  as KSMC,
-        date_format(bd3.ywsj,'%Y%m%d') as YWSJ,
-        ifnull(a.mzrc,0)  as MZRC,
-        ifnull(b.jzrc,0)  as JZRC,
-        ifnull(c.RYRC,0)  as RYRC,
-        ifnull(d.CYRC,0)  as CYRC,
-        ifnull(e.zyrs,0)  as ZYRS,
-        ifnull(f.SYCWS,0)  as SYCWS,
-        ifnull(n.MJZYLFY,0)  as MJZYLFY,
-        ifnull(l.MJZYPFY,0)  as MJZYPFY,
-        ifnull(j.MJZYBYLFY,0)  as MJZYBYLFY,
-        ifnull(i.MJZYBYPFY,0)  as MJZYBYPFY,
-        ifnull(m.ZYYLFY,0)  as ZYYLFY,
-        ifnull(k.ZYYPFY,0)  as ZYYPFY,
-        ifnull(h.ZYYBYLFY,0)  as ZYYBYLFY,
-        ifnull(g.ZYYBYPFY,0)  as ZYYBYPFY,
-        ifnull(m.ZYYLFY ,0) + ifnull(k.ZYYPFY,0)+ifnull(h.ZYYBYLFY,0)+ifnull(g.ZYYBYPFY,0) as ZYSJFSYS,
-        '' as TJYL1,
-        '' as TJYL2,
-        '' as TJYL3,
-        '' as TJYL4,
-        '' as TJYL5,
-        '' as TJYL6,
-        '' as TJYL7,
-        '' as TJYL8,
-        '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.code as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
-        DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
-        FROM base_dept bd
-        LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
-        WHERE
-        DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd DAY),'%Y-%m-%d') &lt; DATE_FORMAT(#{endTime},'%Y-%m-%d') )b on 1=1 where bd.type_code in ('1','2') )bd3
-        left JOIN (select
-        ov.hosp_code as YLJGDM ,
-        ov.dept_id as KSBM,
-        ov.dept_name as KSMC,
-        date(ov.visit_time) as YWSJ,
-        count(1) as MZRC
-        from
-        outpt_visit ov
-        group by
-        ov.hosp_code ,
-        ov.dept_id ,
-        ov.dept_name,
-        date(ov.visit_time)) a   on a.YLJGDM = bd3.YLJGDM  and a.ksbm = bd3.ksbm and bd3.YWSJ = a.YWSJ
-        left join (
-        select
-        ov.hosp_code  as YLJGDM,
-        ov.dept_id as KSBM,
-        ov.dept_name as KSMC,
-        date(ov.visit_time) as YWSJ,
-        count(1) as JZRC
-        from
-        outpt_visit ov
-        where ov.visit_code ='02'
-        and date(ov.visit_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ov.hosp_code ,
-        ov.dept_id ,
-        ov.dept_name,
-        date(ov.visit_time)) b	on bd3.YLJGDM = b.YLJGDM and bd3.ksbm = b.ksbm and bd3.ywsj = b.ywsj
-        left join (select
-        ov.hosp_code  as YLJGDM,
-        ov.in_dept_id as KSBM ,
-        ov.in_dept_name as KSMC,
-        date(ov.in_time) as YWSJ,
-        count(1) as RYRC
-        from
-        inpt_visit ov
-        where ov.status_code  !='8'
-        and date(ov.in_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ov.hosp_code ,
-        ov.in_dept_id ,
-        ov.in_dept_name,
-        date(ov.in_time)) c on bd3.YLJGDM = c.YLJGDM and bd3.ksbm = c.ksbm and bd3.ywsj = c.ywsj
-        left join (select
-        ov.hosp_code   as YLJGDM,
-        ov.in_dept_id  as KSBM,
-        ov.in_dept_name as KSMC,
-        date(ov.out_time) as YWSJ,
-        count(1) as CYRC
-        from
-        inpt_visit ov
-        where ov.status_code  ='7'
-        and date(ov.out_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ov.hosp_code ,
-        ov.in_dept_id ,
-        ov.in_dept_name,
-        date(ov.out_time)) d on bd3.YLJGDM = d.YLJGDM and bd3.ksbm = d.ksbm and bd3.ywsj = d.ywsj
-        left join (select
-        c.YLJGDM,
-        c.KSBM ,
-        c.YWSJ  ,
-        COUNT(1) as ZYRS
-        from
-        (
-        select
-        l_tab.YLJGDM,
-        l_tab.KSBM,
-        l_tab.YWSJ
-        from
-        (
-        select
-        iv.hosp_code  as YLJGDM,
-        iv.in_dept_id  as KSBM,
-        date(iv.in_time) as YWSJ
-        from
-        inpt_visit iv
-        where
-        DATE(iv.in_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        iv.hosp_code ,
-        iv.in_dept_id,
-        DATE(iv.in_time)) l_tab
-        inner join
-        (
-        select
-        hosp_code  as YLJGDM,
-        in_dept_id as KSBM,
-        DATE(in_time) as YWSJ
-        from
-        inpt_visit
-        where
-        DATE(in_time) between date(#{startTime}) and date(#{endTime})) r_tab
-        on
-        l_tab.YWSJ >= r_tab.YWSJ
-        and l_tab.YLJGDM = r_tab.YLJGDM
-        and l_tab.KSBM = r_tab.KSBM) c
-        group by
-        c.YLJGDM,
-        c.KSBM ,
-        c.YWSJ) e on bd3.YLJGDM = e.YLJGDM and bd3.ksbm = e.ksbm and bd3.ywsj = e.ywsj
-        left join (select bb.hosp_code  as YLJGDM,bd2.id as ksbm,count(1) SYCWS
-        from base_bed bb ,base_dept bd2
-        where bb.is_valid = '1' and bb.hosp_code = bd2.hosp_code and bb.dept_code  = bd2.code
-        ) f  on  bd3.YLJGDM = f.YLJGDM and bd3.ksbm = f.ksbm
-        left join (select
-        iiv.hosp_code  as YLJGDM,
-        iiv.visit_drpt_id   as KSBM,
-        iiv.visit_drpt_name as KSMC,
-        date(iiv.crte_time) as YWSJ,
-        sum(iis.plan_price) as ZYYBYPFY
-        from
-        insure_individual_visit iiv  ,
-        insure_individual_cost iic ,
-        insure_item_match iim,
-        insure_individual_settle iis
-        where iiv.hosp_code  = iic.hosp_code
-        and  iiv.visit_id = iic.visit_id
-        and  iim.hosp_code  = iic.hosp_code
-        and  iim.insure_item_code  = iic.item_code
-        and  iic.hosp_code  = iis.hosp_code
-        and  iic.visit_id = iis.visit_id
-        and iiv.is_hospital ='1'
-        and iim.hosp_item_type  ='1'
-        and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        iiv.hosp_code ,
-        iiv.visit_drpt_id ,
-        iiv.visit_drpt_name,
-        date(iiv.crte_time)) g  on bd3.YLJGDM = g.YLJGDM and bd3.ksbm = g.ksbm and bd3.ywsj = g.ywsj
-        left join (select
-        iiv.hosp_code as YLJGDM,
-        iiv.visit_drpt_id  as KSBM ,
-        iiv.visit_drpt_name as KSMC,
-        date(iiv.crte_time) as YWSJ,
-        sum(iis.plan_price) as ZYYBYLFY
-        from
-        insure_individual_visit iiv  ,
-        insure_individual_cost iic ,
-        insure_item_match iim,
-        insure_individual_settle iis
-        where iiv.hosp_code  = iic.hosp_code
-        and  iiv.visit_id = iic.visit_id
-        and  iim.hosp_code  = iic.hosp_code
-        and  iim.insure_item_code  = iic.item_code
-        and  iic.hosp_code  = iis.hosp_code
-        and  iic.visit_id = iis.visit_id
-        and iiv.is_hospital ='1'
-        and iim.hosp_item_type  !='1'
-        and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        iiv.hosp_code ,
-        iiv.visit_drpt_id ,
-        iiv.visit_drpt_name,
-        date(iiv.crte_time)) h on bd3.YLJGDM = h.YLJGDM and bd3.ksbm = h.ksbm and bd3.ywsj = h.ywsj
-        left join (select
-        iiv.hosp_code as YLJGDM,
-        iiv.visit_drpt_id  as KSBM ,
-        iiv.visit_drpt_name as KSMC,
-        date(iiv.crte_time) as YWSJ,
-        sum(iis.plan_price) as MJZYBYPFY
-        from
-        insure_individual_visit iiv  ,
-        insure_individual_cost iic ,
-        insure_item_match iim,
-        insure_individual_settle iis
-        where iiv.hosp_code  = iic.hosp_code
-        and  iiv.visit_id = iic.visit_id
-        and  iim.hosp_code  = iic.hosp_code
-        and  iim.insure_item_code  = iic.item_code
-        and  iic.hosp_code  = iis.hosp_code
-        and  iic.visit_id = iis.visit_id
-        and iiv.is_hospital ='0'
-        and iim.hosp_item_type  ='1'
-        and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        iiv.hosp_code ,
-        iiv.visit_drpt_id ,
-        iiv.visit_drpt_name,
-        date(iiv.crte_time)) i on bd3.YLJGDM = i.YLJGDM and bd3.ksbm = i.ksbm and bd3.ywsj = i.ywsj
-        left join (select
-        iiv.hosp_code  as YLJGDM,
-        iiv.visit_drpt_id   as KSBM ,
-        iiv.visit_drpt_name as KSMC,
-        date(iiv.crte_time) as YWSJ,
-        sum(iis.plan_price) as MJZYBYLFY
-        from
-        insure_individual_visit iiv  ,
-        insure_individual_cost iic ,
-        insure_item_match iim,
-        insure_individual_settle iis
-        where iiv.hosp_code  = iic.hosp_code
-        and  iiv.visit_id = iic.visit_id
-        and  iim.hosp_code  = iic.hosp_code
-        and  iim.insure_item_code  = iic.item_code
-        and  iic.hosp_code  = iis.hosp_code
-        and  iic.visit_id = iis.visit_id
-        and iiv.is_hospital ='0'
-        and iim.hosp_item_type  !='1'
-        and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        iiv.hosp_code ,
-        iiv.visit_drpt_id ,
-        iiv.visit_drpt_name,
-        date(iiv.crte_time)) j on bd3.YLJGDM = j.YLJGDM and bd3.ksbm = j.ksbm and bd3.ywsj = j.ywsj
-        left join (select
-        ic.hosp_code  as YLJGDM ,
-        ic.dept_id  as KSBM,
-        bd.name as KSMC ,
-        date(ic.cost_time) as YWSJ,
-        sum(ic.reality_price) as ZYYPFY
-        from
-        inpt_cost ic ,
-        base_dept bd
-        where
-        ic.hosp_code = bd.hosp_code
-        and ic.dept_id = bd.id
-        and ic.item_code ='1'
-        and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ic.hosp_code ,
-        ic.dept_id,
-        bd.name ,
-        date(ic.cost_time) ) k on bd3.YLJGDM = k.YLJGDM and bd3.ksbm = k.ksbm and bd3.ywsj = k.ywsj
-        left join (select
-        ic.hosp_code  as YLJGDM ,
-        ic.dept_id  as KSBM,
-        bd.name as KSMC ,
-        date(ic.cost_time) as YWSJ,
-        sum(ic.reality_price) as ZYYLFY
-        from
-        inpt_cost ic ,
-        base_dept bd
-        where
-        ic.hosp_code = bd.hosp_code
-        and ic.dept_id = bd.id
-        and ic.item_code !='1'
-        and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ic.hosp_code ,
-        ic.dept_id,
-        bd.name ,
-        date(ic.cost_time)) m on bd3.YLJGDM = m.YLJGDM and bd3.ksbm = m.ksbm and bd3.ywsj = m.ywsj
-        left join (select
-        ic.hosp_code  as YLJGDM ,
-        ic.dept_id as KSBM,
-        bd.name  as KSMC,
-        date(ic.crte_time) as YWSJ ,
-        sum(ic.reality_price) as MJZYPFY
-        from
-        outpt_cost ic ,
-        base_dept bd
-        where
-        ic.hosp_code = bd.hosp_code
-        and ic.dept_id = bd.id
-        and ic.item_code ='1'
-        and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ic.hosp_code ,
-        ic.dept_id,
-        bd.name ,
-        date(ic.crte_time)) l on bd3.YLJGDM = l.YLJGDM and bd3.ksbm = l.ksbm and bd3.ywsj = l.ywsj
-        left join (select
-        ic.hosp_code  as YLJGDM ,
-        ic.dept_id as KSBM,
-        bd.name  as KSMC,
-        date(ic.crte_time) as YWSJ ,
-        sum(ic.reality_price) as MJZYLFY
-        from
-        outpt_cost ic ,
-        base_dept bd
-        where
-        ic.hosp_code = bd.hosp_code
-        and ic.dept_id = bd.id
-        and ic.item_code !='1'
-        and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
-        group by
-        ic.hosp_code ,
-        ic.dept_id,
-        bd.name ,
-        date(ic.crte_time)) n on bd3.YLJGDM = n.YLJGDM and bd3.ksbm = n.ksbm and bd3.ywsj = n.ywsj
+            select bd3.YLJGDM  as YLJGDM,
+            bd3.KSBM  as KSBM,
+            bd3.name  as KSMC,
+            date_format(bd3.ywsj,'%Y%m%d') as YWSJ,
+            ifnull(a.mzrc,0)  as MZRC,
+            ifnull(b.jzrc,0)  as JZRC,
+            ifnull(c.RYRC,0)  as RYRC,
+            ifnull(d.CYRC,0)  as CYRC,
+            ifnull(e.zyrs,0)  as ZYRS,
+            ifnull(f.SYCWS,0)  as SYCWS,
+            ifnull(n.MJZYLFY,0)  as MJZYLFY,
+            ifnull(l.MJZYPFY,0)  as MJZYPFY,
+            ifnull(j.MJZYBYLFY,0)  as MJZYBYLFY,
+            ifnull(i.MJZYBYPFY,0)  as MJZYBYPFY,
+            ifnull(m.ZYYLFY,0)  as ZYYLFY,
+            ifnull(k.ZYYPFY,0)  as ZYYPFY,
+            ifnull(h.ZYYBYLFY,0)  as ZYYBYLFY,
+            ifnull(g.ZYYBYPFY,0)  as ZYYBYPFY,
+            ifnull(m.ZYYLFY ,0) + ifnull(k.ZYYPFY,0)+ifnull(h.ZYYBYLFY,0)+ifnull(g.ZYYBYPFY,0) as ZYSJFSYS,
+            '' as TJYL1,
+            '' as TJYL2,
+            '' as TJYL3,
+            '' as TJYL4,
+            '' as TJYL5,
+            '' as TJYL6,
+            '' as TJYL7,
+            '' as TJYL8,
+            '0' as XGBZ   from (select bd.hosp_code as YLJGDM,bd.code as ksbm, bd.code,bd.name,b.YWSJ from base_dept bd left join (SELECT
+            DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd:=@dateAdd+1 DAY),'%Y-%m-%d') YWSJ
+            FROM base_dept bd
+            LEFT JOIN (SELECT @dateAdd:=-1) t ON 1=1
+            WHERE
+            DATE_FORMAT(ADDDATE(#{startTime}, INTERVAL @dateAdd DAY),'%Y-%m-%d') &lt; DATE_FORMAT(#{endTime},'%Y-%m-%d') )b on 1=1 where bd.type_code in ('1','2') )bd3
+            left JOIN (select
+            ov.hosp_code as YLJGDM ,
+            ov.dept_id as KSBM,
+            ov.dept_name as KSMC,
+            date(ov.visit_time) as YWSJ,
+            count(1) as MZRC
+            from
+            outpt_visit ov
+            group by
+            ov.hosp_code ,
+            ov.dept_id ,
+            ov.dept_name,
+            date(ov.visit_time)) a   on a.YLJGDM = bd3.YLJGDM  and a.ksbm = bd3.ksbm and bd3.YWSJ = a.YWSJ
+            left join (
+            select
+            ov.hosp_code  as YLJGDM,
+            ov.dept_id as KSBM,
+            ov.dept_name as KSMC,
+            date(ov.visit_time) as YWSJ,
+            count(1) as JZRC
+            from
+            outpt_visit ov
+            where ov.visit_code ='02'
+            and date(ov.visit_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ov.hosp_code ,
+            ov.dept_id ,
+            ov.dept_name,
+            date(ov.visit_time)) b	on bd3.YLJGDM = b.YLJGDM and bd3.ksbm = b.ksbm and bd3.ywsj = b.ywsj
+            left join (select
+            ov.hosp_code  as YLJGDM,
+            ov.in_dept_id as KSBM ,
+            ov.in_dept_name as KSMC,
+            date(ov.in_time) as YWSJ,
+            count(1) as RYRC
+            from
+            inpt_visit ov
+            where ov.status_code  !='8'
+            and date(ov.in_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ov.hosp_code ,
+            ov.in_dept_id ,
+            ov.in_dept_name,
+            date(ov.in_time)) c on bd3.YLJGDM = c.YLJGDM and bd3.ksbm = c.ksbm and bd3.ywsj = c.ywsj
+            left join (select
+            ov.hosp_code   as YLJGDM,
+            ov.in_dept_id  as KSBM,
+            ov.in_dept_name as KSMC,
+            date(ov.out_time) as YWSJ,
+            count(1) as CYRC
+            from
+            inpt_visit ov
+            where ov.status_code  ='7'
+            and date(ov.out_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ov.hosp_code ,
+            ov.in_dept_id ,
+            ov.in_dept_name,
+            date(ov.out_time)) d on bd3.YLJGDM = d.YLJGDM and bd3.ksbm = d.ksbm and bd3.ywsj = d.ywsj
+            left join (select
+            c.YLJGDM,
+            c.KSBM ,
+            c.YWSJ  ,
+            COUNT(1) as ZYRS
+            from
+            (
+            select
+            l_tab.YLJGDM,
+            l_tab.KSBM,
+            l_tab.YWSJ
+            from
+            (
+            select
+            iv.hosp_code  as YLJGDM,
+            iv.in_dept_id  as KSBM,
+            date(iv.in_time) as YWSJ
+            from
+            inpt_visit iv
+            where
+            DATE(iv.in_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            iv.hosp_code ,
+            iv.in_dept_id,
+            DATE(iv.in_time)) l_tab
+            inner join
+            (
+            select
+            hosp_code  as YLJGDM,
+            in_dept_id as KSBM,
+            DATE(in_time) as YWSJ
+            from
+            inpt_visit
+            where
+            DATE(in_time) between date(#{startTime}) and date(#{endTime})) r_tab
+            on
+            l_tab.YWSJ >= r_tab.YWSJ
+            and l_tab.YLJGDM = r_tab.YLJGDM
+            and l_tab.KSBM = r_tab.KSBM) c
+            group by
+            c.YLJGDM,
+            c.KSBM ,
+            c.YWSJ) e on bd3.YLJGDM = e.YLJGDM and bd3.ksbm = e.ksbm and bd3.ywsj = e.ywsj
+            left join (select bb.hosp_code  as YLJGDM,bd2.id as ksbm,count(1) SYCWS
+            from base_bed bb ,base_dept bd2
+            where bb.is_valid = '1' and bb.hosp_code = bd2.hosp_code and bb.dept_code  = bd2.code
+            ) f  on  bd3.YLJGDM = f.YLJGDM and bd3.ksbm = f.ksbm
+            left join (select
+            iiv.hosp_code  as YLJGDM,
+            iiv.visit_drpt_id   as KSBM,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as ZYYBYPFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='1'
+            and iim.hosp_item_type  ='1'
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) g  on bd3.YLJGDM = g.YLJGDM and bd3.ksbm = g.ksbm and bd3.ywsj = g.ywsj
+            left join (select
+            iiv.hosp_code as YLJGDM,
+            iiv.visit_drpt_id  as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as ZYYBYLFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='1'
+            and iim.hosp_item_type  !='1'
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) h on bd3.YLJGDM = h.YLJGDM and bd3.ksbm = h.ksbm and bd3.ywsj = h.ywsj
+            left join (select
+            iiv.hosp_code as YLJGDM,
+            iiv.visit_drpt_id  as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as MJZYBYPFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='0'
+            and iim.hosp_item_type  ='1'
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) i on bd3.YLJGDM = i.YLJGDM and bd3.ksbm = i.ksbm and bd3.ywsj = i.ywsj
+            left join (select
+            iiv.hosp_code  as YLJGDM,
+            iiv.visit_drpt_id   as KSBM ,
+            iiv.visit_drpt_name as KSMC,
+            date(iiv.crte_time) as YWSJ,
+            sum(iis.plan_price) as MJZYBYLFY
+            from
+            insure_individual_visit iiv  ,
+            insure_individual_cost iic ,
+            insure_item_match iim,
+            insure_individual_settle iis
+            where iiv.hosp_code  = iic.hosp_code
+            and  iiv.visit_id = iic.visit_id
+            and  iim.hosp_code  = iic.hosp_code
+            and  iim.insure_item_code  = iic.item_code
+            and  iic.hosp_code  = iis.hosp_code
+            and  iic.visit_id = iis.visit_id
+            and iiv.is_hospital ='0'
+            and iim.hosp_item_type  !='1'
+            and date(iiv.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            iiv.hosp_code ,
+            iiv.visit_drpt_id ,
+            iiv.visit_drpt_name,
+            date(iiv.crte_time)) j on bd3.YLJGDM = j.YLJGDM and bd3.ksbm = j.ksbm and bd3.ywsj = j.ywsj
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id  as KSBM,
+            bd.name as KSMC ,
+            date(ic.cost_time) as YWSJ,
+            sum(ic.reality_price) as ZYYPFY
+            from
+            inpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code ='1'
+            and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.cost_time) ) k on bd3.YLJGDM = k.YLJGDM and bd3.ksbm = k.ksbm and bd3.ywsj = k.ywsj
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id  as KSBM,
+            bd.name as KSMC ,
+            date(ic.cost_time) as YWSJ,
+            sum(ic.reality_price) as ZYYLFY
+            from
+            inpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code !='1'
+            and date(ic.cost_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.cost_time)) m on bd3.YLJGDM = m.YLJGDM and bd3.ksbm = m.ksbm and bd3.ywsj = m.ywsj
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id as KSBM,
+            bd.name  as KSMC,
+            date(ic.crte_time) as YWSJ ,
+            sum(ic.reality_price) as MJZYPFY
+            from
+            outpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code ='1'
+            and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.crte_time)) l on bd3.YLJGDM = l.YLJGDM and bd3.ksbm = l.ksbm and bd3.ywsj = l.ywsj
+            left join (select
+            ic.hosp_code  as YLJGDM ,
+            ic.dept_id as KSBM,
+            bd.name  as KSMC,
+            date(ic.crte_time) as YWSJ ,
+            sum(ic.reality_price) as MJZYLFY
+            from
+            outpt_cost ic ,
+            base_dept bd
+            where
+            ic.hosp_code = bd.hosp_code
+            and ic.dept_id = bd.id
+            and ic.item_code !='1'
+            and date(ic.crte_time) between date(#{startTime}) and date(#{endTime})
+            group by
+            ic.hosp_code ,
+            ic.dept_id,
+            bd.name ,
+            date(ic.crte_time)) n on bd3.YLJGDM = n.YLJGDM and bd3.ksbm = n.ksbm and bd3.ywsj = n.ywsj
         ) a where a.YLJGDM = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.YWSJ) &gt;= date(#{startTime})

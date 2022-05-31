@@ -1203,17 +1203,20 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 break;
 
         }
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
         if(resultList !=null && resultList.size() > 0){
             //增加序号
             int index =1;
             for(Map map:resultList){
                 map.put("index",index);
                 index++;
+
+                map.put("hospName",insureConfInfo.getHospName());
             }
         }
         resultMap.put("result",resultList);
 
-        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+
         resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
 
         return resultMap;

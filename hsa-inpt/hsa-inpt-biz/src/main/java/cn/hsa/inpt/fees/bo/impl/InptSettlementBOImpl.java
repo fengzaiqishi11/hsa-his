@@ -136,8 +136,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
     @Resource
     private InsureDetailAuditService insureDetailAuditService;
 
-    @Resource
-    private InptSettlementService inptSettlementServiceProvider;
+
     @Resource
     private InsureIndividualBasicService InsureIndividualBasicServiceConsumer;
 
@@ -2899,14 +2898,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         Map<Object, Object> map = new HashMap<>();
         map.put("inptVisitDTO",inptVisitDTO);
         map.put("hospCode",inptVisitDTO.getHospCode());
-        WrapperResponse<PageDTO> response = inptSettlementServiceProvider.queryDiagnose(map);
-        if (WrapperResponse.SUCCESS != response.getCode()) {
-            throw new AppException(response.getMessage());
-        }
-        if (ObjectUtil.isEmpty(response.getData())) {
+        PageDTO diaginfo = queryDiagnose(inptVisitDTO);
+        if (ObjectUtil.isEmpty(diaginfo) || ObjectUtil.isEmpty(diaginfo.getResult())) {
             throw new AppException("未查询到诊断信息！");
         }
-        List<InptDiagnoseDTO> inptDiagnoseDTOS = JSON.parseArray(JSON.toJSONString(response.getData().getResult()), InptDiagnoseDTO.class);
+        List<InptDiagnoseDTO> inptDiagnoseDTOS = JSON.parseArray(JSON.toJSONString(diaginfo.getResult()), InptDiagnoseDTO.class);
         for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseDTOS) {
             AnaDiagnoseDTO diagnoseDTO = new AnaDiagnoseDTO();
             //*诊断标识

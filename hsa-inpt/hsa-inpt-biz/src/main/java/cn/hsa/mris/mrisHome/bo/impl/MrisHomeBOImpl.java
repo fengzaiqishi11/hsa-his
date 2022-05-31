@@ -25,11 +25,15 @@ import cn.hsa.module.mris.mrisHome.dto.MrisDiagnoseDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisOperDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisTurnDeptDTO;
 import cn.hsa.module.mris.mrisHome.entity.*;
+import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
+import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +77,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private TcmMrisHomeDAO tcmMrisHomeDAO;
 
 
     /**
@@ -581,6 +588,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             throw new AppException("上传失败:该病人就诊信息不存在");
         }
 
+        String mrisPageType = MapUtil.getStr(map, "mrisPageType");
+        if (ObjectUtil.isEmpty(mrisPageType)) {
+            throw new AppException("病案首页类型【mrisPageType】不能为空！1：中医病案首页;0：普通（西医）病案首页");
+        }
+
         InsureIndividualVisitDTO insureIndividualVisitDTO = mrisHomeDAO.getInsureVisitByVisitId(map);
         if (insureIndividualVisitDTO == null) {
             throw new AppException("上传失败:该病人未进行医保登记");
@@ -610,10 +622,20 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
 
         // 病案主体信息数据集
-        MrisBaseInfoDTO mrisBaseInfoDTO = mrisHomeDAO.getMrisBaseInfo(inptVisitDTO);
-        if (mrisBaseInfoDTO == null) {
-            throw new AppException("请先加载病人病案信息再上传");
+        TcmMrisBaseInfoDTO tcmMrisBaseInfo = new TcmMrisBaseInfoDTO();
+        MrisBaseInfoDTO mrisBaseInfoDTO = new MrisBaseInfoDTO();
+        if ("1".equals(mrisPageType)) {
+            tcmMrisBaseInfo = tcmMrisHomeDAO.getTcmMrisBaseInfo(inptVisitDTO);
+            if (tcmMrisBaseInfo == null) {
+                throw new AppException("请先加载病人病案信息再上传");
+            }
+        }else {
+            mrisBaseInfoDTO = mrisHomeDAO.getMrisBaseInfo(inptVisitDTO);
+            if (mrisBaseInfoDTO == null) {
+                throw new AppException("请先加载病人病案信息再上传");
+            }
         }
+
 
         // 病案手术信息数据集
         List<MrisOperInfoDO> mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
@@ -631,6 +653,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             map.put("mrisDiagnoseList",mrisDiagnoseList);
             map.put("mrisBaseInfoDTO",mrisBaseInfoDTO);
             map.put("mrisCostDO",mrisCostDO);
+            map.put("tcmMrisBaseInfo",tcmMrisBaseInfo);
+            map.put("mrisPageType",mrisPageType);
             insureUnifiedEmrUploadService_consumer.updateInsureUnifiedMri(map);
             return true;
         }else{

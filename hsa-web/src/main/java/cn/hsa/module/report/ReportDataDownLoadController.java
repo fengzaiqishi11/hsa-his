@@ -43,6 +43,7 @@ public class ReportDataDownLoadController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("crteId", sysUserDTO.getId());
         map.put("crteName", sysUserDTO.getName());
+        map.put("hospName",sysUserDTO.getHospName());
         return reportDataDownLoadService_consumer.saveBuild(map);
     }
 

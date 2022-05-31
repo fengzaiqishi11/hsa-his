@@ -1214,6 +1214,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         resultMap.put("result",resultList);
 
         InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+        insureConfInfo.setHospName((String)paraMap.get("hospName"));
         resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
 
         return resultMap;

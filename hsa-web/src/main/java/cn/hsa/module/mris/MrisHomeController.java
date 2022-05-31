@@ -286,6 +286,7 @@ public class MrisHomeController extends BaseController {
         map.put("visitId",outptVisitDTO.getId());
         map.put("userId",sysUserDTO.getId());
         map.put("userName",sysUserDTO.getName());
+        map.put("mrisPageType",outptVisitDTO.getMrisPageType());
         return WrapperResponse.success(mrisHomeService_consumer.uploadMrisInfo(map));
     }
 

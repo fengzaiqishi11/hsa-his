@@ -281,4 +281,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String isUploadDise;
 
    private List<String> diagnoseList;
+
+   //病案首页类型   1：中医病案首页    0：普通（西医）病案首页
+   private String mrisPageType;
 }

@@ -685,7 +685,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //组装住院费用参数
         inptCostDTO.setPrice(itemDTO.getPrice());
         inptCostDTO.setNum(new BigDecimal("1"));
-        inptCostDTO.setNumUnitCode(adviceDTO.getUnitCode());
+        inptCostDTO.setNumUnitCode(itemDTO.getUnitCode());
         //用法
         inptCostDTO.setHospCode(itemDTO.getHospCode());
         inptCostDTO.setVisitId(adviceDTO.getVisitId());

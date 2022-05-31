@@ -544,18 +544,19 @@
             ssd.buy_price as buyPrice,  -- 购进单价
             ssd.sell_price as sellPrice,  -- 零售单价
             ssd.split_ratio as splitRatio, -- 拆分比
-            ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio) as sellCount, -- 销售数量
-            (ssd.buy_price * ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio)) as buyPriceAll, -- 进货金额
-            (ssd.sell_price * ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio)) as sellPriceAll, -- 销售金额
-            ((ssd.sell_price - ssd.buy_price) * ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio)) as profit, -- 利润
-            (((ssd.sell_price - ssd.buy_price) * ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio))/(ssd.buy_price * ((sum(podd.num) - sum(podd.back_num))/ssd.split_ratio))) as profitRatio -- 利润率
+            podd.unit_code as unitCode,
+            sum(podd.num - ifnull(podd.back_num,0)) as sellCount,
+            sum(ssd.buy_price *(podd.num - ifnull(podd.back_num,0))) as buyPriceAll,
+            sum(ssd.sell_price *(podd.num- ifnull(podd.back_num,0))) as sellPriceAll,
+            sum((ssd.sell_price - ssd.buy_price) *(podd.num -ifnull(podd.back_num,0))) as profit,
+            round(sum((ssd.sell_price - ssd.buy_price) *(podd.num -ifnull(podd.back_num,0))) /sum(ssd.buy_price *(podd.num - ifnull(podd.back_num,0))),4) as profitRate
         FROM outpt_cost oc
-             left join outpt_settle os
+              join outpt_settle os
                 on os.id = oc.settle_id and os.hosp_code = #{hospCode}
-             left join phar_out_distribute_all_detail podad
+              join phar_out_distribute_all_detail podad
                 on podad.cost_id = oc.id and podad.hosp_code = #{hospCode}
                 and oc.distribute_all_detail_id = podad.id
-             left join phar_out_distribute_detail podd
+              join phar_out_distribute_detail podd
                 on podd.distribute_all_detail_id = podad.id and podd.hosp_code = #{hospCode}
                 and podd.cost_id = oc.id
              left join stro_stock_detail ssd
@@ -583,7 +584,7 @@
         </if>
         <choose>
             <when test='sumCode != null and sumCode == "2"'>
-                group by podd.item_id,podd.batch_no,oc.dept_id
+                group by oc.dept_id
             </when>
             <otherwise>
                 group by podd.item_id,podd.batch_no,oc.dept_id,oc.doctor_id
@@ -605,17 +606,16 @@
             ssd.buy_price as buyPrice,  -- 购进单价
             ssd.sell_price as sellPrice,  -- 零售单价
             ssd.split_ratio as splitRatio, -- 拆分比
-            (sum(pidd.num)/ssd.split_ratio) as sellCount, -- 结算数量
-            (ssd.buy_price * (sum(pidd.num)/ssd.split_ratio)) as buyPriceAll, -- 进货金额
-            (ssd.sell_price * (sum(pidd.num)/ssd.split_ratio)) as sellPriceAll, -- 销售金额
-            ((ssd.sell_price - ssd.buy_price) * (sum(pidd.num)/ssd.split_ratio)) as profit, -- (零售金额 - 进货单价) * 销售数量
-            (((ssd.sell_price - ssd.buy_price) * (sum(pidd.num)/ssd.split_ratio)) / (ssd.buy_price * (sum(pidd.num)/ssd.split_ratio))) as profitRatio -- 利润率=(利润/进货金额)
+            sum(pidd.num)  as sellCount,
+            pidd.unit_code as unitCode,
+            sum(ssd.buy_price * pidd.num) as buyPriceAll,
+            sum(ssd.sell_price * pidd.num) as sellPriceAll,
+            sum((ssd.sell_price - ssd.buy_price) * pidd.num) as profit,
+            ROUND(sum((ssd.sell_price - ssd.buy_price) * pidd.num) / sum(ssd.buy_price * pidd.num),4) as profitRate
         FROM inpt_cost ic
-            left join inpt_settle ins
-                on ins.id = ic.settle_id and ins.hosp_code = #{hospCode}
-            left join phar_in_distribute_all_detail pidad
+             join phar_in_distribute_all_detail pidad
                 on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code =  #{hospCode}
-            left join phar_in_distribute_detail pidd
+             join phar_in_distribute_detail pidd
                 on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code =  #{hospCode}
             left join stro_stock_detail ssd
                 on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
@@ -625,7 +625,6 @@
                 on bfc.id = ic.bfc_id and bfc.hosp_code = #{hospCode}
         where
             ic.is_dist ='1'
-          and ic.settle_code='2'
           and ic.is_wait = '1'
           and ic.item_code in('1','2')
           and ic.hosp_code= #{hospCode}
@@ -636,14 +635,14 @@
             and ic.doctorId = #{doctorId}
         </if>
         <if test="startDate != null ">
-            and ins.settle_time &gt;= #{startDate}
+            and ic.cost_time &gt;= #{startDate}
         </if>
         <if test="endDate != null ">
-            and ins.settle_time &lt;= #{endDate}
+            and ic.cost_time &lt;= #{endDate}
         </if>
         <choose>
             <when test='sumCode != null and sumCode == "2"'>
-                group by pidd.item_id,pidd.batch_no,ic.dept_id
+                group by ic.dept_id
             </when>
             <otherwise>
                 group by pidd.item_id,pidd.batch_no,ic.dept_id,ic.doctor_id

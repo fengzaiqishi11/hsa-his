@@ -278,7 +278,7 @@ public class InsureUnifiedBaseController extends BaseController {
      * @Return
      **/
     @PostMapping("/queryPatientInfo")
-    public WrapperResponse<Map<String,Object>> queryPatientInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<PageDTO> queryPatientInfo(@RequestBody Map<String,Object>map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("crteId",sysUserDTO.getCrteId());
         map.put("crteName",sysUserDTO.getCrteName());

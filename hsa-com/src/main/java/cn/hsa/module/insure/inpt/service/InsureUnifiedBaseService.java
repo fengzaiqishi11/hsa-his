@@ -150,7 +150,7 @@ public interface InsureUnifiedBaseService {
      * @Date   2021/4/23 12:47
      * @Return
      **/
-    WrapperResponse<Map<String, Object>> queryPatientInfo(Map<String, Object> map);
+    WrapperResponse<PageDTO> queryPatientInfo(Map<String, Object> map);
 
     /**
      * @Description: 人员定点信息查询

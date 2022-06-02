@@ -294,7 +294,7 @@ public class TbZyyzmx implements Serializable {
     /**
      * 婴儿序号
      */
-    private Integer yexh;
+    private String yexh;
     /**
      * 中药付数
      */

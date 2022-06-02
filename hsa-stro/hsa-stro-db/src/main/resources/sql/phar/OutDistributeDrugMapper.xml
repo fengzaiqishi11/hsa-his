@@ -455,7 +455,7 @@
                 END prodName
         from phar_in_distribute_all_detail a
         left join phar_in_distribute pid on a.distribute_id = pid.id and a.hosp_code = pid.hosp_code
-        join inpt_advice b on a.advice_id = b.id and a.hosp_code = b.hosp_code
+        left join inpt_advice b on a.advice_id = b.id and a.hosp_code = b.hosp_code
         join inpt_visit c on c.id = a.visit_id and c.hosp_code = a.hosp_code
         left join base_drug bd on a.item_code='1' and bd.id=a.item_id and bd.hosp_code=a.hosp_code
         left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code

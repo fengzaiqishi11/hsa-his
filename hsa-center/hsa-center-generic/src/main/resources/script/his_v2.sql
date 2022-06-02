@@ -9704,17 +9704,12 @@ ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag varchar(32)CHARACTER SET
 -- 医嘱国家编码增加字段
 ALTER TABLE base_advice ADD union_nation_code varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）';
 
--- 码表
--- 住院人员特殊标识类型
-INSERT INTO insure_dict (id,hosp_code,insure_reg_code,code,name,value,remark,crte_id,crte_name,crte_time,ext01,ext02,ext03,medicine_org_code) VALUES
-	 ('1527199752754868224',{hospCode},'540329','IPT_PSN_SP_FLAG_TYPE','连续住院','01','住院人员特殊标识类型','1290816158941450240','管理员','2022-05-19 16:09:30',NULL,NULL,NULL,NULL);
- -- 住院人员特殊标识
-INSERT INTO insure_dict
-(id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03, medicine_org_code)
-VALUES('1527199305952440320', {hospCode}, '540329', 'IPT_PSN_SP_FLAG', '无效', '0', '住院人员特殊标识', '1290816158941450240', '管理员', '2022-05-19 16:07:43', NULL, NULL, NULL, NULL);
-INSERT INTO insure_dict
-(id, hosp_code, insure_reg_code, code, name, value, remark, crte_id, crte_name, crte_time, ext01, ext02, ext03, medicine_org_code)
-VALUES('1527199436886028288', {hospCode}, '540329', 'IPT_PSN_SP_FLAG', '有效', '1', '住院人员特殊标识', '1290816158941450240', '管理员', '2022-05-19 16:08:14', NULL, NULL, NULL, NULL);
+-- 新增门诊用药性质
+ALTER TABLE base_material ADD outpt_use_code varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '门诊用药性质（YYXZ）';
+-- 修改报表模板表中报表模板文件名称字段长度
+ALTER TABLE report_configuration MODIFY COLUMN temp_name varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '报表模板文件名称';
+-- 修改医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）长度
+ALTER TABLE base_advice MODIFY COLUMN union_nation_code varchar(128);
 
 
 

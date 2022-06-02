@@ -827,7 +827,11 @@ public class BedListBOImpl implements BedListBO {
             String zzDoctorId = MapUtils.getEmptyErr(map, "zzDoctorId", "主治医生ID为空");
             String zgDoctorId = MapUtils.getEmptyErr(map, "zgDoctorId", "主管医生ID为空");
             String respNurseId = MapUtils.getEmptyErr(map, "respNurseId", "责任护士ID为空");
-            String inTime =  MapUtils.getEmptyErr(map, "inTime", "入院时间为空");
+            if (Constants.YDLX.AC.equals(changeCode)){// 只会影响安床，不会影响换床
+                String inTime = MapUtils.get(map,"inTime");
+                Optional.ofNullable(inTime).orElseThrow(()->new AppException("入院时间不能为空"));
+                inptVisitDTO.setInTime(DateUtils.parse(inTime,DateUtils.Y_M_DH_M_S));
+            }
 
             // 获取医生、护士信息
             Map<String, SysUserDTO> userMap = getDoctorInfo(jzDoctorId , zzDoctorId, zgDoctorId, respNurseId);
@@ -852,7 +856,6 @@ public class BedListBOImpl implements BedListBO {
             inptVisitDTO.setZzDoctorName(zzDoctor.getName());
             inptVisitDTO.setZgDoctorId(zgDoctor.getId());
             inptVisitDTO.setZgDoctorName(zgDoctor.getName());
-            inptVisitDTO.setInTime(DateUtils.parse(inTime,DateUtils.Y_M_DH_M_S));
             inptVisitDTO.setRespNurseId(respNurse.getId());
             inptVisitDTO.setRespNurseName(respNurse.getName());
         }

@@ -773,6 +773,7 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
             inptCos.setJzDoctorId(inptVisitById.getJzDoctorId());
             inptCos.setJzDoctorName(inptVisitById.getJzDoctorName());
             inptCos.setIndeptId(inptVisitById.getInDeptId());
+            inptCos.setInDeptId(inptVisitById.getInDeptId());
         }
 
         //----从源数据中获得项目或材料的id集合，并从数据库中取得项目或材料的信息

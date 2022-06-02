@@ -338,4 +338,13 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String startTime;
 
 
+    private Date begndate; //开始日期
+    private String certno; //证件号码
+    private String insutype; //险种类型
+    private String ipt_otp_no;//住院/门诊号	字符型
+    private String mdtrt_id; // 就诊id *
+    private String med_type;//医疗类别
+    private String out_flag; //异地标志
+    private String psn_no; //人员编号
+
 }

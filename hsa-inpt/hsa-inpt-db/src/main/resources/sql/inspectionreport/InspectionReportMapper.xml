@@ -195,12 +195,14 @@
         a.order_no AS orderNo,
         a.result_id AS resultId,
         a.opd_id as opdId,
-        CONCAT (a.bar_code,c.code)  AS zhId,
+        case when b.id is not null then  CONCAT (a.bar_code,c.code) else   CONCAT (a.bar_code,e.code) end AS zhId,
         a.content,
         a.crte_time AS crteTime
         from medic_apply a
         left join inpt_advice_detail b on a.hosp_code = b.hosp_code and a.opd_id = b.id
         left join base_advice c on a.hosp_code = b.hosp_code  and  b.ba_id =c.id
+        left join outpt_prescribe_detail  d on a.hosp_code = d.hosp_code and a.opd_id = d.id
+        left join base_advice e on d.hosp_code = e.hosp_code  and  d.item_id =e.id
         WHERE
         a.hosp_code=#{hospCode}
         and a.type_code= #{typeCode}

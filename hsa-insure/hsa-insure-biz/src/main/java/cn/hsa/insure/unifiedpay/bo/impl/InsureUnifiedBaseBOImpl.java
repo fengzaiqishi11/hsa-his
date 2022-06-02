@@ -16,11 +16,7 @@ import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.*;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
@@ -1065,7 +1061,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Return
      */
     @Override
-    public Map<String, Object> queryPatientInfo(Map<String, Object> map) {
+    public PageDTO queryPatientInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> dataMap = new HashMap<>();
         String regCode = MapUtils.get(map, "regCode");
@@ -1073,6 +1069,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         dataMap.put("begntime", MapUtils.get(map, "startDate"));
         dataMap.put("endtime", MapUtils.get(map, "endDate"));
+        String pageNo = Integer.toString(MapUtils.get(map, "pageNo"));
+        String pageSize = Integer.toString(MapUtils.get(map,"pageSize"));
         paramMap.put("data", dataMap);
         map.put("msgName","在院信息查询");
         map.put("visitId","");
@@ -1080,8 +1078,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.REGISTER.UP_5303, paramMap,map);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "data");
+        PageHelper.startPage(Integer.parseInt(pageNo), Integer.parseInt(pageSize));
+        List<InsureSettleInfoDTO> insureSettleInfoDTOList = MapUtils.get(outptMap, "data");
+        PageDTO of = PageDTO.of(insureSettleInfoDTOList);
         map.put("resultDataMap", resultDataMap);
-        return map;
+        return of;
     }
 
     /**

@@ -357,7 +357,9 @@
     </select>
 
     <select id="queryEmrIndexInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbDzblsyxx">
-        select c.id as blwdlsh,
+        select
+        distinct
+        max(c.id) as blwdlsh,
        (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
 	   (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
 	   '3' as hzlxdm,
@@ -406,6 +408,7 @@
       where c.crte_time &gt;= date(#{startTime})
       and c.crte_time &lt;= date(#{endTime})
       and a.hosp_code =#{hospCode}
+      group by c.id
       order by c.crte_time asc
     </select>
     <select id="queryInptNurseRecordInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbEmrYbhljl">
@@ -515,7 +518,7 @@
 
     <select id="queryInptEmrOutInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbEmrCyxj">
     select
-	a.id as zylsh,
+	max(a.id) as zylsh,
     (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
     (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
     a.in_dept_id as ksbm,
@@ -599,13 +602,14 @@
     where a.status_code ='7' and a.out_time &gt;= date(#{startTime})
     and a.out_time &lt;= date(#{endTime})
     and a.hosp_code =#{hospCode}
+    group by a.id
     order by a.out_time asc
     </select>
     <select id="queryInptBedInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZycwjl">
     select
    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
-	a.after_dept_id as ksbm,
+	max(a.after_dept_id) as ksbm,
     b.code as cwbm,
     a.after_dept_name as ksmc,
     b.name as cwmc,
@@ -629,6 +633,7 @@
     and a.crte_time &gt;= date(#{startTime})
     and a.crte_time &lt;= date(#{endTime})
     and a.hosp_code =#{hospCode}
+    group by a.after_dept_id
     order by a.crte_time asc
     </select>
 

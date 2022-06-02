@@ -78,7 +78,7 @@ public class TbEmrYbhljl implements Serializable {
     /**
      * 血氧饱和度（％)
      */
-    private Integer xybhd;
+    private String xybhd;
     /**
      * 足背动脉搏动标志
      */
@@ -212,11 +212,11 @@ public class TbEmrYbhljl implements Serializable {
     /**
      * 收缩压(mmHg)
      */
-    private Integer ssy;
+    private String ssy;
     /**
      * 舒张压（mmHg)
      */
-    private Integer szy;
+    private String szy;
     /**
      * 饮食情况
      */

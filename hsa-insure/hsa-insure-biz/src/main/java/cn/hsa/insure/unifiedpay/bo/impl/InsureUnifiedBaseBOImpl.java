@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.module.bo.impl.InsureIndividualVisitBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
@@ -78,6 +79,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     @Resource
     private InsureUnifiedPayInptService insureUnifiedPayInptService;
+    @Resource
+    private InsureIndividualVisitBOImpl insureIndividualVisitBO;
 
     @Resource
     private InsureUnifiedPayRestService insureUnifiedPayRestService;
@@ -1098,6 +1101,13 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String regCode = MapUtils.get(map, "regCode");
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
+        InsureIndividualVisitDTO insureIndividualVisit = new InsureIndividualVisitDTO();
+        insureIndividualVisit.setVisitId(MapUtils.get(map, "visitId"));
+        InsureIndividualVisitDTO result = insureIndividualVisitBO.selectInsureInfo(insureIndividualVisit);
+        if (ObjectUtil.isEmpty(result)) {
+            throw new AppException("没有该就诊信息");
+        }
+        regCode = result.getInsureRegCode();
         dataMap.put("biz_appy_type", MapUtils.get(map, "bizAppyType"));
         map.put("msgName","人员定点信息查询");
         map.put("isHospital","");
@@ -1597,12 +1607,18 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("visitId","");
         // 返参map
         Map<String, Object> resultMap = new HashMap<>();
-        if (deptDTOList.size() == 1) {
+        //如果是甘肃，海南的医保的就走3401接口 因为3401a接口没开 医保编码为 甘肃：620102 海南的：460100
+        if(StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("62") && attrCode.startsWith("46")){
             log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap,map);
-        } else if (deptDTOList.size() > 1) {
-            log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap,map);
+            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
+        }else {
+            if (deptDTOList.size() == 1) {
+                log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+                resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
+            } else if (deptDTOList.size() > 1) {
+                log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+                resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap, map);
+            }
         }
 
         // 上传完成后，更新本地科室表上传状态

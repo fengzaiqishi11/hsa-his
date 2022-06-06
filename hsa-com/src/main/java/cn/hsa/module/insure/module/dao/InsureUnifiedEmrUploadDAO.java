@@ -62,4 +62,20 @@ public interface InsureUnifiedEmrUploadDAO {
      * @Return 
     **/
     void updateEmrPatientFlag(InptVisitDTO inptVisitDTO);
+    /**
+     * @Description 查询中医病案首页诊断信息
+     * @Author 产品三部-郭来
+     * @Date 2022-06-01 16:45
+     * @param map
+     * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    List<Map<String, Object>> selectTcmDiseinfo(Map<String, Object> map);
+    /**
+     * @Description 查询中医病案首页手术信息
+     * @Author 产品三部-郭来
+     * @Date 2022-06-01 16:59
+     * @param map
+     * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    List<Map<String, Object>> selectTcmOperInfo(Map<String, Object> map);
 }

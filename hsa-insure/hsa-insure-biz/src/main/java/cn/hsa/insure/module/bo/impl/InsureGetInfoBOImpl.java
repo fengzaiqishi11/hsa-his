@@ -28,6 +28,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -234,11 +235,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         setlinfo.put("adm_way", settleInfoDTO.getInWay()); // 入院途径 *******
         setlinfo.put("trt_type", settleInfoDTO.getTrtType()); // 治疗类别 *******
-        setlinfo.put("adm_time", DateUtils.format(settleInfoDTO.getAdmTime(),DateUtils.Y_M_DH_M_S)); // 入院时间 *******
+        if(ObjectUtil.isNotEmpty(settleInfoDTO.getAdmTime())){ //对时间对象做判空处理才能 用date工具类做处理
+            setlinfo.put("adm_time", DateUtils.format(settleInfoDTO.getAdmTime(),DateUtils.Y_M_DH_M_S)); // 入院时间 *******
+        }
 
         setlinfo.put("refldept_dept", settleInfoDTO.getRefldeptDept()); // 转科科别
 
-        setlinfo.put("dscg_time", DateUtils.format(settleInfoDTO.getDscgTime(),DateUtils.Y_M_DH_M_S)); // 出院时间 *******
+        if (ObjectUtil.isNotEmpty(settleInfoDTO.getDscgTime())) { //对时间对象做判空处理才能 用date工具类做处理
+            setlinfo.put("dscg_time", DateUtils.format(settleInfoDTO.getDscgTime(),DateUtils.Y_M_DH_M_S)); // 出院时间 *******
+        }
         setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
 
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
@@ -265,8 +270,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("days_rinp_pup_31", settleInfoDTO.getDaysRinpPup31()); // 出院31天内再住院目的 *******
         setlinfo.put("chfpdr_name", settleInfoDTO.getChfpdrName()); // 主诊医生姓名 *******
         setlinfo.put("chfpdr_code", settleInfoDTO.getChfpdrCode()); // 主诊医生代码 *******
-        setlinfo.put("setl_begn_date", DateUtils.format(settleInfoDTO.getSetlBegnDate(),DateUtils.Y_M_DH_M_S)); // 结算开始日期
-        setlinfo.put("setl_end_date", DateUtils.format(settleInfoDTO.getSetlEnDate(),DateUtils.Y_M_DH_M_S)); // 结算结束日期
+        if (ObjectUtil.isNotEmpty(settleInfoDTO.getSetlBegnDate())) { //对时间对象做判空处理才能 用date工具类做处理
+            setlinfo.put("setl_begn_date", DateUtils.format(settleInfoDTO.getSetlBegnDate(),DateUtils.Y_M_DH_M_S)); // 结算开始日期
+        }
+        if (ObjectUtil.isNotEmpty(settleInfoDTO.getSetlEnDate())) { //对时间对象做判空处理才能 用date工具类做处理
+            setlinfo.put("setl_end_date", DateUtils.format(settleInfoDTO.getSetlEnDate(),DateUtils.Y_M_DH_M_S)); // 结算结束日期
+        }
 
         setlinfo.put("medins_fill_dept", settleInfoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medins_fill_psn", settleInfoDTO.getMedinsFillPsn()); // 医疗机构填报人
@@ -284,7 +293,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("psn_name", settleInfoDTO.getPsnName());// 人员姓名
 
         setlinfo.put("gend", settleInfoDTO.getGend());// 性别
-        setlinfo.put("brdy", DateUtils.format(settleInfoDTO.getBrdy(),DateUtils.Y_M_D)); // 出生日期
+        if (ObjectUtil.isNotEmpty(settleInfoDTO.getBrdy())) { //对时间对象做判空处理才能 用date工具类做处理
+            setlinfo.put("brdy", DateUtils.format(settleInfoDTO.getBrdy(),DateUtils.Y_M_D)); // 出生日期
+        }
         setlinfo.put("age", settleInfoDTO.getAge()); // 年龄
         setlinfo.put("nwb_age", settleInfoDTO.getNebAge()); // （年龄不足1周岁）年龄
         setlinfo.put("naty", settleInfoDTO.getNaty()); // 民族

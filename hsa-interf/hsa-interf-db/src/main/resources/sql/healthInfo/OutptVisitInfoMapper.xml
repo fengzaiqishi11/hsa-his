@@ -116,6 +116,7 @@
     <select id="queryOutptVisitInfo" resultType="cn.hsa.module.interf.healthInfo.entity.TbMzjzjl"
             parameterType="java.util.Map">
     select
+    distinct
     (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as YLJGDM,
     a.id as MZLSH,
     (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,

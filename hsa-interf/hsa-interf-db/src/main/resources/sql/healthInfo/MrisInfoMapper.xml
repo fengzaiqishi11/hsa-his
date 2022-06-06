@@ -562,6 +562,7 @@
     <select id="queryInptMrisDiagnoseInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbBasyzdmx">
      select * from
     (select
+    distinct
 	a.visit_id as zylsh,
 	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
     a.id as zdjllsh,
@@ -586,6 +587,7 @@
     and b.hosp_code =#{hospCode}
 	union all
 	select
+	distinct
 	a.visit_id as zylsh,
 	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
     a.id as zdjllsh,
@@ -615,6 +617,7 @@
     <select id="queryInptMrisOperInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbBasyssmx">
     select * from
     (select
+    distinct
     b.visit_id as zylsh,
    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
@@ -645,6 +648,7 @@
     and b.hosp_code =#{hospCode}
    union
     select
+    distinct
     b.visit_id as zylsh,
    (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
    (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,

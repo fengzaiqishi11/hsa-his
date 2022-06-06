@@ -284,6 +284,8 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       interfaceParamDTO.setHospCode(hospCode);
       interfaceParamDTO.setIsHospital(insureIndividualVisitDTO.getIsHospital());
       interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      //设置请求url
+      interfaceParamDTO.setUrl("http://10.103.161.181:8082/org/local/api/hos/uldFeeInfo");
       // 调用统一支付平台接口
       Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.ONLINE_FEE_PAY, interfaceParamDTO);
       Map<String, Object> outptMap = MapUtils.get(resultMap, "output");

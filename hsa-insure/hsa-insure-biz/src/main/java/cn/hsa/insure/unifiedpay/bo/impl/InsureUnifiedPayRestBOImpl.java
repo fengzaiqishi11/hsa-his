@@ -3045,6 +3045,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("type", type);
         dataMap.put("date", DateUtils.format(DateUtils.getNow(), DateUtils.Y_M_DH_M_S));
+        dataMap.put("admdvs", "");
+        dataMap.put("vali_flag", Constants.SF.S);
         Map<String, Object> inputMap = new HashMap<>();
         inputMap.put("data", dataMap);
         map.put("msgName","字典下载");

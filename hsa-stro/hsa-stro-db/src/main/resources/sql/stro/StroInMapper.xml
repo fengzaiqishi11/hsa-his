@@ -53,6 +53,7 @@
       <result property="expiryDate" column="expiry_date" jdbcType="TIMESTAMP"/>
       <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
       <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+      <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -257,7 +258,8 @@
       (select p.name from base_product p where p.hosp_code = #{hospCode} and a.prod_code = p.code) as prodName,
       case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
       case when a.item_code='2' then bm.model end model,
-      case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code
+      case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code,
+      case when a.item_code='1' then bd.nation_name when a.item_code='2' then bm.nation_name end nation_name
       from stro_in_detail a
       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
       left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}

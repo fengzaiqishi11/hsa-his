@@ -38,5 +38,6 @@ public class StroOutDetailDTO extends StroOutDetailDO implements Serializable {
     private String nationCode;// 医保编码
     //材料药品分类
     private String typeCode;
+    private String nationName; // 医保名称
 
 }

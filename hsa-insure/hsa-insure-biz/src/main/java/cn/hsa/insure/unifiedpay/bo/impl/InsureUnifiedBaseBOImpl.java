@@ -629,16 +629,16 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());
             insureIndividualSettleDTO.setHospCode(hospCode);
             insureIndividualSettleDTO.setInsureSettleId(MapUtils.get(setlinfo,"setl_id"));
-            insureIndividualSettleDTO.setAllPortionPrice(MapUtils.get(setlinfo,"fulamt_ownpay_amt"));
-            insureIndividualSettleDTO.setOverSelfPrice(MapUtils.get(setlinfo,"overlmt_selfpay"));
-            insureIndividualSettleDTO.setInscpScpAmt(MapUtils.get(setlinfo,"inscp_scp_amt"));
-            insureIndividualSettleDTO.setPreselfpayAmt(MapUtils.get(setlinfo,"preselfpay_amt"));
-            insureIndividualSettleDTO.setPoolPropSelfpay(MapUtils.get(setlinfo,"pool_prop_selfpay"));
-            insureIndividualSettleDTO.setPlanPrice(MapUtils.get(setlinfo,"hifp_pay"));
+            insureIndividualSettleDTO.setAllPortionPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"fulamt_ownpay_amt").toString()));
+            insureIndividualSettleDTO.setOverSelfPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"overlmt_selfpay").toString()));
+            insureIndividualSettleDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"inscp_scp_amt").toString()));
+            insureIndividualSettleDTO.setPreselfpayAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"preselfpay_amt").toString()));
+            insureIndividualSettleDTO.setPoolPropSelfpay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"pool_prop_selfpay").toString()));
+            insureIndividualSettleDTO.setPlanPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifp_pay").toString()));
             BigDecimal hifmi_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifmi_pay").toString());
             BigDecimal hifob_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifob_pay").toString());
             insureIndividualSettleDTO.setSeriousPrice(BigDecimalUtils.add(hifmi_pay,hifob_pay));
-            insureIndividualSettleDTO.setMafPay(MapUtils.get(setlinfo,"maf_pay"));
+            insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"maf_pay").toString()));
             List <Map<String,Object>> setldetailList = MapUtils.get(outptMap,"setldetail");
             if (!ListUtils.isEmpty(setldetailList)) {
                 BigDecimal othPay = BigDecimal.ZERO;

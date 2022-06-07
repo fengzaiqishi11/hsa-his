@@ -586,8 +586,8 @@
                b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,
                ifnull(a.tcm_syndromes_id,'') as tcmSyndromesId,ifnull(a.tcm_syndromes_name,'') as tcmSyndromesName,
                ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName,
-               (case when b.item_code = '1' then f.nation_code when b.item_code = '2' then g.nation_code else '' end) as nation_code,
-               (case when b.item_code = '1' then ifnull(f.nation_name,f.usual_name) when b.item_code = '2' then ifnull(g.nation_name,g.name) else '' end) as nation_name
+               (case when b.item_code = '1' then f.nation_code when b.item_code = '2' then g.nation_code when b.item_code = '4' then h.union_nation_code else '' end) as nation_code,
+               (case when b.item_code = '1' then f.nation_name when b.item_code = '2' then g.nation_name when b.item_code = '4' then h.union_nation_name else '' end) as nation_name
         from outpt_prescribe a
                  join outpt_prescribe_detail b on a.hosp_code = b.hosp_code and a.visit_id = b.visit_id and a.id = b.op_id
                  left join(
@@ -878,7 +878,7 @@
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
-        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, ifnull(a.nation_name,a.good_name)  nation_name, a.reimbursement_ratio
+        a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.nation_name  nation_name, a.reimbursement_ratio
         from base_drug a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zcf,max(if(b.type_code = '3',c.id,'0')) cyf,
@@ -936,7 +936,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
-        a.pym usual_pym ,'' as technology_code,a.nation_code, ifnull(a.nation_name,a.name) nation_name, a.reimbursement_ratio
+        a.pym usual_pym ,'' as technology_code,a.nation_code, a.nation_name nation_name, a.reimbursement_ratio
         from base_material a
         left join(
         select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
@@ -978,7 +978,7 @@
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
         '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
-        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.name as nation_name, a.reimbursement_ratio as reimbursement_ratio
+        usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.union_nation_name as nation_name, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
         left join base_dept c on a.in_dept_code = c.code and a.hosp_code = c.hosp_code

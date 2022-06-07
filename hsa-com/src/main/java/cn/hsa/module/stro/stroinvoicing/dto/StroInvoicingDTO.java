@@ -96,4 +96,5 @@ public class StroInvoicingDTO extends StroInvoicingDO implements Serializable {
 
     //医保编码
     private String nationCode;
+    private String nationName; // 医保名称
 }

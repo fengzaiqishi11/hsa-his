@@ -96,4 +96,6 @@ public class PharOutReceiveDetailDTO extends PharOutReceiveDetailDO implements S
     private String doctorName;
     // 医保编码
     private String nationCode;
+    // 国家编码
+    private String nationName;
 }

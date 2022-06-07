@@ -691,6 +691,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
               baseAdviceDTO.setCrteId(userId); //创建人id
               baseAdviceDTO.setCrteTime(DateUtils.getNow()); //创建时间
               baseAdviceDTO.setUnionNationCode(item.getNationCode());//医嘱联合国家编码
+              baseAdviceDTO.setUnionNationName(item.getNationName());//医嘱联合国家编码名称
               baseAdviceDTOList.add(baseAdviceDTO);//加入新增列表
 
 

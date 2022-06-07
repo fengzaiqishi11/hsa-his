@@ -39,6 +39,10 @@ public class BaseItemDO extends PageDO implements Serializable  {
      */
     private String nationCode;
     /**
+     * 国家编码
+     */
+    private String nationName;
+    /**
      * 项目分类代码（XMFL）
      */
     private String typeCode;

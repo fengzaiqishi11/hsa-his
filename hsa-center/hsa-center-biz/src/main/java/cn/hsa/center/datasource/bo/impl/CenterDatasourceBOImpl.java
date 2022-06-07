@@ -403,11 +403,19 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
                 "c.admin_name as 'contactName'," +
                 "c.admin_phone as 'phone'," +
                 "c.`code` as 'hospCode'," +
+                "(select count(*) from insure_individual_settle a where a.settle_state='1' and a.state ='0') as totalInsureNum,"+
+                "(select count(*) from (select a.id from inpt_visit a "+
+                "JOIN inpt_settle b on a.id = b.visit_id and a.hosp_code =b.hosp_code "+
+                "where b.is_settle='1' and a.patient_code='0' and b.status_code ='0' "+
+                "union all "+
+                "select a.id from outpt_visit a "+
+                "JOIN outpt_settle b on a.id = b.visit_id and a.hosp_code =b.hosp_code "+
+                "where b.is_settle='1' and a.patient_code='0' and b.status_code ='0')aa)  as totalInptNum,"+
                 "ifnull(sum(ff.insureCount),0) as 'insureCount'," +
                 "ifnull(sum(ff.inptCount),0) as 'inptCount'," +
                 "c.start_date as 'startDate'," +
                 "c.end_date as 'endDate'" +
-                " from his_v2_center.center_hospital c left JOIN (" +
+                " from dhis_center.center_hospital c left JOIN (" +
                 "select a.hosp_code as hospCode,COUNT(a.id) insureCount,0 as inptCount,MIN(a.crte_time) as startTime,MAX(a.crte_time) as endTime\n" +
                 "from insure_individual_settle a\n" +
                 "where a.settle_state='1' and a.state ='0' and a.crte_time >='" +startDate+"'"+ " and a.crte_time <='" +endDate+"' "+

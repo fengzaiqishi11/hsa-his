@@ -148,6 +148,10 @@
             then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '2'
             then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode,
+        case a.item_code when '1'
+        then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationName,
         a.in_no
         from (
         select a.id,a.receive_id,a.item_name,a.spec,
@@ -246,7 +250,11 @@
         case a.item_code when '1'
         then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '2'
-        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode
+        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode,
+        case a.item_code when '1'
+        then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationName
             from phar_in_receive_detail a
             join phar_in_receive b on a.receive_id=b.id
             where 1=1

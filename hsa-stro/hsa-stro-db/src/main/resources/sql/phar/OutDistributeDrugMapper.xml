@@ -219,6 +219,10 @@
         then  e.nation_code
         when '2'
         then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationCode,
+        case a.item_code when '1'
+        then  e.nation_name
+        when '2'
+        then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)  end nationName,
         br.name as rateName,
         br.daily_times as dailyTimes,
         br.remark as rateRemark,

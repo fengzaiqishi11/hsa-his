@@ -7,13 +7,13 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
-import cn.hsa.module.drgdip.dao.DrgDipResultDAO;
-import cn.hsa.module.drgdip.dao.DrgDipResultDetailDAO;
-import cn.hsa.module.drgdip.dto.DrgDipComboDTO;
-import cn.hsa.module.drgdip.dto.DrgDipResultDTO;
-import cn.hsa.module.drgdip.dto.DrgDipResultDetailDTO;
-import cn.hsa.module.drgdip.entity.DrgDipResultDO;
-import cn.hsa.module.drgdip.entity.DrgDipResultDetailDO;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -417,14 +417,16 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
-        DrgDipResultDO drgDipResultDO = drgDipResultDAO.selectListByVisitIdDesc(map.get("visitId").toString());
+      DrgDipResultDTO dto = new DrgDipResultDTO();
+      dto.setVisitId(map.get("visitId").toString());
+      dto.setHospCode(map.get("hospCode").toString());
+        DrgDipResultDO drgDipResultDO = drgDipResultDAO.queryListByVisitIdDesc(dto);
         //未质控过
         if (ObjectUtil.isEmpty(drgDipResultDO)){
           resultMap.put("drgInfo",null);
         }else{
           List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
           //出参转换
-          DrgDipResultDTO dto = new DrgDipResultDTO();
           BeanUtil.copyProperties(drgDipResultDO,dto);
           List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
           DrgDipComboDTO combo = new DrgDipComboDTO();

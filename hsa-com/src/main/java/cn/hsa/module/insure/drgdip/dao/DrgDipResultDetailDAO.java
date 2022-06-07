@@ -1,6 +1,6 @@
-package cn.hsa.module.drgdip.dao;
+package cn.hsa.module.insure.drgdip.dao;
 
-import cn.hsa.module.drgdip.entity.DrgDipResultDetailDO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -54,7 +54,7 @@ public interface DrgDipResultDetailDAO  {
       * @param id
       * @Author 医保开发二部-湛康
       * @Date 2022-06-07 9:52
-      * @return java.util.List<cn.hsa.module.drgdip.entity.DrgDipResultDetailDO>
+      * @return java.util.List<cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO>
       */
      List<DrgDipResultDetailDO> selectListByVisitId(String id);
 }

@@ -1,4 +1,4 @@
-package cn.hsa.module.drgdip.entity;
+package cn.hsa.module.insure.drgdip.entity;
 
 import java.math.BigDecimal;
 import java.io.Serializable;

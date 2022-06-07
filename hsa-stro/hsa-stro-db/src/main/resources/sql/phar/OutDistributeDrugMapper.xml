@@ -173,12 +173,14 @@
         d.herb_num as chineseDrugNum,
         br.remark as rateRemark,
         case when e.big_type_code='2' then d.herb_num else opd.use_days end useDays,
-        e.nation_code as nationCode
+        case a.item_code when '1' then e.nation_code when '2' then bm.nation_code else '' end nationCode,
+        case a.item_code when '1' then e.nation_name when '2' then bm.nation_name else '' end nationName
         from phar_out_receive_detail a
         join phar_out_receive b on a.or_id=b.id
         left join base_window c on b.window_id=c.id and c.hosp_code=#{hospCode}
         left join outpt_prescribe d on a.op_id=d.id and d.hosp_code=#{hospCode}
         left join base_drug e on a.hosp_code=e.hosp_code and a.item_code='1' and a.item_id=e.id
+        left join base_material bm on a.hosp_code=bm.hosp_code and a.item_code='2' and a.item_id=bm.id
         left join outpt_prescribe_detail opd on a.opd_id = opd.id and a.hosp_code = opd.hosp_code
         left join base_rate br on opd.rate_id = br.id and a.hosp_code = br.hosp_code
         where 1=1 and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode}

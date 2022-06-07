@@ -18,6 +18,7 @@ import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
@@ -95,6 +96,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
 
 
     /**
@@ -417,23 +421,15 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
+      //新增质控信息
       DrgDipResultDTO dto = new DrgDipResultDTO();
       dto.setVisitId(map.get("visitId").toString());
       dto.setHospCode(map.get("hospCode").toString());
-        DrgDipResultDO drgDipResultDO = drgDipResultDAO.queryListByVisitIdDesc(dto);
-        //未质控过
-        if (ObjectUtil.isEmpty(drgDipResultDO)){
-          resultMap.put("drgInfo",null);
-        }else{
-          List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
-          //出参转换
-          BeanUtil.copyProperties(drgDipResultDO,dto);
-          List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
-          DrgDipComboDTO combo = new DrgDipComboDTO();
-          combo.setResult(dto);
-          combo.setDetails(dtoList);
-          resultMap.put("drgInfo",combo);
-        }
+      HashMap map1 = new HashMap();
+      map1.put("drgDipResultDTO",dto);
+      map1.put("hospCode",map.get("hospCode").toString());
+      DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+      resultMap.put("drgInfo",combo);
         return resultMap;
     }
 

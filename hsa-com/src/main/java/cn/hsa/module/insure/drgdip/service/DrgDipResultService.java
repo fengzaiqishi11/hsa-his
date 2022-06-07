@@ -5,6 +5,8 @@ import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import java.util.HashMap;
+
 /**
  * @Package_name: cn.hsa.module.insure.advice.service
  * @Class_name: AdviceService
@@ -25,5 +27,5 @@ public interface DrgDipResultService {
    * @Date 2022-06-07 15:48
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
    */
-  WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(DrgDipResultDTO dtoo);
+  WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(HashMap map);
 }

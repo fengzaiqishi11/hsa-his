@@ -1648,62 +1648,69 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException((String) resultMap.get("err_msg"));
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
-        List<Map<String, Object>> dataResultMap = (List<Map<String, Object>>) outptMap.get("data");
-        if (ListUtils.isEmpty(dataResultMap)) {
-            throw new AppException("调用" + itemType + "功能号下载接口反参为空");
-        }
-        int recordCounts = MapUtils.get(outptMap, "recordCounts");
-        map.put("size", size);
-        map.put("num", num);
-        map.put("recordCounts", recordCounts);
-        if (!ListUtils.isEmpty(dataResultMap)) {
-            logger.info("统一支付平台下载回参" + itemType + ":" + new JSONObject(dataResultMap.get(0)));
-        }
-        switch (itemType) {
-            case "1301":
-                insert_1301(dataResultMap, map);
-                break;
-            case "1302":
-                insert_1302(dataResultMap, map);
-                break;
-            case "1303":
-                insert_1303(dataResultMap, map);
-                break;
-            case "1304":
-                insert_1304(dataResultMap, map);
-                break;
+        Object obj = outptMap.get("data");
+        List<Map<String, Object>> dataResultMap;
+        // 医保可能返回了string字符串这里需要做一下判断才能继续往下走
+        if(obj instanceof String){
+            logger.info("统一支付平台下载回参" + itemType + ":" + obj);
+        }else if(obj instanceof List){
+            dataResultMap = (List<Map<String, Object>>) obj;
+            if (ListUtils.isEmpty(dataResultMap)) {
+                throw new AppException("调用" + itemType + "功能号下载接口反参为空");
+            }
+            int recordCounts = MapUtils.get(outptMap, "recordCounts");
+            map.put("size", size);
+            map.put("num", num);
+            map.put("recordCounts", recordCounts);
+            if (!ListUtils.isEmpty(dataResultMap)) {
+                logger.info("统一支付平台下载回参" + itemType + ":" + new JSONObject(dataResultMap.get(0)));
+            }
+            switch (itemType) {
+                case "1301":
+                    insert_1301(dataResultMap, map);
+                    break;
+                case "1302":
+                    insert_1302(dataResultMap, map);
+                    break;
+                case "1303":
+                    insert_1303(dataResultMap, map);
+                    break;
+                case "1304":
+                    insert_1304(dataResultMap, map);
+                    break;
 
-            case "1305":
-                insert_1305(dataResultMap, map);
-                break;
-            case "1306":
-                insert_1306(dataResultMap, map);
-                break;
-            case "1307":
-                insert_1307(dataResultMap, map);
-                break;
-            case "1308":
-                insert_1308(dataResultMap, map);
-                break;
+                case "1305":
+                    insert_1305(dataResultMap, map);
+                    break;
+                case "1306":
+                    insert_1306(dataResultMap, map);
+                    break;
+                case "1307":
+                    insert_1307(dataResultMap, map);
+                    break;
+                case "1308":
+                    insert_1308(dataResultMap, map);
+                    break;
 
-            case "1309":
-                insert_1309(dataResultMap, map);
-                break;
-            case "1310":
-                insert_1310(dataResultMap, map);
-                break;
-            case "1311":
-                insert_1311(dataResultMap, map);
-                break;
-            case "1312":
-                insert_1312(dataResultMap, map);
-                break;
-            case "1313":
-                insert_1313(dataResultMap, map);
-                break;
-            case "1314":
-                insert_1314(dataResultMap, map);
-                break;
+                case "1309":
+                    insert_1309(dataResultMap, map);
+                    break;
+                case "1310":
+                    insert_1310(dataResultMap, map);
+                    break;
+                case "1311":
+                    insert_1311(dataResultMap, map);
+                    break;
+                case "1312":
+                    insert_1312(dataResultMap, map);
+                    break;
+                case "1313":
+                    insert_1313(dataResultMap, map);
+                    break;
+                case "1314":
+                    insert_1314(dataResultMap, map);
+                    break;
+            }
         }
         return resultMap;
     }

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.drgdip.dao.DrgDipResultDetailDAO">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" id="drgDipResultDetailMap">
+        <result property="id" column="id"/>
+        <result property="resultId" column="result_id"/>
+        <result property="ruleLevel" column="rule_level"/>
+        <result property="ruleScore" column="rule_score"/>
+        <result property="fieldId" column="field_id"/>
+        <result property="checkFiled" column="check_filed"/>
+        <result property="resultMsg" column="result_msg"/>
+        <result property="originalValue" column="original_value"/>
+        <result property="validFlag" column="valid_flag"/>
+        <result property="crtId" column="crt_id"/>
+        <result property="crtName" column="crt_name"/>
+        <result property="crtTime" column="crt_time"/>
+    </resultMap>
+
+    <insert id="insertDrgDipResultDetail" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" >
+        insert into drg_dip_result_detail (
+            if(#{id} != null and #{id} != ''){
+                id <!--id--> ,
+            }
+            if(#{resultId} != null and #{resultId} != ''){
+                result_id <!--质控结果主表id--> ,
+            }
+            if(#{ruleLevel} != null and #{ruleLevel} != ''){
+                rule_level <!--规则等级--> ,
+            }
+            if(#{ruleScore} != null and #{ruleScore} != ''){
+                rule_score <!--规则分数--> ,
+            }
+            if(#{fieldId} != null and #{fieldId} != ''){
+                field_id <!--错误字段字段名--> ,
+            }
+            if(#{checkFiled} != null and #{checkFiled} != ''){
+                check_filed <!--错误字段字段中文名--> ,
+            }
+            if(#{resultMsg} != null and #{resultMsg} != ''){
+                result_msg <!--质控结果信息--> ,
+            }
+            if(#{originalValue} != null and #{originalValue} != ''){
+                original_value <!--字段原始值--> ,
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                valid_flag <!--有效标志--> ,
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                crt_id <!--创建人编号--> ,
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                crt_name <!--创建人姓名--> ,
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                crt_time <!--创建时间--> 
+            }
+    )
+        values (
+            if(#{id} != null and #{id} != ''){
+                #{id},
+            }
+            if(#{resultId} != null and #{resultId} != ''){
+                #{resultId},
+            }
+            if(#{ruleLevel} != null and #{ruleLevel} != ''){
+                #{ruleLevel},
+            }
+            if(#{ruleScore} != null and #{ruleScore} != ''){
+                #{ruleScore},
+            }
+            if(#{fieldId} != null and #{fieldId} != ''){
+                #{fieldId},
+            }
+            if(#{checkFiled} != null and #{checkFiled} != ''){
+                #{checkFiled},
+            }
+            if(#{resultMsg} != null and #{resultMsg} != ''){
+                #{resultMsg},
+            }
+            if(#{originalValue} != null and #{originalValue} != ''){
+                #{originalValue},
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                #{validFlag},
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                #{crtId},
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                #{crtName},
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                #{crtTime}
+            }
+        )
+    </insert>
+
+    <select id="selectById" resultMap="drgDipResultDetailMap" >
+        select
+        id <!--id-->,        result_id <!--质控结果主表id-->,        rule_level <!--规则等级-->,        rule_score <!--规则分数-->,        field_id <!--错误字段字段名-->,        check_filed <!--错误字段字段中文名-->,        result_msg <!--质控结果信息-->,        original_value <!--字段原始值-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人编号-->,        crt_name <!--创建人姓名-->,        crt_time <!--创建时间-->
+        from drg_dip_result_detail where
+            id = #{id}
+                                                    </select>
+
+    <update id="updateById" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" >
+        update drg_dip_result_detail set
+            if(#{id} != null and #{id} != ''){
+                id = #{id} <!--id-->,
+            }
+            if(#{resultId} != null and #{resultId} != ''){
+                result_id = #{resultId} <!--质控结果主表id-->,
+            }
+            if(#{ruleLevel} != null and #{ruleLevel} != ''){
+                rule_level = #{ruleLevel} <!--规则等级-->,
+            }
+            if(#{ruleScore} != null and #{ruleScore} != ''){
+                rule_score = #{ruleScore} <!--规则分数-->,
+            }
+            if(#{fieldId} != null and #{fieldId} != ''){
+                field_id = #{fieldId} <!--错误字段字段名-->,
+            }
+            if(#{checkFiled} != null and #{checkFiled} != ''){
+                check_filed = #{checkFiled} <!--错误字段字段中文名-->,
+            }
+            if(#{resultMsg} != null and #{resultMsg} != ''){
+                result_msg = #{resultMsg} <!--质控结果信息-->,
+            }
+            if(#{originalValue} != null and #{originalValue} != ''){
+                original_value = #{originalValue} <!--字段原始值-->,
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                valid_flag = #{validFlag} <!--有效标志-->,
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                crt_id = #{crtId} <!--创建人编号-->,
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                crt_name = #{crtName} <!--创建人姓名-->,
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                crt_time = #{crtTime} <!--创建时间-->
+            }
+        where
+            id = #{id}
+                                                    </update>
+
+    <delete id="deleteById"  >
+        delete drg_dip_result_detail where
+                id = #{id}
+                                                    </delete>
+</mapper>

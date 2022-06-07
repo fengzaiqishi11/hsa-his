@@ -37,18 +37,36 @@
             </exclusions>
         </dependency>
 
-        <!--ID唯一生成-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.core</groupId>-->
-        <!--            <artifactId>hsaf-idgenerator</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- 认证安全组件 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.auth.security</groupId>-->
-<!--            <artifactId>hsaf-auth-security</artifactId>-->
-<!--        </dependency>-->
-
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.albfernandez</groupId>
+                    <artifactId>javadbf</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.pdfbox</groupId>
+                    <artifactId>pdfbox</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-examples</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!--MVC框架-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -111,51 +129,9 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--定时任务-->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
-        <!--工作流依赖-->
-        <dependency>
-            <!--
-            <groupId>cn.hsa.hsaf.workflow</groupId>
-            <artifactId>workflow-sdk</artifactId>
-            -->
-            <groupId>cn.hsa.cep.wfc</groupId>
-            <artifactId>hsa-cep-wfc-sdk</artifactId>
-        </dependency>
-        <!--工作流结束-->
-
-        <!--工具类-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>

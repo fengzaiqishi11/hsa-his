@@ -19,6 +19,13 @@
         <result property="crtTime" column="crt_time"/>
     </resultMap>
 
+    <select id="selectListByVisitId" resultMap="drgDipResultDetailMap" >
+        select
+        id <!--id-->,        result_id <!--质控结果主表id-->,        rule_level <!--规则等级-->,        rule_score <!--规则分数-->,        field_id <!--错误字段字段名-->,        check_filed <!--错误字段字段中文名-->,        result_msg <!--质控结果信息-->,        original_value <!--字段原始值-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人编号-->,        crt_name <!--创建人姓名-->,        crt_time <!--创建时间-->
+        from drg_dip_result_detail where
+        result_id = #{id} and valid_flag = 1
+    </select>
+
     <insert id="insertDrgDipResultDetail" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" >
         insert into drg_dip_result_detail (
             if(#{id} != null and #{id} != ''){

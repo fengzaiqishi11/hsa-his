@@ -7,6 +7,13 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
+import cn.hsa.module.drgdip.dao.DrgDipResultDAO;
+import cn.hsa.module.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.drgdip.dto.DrgDipComboDTO;
+import cn.hsa.module.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.drgdip.entity.DrgDipResultDO;
+import cn.hsa.module.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -32,6 +39,8 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -80,6 +89,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private TcmMrisHomeDAO tcmMrisHomeDAO;
+
+    @Resource
+    private DrgDipResultDAO drgDipResultDAO;
+
+    @Resource
+    private DrgDipResultDetailDAO drgDipResultDetailDAO;
 
 
     /**
@@ -401,6 +416,22 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisControl",mrisHomeDAO.getMrisControl(inptVisitDTO));
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
+        //新增质控信息
+        DrgDipResultDO drgDipResultDO = drgDipResultDAO.selectListByVisitIdDesc(map.get("visitId").toString());
+        //未质控过
+        if (ObjectUtil.isEmpty(drgDipResultDO)){
+          resultMap.put("drgInfo",null);
+        }else{
+          List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
+          //出参转换
+          DrgDipResultDTO dto = new DrgDipResultDTO();
+          BeanUtil.copyProperties(drgDipResultDO,dto);
+          List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
+          DrgDipComboDTO combo = new DrgDipComboDTO();
+          combo.setResult(dto);
+          combo.setDetails(dtoList);
+          resultMap.put("drgInfo",combo);
+        }
         return resultMap;
     }
 

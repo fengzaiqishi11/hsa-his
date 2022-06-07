@@ -52,6 +52,13 @@
         <result property="crtTime" column="crt_time"/>
     </resultMap>
 
+    <select id="selectListByVisitIdDesc" resultMap="drgDipResultMap">
+        select
+        id <!--主键-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        psn_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        gend <!--性别-->,        age <!--年龄-->,        insutype <!--险种-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        in_time <!--入院时间-->,        out_time <!--出院时间-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        dept_id <!--科室id-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        insure_settle_id <!--医保结算id-->,        drg_dip_code <!--drg\dip组编码-->,        drg_dip_name <!--drg\dip组名称-->,        icd10 <!--主要诊断-->,        icd9 <!--主要手术-->,        weight <!--权重-->,        total_fee <!--总费用-->,        stand_fee <!--标杆费用-->,        override <!--倍率-->,        cdntn_pay <!--统筹金额-->,        diff_fee <!--预计偏差-->,        yp_fee <!--药品费-->,        cl_fee <!--耗材费-->,        states <!--质控完成状态-->,        type <!--质控类型-->,        business_type <!--业务类型-->,        business_id <!--业务id-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
+        from drg_dip_result where
+        visit_id = #{visitId} and valid_flag = 1 order by crt_time desc limit 1
+    </select>
+
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDO" >
         insert into drg_dip_result (
             if(#{id} != null and #{id} != ''){

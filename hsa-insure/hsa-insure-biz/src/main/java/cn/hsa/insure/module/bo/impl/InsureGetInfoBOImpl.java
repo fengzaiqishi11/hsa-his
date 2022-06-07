@@ -649,6 +649,199 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String,Object>> list =  insureGetInfoDAO.querySetlePage(map);
         return PageDTO.of(list);
     }
+    /**
+     * @Author gory
+     * @Description 结算清单DRG
+     * @Date 2022/6/6 16:02
+     * @Param [map]
+     **/
+    @Override
+    public Map<String, Object> uploadInsureSettleInfoForDRG(Map<String, Object> map) {
+        //todo 此处需要校验授权码
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        dataMap.put("baseInfo", JSONObject.toJSONString(getInsureSettleBaseInfo(map)));// 基础信息
+        dataMap.put("diseInfo", getInsureSettleDiseInfo(map));// 诊断信息
+        dataMap.put("oprtInfo", getInsureSettleOprtInfo(map));// 手术信息
+        Map<String, Object> paramMap = new HashMap<>();
+        /**=============获取系统参数中配置的结算清单质控drg地址 Begin=========**/
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "JSQD_DRG");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String url = "";
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
+            url = sysParameterDTO.getValue();
+        } else {
+            throw new AppException("请在系统参数中配置结算清单上传drg时，drg地址  例：JSQD_DRG: url");
+        }
+        /**===================获取系统参数中配置的结算清单质控drg地址 End==============**/
+
+        paramMap.put("url", url);
+        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        String result = HttpConnectUtil.doPost(paramMap);
+        //todo 此处根据返回的参数状态进行判断，成功就写入日志表，为防止事务不一致的情况，请不要调用远程服务的insert
+
+        /**===========封装返回参数 begin===============**/
+        Map resultMap = new HashMap<>();
+
+        /**===========封装返回参数 end===============**/
+        return resultMap;
+    }
+    /**
+     * @Author gory
+     * @Description 手术信息
+     * @Date 2022/6/6 16:12
+     * @Param [map]
+     **/
+    private List<Map<String,Object>> getInsureSettleOprtInfo(Map<String, Object> map) {
+        List<Map<String,Object>> resultList = insureGetInfoDAO.selectMriOperInfoForDRGorDIP(map);
+        return resultList;
+    }
+    /**
+     * @Author gory
+     * @Description 诊断信息
+     * @Date 2022/6/6 16:11
+     * @Param [map]
+     **/
+    private List<Map<String, Object>> getInsureSettleDiseInfo(Map<String, Object> map) {
+        return insureGetInfoDAO.selectMriInptDiagNoseForDRGorDIP(map);
+    }
+
+    /**
+     * @Author gory
+     * @Description 基础信息
+     * @Date 2022/6/6 16:10
+     * @Param [map]
+     **/
+    private Map<String, Object> getInsureSettleBaseInfo(Map<String, Object> map) {
+        Map setlinfo = selectLoadingSetlMsg(map);
+        Map resultMap = new HashMap<>();
+        resultMap.put("visit_id",setlinfo.get("visitId"));// 就诊id
+        resultMap.put("psn_no",setlinfo.get("psnNo"));// 人员编号
+        resultMap.put("set1_id",setlinfo.get("setlId"));// 结算id
+        resultMap.put("fixmedins_name",setlinfo.get("fixmedinsName"));// 定点医药机构名称
+        resultMap.put("fixmedins_code",setlinfo.get("fixmedinsCode"));// 定点医药机构编号
+        resultMap.put("hi_setl_lv",setlinfo.get("hiSetlLv"));// 医保结算等级
+        resultMap.put("hi_no",setlinfo.get("hiNo"));// 医保编号
+        resultMap.put("medcasno",setlinfo.get("medcasno"));// 病案号
+        resultMap.put("dcla_time",setlinfo.get("dclaTime"));// 申报时间
+        resultMap.put("psn_name",setlinfo.get("psnName"));// 人员姓名
+        resultMap.put("gend",setlinfo.get("gend"));// 性别代码
+        resultMap.put("brdy",setlinfo.get("brdy"));// 出生日期
+        resultMap.put("age",setlinfo.get("age"));// 年龄
+        resultMap.put("ntly",setlinfo.get("ntly"));// 国籍代码
+        resultMap.put("nwb_age",setlinfo.get("nwbAge"));// 年龄（不足一周岁）
+        resultMap.put("naty",setlinfo.get("naty"));// 民族代码
+        resultMap.put("patn_cert_type",setlinfo.get("patnCertType"));// 患者证件类别代码
+        resultMap.put("certno",setlinfo.get("certno"));// 证件号码
+        resultMap.put("prfs",setlinfo.get("prfs"));// 职业代码
+        resultMap.put("curr_addr",setlinfo.get("currAddr"));// 现住址
+        resultMap.put("emp_name",setlinfo.get("empName"));// 单位名称
+        resultMap.put("emp_addr",setlinfo.get("empAddr"));// 单位地址
+        resultMap.put("emp_tel",setlinfo.get("empTel"));// 单位电话
+        resultMap.put("poscode",setlinfo.get("poscode"));// 邮编
+        resultMap.put("coner_name",setlinfo.get("conerName"));// 联系人姓名
+        resultMap.put("patn_rlts",setlinfo.get("patnRlts"));// 与患者关系代码
+        resultMap.put("coner_addr",setlinfo.get("conerAddr"));// 联系人地址
+        resultMap.put("coner_tel",setlinfo.get("conerTel"));// 联系人电话
+        resultMap.put("hi_type",setlinfo.get("hiType"));// 医保类型代码
+        resultMap.put("insuplc",setlinfo.get("insuplc"));// 参保地
+        resultMap.put("sp_psn_type",setlinfo.get("spPsnType"));// 特殊人员类型代码
+        resultMap.put("nwb_adm_type",setlinfo.get("nwbAdmType"));// 新生儿入院类型代码
+        resultMap.put("nwb_bir_wt",setlinfo.get("nwbBirWt"));// 新生儿出生体重
+        resultMap.put("nwb_adm_wt",setlinfo.get("nwbAdmWt"));// 新生儿入院体重
+        resultMap.put("mul_nwb_bir_wt",setlinfo.get("nwbBirWt"));// todo 多新生儿出生体重
+        resultMap.put("mul_nwb_adm_wt",setlinfo.get("nwbAdmWt"));// todo 多新生儿入院体重
+        resultMap.put("opsp_diag_caty_name",setlinfo.get("opspDiagCatyName"));// todo 门诊慢特病诊断科别名称
+        resultMap.put("opsp_diag_caty",setlinfo.get("opspDiagCaty"));// 门诊慢特病诊断科别代码
+        resultMap.put("opsp_mdtrt_date",setlinfo.get("opspMdtrtDate"));// 门诊慢特病就诊日期
+        resultMap.put("ipt_med_type",setlinfo.get("iptMedTpe"));//住院医疗类型代码
+        resultMap.put("adm_way",setlinfo.get("admWay"));// 入院途径代码
+        resultMap.put("trt_type",setlinfo.get("trtType"));// 治疗类别代码
+        resultMap.put("adm_time",setlinfo.get("admTime"));// 入院时间
+        resultMap.put("adm_caty",setlinfo.get("admCaty"));// 入院科别代码
+        resultMap.put("refldept_dept",setlinfo.get("refldeptDept"));// 转科科别代码
+        resultMap.put("dscg_time",setlinfo.get("dscgTime"));// 出院时间
+        resultMap.put("dscg_caty",setlinfo.get("dscgCaty"));// 出院科别代码
+        resultMap.put("act_ipt_days",setlinfo.get("actIptDays"));// 实际住院天数
+        resultMap.put("otp_wm_dise",setlinfo.get("otpWmDise"));// 门诊西医诊断名称
+        resultMap.put("wm_dise_code",setlinfo.get("wmDiseCode"));// 门诊西医诊断疾病代码
+        resultMap.put("otp_tcm_dise",setlinfo.get("otpTcmDise"));// 门诊中医诊断名称
+        resultMap.put("tcm_dise_code",setlinfo.get("tcmDiseCode"));// 门诊中医诊断代码
+        resultMap.put("vent_used_days",setlinfo.get("ventUsedDays"));// todo 呼吸机使用时长（天）
+        resultMap.put("vent_used_hours",setlinfo.get("ventUsedHours"));// todo 呼吸机使用时长（小时）
+        resultMap.put("vent_used_mins",setlinfo.get("ventUsedMins"));// todo 呼吸机使用时长（分钟）
+        resultMap.put("pwcry_bfadm_coma_days",setlinfo.get("pwcry_bfadm_coma_days"));// todo 颅脑损伤患者入院前昏迷时长（天）
+        resultMap.put("pwcry_bfadm_coma_hours",setlinfo.get("pwcry_bfadm_coma_hours"));// todo 颅脑损伤患者入院前昏迷时长（小时）
+        resultMap.put("pwcry_bfadm_coma_mins",setlinfo.get("pwcry_bfadm_coma_mins"));// todo 颅脑损伤患者入院前昏迷时长（分钟）
+        resultMap.put("pwcry_afadm_coma_days",setlinfo.get("pwcry_afadm_coma_days"));// todo 颅脑损伤患者入院后昏迷时长(天）
+        resultMap.put("pwcry_afadm_coma_hours",setlinfo.get("pwcry_afadm_coma_hours"));// todo 颅脑损伤患者入院后昏迷时长（小时）
+        resultMap.put("pwcry_afadm_coma_mins",setlinfo.get("pwcry_afadm_coma_mins"));// todo 颅脑损伤患者入院后昏迷时长（分钟）
+        resultMap.put("bld_cat",setlinfo.get("bldCat"));// 输血品种代码
+        resultMap.put("bld_amt",setlinfo.get("bldAmt"));// 输血量
+        resultMap.put("bld_unt",setlinfo.get("bldUnt"));// 输血计量单位
+        resultMap.put("spga_nurscare_days",setlinfo.get("spgaNurscareDays"));// 特级护理天数
+        resultMap.put("lv1_nurscare_days",setlinfo.get("lv1NurscareDays"));// 一级护理天数
+        resultMap.put("scd_nurscare_days",setlinfo.get("scdNurscareDays"));// 二级护理天数
+        resultMap.put("lv3_nurscare_days",setlinfo.get("lv3NurscareDays"));// 三级护理天数
+        resultMap.put("dscg_way",setlinfo.get("dscgWay"));// 离院方式代码
+        resultMap.put("acp_medins_name",setlinfo.get("acpMedinsName"));// 拟接收机构名称
+        resultMap.put("acp_optins_code",setlinfo.get("acpMedinsCode"));// 拟接收结构代码
+        resultMap.put("bill_code",setlinfo.get("billCode"));// 票据代码
+        resultMap.put("bill_no",setlinfo.get("billNo"));// 票据号码
+        resultMap.put("days_rinp_flag_31",setlinfo.get("daysRinpFlag31"));// 出院31天内再住院计划标志代码
+        resultMap.put("days_rinp_pup_31",setlinfo.get("daysRinpPup31"));// 出院31天内再住院目的
+        resultMap.put("chfpdr_name",setlinfo.get("chfpdrName"));// 主诊医师姓名
+        resultMap.put("chfpdr_code",setlinfo.get("chfpdrCode"));// 主诊医师代码
+        resultMap.put("resp_nurs",setlinfo.get("zrNurseName"));// 责任护士名称
+        resultMap.put("resp_nurs_code",setlinfo.get("zrNurseCode"));// 责任护士代码
+        resultMap.put("setl_begn_date",setlinfo.get("setlBegnDate"));// 结算开始日期
+        resultMap.put("setl_end_date",setlinfo.get("setlEndDate"));// 结算结束日期
+        resultMap.put("total_fee",setlinfo.get("totalFee"));// todo 总费用
+        resultMap.put("hi_paymtd",setlinfo.get("hiPaymtd"));//医保支付方式代码
+        return resultMap;
+    }
+
+    /**
+     * @Author gory
+     * @Description 结算清单DIP
+     * @Date 2022/6/6 16:02
+     * @Param [map]
+     **/
+    @Override
+    public Map<String, Object> uploadInsureSettleInfoForDIP(Map<String, Object> map) {
+        //todo 此处需要校验授权码
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        dataMap.put("baseInfo", JSONObject.toJSONString(getInsureSettleBaseInfo(map)));// 基础信息
+        dataMap.put("diseInfo", getInsureSettleDiseInfo(map));// 诊断信息
+        dataMap.put("oprtInfo", getInsureSettleOprtInfo(map));// 手术信息
+        Map<String, Object> paramMap = new HashMap<>();
+        /**=============获取系统参数中配置的结算清单质控drg地址 Begin=========**/
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "JSQD_DIP");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String url = "";
+        if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
+            url = sysParameterDTO.getValue();
+        } else {
+            throw new AppException("请在系统参数中配置结算清单上传dip时，dip地址  例：JSQD_DIP: url");
+        }
+        /**===================获取系统参数中配置的结算清单质控drg地址 End==============**/
+
+        paramMap.put("url", url);
+        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        String result = HttpConnectUtil.doPost(paramMap);
+        //todo 此处根据返回的参数状态进行判断，成功就写入日志表，为防止事务不一致的情况，请不要调用远程服务的insert
+
+        /**===========封装返回参数 begin===============**/
+        Map resultMap = new HashMap<>();
+
+        /**===========封装返回参数 end===============**/
+        return resultMap;
+    }
 
     /**
      * @Method handerSetleDiseaInfo

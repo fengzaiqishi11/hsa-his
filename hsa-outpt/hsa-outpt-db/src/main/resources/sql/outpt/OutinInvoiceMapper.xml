@@ -857,7 +857,23 @@
             v.age_unit_code as ageUnitCode,
             s.reality_price as settleRealityPrice,
             s.self_price as selfPrice,
-            s.mi_price as miPrice
+            s.mi_price as miPrice,
+            case a.item_code when '1'
+                                 then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '2'
+                                 then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '3'
+                                 then (select f.nation_code from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '4'
+                                 then (select f.union_nation_code from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationCode,
+            case a.item_code when '1'
+                                 then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '2'
+                                 then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '3'
+                                 then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '4'
+                                 then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
         FROM
             outpt_cost a
             left join base_finance_classify b on a.bfc_id = b.id

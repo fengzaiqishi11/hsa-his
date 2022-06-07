@@ -380,7 +380,7 @@
         left join base_material bm on  a.item_code = '2' and  bm.id = a.item_id and bm.hosp_code = a.hosp_code
         left join base_item bi on a.item_code = '3' and  bi.id = a.item_id and bi.hosp_code = a.hosp_code
         where
-        hosp_code = #{hospCode}
+        a.hosp_code = #{hospCode}
         and item_code  = #{itemCode}
         and visit_id = #{visitId}
         and item_id = #{itemId}

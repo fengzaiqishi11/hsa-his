@@ -51,7 +51,7 @@ public interface DrgDipResultDAO {
       * @param result
       * @Author 医保开发二部-湛康
       * @Date 2022-06-07 9:38
-      * @return cn.hsa.module.insure.drgdip.entity.DrgDipResultDO
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
       */
      DrgDipResultDO queryListByVisitIdDesc(DrgDipResultDTO result);
 }

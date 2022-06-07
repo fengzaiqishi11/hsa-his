@@ -5,6 +5,8 @@ import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import java.util.Map;
+
 /**
  * @Package_name: cn.hsa.module.insure.advice.service
  * @Class_name: AdviceService
@@ -18,12 +20,14 @@ import org.springframework.cloud.openfeign.FeignClient;
 @FeignClient(value = "hsa-insure")
 public interface DrgDipResultService {
 
-  /**
-   * 查询质控信息
-   * @param dtoo
-   * @Author 医保开发二部-湛康
-   * @Date 2022-06-07 15:48
-   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
-   */
-  WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(DrgDipResultDTO dtoo);
+    /**
+     * 查询质控信息
+     * @param dtoo
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-07 15:48
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
+     */
+    WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(DrgDipResultDTO dtoo);
+
+    WrapperResponse<Boolean> insertDrgDipQulityInfoLog(Map<String, Object> map);
 }

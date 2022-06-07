@@ -1,8 +1,10 @@
 package cn.hsa.module.insure.drgdip.entity;
 
+import cn.hsa.base.PageDO;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * @Description: DIP/DRG质控信息日志表
@@ -10,7 +12,7 @@ import lombok.Data;
  * @date： 2022-06-07 08:41:51
  */
 @Data
-public class DrgDipQulityInfoLogDO implements Serializable {
+public class DrgDipQulityInfoLogDO extends PageDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**

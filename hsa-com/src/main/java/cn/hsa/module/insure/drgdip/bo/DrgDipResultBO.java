@@ -1,5 +1,7 @@
 package cn.hsa.module.insure.drgdip.bo;
 
+import java.util.Map;
+
 /**
  * @Package_name: cn.hsa.module.insure.advice.bo
  * @Class_name: AdviceBoImpl
@@ -11,4 +13,5 @@ package cn.hsa.module.insure.drgdip.bo;
  */
 public interface DrgDipResultBO {
 
+    Boolean insertDrgDipQulityInfoLog(Map<String, Object> map);
 }

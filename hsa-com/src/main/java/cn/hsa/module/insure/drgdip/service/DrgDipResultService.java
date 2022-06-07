@@ -29,15 +29,7 @@ public interface DrgDipResultService {
      * @Date 2022-06-07 15:48
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
      */
-    WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(DrgDipResultDTO dtoo);
+    WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(HashMap map);
 
     WrapperResponse<Boolean> insertDrgDipQulityInfoLog(Map<String, Object> map);
-  /**
-   * 查询质控信息
-   * @param dtoo
-   * @Author 医保开发二部-湛康
-   * @Date 2022-06-07 15:48
-   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
-   */
-  WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(HashMap map);
 }

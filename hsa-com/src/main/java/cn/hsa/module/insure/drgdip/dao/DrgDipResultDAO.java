@@ -17,7 +17,7 @@ public interface DrgDipResultDAO {
      * @param
      * @return  int
      */
-    int insertDrgDipResult(DrgDipResultDO drgDipResultDO);
+    int insertDrgDipResult(DrgDipResultDTO drgDipResultDTO);
 
     /**
      * @Author 医保开发二部-湛康

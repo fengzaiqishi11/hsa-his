@@ -6,6 +6,7 @@ import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.insure.advice.bo
@@ -28,4 +29,6 @@ public interface DrgDipResultBO {
   DrgDipComboDTO getDrgDipInfoByParam(HashMap map);
 
     Boolean insertDrgDipQulityInfoLog(Map<String, Object> map);
+
+    Boolean insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> resultMap);
 }

@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Slf4j
 @HsafRestPath("/service/insure/drgDipResultService")
-@Service("drgDipResultService_provider")
+@Service("drgDipResultService")
 public class DrgDipResultServiceImpl extends HsafService implements DrgDipResultService {
 
   @Resource

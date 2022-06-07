@@ -288,6 +288,7 @@
         left JOIN base_material bm ON ilc.hosp_code = bm.hosp_code AND ilc.item_id = bm.id
         left join base_finance_classify bfc2 on ilc.hosp_code = bfc2.hosp_code and bfc2.code = bm.bfc_code
         WHERE ilc.hosp_code = #{hospCode}
+        AND iv.status_code in ('2','3')
         AND ifnull(ilc.is_cancel,'0') = '0'
         AND ilc.start_time &lt; #{endTime}
         and (ilc.end_time is null or ilc.end_time &gt; date(#{endTime}))

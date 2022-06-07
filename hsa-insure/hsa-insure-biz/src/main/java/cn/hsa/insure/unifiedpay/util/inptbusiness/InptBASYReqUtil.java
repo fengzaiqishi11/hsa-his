@@ -69,12 +69,12 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
             TcmMrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map, "tcmMrisBaseInfo");
             // 输入-诊断信息（节点标识：diseinfo）
             String mid = mrisBaseInfoDTO.getId();
-            diseaseInfoMap = queryDiseaseInfo(map, mid, mdtrtSn);
+            diseaseInfoMap = queryTcmDiseaseInfo(map, mid, mdtrtSn);
             // 输入-手术记录（节点标识：oprninfo）
-            operationMap = queryOperationInfo(map, mid, mdtrtSn);
+            operationMap = queryTcmOperationInfo(map, mid, mdtrtSn);
             //  输入-重症监护信息（节点标识：icuinfo）
             icuinfoMap = queryIcuinInfo(map, mid, mdtrtSn);
-
+        //西医病案首页
         }else {
             //  输入-基本信息（节点标识：baseinfo）
             baseinfoMap = queryEmcBaseInfo(map, mdtrtSn);
@@ -632,6 +632,64 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
     }
 
     /**
+     * @Description 住院病案首页信息   -中医病案诊断信息
+     * @Author 产品三部-郭来
+     * @Date 2022-06-01 16:41
+     * @param map
+     * @param midId
+     * @param mdtrtSn
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    private Map<String, Object> queryTcmDiseaseInfo(Map<String, Object> map,String midId,String mdtrtSn) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        map.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
+        List<Map<String,Object>> mrisDiagnoseList = insureUnifiedEmrUploadDAO.selectTcmDiseinfo(map);
+        if(!ListUtils.isEmpty(mrisDiagnoseList)){
+            mrisDiagnoseList.stream().forEach(item->{
+                item.put("palg_no","");//	病理号
+                item.put("ipt_patn_disediag_type_code",null);//	住院患者疾病诊断类型代码
+                item.put("disediag_type",null);//	疾病诊断类型
+                if(!"1".equals(MapUtils.get(item,"maindiag_flag"))){
+                    item.put("maindiag_flag","0");//	主诊断标志
+                }else{
+                    item.put("maindiag_flag",MapUtils.get(item,"maindiag_flag"));//	主诊断标志
+                }
+                String disgCodeValue = MapUtils.get(item,"diag_code");
+                item.put("inhosp_diag_code",MapUtils.get(item,"disease_icd10"));//	院内诊断代码
+                String diseaseIcd10Name = MapUtils.get(item,"disease_icd10_name");
+                item.put("inhosp_diag_name",diseaseIcd10Name);//	院内诊断名称
+
+                if(StringUtils.isEmpty(disgCodeValue)){
+                    throw new AppException("病案首页的"+diseaseIcd10Name+"还未匹配");
+                }
+                item.put("diag_code",MapUtils.get(item,"diag_code"));//	诊断代码
+                item.put("diag_name",MapUtils.get(item,"diag_name"));//	诊断名称
+                item.put("adm_dise_cond_name",null);//	入院疾病病情名称
+                item.put("adm_dise_cond_code",null);//	入院疾病病情代码
+                String admCondValue = MapUtils.get(item,"adm_cond");
+                item.put("adm_cond_code",admCondValue);//	入院时病情代码
+                if("1".equals(admCondValue)){
+                    item.put("adm_cond","有");//	入院时病情名称
+                }else if("2".equals(admCondValue)){
+                    item.put("adm_cond","临床未确定");//	入院时病情名称
+                }else if("3".equals(admCondValue)){
+                    item.put("adm_cond","情况不明");//	入院时病情名称
+                }else{
+                    item.put("adm_cond","无");//	入院时病情名称
+                }
+                item.put("high_diag_evid",null);//	最高诊断依据
+                item.put("bkup_deg",null);//	分化程度
+                item.put("bkup_deg_code", null);//分化程度代码	分化程度代码分化程度代码
+                item.put("vali_flag",Constants.SF.S);//	有效标志
+                // 医保的住院病案流水号是唯一主键，所以占时用诊断id替代
+                item.put("ipt_medcas_hmpg_sn",MapUtils.get(item,"id"));//	住院病案首页流水号
+                item.put("mdtrt_sn",mdtrtSn);//	就医流水号
+            });
+        }
+        map.put("mrisDiagnoseList",mrisDiagnoseList);
+        return map;
+    }
+    /**
      * @Method queryOperationInfo
      * @Desrciption
      * @Param
@@ -682,8 +740,75 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
             SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
 
             if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+                //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
+//                Map<String,Object> operInfoMap = new HashMap<>();
+//                operInfoDOList.add(operInfoMap);
+            }else{
+                // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();
+                operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+                operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+                operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
                 operInfoDOList.add(operInfoMap);
+            }
+        }
+        map.put("oprationMapList",operInfoDOList);
+        return map;
+    }
+    /**
+     * @Description 查询中医病案手术信息
+     * @Author 产品三部-郭来
+     * @Date 2022-06-01 16:58
+     * @param map
+     * @param mid
+     * @param mdtrtSn
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    private Map<String, Object> queryTcmOperationInfo(Map<String, Object> map,String mid,String mdtrtSn) {
+        InsureIndividualVisitDTO insureIndividualVisitDTO =MapUtils.get(map,"insureIndividualVisitDTO");
+        map.put("insureRegCode",insureIndividualVisitDTO.getInsureRegCode());
+        List<Map<String,Object>> operInfoDOList = insureUnifiedEmrUploadDAO.selectTcmOperInfo(map);
+        if(!ListUtils.isEmpty(operInfoDOList)){
+            operInfoDOList.stream().forEach(item->{
+                item.put("oprn_oprt_sn",""); // 手术操作序列号
+                item.put("oprn_oper_part",""); //手术操作部位
+                item.put("oprn_oper_part_code",""); // 手术操作部位代码
+                item.put("oprn_con_time",""); // 手术持续时间
+                item.put("anst_lv_name",""); // 麻醉分级名称
+                item.put("anst_lv_code",""); // 麻醉分级代码
+                item.put("oprn_patn_type",""); // 手术患者类型
+                item.put("oprn_patn_type _code",""); //手术患者类型代码
+                if(!"1".equals(MapUtils.get(item,"oprn_oprt_sn"))){
+                    item.put("main_oprn_flag","0"); // 主要手术标志
+                }else {
+                    item.put("main_oprn_flag","1"); // 主要手术标志
+                }
+                item.put("anst_asa_lv_code",""); // 麻醉ASA分级名称
+                item.put("anst_asa_lv_name",""); // 麻醉ASA分级名称
+                item.put("anst_medn_code",""); // 麻醉药物代码
+                item.put("anst_medn_name",""); // 麻醉药物名称
+                item.put("anst_medn_dos",""); // 麻醉药物剂量
+                item.put("unt",""); //计量单位
+                item.put("anst_begntime",""); // 麻醉开始时间
+                item.put("anst_endtime",""); //麻醉结束时间
+                item.put("anst_copn_code",""); // 麻醉合并症代码
+                item.put("anst_copn_name",""); // 麻醉合并症名称
+                item.put("anst_copn_dscr",""); // 麻醉合并症描述
+                item.put("pacu_begntime",""); // 复苏室开始时间
+                item.put("pacu_endtime",""); // 复苏室结束时间
+                item.put("canc_oprn_flag",""); //取消手术标志
+                item.put("vali_flag",Constants.SF.S); // 有效标志
+                item.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+                item.put("ipt_medcas_hmpg_sn",MapUtils.get(item,"id")); // 住院病案首页流水号
+            });
+        }else{
+            map.put("code","SHOW_GDSBASY");
+            SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
+
+            if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
+                //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
+//                Map<String,Object> operInfoMap = new HashMap<>();
+//                operInfoDOList.add(operInfoMap);
             }else{
                 // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();

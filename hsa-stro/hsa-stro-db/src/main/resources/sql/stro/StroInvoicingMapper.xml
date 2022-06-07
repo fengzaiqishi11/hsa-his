@@ -40,6 +40,7 @@
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
         <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
     </resultMap>
 
 
@@ -61,7 +62,8 @@
         (case a.item_code when '1' then (select name from base_product where code = c.prod_code) when '2' then
         (select name from base_product where code = d.prod_code) end ) prodName,
         ifnull(a.new_price,0) new_price,
-        ifnull(a.new_split_price,0) new_split_price
+        ifnull(a.new_split_price,0) new_split_price,
+        (case a.item_code when '1' then c.nation_name when '2' then d.nation_name end ) nation_name
         from stro_invoicing a left join base_dept b on a.biz_id=b.id and a.hosp_code=b.hosp_code
         left join base_drug c on a.item_code='1' and c.id=a.item_id and c.hosp_code=a.hosp_code
         left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code

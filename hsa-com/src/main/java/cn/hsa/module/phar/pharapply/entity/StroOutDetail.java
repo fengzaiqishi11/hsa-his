@@ -119,4 +119,8 @@ public class StroOutDetail extends PageDO implements Serializable {
      *国家编码
      */
     private String nationCode;
+    /**
+     *国家名称
+     */
+    private String nationName;
 }

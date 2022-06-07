@@ -49,7 +49,8 @@
 		<result property="expiryDate" column="expiry_date" jdbcType="OTHER"/>
 		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
 		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
-    <result property="model" column="model" jdbcType="VARCHAR"/>
+        <result property="model" column="model" jdbcType="VARCHAR"/>
+		<result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.stro.stock.dto.StroStockDetailDTO" id="StroStockDetailMap">
@@ -337,7 +338,8 @@
     case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
     case when a.item_code='1' then bd.type_code when a.item_code='2' then bm.type_code end type_code,
     case when a.item_code='2' then bm.model end model,
-	case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code
+	case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code,
+	case when a.item_code='1' then bd.nation_name when a.item_code='2' then bm.nation_name end nation_name
 		from stro_out_detail as a
     left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
     left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}

@@ -101,7 +101,7 @@ public class HttpConnectUtil {
                 HttpEntity entity = res.getEntity();
                 result = EntityUtils.toString(entity);
                 resultMap = JSONObject.parseObject(result,Map.class);
-                System.out.println(resultMap.get("code"));
+                logger.info("调用成功，返回参数为： " + resultMap.get("code"));
             }
         } catch (Exception e) {
             logger.error("http 调用发生了异常: "+ e);

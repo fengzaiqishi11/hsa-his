@@ -3,6 +3,8 @@ package cn.hsa.module.drgdip.dao;
 import cn.hsa.module.drgdip.entity.DrgDipResultDetailDO;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * @Description: DIP/DRG质控信息结果明细表
  * @author： 医保开发二部-湛康
@@ -46,4 +48,13 @@ public interface DrgDipResultDetailDAO  {
      * @return int
      */
      DrgDipResultDetailDO selectById(DrgDipResultDetailDO drgDipResultDetailDO);
+
+     /**
+      * 根据质控id获取质控详细信息
+      * @param id
+      * @Author 医保开发二部-湛康
+      * @Date 2022-06-07 9:52
+      * @return java.util.List<cn.hsa.module.drgdip.entity.DrgDipResultDetailDO>
+      */
+     List<DrgDipResultDetailDO> selectListByVisitId(String id);
 }

@@ -45,4 +45,13 @@ public interface DrgDipResultDAO {
      * @return int
      */
      DrgDipResultDO selectById(DrgDipResultDO drgDipResultDO);
+
+     /**
+      * 根据就诊ID倒叙查询DIP/DRG质控结果
+      * @param visitId
+      * @Author 医保开发二部-湛康
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     DrgDipResultDO selectListByVisitIdDesc(String visitId);
 }

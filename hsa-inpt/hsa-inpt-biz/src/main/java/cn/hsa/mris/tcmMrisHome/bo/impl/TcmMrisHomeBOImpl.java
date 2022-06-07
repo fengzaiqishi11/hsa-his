@@ -16,6 +16,7 @@ import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.mris.service.MrisService;
@@ -88,6 +89,9 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
     @Resource
     private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
 
 
     /**
@@ -265,20 +269,11 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         DrgDipResultDTO dto = new DrgDipResultDTO();
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
-        DrgDipResultDO drgDipResultDO = drgDipResultDAO.queryListByVisitIdDesc(dto);
-        //未质控过
-        if (ObjectUtil.isEmpty(drgDipResultDO)){
-          resultMap.put("drgInfo",null);
-        }else{
-          List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
-          //出参转换
-          BeanUtil.copyProperties(drgDipResultDO,dto);
-          List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
-          DrgDipComboDTO combo = new DrgDipComboDTO();
-          combo.setResult(dto);
-          combo.setDetails(dtoList);
-          resultMap.put("drgInfo",combo);
-        }
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultMap.put("drgInfo",combo);
         return resultMap;
     }
 

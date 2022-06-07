@@ -311,6 +311,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_UPLOD.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         interfaceParamDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        interfaceParamDTO.setFixmedins_code(insureSettleInfoDTO.getOrgCode());
+        interfaceParamDTO.setFixmedins_name(insureConfigurationDTO.getHospName());
         interfaceParamDTO.setIsHospital(insureSettleInfoDTO.getLx());
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口

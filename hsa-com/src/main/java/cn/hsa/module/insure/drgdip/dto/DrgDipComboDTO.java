@@ -1,4 +1,4 @@
-package cn.hsa.module.drgdip.dto;
+package cn.hsa.module.insure.drgdip.dto;
 
 import lombok.Data;
 

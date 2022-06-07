@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="cn.hsa.module.drgdip.dao.DrgDipResultDetailDAO">
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" id="drgDipResultDetailMap">
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO" id="drgDipResultDetailMap">
         <result property="id" column="id"/>
         <result property="resultId" column="result_id"/>
         <result property="ruleLevel" column="rule_level"/>
@@ -26,7 +26,7 @@
         result_id = #{id} and valid_flag = 1
     </select>
 
-    <insert id="insertDrgDipResultDetail" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" >
+    <insert id="insertDrgDipResultDetail" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO" >
         insert into drg_dip_result_detail (
             if(#{id} != null and #{id} != ''){
                 id <!--id--> ,
@@ -112,7 +112,7 @@
             id = #{id}
                                                     </select>
 
-    <update id="updateById" parameterType="cn.hsa.module.drgdip.entity.DrgDipResultDetailDO" >
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO" >
         update drg_dip_result_detail set
             if(#{id} != null and #{id} != ''){
                 id = #{id} <!--id-->,

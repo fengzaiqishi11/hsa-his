@@ -1,4 +1,4 @@
-package cn.hsa.module.drgdip.bo;
+package cn.hsa.module.insure.drgdip.bo;
 
 /**
  * @Package_name: cn.hsa.module.insure.advice.bo

@@ -1,6 +1,6 @@
-package cn.hsa.module.drgdip.dao;
+package cn.hsa.module.insure.drgdip.dao;
 
-import cn.hsa.module.drgdip.entity.DrgDipBusinessOptInfoLogDO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO;
 
 /**
  * @Description: drg/dip质控业务操作日志表

@@ -1,7 +1,6 @@
-package cn.hsa.module.drgdip.dao;
+package cn.hsa.module.insure.drgdip.dao;
 
-import cn.hsa.module.drgdip.entity.DrgDipQulityInfoLogDO;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO;
 
 /**
  * @Description: DIP/DRG质控信息日志表

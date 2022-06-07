@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="cn.hsa.module.drgdip.dao.DrgDipQulityInfoLogDAO">
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipQulityInfoLogDAO">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="cn.hsa.module.drgdip.entity.DrgDipQulityInfoLogDO" id="drgDipQulityInfoLogMap">
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" id="drgDipQulityInfoLogMap">
         <result property="id" column="id"/>
         <result property="msgId" column="msg_id"/>
         <result property="orgCode" column="org_code"/>
@@ -26,7 +26,7 @@
         <result property="crtTime" column="crt_time"/>
     </resultMap>
 
-    <insert id="insertDrgDipQulityInfoLog" parameterType="cn.hsa.module.drgdip.entity.DrgDipQulityInfoLogDO" >
+    <insert id="insertDrgDipQulityInfoLog" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" >
         insert into drg_dip_qulity_info_log (
             if(#{id} != null and #{id} != ''){
                 id <!--主键ID--> ,
@@ -154,7 +154,7 @@
             id = #{id}
                                                                                 </select>
 
-    <update id="updateById" parameterType="cn.hsa.module.drgdip.entity.DrgDipQulityInfoLogDO" >
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" >
         update drg_dip_qulity_info_log set
             if(#{id} != null and #{id} != ''){
                 id = #{id} <!--主键ID-->,

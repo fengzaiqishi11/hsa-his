@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="cn.hsa.module.drgdip.dao.DrgDipBusinessOptInfoLogDAO">
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO">
 
 	<!-- 可根据自己的需求，是否要使用 -->
-    <resultMap type="cn.hsa.module.drgdip.entity.DrgDipBusinessOptInfoLogDO" id="drgDipBusinessOptInfoLogMap">
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO" id="drgDipBusinessOptInfoLogMap">
         <result property="id" column="id"/>
         <result property="qulityId" column="qulity_id"/>
         <result property="businessId" column="business_id"/>
@@ -49,7 +49,7 @@
         <result property="crtTime" column="crt_time"/>
     </resultMap>
 
-    <insert id="insertDrgDipBusinessOptInfoLog" parameterType="cn.hsa.module.drgdip.entity.DrgDipBusinessOptInfoLogDO" >
+    <insert id="insertDrgDipBusinessOptInfoLog" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO" >
         insert into drg_dip_business_opt_info_log (
             if(#{id} != null and #{id} != ''){
                 id <!--主键id--> ,
@@ -315,7 +315,7 @@
             id = #{id}
                                                                                                                                                                             </select>
 
-    <update id="updateById" parameterType="cn.hsa.module.drgdip.entity.DrgDipBusinessOptInfoLogDO" >
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO" >
         update drg_dip_business_opt_info_log set
             if(#{id} != null and #{id} != ''){
                 id = #{id} <!--主键id-->,

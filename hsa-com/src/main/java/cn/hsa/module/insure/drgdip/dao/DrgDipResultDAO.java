@@ -1,7 +1,7 @@
-package cn.hsa.module.drgdip.dao;
+package cn.hsa.module.insure.drgdip.dao;
 
-import cn.hsa.module.drgdip.entity.DrgDipResultDO;
-import org.apache.ibatis.annotations.Mapper;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 
 /**
  * @Description: DIP/DRG质控结果表
@@ -14,7 +14,7 @@ public interface DrgDipResultDAO {
      * @Author 医保开发二部-湛康
      * @Date 2020-07-17 10:09
      * @Description 新增
-     * @param DrgDipResultDO
+     * @param
      * @return  int
      */
     int insertDrgDipResult(DrgDipResultDO drgDipResultDO);
@@ -23,7 +23,7 @@ public interface DrgDipResultDAO {
      * @Author 医保开发二部-湛康
      * @Date 2020-07-17 10:09
      * @Description 根据主键删除
-     * @param DrgDipResultDO
+     * @param
      * @return int
      */
      int deleteById(DrgDipResultDO drgDipResultDO);
@@ -32,7 +32,7 @@ public interface DrgDipResultDAO {
      * @Author 医保开发二部-湛康
      * @Date 2020-07-17 10:09
      * @Description 根据主键修改
-     * @param DrgDipResultDO
+     * @param
      * @return int
      */
     int updateById(DrgDipResultDO drgDipResultDO);
@@ -41,17 +41,17 @@ public interface DrgDipResultDAO {
      * @Author 医保开发二部-湛康
      * @Date 2020-07-17 10:09
      * @Description 根据主键查询
-     * @param DrgDipResultDO
+     * @param
      * @return int
      */
      DrgDipResultDO selectById(DrgDipResultDO drgDipResultDO);
 
      /**
       * 根据就诊ID倒叙查询DIP/DRG质控结果
-      * @param visitId
+      * @param result
       * @Author 医保开发二部-湛康
       * @Date 2022-06-07 9:38
-      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      * @return cn.hsa.module.insure.drgdip.entity.DrgDipResultDO
       */
-     DrgDipResultDO selectListByVisitIdDesc(String visitId);
+     DrgDipResultDO queryListByVisitIdDesc(DrgDipResultDTO result);
 }

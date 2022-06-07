@@ -55,10 +55,10 @@
             bd.dan as PZWH,
             null as SCRQ,
             sod.expiry_date as YXQ,
-            sod.buy_price_all as PFJ,
-            sod.sell_price_all as LSJ,
-            sod.buy_price_all as GJJ ,
-            sod.buy_price_all * sod.num as GJZJE,
+            sod.buy_price as PFJ,
+            sod.sell_price as LSJ,
+            sod.buy_price as GJJ ,
+            sod.buy_price_all as GJZJE,
             sod.num as SL,
             '' as JYQKC,
             '' as JYHKC,
@@ -96,10 +96,10 @@
             bd.dan as PZWH,
             null as SCRQ,
             sid.expiry_date as YXQ,
-            sid.buy_price_all as PFJ,
-            sid.sell_price_all as LSJ,
-            sid.buy_price_all as GJJ ,
-            sid.buy_price_all * sid.num as GJZJE,
+            sid.buy_price as PFJ,
+            sid.sell_price as LSJ,
+            sid.buy_price as GJJ ,
+            sid.buy_price_all  as GJZJE,
             sid.num as SL,
             '' as JYQKC,
             '' as JYHKC,
@@ -134,7 +134,7 @@
     <select id="getTbYpkcxxData" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpkcxx">
         select * from (
             select
-            ss.id,
+            ssd.id,
             ss.hosp_code as YLJGDM,
             ss.item_id ,
             bd.code as YPBM,
@@ -147,17 +147,21 @@
             sum(ss.num) as BZSL,
             ss.unit_code as DW,
             sum(ss.num) as KCSL,
-            ss.stock_max as ZDCL,
+            max(ss.stock_max) as ZDCL,
             null as BJCL,
-            ss.stock_min as ZXCL,
-            ss.buy_price_all as PFJ,
-            ss.sell_price_all as LSJ,
+            max(ss.stock_min) as ZXCL,
+            max(ssd.buy_price) as PFJ,
+            max(ssd.sell_price) as LSJ,
             null as SXRQ
             from
             stro_stock ss,
+            stro_stock_detail ssd ,
             base_drug bd
             where
-            ss.hosp_code = bd.hosp_code
+            ss.hosp_code  = ssd.hosp_code
+            and ss.biz_id  = ssd.biz_id
+            and ss.item_id  = ssd.item_id
+            and ss.hosp_code = bd.hosp_code
             and ss.item_id = bd.id
             group by
             ss.hosp_code,
@@ -165,11 +169,7 @@
             bd.usual_name,
             bd.good_name,
             bd.spec,
-            ss.unit_code,
-            ss.stock_max,
-            ss.stock_min,
-            ss.buy_price_all,
-            ss.sell_price_all
+            ss.unit_code
         )a where a.YLJGDM = #{hospCode}
 <!--        <if test="startTime != null and startTime != ''">-->
 <!--            and date(a.SXRQ) &gt;= date(#{startTime})-->

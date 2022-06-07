@@ -407,6 +407,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     // 整理病案首页数据，上传drg
     @Override
     public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
+        //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));// 病案基本信息
@@ -428,14 +429,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
-        //todo 此处需要校验授权码
         String result = HttpConnectUtil.doPost(paramMap);
+        Map<String,Object> responseMap = JSONObject.parseObject(result);
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        // todo 此处调用插入日志
 
-        dataMap.put("result", result);
-        dataMap.put("url", url);
-
-
-        return dataMap;
+        return resultMap;
     }
     // 整理病案首页数据，上传drg
     @Override
@@ -461,11 +460,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         String result = HttpConnectUtil.doPost(paramMap);
-        dataMap.put("result", result);
-        dataMap.put("url", url);
-
-
-        return dataMap;
+        Map<String,Object> responseMap = JSONObject.parseObject(result);
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        // todo 此处调用插入日志
+        return resultMap;
     }
 
     public Map<String, Object> getMaisPatientInfo(Map<String, Object> map) {

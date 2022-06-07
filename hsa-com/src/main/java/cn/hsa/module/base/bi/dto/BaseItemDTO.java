@@ -124,6 +124,8 @@ public class BaseItemDTO extends BaseItemDO implements Serializable {
     private Date crteTime;
     //用药性质
     private String useCode;
+
+    private String gbNationName;
     //药房
     private String pharId;
     private String downLoadFlag ; // 下载过滤标识

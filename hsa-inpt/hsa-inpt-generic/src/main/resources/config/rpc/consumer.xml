@@ -124,4 +124,6 @@
     <dubbo:reference interface="cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService" id="insureUnifiedBaseService_consumer" check="false"/>
     <!--明细审核分析服务-->
     <dubbo:reference interface="cn.hsa.module.insure.module.service.InsureDetailAuditService" id="insureDetailAuditService" check="false"/>
+    <!--DRGDIP质控服务-->
+    <dubbo:reference interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" id="drgDipResultService" check="false"/>
 </beans>

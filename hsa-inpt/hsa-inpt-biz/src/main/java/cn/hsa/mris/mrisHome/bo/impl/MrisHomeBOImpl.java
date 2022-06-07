@@ -18,6 +18,7 @@ import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
@@ -95,6 +96,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
 
 
     /**
@@ -417,55 +421,49 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
+      //新增质控信息
       DrgDipResultDTO dto = new DrgDipResultDTO();
       dto.setVisitId(map.get("visitId").toString());
       dto.setHospCode(map.get("hospCode").toString());
-        DrgDipResultDO drgDipResultDO = drgDipResultDAO.queryListByVisitIdDesc(dto);
-        //未质控过
-        if (ObjectUtil.isEmpty(drgDipResultDO)){
-          resultMap.put("drgInfo",null);
-        }else{
-          List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
-          //出参转换
-          BeanUtil.copyProperties(drgDipResultDO,dto);
-          List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
-          DrgDipComboDTO combo = new DrgDipComboDTO();
-          combo.setResult(dto);
-          combo.setDetails(dtoList);
-          resultMap.put("drgInfo",combo);
-        }
+      HashMap map1 = new HashMap();
+      map1.put("drgDipResultDTO",dto);
+      map1.put("hospCode",map.get("hospCode").toString());
+      DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+      resultMap.put("drgInfo",combo);
         return resultMap;
     }
 
     // 整理病案首页数据，上传drg
     @Override
     public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
+        //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));
-        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));
-        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));
-        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));// 病案基本信息
+        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));// 病案诊断信息
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));// 病案手术信息
         Map<String, Object> paramMap = new HashMap<>();
-
+        /**=============获取系统参数中配置的病案质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
         sysMap.put("code", "BA_DRG");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
-        String url = "http://172.18.22.8:8080/drg_web/drgGroupThird/groupAndQuality.action";
+        String url = "";
         if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
             url = sysParameterDTO.getValue();
         } else {
             throw new AppException("请在系统参数中配置病案上传drg时，drg地址  例：BA_DRG: url");
         }
+        /**===================获取系统参数中配置的病案质控drg地址 End==============**/
 
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         String result = HttpConnectUtil.doPost(paramMap);
-        dataMap.put("result", result);
-        dataMap.put("url", url);
+        Map<String,Object> responseMap = JSONObject.parseObject(result);
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        // todo 此处调用插入日志
 
-
-        return dataMap;
+        return resultMap;
     }
     // 整理病案首页数据，上传drg
     @Override
@@ -491,11 +489,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         String result = HttpConnectUtil.doPost(paramMap);
-        dataMap.put("result", result);
-        dataMap.put("url", url);
-
-
-        return dataMap;
+        Map<String,Object> responseMap = JSONObject.parseObject(result);
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        // todo 此处调用插入日志
+        return resultMap;
     }
 
     public Map<String, Object> getMaisPatientInfo(Map<String, Object> map) {

@@ -236,10 +236,14 @@
         b.type_code when '3' then bi.id
         else bm.id
         end itemId,
-<!--        case-->
-<!--        b.type_code when '3' then bi.name-->
-<!--        else bm.name-->
-<!--        end itemName,-->
+        case
+        b.type_code when '3' then bi.nation_code
+        else bm.nation_code
+        end nation_code,
+        case
+        b.type_code when '3' then bi.nation_name
+        else bm.nation_name
+        end nation_name,
         case
         b.type_code when '3' then bi.unit_code
         else bm.unit_code

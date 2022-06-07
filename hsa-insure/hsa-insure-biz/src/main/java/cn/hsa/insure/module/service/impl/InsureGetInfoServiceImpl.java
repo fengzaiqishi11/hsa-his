@@ -236,4 +236,14 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         return WrapperResponse.success(insureGetInfoBO.querySetlePage(map));
     }
 
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRG(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.uploadInsureSettleInfoForDRG(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.uploadInsureSettleInfoForDIP(map));
+    }
+
 }

@@ -792,4 +792,8 @@ public interface InsureGetInfoDAO {
     void updateSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     void deleteFmiOwnPayPatnCost(@Param("feeIdList")List<String> feeIdList,@Param("hospCode")String hospCode);
+
+    List<Map<String, Object>> selectMriOperInfoForDRGorDIP(Map<String, Object> map);
+
+    List<Map<String, Object>> selectMriInptDiagNoseForDRGorDIP(Map<String, Object> map);
 }

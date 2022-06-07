@@ -47,5 +47,13 @@ public class InptAdviceDetailDTO extends InptAdviceDetailDO implements Serializa
      */
     private String isReimburse;
     private String hospItemCode;
+    /**
+     * 国家编码
+     */
+    private String nationCode;
+    /**
+     * 国家名称
+     */
+    private String nationName;
 
 }

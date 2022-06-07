@@ -85,4 +85,12 @@ public class PatientCompreHensiveQueryDTO extends PageDO implements Serializable
     private String attributionCode;
     //  项目明细费用
     private List<PatientCompreHensiveQueryDTO> patientCompreHensiveQueryDTOList;
+    /**
+     * 国家编码
+     */
+    private String nationCode;
+    /**
+     * 国家名称
+     */
+    private String nationName;
 }

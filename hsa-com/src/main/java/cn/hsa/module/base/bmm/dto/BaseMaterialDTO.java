@@ -140,4 +140,5 @@ public class BaseMaterialDTO extends BaseMaterialDO implements Serializable {
     private Date crteTime;
     private Boolean isNationCode;
     private String downLoadFlag ; // 下载过滤标识
+    private String gbNationName ;
 }

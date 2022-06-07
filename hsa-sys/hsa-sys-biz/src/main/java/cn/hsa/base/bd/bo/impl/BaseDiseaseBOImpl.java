@@ -417,7 +417,7 @@ public class BaseDiseaseBOImpl extends HsafBO implements BaseDiseaseBO{
     @Override
     public Boolean updateDisease(BaseDiseaseDTO baseDiseaseDTO) {
         //设置拆分List大小
-        int limitLength = 500;
+        int limitLength = 50;
         try {
             log.info("开始执行任务");
             //获取所有匹配好的数据

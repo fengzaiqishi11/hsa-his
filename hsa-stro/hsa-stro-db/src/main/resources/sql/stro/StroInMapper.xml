@@ -460,7 +460,8 @@
         a.id as itemId, a.last_buy_price, a.hosp_code, a.type_code, a.bfc_code, a.code,a.good_name as itemName, a.spec,
         a.prod_code, a.price, a.unit_code,a.split_ratio,  a.split_unit_code,  a.split_price as splitPrice,
         a.is_valid, a.crte_id,  a.crte_name, a.crte_time,"1" as itemCode,a.dosage, a.dosage_unit_code,a.ndan,a.dan,
-        (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName
+        (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
       from base_drug a
       where a.hosp_code = #{hospCode}
         <if test="isValid != null and isValid != ''">
@@ -487,7 +488,8 @@
       select
       a.id as itemId, a.last_buy_price,a.hosp_code, a.type_code, a.bfc_code, a.code, a.name as itemName, a.spec, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price,
       a.use_code, a.remark, a.prod_code, a.pym, a.wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time, "2" as itemCode,a.model,
-      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName
+      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
       from base_material a
       where a.hosp_code = #{hospCode}
       <if test="typeCode != null and typeCode != ''">
@@ -511,7 +513,8 @@
       a.id as itemId, a.last_buy_price, a.hosp_code, a.type_code, a.bfc_code, a.code,a.good_name as itemName, a.spec,
       a.prod_code, a.price, a.unit_code,a.split_ratio,  a.split_unit_code,  a.split_price as splitPrice,
       a.is_valid, a.crte_id,  a.crte_name, a.crte_time,"1" as itemCode,a.dosage, a.dosage_unit_code,a.ndan,"" as model,
-      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName
+      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
       from base_drug a
       where a.hosp_code = #{hospCode}
       <if test="isValid != null and isValid != ''">
@@ -536,7 +539,8 @@
       a.id as itemId, a.last_buy_price,a.hosp_code, a.type_code, a.bfc_code, a.code, a.name as itemName, a.spec,
       a.prod_code, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price as splitPrice,
       a.is_valid, a.crte_id, a.crte_name, a.crte_time, "2" as itemCode,"" as dosage,"" as dosageUnitCode,"" as ndan,a.model,
-      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName
+      (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
       from base_material a
       where  a.hosp_code = #{hospCode}
       <if test="isValid != null and isValid != ''">

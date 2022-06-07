@@ -13,6 +13,9 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
+import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.bo.InsureGetInfoBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
@@ -81,6 +84,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     private BaseReqUtilFactory baseReqUtilFactory;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
 
     /**
      * @Method getSettleInfo
@@ -629,6 +635,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultDataMap.put("bldinfo", bldinfoList);
         resultDataMap.put("hifp_pay", MapUtils.get(setlinfoMap, "hifp_pay"));
         resultDataMap.put("setldetail", setldetail);
+        //新增质控信息
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultDataMap.put("drgInfo",combo);
         return resultDataMap;
     }
 
@@ -1324,6 +1339,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             resultDataMap.put("hifp_pay", MapUtils.get(setlinfo, "hifp_pay"));
             String json = JSONObject.toJSONString(resultDataMap);
             System.out.println("----======" + json);
+            //新增质控信息
+            DrgDipResultDTO dto = new DrgDipResultDTO();
+            dto.setVisitId(map.get("visitId").toString());
+            dto.setHospCode(map.get("hospCode").toString());
+            HashMap map1 = new HashMap();
+            map1.put("drgDipResultDTO",dto);
+            map1.put("hospCode",map.get("hospCode").toString());
+            DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+            resultDataMap.put("drgInfo",combo);
         }
         return resultDataMap;
     }

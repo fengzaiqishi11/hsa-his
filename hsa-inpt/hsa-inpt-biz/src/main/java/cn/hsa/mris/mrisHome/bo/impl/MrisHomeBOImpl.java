@@ -532,6 +532,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         //businessLogMap.put("inputJosn",MapUtils.get(map, "inputJson"));
         businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
         businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
+        businessLogMap.put("crtTime",new Date());
         drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
         /**==========返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
@@ -1011,6 +1012,52 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             String mbiId = saveFrontData(mrisBaseInfoDTO);
             saveBackData(mrisBaseInfoDTO, mbiId);
         }
+        //todo 保存病案首页保存操作日志信息 类型为1.修改 2.保存
+        Map<String, Object> businessLogMap = new HashMap<>();
+        businessLogMap.put("businessId","");
+        if("1".equals(mrisBaseInfoDTO.getOperFlag())){//修改
+            businessLogMap.put("optType","1");
+            businessLogMap.put("optTypeName","修改");
+        }else if("2".equals(mrisBaseInfoDTO.getOperFlag())){//保存
+            businessLogMap.put("optType","2");
+            businessLogMap.put("optTypeName","保存");
+        }
+        businessLogMap.put("businessType","1");
+        businessLogMap.put("hospCode",mrisBaseInfoDTO.getHospCode());
+        businessLogMap.put("insureRegCode","");
+        businessLogMap.put("hospName",mrisBaseInfoDTO.getHospName());
+        businessLogMap.put("orgCode","");
+        businessLogMap.put("insureSettleId","");
+        businessLogMap.put("medicalRegNo","");
+        businessLogMap.put("settleId","");
+        businessLogMap.put("visitId",mrisBaseInfoDTO.getVisitId());
+        businessLogMap.put("psnNo","");
+        businessLogMap.put("psnName","");
+        businessLogMap.put("certNo","");
+        businessLogMap.put("deptId","");
+        businessLogMap.put("sex","");
+        businessLogMap.put("age","");
+        businessLogMap.put("insueType","");
+        businessLogMap.put("inptTime","");
+        businessLogMap.put("outptTime,","");
+        businessLogMap.put("medType","");
+        businessLogMap.put("medTypeName","");
+        businessLogMap.put("deptName","");
+        businessLogMap.put("doctorId","");
+        businessLogMap.put("doctorName","");
+
+        businessLogMap.put("inptDiagnose","");
+        businessLogMap.put("outptDiagnose","");
+        businessLogMap.put("totalFee","");
+        businessLogMap.put("payFee","");
+        businessLogMap.put("selfFee","");
+        businessLogMap.put("cashPayFee","");
+        //businessLogMap.put("inputJosn",MapUtils.get(map, "inputJson"));
+        businessLogMap.put("crtId","1");
+        businessLogMap.put("crtName","1");
+        businessLogMap.put("crtTime",new Date());
+        drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
+
         return true;
     }
 

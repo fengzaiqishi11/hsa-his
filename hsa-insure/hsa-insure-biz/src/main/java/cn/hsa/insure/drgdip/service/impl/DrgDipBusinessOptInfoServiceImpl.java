@@ -45,4 +45,9 @@ public class DrgDipBusinessOptInfoServiceImpl extends HsafService implements Drg
     public WrapperResponse<PageDTO> queryDrgDipBusinessOptInfoLogList(Map<String, Object> map) {
         return WrapperResponse.success(drgDipBusinessOptInfoBO.queryDrgDipBusinessOptInfoLogList(MapUtils.get(map,"drgDipBusinessOptInfoLogDO")));
     }
+
+    @Override
+    public WrapperResponse<PageDTO> getDrgDipBusinessOptInfoLogDetail(Map<String, Object> map) {
+        return null;
+    }
 }

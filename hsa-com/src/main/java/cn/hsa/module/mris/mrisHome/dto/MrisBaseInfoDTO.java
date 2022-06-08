@@ -57,6 +57,7 @@ public class MrisBaseInfoDTO extends MrisBaseInfoDO implements Serializable {
     private  String respNursCode; // 责任护士代码
     private  String iptDrCode; // 住院医师代码
 
+    private String operFlag;
 
 }
 

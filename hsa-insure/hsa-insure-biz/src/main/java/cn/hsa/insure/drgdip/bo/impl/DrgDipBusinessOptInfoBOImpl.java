@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.support.ResourceTransactionManager;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -22,6 +23,11 @@ import java.util.Map;
 @Component
 @Slf4j
 public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusinessOptInfoBO {
+    /**
+     * 开启事务
+     */
+    @Resource
+    private ResourceTransactionManager transactionManager;
     @Resource
     DrgDipBusinessOptInfoLogDAO drgDipBusinessOptInfoLogDAO;
     /**
@@ -34,7 +40,7 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
     @Override
     public Boolean insertDrgDipBusinessOptInfoLog(Map<String, Object> map) {
 
-       // TransactionStatus status = null;
+       TransactionStatus status = null;
         boolean functionLog = false;
         try {
             String qulityId = MapUtils.get(map, "qulityId");
@@ -80,10 +86,10 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             BigDecimal cashPayFee = BigDecimalUtils.convert(MapUtils.get(map,"cashPayFee").toString());
             String inputJson = MapUtils.get(map,"inputJson");
 
-       /*     // 开启独立新事务
+            // 开启独立新事务
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-            status = transactionManager.getTransaction(def);*/
+            status = transactionManager.getTransaction(def);
             DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO = new DrgDipBusinessOptInfoLogDO();
             drgDipBusinessOptInfoLogDO.setAge(age);
             drgDipBusinessOptInfoLogDO.setBusinessId(businessId);
@@ -129,12 +135,12 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             drgDipBusinessOptInfoLogDO.setVisitId(visitId);
 
             functionLog = drgDipBusinessOptInfoLogDAO.insertDrgDipBusinessOptInfoLog(drgDipBusinessOptInfoLogDO);
-          /*  // 提交独立事务
-            transactionManager.commit(status);*/
+            // 提交独立事务
+            transactionManager.commit(status);
         } catch (Exception e) {
-           /* if (status != null) {
+            if (status != null) {
                 transactionManager.rollback(status);
-            }*/
+            }
             e.printStackTrace();
         }
         return functionLog;

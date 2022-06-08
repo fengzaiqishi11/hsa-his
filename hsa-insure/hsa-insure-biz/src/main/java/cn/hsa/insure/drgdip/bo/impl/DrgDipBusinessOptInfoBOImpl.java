@@ -19,6 +19,7 @@ import org.springframework.transaction.support.ResourceTransactionManager;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -156,6 +157,7 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
      */
     @Override
     public PageDTO queryDrgDipBusinessOptInfoLogList(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO) {
-        return PageDTO.of(drgDipBusinessOptInfoLogDAO.queryDrgDipBusinessOptInfoLogList(drgDipBusinessOptInfoLogDO));
+        List<DrgDipBusinessOptInfoLogDO> list = drgDipBusinessOptInfoLogDAO.queryDrgDipBusinessOptInfoLogList(drgDipBusinessOptInfoLogDO);
+        return PageDTO.of(list);
     }
 }

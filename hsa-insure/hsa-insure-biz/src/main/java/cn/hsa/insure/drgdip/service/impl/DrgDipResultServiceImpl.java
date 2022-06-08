@@ -49,5 +49,17 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
         return WrapperResponse.success(drgDipResultBO.insertDrgDipQulityInfoLog(map));
     }
 
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 9:36
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> checkDrgDipBizAuthorization(Map<String, Object> map) {
+      return WrapperResponse.success(drgDipResultBO.checkDrgDipBizAuthorization(map));
+    }
+
 
 }

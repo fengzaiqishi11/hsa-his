@@ -2,12 +2,13 @@ package cn.hsa.insure.drgdip.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
 
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.insure.drgdip.dto.*;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.util.MapUtils;
@@ -49,11 +50,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     @Resource
     private DrgDipResultDAO drgDipResultDAO;
 
+    @Resource
+    private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
     /**
      * 开启事务
      */
     @Resource
     private ResourceTransactionManager transactionManager;
+
+    @Resource
+    private CenterFunctionAuthorizationService centerFunctionAuthorizationService;
 
     /**
      * @return
@@ -130,17 +137,69 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
      * @Return
      */
     @Override
-    public Boolean insertDrgDipResult(Map<String,Object> dataMap,Map<String,Object> resultMap) {
+    public Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
 
-        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
-        Map<String,Object> baseInfo = MapUtils.get(dataMap,"baseInfo");
-        drgDipResultDTO.setId(SnowflakeUtils.getId());
+        if(drgDipResultDTO != null){
+            drgDipResultDTO.setId(SnowflakeUtils.getId());
+            drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
+        }
+        if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
+            drgDipResultDetailDAO.insertDrgDipResultDetailList(drgDipResultDetailDTOList);
+        }
         return true;
 
     }
 
-    @Resource
-    private DrgDipResultDetailDAO drgDipResultDetailDAO;
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param map
+     * 【参数配置1】：支付方式：0：不开启DRG/DIP支付方式（默认），1：DIP 2：DRG 3:DIP和DRG
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 9:44
+     * @return java.lang.Boolean
+     */
+    @Override
+    public Boolean checkDrgDipBizAuthorization(Map<String, Object> map) {
+      HashMap param = new HashMap();
+      //入参判断
+      if (ObjectUtil.isEmpty(MapUtils.get(map, "orderTypeCode"))){
+        throw new AppException("授权类型类型【orderTypeCode】不能为空！");
+      }
+      param.put("hospCode",MapUtils.get(map, "hospCode"));
+      String orderTypeCode = MapUtils.get(map, "orderTypeCode");
+      //不开启
+      if ("0".equals(orderTypeCode)){
+        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+      }
+      //1：DIP 2:DRG
+      if ("1".equals(orderTypeCode) || "2".equals(orderTypeCode)){
+        param.put("orderTypeCode",orderTypeCode);
+        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO =
+            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO)){
+          throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+        }
+      }
+      //3:DIP和DRG 循环调用
+      if ("3".equals(orderTypeCode)){
+        // 1 DIP
+        param.put("orderTypeCode",1);
+        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO =
+            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO)){
+          throw new AppException("未查询到本机构的DIP质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+        }
+        // 2 DRG
+        param.put("orderTypeCode",2);
+        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO1 =
+            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO1)){
+          throw new AppException("未查询到本机构的DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+        }
+      }
+      return true;
+    }
+
 
   /**
    * 获取质控信息

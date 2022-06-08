@@ -1,7 +1,9 @@
 package cn.hsa.module.insure.drgdip.dao;
 
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,7 +22,16 @@ public interface DrgDipResultDetailDAO  {
      * @param drgDipResultDetailDO
      * @return  int
      */
-    int insertDrgDipResultDetail(DrgDipResultDetailDO drgDipResultDetailDO);
+    int insertDrgDipResultDetail(DrgDipResultDetailDTO drgDipResultDetailDTO);
+
+    /**
+     * @Author 医保开发二部-湛康
+     * @Date 2020-07-17 10:09
+     * @Description 新增
+     * @param drgDipResultDetailDO
+     * @return  int
+     */
+    int insertDrgDipResultDetailList(@Param("list")List<DrgDipResultDetailDTO> drgDipResultDetailDTOList);
 
     /**
      * @Author 医保开发二部-湛康

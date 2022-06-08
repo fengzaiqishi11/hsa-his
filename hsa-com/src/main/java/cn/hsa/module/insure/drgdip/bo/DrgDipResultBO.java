@@ -3,9 +3,11 @@ package cn.hsa.module.insure.drgdip.bo;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,16 +21,40 @@ import java.util.Map;
  */
 public interface DrgDipResultBO {
 
+    /**
+     * 获取质控信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    DrgDipComboDTO getDrgDipInfoByParam(HashMap map);
+
   /**
-   * 获取质控信息
+   * 质控插入日志
    * @param map
-   * @Author 医保开发二部-湛康
+   * @Author
    * @Date 2022-06-07 15:54
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  DrgDipComboDTO getDrgDipInfoByParam(HashMap map);
+  Boolean insertDrgDipQulityInfoLog(Map<String, Object> map);
 
-    Boolean insertDrgDipQulityInfoLog(Map<String, Object> map);
 
-    Boolean insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> resultMap);
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 9:42
+     * @return java.lang.Boolean
+     */
+    Boolean checkDrgDipBizAuthorization(Map<String, Object> map);
+
+  /**
+   * 质控结果保存
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList);
 }

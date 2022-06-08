@@ -62,278 +62,256 @@
 
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
         insert into drg_dip_result (
-            if(#{id} != null and #{id} != ''){
-                id <!--主键--> ,
-            }
-            if(#{visitId} != null and #{visitId} != ''){
-                visit_id <!--就诊id--> ,
-            }
-            if(#{psnNo} != null and #{psnNo} != ''){
-                psn_no <!--人员编号--> ,
-            }
-            if(#{psnName} != null and #{psnName} != ''){
-                psn_name <!--患者姓名--> ,
-            }
-            if(#{certno} != null and #{certno} != ''){
-                certno <!--患者身份证号码--> ,
-            }
-            if(#{gend} != null and #{gend} != ''){
-                gend <!--性别--> ,
-            }
-            if(#{age} != null and #{age} != ''){
-                age <!--年龄--> ,
-            }
-            if(#{insutype} != null and #{insutype} != ''){
-                insutype <!--险种--> ,
-            }
-            if(#{medType} != null and #{medType} != ''){
-                med_type <!--业务类型--> ,
-            }
-            if(#{medTypeName} != null and #{medTypeName} != ''){
-                med_type_name <!--业务类型名称--> ,
-            }
-            if(#{inTime} != null and #{inTime} != ''){
-                in_time <!--入院时间--> ,
-            }
-            if(#{outTime} != null and #{outTime} != ''){
-                out_time <!--出院时间--> ,
-            }
-            if(#{inptDiagnose} != null and #{inptDiagnose} != ''){
-                inpt_diagnose <!--入院诊断--> ,
-            }
-            if(#{outptDiagnose} != null and #{outptDiagnose} != ''){
-                outpt_diagnose <!--出院诊断--> ,
-            }
-            if(#{deptId} != null and #{deptId} != ''){
-                dept_id <!--科室id--> ,
-            }
-            if(#{deptName} != null and #{deptName} != ''){
-                dept_name <!--科室名称--> ,
-            }
-            if(#{doctorId} != null and #{doctorId} != ''){
-                doctor_id <!--医生id--> ,
-            }
-            if(#{doctorName} != null and #{doctorName} != ''){
-                doctor_name <!--医生姓名--> ,
-            }
-            if(#{medicalRegNo} != null and #{medicalRegNo} != ''){
-                medical_reg_no <!--就医登记号--> ,
-            }
-            if(#{settleId} != null and #{settleId} != ''){
-                settle_id <!--his结算id--> ,
-            }
-            if(#{insureSettleId} != null and #{insureSettleId} != ''){
-                insure_settle_id <!--医保结算id--> ,
-            }
-            if(#{drgDipCode} != null and #{drgDipCode} != ''){
-                drg_dip_code <!--drg\dip组编码--> ,
-            }
-            if(#{drgDipName} != null and #{drgDipName} != ''){
-                drg_dip_name <!--drg\dip组名称--> ,
-            }
-            if(#{icd10} != null and #{icd10} != ''){
-                icd10 <!--主要诊断--> ,
-            }
-            if(#{icd9} != null and #{icd9} != ''){
-                icd9 <!--主要手术--> ,
-            }
-            if(#{weight} != null and #{weight} != ''){
-                weight <!--权重--> ,
-            }
-            if(#{totalFee} != null and #{totalFee} != ''){
-                total_fee <!--总费用--> ,
-            }
-            if(#{standFee} != null and #{standFee} != ''){
-                stand_fee <!--标杆费用--> ,
-            }
-            if(#{override} != null and #{override} != ''){
-                override <!--倍率--> ,
-            }
-            if(#{cdntnPay} != null and #{cdntnPay} != ''){
-                cdntn_pay <!--统筹金额--> ,
-            }
-            if(#{diffFee} != null and #{diffFee} != ''){
-                diff_fee <!--预计偏差--> ,
-            }
-            if(#{ypFee} != null and #{ypFee} != ''){
-                yp_fee <!--药品费--> ,
-            }
-            if(#{clFee} != null and #{clFee} != ''){
-                cl_fee <!--耗材费--> ,
-            }
-            if(#{states} != null and #{states} != ''){
-                states <!--质控完成状态--> ,
-            }
-            if(#{type} != null and #{type} != ''){
-                type <!--质控类型--> ,
-            }
-            if(#{businessType} != null and #{businessType} != ''){
-                business_type <!--业务类型--> ,
-            }
-            if(#{businessId} != null and #{businessId} != ''){
-                business_id <!--业务id--> ,
-            }
-            if(#{hospCode} != null and #{hospCode} != ''){
-                hosp_code <!--医院编码--> ,
-            }
-            if(#{insureRegCode} != null and #{insureRegCode} != ''){
-                insure_reg_code <!--医保注册编码--> ,
-            }
-            if(#{hospName} != null and #{hospName} != ''){
-                hosp_name <!--医院名称--> ,
-            }
-            if(#{orgCode} != null and #{orgCode} != ''){
-                org_code <!--机构编码--> ,
-            }
-            if(#{validFlag} != null and #{validFlag} != ''){
-                valid_flag <!--有效标志--> ,
-            }
-            if(#{crtId} != null and #{crtId} != ''){
-                crt_id <!--创建人--> ,
-            }
-            if(#{crtName} != null and #{crtName} != ''){
-                crt_name <!--创建姓名--> ,
-            }
-            if(#{crtTime} != null and #{crtTime} != ''){
-                crt_time <!--创建时间--> 
-            }
-    )
+
+        id <!--主键--> ,
+
+
+        visit_id <!--就诊id--> ,
+
+
+        psn_no <!--人员编号--> ,
+
+
+        psn_name <!--患者姓名--> ,
+
+
+        certno <!--患者身份证号码--> ,
+
+
+        gend <!--性别--> ,
+
+
+        age <!--年龄--> ,
+
+
+        insutype <!--险种--> ,
+
+
+        med_type <!--业务类型--> ,
+
+
+        med_type_name <!--业务类型名称--> ,
+
+
+        in_time <!--入院时间--> ,
+
+
+        out_time <!--出院时间--> ,
+
+
+        inpt_diagnose <!--入院诊断--> ,
+
+
+        outpt_diagnose <!--出院诊断--> ,
+
+
+        dept_id <!--科室id--> ,
+
+
+        dept_name <!--科室名称--> ,
+
+
+        doctor_id <!--医生id--> ,
+
+
+        doctor_name <!--医生姓名--> ,
+
+
+        medical_reg_no <!--就医登记号--> ,
+
+
+        settle_id <!--his结算id--> ,
+
+
+        insure_settle_id <!--医保结算id--> ,
+
+
+        drg_dip_code <!--drg\dip组编码--> ,
+
+
+        drg_dip_name <!--drg\dip组名称--> ,
+
+
+        icd10 <!--主要诊断--> ,
+
+
+        icd9 <!--主要手术--> ,
+
+
+        weight <!--权重--> ,
+
+
+        total_fee <!--总费用--> ,
+
+
+        stand_fee <!--标杆费用--> ,
+
+
+        override <!--倍率--> ,
+
+
+        cdntn_pay <!--统筹金额--> ,
+
+
+        diff_fee <!--预计偏差--> ,
+
+
+        yp_fee <!--药品费--> ,
+
+
+        cl_fee <!--耗材费--> ,
+
+
+        states <!--质控完成状态--> ,
+
+
+        type <!--质控类型--> ,
+
+
+        business_type <!--业务类型--> ,
+
+
+        business_id <!--业务id--> ,
+
+
+        hosp_code <!--医院编码--> ,
+
+
+        insure_reg_code <!--医保注册编码--> ,
+
+
+        hosp_name <!--医院名称--> ,
+
+
+        org_code <!--机构编码--> ,
+
+
+        valid_flag <!--有效标志--> ,
+
+
+        crt_id <!--创建人--> ,
+
+
+        crt_name <!--创建姓名--> ,
+
+
+        crt_time <!--创建时间-->
+
+        )
         values (
-            if(#{id} != null and #{id} != ''){
-                #{id},
-            }
-            if(#{visitId} != null and #{visitId} != ''){
-                #{visitId},
-            }
-            if(#{psnNo} != null and #{psnNo} != ''){
-                #{psnNo},
-            }
-            if(#{psnName} != null and #{psnName} != ''){
-                #{psnName},
-            }
-            if(#{certno} != null and #{certno} != ''){
-                #{certno},
-            }
-            if(#{gend} != null and #{gend} != ''){
-                #{gend},
-            }
-            if(#{age} != null and #{age} != ''){
-                #{age},
-            }
-            if(#{insutype} != null and #{insutype} != ''){
-                #{insutype},
-            }
-            if(#{medType} != null and #{medType} != ''){
-                #{medType},
-            }
-            if(#{medTypeName} != null and #{medTypeName} != ''){
-                #{medTypeName},
-            }
-            if(#{inTime} != null and #{inTime} != ''){
-                #{inTime},
-            }
-            if(#{outTime} != null and #{outTime} != ''){
-                #{outTime},
-            }
-            if(#{inptDiagnose} != null and #{inptDiagnose} != ''){
-                #{inptDiagnose},
-            }
-            if(#{outptDiagnose} != null and #{outptDiagnose} != ''){
-                #{outptDiagnose},
-            }
-            if(#{deptId} != null and #{deptId} != ''){
-                #{deptId},
-            }
-            if(#{deptName} != null and #{deptName} != ''){
-                #{deptName},
-            }
-            if(#{doctorId} != null and #{doctorId} != ''){
-                #{doctorId},
-            }
-            if(#{doctorName} != null and #{doctorName} != ''){
-                #{doctorName},
-            }
-            if(#{medicalRegNo} != null and #{medicalRegNo} != ''){
-                #{medicalRegNo},
-            }
-            if(#{settleId} != null and #{settleId} != ''){
-                #{settleId},
-            }
-            if(#{insureSettleId} != null and #{insureSettleId} != ''){
-                #{insureSettleId},
-            }
-            if(#{drgDipCode} != null and #{drgDipCode} != ''){
-                #{drgDipCode},
-            }
-            if(#{drgDipName} != null and #{drgDipName} != ''){
-                #{drgDipName},
-            }
-            if(#{icd10} != null and #{icd10} != ''){
-                #{icd10},
-            }
-            if(#{icd9} != null and #{icd9} != ''){
-                #{icd9},
-            }
-            if(#{weight} != null and #{weight} != ''){
-                #{weight},
-            }
-            if(#{totalFee} != null and #{totalFee} != ''){
-                #{totalFee},
-            }
-            if(#{standFee} != null and #{standFee} != ''){
-                #{standFee},
-            }
-            if(#{override} != null and #{override} != ''){
-                #{override},
-            }
-            if(#{cdntnPay} != null and #{cdntnPay} != ''){
-                #{cdntnPay},
-            }
-            if(#{diffFee} != null and #{diffFee} != ''){
-                #{diffFee},
-            }
-            if(#{ypFee} != null and #{ypFee} != ''){
-                #{ypFee},
-            }
-            if(#{clFee} != null and #{clFee} != ''){
-                #{clFee},
-            }
-            if(#{states} != null and #{states} != ''){
-                #{states},
-            }
-            if(#{type} != null and #{type} != ''){
-                #{type},
-            }
-            if(#{businessType} != null and #{businessType} != ''){
-                #{businessType},
-            }
-            if(#{businessId} != null and #{businessId} != ''){
-                #{businessId},
-            }
-            if(#{hospCode} != null and #{hospCode} != ''){
-                #{hospCode},
-            }
-            if(#{insureRegCode} != null and #{insureRegCode} != ''){
-                #{insureRegCode},
-            }
-            if(#{hospName} != null and #{hospName} != ''){
-                #{hospName},
-            }
-            if(#{orgCode} != null and #{orgCode} != ''){
-                #{orgCode},
-            }
-            if(#{validFlag} != null and #{validFlag} != ''){
-                #{validFlag},
-            }
-            if(#{crtId} != null and #{crtId} != ''){
-                #{crtId},
-            }
-            if(#{crtName} != null and #{crtName} != ''){
-                #{crtName},
-            }
-            if(#{crtTime} != null and #{crtTime} != ''){
-                #{crtTime}
-            }
+
+        #{id},
+
+
+        #{visitId},
+
+
+        #{psnNo},
+
+
+        #{psnName},
+
+
+        #{certno},
+
+
+        #{gend},
+
+
+        #{age},
+
+
+        #{insutype},
+
+
+        #{medType},
+
+
+        #{medTypeName},
+
+
+        #{inTime},
+
+
+        #{outTime},
+
+
+        #{inptDiagnose},
+
+
+        #{outptDiagnose},
+
+
+        #{deptId},
+
+
+        #{deptName},
+
+
+        #{doctorId},
+
+
+        #{doctorName},
+
+
+        #{medicalRegNo},
+
+
+        #{settleId},
+
+
+        #{insureSettleId},
+
+
+        #{drgDipCode},
+
+
+        #{drgDipName},
+
+
+        #{icd10},
+
+
+        #{icd9},
+
+
+        #{weight},
+
+
+        #{totalFee},
+
+
+        #{standFee},
+
+
+        #{override},
+
+
+        #{cdntnPay},
+
+
+        #{diffFee},
+
+
+        #{ypFee},
+
+
+        #{clFee},
+
+
+        #{states},
+        #{type},
+        #{businessType},
+        #{businessId},
+        #{hospCode},
+        #{insureRegCode},
+        #{hospName},
+        #{orgCode},
+        #{validFlag},
+        #{crtId},
+        #{crtName},
+        #{crtTime}
+
         )
     </insert>
 

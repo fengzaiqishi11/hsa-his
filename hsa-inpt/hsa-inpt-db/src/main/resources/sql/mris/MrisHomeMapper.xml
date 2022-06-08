@@ -2190,7 +2190,8 @@
            '' as addr_street,
            '' as disch_dept_id,
            '' as hsptzd_dept_id,
-           IFNULL(iiv.bka006_name,'') as insur_type
+           IFNULL(iiv.bka006_name,'') as insur_type,
+           iiv.medicine_org_code as medicine_org_code
             FROM mris_base_info mbi
            left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code

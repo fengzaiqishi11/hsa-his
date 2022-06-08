@@ -7,6 +7,7 @@ import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
+import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,6 +48,32 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
     @Override
     public WrapperResponse<Boolean> insertDrgDipQulityInfoLog(Map<String,Object> map) {
         return WrapperResponse.success(drgDipResultBO.insertDrgDipQulityInfoLog(map));
+    }
+
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 9:36
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Boolean> checkDrgDipBizAuthorization(Map<String, Object> map) {
+      return WrapperResponse.success(drgDipResultBO.checkDrgDipBizAuthorization(map));
+    }
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption drg\dip保存质控结果
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Boolean> insertDrgDipResult(Map<String,Object> map) {
+        return WrapperResponse.success(drgDipResultBO.insertDrgDipResult(MapUtils.get(map,"drgDipResultDTO"),MapUtils.get(map,"drgDipResultDetailDTOList")));
     }
 
 

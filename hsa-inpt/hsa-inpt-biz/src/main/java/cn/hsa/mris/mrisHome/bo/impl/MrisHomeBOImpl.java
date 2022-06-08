@@ -425,15 +425,24 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
-      //新增质控信息
-      DrgDipResultDTO dto = new DrgDipResultDTO();
-      dto.setVisitId(map.get("visitId").toString());
-      dto.setHospCode(map.get("hospCode").toString());
-      HashMap map1 = new HashMap();
-      map1.put("drgDipResultDTO",dto);
-      map1.put("hospCode",map.get("hospCode").toString());
-      DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-      resultMap.put("drgInfo",combo);
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultMap.put("drgInfo",combo);
+        //DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultMap.put("DIP_DRG_MODE",null);
+        }else{
+          resultMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+        }
         return resultMap;
     }
 

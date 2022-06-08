@@ -19,16 +19,25 @@ import java.util.Map;
  */
 public interface DrgDipResultBO {
 
-  /**
-   * 获取质控信息
-   * @param map
-   * @Author 医保开发二部-湛康
-   * @Date 2022-06-07 15:54
-   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
-   */
-  DrgDipComboDTO getDrgDipInfoByParam(HashMap map);
+    /**
+     * 获取质控信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    DrgDipComboDTO getDrgDipInfoByParam(HashMap map);
 
     Boolean insertDrgDipQulityInfoLog(Map<String, Object> map);
 
     Boolean insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> resultMap);
+
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 9:42
+     * @return java.lang.Boolean
+     */
+    Boolean checkDrgDipBizAuthorization(Map<String, Object> map);
 }

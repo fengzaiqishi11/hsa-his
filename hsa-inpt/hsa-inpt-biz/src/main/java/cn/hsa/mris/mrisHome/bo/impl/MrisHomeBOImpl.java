@@ -475,7 +475,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
         logMap.put("type","1");
-        logMap.put("businessType","1");
+        logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
@@ -521,8 +521,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
-        logMap.put("type","1");
-        logMap.put("businessType","1");
+        logMap.put("type","2");
+        logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);

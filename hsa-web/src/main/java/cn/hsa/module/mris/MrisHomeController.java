@@ -144,6 +144,8 @@ public class MrisHomeController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String,Object> map = new HashMap<>();
         map.put("visitId",visitId);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.upMrisForDRG(map));
     }
@@ -155,6 +157,8 @@ public class MrisHomeController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String,Object> map = new HashMap<>();
         map.put("visitId",visitId);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.upMrisForDIP(map));
     }

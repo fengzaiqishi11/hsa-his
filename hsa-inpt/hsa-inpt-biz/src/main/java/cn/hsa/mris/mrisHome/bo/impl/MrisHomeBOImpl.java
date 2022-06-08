@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
+import cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
@@ -99,6 +100,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private DrgDipResultService drgDipResultService;
+
+    @Resource
+    private DrgDipBusinessOptInfoLogService drgDipBusinessOptInfoLogService_consumer;
 
 
     /**
@@ -421,15 +425,24 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisTurnDeptList",mrisHomeDAO.queyMrisTurnDeptPage(inptVisitDTO));
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
-      //新增质控信息
-      DrgDipResultDTO dto = new DrgDipResultDTO();
-      dto.setVisitId(map.get("visitId").toString());
-      dto.setHospCode(map.get("hospCode").toString());
-      HashMap map1 = new HashMap();
-      map1.put("drgDipResultDTO",dto);
-      map1.put("hospCode",map.get("hospCode").toString());
-      DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-      resultMap.put("drgInfo",combo);
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultMap.put("drgInfo",combo);
+        //DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultMap.put("DIP_DRG_MODE",null);
+        }else{
+          resultMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+        }
         return resultMap;
     }
 
@@ -475,7 +488,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
         logMap.put("type","1");
-        logMap.put("businessType","1");
+        logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
@@ -499,6 +512,48 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("quality",resultMap.get("quality"));// 质控信息list
         /**==========返回参数封装 End ===========**/
         return responseDataMap;
+        //TODO 此处插入业务操作日志 类型为4.上传
+        Map<String, Object> businessLogMap = new HashMap<>();
+        businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
+        businessLogMap.put("optType","4");
+        businessLogMap.put("optTypeName","上传");
+        businessLogMap.put("type","1");
+        businessLogMap.put("businessType","2");
+        businessLogMap.put("isForce",MapUtils.get(map, "isForce"));
+        businessLogMap.put("forceUploadInfo",MapUtils.get(map, "forceUploadInfo"));
+        businessLogMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        businessLogMap.put("insureRegCode",MapUtils.get(map, "insureRegCode"));
+        businessLogMap.put("hospName",MapUtils.get(map, "hospName"));
+        businessLogMap.put("orgCode",MapUtils.get(map, "orgCode"));
+        businessLogMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
+        businessLogMap.put("medicalRegNo",MapUtils.get(map, "medicalRegCode"));
+        businessLogMap.put("settleId",MapUtils.get(map, "settleId"));
+        businessLogMap.put("visitId",MapUtils.get(map, "visitId"));
+        businessLogMap.put("psnNo",MapUtils.get(map, "psnNo"));
+        businessLogMap.put("psnName",MapUtils.get(map, "psnName"));
+        businessLogMap.put("certNo",MapUtils.get(map, "certNo"));
+        businessLogMap.put("deptId",MapUtils.get(map, "deptId"));
+        businessLogMap.put("sex",MapUtils.get(map, "sex"));
+        businessLogMap.put("age",MapUtils.get(map, "age"));
+        businessLogMap.put("insueType",MapUtils.get(map, "insueType"));
+        businessLogMap.put("inptTime",MapUtils.get(map, "inptTime"));
+        businessLogMap.put("outptTime,",MapUtils.get(map, "outptTime"));
+        businessLogMap.put("medType",MapUtils.get(map, "medType"));
+        businessLogMap.put("medTypeName",MapUtils.get(map, "medTypeName"));
+        businessLogMap.put("deptName",MapUtils.get(map, "deptName"));
+        businessLogMap.put("doctorId",MapUtils.get(map, "doctorId"));
+        businessLogMap.put("doctorName",MapUtils.get(map, "doctorName"));
+        businessLogMap.put("inptDiagnose",MapUtils.get(map, "inptDiagnose"));
+        businessLogMap.put("outptDiagnose",MapUtils.get(map, "outptDiagnose"));
+        businessLogMap.put("totalFee",MapUtils.get(map, "totalFee"));
+        businessLogMap.put("payFee",MapUtils.get(map, "payFee"));
+        businessLogMap.put("selfFee",MapUtils.get(map, "selfFee"));
+        businessLogMap.put("cashPayFee",MapUtils.get(map, "cashPayFee"));
+        //businessLogMap.put("inputJosn",MapUtils.get(map, "inputJson"));
+        businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
+        businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
+        drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
+        return resultMap;
     }
     // 整理病案首页数据，上传drg
     @Override
@@ -540,11 +595,54 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
-        logMap.put("type","1");
-        logMap.put("businessType","1");
+        logMap.put("type","2");
+        logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
+        //TODO 此处插入业务操作日志 类型为4.上传
+        Map<String, Object> businessLogMap = new HashMap<>();
+        businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
+        businessLogMap.put("optType","4");
+        businessLogMap.put("optTypeName","上传");
+        businessLogMap.put("type","2");
+        businessLogMap.put("businessType","1");
+        businessLogMap.put("isForce",MapUtils.get(map, "isForce"));
+        businessLogMap.put("forceUploadInfo",MapUtils.get(map, "forceUploadInfo"));
+        businessLogMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        businessLogMap.put("insureRegCode",MapUtils.get(map, "insureRegCode"));
+        businessLogMap.put("hospName",MapUtils.get(map, "hospName"));
+        businessLogMap.put("orgCode",MapUtils.get(map, "orgCode"));
+        businessLogMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
+        businessLogMap.put("medicalRegNo",MapUtils.get(map, "medicalRegCode"));
+        businessLogMap.put("settleId",MapUtils.get(map, "settleId"));
+        businessLogMap.put("visitId",MapUtils.get(map, "visitId"));
+        businessLogMap.put("psnNo",MapUtils.get(map, "psnNo"));
+        businessLogMap.put("psnName",MapUtils.get(map, "psnName"));
+        businessLogMap.put("certNo",MapUtils.get(map, "certNo"));
+        businessLogMap.put("deptId",MapUtils.get(map, "deptId"));
+        businessLogMap.put("sex",MapUtils.get(map, "sex"));
+        businessLogMap.put("age",MapUtils.get(map, "age"));
+        businessLogMap.put("insueType",MapUtils.get(map, "insueType"));
+        businessLogMap.put("inptTime",MapUtils.get(map, "inptTime"));
+        businessLogMap.put("outptTime,",MapUtils.get(map, "outptTime"));
+        businessLogMap.put("medType",MapUtils.get(map, "medType"));
+        businessLogMap.put("medTypeName",MapUtils.get(map, "medTypeName"));
+        businessLogMap.put("deptName",MapUtils.get(map, "deptName"));
+        businessLogMap.put("doctorId",MapUtils.get(map, "doctorId"));
+        businessLogMap.put("doctorName",MapUtils.get(map, "doctorName"));
+
+        businessLogMap.put("inptDiagnose",MapUtils.get(map, "inptDiagnose"));
+        businessLogMap.put("outptDiagnose",MapUtils.get(map, "outptDiagnose"));
+        businessLogMap.put("totalFee",MapUtils.get(map, "totalFee"));
+        businessLogMap.put("payFee",MapUtils.get(map, "payFee"));
+        businessLogMap.put("selfFee",MapUtils.get(map, "selfFee"));
+        businessLogMap.put("cashPayFee",MapUtils.get(map, "cashPayFee"));
+        //businessLogMap.put("inputJosn",MapUtils.get(map, "inputJson"));
+        businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
+        businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
+        drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
+        return resultMap;
         /**==========返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
         responseDataMap.put("name",baseInfoStr.get("name"));// 姓名

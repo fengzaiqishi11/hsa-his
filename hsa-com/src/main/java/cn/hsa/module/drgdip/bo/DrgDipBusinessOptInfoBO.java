@@ -1,5 +1,8 @@
 package cn.hsa.module.drgdip.bo;
 
+import cn.hsa.base.PageDTO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO;
+
 import java.util.Map;
 
 /**
@@ -16,4 +19,13 @@ public interface DrgDipBusinessOptInfoBO {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     Boolean insertDrgDipBusinessOptInfoLog(Map<String, Object> map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-06-08 14:02
+     * @Description 查询dip、drg质控过程日志记录
+     * @param drgDipBusinessOptInfoLogDO
+     * @return cn.hsa.base.PageDTO
+     */
+    PageDTO queryDrgDipBusinessOptInfoLogList(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
 }

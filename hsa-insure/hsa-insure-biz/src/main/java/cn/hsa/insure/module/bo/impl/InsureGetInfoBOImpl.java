@@ -648,6 +648,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         map1.put("hospCode",map.get("hospCode").toString());
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
         resultDataMap.put("drgInfo",combo);
+        //DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultDataMap.put("DIP_DRG_MODE",null);
+        }else{
+          resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+        }
         return resultDataMap;
     }
 
@@ -706,11 +716,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
         Map<String, Object> resultMap = MapUtils.get(responseMap, "result");// 返回结果
         logMap.put("respTime",DateUtils.getNow());//响应时间
-        if (MapUtils.isEmpty(resultMap)){
-            throw new AppException("调用DRG,返回结果为空");
-        }
-        Map<String, Object> groupInfo = MapUtils.get(resultMap, "groupInfo");// 分组信息，可以使用fastjson转成dto
-        List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 结果明细,可以使用fastjson转成List<dto>
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
@@ -723,6 +728,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
+        if (MapUtils.isEmpty(resultMap)){
+            throw new AppException("调用DRG,返回结果为空");
+        }
+        Map<String, Object> groupInfo = MapUtils.get(resultMap, "groupInfo");// 分组信息，可以使用fastjson转成dto
+        List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 结果明细,可以使用fastjson转成List<dto>
         if (0 == responseCode) { // 成功
             // TODO xxx写入日志的流程，为防止事务不一致的情况，请不要调用远程服务的insert
         } else {
@@ -900,9 +910,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
         Map<String, Object> resultMap = MapUtils.get(responseMap, "result");// 返回结果
         logMap.put("respTime",DateUtils.getNow());//响应时间
-        if (MapUtils.isEmpty(resultMap)){
-            throw new AppException("调用DIP,返回结果为空");
-        }
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
@@ -910,11 +917,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",responseCode);
-        logMap.put("type","1");
+        logMap.put("type","2");
         logMap.put("businessType","1");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
+        if (MapUtils.isEmpty(resultMap)){
+            throw new AppException("调用DIP,返回结果为空");
+        }
         if (0 == responseCode) { // 成功
             // TODO xxx写入日志的流程，为防止事务不一致的情况，请不要调用远程服务的insert
         } else {
@@ -1417,6 +1427,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map1.put("hospCode",map.get("hospCode").toString());
             DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
             resultDataMap.put("drgInfo",combo);
+            //DIP_DRG_MODE值
+            Map<String, Object> sysMap = new HashMap<>();
+            sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+            sysMap.put("code", "DIP_DRG_MODE");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+            if (ObjectUtil.isEmpty(sysParameterDTO)){
+              resultDataMap.put("DIP_DRG_MODE",null);
+            }else{
+              resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+            }
         }
         return resultDataMap;
     }

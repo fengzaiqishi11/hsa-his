@@ -1,5 +1,6 @@
 package cn.hsa.module.drgdip.service;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,4 +24,13 @@ public interface DrgDipBusinessOptInfoLogService {
      */
     @PostMapping("/service/insure/insureDrgDipBusinessOptInfo/insertDrgDipBusinessOptInfoLog")
     WrapperResponse<Boolean> insertDrgDipBusinessOptInfoLog(Map<String,Object> map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-06-08 13:57
+     * @Description  查询dip、drg质控过程日志记录
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> queryDrgDipBusinessOptInfoLogList(Map<String, Object> map);
 }

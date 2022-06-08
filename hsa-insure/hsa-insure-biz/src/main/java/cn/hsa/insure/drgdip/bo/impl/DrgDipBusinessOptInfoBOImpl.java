@@ -1,5 +1,6 @@
 package cn.hsa.insure.drgdip.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.util.DateUtil;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
@@ -144,5 +145,17 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             e.printStackTrace();
         }
         return functionLog;
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-06-08 14:31
+     * @Description 查询dip、drg质控过程日志记录
+     * @param drgDipBusinessOptInfoLogDO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryDrgDipBusinessOptInfoLogList(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO) {
+        return PageDTO.of(drgDipBusinessOptInfoLogDAO.queryDrgDipBusinessOptInfoLogList(drgDipBusinessOptInfoLogDO));
     }
 }

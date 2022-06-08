@@ -585,8 +585,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
         businessLogMap.put("optType","4");
         businessLogMap.put("optTypeName","上传");
-        businessLogMap.put("type","1");
-        businessLogMap.put("businessType","2");
+        businessLogMap.put("type","2");
+        businessLogMap.put("businessType","1");
         businessLogMap.put("isForce",MapUtils.get(map, "isForce"));
         businessLogMap.put("forceUploadInfo",MapUtils.get(map, "forceUploadInfo"));
         businessLogMap.put("hospCode",MapUtils.get(map, "hospCode"));
@@ -611,6 +611,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         businessLogMap.put("deptName",MapUtils.get(map, "deptName"));
         businessLogMap.put("doctorId",MapUtils.get(map, "doctorId"));
         businessLogMap.put("doctorName",MapUtils.get(map, "doctorName"));
+
         businessLogMap.put("inptDiagnose",MapUtils.get(map, "inptDiagnose"));
         businessLogMap.put("outptDiagnose",MapUtils.get(map, "outptDiagnose"));
         businessLogMap.put("totalFee",MapUtils.get(map, "totalFee"));

@@ -14,7 +14,7 @@ public interface CenterFunctionAuthorizationBO {
      *  根据医院编码与业务单据编码查询功能授权信息
      * @param hospCode 医院编码
      * @param orderTypeCode 单据编码
-     * @return 中心端增值功能授权
+     * @return 中心端增值功能授权实体对象
      */
     WrapperResponse<CenterFunctionAuthorizationDO> queryBizAuthorizationByOrderTypeCode(String hospCode, String orderTypeCode);
 }

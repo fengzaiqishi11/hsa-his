@@ -1,6 +1,7 @@
 package cn.hsa.module.center.authorization.entity;
 
 import cn.hsa.base.PageDO;
+import cn.hsa.util.Constants;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,9 @@ public class CenterFunctionAuthorizationDO extends PageDO implements Serializabl
     private String	encryptStartDate;
     private String	encryptEndDate;
     private String	remark;
+    /**
+     *  审核状态 SF.S 1 代表已经审核 0 代表未审核
+     */
     private String	auditStatus;
     private String	auditId;
     private String	auditName;

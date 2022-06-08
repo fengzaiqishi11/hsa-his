@@ -16,7 +16,7 @@ public interface DrgDipBusinessOptInfoLogDAO {
      * @param
      * @return  int
      */
-    int insertDrgDipBusinessOptInfoLog(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
+    Boolean insertDrgDipBusinessOptInfoLog(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
 
     /**
      * @Author 医保开发二部-湛康

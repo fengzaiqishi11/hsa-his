@@ -84,7 +84,7 @@
 
     <update id="saveMwdicalTechnologyConfirmCost" parameterType="java.util.Map">
         update inpt_cost set is_ok = '1', ok_id = #{crteId}, ok_name = #{crteName}, ok_time = #{crteTime}
-        where hosp_code = #{hospCode} and id in in
+        where hosp_code = #{hospCode} and id in
         <foreach collection="ids" separator="," open="(" close=")" item="item">
             #{item}
         </foreach>

@@ -9,6 +9,7 @@ import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -16,6 +17,7 @@ import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.bo.InsureGetInfoBO;
@@ -34,6 +36,7 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +94,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     private DrgDipResultBO drgDipResultBO;
+
+    @Resource
+    DrgDipBusinessOptInfoBO drgDipBusinessOptInfoBO;
 
     /**
      * @Method getSettleInfo
@@ -448,10 +454,50 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         // 保存 住院诊断信息
         insertDiseaseInfo(map);
         // 保存结清单信息
-        insertSetleInfo(map);
+        Map<String, Object> setleInfoMap = insertSetleInfo(map);
         // 保存输血信息
         insertBldInfo(map);
-
+        //TODO 此处插入业务操作日志 类型为4.上传
+        Map<String, Object> businessLogMap = new HashMap<>();
+        businessLogMap.put("businessId",MapUtils.get(setleInfoMap, "id"));
+        businessLogMap.put("optType","2");
+        businessLogMap.put("optTypeName","保存");
+        businessLogMap.put("type","1");
+        businessLogMap.put("businessType","1");
+        businessLogMap.put("isForce",MapUtils.get(setleInfoMap, "isForce"));
+        businessLogMap.put("forceUploadInfo",MapUtils.get(setleInfoMap, "forceUploadInfo"));
+        businessLogMap.put("hospCode",MapUtils.get(setleInfoMap, "hospCode"));
+        businessLogMap.put("insureRegCode",MapUtils.get(setleInfoMap, "insureRegCode"));
+        businessLogMap.put("hospName",MapUtils.get(setleInfoMap, "hospName"));
+        businessLogMap.put("orgCode",MapUtils.get(setleInfoMap, "orgCode"));
+        businessLogMap.put("insureSettleId",MapUtils.get(setleInfoMap, "insureSettleId"));
+        businessLogMap.put("medicalRegNo",MapUtils.get(setleInfoMap, "medicalRegCode"));
+        businessLogMap.put("settleId",MapUtils.get(setleInfoMap, "settleId"));
+        businessLogMap.put("visitId",MapUtils.get(setleInfoMap, "visitId"));
+        businessLogMap.put("psnNo",MapUtils.get(setleInfoMap, "psnNo"));
+        businessLogMap.put("psnName",MapUtils.get(setleInfoMap, "psnName"));
+        businessLogMap.put("certNo",MapUtils.get(setleInfoMap, "certNo"));
+        businessLogMap.put("deptId",MapUtils.get(setleInfoMap, "deptId"));
+        businessLogMap.put("sex",MapUtils.get(setleInfoMap, "gend"));
+//        businessLogMap.put("age",MapUtils.get(map, "age")) ;
+        businessLogMap.put("insueType",MapUtils.get(setleInfoMap, "hiType"));
+        businessLogMap.put("inptTime",MapUtils.get(setleInfoMap, "admTime"));
+        businessLogMap.put("outptTime",MapUtils.get(setleInfoMap, "dscgTime"));
+        businessLogMap.put("medType",MapUtils.get(setleInfoMap, "medType"));
+        businessLogMap.put("medTypeName",MapUtils.get(setleInfoMap, "medTypeName"));
+        businessLogMap.put("deptName",MapUtils.get(setleInfoMap, "deptName"));
+        businessLogMap.put("doctorId",MapUtils.get(setleInfoMap, "doctorId"));
+        businessLogMap.put("doctorName",MapUtils.get(setleInfoMap, "doctorName"));
+        businessLogMap.put("inptDiagnose",MapUtils.get(setleInfoMap, "inptDiagnose"));
+        businessLogMap.put("outptDiagnose",MapUtils.get(setleInfoMap, "outptDiagnose"));
+        businessLogMap.put("totalFee",MapUtils.get(setleInfoMap, "totalFee"));
+        businessLogMap.put("payFee",MapUtils.get(setleInfoMap, "payFee"));
+        businessLogMap.put("selfFee",MapUtils.get(setleInfoMap, "selfFee"));
+        businessLogMap.put("cashPayFee",MapUtils.get(setleInfoMap, "cashPayFee"));
+        businessLogMap.put("inputJosn",setleInfoMap);
+        businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
+        businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
+        drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
         return true;
     }
 
@@ -754,6 +800,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("feeStand",groupInfo.get("fee_stand"));// 总费用标杆
         responseDataMap.put("quality",qualityInfo);// 质控信息
         /**==========返回参数封装 End ===========**/
+        //保存质控结果
+//        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
         return resultMap;
     }
 
@@ -945,6 +993,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("feeStand",resultMap.get("fee_stand"));// todo 总费用标杆
         responseDataMap.put("quality",resultMap.get("qualityInfo"));// 质控信息
         /**==========返回参数封装 End ===========**/
+        //保存质控结果
+//        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(resultMap),DrgDipResultDTO.class);
+//        List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(resultMap.get("qualityInfo")),DrgDipResultDetailDTO.class);
+//        drgDipResultBO.insertDrgDipResult(drgDipResultDTO,drgDipResultDetailDTOList);
         return resultMap;
     }
 
@@ -1129,7 +1181,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Date 2021/11/3 20:18
      * @Return
      **/
-    private void insertSetleInfo(Map<String, Object> map) {
+    private Map<String, Object>  insertSetleInfo(Map<String, Object> map) {
         Map<String, Object> setlInfoMap = MapUtils.get(map, "setlinfo");
         String isHospital = MapUtils.get(map, "isHospital");
         if (MapUtils.isEmpty(setlInfoMap)) {
@@ -1257,6 +1309,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         insureGetInfoDAO.deleteSetleInfo(setlInfoMap);
         insureGetInfoDAO.insertSetleInfo(setlInfoMap);
+        return setlInfoMap;
     }
 
     /**
@@ -2716,4 +2769,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         return (T) map.get(key);
     }
 
+    //保存质控结果
+    private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
+        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(groupInfo),DrgDipResultDTO.class);
+        List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
+        drgDipResultBO.insertDrgDipResult(drgDipResultDTO,drgDipResultDetailDTOList);
+        return true;
+    }
 }

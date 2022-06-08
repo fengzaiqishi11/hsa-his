@@ -31,6 +31,15 @@ public interface DrgDipResultService {
      */
     WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(HashMap map);
 
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption drg\dip调用插入日志表
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
     WrapperResponse<Boolean> insertDrgDipQulityInfoLog(Map<String, Object> map);
 
     /**
@@ -41,4 +50,15 @@ public interface DrgDipResultService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     WrapperResponse<Boolean> checkDrgDipBizAuthorization(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption drg\dip保存质控结果
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<Boolean> insertDrgDipResult(Map<String, Object> map);
 }

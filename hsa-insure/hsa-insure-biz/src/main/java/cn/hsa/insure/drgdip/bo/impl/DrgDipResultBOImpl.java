@@ -8,9 +8,7 @@ import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationSer
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
-import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.insure.drgdip.dto.*;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.util.MapUtils;
@@ -139,11 +137,15 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
      * @Return
      */
     @Override
-    public Boolean insertDrgDipResult(Map<String,Object> dataMap,Map<String,Object> resultMap) {
+    public Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
 
-        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
-        Map<String,Object> baseInfo = MapUtils.get(dataMap,"baseInfo");
-        drgDipResultDTO.setId(SnowflakeUtils.getId());
+        if(drgDipResultDTO != null){
+            drgDipResultDTO.setId(SnowflakeUtils.getId());
+            drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
+        }
+        if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
+            drgDipResultDetailDAO.insertDrgDipResultDetailList(drgDipResultDetailDTOList);
+        }
         return true;
 
     }

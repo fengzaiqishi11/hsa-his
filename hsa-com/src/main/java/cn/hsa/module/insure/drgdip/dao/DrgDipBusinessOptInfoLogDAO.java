@@ -2,6 +2,8 @@ package cn.hsa.module.insure.drgdip.dao;
 
 import cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO;
 
+import java.util.List;
+
 /**
  * @Description: drg/dip质控业务操作日志表
  * @author： 医保开发二部-湛康
@@ -44,4 +46,13 @@ public interface DrgDipBusinessOptInfoLogDAO {
      * @return int
      */
      DrgDipBusinessOptInfoLogDO selectById(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-06-08 14:31
+     * @Description 查询dip、drg质控过程日志记录
+     * @param drgDipBusinessOptInfoLogDO
+     * @return cn.hsa.base.PageDTO
+     */
+    List<DrgDipBusinessOptInfoLogDO> queryDrgDipBusinessOptInfoLogList(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
 }

@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ImportResource;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * @Package_name: cn.hsa.base
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.ImportResource;
 @ImportResource("classpath*:config/spring.xml")
 @MapperScan({"cn.hsa.module.sys.*.dao"})
 @MapperScan({"cn.hsa.module.base.*.dao"})
-
+@EnableAsync
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
 @EnableEncryptableProperties
 public class HsaGenericApplication {

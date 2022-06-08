@@ -121,4 +121,6 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private String sLossList;
     // 是否过滤科室库存
     private String sfdeptFilter;
+    private String nationCode;
+    private String nationName;
 }

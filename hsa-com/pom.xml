@@ -46,7 +46,7 @@
         </dependency>
 
         <!--版本和腾讯依赖的feign保持一致-->
-            <dependency>
+        <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-openfeign-core</artifactId>
             <scope>provided</scope>

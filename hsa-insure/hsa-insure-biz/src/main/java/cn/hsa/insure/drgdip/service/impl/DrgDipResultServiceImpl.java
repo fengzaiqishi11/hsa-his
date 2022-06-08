@@ -25,14 +25,14 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
 
   /**
    * 查询质控信息
-   * @param dtoo
+   * @param map
    * @Author 医保开发二部-湛康
    * @Date 2022-06-07 15:48
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO>
    */
   @Override
-  public WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(DrgDipResultDTO dtoo) {
-    return null;
+  public WrapperResponse<DrgDipComboDTO> getDrgDipInfoByParam(HashMap map) {
+    return WrapperResponse.success(drgDipResultBO.getDrgDipInfoByParam(map));
   }
 
     /**

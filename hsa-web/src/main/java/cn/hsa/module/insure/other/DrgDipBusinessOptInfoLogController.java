@@ -53,4 +53,16 @@ public class DrgDipBusinessOptInfoLogController extends BaseController {
         map.put("drgDipBusinessOptInfoLogDO",drgDipBusinessOptInfoLogDO);
         return drgDipBusinessOptInfoLogService_consumer.queryDrgDipBusinessOptInfoLogList(map);
     }
+
+    @PostMapping("/getDrgDipBusinessOptInfoLogDetail")
+    public WrapperResponse<PageDTO> getDrgDipBusinessOptInfoLogDetail(@RequestBody DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO,
+                                                                      HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        drgDipBusinessOptInfoLogDO.setHospCode(sysUserDTO.getHospCode());
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("drgDipBusinessOptInfoLogDO",drgDipBusinessOptInfoLogDO);
+        return drgDipBusinessOptInfoLogService_consumer.getDrgDipBusinessOptInfoLogDetail(map);
+    }
+
 }

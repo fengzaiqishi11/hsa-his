@@ -679,9 +679,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     public Map<String, Object> uploadInsureSettleInfoForDRG(Map<String, Object> map) {
         //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("baseInfo", getInsureSettleBaseInfo(map));// 基础信息
-        dataMap.put("diseInfo", getInsureSettleDiseInfo(map));// 诊断信息
-        dataMap.put("oprtInfo", getInsureSettleOprtInfo(map));// 手术信息
+        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
+        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
+        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
+        dataMap.put("baseInfo", baseInfo);
+        dataMap.put("diseInfo", diseInfo);
+        dataMap.put("oprtInfo", oprtInfo);
         Map<String, Object> paramMap = new HashMap<>();
         /**=============获取系统参数中配置的结算清单质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
@@ -710,8 +713,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 结果明细,可以使用fastjson转成List<dto>
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfo"), "fixmedins_code"));
-        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfo"), "visit_id"));
+        logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
+        logMap.put("visitId",MapUtils.get(baseInfo, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",responseCode);
@@ -726,6 +729,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             String message = MapUtils.get(responseMap, "message");
             throw new AppException("调用DRG质控失败，原因：" + message);
         }
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
+        responseDataMap.put("sex",baseInfo.get("gender"));// 性别
+        responseDataMap.put("age",baseInfo.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("drgCode",groupInfo.get("drg_code"));// DRG组编码
+        responseDataMap.put("drgName",groupInfo.get("drg_name"));// DRG组名称
+        responseDataMap.put("weightValue",groupInfo.get("weight_value"));// DRG权重
+        responseDataMap.put("ratio",groupInfo.get("bl"));// 倍率
+        responseDataMap.put("profitAndLossAmount",groupInfo.get("profitAndLossAmount"));// todo 盈亏额
+        responseDataMap.put("totalFee",groupInfo.get("total_fee"));// 总费用
+        responseDataMap.put("feeStand",groupInfo.get("fee_stand"));// 总费用标杆
+        responseDataMap.put("quality",qualityInfo);// 质控信息
+        /**==========返回参数封装 End ===========**/
         return resultMap;
     }
 
@@ -855,9 +873,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     public Map<String, Object> uploadInsureSettleInfoForDIP(Map<String, Object> map) {
         //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("baseInfo", getInsureSettleBaseInfo(map));// 基础信息
-        dataMap.put("diseInfo", getInsureSettleDiseInfo(map));// 诊断信息
-        dataMap.put("oprtInfo", getInsureSettleOprtInfo(map));// 手术信息
+        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
+        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
+        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
+        dataMap.put("baseInfo", baseInfo);
+        dataMap.put("diseInfo", diseInfo);
+        dataMap.put("oprtInfo", oprtInfo);
         Map<String, Object> paramMap = new HashMap<>();
         /**=============获取系统参数中配置的结算清单质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
@@ -884,8 +905,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfo"), "fixmedins_code"));
-        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfo"), "visit_id"));
+        logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
+        logMap.put("visitId",MapUtils.get(baseInfo, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",responseCode);
@@ -900,6 +921,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             String message = MapUtils.get(responseMap, "message");
             throw new AppException("调用DIP质控失败，原因：" + message);
         }
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
+        responseDataMap.put("sex",baseInfo.get("gender"));// 性别
+        responseDataMap.put("age",baseInfo.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
+        responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
+        responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值
+        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
+        responseDataMap.put("totalFee",resultMap.get("total_fee"));// todo 总费用
+        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// todo 总费用标杆
+        responseDataMap.put("quality",resultMap.get("qualityInfo"));// 质控信息
+        /**==========返回参数封装 End ===========**/
         return resultMap;
     }
 

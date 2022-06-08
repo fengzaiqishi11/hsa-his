@@ -479,7 +479,26 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
-        return resultMap;
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
+        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
+        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("drgCode",resultMap.get("drg_code"));// DRG组编码
+        responseDataMap.put("drgName",resultMap.get("drg_name"));// DRG组名称
+        responseDataMap.put("weightValue",resultMap.get("weight_value"));// DRG权重
+        responseDataMap.put("ratio",resultMap.get("bl"));// 倍率
+        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
+        responseDataMap.put("totalFee",resultMap.get("total_fee"));// 总费用
+        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",resultMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",resultMap.get("proMedicMaterStand"));// todo 药占比标杆
+        responseDataMap.put("proConsum",resultMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",resultMap.get("proConsumStand"));// todo 耗材占比标杆
+        responseDataMap.put("quality",resultMap.get("quality"));// 质控信息list
+        /**==========返回参数封装 End ===========**/
+        return responseDataMap;
     }
     // 整理病案首页数据，上传drg
     @Override
@@ -526,7 +545,25 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
-        return resultMap;
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
+        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
+        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
+        responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
+        responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值
+        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
+        responseDataMap.put("totalFee",resultMap.get("total_fee"));// TODO 总费用
+        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",resultMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",resultMap.get("proMedicMaterStand"));// todo 药占比标杆
+        responseDataMap.put("proConsum",resultMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",resultMap.get("proConsumStand"));// todo 耗材占比标杆
+        responseDataMap.put("quality",resultMap.get("quality"));// 质控信息
+        /**==========返回参数封装 End ===========**/
+        return responseDataMap;
     }
 
     public Map<String, Object> getMaisPatientInfo(Map<String, Object> map) {

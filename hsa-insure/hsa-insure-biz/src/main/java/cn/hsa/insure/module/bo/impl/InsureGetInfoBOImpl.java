@@ -648,6 +648,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         map1.put("hospCode",map.get("hospCode").toString());
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
         resultDataMap.put("drgInfo",combo);
+        //DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultDataMap.put("DIP_DRG_MODE",null);
+        }else{
+          resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+        }
         return resultDataMap;
     }
 
@@ -1382,6 +1392,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map1.put("hospCode",map.get("hospCode").toString());
             DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
             resultDataMap.put("drgInfo",combo);
+            //DIP_DRG_MODE值
+            Map<String, Object> sysMap = new HashMap<>();
+            sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+            sysMap.put("code", "DIP_DRG_MODE");
+            SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+            if (ObjectUtil.isEmpty(sysParameterDTO)){
+              resultDataMap.put("DIP_DRG_MODE",null);
+            }else{
+              resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+            }
         }
         return resultDataMap;
     }

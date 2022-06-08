@@ -449,7 +449,7 @@
     </update>
     <delete id="deleteById">delete drg_dip_business_opt_info_log whereid = #{id} </delete>
 
-    <select id="queryDrgDipBusinessOptInfoLogList" resultMap="drgDipBusinessOptInfoLogMap" >
+    <select id="queryDrgDipBusinessOptInfoLogList">
         select
         id <!--主键id-->,        qulity_id <!--质控结果主表id-->,        business_id <!--业务id-->,        opt_type <!--操作类型1.修改 2.保存 3.质控 4.上传-->,        opt_type_name <!--操作类型名称-->,        type <!--类型1.DRG 2.DIP-->,        business_type <!--业务类型1.结算清单 2.病案首页-->,        is_force <!--是否强制上传1.是 2.否（默认）-->,        force_upload_info <!--操作提示信息-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码（H码）-->,        insure_settle_id <!--医保结算id-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        ps_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        dept_id <!--科室id-->,        sex <!--性别-->,        age <!--年龄-->,        insue_type <!--险种类型-->,        inpt_time <!--入院时间-->,        outpt_time <!--出院时间-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        total_fee <!--总费用-->,        pay_fee <!--基金支付合计-->,        self_fee <!--个人账户支付-->,        cash_pay_fee <!--现金支付-->,        input_json <!--数据保存入参-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
         from drg_dip_business_opt_info_log where 1=1

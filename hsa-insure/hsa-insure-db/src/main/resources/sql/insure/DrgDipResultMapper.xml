@@ -60,7 +60,7 @@
         visit_id = #{visitId} and valid_flag = 1 order by crt_time desc limit 1
     </select>
 
-    <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >
+    <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
         insert into drg_dip_result (
             if(#{id} != null and #{id} != ''){
                 id <!--主键--> ,

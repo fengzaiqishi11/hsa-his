@@ -26,124 +26,124 @@
         <result property="crtTime" column="crt_time"/>
     </resultMap>
 
-    <insert id="insertDrgDipQulityInfoLog" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" >
+    <insert id="insertDrgDipQulityInfoLog" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipQulityInfoLogDTO" >
         insert into drg_dip_qulity_info_log (
-            if(#{id} != null and #{id} != ''){
-                id <!--主键ID--> ,
-            }
-            if(#{msgId} != null and #{msgId} != ''){
-                msg_id <!--交易流水号--> ,
-            }
-            if(#{orgCode} != null and #{orgCode} != ''){
-                org_code <!--机构编码--> ,
-            }
-            if(#{hospCode} != null and #{hospCode} != ''){
-                hosp_code <!--医院编码--> ,
-            }
-            if(#{visitId} != null and #{visitId} != ''){
-                visit_id <!--就诊ID--> ,
-            }
-            if(#{infNo} != null and #{infNo} != ''){
-                inf_no <!--功能编号--> ,
-            }
-            if(#{infName} != null and #{infName} != ''){
-                inf_name <!--功能名称--> ,
-            }
-            if(#{reqTime} != null and #{reqTime} != ''){
-                req_time <!--请求时间--> ,
-            }
-            if(#{respTime} != null and #{respTime} != ''){
-                resp_time <!--响应时间--> ,
-            }
-            if(#{reqContent} != null and #{reqContent} != ''){
-                req_content <!--请求入参--> ,
-            }
-            if(#{respContent} != null and #{respContent} != ''){
-                resp_content <!--返回入参--> ,
-            }
-            if(#{status} != null and #{status} != ''){
-                status <!--状态 Y正常 N异常--> ,
-            }
-            if(#{type} != null and #{type} != ''){
-                type <!--类型 1.DRG 2.DIP--> ,
-            }
-            if(#{businessType} != null and #{businessType} != ''){
-                business_type <!--业务类型 1结算清单 2病案首页--> ,
-            }
-            if(#{forceUploadInfo} != null and #{forceUploadInfo} != ''){
-                force_upload_info <!--质控提示信息--> ,
-            }
-            if(#{validFlag} != null and #{validFlag} != ''){
-                valid_flag <!--有效标志--> ,
-            }
-            if(#{crtId} != null and #{crtId} != ''){
-                crt_id <!--创建人ID--> ,
-            }
-            if(#{crtName} != null and #{crtName} != ''){
-                crt_name <!--创建人名称--> ,
-            }
-            if(#{crtTime} != null and #{crtTime} != ''){
-                crt_time <!--创建时间--> 
-            }
-    )
+
+        id <!--主键ID--> ,
+
+
+        msg_id <!--交易流水号--> ,
+
+
+        org_code <!--机构编码--> ,
+
+
+        hosp_code <!--医院编码--> ,
+
+
+        visit_id <!--就诊ID--> ,
+
+
+        inf_no <!--功能编号--> ,
+
+
+        inf_name <!--功能名称--> ,
+
+
+        req_time <!--请求时间--> ,
+
+
+        resp_time <!--响应时间--> ,
+
+
+        req_content <!--请求入参--> ,
+
+
+        resp_content <!--返回入参--> ,
+
+
+        status <!--状态 Y正常 N异常--> ,
+
+
+        type <!--类型 1.DRG 2.DIP--> ,
+
+
+        business_type <!--业务类型 1结算清单 2病案首页--> ,
+
+
+        force_upload_info <!--质控提示信息--> ,
+
+
+        valid_flag <!--有效标志--> ,
+
+
+        crt_id <!--创建人ID--> ,
+
+
+        crt_name <!--创建人名称--> ,
+
+
+        crt_time <!--创建时间-->
+
+        )
         values (
-            if(#{id} != null and #{id} != ''){
-                #{id},
-            }
-            if(#{msgId} != null and #{msgId} != ''){
-                #{msgId},
-            }
-            if(#{orgCode} != null and #{orgCode} != ''){
-                #{orgCode},
-            }
-            if(#{hospCode} != null and #{hospCode} != ''){
-                #{hospCode},
-            }
-            if(#{visitId} != null and #{visitId} != ''){
-                #{visitId},
-            }
-            if(#{infNo} != null and #{infNo} != ''){
-                #{infNo},
-            }
-            if(#{infName} != null and #{infName} != ''){
-                #{infName},
-            }
-            if(#{reqTime} != null and #{reqTime} != ''){
-                #{reqTime},
-            }
-            if(#{respTime} != null and #{respTime} != ''){
-                #{respTime},
-            }
-            if(#{reqContent} != null and #{reqContent} != ''){
-                #{reqContent},
-            }
-            if(#{respContent} != null and #{respContent} != ''){
-                #{respContent},
-            }
-            if(#{status} != null and #{status} != ''){
-                #{status},
-            }
-            if(#{type} != null and #{type} != ''){
-                #{type},
-            }
-            if(#{businessType} != null and #{businessType} != ''){
-                #{businessType},
-            }
-            if(#{forceUploadInfo} != null and #{forceUploadInfo} != ''){
-                #{forceUploadInfo},
-            }
-            if(#{validFlag} != null and #{validFlag} != ''){
-                #{validFlag},
-            }
-            if(#{crtId} != null and #{crtId} != ''){
-                #{crtId},
-            }
-            if(#{crtName} != null and #{crtName} != ''){
-                #{crtName},
-            }
-            if(#{crtTime} != null and #{crtTime} != ''){
-                #{crtTime}
-            }
+
+        #{id},
+
+
+        #{msgId},
+
+
+        #{orgCode},
+
+
+        #{hospCode},
+
+
+        #{visitId},
+
+
+        #{infNo},
+
+
+        #{infName},
+
+
+        #{reqTime},
+
+
+        #{respTime},
+
+
+        #{reqContent},
+
+
+        #{respContent},
+
+
+        #{status},
+
+
+        #{type},
+
+
+        #{businessType},
+
+
+        #{forceUploadInfo},
+
+
+        #{validFlag},
+
+
+        #{crtId},
+
+
+        #{crtName},
+
+
+        #{crtTime}
+
         )
     </insert>
 

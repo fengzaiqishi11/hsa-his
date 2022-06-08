@@ -458,11 +458,24 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
+        Map<String, Object> logMap = new HashMap<>();
+        logMap.put("reqTime",DateUtils.getNow());//请求时间
         String result = HttpConnectUtil.doPost(paramMap);
         Map<String,Object> responseMap = JSONObject.parseObject(result);
+        logMap.put("respTime",DateUtils.getNow());//响应时间
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
         // todo 此处调用插入日志
-
+        logMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfoStr"), "medins_orgcode"));
+        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfoStr"), "visit_id"));
+        logMap.put("reqContent",JSONObject.toJSONString(dataMap));
+        logMap.put("respContent",JSONObject.toJSONString(responseMap));
+        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+        logMap.put("type","1");
+        logMap.put("businessType","1");
+        logMap.put("crtId",MapUtils.get(map, "crteId"));
+        logMap.put("crtName",MapUtils.get(map, "crteName"));
+        drgDipResultService.insertDrgDipQulityInfoLog(logMap);
         return resultMap;
     }
     // 整理病案首页数据，上传drg
@@ -488,10 +501,24 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
+        Map<String, Object> logMap = new HashMap<>();
+        logMap.put("reqTime",DateUtils.getNow());//请求时间
         String result = HttpConnectUtil.doPost(paramMap);
         Map<String,Object> responseMap = JSONObject.parseObject(result);
+        logMap.put("respTime",DateUtils.getNow());//响应时间
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
         // todo 此处调用插入日志
+        logMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfoStr"), "medins_orgcode"));
+        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfoStr"), "visit_id"));
+        logMap.put("reqContent",JSONObject.toJSONString(dataMap));
+        logMap.put("respContent",JSONObject.toJSONString(responseMap));
+        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+        logMap.put("type","1");
+        logMap.put("businessType","1");
+        logMap.put("crtId",MapUtils.get(map, "crteId"));
+        logMap.put("crtName",MapUtils.get(map, "crteName"));
+        drgDipResultService.insertDrgDipQulityInfoLog(logMap);
         return resultMap;
     }
 

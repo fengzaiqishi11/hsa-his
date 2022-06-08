@@ -87,4 +87,6 @@
     <dubbo:service interface="cn.hsa.module.insure.module.service.InsureSpecialAttributeService" ref="insureSpecialAttributeService_provider"/>
     <!--明细审核分析服务-->
     <dubbo:service interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" ref="drgDipResultService"/>
+    <!--drg/dip质控服务-->
+    <dubbo:service interface="cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService" ref="insureDrgDipBusinessOptInfo_provider"/>
 </beans>

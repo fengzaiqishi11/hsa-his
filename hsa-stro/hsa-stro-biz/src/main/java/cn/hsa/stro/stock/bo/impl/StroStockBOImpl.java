@@ -3,8 +3,7 @@ package cn.hsa.stro.stock.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.base.dept.service.BaseDeptService;
-import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
+
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dao.StroStockDao;
 import cn.hsa.module.stro.stock.dao.StroStockDetailDao;
@@ -1724,7 +1723,9 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
      **/
     @Override
     public PageDTO queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO) {
+        // 1：门诊，2：住院
         String bizCode = itemProfitStatisticsDTO.getBizCode();
+        // 1:业务类型/项目/医生  2:业务类型/科室
         String sumCode = itemProfitStatisticsDTO.getSumCode();
         if (StringUtils.isEmpty(bizCode)){
             throw new AppException("请选择需要查询的业务类型");
@@ -1735,81 +1736,14 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
 
         List<ItemProfitStatisticsDTO> list = new ArrayList<>();
         PageHelper.startPage(itemProfitStatisticsDTO.getPageNo(),itemProfitStatisticsDTO.getPageSize());
-        // 门诊
-        if ("1".equals(bizCode)){
-            // 判断汇总类型
-            if ("1".equals(sumCode)){
-                // 查询门诊药品和材料利润统计信息（按批号和项目和科室和医生）
-                list = stroStockDetailDao.queryMZDrugAndMaterialProfit(itemProfitStatisticsDTO);
-            }else{
-                // 查询门诊药品和材料利润统计信息（按批号和项目和科室）
-                list = stroStockDetailDao.queryMZDrugAndMaterialProfitByDept(itemProfitStatisticsDTO);
-            }
+        switch (bizCode){
+            // 查询门诊药品和材料利润统计信息
+            case "1" : list = stroStockDetailDao.queryMZDrugAndMaterialProfit(itemProfitStatisticsDTO); break;
+            // 查询住院药品和材料利润统计信息
+            case "2" : list = stroStockDetailDao.queryZYDrugAndMaterialProfit(itemProfitStatisticsDTO); break;
         }
-        // 住院
-        if("2".equals(bizCode)){
-            // 判断汇总类型
-            if ("1".equals(sumCode)){
-                // 查询住院药品和材料利润统计信息（按批号和项目和科室和医生）
-                list = stroStockDetailDao.queryZYDrugAndMaterialProfit(itemProfitStatisticsDTO);
-            }else{
-                // 查询住院药品和材料利润统计信息（按批号和项目和科室）
-                list = stroStockDetailDao.queryZYDrugAndMaterialProfitByDept(itemProfitStatisticsDTO);
-            }
-        }
-        // 先分页，统计完再放回分页对象，这样就不影响分页效果
         PageDTO pageDTO = PageDTO.of(list);
-        // 门诊药品和材料利润信息统计
-        pageDTO.setResult(profitStatistics(list,bizCode));
         return pageDTO;
-    }
-
-    /**
-     * 门诊或住院的药品和材料利润信息统计
-     * @Author liudawen
-     * @Param [ItemProfitStatisticsDTOS, bizCode]
-     * @Return java.util.List<cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO>
-     * @Throws
-     * @Date 2022/4/20 11:29
-     **/
-    private List<ItemProfitStatisticsDTO> profitStatistics(List<ItemProfitStatisticsDTO> profitStatistics,String bizCode) {
-        if (!profitStatistics.isEmpty()){
-            profitStatistics = profitStatistics.stream().map(p -> {
-                if(p != null){
-                    // 累计结算数量
-                    BigDecimal settleCount = BigDecimalUtils.nullToZero(p.getSettleCount());
-                    // 累计退费数量
-                    BigDecimal   backCount = BigDecimalUtils.nullToZero(p.getBackCount());
-                    // 进货单价
-                    BigDecimal    buyPrice = p.getBuyPrice();
-                    // 进货总金额
-                    BigDecimal buyPriceAll = p.getBuyPriceAll();
-                    // 零售金额
-                    BigDecimal   sellPrice = p.getSellPrice();
-
-                    // 销售总数量
-                    BigDecimal   sellCont = BigDecimalUtils.nullToZero(p.getSellCount());
-                    // 门诊和住院的销售总数量计算不同
-                    if ("1".equals(bizCode)){
-                        // 门诊销售总数量 = 结算数量 - 退费数量
-                        sellCont = BigDecimalUtils.subtract(settleCount,backCount);
-                    }
-                    p.setSellCount(sellCont);
-                    // 零售总金额 = 零售金额 * 销售总数量
-                    BigDecimal sellPriceAll = BigDecimalUtils.multiply(sellPrice,sellCont);
-                    p.setSellPriceAll(sellPriceAll);
-                    // 利润 = (零售金额 - 进货单价) * 销售总数量
-                    BigDecimal profit = BigDecimalUtils.subtract(sellPrice,buyPrice).multiply(sellCont);
-                    p.setProfit(profit);
-                    // 利润率 = 利润/成本(进货总金额)
-                    if (BigDecimalUtils.compareTo(buyPriceAll,BigDecimal.ZERO) > 0){
-                        p.setProfitRate(BigDecimalUtils.divide(profit,buyPriceAll));
-                    }
-                }
-                return p;
-            }).collect(Collectors.toList());
-        }
-        return profitStatistics;
     }
 
 }

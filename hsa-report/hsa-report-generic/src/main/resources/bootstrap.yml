@@ -39,3 +39,15 @@ security:
   oauth2:
     client:
       permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: info,health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    elasticsearch:
+      enabled: false

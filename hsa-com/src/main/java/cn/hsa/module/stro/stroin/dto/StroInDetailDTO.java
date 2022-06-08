@@ -46,4 +46,6 @@ public class StroInDetailDTO extends StroInDetailDO implements Serializable {
 
     //医保编码
     private String nationCode;
+    // 医保名称
+    private String nationName;
 }

@@ -82,6 +82,7 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private String typeIdentity;
     //药品大类
     private String bigTypeCode;
+    private String typeCode;
     private List<String> types;
     // 生产企业名称
     private String prodName;
@@ -120,4 +121,6 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private String sLossList;
     // 是否过滤科室库存
     private String sfdeptFilter;
+    private String nationCode;
+    private String nationName;
 }

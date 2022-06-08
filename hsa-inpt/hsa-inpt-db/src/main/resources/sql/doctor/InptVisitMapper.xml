@@ -104,6 +104,8 @@
 		<result property="totalMergeCost" column="totalMergeCost" jdbcType="NUMERIC"/>
 		<result property="totalMergeBalance" column="totalMergeBalance" jdbcType="NUMERIC"/>
 		<result property="preferentialTypeName" column="preferential_type_name" jdbcType="VARCHAR"/>
+		<result property="isUplodDise" column="is_uplod_dise" jdbcType="VARCHAR"/>
+		<result property="isUplodCost" column="is_uplod_cost" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<resultMap type="cn.hsa.module.inpt.doctor.dto.InptCostDTO" id="InptCostMap">
@@ -126,6 +128,7 @@
 	<select id="getInptVisitById" resultMap="InptVisitMap">
         select
           id, hosp_code, profile_id, in_profile, in_no, name, gender_code, age, age_unit_code, birthday, nationality_cation, occupation_code, education_code, contact_name, contact_rela_code, contact_address, contact_phone, nation_code, cert_code, cert_no, marry_code, phone, address, preferential_type_id, patient_code, receive_hosp_name, bed_id, bed_name, nursing_code, diet_type, Illness_code, status_code, in_ward_id, in_dept_id, in_dept_name, in_time, zz_doctor_id, zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, in_remark, in_mode_code, in_disease_id, in_disease_name, in_disease_icd10, in_situation_code, outpt_visit_no, outpt_doctor_id, outpt_doctor_name, outpt_disease_id, outpt_disease_name, outpt_disease_icd10, out_ward_id, out_dept_id, out_dept_name, out_time, out_disease_id, out_disease_name, out_disease_icd10, out_oper_id, out_oper_name, out_oper_time, out_situation_code, out_remark, out_mode_code, is_archive, archive_time, archive_id, archive_name, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code, insure_patient_id, insure_remark, total_advance, total_cost, total_balance, crte_id, crte_name, crte_time,
+          is_uplod_cost,is_uplod_dise,cplt_flag,
           (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
         (select nation_code from base_dept where id  = a.in_dept_id and hosp_code = a.hosp_code) as nationCode,
 		(select prac_certi_no from sys_user where id = a.zz_doctor_id and a.hosp_code = a.hosp_code) as zzPracCertiNo ,
@@ -239,7 +242,14 @@
 		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
 			and iv.in_time BETWEEN #{Stime} and #{Etime}
 		</if>
-		order by bb.seq_no asc
+		<choose>
+			<when test="statusCode != null and statusCode != ''and statusCode == '5'.toString()">
+				order by iv.out_time desc
+			</when>
+			<otherwise>
+				order by bb.seq_no asc
+			</otherwise>
+		</choose>
 	</select>
 
 	<!--分页查询-->
@@ -2502,4 +2512,20 @@
         select count(*) from inpt_visit
         where hosp_code = #{hospCode} and cert_code = #{certCode} and cert_no = #{certNo}
     </select>
+	<update id="updateUplod">
+		update inpt_visit
+		<set>
+			<if test="isUplodCost != null and isUplodCost != ''">
+				is_uplod_cost = #{isUplodCost},
+			</if>
+			<if test="isUplodDise != null and isUplodDise != ''">
+				is_uplod_dise = #{isUplodDise},
+			</if>
+			<if test="cpltFlag != null and cpltFlag != ''">
+				cplt_flag = #{cpltFlag},
+			</if>
+		</set>
+		where hosp_code = #{hospCode}
+		and id = #{id}
+	</update>
 </mapper>

@@ -65,6 +65,7 @@ public class StroInvoicingDTO extends StroInvoicingDO implements Serializable {
     private String code;
     // 药品/材料类别
     private String typeCode;
+    private String bigTypeCode;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;        //开始日期
@@ -95,4 +96,5 @@ public class StroInvoicingDTO extends StroInvoicingDO implements Serializable {
 
     //医保编码
     private String nationCode;
+    private String nationName; // 医保名称
 }

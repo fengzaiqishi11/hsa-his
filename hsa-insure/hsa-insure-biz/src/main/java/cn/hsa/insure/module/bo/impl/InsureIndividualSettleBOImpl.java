@@ -9,7 +9,8 @@ import cn.hsa.module.insure.module.dto.InsureIndividualFundDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

@@ -31,6 +31,8 @@ public class OutptCostRevocationReqUtil<T> extends InsureCommonUtil implements B
         dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
         // 当费用批次号不为空时 撤销已经上传的费用信息  批次号为空时 撤销所有的费用的信息
         dataMap.put("chrg_bchno", "0000");
+        //费用流水号 广州接口字段，传入“0000”删除全部
+        dataMap.put("feedetl_sn", "0000");
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
 
         HashMap commParam = new HashMap();

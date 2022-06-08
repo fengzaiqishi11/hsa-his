@@ -5,6 +5,8 @@
 		<result property="id" column="id" jdbcType="VARCHAR"/>
 		<result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
 		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+		<result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
+		<result property="gbNationName" column="gb_nation_name" jdbcType="VARCHAR"/>
 		<result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
 		<result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
 		<result property="code" column="code" jdbcType="VARCHAR"/>
@@ -47,11 +49,11 @@
 	<select id="getById" resultMap="BaseItemMap">
 		select
 		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
-		a.two_price,
+		a.two_price,a.nation_name,
 		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
 		a.is_supp_curtain,
 		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
-		a.crte_name, a.crte_time,a.other_name,
+		a.crte_name, a.crte_time,a.other_name,a.nation_name as gb_nation_name,
 		(select count(0) from base_advice_detail d where d.type_code = '3' and d.item_code = a.code) as adviceFlag,
 		b.name as outDeptName, a.reimbursement_ratio,
 		c.name as inDeptName
@@ -197,7 +199,7 @@
 	<select id="queryPage" resultMap="BaseItemMap">
 		select
 		a.id, a.hosp_code, a.nation_code, a.type_code, a.bfc_code, a.code, a.name, a.abbr, a.spec, a.price, a.one_price,
-		a.two_price,a.name as itemName,
+		a.two_price,a.name as itemName, a.nation_name,a.nation_name as gb_nation_name,
 		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
 		a.is_supp_curtain,a.other_name,
 		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
@@ -319,8 +321,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_item(id, hosp_code, nation_code, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name, reimbursement_ratio)
-        values (#{id}, #{hospCode}, #{nationCode}, #{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm},'1', #{crteId}, #{crteName}, #{crteTime},#{otherName}, #{reimbursementRatio})
+        insert into base_item(id, hosp_code, nation_code,nation_name, type_code, bfc_code, code, name, abbr, spec, price, one_price, two_price, three_price, unit_code, intension, prompt, except, remark, is_out, is_in, is_cg, is_ms, is_supp_curtain, out_dept_code, in_dept_code, name_pym, name_wbm, abbr_pym, abbr_wbm, is_valid, crte_id, crte_name, crte_time,other_name, reimbursement_ratio)
+        values (#{id}, #{hospCode}, #{nationCode}, #{gbNationName},#{typeCode}, #{bfcCode}, #{code}, #{name}, #{abbr}, #{spec}, #{price}, #{onePrice}, #{twoPrice}, #{threePrice}, #{unitCode}, #{intension}, #{prompt}, #{except}, #{remark}, #{isOut}, #{isIn}, #{isCg}, #{isMs}, #{isSuppCurtain}, #{outDeptCode}, #{inDeptCode}, #{namePym}, #{nameWbm}, #{abbrPym}, #{abbrWbm},'1', #{crteId}, #{crteName}, #{crteTime},#{otherName}, #{reimbursementRatio})
     </insert>
 	<insert id="insertBatch">
         insert into base_item
@@ -361,6 +363,7 @@
 		update base_item
 		<set>
 			nation_code = #{nationCode},
+			nation_name = #{gbNationName},
 			type_code = #{typeCode},
 			bfc_code = #{bfcCode},
 			code = #{code},
@@ -589,6 +592,6 @@
 	</select>
 
     <update id="updateNationCodeById">
-        update base_item set nation_code = #{nationCode}  where id = #{id} and hosp_code = #{hospCode}
+        update base_item set nation_code = #{nationCode},nation_name = #{gbNationName}  where id = #{id} and hosp_code = #{hospCode}
     </update>
 </mapper>

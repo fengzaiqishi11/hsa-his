@@ -498,5 +498,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String preferentialTypeName;
     private String mdtrtCertType;   //证件类型
     private String mdtrtCertNo;  //入参值
+    private String visitDate;  //入参值
 
 }

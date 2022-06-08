@@ -1186,7 +1186,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
                 break;
-            case Constants.SBLX.CXJM_ZY: // 城乡居民（非一站式住院）
+            case Constants.SBLX.CXJM_ZY: // 城乡居民
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 paraMap.put("isValidOneSettle",Constants.SF.F);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
@@ -1203,17 +1203,20 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 break;
 
         }
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
         if(resultList !=null && resultList.size() > 0){
             //增加序号
             int index =1;
             for(Map map:resultList){
                 map.put("index",index);
                 index++;
+
+                map.put("hospName",insureConfInfo.getHospName());
             }
         }
         resultMap.put("result",resultList);
 
-        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+
         resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
 
         return resultMap;
@@ -1974,7 +1977,8 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             throw new AppException("该医保患者的参参保地区划为空");
         }
         // 就诊人的参保地区划和就医地区划不一致就是异地
-        if (mdtrtareaAdmvs.substring(0, 4).equals(insuplcAdmdvs.substring(0, 4))) {
+        //就诊人的参保地区划和就医地区划不一致就是异地(省内不算异地，省外才算)
+        if (mdtrtareaAdmvs.substring(0, 2).equals(insuplcAdmdvs.substring(0, 2))) {
             dataMap.put("setl_id", setlId);//结算ID
             dataMap.put("psn_no", psnNo);//人员编号
             dataMap.put("mdtrt_id", mdtrtId);//就医登记号

@@ -823,6 +823,13 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 if(StringUtils.isNotEmpty(inptAdviceDTO.getUseCode())){
                     inptAdviceDetailDTO.setUseCode(inptAdviceDTO.getUseCode());
                 }
+
+                // //(20220602 跟峰哥确认，医嘱目录里面如果含有材料的  只走科室自备，不会走库存，所有 下面两段赋值代码注释掉)
+                if(Constants.XMLB.CL.equals(inptAdviceDetailDTO.getItemCode())){
+                    inptAdviceDetailDTO.setUseCode(Constants.YYXZ.KSZB);
+                }
+
+
                 //来源方式代码
                 inptAdviceDetailDTO.setSourceCode(Constants.FYLYFS.YZ);
                 inptAdviceDetailDTOList.add(inptAdviceDetailDTO);

@@ -1,5 +1,8 @@
 package cn.hsa.module.stro.stroinvoicing.bo;
 
+import cn.hsa.base.PageDTO;
+import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
+
 import java.util.Map;
 
 /**
@@ -9,5 +12,9 @@ import java.util.Map;
  * @Date: 2022/3/18 9:34
  **/
 public interface StroInvoicingMonthlyBO {
-    boolean copyStroInvoicing(Map map);
+    boolean insertCopyStroInvoicing(Map map);
+
+    PageDTO queryPage(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO);
+
+    PageDTO queryDetailByMonthlyId(StroInvoicingMonthlyDTO stroInvoicingMonthlyDTO);
 }

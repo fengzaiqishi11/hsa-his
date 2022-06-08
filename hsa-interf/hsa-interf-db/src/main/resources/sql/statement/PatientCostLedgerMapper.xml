@@ -812,6 +812,7 @@
         (select name from base_dept where hosp_code = b.hosp_code and id = b.phar_id) as pharName,
         (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
         '门诊病人' as statusCode,
+        (case a.item_code when '1' then bd.type_code when '2' then c.type_code end ) typeCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',ifnull(v.age,''),
         (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
         from phar_out_distribute_all_detail a

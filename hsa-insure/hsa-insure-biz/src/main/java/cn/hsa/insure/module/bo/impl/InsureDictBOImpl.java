@@ -22,7 +22,8 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

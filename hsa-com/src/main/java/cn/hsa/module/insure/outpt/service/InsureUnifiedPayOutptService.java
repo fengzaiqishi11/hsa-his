@@ -185,4 +185,13 @@ public interface InsureUnifiedPayOutptService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     WrapperResponse<Map<String, Object>> UP6401(Map<String, Object> map);
+
+    /**
+     * 医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-17 10:00
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> UP6203(Map<String, Object> map);
 }

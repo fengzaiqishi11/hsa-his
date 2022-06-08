@@ -132,7 +132,11 @@
         case a.item_code when '1' then
         ( select nation_code from base_drug where hosp_code = a.hosp_code and id = a.item_id)
         when '2' then
-        (select nation_code from base_material where hosp_code = a.hosp_code and id = a.item_id) end nationCode
+        (select nation_code from base_material where hosp_code = a.hosp_code and id = a.item_id) end nationCode,
+        case a.item_code when '1' then
+        ( select nation_name from base_drug where hosp_code = a.hosp_code and id = a.item_id)
+        when '2' then
+        (select nation_name from base_material where hosp_code = a.hosp_code and id = a.item_id) end nationName
         from stro_out_detail a
         where a.hosp_code=#{hospCode}
         <if test="outId !=null and outId !='' ">

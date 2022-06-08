@@ -1138,7 +1138,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         Map map = new HashMap();
         map.put("hospCode", inptVisitDTO.getHospCode());
         map.put("visitId", inptVisitDTO.getVisitId());
+        map.put("deptId", inptVisitDTO.getInDeptId());
         inptVisitDTO = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        inptVisitDTO.setVisitId(inptVisitDTO.getId());
 
         EmrPatientDTO emrPatientDTO = new EmrPatientDTO();
         emrPatientDTO.setHospCode(inptVisitDTO.getHospCode());
@@ -1160,6 +1162,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         insureEmrNodeInfoMessage.put("operInfoRecordInfos", operInfoRecordInfos);
         insureEmrNodeInfoMessage.put("visitId", inptVisitDTO.getVisitId());
         insureEmrNodeInfoMessage.put("hospCode", map.get("hospCode"));
+        insureEmrNodeInfoMessage.put("inptVisitDTO", inptVisitDTO);
         insureUnifiedEmrUploadService_consumer.updateInsureUnifiedEmr(insureEmrNodeInfoMessage);
         return true;
     }

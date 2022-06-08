@@ -274,4 +274,14 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
     // 发票号
     private String invoiceNo;
+
+    // 医保机构编号
+    private String insureRegCode;
+
+    private String isUploadDise;
+
+   private List<String> diagnoseList;
+
+   //病案首页类型   1：中医病案首页    0：普通（西医）病案首页
+   private String mrisPageType;
 }

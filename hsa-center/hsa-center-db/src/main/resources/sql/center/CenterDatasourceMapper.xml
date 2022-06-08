@@ -270,7 +270,7 @@
         INNER JOIN center_hospital_datasource chd ON ch.CODE = chd.hosp_code
         INNER JOIN center_datasource cd ON chd.ds_code = cd.code
     WHERE
-        ch.is_valid = '1' and now() BETWEEN ch.start_date and ch.end_date
+        ch.is_valid = '1'
   </select>
 
   <!-- 根据条件参数查询数据列表 -->
@@ -339,7 +339,7 @@
         INNER JOIN center_hospital_datasource chd ON ch.CODE = chd.hosp_code
         INNER JOIN center_datasource cd ON chd.ds_code = cd.code
     WHERE
-        ch.is_valid = '1' and now() BETWEEN ch.start_date and ch.end_date and ch.code = #{hospCode}
+        ch.is_valid = '1'  and ch.code = #{hospCode}
   </select>
   <select id="findHospitalCenterDataSource"
           resultType="cn.hsa.module.center.datasource.dto.CenterDatasourceDTO">

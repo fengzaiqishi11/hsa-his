@@ -22,7 +22,10 @@ public class FeeDetailDTO implements Serializable {
    * 序列号
    */
   private static final long serialVersionUID = -8142117462251296112L;
-
+  /**
+   * 费用ID
+   */
+  private String costId;
   /**
    * 费用明细流水号
    */
@@ -214,4 +217,8 @@ public class FeeDetailDTO implements Serializable {
    * 医疗目录规格
    */
   private String medListSpc;
+  /**
+   * 医保目录类别
+   */
+  private String itemtype;
 }

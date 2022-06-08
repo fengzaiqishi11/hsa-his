@@ -17,9 +17,9 @@
     <!--分布式关系数据库-->
     <import resource="classpath:config/db/db.xml"/>
     <!--分布式非结构化存储-->
-    <import resource="classpath:config/fsstore/fsstore.xml"/>
-    <!--网关-->
-    <import resource="classpath:config/gateway/gateway.xml"/>
+<!--    <import resource="classpath:config/fsstore/fsstore.xml"/>-->
+<!--    &lt;!&ndash;网关&ndash;&gt;-->
+<!--    <import resource="classpath:config/gateway/gateway.xml"/>-->
     <!--唯一ID生成-->
     <!--单IP配置-->
 <!--    <import resource="classpath*:config/idgen/idgenerator-single.xml"/>-->
@@ -31,6 +31,6 @@
     <!--参数校验拦截器-->
     <import resource="classpath:config/validate/spring-validate.xml"/>
     <!-- api权限过滤 -->
-    <import resource="classpath:config/security/consumer.xml"/>
+<!--    <import resource="classpath:config/security/consumer.xml"/>-->
 
 </beans>

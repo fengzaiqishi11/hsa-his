@@ -405,4 +405,35 @@
         </if>
 
     </select>
+
+	<select id="getDiseaseIsMatch" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+		select *
+		from insure_disease_match
+		where
+			hosp_code = #{hospCode} and insure_reg_code = #{insureRegCode} and is_match = '1'
+    </select>
+
+	<update id="updateDiseaseMatch">
+			update base_disease
+			<trim prefix="set" suffixOverrides=",">
+				<trim prefix="nation_code =case" suffix="end,">
+					<foreach collection="insureDiseaseMatchDTOList" item="item" index="index">
+						<if test="item.insureIllnessCode !=null">
+							when id=#{item.hospIllnessId} then #{item.insureIllnessCode}
+						</if>
+					</foreach>
+				</trim>
+				<trim prefix="nation_name =case" suffix="end,">
+					<foreach collection="insureDiseaseMatchDTOList" item="item" index="index">
+						<if test="item.insureIllnessName !=null">
+							when id=#{item.hospIllnessId} then #{item.insureIllnessName}
+						</if>
+					</foreach>
+				</trim>
+			</trim>,is_match = '1'
+			where hosp_code = #{hospCode} and id in
+			<foreach collection="insureDiseaseMatchDTOList" index="index" item="item" separator="," open="(" close=")">
+				#{item.hospIllnessId}
+			</foreach>
+	</update>
 </mapper>

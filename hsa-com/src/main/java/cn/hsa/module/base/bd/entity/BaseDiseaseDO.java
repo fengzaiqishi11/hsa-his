@@ -57,6 +57,8 @@ public class BaseDiseaseDO extends PageDO implements Serializable {
     * 国家编码
     */
     private String nationCode;
+    // 国家编码名称
+    private String nationName;
     /**
     * 是否自增
     */
@@ -103,6 +105,6 @@ public class BaseDiseaseDO extends PageDO implements Serializable {
     // 病案平台编码
     private String platformCode;
 
-    // 国家编码名称
-    private String nationName;
+
+    private String isMatch; // 是否医保匹配
 }

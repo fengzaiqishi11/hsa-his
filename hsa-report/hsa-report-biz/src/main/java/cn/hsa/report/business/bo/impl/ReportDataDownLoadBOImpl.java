@@ -51,7 +51,7 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
-    @Autowired
+    @Autowired(required = false)
     private FSManager fsManager;
 
     @Value("${fsstore.url}")

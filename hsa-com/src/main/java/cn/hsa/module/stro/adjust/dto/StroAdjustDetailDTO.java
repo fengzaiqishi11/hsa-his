@@ -48,4 +48,6 @@ public class StroAdjustDetailDTO extends StroAdjustDetailDO implements Serializa
     private String sfdeptFilter;
     // 库位名称
     private String bizName;
+    //材料药品分类
+    private String typeCode;
 }

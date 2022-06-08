@@ -15,6 +15,7 @@ import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import kafka.api.ApiUtils;
@@ -435,16 +436,21 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
     public Boolean deleteInptRecord(InsureInptRecordDTO inptRecordDTO) {
         String memo = inptRecordDTO.getMemo();
         inptRecordDTO = insureDiseaseRecordDAO.getInptRecordById(inptRecordDTO);
+        if(ObjectUtil.isEmpty(inptRecordDTO)){
+            throw new AppException("未查询到转院备案数据");
+        }
         String hospCode = inptRecordDTO.getHospCode();
         String orgCode = inptRecordDTO.getInsureRegCode();
+        String regCode = inptRecordDTO.getMdtrtareaAdmdvs();
         InsureConfigurationDTO configurationDTO = new InsureConfigurationDTO();
         configurationDTO.setHospCode(inptRecordDTO.getHospCode());
         configurationDTO.setOrgCode(orgCode);
+        configurationDTO.setRegCode(regCode);
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
         map.put("regsiterTime",inptRecordDTO.getRegsiterTime());
-        map.put("insureRegCode", configurationDTO.getOrgCode());
+        map.put("insureRegCode", configurationDTO.getRegCode());
         map.put("psnNo", inptRecordDTO.getPsnNo());
         Map<String, Object> paramMap = new HashMap<>(5);
         paramMap.put("psn_no", inptRecordDTO.getPsnNo());

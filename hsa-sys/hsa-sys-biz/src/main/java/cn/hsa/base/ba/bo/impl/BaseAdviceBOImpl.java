@@ -17,7 +17,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.util.*;
-import com.aliyun.openservices.shade.com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -690,6 +690,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
               baseAdviceDTO.setCrteName(userName);// 创建人
               baseAdviceDTO.setCrteId(userId); //创建人id
               baseAdviceDTO.setCrteTime(DateUtils.getNow()); //创建时间
+              baseAdviceDTO.setUnionNationCode(item.getNationCode());//医嘱联合国家编码
+              baseAdviceDTO.setUnionNationName(item.getNationName());//医嘱联合国家编码名称
               baseAdviceDTOList.add(baseAdviceDTO);//加入新增列表
 
 

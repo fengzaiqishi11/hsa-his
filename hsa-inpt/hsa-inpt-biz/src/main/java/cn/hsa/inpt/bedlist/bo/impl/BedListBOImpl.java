@@ -551,8 +551,8 @@ public class BedListBOImpl implements BedListBO {
         longCostDTO.setCancelName(MapUtils.get(map, "userName"));
         longCostDTO.setCancelRemark(cancelRemark);
         String changeCode = MapUtils.getEmptyErr(map, "changeCode", "床位异动失败：异动类型不能为空");
-        //预出院停所有
-        if(Constants.YDLX.YCY.equals(changeCode) || Constants.YDLX.ZK.equals(changeCode)){
+        //预出院,转科，换科停所有
+        if(Constants.YDLX.YCY.equals(changeCode) || Constants.YDLX.ZK.equals(changeCode) || Constants.YDLX.ZHC.equals(changeCode)){
             longCostDTO.setChangeCode(changeCode);
         }
         bedListDAO.stopInptLongCost(longCostDTO);
@@ -827,6 +827,11 @@ public class BedListBOImpl implements BedListBO {
             String zzDoctorId = MapUtils.getEmptyErr(map, "zzDoctorId", "主治医生ID为空");
             String zgDoctorId = MapUtils.getEmptyErr(map, "zgDoctorId", "主管医生ID为空");
             String respNurseId = MapUtils.getEmptyErr(map, "respNurseId", "责任护士ID为空");
+            if (Constants.YDLX.AC.equals(changeCode)){// 只会影响安床，不会影响换床
+                String inTime = MapUtils.get(map,"inTime");
+                Optional.ofNullable(inTime).orElseThrow(()->new AppException("入院时间不能为空"));
+                inptVisitDTO.setInTime(DateUtils.parse(inTime,DateUtils.Y_M_DH_M_S));
+            }
 
             // 获取医生、护士信息
             Map<String, SysUserDTO> userMap = getDoctorInfo(jzDoctorId , zzDoctorId, zgDoctorId, respNurseId);

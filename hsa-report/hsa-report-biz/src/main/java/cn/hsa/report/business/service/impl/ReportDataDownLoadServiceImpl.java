@@ -8,7 +8,10 @@ import cn.hsa.module.report.business.bo.ReportDataDownLoadBO;
 import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import cn.hsa.report.business.bo.impl.factory.ReportBusinessFactory;
+import cn.hsa.util.StringUtils;
+import com.github.pagehelper.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -24,6 +27,9 @@ import java.util.Map;
 @Service("reportDataDownLoadService_provider")
 public class ReportDataDownLoadServiceImpl extends HsafService implements ReportDataDownLoadService {
 
+    @Value("${ureport.hospCode}")
+    private String ureportHospCode;
+
     @Autowired
     private ReportDataDownLoadBO reportDataDownLoadBO;
 
@@ -32,6 +38,12 @@ public class ReportDataDownLoadServiceImpl extends HsafService implements Report
 
     @Override
     public WrapperResponse<ReportReturnDataDTO> saveBuild(Map map) {
+        String hospCode = (String) map.get("hospCode");
+        if(StringUtils.isNotEmpty(ureportHospCode)){
+            if(ureportHospCode.contains(hospCode)&&"settleDeclareDetlSheetBOImpl".equals(map.get("businessType"))){
+                map.put("businessType","settleDeclareDetlSheetmlyBOImpl");
+            }
+        }
         ReportBusinessBO reportBusinessProcess = reportBusinessFactory.getReportBusinessProcess(map.get("businessType").toString());
         map = reportBusinessProcess.getReportDataMap(map);
         return WrapperResponse.success(reportDataDownLoadBO.saveBuild(map));

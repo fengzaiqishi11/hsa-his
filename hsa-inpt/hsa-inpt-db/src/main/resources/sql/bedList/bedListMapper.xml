@@ -215,7 +215,8 @@
     <update id="updateInptVisit_Ac">
         update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',
         jz_doctor_id = #{jzDoctorId}, jz_doctor_name = #{jzDoctorName}, zz_doctor_id = #{zzDoctorId}, zz_doctor_name = #{zzDoctorName},
-        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName}
+        zg_doctor_id = #{zgDoctorId}, zg_doctor_name = #{zgDoctorName}, resp_nurse_id = #{respNurseId}, resp_nurse_name = #{respNurseName},
+        in_time = #{inTime}
         where id = #{id} and status_code = '1'
     </update>
 
@@ -251,7 +252,7 @@
         where  is_cancel = '0'
         and visit_id = #{visitId}
         and dept_id = #{deptId}
-        <!-- 预出院 转科,  这时候不需要根据source_type_code,source_id 取消费用 而是直接停掉这个人所有的 -->
+        <!-- 预出院 转科,换科  这时候不需要根据source_type_code,source_id 取消费用 而是直接停掉这个人所有的 -->
         <if  test="changeCode == null or changeCode == '' ">
             and source_type_code = #{sourceTypeCode}
             and source_id in
@@ -308,7 +309,8 @@
 
     <!-- 修改住院病人信息-出院召回 -->
     <update id="updateInptVisit_Cyzh">
-        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',out_time = null
+        update inpt_visit set bed_id = #{bedId}, bed_name = #{bedName}, status_code = '2',out_time = null,
+                              out_disease_name = null
         where id = #{id} and status_code = '5'
     </update>
 
@@ -355,7 +357,7 @@
         (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
         where ic.source_ia_id = ia.id
         and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
-        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        and ifnull(ic.is_positive, ia.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
         union all
         select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'
@@ -452,7 +454,7 @@
         (select a.source_ia_id,b.is_positive from inpt_advice a, inpt_advice_exec b where b.hosp_code = a.hosp_code and a.id = b.advice_id ) ic
         where ic.source_ia_id = ia.id
         and ia.hosp_code = #{hospCode} and ia.visit_id = #{visitId} and ia.is_submit = '1' and ifnull(ia.is_skin, '0') = '1'
-        and ifnull(ia.is_positive, ic.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
+        and ifnull(ic.is_positive, ia.is_positive) = ''  and ifnull(ia.is_reject, '0') = '0' and ia.is_stop ='0' and ia.cancel_id is null
         union all
         select if(count(1) > 0, concat('[',group_concat(ic.item_name),']费用未确认'), '') errMsg from inpt_cost ic
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '0'

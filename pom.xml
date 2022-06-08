@@ -37,6 +37,7 @@
 <!--                        <module>hsa-cron</module>-->
 <!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
         <module>hsa-cron/xxl-job-executor</module>
+<!--        <module>hsa-dynamic</module>-->
     </modules>
 
     <!--spring boot默认推荐的组件及版本-->
@@ -122,6 +123,7 @@
         <hsaf-generic-mq.version>1.0.0</hsaf-generic-mq.version>
         <hsaf-generic-fsstore.version>1.0.1</hsaf-generic-fsstore.version>
         <hsaf-generic-gateway.version>1.2.2</hsaf-generic-gateway.version>
+        <hibernate-validator.version>6.0.8.Final</hibernate-validator.version>
                 <dockerUrl>https://8.136.115.215:2375</dockerUrl>
                 <dockerUrlZs>D:\work\文档资料——和宇\云his\服务器\tls-client-certs</dockerUrlZs>
 <!--                        <dockerUrl>http://8.136.110.29:2375</dockerUrl>-->
@@ -440,7 +442,11 @@
                 <artifactId>ureport2-console</artifactId>
                 <version>2.2.9</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-validator</artifactId>
+                <version>${hibernate-validator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

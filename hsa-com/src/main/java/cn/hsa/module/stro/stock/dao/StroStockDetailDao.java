@@ -63,30 +63,16 @@ public interface StroStockDetailDao {
     List<StroStockDetailDTO> queryAllStroStock(String param);
 
     /**
-     * 查询门诊药品和材料利润统计信息（按批号和项目和科室和医生）
+     * 查询门诊药品和材料利润统计信息
      * @param itemProfitStatisticsDTO
      * @return
      */
     List<ItemProfitStatisticsDTO> queryMZDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
 
     /**
-     * 查询住院药品和材料利润统计信息（按批号和项目和科室和医生）
+     * 查询住院药品和材料利润统计信息
      * @param itemProfitStatisticsDTO
      * @return
      */
     List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
-
-    /**
-     * 查询门诊药品和材料利润统计信息（按批号和项目和科室）
-     * @param itemProfitStatisticsDTO
-     * @return
-     */
-    List<ItemProfitStatisticsDTO> queryMZDrugAndMaterialProfitByDept(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
-
-    /**
-     * 查询住院药品和材料利润统计信息（按批号和项目和科室）
-     * @param itemProfitStatisticsDTO
-     * @return
-     */
-    List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfitByDept(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
 }

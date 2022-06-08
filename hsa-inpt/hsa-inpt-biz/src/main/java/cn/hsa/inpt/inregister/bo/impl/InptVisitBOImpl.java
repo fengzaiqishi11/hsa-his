@@ -1032,6 +1032,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                 insureRemoteInptRegisterDTO.setBka245(insureInptRegisterDTO.getBka245()); // 预付款总额
                 insureRemoteInptRegisterDTO.setAae005(insureInptRegisterDTO.getAae005()); // 联系电话
                 insureRemoteInptRegisterDTO.setBka008(insureIndividualBasicDTO.getBka008());
+                insureRemoteInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001());//单位ID
                 insureRemoteInptRegisterDTO.setInjuryBorthSn(insureInptRegisterDTO.getInjuryBorthSn());
                 insureRemoteInptRegisterDTO.setAab001(insureIndividualBasicDTO.getAab001());//单位ID
 
@@ -1909,5 +1910,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         return messageInfoDTOList;
     }
 
+    public Boolean updateUplod(InptVisitDTO inptVisitDTO) {
+        inptVisitDAO.updateUplod(inptVisitDTO);
+        return true;
+    }
 
 }

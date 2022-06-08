@@ -911,7 +911,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             //*处方(医嘱)标识
             anaOrderDTO.setRxId(MapUtil.getStr(map,"id"));
             //*处方号
-            anaOrderDTO.setRxno(MapUtil.getStr(map,"iatId"));
+            anaOrderDTO.setRxno(ObjectUtil.isEmpty(MapUtil.getStr(map,"iatId"))?MapUtil.getStr(map,"id"):MapUtil.getStr(map,"iatId"));
             //组编号
             anaOrderDTO.setGrpno(MapUtil.getStr(map,"iatdGroupNo"));
             //*是否为长期医嘱  1:是   0：否
@@ -942,21 +942,21 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             //医院目录(药品)剂型
             anaOrderDTO.setHosplistDosform(MapUtil.getStr(map,"hospItemPrepCode"));
             //*数量
-            anaOrderDTO.setCnt(new BigDecimal(MapUtil.getStr(map,"num")));
+            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")));
             //*单价
-            anaOrderDTO.setPric(new BigDecimal(MapUtil.getStr(map,"price")));
+            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")));
             //*总费用
-            anaOrderDTO.setSumamt(new BigDecimal(MapUtil.getStr(map,"totalPrice")));
+            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")));
             //*自费金额
-            anaOrderDTO.setOwnpayAmt(new BigDecimal(MapUtil.getStr(map,"fulamtOwnpayAmt")));
+            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")));
             //*自付金额
-            anaOrderDTO.setSelfpayAmt(new BigDecimal(MapUtil.getStr(map,"preselfpayAmt")));
+            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")));
             //*规格
             anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
             //*数量单位
             anaOrderDTO.setSpecUnt(ObjectUtil.isEmpty(MapUtil.getStr(map,"numUnitCode"))?"-":MapUtil.getStr(map,"numUnitCode"));
             //*医嘱开始日期
-            anaOrderDTO.setDrordBegnDate(MapUtil.getDate(map,"longStartTime"));
+            anaOrderDTO.setDrordBegnDate(ObjectUtil.isEmpty(MapUtil.getDate(map,"longStartTime"))?MapUtil.getDate(map,"costTime"):MapUtil.getDate(map,"longStartTime"));
             //*下达医嘱的科室标识
             anaOrderDTO.setDrordDeptCodg(ObjectUtil.isEmpty(MapUtil.getStr(map,"execDeptId"))?"-":MapUtil.getStr(map,"execDeptId"));
             //*下达医嘱科室名称
@@ -988,17 +988,17 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             AnaDiagnoseDTO diagnoseDTO = new AnaDiagnoseDTO();
             //*诊断标识
             diagnoseDTO.setDiseId(inptDiagnoseDTO.getId());
-            //*诊断日期
-            diagnoseDTO.setInoutDiseType("1");
             //*出入诊断类别
-            diagnoseDTO.setMaindiseFlag(inptDiagnoseDTO.getIsMain());
+            diagnoseDTO.setInoutDiseType("1");
             //*主诊断标志
-            diagnoseDTO.setDiasSrtNo(ObjectUtil.isEmpty(inptDiagnoseDTO.getDiagnoseNo())? BigDecimal.ZERO:new BigDecimal(inptDiagnoseDTO.getDiagnoseNo()));
+            diagnoseDTO.setMaindiseFlag(inptDiagnoseDTO.getIsMain());
             //*诊断排序号
-            diagnoseDTO.setDiseCodg(inptDiagnoseDTO.getDiseaseCode());
+            diagnoseDTO.setDiasSrtNo(ObjectUtil.isEmpty(inptDiagnoseDTO.getDiagnoseNo())? BigDecimal.ZERO:new BigDecimal(inptDiagnoseDTO.getDiagnoseNo()));
             //*诊断(疾病)编码
-            diagnoseDTO.setDiseName(inptDiagnoseDTO.getDiseaseName());
+            diagnoseDTO.setDiseCodg(inptDiagnoseDTO.getDiseaseCode());
             //*诊断(疾病)名称
+            diagnoseDTO.setDiseName(inptDiagnoseDTO.getDiseaseName());
+            //*诊断日期
             diagnoseDTO.setDiseDate(inptDiagnoseDTO.getCrteTime());
             anaDiagnoseDTOS.add(diagnoseDTO);
         }
@@ -1008,7 +1008,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         basicInParm.setHospCode(inptVisitDTO.getHospCode());
         basicInParm.setMedicalRegNo(inptVisitDTO.getMedicalRegNo());
         InsureIndividualBasicDTO basicDTO = insureIndividualBasicDAO.getByVisitId(basicInParm);
-
+        if (ObjectUtil.isEmpty(basicDTO)) {
+            throw new AppException("明细审核查询人员医保基本信息为空，请检查！");
+        }
         //查询住院信息
         Map<String, Object> map1 = new HashMap<>();
         map1.put("inptVisitDTO",inptVisitDTO);
@@ -1055,9 +1057,9 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         //*入院科室名称
         anaMdtrtDTO.setAdmDeptName(mdtrtDTO.getInDeptName());
         //*出院科室标识
-        anaMdtrtDTO.setDscgDeptCodg(mdtrtDTO.getOutDeptId());
+        anaMdtrtDTO.setDscgDeptCodg(ObjectUtil.isEmpty(mdtrtDTO.getOutDeptId())?mdtrtDTO.getInDeptId():mdtrtDTO.getOutDeptId());
         //*出院科室名称
-        anaMdtrtDTO.setDscgDeptName(mdtrtDTO.getOutDeptName());
+        anaMdtrtDTO.setDscgDeptName(ObjectUtil.isEmpty(mdtrtDTO.getOutDeptName())?mdtrtDTO.getInDeptName():mdtrtDTO.getOutDeptName());
         //*就诊类型
         anaMdtrtDTO.setMedMdtrtType("210");//住院写死210
         //*医疗类别

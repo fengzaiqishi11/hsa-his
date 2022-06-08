@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.LabSurveyReportDAO">
+
+    <!--查询实验室检验报告主表-->
+    <select id="listLabSurveyReport" resultType="cn.hsa.module.interf.healthInfo.entity.TbJyzbg">
+        select
+            sp.value as yljgdm, -- 医疗机构代码
+            ma.id as jybgjllsh, -- 检验报告记录流水号
+            ma.visit_id as hzjgnwyid, -- 患者机构内唯一id
+            ma.apply_no as jybgdbh, -- 检验报告单编号
+            sp.name as yljgmc, -- 医疗机构名称
+            ma.in_no as jzlsh, -- 就诊记录流水号
+            if(ma.is_inpt = '1','3','1') as hzlxdm, -- 患者类型代码
+            mr.diagnosis_id as zdbm, -- 诊断编码
+            mr.diagnosis_name as zdmc, -- 诊断名称
+            if(ma.is_inpt = '1',iv.name,ov.name) as xm, -- 病人姓名
+            if(ma.is_inpt = '1',iv.gender_code,ov.gender_code) as xbdm, -- 性别代码
+            if(ma.is_inpt = '1',if(iv.gender_code='1','男','女'),if(iv.gender_code='1','男','女')) as xbmc, -- 性别名称
+            if(ma.is_inpt = '1',iv.age,ov.age) as nn, -- 年龄
+            ma.doctor_id as sqysbm, -- 申请医生编码
+            ma.doctor_name as sqysxm, -- 申请医生姓名
+            ma.doctor_id as bgysbm, -- 报告医生编码
+            ma.doctor_name as bgysxm, -- 报告医生姓名
+            mr.crte_id as shysbm, -- 审核医生编码
+            mr.crte_name as shysxm, -- 审核医生名称
+            mr.crte_id as jyysbm, -- 检验医生编码
+            mr.crte_name as jyysqm, -- 检验医生签名
+            ma.coll_blood_id as cyysbm, -- 采样医生编码
+            ma.coll_blood_name as cyysxm, -- 采样医生姓名
+            ma.doctor_id as hsysbm, -- 核收医生编码
+            ma.doctor_name as hsysxm, -- 核收医生姓名
+            '' as jysqjgdm, -- 检验申请机构代码
+            '' as jysqjgmc, -- 检验申请机构名称
+            '' as jybgjgmc, -- 检验报告机构名称
+            '' as jybgksmc, -- 检验报告科室名称
+            '' as jyjgdm, -- 检验机构代码
+            '' as jyksdm, -- 检验科室代码
+            ma.dept_id as sqks, -- 申请科室编码
+            ma.dept_name as sqksmc, -- 申请科室名称
+            ma.apply_time as sqrqsj, -- 申请日期
+            ma.coll_blood_time as cjrqsj, -- 采集日期
+            ma.apply_time as jsbbrqsj, -- 接收标本日期时间
+            ma.apply_time as jyrqsj, -- 检验日期
+            ma.report_time as shrqsj, -- 审核日期
+            ma.print_time as dyrqsj, -- 打印日期
+            ma.report_time  as bgsj, -- 报告时间
+            '' as bbdm, -- 标本代码
+            '' as bbmc, -- 标本名称
+            ma.bar_code as jybbh, -- 检验标本号
+            '01' as bgdlbbm, -- 报告单类别编码
+            ma.remark as jybgbz -- 检验报告备注
+        from medic_apply ma
+        left join medic_result mr on mr.apply_no = ma.apply_no and mr.hosp_code=#{hospCode}
+        left join inpt_visit iv on iv.id=ma.visit_id and iv.hosp_code=#{hospCode}
+        left join outpt_visit ov on ov.id=ma.visit_id and iv.hosp_code=#{hospCode}
+        left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        where
+        ma.hosp_code=#{hospCode}
+        group by ma.id
+        <if test="startTime != null">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and ma.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--查询实验室检验报告项目分组记录信息-->
+    <select id="listLabSurveyGroupRecord" resultType="cn.hsa.module.interf.healthInfo.entity.TbJyxmfzjl">
+        select
+            sp.value as yljgdm, -- 医疗机构代码
+            ma.id as jybgjllsh, -- 检验报告记录流水号
+            if(ma.is_inpt = '1',iad.item_id,opd.item_id) as fzxmdm, -- 分组项目代码
+            ma.visit_id as hzjgnwyid, -- 患者机构内唯一id
+            ma.content as fzxmmc -- 分组项目名称
+        from medic_apply ma
+                 left join inpt_advice_detail iad on iad.id = ma.opd_id
+                      and iad.item_id is not null and iad.hosp_code =#{hospCode}
+                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id
+                      and opd.item_id is not null and opd.hosp_code =#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        where
+            ma.hosp_code=#{hospCode}
+        <if test="startTime != null">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and ma.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+    
+    <!--条件查询实验室检验报告项目指标结果-->
+    <select id="listLabSurveyIndexResult" resultType="cn.hsa.module.interf.healthInfo.entity.TbJyzbjg">
+        select
+            concat('jyzblsh',mr.id) as jyzblsh, -- 检验指标流水号
+            sp.value as yljgdm, -- 医疗机构代码
+            ma.id as jybgjlls, -- 检验报告记录流水号
+            if(ma.is_inpt = '1',iad.item_id,opd.item_id) as fzxmdm, -- 分组项目代码
+            mr.visit_id as hzjgnwyid, -- 患者机构内唯一id
+            '' as jybgjgmc, -- 检验报告机构名称
+            ma.report_time as jysj, -- 检验时间
+            mr.item_id as jczbdm, -- 检测指标代码
+            mr.item_name as jczbmc, -- 检测指标名称
+            mr.`result` as jczbjg, -- 检测指标结果
+            '' as jydljgjsdw, -- 检验定量结果计算
+            mr.check_ways as jcff, -- 检测方法
+            '' as loinc, -- loinc编码
+            '' as sbbm, -- 设备编码
+            '' as yqbh, -- 仪器编号
+            '' as yqmc, -- 仪器名称
+            mr.reference_value as ckz, -- 参考值范围
+            mr.result_unit as jldw, -- 计量单位
+            mr.result_detail as jgts, -- 结果提示
+            '' as dyxh, -- 打印序号
+            ma.remark as jybgbz -- 检验报告备注
+        from medic_result mr
+                 left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
+                 left join inpt_advice_detail iad on iad.id = ma.opd_id
+                      and iad.item_id is not null and iad.hosp_code =#{hospCode}
+                 left join outpt_prescribe_detail opd on opd.id = ma.opd_id
+                      and opd.item_id is not null and opd.hosp_code =#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        where
+            mr.hosp_code =#{hospCode}
+        <if test="startTime != null">
+            and mr.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and mr.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询实验室检验报告细菌结果-->
+    <select id="listLabSurveyGermResult" resultType="cn.hsa.module.interf.healthInfo.entity.TbJyxjjg">
+        select
+            concat('xjjglsh',mr.id) as xjjglsh, -- 检验指标流水号
+            sp.value as yljgdm, -- 医疗机构代码
+            mr.visit_id as hzjgnwyid, -- 患者机构内唯一id
+            ma.id as jybgjlls, -- 检验报告记录流水号
+            null as bysj, -- 培养时间
+            null as bgsj, -- 报告日期时间
+            '' as xjdh, -- 细菌代号
+            '' as xjmc, -- 细菌名称
+            '' as jljs, -- 菌落计数
+            '' as byj, -- 培养基
+            '' as pytj, -- 培养条件
+            '' as fxfs, -- 发现方式
+            '' as jcjg, -- 检测结果
+            '' as jcjgwz, -- 检测结果文字描述
+            '' as sbbm, -- 设备编码
+            '' as yqbh, -- 仪器编号
+            '' as yqmc, -- 仪器名称
+            '' as dyxh -- 打印序号
+        from medic_result mr
+                 left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        where
+            mr.hosp_code =#{hospCode}
+        <if test="startTime != null">
+            and mr.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and mr.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询实验室检验报告药敏结果-->
+    <select id="listLabSurveyDrugSensitivityResult" resultType="cn.hsa.module.interf.healthInfo.entity.TbJyymjg">
+        select
+            concat('ymjglsh',mr.id) as ymjglsh, -- 药敏结果流水号
+            sp.value as yljgdm, -- 医疗机构代码
+            mr.visit_id as hzjgnwyid, -- 患者机构内唯一id
+            ma.id as jybgjllsh, -- 检验报告记录流水号
+            null as bgsj, -- 报告日期时间
+            '' as xjdh, -- 细菌代号
+            '' as ymdm, -- 药敏代码
+            '' as ymmc, -- 药敏名称
+            '' as zphyl, -- 纸片含药量
+            '' as yjnd, -- 抑菌浓度
+            '' as yjhzj, -- 抑菌环直径
+            '' as jcjg, -- 检测结果描述
+            '' as dyxh -- 打印序号
+        from medic_result mr
+                 left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        where
+            mr.hosp_code =#{hospCode}
+        <if test="startTime != null">
+            and mr.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and mr.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+</mapper>

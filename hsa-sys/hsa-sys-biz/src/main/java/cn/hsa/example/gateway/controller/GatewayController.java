@@ -24,7 +24,7 @@ public class GatewayController {
     @Value("${gateway.apicaller:csbcaller4channelA}")
     private String apiCallerName;
 
-    @Autowired
+    @Autowired(required = false)
     private ApiCallerManager apiCallerManager;
 
     @GetMapping(value = "/get")

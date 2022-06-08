@@ -38,6 +38,9 @@
         <result property="invoicingTargetId" column="invoicing_target_id" jdbcType="VARCHAR"/>
         <result property="invoicingTargetName" column="invoicing_target_name" jdbcType="VARCHAR"/>
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
     </resultMap>
 
 
@@ -45,7 +48,7 @@
     <!--通过实体作为筛选条件查询-->
     <select id="queryAll" resultMap="StroInvoicingMap">
         select
-        a.id, a.hosp_code, a.outin_code, a.order_no, a.biz_id, a.item_code, a.item_id, a.item_name, ifnull(a.num,0) num, a.unit_code, a.curr_unit_code,
+        a.id, a.hosp_code,  c.big_type_code ,a.outin_code, a.order_no, a.biz_id, a.item_code, a.item_id, a.item_name, ifnull(a.num,0) num, a.unit_code, a.curr_unit_code,
         ifnull(a.sell_price,0) sell_price, ifnull(a.buy_price,0) buy_price, a.split_ratio, ifnull(a.split_price,0) split_price,
         ifnull(a.split_num,0) split_num, a.split_unit_code, a.batch_no, ifnull(a.batch_surplus_num,0) batch_surplus_num,
         ifnull(a.up_surplus_num,0) up_surplus_num, ifnull(a.surplus_num,0) surplus_num, ifnull(a.up_buy_price_all,0) up_buy_price_all,
@@ -55,10 +58,12 @@
         (case a.item_code when '1' then c.spec when '2' then d.spec end ) spec,
         (case a.item_code when '1' then c.code when '2' then d.code end ) code,
         (case a.item_code when '1' then c.nation_code when '2' then d.nation_code end ) nation_code,
+        (case a.item_code when '1' then c.type_code when '2' then d.type_code end ) type_code,
         (case a.item_code when '1' then (select name from base_product where code = c.prod_code) when '2' then
         (select name from base_product where code = d.prod_code) end ) prodName,
         ifnull(a.new_price,0) new_price,
-        ifnull(a.new_split_price,0) new_split_price
+        ifnull(a.new_split_price,0) new_split_price,
+        (case a.item_code when '1' then c.nation_name when '2' then d.nation_name end ) nation_name
         from stro_invoicing a left join base_dept b on a.biz_id=b.id and a.hosp_code=b.hosp_code
         left join base_drug c on a.item_code='1' and c.id=a.item_id and c.hosp_code=a.hosp_code
         left join base_material d on a.item_code='2' and d.id=a.item_id and d.hosp_code=a.hosp_code

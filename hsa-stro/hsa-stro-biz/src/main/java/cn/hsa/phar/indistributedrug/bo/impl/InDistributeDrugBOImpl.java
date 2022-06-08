@@ -38,7 +38,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.collect;
+
 
 /**
 * @Package_name: cn.hsa.phar.indistributedrug.bo

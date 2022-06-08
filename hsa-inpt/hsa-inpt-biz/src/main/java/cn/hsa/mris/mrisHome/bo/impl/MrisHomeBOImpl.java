@@ -439,9 +439,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
-        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));// 病案基本信息
-        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));// 病案诊断信息
-        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));// 病案手术信息
+        Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
+        List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
+        dataMap.put("strArr", JSONObject.toJSONString(strArr));
+        List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
         Map<String, Object> paramMap = new HashMap<>();
         /**=============获取系统参数中配置的病案质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
@@ -466,8 +469,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
         // todo 此处调用插入日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfoStr"), "medins_orgcode"));
-        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfoStr"), "visit_id"));
+        logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
+        logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
@@ -481,11 +484,15 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     // 整理病案首页数据，上传drg
     @Override
     public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
+        // todo 此处调用授权码
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));
-        dataMap.put("baseInfoStr", JSONObject.toJSONString(getMaisPatientInfo(map)));
-        dataMap.put("strArr", JSONObject.toJSONString(getMrisDiagnosePage(map)));
-        dataMap.put("strSsxxArr", JSONObject.toJSONString(getMrisOperInfoForDRG(map)));
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
+        List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
+        dataMap.put("strArr", JSONObject.toJSONString(strArr));
+        List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
         Map<String, Object> paramMap = new HashMap<>();
 
         Map<String, Object> sysMap = new HashMap<>();
@@ -509,8 +516,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
         // todo 此处调用插入日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        logMap.put("orgCode",MapUtils.get((Map)dataMap.get("baseInfoStr"), "medins_orgcode"));
-        logMap.put("visitId",MapUtils.get((Map)dataMap.get("baseInfoStr"), "visit_id"));
+        logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
+        logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));

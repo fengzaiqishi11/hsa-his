@@ -3656,4 +3656,13 @@
         </foreach>
         )
     </select>
+    <!--批量修改确费状态为申请退费状态-->
+    <update id="updateIsTechnologyOkByContans">
+        update outpt_cost set is_technology_ok = #{status} where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="lisAndPasCostIds" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </update>
+
 </mapper>

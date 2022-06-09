@@ -194,8 +194,11 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
   **/
   @Override
   public Boolean save(StroInDTO stroInDTO) {
-    // 进行有效期校验
-    validExpiryDate(stroInDTO.getStroInDetailDTOS());
+    // 进行有效期校验，退供应商不进行校验
+    if(!Constants.CRFS.TGYS.equals(stroInDTO.getInCode())){
+      validExpiryDate(stroInDTO.getStroInDetailDTOS());
+    }
+
     StroInDTO stroInDTO1 = checkMoney(stroInDTO);
 
     List<StroInDetailDTO> stroInDetailDTOS = stroInDTO1.getStroInDetailDTOS();
@@ -208,11 +211,11 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       //是增加就添加医院编码，创建人id,创建人名称，单据号
       stroInDTO.setId(SnowflakeUtils.getId());
       Map map = new HashMap();
-      if("2".equals(stroInDTO.getInCode())){
-        map.put("typeCode", "02");
-      } else if("9".equals(stroInDTO.getInCode())) {
+      if(Constants.CRFS.ZJRK.equals(stroInDTO.getInCode())){//直接入库
+        map.put("typeCode", "02");//生成的单据类型，直接入库单据号生成规则
+      } else if(Constants.CRFS.TJTB.equals(stroInDTO.getInCode())) {// 平级出库
         map.put("typeCode", "08");
-      } else{
+      } else{//退供应商
         map.put("typeCode", "05");
       }
       map.put("hospCode", stroInDTO.getHospCode());

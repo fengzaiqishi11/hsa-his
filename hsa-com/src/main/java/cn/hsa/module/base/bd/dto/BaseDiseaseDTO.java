@@ -47,7 +47,7 @@ public class BaseDiseaseDTO extends BaseDiseaseDO implements Serializable {
     private Boolean isNeedReport;
     // 基础信息疾病查询
     private String baseQuery;
-    private String isMatch; // 是否医保匹配
+
 
 
 }

@@ -757,7 +757,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
          * 1.调用政策查询接口  且是一站式结算单
          */
         BigDecimal sumBxFeeNumber = new BigDecimal(0.00);
-        if (Constants.SF.S.equals(isHospital) && (oneSettle || specialOneSettle) && !jxSettle) {
+        if (Constants.SF.S.equals(isHospital) && (oneSettle || specialOneSettle) && !jxSettle && !gsSettle) {
             Map<String, Object> policyMap = insureUnifiedBaseService.queryPolicyInfo(map).getData();
             List<Map<String, Object>> policyMapList = MapUtils.get(policyMap, "outptMap");
             if (!MapUtils.isEmpty(setlProcInfoMap)) {
@@ -1186,7 +1186,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
                 break;
-            case Constants.SBLX.CXJM_ZY: // 城乡居民（非一站式住院）
+            case Constants.SBLX.CXJM_ZY: // 城乡居民
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 paraMap.put("isValidOneSettle",Constants.SF.F);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
@@ -1203,17 +1203,20 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 break;
 
         }
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
         if(resultList !=null && resultList.size() > 0){
             //增加序号
             int index =1;
             for(Map map:resultList){
                 map.put("index",index);
                 index++;
+
+                map.put("hospName",insureConfInfo.getHospName());
             }
         }
         resultMap.put("result",resultList);
 
-        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+
         resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
 
         return resultMap;

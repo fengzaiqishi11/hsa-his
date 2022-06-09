@@ -16,7 +16,6 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import scala.collection.immutable.Page;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;

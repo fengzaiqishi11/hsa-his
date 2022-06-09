@@ -1144,10 +1144,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         insureIndividualSettleDO.setRestsPrice(bka839);//其他支付
         insureIndividualSettleDO.setFertilityPay(fertilityPay);// 生育基金
         insureIndividualSettleDO.setComPay(ake026);// 企业补充医疗保险基金
-        //2022-05-11 zhangjinping 当门诊单病钟病人结算时，我们的程序需要把其他基金支付的金额写回到insure_individual_settle中的hosp_price字段中
-        //insureIndividualSettleDO.setHospPrice(hospPrice);//医院垫付
         insureIndividualSettleDO.setHospPrice("990101".equals(insureIndividualVisitById.getAka130())?othPay:hospPrice);//医院垫付
-       /////
         insureIndividualSettleDO.setAcctInjPay(acctInjPay);
         insureIndividualSettleDO.setRetAcctInjPay(retAcctInjPay);
         insureIndividualSettleDO.setGovernmentPay(governmentPay);

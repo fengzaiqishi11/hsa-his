@@ -3283,10 +3283,6 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                    }
 //                }
 
-                // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
-                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
-                    continue;
-                }
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);
                 BigDecimal tzCost = BigDecimal.valueOf(0);

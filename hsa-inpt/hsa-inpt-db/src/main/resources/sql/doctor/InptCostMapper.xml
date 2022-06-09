@@ -85,6 +85,8 @@
         <result property="isLong" column="is_long" jdbcType="VARCHAR"/>
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <!-- 实体字段映射 -->
@@ -257,7 +259,8 @@
         (select pt.name from base_dept pt where pt.hosp_code = st.hosp_code and pt.id = st.exec_dept_id) execDeptName,
         (ifnull(st.back_num,0) * st.price) backAmount,
         (select fy.name from base_finance_classify fy where fy.hosp_code = st.hosp_code and fy.id = st.bfc_id) bfcName,st.is_wait,st.attribution_code,
-        (case ia.is_long when '0' then '长期' when '1' then '临时' else '' end ) as is_long
+        (case ia.is_long when '0' then '长期' when '1' then '临时' else '' end ) as is_long,
+        ia.type_code as type_code
         from inpt_cost st
         left join inpt_advice ia on st.iat_id = ia.id and st.hosp_code = ia.hosp_code
         where st.hosp_code = #{hospCode}
@@ -2249,6 +2252,13 @@
         <foreach collection="ids" item="id" open="(" close=")" separator=",">
             #{id}
         </foreach>
+    </update>
+    <!--更新住院费用为已申请退费-->
+    <update id="updateInptCostIsOkByIds">
+        update inpt_cost set is_ok = '2' where hosp_code = #{hospCode} and id in
+                                         <foreach collection="ids" item="item" open="(" separator="," close=")">
+                                             #{item}
+                                         </foreach>
     </update>
 
 

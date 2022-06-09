@@ -225,4 +225,13 @@ public class OutinInvoiceDTO extends OutinInvoiceDO implements Serializable {
     private String dqCurrNo;
     // 收费员id
     private String chargeId;
+
+    // 余额
+    private String balanceSettle;
+
+    // 国家编码
+    private String nationCode;
+    // 国家名称
+    private String nationName;
+
 }

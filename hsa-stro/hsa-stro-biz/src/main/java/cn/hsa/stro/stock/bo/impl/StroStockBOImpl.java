@@ -3,8 +3,7 @@ package cn.hsa.stro.stock.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.base.dept.service.BaseDeptService;
-import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
+
 import cn.hsa.module.stro.stock.bo.StroStockBO;
 import cn.hsa.module.stro.stock.dao.StroStockDao;
 import cn.hsa.module.stro.stock.dao.StroStockDetailDao;
@@ -1724,7 +1723,9 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
      **/
     @Override
     public PageDTO queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO) {
+        // 1：门诊，2：住院
         String bizCode = itemProfitStatisticsDTO.getBizCode();
+        // 1:业务类型/项目/医生  2:业务类型/科室
         String sumCode = itemProfitStatisticsDTO.getSumCode();
         if (StringUtils.isEmpty(bizCode)){
             throw new AppException("请选择需要查询的业务类型");

@@ -857,7 +857,23 @@
             v.age_unit_code as ageUnitCode,
             s.reality_price as settleRealityPrice,
             s.self_price as selfPrice,
-            s.mi_price as miPrice
+            s.mi_price as miPrice,
+            case a.item_code when '1'
+                                 then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '2'
+                                 then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '3'
+                                 then (select f.nation_code from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '4'
+                                 then (select f.union_nation_code from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationCode,
+            case a.item_code when '1'
+                                 then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '2'
+                                 then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '3'
+                                 then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+                             when '4'
+                                 then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
         FROM
             outpt_cost a
             left join base_finance_classify b on a.bfc_id = b.id
@@ -927,7 +943,24 @@
             u.name as doctorName,
             u.prac_certi_no as pracCertiNo,
             (select sum(reality_price) from outpt_cost where hosp_code = #{hospCode} and settle_id = #{settleId}) as sumRealityPrice,
-            ifnull(iim.remark, '') as chrgItemLv
+            ifnull(iim.remark, '') as chrgItemLv,
+        (select CONCAT(ROUND(before_settle,2),'/',ROUND(last_settle,2)) balanceSettle from insure_individual_settle where hosp_code = #{hospCode} and v.id = visit_id and settle_id = #{settleId}) as balanceSettle,
+        case a.item_code when '1'
+        then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '3'
+        then (select f.nation_code from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '4'
+        then (select f.union_nation_code from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationCode,
+        case a.item_code when '1'
+        then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '3'
+        then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '4'
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
@@ -1056,7 +1089,24 @@
             u.prac_certi_no as pracCertiNo,
             (select sum(reality_price) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id =#{settleId} and a.status_code = '0') as sumRealityPrice,
             ifnull((case when iic.chrgItemLv = '01' then '甲类' when iic.chrgItemLv = '02' then '乙类' when iic.chrgItemLv = '03' then '丙类' else null end), '自费') as chrgItemLv,
-            iic.item_code as ybCode
+            iic.item_code as ybCode,
+            (select CONCAT(ROUND(before_settle,2),'/',ROUND(last_settle,2)) balanceSettle from insure_individual_settle where hosp_code = #{hospCode} and v.id = visit_id and settle_id = #{settleId}) as balanceSettle,
+             case a.item_code when '1'
+        then  (select f.nation_code from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_code from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '3'
+        then (select f.nation_code from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '4'
+        then (select f.union_nation_code from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationCode,
+        case a.item_code when '1'
+        then  (select f.nation_name from base_drug f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '2'
+        then (select f.nation_name from base_material f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '3'
+        then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
+        when '4'
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
         FROM
             inpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id

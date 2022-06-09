@@ -155,4 +155,6 @@ public interface BaseDiseaseBO  {
      * @Return java.util.List<cn.hsa.module.base.bd.dto.BaseDiseaseDTO>
      **/
     List<BaseDiseaseDTO> queryAllInfectious(BaseDiseaseDTO baseDiseaseDTO);
+
+    Boolean updateDisease(BaseDiseaseDTO baseDiseaseDTO);
 }

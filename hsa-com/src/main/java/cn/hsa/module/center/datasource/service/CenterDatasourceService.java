@@ -167,4 +167,13 @@ public interface CenterDatasourceService {
      * @Date: 2022-02-17
      */
     WrapperResponse updateIsGuide();
+
+    /**
+     * @Description: 导出医院数据（SaaS导出）
+     * @Param: []
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @Author: liuliyun
+     * @Date: 2022-05-05
+     */
+    WrapperResponse exportHospitalData(String startDate,String endDate);
 }

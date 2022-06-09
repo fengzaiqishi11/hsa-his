@@ -461,4 +461,6 @@ public interface OutptDoctorPrescribeBO {
 
 
     List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
+
+    PageDTO getCfData2(BaseDrugDTO baseDrugDTO);
 }

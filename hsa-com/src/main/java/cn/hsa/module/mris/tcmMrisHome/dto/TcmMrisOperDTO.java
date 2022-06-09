@@ -1,6 +1,6 @@
 package cn.hsa.module.mris.tcmMrisHome.dto;
 
-import cn.hsa.module.mris.mrisHome.entity.MrisOperInfoDO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -19,9 +19,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class TcmMrisOperDTO extends MrisOperInfoDO implements Serializable {
+public class TcmMrisOperDTO extends TcmMrisOperInfoDO implements Serializable {
 
-    private List<MrisOperInfoDO> operList;
+    private List<TcmMrisOperInfoDO> operList;
 
     private String name;
 

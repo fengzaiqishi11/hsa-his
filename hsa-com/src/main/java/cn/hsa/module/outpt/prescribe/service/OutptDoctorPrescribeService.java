@@ -497,6 +497,8 @@ public interface OutptDoctorPrescribeService {
      **/
     @PostMapping("/service/outpt/outptDoctorPrescribe/getBaseDrug")
     WrapperResponse<BaseDrugDTO> getBaseDrug(Map parmMap);
+    @GetMapping("/web/outpt/outptDoctorPrescribeService/getCfData2")
+    WrapperResponse<PageDTO> getCfData2(Map paramMap);
 
     @PostMapping("/web/outpt/outptDoctorPrescribeService/queryOutptDiagnoseByVisitIds")
     WrapperResponse<List<OutptDiagnoseDTO>> queryOutptDiagnoseByVisitIds(Map map);

@@ -1,7 +1,8 @@
 package cn.hsa.license;
 
 import lombok.SneakyThrows;
-import org.eclipse.jetty.util.StringUtil;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,7 +65,7 @@ public class LicenseCheckListener implements ApplicationListener<ContextRefreshe
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         //root application context 没有parent
-        if(StringUtil.isNotBlank(licensePath)){
+        if(StringUtils.isNotBlank(licensePath)){
             logger.info("类加载的根路径:"+this.getClass().getResource("/").getPath());
             logger.info("++++++++ 开始安装证书 ++++++++");
 

@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
+import cn.hsa.insure.module.bo.impl.InsureIndividualVisitBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
@@ -16,11 +17,7 @@ import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.*;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
@@ -82,6 +79,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
     @Resource
     private InsureUnifiedPayInptService insureUnifiedPayInptService;
+    @Resource
+    private InsureIndividualVisitBOImpl insureIndividualVisitBO;
 
     @Resource
     private InsureUnifiedPayRestService insureUnifiedPayRestService;
@@ -630,16 +629,16 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());
             insureIndividualSettleDTO.setHospCode(hospCode);
             insureIndividualSettleDTO.setInsureSettleId(MapUtils.get(setlinfo,"setl_id"));
-            insureIndividualSettleDTO.setAllPortionPrice(MapUtils.get(setlinfo,"fulamt_ownpay_amt"));
-            insureIndividualSettleDTO.setOverSelfPrice(MapUtils.get(setlinfo,"overlmt_selfpay"));
-            insureIndividualSettleDTO.setInscpScpAmt(MapUtils.get(setlinfo,"inscp_scp_amt"));
-            insureIndividualSettleDTO.setPreselfpayAmt(MapUtils.get(setlinfo,"preselfpay_amt"));
-            insureIndividualSettleDTO.setPoolPropSelfpay(MapUtils.get(setlinfo,"pool_prop_selfpay"));
-            insureIndividualSettleDTO.setPlanPrice(MapUtils.get(setlinfo,"hifp_pay"));
+            insureIndividualSettleDTO.setAllPortionPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"fulamt_ownpay_amt").toString()));
+            insureIndividualSettleDTO.setOverSelfPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"overlmt_selfpay").toString()));
+            insureIndividualSettleDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"inscp_scp_amt").toString()));
+            insureIndividualSettleDTO.setPreselfpayAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"preselfpay_amt").toString()));
+            insureIndividualSettleDTO.setPoolPropSelfpay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"pool_prop_selfpay").toString()));
+            insureIndividualSettleDTO.setPlanPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifp_pay").toString()));
             BigDecimal hifmi_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifmi_pay").toString());
             BigDecimal hifob_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifob_pay").toString());
             insureIndividualSettleDTO.setSeriousPrice(BigDecimalUtils.add(hifmi_pay,hifob_pay));
-            insureIndividualSettleDTO.setMafPay(MapUtils.get(setlinfo,"maf_pay"));
+            insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"maf_pay").toString()));
             List <Map<String,Object>> setldetailList = MapUtils.get(outptMap,"setldetail");
             if (!ListUtils.isEmpty(setldetailList)) {
                 BigDecimal othPay = BigDecimal.ZERO;
@@ -1065,7 +1064,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
      * @Return
      */
     @Override
-    public Map<String, Object> queryPatientInfo(Map<String, Object> map) {
+    public PageDTO queryPatientInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> dataMap = new HashMap<>();
         String regCode = MapUtils.get(map, "regCode");
@@ -1073,6 +1072,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         dataMap.put("begntime", MapUtils.get(map, "startDate"));
         dataMap.put("endtime", MapUtils.get(map, "endDate"));
+        String pageNo = Integer.toString(MapUtils.get(map, "pageNo"));
+        String pageSize = Integer.toString(MapUtils.get(map,"pageSize"));
         paramMap.put("data", dataMap);
         map.put("msgName","在院信息查询");
         map.put("visitId","");
@@ -1080,8 +1081,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.REGISTER.UP_5303, paramMap,map);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "data");
+        PageHelper.startPage(Integer.parseInt(pageNo), Integer.parseInt(pageSize));
+        List<InsureSettleInfoDTO> insureSettleInfoDTOList = MapUtils.get(outptMap, "data");
+        PageDTO of = PageDTO.of(insureSettleInfoDTOList);
         map.put("resultDataMap", resultDataMap);
-        return map;
+        return of;
     }
 
     /**
@@ -1097,6 +1101,13 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String regCode = MapUtils.get(map, "regCode");
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
+        InsureIndividualVisitDTO insureIndividualVisit = new InsureIndividualVisitDTO();
+        insureIndividualVisit.setVisitId(MapUtils.get(map, "visitId"));
+        InsureIndividualVisitDTO result = insureIndividualVisitBO.selectInsureInfo(insureIndividualVisit);
+        if (ObjectUtil.isEmpty(result)) {
+            throw new AppException("没有该就诊信息");
+        }
+        regCode = result.getInsureRegCode();
         dataMap.put("biz_appy_type", MapUtils.get(map, "bizAppyType"));
         map.put("msgName","人员定点信息查询");
         map.put("isHospital","");
@@ -1596,12 +1607,18 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("visitId","");
         // 返参map
         Map<String, Object> resultMap = new HashMap<>();
-        if (deptDTOList.size() == 1) {
+        //如果是甘肃，海南的医保的就走3401接口 因为3401a接口没开 医保编码为 甘肃：620102 海南的：460100
+        if(StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("62") && attrCode.startsWith("46")){
             log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap,map);
-        } else if (deptDTOList.size() > 1) {
-            log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
-            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap,map);
+            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
+        }else {
+            if (deptDTOList.size() == 1) {
+                log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+                resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
+            } else if (deptDTOList.size() > 1) {
+                log.debug("科室上传【3401A】待上传数据：" + JSONObject.toJSONString(deptDTOList));
+                resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401A, inputMap, map);
+            }
         }
 
         // 上传完成后，更新本地科室表上传状态

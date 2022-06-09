@@ -1099,6 +1099,7 @@
         SELECT DISTINCT
         c.aac003 AS psnName,
         c.aac004 AS gend,
+        (select name from insure_dict where value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
         c.bka008 insureUnit,
@@ -1126,11 +1127,10 @@
         e.person_price AS personPrice,
         e.hosp_price AS hospPrice,
         e.rests_price AS restsPrice,
-        e.thb_pay AS thbPay,
+        ifNull(e.thb_pay, 0) AS thbPay, /*如果值为空 做0处理*/
         ifnull(e.hosp_exem_amount,0) AS hospExemAmount,
         ifnull(e.government_pay,0) AS governmentPay,
-        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0)
-        +ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
+        (e.plan_price + e.serious_price + ifnull(e.thb_pay,0) + ifnull(e.maf_pay,0) + ifnull(e.hosp_exem_amount,0)+ifnull(e.government_pay,0) + e.personal_price) AS planSumPay,
         ifnull(e.maf_pay,0.00) AS mafPay,
         ( e.insure_price - e.personal_price ) AS planSumPrice,
         e.clr_optins AS clrOptins,
@@ -1188,6 +1188,9 @@
         </if>
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
         </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
@@ -1315,6 +1318,9 @@
             and e.clr_optins = #{clrOptins}
         </if>
 
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
+        </if>
         <if test="isRemote == '0'.toString()"> <!-- 本市参保 -->
             and LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
         </if>
@@ -1456,6 +1462,9 @@
         <if test="clrOptins != null and clrOptins != '' ">
             and e.clr_optins = #{clrOptins}
         </if>
+        <if test="clrType != null and clrType != '' ">
+            and e.clr_type = #{clrType}
+        </if>
         <if test="insutype != null and insutype != '' ">
             and c.aae140 = #{insutype}
         </if>
@@ -1573,7 +1582,6 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
-        AND ifnull(t.is_one_settle,0) != '1'
         AND e.insure_price > 0
         AND t.insuplc_admdvs = ia.admdvs_code
         <if test="isValidOneSettle == '1'.toString()">

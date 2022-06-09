@@ -2,10 +2,12 @@ package cn.hsa.inpt.medicaltechnology.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.medicaltechnology.bo.MedicalTechnologyBO;
 import cn.hsa.module.inpt.medicaltechnology.dao.MedicalTechnologyDAO;
 import cn.hsa.module.inpt.medicaltechnology.dto.MedicalTechnologyDTO;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -86,16 +88,14 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 	public boolean saveMwdicalTechnologyConfirmCost(Map<String, Object> map) {
 		map.put("crteTime", DateUtils.getNow());
 		List<String> list = MapUtils.get(map, "ids");
-		StringBuilder ids = new StringBuilder();
-		for (int i = 0; i < list.size(); i++) {
-			ids.append("'");
-			ids.append(list.get(i));
-			ids.append("'");
-			if ((i+1) != list.size()) {
-				ids.append(",");
-			}
+		if (ListUtils.isEmpty(list)){
+			throw new AppException("费用id不能为空");
 		}
-		map.put("costIds", ids.toString());
+		// 后端对确费状态再做一次校验，根据费用id查询确费状态，查看是否都是未确费状态
+		int alreadyCount = medicalTechnologyDAO.getAlreadyCostByCostIds((String) map.get("hospCode"),list);
+		if (alreadyCount > 0){
+			throw new AppException("只能选未确费数据");
+		}
 		//"1"为门诊确费
 		if(!MapUtils.isEmpty(map,"clinicType") &&"1".equals(MapUtils.get(map, "clinicType").toString())){
 			return medicalTechnologyDAO.saveOutPtMwdicalTechnologyConfirmCost(map) > 0;
@@ -114,16 +114,9 @@ public class MedicalTechnologyBOImpl extends HsafBO implements MedicalTechnology
 	@Override
 	public boolean updateMedicalTechnologyConfirmCost(Map<String, Object> map) {
 		List<String> list = MapUtils.get(map, "ids");
-		StringBuilder ids = new StringBuilder();
-		for (int i = 0; i < list.size(); i++) {
-			ids.append("'");
-			ids.append(list.get(i));
-			ids.append("'");
-			if ((i+1) != list.size()) {
-				ids.append(",");
-			}
+		if (ListUtils.isEmpty(list)){
+			throw new AppException("费用id不能为空");
 		}
-		map.put("costIds", ids.toString());
 		//"1"为门诊取消
 		if(!MapUtils.isEmpty(map,"clinicType")&&"1".equals(MapUtils.get(map, "clinicType").toString())){
 			return medicalTechnologyDAO.updateOutPtMedicalTechnologyConfirmCost(map) > 0;

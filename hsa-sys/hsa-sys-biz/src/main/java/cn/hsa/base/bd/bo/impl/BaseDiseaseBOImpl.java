@@ -8,7 +8,6 @@ import cn.hsa.module.base.bd.bo.BaseDiseaseBO;
 import cn.hsa.module.base.bd.dao.BaseDiseaseDAO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseRuleDTO;
-import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -48,7 +47,8 @@ public class BaseDiseaseBOImpl extends HsafBO implements BaseDiseaseBO{
     @Resource
     private InsureDiseaseMatchService insureDiseaseMatchService_consumer;
 
-
+    @Resource
+    AyncDiseaseMatch ayncDiseaseMatch;
     /**
      * @Method getById
      * @Desrciption 通过id获取疾病信息
@@ -412,5 +412,29 @@ public class BaseDiseaseBOImpl extends HsafBO implements BaseDiseaseBO{
     @Override
     public List<BaseDiseaseDTO> queryAllInfectious(BaseDiseaseDTO baseDiseaseDTO) {
         return baseDiseaseDAO.queryAllInfectious(baseDiseaseDTO);
+    }
+
+    @Override
+    public Boolean updateDisease(BaseDiseaseDTO baseDiseaseDTO) {
+        //设置拆分List大小
+        int limitLength = 50;
+        try {
+            log.info("开始执行任务");
+            //获取所有匹配好的数据
+            List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = baseDiseaseDAO.getDiseaseIsMatch(baseDiseaseDTO);
+            //拆分数据
+            List<List<InsureDiseaseMatchDTO>> splitList = ListUtils.splitList(insureDiseaseMatchDTOList, limitLength);
+            //循环调用异步线程
+            for (List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOS : splitList) {
+                //异步线程需要再调整，直接同步调用速度处理速度也还能接受，后面再维护
+//                ayncDiseaseMatch.executeAsyncTask(insureDiseaseMatchDTOS,baseDiseaseDTO.getHospCode());
+                baseDiseaseDAO.updateDiseaseMatch(insureDiseaseMatchDTOS,baseDiseaseDTO.getHospCode());
+            }
+            log.info("任务执行完成");
+        } catch (Exception e) {
+            log.error("执行更新任务出错");
+            throw e;
+        }
+        return true;
     }
 }

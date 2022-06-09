@@ -9,7 +9,8 @@ import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.service.OutptOutTmakePriceFormService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.util.MapUtils;
-import groovy.util.logging.Slf4j;
+
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;

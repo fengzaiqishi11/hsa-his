@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.interf.healthInfo.dao.LocalBasicDictDAO">
+
+    <!--条件查询医院的科室字典表信息-->
+    <select id="listDeptDict" resultType="cn.hsa.module.interf.healthInfo.entity.TbKsxx">
+        select
+            sp.code as yljgdm, -- 机构编码
+            bd.code as ksbm, -- 科室编码
+            bd.name as ksmc, -- 科室名称
+            '' as wsjbm, -- 区域平台编码
+            '' as nhbm, -- 新农合编码
+            '' as ybjbm, -- 医保局编码
+            hbc.c_value as yxbz, -- 是否有效
+            bd.remark as bz, -- 备注
+            bd.type_code as kslx, -- 科室类别
+            bd.up_dept_code as sjksbm, -- 上级科室编码
+            bd.person_name as fzr, -- 负责人
+            bd.phone as lxdh -- 联系电话
+        from base_dept bd
+                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code = #{hospCode}
+                 left join healthinfo_base_code hbc on hbc.c_code='CX02.01.012' and hbc.cm_value = bd.is_valid
+        where bd.hosp_code = #{hospCode}
+          and bd.code is not null
+        <if test="startTime != null">
+            and bd.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and bd.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询医护人员基本信息-->
+    <select id="listMedicalStaffBasicInfo" resultType="cn.hsa.module.interf.healthInfo.entity.TbYhryjbxx">
+        select
+            su.code as ysbm, -- 医生编码
+            sp.value as yljgdm, -- 机构编码
+            su.code as zcm, -- 注册名称
+            su.name as xm, -- 姓名
+            hbcxb.c_value as xbdm, -- 性别代码
+            su.cert_code as sfzh, -- 身份证号
+            su.phone as lxdh, -- 联系电话
+            su.dept_code as ksbm, -- 科室编码
+            '' as zwdm, -- 职务编码
+            '' as zhiw, -- 职务名称
+            hbczc.c_value as zcdm, -- 职称编码
+            '' as zhic, -- 职称名称
+            su.crte_time as rzsj, -- 入职日期
+            su.birthday as csrq, -- 出生日期
+            case when substr(su.work_type_code,1,2) = '10' then '01'
+            when substr(su.work_type_code,1,2) = '20' then '02'
+            when substr(su.work_type_code,1,2) = '0' then '04'
+            else '99' end  as lb,  -- 人员类别
+            '' as zydm, -- 专业代码
+            su.major_code as zymc, -- 专业名称
+            hbcxl.c_value as whcddm, -- 文化程度代码
+            hbcxl.c_meaning as whcdmc -- 文化程度名称
+        from sys_user su
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+             left join healthinfo_base_code hbcxb on hbcxb.c_code='GB/T 2261.1-2003' and hbcxb.cm_value = su.gender_code
+             left join healthinfo_base_code hbczc on hbczc.c_code='GB/T 8561-2001' and hbczc.cm_value = su.work_type_code
+             left join healthinfo_base_code hbcxl on hbcxl.c_code='GB/T 4658-2006'
+                  and hbcxl.cm_value = su.education_code and hbcxl.cm_value != ''
+        where
+            su.hosp_code = #{hospCode}
+            and su.code is not null
+        <if test="startTime != null">
+            and su.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and su.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询药品字典信息-->
+    <select id="listDrugDict" resultType="cn.hsa.module.interf.healthInfo.entity.TbYpzd">
+        select
+            sp.value as yljgdm, -- 机构编码
+            bd.code as ypbm, -- 药品编码
+            bd.usual_name as ypmc, -- 药品名称
+            bd.good_name as ypsymc, -- 药品通用名称
+            bd.spec as ypgg, -- 药品规格
+            bd.prep_code as ypjxdm, -- 药品剂型代码
+            jxfl.name as ypjxms, -- 药品剂型
+            bd.dosage_unit_code as ypjldw, -- 药品计量单位
+            bd.usage_code as ypyfdm, -- 药品用法代码
+            yf.name as ypyfms, -- 药品用法
+            bd.split_unit_code as fydw, -- 发药单位
+            bd.split_unit_code as zxdw, -- 最小单位
+            bd.unit_code as bzdw, -- 包装单位
+            bd.split_ratio as cfsl, -- 拆分数量
+            bd.last_buy_price as bzpfj, -- 包装批发价
+            bd.price as bzlsj, -- 包装零售价
+            bd.ddd as ddd, -- 限定日剂量（DDD）
+            bp.name as sccj, -- 生产厂家
+            bd.is_prescription as cfybz, -- 处方药标志
+            '' as cfyfl, -- 处方药分类
+            '' as cfyflms, -- 处方药分类描述
+            bd.is_basic as jbybz, -- 基本药物标志
+            bd.basic_code as jbylx, -- 基本药物类型
+            jy.name as jbywms, -- 基本药物描述
+            bd.big_type_code as ypflbm, -- 药品分类编码
+            ypdl.name as ypflmc, -- 药品分类名称
+            bd.antibacterial_code as kjlypfj, -- 抗菌类药品分级
+            kjypjb.name as kjfjms, -- 抗菌类分级描述
+            '' as sfydbz, -- 是否有毒标识
+            bd.ph_code as mzjslfldm, -- 麻醉精神类药品分类代码
+            dmtx.name as mzjslms, -- 麻醉精神类药品标识描述
+            '' as kssbz, -- 抗生素标识
+            ypfl.name as ylfl, -- 药理分类
+            bd.nation_code as wsjbm, -- 卫生局标准编码
+            bd.insure_code as ybjbm, -- 医保局标准编码
+            '' as xnhbjbm, -- 新农合标准编码
+            '' as sypcgbm, -- 省药品采购标准编码
+            bd.is_valid as sfyx, -- 是否有效
+            '' as sfzzy, -- 是否自制药
+            '' as sfzyyp, -- 是否中药饮片
+            '' as sfzcyzsj, -- 是否中成药注射剂
+            bd.proton_pump as sfzzbyzj -- 是否质子泵抑制剂
+        from base_drug bd
+             left join sys_parameter sp on sp.code =#{sysParameter} and sp.hosp_code=#{hospCode}
+             left join sys_code_detail jxfl
+                       on jxfl.c_code ='JXFL' and jxfl.value = bd.prep_code and jxfl.hosp_code = #{hospCode}
+             left join sys_code_detail yf
+                       on yf.c_code ='YF' and yf.value = bd.usage_code and yf.hosp_code = #{hospCode}
+             left join sys_code_detail jy
+                       on jy.c_code ='jy' and jy.value = bd.basic_code and jy.hosp_code = #{hospCode}
+             left join sys_code_detail ypdl
+                       on ypdl.c_code ='YPDL' and ypdl.value = bd.big_type_code and ypdl.hosp_code = #{hospCode}
+             left join sys_code_detail kjypjb
+                       on kjypjb.c_code ='KJYPJB' and kjypjb.value = bd.antibacterial_code and kjypjb.hosp_code = #{hospCode}
+             left join sys_code_detail dmtx
+                       on dmtx.c_code ='DMTX' and dmtx.value = bd.ph_code and dmtx.hosp_code = #{hospCode}
+             left join sys_code_detail ypfl
+                       on ypfl.c_code ='YPFL' and ypfl.value = bd.type_code and ypfl.hosp_code = #{hospCode}
+             left join base_product bp on bp.code = bd.prod_code and bp.hosp_code =#{hospCode}
+        where
+            bd.hosp_code =#{hospCode}
+            and bd.code is not null
+        <if test="startTime != null">
+            and bd.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and bd.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询诊疗项目字典信息-->
+    <select id="listClinicProjectDict" resultType="cn.hsa.module.interf.healthInfo.entity.TbZlxmzd">
+        select
+            sp.value as yljgdm, -- 机构编码
+            bi.code as xmbm, -- 项目编码
+            bi.name  as xmmc, -- 项目名称
+            bi.other_name as xmtym, -- 项目通用名称
+            bi.spec as xmgg, --  项目规格
+            dw.name as xmdwms, -- 项目单位描述
+            bi.type_code as xmlbbm, -- 项目类别编码
+            xmfl.name as xmlbmc, -- 项目类别名称
+            '' as xmjbms, -- 项目级别描述
+            bi.nation_code as wsjbm, -- 卫生局标准编码
+            '' as ybjbm, -- 医保局标准编码
+            '' as xnhbjbm, -- 新农合标准编码
+            '' as sbjbm, -- 省标准编码
+            bi.is_valid as yxbz -- 是否有效
+        from base_item bi
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode}
+             left join sys_code_detail xmfl
+               on xmfl.c_code = 'XMFL' and xmfl.value = bi.unit_code and xmfl.hosp_code =#{hospCode}
+             left join sys_code_detail dw
+               on dw.c_code = 'DW' and dw.value = bi.unit_code and dw.hosp_code =#{hospCode}
+        where
+            bi.hosp_code =#{hospCode}
+            and bi.code is not null
+        <if test="startTime != null">
+            and bi.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and bi.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询疾病字典信息-->
+    <select id="listDiseaseDict" resultType="cn.hsa.module.interf.healthInfo.entity.TbJbzd">
+        select
+            sp.value as yljgdm, -- 机构编码
+            bd.code as jbzdbm, -- 疾病诊断编码
+            bd.name as jbzdmc, -- 疾病诊断名称
+            bd.usual_name as zdtymc, -- 诊断通用名称
+            bd.nation_code as icd10bm, -- ICD10编码
+            bd.nation_name as icd10mc, -- ICD10名称
+            bd.type_code as jbzlbm, -- 疾病种类编码
+            jbfl.name as jbzlms, -- 疾病种类描述
+            '' as bzlx, -- 病种类型
+            '' as dbzbs, -- 是否单病种标识
+            '' as wsjbzbm, -- 卫生局标准编码
+            '' as ybjbm, -- 医保局标准编码
+            '' as xnhbjbm, -- 新农合标准编码
+            bd.is_valid as sfyxbz -- 是否有效标志
+        from base_disease bd
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode}
+             left join sys_code_detail jbfl
+               on jbfl.c_code='JBFL' and jbfl.value = bd.type_code and jbfl.hosp_code=#{hospCode}
+        where
+            bd.hosp_code =#{hospCode}
+            and bd.code is not null
+        <if test="startTime != null">
+            and bd.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and bd.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+
+    <!--条件查询物料字典信息-->
+    <select id="listMaterialsDict" resultType="cn.hsa.module.interf.healthInfo.entity.TbWzzd">
+        select
+            bm.code as wzbm, -- 物资编码
+            sp.value as jgbm, -- 机构编码
+            bm.name as wzmc, -- 物资名称
+            bm.type_code as wzlxbm, -- 物资类型编码
+            bm.spec as wzgg, -- 规格
+            dw.name as wzdw, -- 单位
+            bm.price as wzlsj, -- 包装零售价
+            bp.name as sccj, -- 生产厂家
+            bm.remark as bz, -- 备注
+            '' as wzkw, -- 物资库位
+            bm.last_buy_price as pfj, -- 批发价
+            '' as dyzlxmbm, -- 对应诊疗项目编码
+            '' as dyypbm, -- 对应药品编码
+            '' as sfgzhc, -- 是否高值耗材
+            bm.model as dyqxbm -- 对应器械编码
+        from base_material bm
+                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code =#{hospCode}
+                 left join sys_code_detail dw on dw.c_code = bm.unit_code and dw.hosp_code =#{hospCode}
+                 left join base_product bp on bp.code = bm.prod_code and bp.hosp_code =#{hospCode}
+        where
+            bm.hosp_code =#{hospCode}
+            and bm.code is not null
+        <if test="startTime != null">
+            and bm.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and bm.crte_time &lt;= #{endTime}
+        </if>
+    </select>
+</mapper>

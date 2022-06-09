@@ -37,6 +37,8 @@ public class StroInventoryDetailDTO extends StroInventoryDetailDO implements Ser
     private BigDecimal beforSellPriceAll;
     // 盘后零售总金额
     private BigDecimal afterSellPriceAll;
+    //分类
+    private String typeCode;
     public StroInventoryDetailDTO() {
 
     }

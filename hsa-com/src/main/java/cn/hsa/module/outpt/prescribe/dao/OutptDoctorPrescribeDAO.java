@@ -903,4 +903,6 @@ public interface OutptDoctorPrescribeDAO {
 
 
     List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
+
+    List<BaseDrugDTO> getCfData2(BaseDrugDTO baseDrugDTO);
 }

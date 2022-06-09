@@ -9687,6 +9687,30 @@ ALTER TABLE `outpt_register_settle` ADD INDEX `idx_outpt_register_settle_05` USI
 ALTER TABLE `outpt_settle` ADD INDEX `idx_outpt_settle_06` USING BTREE(`is_settle`);
 ALTER TABLE `inpt_settle` ADD INDEX `idx_inpt_settle_06` USING BTREE(`crte_time`);
 
+    -- 表结构
+-- 自费病人上传新增字段
+ALTER TABLE inpt_visit ADD COLUMN `is_uplod_cost` varchar(3) DEFAULT '0' COMMENT '自费病人是否上传费用';
+ALTER TABLE inpt_visit ADD COLUMN `is_uplod_dise` varchar(3) DEFAULT '0' COMMENT '自费病人是否诊断和就诊信息';
+ALTER TABLE inpt_visit ADD COLUMN `cplt_flag` varchar(3) DEFAULT '0' COMMENT '自费病人上传完成标志';
+ALTER TABLE outpt_visit ADD COLUMN `cplt_flag` varchar(3) DEFAULT '0' COMMENT '自费病人上传完成标志';
+-- 中医病案首页诊断新增字段
+ALTER TABLE tcm_mris_diagnose ADD COLUMN columns_num varchar(4) NULL COMMENT '诊断行号';
+-- 就医信息是否上传标志
+ALTER TABLE outpt_visit ADD is_uplod_dise varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '就医信息上传标志';
+-- 住院人员特殊信息
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag_type varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识类型';
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag_detl_id varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识';
+ALTER TABLE insure_individual_basic ADD ipt_psn_sp_flag varchar(32)CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '住院特殊人员标识id';
+-- 医嘱国家编码增加字段
+ALTER TABLE base_advice ADD union_nation_code varchar(64) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）';
+
+-- 新增门诊用药性质
+ALTER TABLE base_material ADD outpt_use_code varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '门诊用药性质（YYXZ）';
+-- 修改报表模板表中报表模板文件名称字段长度
+ALTER TABLE report_configuration MODIFY COLUMN temp_name varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '报表模板文件名称';
+-- 修改医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）长度
+ALTER TABLE base_advice MODIFY COLUMN union_nation_code varchar(128);
+
 
 
 

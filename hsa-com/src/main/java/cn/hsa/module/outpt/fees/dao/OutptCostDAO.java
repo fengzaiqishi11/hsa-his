@@ -666,6 +666,14 @@ public interface OutptCostDAO {
      * @Date: 2022/2/23
      */
     List<OutptCostDTO> queryCostByIds(@Param("hospCode") String hospCode,@Param("costIds") List<String> costIds);
+    /**
+     * @Author gory
+     * @Description 批量修改确费状态
+     * @Date 2022/5/24 16:04
+     * @Param [hospCode, lisAndPasCostIds]
+     **/
+    void updateIsTechnologyOkByContans(@Param("status")String status,@Param("hospCode")String hospCode,
+                                      @Param("lisAndPasCostIds")  List<String> lisAndPasCostIds);
 
     /**
      * @Author 医保二部-张金平

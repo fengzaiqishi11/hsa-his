@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.Constants;
@@ -18,6 +19,7 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -355,8 +357,17 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
      */
     private Map<String, Object> queryTcmEmcBaseInfo(Map<String, Object> map,String mdtrtSn) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
-        MrisCostDO mrisCostDO =  MapUtils.get(map,"mrisCostDO");
+        if (ObjectUtil.isEmpty(insureIndividualVisitDTO)) {
+            throw new AppException("未获取到医保登记信息！");
+        }
+        TcmMrisCostDO mrisCostDO =  MapUtils.get(map,"tcmmrisCostDO");
+        if (ObjectUtil.isEmpty(mrisCostDO)) {
+            throw new AppException("未获取到病案首页费用信息！");
+        }
         TcmMrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"tcmMrisBaseInfo");
+        if (ObjectUtil.isEmpty(mrisBaseInfoDTO)) {
+            throw new AppException("未获取到病案首页基础信息！");
+        }
         Map<String,Object> baseInfoMap = new HashMap<>();
 
         baseInfoMap.put("mdtrt_sn",mdtrtSn); // 就医流水号 定点医药机构编号+院内唯一流水号
@@ -741,8 +752,11 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
 
             if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
                 //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
-//                Map<String,Object> operInfoMap = new HashMap<>();
-//                operInfoDOList.add(operInfoMap);
+                Map<String,Object> operInfoMap = new HashMap<>();
+                operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+                operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+                operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+                operInfoDOList.add(operInfoMap);
             }else{
                 // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();
@@ -807,8 +821,11 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
 
             if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
                 //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
-//                Map<String,Object> operInfoMap = new HashMap<>();
-//                operInfoDOList.add(operInfoMap);
+                Map<String,Object> operInfoMap = new HashMap<>();
+                operInfoMap.put("vali_flag",Constants.SF.F); // 有效标志
+                operInfoMap.put("mdtrt_sn",mdtrtSn);  //  就医流水号
+                operInfoMap.put("ipt_medcas_hmpg_sn",mid); // 住院病案首页流水号
+                operInfoDOList.add(operInfoMap);
             }else{
                 // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();

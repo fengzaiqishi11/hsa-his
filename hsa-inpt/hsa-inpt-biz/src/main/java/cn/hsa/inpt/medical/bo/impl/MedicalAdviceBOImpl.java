@@ -685,7 +685,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         //组装住院费用参数
         inptCostDTO.setPrice(itemDTO.getPrice());
         inptCostDTO.setNum(new BigDecimal("1"));
-        inptCostDTO.setNumUnitCode(adviceDTO.getUnitCode());
+        inptCostDTO.setNumUnitCode(itemDTO.getUnitCode());
         //用法
         inptCostDTO.setHospCode(itemDTO.getHospCode());
         inptCostDTO.setVisitId(adviceDTO.getVisitId());
@@ -1733,6 +1733,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //inptAdviceDetailDTO.setUnitCode(materiaDTO.getSplitUnitCode());
                 //项目ID
                 inptAdviceDetailDTO.setItemId(materiaDTO.getId());
+                //名称
+                inptAdviceDetailDTO.setItemName(materiaDTO.getName());
                 //用药性质
                 inptAdviceDetailDTO.setUseCode(Constants.YYXZ.KSZB);
 
@@ -3281,6 +3283,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                    }
 //                }
 
+                // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
+                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
+                    continue;
+                }
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);
                 BigDecimal tzCost = BigDecimal.valueOf(0);
@@ -3327,8 +3333,25 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     costDTO.setBackNum(BigDecimal.valueOf(Math.ceil(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum).doubleValue())));
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }else{
-                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    Map map = new HashMap();
+                    map.put("hospCode",inptAdviceDTO.getHospCode());
+                    BaseRateDTO baseRateDTO = new BaseRateDTO();
+                    baseRateDTO.setHospCode(inptAdviceDTO.getHospCode());
+                    baseRateDTO.setId(inptAdviceDTO.getRateId());
+                    map.put("baseRateDTO",baseRateDTO);
+                    baseRateDTO = baseRateService_consumer.getById(map).getData();
+                    BigDecimal dailyTimes = BigDecimal.valueOf(1) ;
+                    if(baseRateDTO != null){
+                        dailyTimes = baseRateDTO.getDailyTimes();
+                    }
+                    //总数量 - （总数量*停止次数/每日次数）
+                    BigDecimal  backNum =BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes));
+                    backNum = BigDecimal.valueOf(Math.ceil(backNum.doubleValue()));
+                    costDTO.setBackNum(backNum);
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+
+                    // costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    // costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }
 
                 //过滤掉退费数量为0的费用

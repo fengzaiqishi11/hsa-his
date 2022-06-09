@@ -143,6 +143,31 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         if(drgDipResultDTO != null){
             drgDipResultDTO.setId(SnowflakeUtils.getId());
             drgDipResultDTO.setCrtTime(DateUtils.getNow());
+            //保存可疑，违规条数
+            int suspiciousNum = 0;
+            int violationNum = 0;
+            if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
+                for(DrgDipResultDetailDTO drgDipResultDetailDTO:drgDipResultDetailDTOList){
+                    if("1".equals(drgDipResultDetailDTO.getRuleLevel())){
+                        suspiciousNum++;
+                    }
+                    if("2".equals(drgDipResultDetailDTO.getRuleLevel())){
+                        violationNum++;
+                    }
+                }
+
+            }
+            drgDipResultDTO.setSuspiciousNum(suspiciousNum);
+            drgDipResultDTO.setViolationNum(violationNum);
+            drgDipResultDTO.setValidFlag("1");
+            //保存完成状态
+            if(violationNum == 0){
+                drgDipResultDTO.setStates("2");
+            }else {
+                drgDipResultDTO.setStates("1");
+            }
+            //插入之前先更新之前的数据
+            drgDipResultDAO.updateByVisitId(drgDipResultDTO.getVisitId());
             drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
         }
         //保存质控结果明细表

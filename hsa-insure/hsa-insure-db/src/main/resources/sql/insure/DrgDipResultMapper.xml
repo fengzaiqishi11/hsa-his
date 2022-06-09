@@ -228,6 +228,8 @@
 
 
         profit <!--盈亏额--> ,
+        suspicious_num,
+        violation_num,
 
 
         valid_flag <!--有效标志--> ,
@@ -295,6 +297,8 @@
         #{standProMedicMater},
         #{standProConsum},
         #{profit},
+        #{suspiciousNum},
+        #{violationNum},
         #{validFlag},
         #{crtId},
         #{crtName},
@@ -308,6 +312,12 @@
         where
         id = #{id}
     </select>
+
+    <update id="updateByVisitId" parameterType="java.lang.String" >
+      update drg_dip_result
+      set valid_flag = '0'
+      where visit_id = #{visitId}
+    </update>
 
     <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >
         update drg_dip_result set

@@ -40,6 +40,15 @@ public interface DrgDipResultDAO {
     /**
      * @Author 医保开发二部-湛康
      * @Date 2020-07-17 10:09
+     * @Description 根据主键修改
+     * @param
+     * @return int
+     */
+    int updateByVisitId(String visitId);
+
+    /**
+     * @Author 医保开发二部-湛康
+     * @Date 2020-07-17 10:09
      * @Description 根据主键查询
      * @param
      * @return int

@@ -1368,9 +1368,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("daysRinpFlag31", MapUtils.getMapVS(mriBaseInfo,"is_inpt","")); // 是否有出院31天再住院计划 *******
         setlinfo.put("daysRinpPup31",MapUtils.getMapVS(mriBaseInfo,"aim","")); // 出院31天内再住院目的 *******
         // 更换主治医生和责任医生的数据源 从inpt_visit表 切换至 mris_base_info表
-        setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_name","")); // 主诊医生姓名 *******
-        setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_id","")); // 主诊医生代码 *******
-        setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_name","")); // 责任护士名 *******
+        setlinfo.put("chfpdrName", MapUtils.get(mriBaseInfo, "zzDoctor_name")); // 主诊医生姓名 *******
+        setlinfo.put("chfpdrCode", MapUtils.get(mriBaseInfo, "zz_doctor_code")); // 主诊医生代码 *******
+        setlinfo.put("zrNurseName", MapUtils.get(mriBaseInfo, "zrNurse_name")); // 责任护士名 *******
         setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code","")); // 责任护士代码 *******
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
         if(setlBegnDate ==null){

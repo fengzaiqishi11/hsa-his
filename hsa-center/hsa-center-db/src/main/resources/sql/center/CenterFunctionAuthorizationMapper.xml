@@ -36,5 +36,11 @@
      hosp_code =#{hospCode} and order_type_code = #{orderTypeCode} and is_valid = '1'
   </select>
 
+    <insert id="insertAuthorization"  parameterType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
+        INSERT INTO `center_function_authorization`(`id`, `hosp_code`, `order_type_code`, `start_date`, `end_date`, `encrypt_start_date`,
+                                                    `encrypt_end_date`, `remark`, `audit_status`, `audit_id`, `audit_name`, `audit_time`,
+                                                    `is_valid`, `crte_id`, `crte_name`, `crte_time`, `update_id`, `update_name`, `update_time`)
+        VALUES (#{id}, #{hospCode}, #{orderTypeCode}, #{startDate},#{endDate}, #{encryptStartDate}, #{encryptEndDate},#{remark},#{auditStatus},#{auditId} ,#{auditName}, #{auditTime}, #{isValid}, #{crteId},#{crteName}, #{crteTime}, #{updateId}, #{updateName},#{updateTime});
+    </insert>
 
 </mapper>

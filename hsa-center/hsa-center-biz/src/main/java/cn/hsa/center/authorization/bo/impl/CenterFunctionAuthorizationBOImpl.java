@@ -74,4 +74,16 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         }
         return WrapperResponse.success(functionAuthorizationDO);
     }
+
+    /**
+     * 新增功能授权数据
+     *
+     * @param functionAuthorizationDO
+     * @return
+     */
+    @Override
+    public WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO) {
+        int affectRows = centerFunctionAuthorizationDAO.insertAuthorization(functionAuthorizationDO);
+        return WrapperResponse.success(functionAuthorizationDO);
+    }
 }

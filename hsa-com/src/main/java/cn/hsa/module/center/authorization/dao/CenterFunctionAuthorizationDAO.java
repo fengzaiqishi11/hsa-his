@@ -2,9 +2,10 @@ package cn.hsa.module.center.authorization.dao;
 
 
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-
+@Mapper
 public interface CenterFunctionAuthorizationDAO {
 
   /**
@@ -15,4 +16,10 @@ public interface CenterFunctionAuthorizationDAO {
    */
   CenterFunctionAuthorizationDO queryBizAuthorizationByOrderTypeCode(@Param("hospCode") String hospCode, @Param("orderTypeCode") String orderTypeCode);
 
+  /**
+   *  新增一条增值功能授权数据
+   * @param authorizationDO 授权数据
+   * @return 受影响的行数
+   */
+  int insertAuthorization(CenterFunctionAuthorizationDO authorizationDO);
 }

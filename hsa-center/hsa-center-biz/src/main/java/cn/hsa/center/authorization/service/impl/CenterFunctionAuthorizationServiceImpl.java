@@ -38,4 +38,15 @@ public class CenterFunctionAuthorizationServiceImpl implements CenterFunctionAut
 
         return centerFunctionAuthorizationBO.queryBizAuthorizationByOrderTypeCode(hospCode,orderTypeCode);
     }
+
+    /**
+     * 新增功能授权数据
+     *
+     * @param functionAuthorizationDO
+     * @return
+     */
+
+    public WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO) {
+        return centerFunctionAuthorizationBO.insertBizAuthorization(functionAuthorizationDO);
+    }
 }

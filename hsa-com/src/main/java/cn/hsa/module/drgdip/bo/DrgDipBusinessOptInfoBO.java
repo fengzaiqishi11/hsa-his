@@ -28,4 +28,13 @@ public interface DrgDipBusinessOptInfoBO {
      * @return cn.hsa.base.PageDTO
      */
     PageDTO queryDrgDipBusinessOptInfoLogList(DrgDipBusinessOptInfoLogDO drgDipBusinessOptInfoLogDO);
+
+    /**
+     * 质控信息查询统计
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-09 10:17
+     * @return cn.hsa.base.PageDTO
+     */
+    PageDTO getDrgDipInfoByParam(Map<String, Object> map);
 }

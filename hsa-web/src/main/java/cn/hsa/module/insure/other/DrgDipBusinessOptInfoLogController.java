@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService;
 import cn.hsa.module.insure.drgdip.dto.DrgDipBusinessOptInfoLogDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO;
 import cn.hsa.module.insure.other.dto.PolicyRequestDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -63,6 +64,26 @@ public class DrgDipBusinessOptInfoLogController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("drgDipBusinessOptInfoLogDO",drgDipBusinessOptInfoLogDO);
         return drgDipBusinessOptInfoLogService_consumer.getDrgDipBusinessOptInfoLogDetail(map);
+    }
+
+    /**
+     * 质控信息查询统计
+     * @param drgDipResultDTO
+     * @param req
+     * @param res
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-09 10:11
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @PostMapping("/getDrgDipInfoByParam")
+    public WrapperResponse<PageDTO> getDrgDipInfoByParam(@RequestBody DrgDipResultDTO drgDipResultDTO,
+                                                         HttpServletRequest req, HttpServletResponse res){
+      SysUserDTO sysUserDTO = getSession(req, res);
+      drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
+      Map<String,Object> map = new HashMap<>();
+      map.put("hospCode",sysUserDTO.getHospCode());
+      map.put("drgDipResultDTO",drgDipResultDTO);
+      return drgDipBusinessOptInfoLogService_consumer.getDrgDipInfoByParam(map);
     }
 
 }

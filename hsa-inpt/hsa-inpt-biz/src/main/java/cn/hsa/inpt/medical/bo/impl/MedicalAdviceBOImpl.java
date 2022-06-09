@@ -3340,10 +3340,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if(baseRateDTO != null){
                         dailyTimes = baseRateDTO.getDailyTimes();
                     }
-
                     //总数量 - （总数量*停止次数/每日次数）
-                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes)));
+                    BigDecimal  backNum =BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes));
+                    backNum = BigDecimal.valueOf(Math.ceil(backNum.doubleValue()));
+                    costDTO.setBackNum(backNum);
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+
+                    // costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    // costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }
 
                 //过滤掉退费数量为0的费用

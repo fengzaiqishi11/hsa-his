@@ -13,6 +13,7 @@ import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.util.MapUtils;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
@@ -193,45 +194,36 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
      * @return java.lang.Boolean
      */
     @Override
-    public Boolean checkDrgDipBizAuthorization(Map<String, Object> map) {
+    public DrgDipAuthDTO checkDrgDipBizAuthorization(Map<String, Object> map) {
+      DrgDipAuthDTO dto = new DrgDipAuthDTO();
       HashMap param = new HashMap();
-      //入参判断
-      if (ObjectUtil.isEmpty(MapUtils.get(map, "orderTypeCode"))){
-        throw new AppException("授权类型类型【orderTypeCode】不能为空！");
-      }
       param.put("hospCode",MapUtils.get(map, "hospCode"));
-      String orderTypeCode = MapUtils.get(map, "orderTypeCode");
-      //不开启
-      if ("0".equals(orderTypeCode)){
+      //循环查询DRG和DIP质控权限1：DIP 2:DRG
+      Boolean dip = false;
+      Boolean drg = false;
+      param.put("orderTypeCode","1");
+      CenterFunctionAuthorizationDO dipAuth =
+          (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+      param.put("orderTypeCode","2");
+      CenterFunctionAuthorizationDO drgAuth =
+          (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+      //都没有权限 报错
+      if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
         throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
       }
-      //1：DIP 2:DRG
-      if ("1".equals(orderTypeCode) || "2".equals(orderTypeCode)){
-        param.put("orderTypeCode",orderTypeCode);
-        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO =
-            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
-        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO)){
-          throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
-        }
+      //dip
+      if (ObjectUtil.isNotEmpty(dipAuth)){
+        dto.setDip("true");
+      }else{
+        dto.setDip("false");
       }
-      //3:DIP和DRG 循环调用
-      if ("3".equals(orderTypeCode)){
-        // 1 DIP
-        param.put("orderTypeCode",1);
-        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO =
-            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
-        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO)){
-          throw new AppException("未查询到本机构的DIP质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
-        }
-        // 2 DRG
-        param.put("orderTypeCode",2);
-        CenterFunctionAuthorizationDO centerFunctionAuthorizationDO1 =
-            (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
-        if (ObjectUtil.isEmpty(centerFunctionAuthorizationDO1)){
-          throw new AppException("未查询到本机构的DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
-        }
+      //drg
+      if (ObjectUtil.isNotEmpty(drgAuth)){
+        dto.setDrg("true");
+      }else{
+        dto.setDrg("false");
       }
-      return true;
+      return dto;
     }
 
 
@@ -244,21 +236,61 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
    */
     @Override
     public DrgDipComboDTO getDrgDipInfoByParam(HashMap map) {
+      DrgDipComboDTO combo = new DrgDipComboDTO();
       DrgDipResultDTO dto =MapUtils.get(map, "drgDipResultDTO");
       //新增质控信息
-      DrgDipResultDO drgDipResultDO = drgDipResultDAO.queryListByVisitIdDesc(dto);
+      List<DrgDipResultDO> list = drgDipResultDAO.queryListByVisitIdDesc(dto);
       //未质控过
-      if (ObjectUtil.isEmpty(drgDipResultDO)){
-        return null;
+      if (CollectionUtil.isEmpty(list)){
+        combo.setQuaStaus("0");
+        combo.setQuaStausName("未质控");
       }else{
-        List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
+        //只有一条
+        if (list.size() > 1){
+          //完成标志
+          Integer flag = 0;
+          //可疑条数
+          Integer suspiciousNum = 0;
+          //违规条数
+          Integer violationNum = 0;
+          for (DrgDipResultDO result : list){
+            //2已完成
+            if ("2".equals(result.getStates())){
+              flag++;
+            }
+            suspiciousNum = suspiciousNum + result.getSuspiciousNum();
+            violationNum = violationNum + result.getViolationNum();
+          }
+          if (flag >= 2){
+            combo.setQuaStaus("2");
+            combo.setQuaStausName("质控完成");
+          }else{
+            combo.setQuaStaus("1");
+            combo.setQuaStausName("质控中");
+            combo.setSuspiciousNum(suspiciousNum);
+            combo.setViolationNum(violationNum);
+          }
+        }else{
+          DrgDipResultDO result = list.get(0);
+          //2已完成
+          if ("2".equals(result.getStates())){
+            combo.setQuaStaus("2");
+            combo.setQuaStausName("质控完成");
+          }else{
+            combo.setQuaStaus("1");
+            combo.setQuaStausName("质控中");
+            combo.setSuspiciousNum(result.getSuspiciousNum());
+            combo.setViolationNum(result.getViolationNum());
+          }
+        }
+
+        /*List<DrgDipResultDetailDO> list = drgDipResultDetailDAO.selectListByVisitId(drgDipResultDO.getId());
         //出参转换
         BeanUtil.copyProperties(drgDipResultDO,dto);
         List<DrgDipResultDetailDTO> dtoList = Convert.toList(DrgDipResultDetailDTO.class, list);
-        DrgDipComboDTO combo = new DrgDipComboDTO();
         combo.setResult(dto);
-        combo.setDetails(dtoList);
-        return combo;
+        combo.setDetails(dtoList);*/
       }
+      return combo;
     }
 }

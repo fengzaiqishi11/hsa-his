@@ -3,6 +3,8 @@ package cn.hsa.module.insure.drgdip.dao;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 
+import java.util.List;
+
 /**
  * @Description: DIP/DRG质控结果表
  * @author： 医保开发二部-湛康
@@ -62,5 +64,5 @@ public interface DrgDipResultDAO {
       * @Date 2022-06-07 9:38
       * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
       */
-     DrgDipResultDO queryListByVisitIdDesc(DrgDipResultDTO result);
+     List<DrgDipResultDO> queryListByVisitIdDesc(DrgDipResultDTO result);
 }

@@ -5,6 +5,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisDiagnoseDTO;
@@ -281,7 +282,6 @@ public class TcmMrisHomeController extends BaseController {
 
     /**
      * 前端调用DRG DIP接口授权校验
-     * @param orderTypeCode
      * @param req
      * @param res
      * @Author 医保开发二部-湛康
@@ -289,11 +289,9 @@ public class TcmMrisHomeController extends BaseController {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     @GetMapping(value = "/checkDrgDipBizAuthorization")
-    public WrapperResponse<Boolean> checkDrgDipBizAuthorization(String orderTypeCode, HttpServletRequest req,
-                                                          HttpServletResponse res) {
+    public WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(HttpServletRequest req, HttpServletResponse res) {
       SysUserDTO sysUserDTO = getSession(req, res);
       Map<String,Object> map = new HashMap<>();
-      map.put("orderTypeCode",orderTypeCode);
       map.put("hospCode",sysUserDTO.getHospCode());
       return drgDipResultService.checkDrgDipBizAuthorization(map);
     }

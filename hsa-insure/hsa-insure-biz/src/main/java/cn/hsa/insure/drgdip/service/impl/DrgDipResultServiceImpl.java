@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
@@ -58,7 +59,7 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     @Override
-    public WrapperResponse<Boolean> checkDrgDipBizAuthorization(Map<String, Object> map) {
+    public WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(Map<String, Object> map) {
       return WrapperResponse.success(drgDipResultBO.checkDrgDipBizAuthorization(map));
     }
 

@@ -8,14 +8,17 @@ import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import cn.hsa.util.ServletUtils;
+import cn.hsa.util.SnowflakeUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,11 +37,11 @@ public class CenterInsureAuthorizationController {
     @GetMapping("/queryAuthorizationInfo")
     public WrapperResponse<CenterFunctionAuthorizationDO> queryAdmdvsInfoPage(HttpServletResponse res){
         Map<String,Object> map = new HashMap<>();
-        map.put("hospCode", "100001");
-        map.put("orderTypeCode", "2");
+        map.put("hospCode", "0012");
+        map.put("orderTypeCode", "1");
 
         HttpSession session =  ServletUtils.getCurrentRequest().get().getSession();
-        System.err.println(session.getAttribute("SESSION_USER_INFO"));
+
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET");
         res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -66,5 +69,30 @@ public class CenterInsureAuthorizationController {
         return centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(map);
     }
 
+    @GetMapping("/insertAuthorization/{hospCode}/{orderTypeCode}")
+    public WrapperResponse<CenterFunctionAuthorizationDO>  insertAuthorization(@PathVariable("hospCode") String hospCode,@PathVariable("orderTypeCode") String orderTypeCode){
 
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode", "0001");
+        map.put("orderTypeCode", "1");
+        CenterFunctionAuthorizationDO authorizationDO = centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(map).getData();
+        authorizationDO.setId(SnowflakeUtils.getId());
+        authorizationDO.setAuditTime(new Date());
+        authorizationDO.setCrteTime(new Date());
+        authorizationDO.setUpdateTime(new Date());
+        authorizationDO.setHospCode(hospCode);
+        authorizationDO.setOrderTypeCode(orderTypeCode);
+
+        String str2EncryptStartDate = authorizationDO.getHospCode()+':'+authorizationDO.getOrderTypeCode()+':'+authorizationDO.getStartDate().getTime();
+        String str2EncryptEndDate = authorizationDO.getHospCode()+':'+authorizationDO.getOrderTypeCode()+':'+authorizationDO.getEndDate().getTime();
+        try {
+            String encryptStartTime = RSAUtil.encryptByPublicKey(str2EncryptStartDate.getBytes(), rsaPublicKey);
+            authorizationDO.setEncryptStartDate(encryptStartTime);
+            String encryptEndTime = RSAUtil.encryptByPublicKey(str2EncryptEndDate.getBytes(), rsaPublicKey);
+            authorizationDO.setEncryptEndDate(encryptEndTime);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+            return  centerFunctionAuthorizationService.insertBizAuthorization(authorizationDO);
+    }
 }

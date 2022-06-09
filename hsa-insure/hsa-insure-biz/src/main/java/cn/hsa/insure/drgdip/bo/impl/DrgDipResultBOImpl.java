@@ -139,11 +139,13 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     @Override
     public Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
 
+        //保存质控结果表
         if(drgDipResultDTO != null){
             drgDipResultDTO.setId(SnowflakeUtils.getId());
             drgDipResultDTO.setCrtTime(DateUtils.getNow());
             drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
         }
+        //保存质控结果明细表
         if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
             for(DrgDipResultDetailDTO drgDipResultDetailDTO:drgDipResultDetailDTOList){
                 drgDipResultDetailDTO.setResultId(drgDipResultDTO.getId());

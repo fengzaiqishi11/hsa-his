@@ -50,4 +50,16 @@ public class DrgDipBusinessOptInfoServiceImpl extends HsafService implements Drg
     public WrapperResponse<PageDTO> getDrgDipBusinessOptInfoLogDetail(Map<String, Object> map) {
         return null;
     }
+
+    /**
+     * 质控信息查询统计
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-09 10:15
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public WrapperResponse<PageDTO> getDrgDipInfoByParam(Map<String, Object> map) {
+      return WrapperResponse.success(drgDipBusinessOptInfoBO.getDrgDipInfoByParam(map));
+    }
 }

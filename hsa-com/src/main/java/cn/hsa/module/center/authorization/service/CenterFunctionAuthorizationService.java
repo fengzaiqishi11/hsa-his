@@ -21,4 +21,12 @@ public interface CenterFunctionAuthorizationService {
    */
   WrapperResponse<CenterFunctionAuthorizationDO> queryBizAuthorizationByOrderTypeCode(Map<String,Object> params);
 
+
+  /**
+   *  新增功能授权数据
+   * @param functionAuthorizationDO
+   * @return
+   */
+  WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO);
+
 }

@@ -160,4 +160,16 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
         List<DrgDipBusinessOptInfoLogDO> list = drgDipBusinessOptInfoLogDAO.queryDrgDipBusinessOptInfoLogList(drgDipBusinessOptInfoLogDO);
         return PageDTO.of(list);
     }
+
+    /**
+     * 质控信息查询统计
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-09 10:20
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO getDrgDipInfoByParam(Map<String, Object> map) {
+      return null;
+    }
 }

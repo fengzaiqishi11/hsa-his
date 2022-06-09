@@ -17,4 +17,11 @@ public interface CenterFunctionAuthorizationBO {
      * @return 中心端增值功能授权实体对象
      */
     WrapperResponse<CenterFunctionAuthorizationDO> queryBizAuthorizationByOrderTypeCode(String hospCode, String orderTypeCode);
+
+    /**
+     *  新增功能授权数据
+     * @param functionAuthorizationDO
+     * @return
+     */
+    WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO);
 }

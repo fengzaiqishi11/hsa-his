@@ -203,6 +203,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
         drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
 
+        //根据DIP_DRG_MODE值判断质控模式
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", hospCode);
+        sysMap.put("code", "DIP_DRG_MODEL");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isNotEmpty(sysParameterDTO) && "1".equals(sysParameterDTO.getValue())){
+            throw new AppException("违规质控结果处理完成后，才能医保上传");
+        }
         map.put("msgName", "医疗保障结算清单上传");
         map.put("visitId", insureIndividualVisitDTO.getVisitId());
         map.put("isHospital", insureIndividualVisitDTO.getIsHospital());
@@ -739,12 +747,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
-        sysMap.put("code", "DIP_DRG_MODE");
+        sysMap.put("code", "DIP_DRG_MODEL");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
         if (ObjectUtil.isEmpty(sysParameterDTO)){
-          resultDataMap.put("DIP_DRG_MODE",null);
+          resultDataMap.put("DIP_DRG_MODEL",null);
         }else{
-          resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+          resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
         return resultDataMap;
     }
@@ -848,6 +856,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         dataMap.put("crtId",MapUtils.get(map, "crteId"));
         dataMap.put("crtName",MapUtils.get(map, "crteName"));
         dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        dataMap.put("type",MapUtils.get(map, "1"));
+        dataMap.put("businessType",MapUtils.get(map, "1"));
 //        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
         return responseDataMap;
     }
@@ -1534,12 +1544,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             //DIP_DRG_MODE值
             Map<String, Object> sysMap = new HashMap<>();
             sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
-            sysMap.put("code", "DIP_DRG_MODE");
+            sysMap.put("code", "DIP_DRG_MODEL");
             SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
             if (ObjectUtil.isEmpty(sysParameterDTO)){
-              resultDataMap.put("DIP_DRG_MODE",null);
+              resultDataMap.put("DIP_DRG_MODEL",null);
             }else{
-              resultDataMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+              resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
             }
         }
         return resultDataMap;
@@ -2834,8 +2844,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setOutTime(MapUtils.get(baseInfo, "dscg_time"));
         drgDipResultDTO.setDoctorId(MapUtils.get(baseInfo, "chfpdr_code"));
         drgDipResultDTO.setDoctorName(MapUtils.get(baseInfo, "chfpdr_name"));
+        drgDipResultDTO.setInsutype(MapUtils.get(baseInfo, "hi_type"));
         drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));
         drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
+        drgDipResultDTO.setBusinessType(MapUtils.get(dataMap, "businessType"));
+        drgDipResultDTO.setType(MapUtils.get(dataMap, "type"));
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("hospCode",MapUtils.get(dataMap, "hospCode"));

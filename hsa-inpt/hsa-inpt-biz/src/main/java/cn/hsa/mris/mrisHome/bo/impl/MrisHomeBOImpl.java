@@ -436,12 +436,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
-        sysMap.put("code", "DIP_DRG_MODE");
+        sysMap.put("code", "DIP_DRG_MODEL");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
         if (ObjectUtil.isEmpty(sysParameterDTO)){
-          resultMap.put("DIP_DRG_MODE",null);
+          resultMap.put("DIP_DRG_MODEL",null);
         }else{
-          resultMap.put("DIP_DRG_MODE",sysParameterDTO.getValue());
+          resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
         return resultMap;
     }

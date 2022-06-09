@@ -4,6 +4,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.module.bo.InsureGetInfoBO;
 import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -21,6 +24,8 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     // 采集信息上传
     @Resource
     private InsureGetInfoBO insureGetInfoBO;
+    @Resource
+    private DrgDipResultService drgDipResultService_consumer;
 
     /**
      * @Method getSettleInfo
@@ -244,6 +249,25 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     @Override
     public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.uploadInsureSettleInfoForDIP(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
+        //调用授权
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService_consumer.checkDrgDipBizAuthorization(map);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        Map<String,Object> drgData = new HashMap<>();
+        Map<String,Object> dipData = new HashMap<>();
+        if ("true".equals(drgDipAuthDTO.getDrg())){
+            drgData = insureGetInfoBO.uploadInsureSettleInfoForDRG(map);
+        }
+        if ("true".equals(drgDipAuthDTO.getDip())){
+            dipData = insureGetInfoBO.uploadInsureSettleInfoForDIP(map);
+        }
+        Map resultMap = new HashMap<>();
+        resultMap.put("drgData",drgData);
+        resultMap.put("dipData",dipData);
+        return WrapperResponse.success(resultMap);
     }
 
 }

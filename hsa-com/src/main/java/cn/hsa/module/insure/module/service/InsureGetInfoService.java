@@ -210,4 +210,6 @@ public interface InsureGetInfoService {
      * @Param [map]
      **/
     WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map);
+
+    WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRGorDIP(Map<String, Object> map);
 }

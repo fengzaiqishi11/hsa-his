@@ -141,9 +141,16 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
 
         if(drgDipResultDTO != null){
             drgDipResultDTO.setId(SnowflakeUtils.getId());
+            drgDipResultDTO.setCrtTime(DateUtils.getNow());
             drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
         }
         if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
+            for(DrgDipResultDetailDTO drgDipResultDetailDTO:drgDipResultDetailDTOList){
+                drgDipResultDetailDTO.setResultId(drgDipResultDTO.getId());
+                drgDipResultDetailDTO.setCrtId(drgDipResultDTO.getCrtId());
+                drgDipResultDetailDTO.setCrtName(drgDipResultDTO.getCrtName());
+                drgDipResultDetailDTO.setCrtTime(DateUtils.getNow());
+            }
             drgDipResultDetailDAO.insertDrgDipResultDetailList(drgDipResultDetailDTOList);
         }
         return true;

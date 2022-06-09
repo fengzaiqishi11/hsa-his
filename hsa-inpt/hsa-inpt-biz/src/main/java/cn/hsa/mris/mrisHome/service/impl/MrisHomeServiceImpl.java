@@ -252,11 +252,11 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
 
     @Override
     public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
-        return mrisHomeBO.upMrisForDRG(map);
+        return mrisHomeBO.insertMrisForDRG(map);
     }
     @Override
     public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
-        return mrisHomeBO.upMrisForDIP(map);
+        return mrisHomeBO.insertMrisForDIP(map);
     }
     /**
      * @Author gory

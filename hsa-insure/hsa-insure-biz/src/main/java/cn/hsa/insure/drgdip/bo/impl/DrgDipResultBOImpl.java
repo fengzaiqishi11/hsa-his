@@ -174,6 +174,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         //保存质控结果明细表
         if(drgDipResultDetailDTOList != null && drgDipResultDetailDTOList.size()>0){
             for(DrgDipResultDetailDTO drgDipResultDetailDTO:drgDipResultDetailDTOList){
+                drgDipResultDetailDTO.setId(SnowflakeUtils.getId());
                 drgDipResultDetailDTO.setResultId(drgDipResultDTO.getId());
                 drgDipResultDetailDTO.setCrtId(drgDipResultDTO.getCrtId());
                 drgDipResultDetailDTO.setCrtName(drgDipResultDTO.getCrtName());

@@ -83,9 +83,9 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             String inptDiagnose = MapUtils.get(map,"outptDiagnose");
             String outptDiagnose = MapUtils.get(map,"outptDiagnose");
             BigDecimal totalFee = BigDecimalUtils.convert(MapUtils.get(map,"totalFee").toString());
-            BigDecimal payFee = BigDecimalUtils.convert(MapUtils.get(map,"payFee").toString());
-            BigDecimal selfFee = BigDecimalUtils.convert(MapUtils.get(map,"selfFee").toString());
-            BigDecimal cashPayFee = BigDecimalUtils.convert(MapUtils.get(map,"cashPayFee").toString());
+//            BigDecimal payFee = BigDecimalUtils.convert(MapUtils.get(map,"payFee").toString());
+//            BigDecimal selfFee = BigDecimalUtils.convert(MapUtils.get(map,"selfFee").toString());
+//            BigDecimal cashPayFee = BigDecimalUtils.convert(MapUtils.get(map,"cashPayFee").toString());
             String inputJson = MapUtils.get(map,"inputJson");
 
             // 开启独立新事务
@@ -96,7 +96,7 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             drgDipBusinessOptInfoLogDO.setAge(age);
             drgDipBusinessOptInfoLogDO.setBusinessId(businessId);
             drgDipBusinessOptInfoLogDO.setBusinessType(businessType);
-            drgDipBusinessOptInfoLogDO.setCashPayFee(cashPayFee);
+//            drgDipBusinessOptInfoLogDO.setCashPayFee(cashPayFee);
             drgDipBusinessOptInfoLogDO.setCertno(certno);
             drgDipBusinessOptInfoLogDO.setCrtId(crteId);
             drgDipBusinessOptInfoLogDO.setCrtName(crteName);
@@ -124,14 +124,14 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             drgDipBusinessOptInfoLogDO.setOrgCode(orgCode);
             drgDipBusinessOptInfoLogDO.setOutptDiagnose(outptDiagnose);
             drgDipBusinessOptInfoLogDO.setOutptTime(outptTime);
-            drgDipBusinessOptInfoLogDO.setPayFee(payFee);
+//            drgDipBusinessOptInfoLogDO.setPayFee(payFee);
             drgDipBusinessOptInfoLogDO.setPsName(psName);
             drgDipBusinessOptInfoLogDO.setPsnNo(psnNo);
             drgDipBusinessOptInfoLogDO.setQulityId(qulityId);
-            drgDipBusinessOptInfoLogDO.setSelfFee(selfFee);
+//            drgDipBusinessOptInfoLogDO.setSelfFee(selfFee);
             drgDipBusinessOptInfoLogDO.setSettleId(settleId);
             drgDipBusinessOptInfoLogDO.setSex(sex);
-            drgDipBusinessOptInfoLogDO.setTotalFee(totalFee);
+//            drgDipBusinessOptInfoLogDO.setTotalFee(totalFee);
             drgDipBusinessOptInfoLogDO.setType(type);
             drgDipBusinessOptInfoLogDO.setValidFlag("1");
             drgDipBusinessOptInfoLogDO.setVisitId(visitId);

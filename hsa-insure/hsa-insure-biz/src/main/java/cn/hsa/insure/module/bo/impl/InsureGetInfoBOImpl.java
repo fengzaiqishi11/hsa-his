@@ -857,7 +857,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
         dataMap.put("type",MapUtils.get(map, "1"));
         dataMap.put("businessType",MapUtils.get(map, "1"));
-        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
+//        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
         return responseDataMap;
     }
 

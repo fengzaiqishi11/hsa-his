@@ -448,7 +448,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     // 整理病案首页数据，上传drg
     @Override
-    public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
+    public Map<String, Object> insertMrisForDRG(Map<String, Object> map) {
         //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
@@ -571,7 +571,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     }
     // 整理病案首页数据，上传drg
     @Override
-    public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
+    public Map<String, Object> insertMrisForDIP(Map<String, Object> map) {
         // todo 此处调用授权码
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码

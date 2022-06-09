@@ -1490,13 +1490,13 @@
         select mbi.*,
                (select prac_certi_no from sys_user su where mbi.zz_doctor_id = su.id) zz_doctor_code,
                (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
-               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zrNurse_name,
-               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zr_nurse_code,
+               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
+               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
                (select bd.nation_code
-                from base_dept bd
-                where bd.hosp_code =
-                      mbi.hosp_code
-                  and bd.id = mbi.turn_dept_ids) as                                   nation_code
+                    from base_dept bd
+                    where bd.hosp_code =
+                    mbi.hosp_code
+                    and bd.id = mbi.turn_dept_ids) as nation_code
         from mris_base_info mbi
         where mbi.hosp_code = #{hospCode}
           and mbi.visit_id = #{visitId}

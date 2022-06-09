@@ -41,4 +41,13 @@ public interface DrgDipBusinessOptInfoLogService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
      */
     WrapperResponse<PageDTO> getDrgDipBusinessOptInfoLogDetail(Map<String, Object> map);
+
+    /**
+     * 质控信息查询统计
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-09 10:12
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> getDrgDipInfoByParam(Map<String, Object> map);
 }

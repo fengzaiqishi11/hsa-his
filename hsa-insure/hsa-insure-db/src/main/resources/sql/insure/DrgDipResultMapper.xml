@@ -30,7 +30,6 @@
         <result property="drgDipName" column="drg_dip_name"/>
         <result property="icd10" column="icd10"/>
         <result property="icd9" column="icd9"/>
-        <result property="weight" column="weight"/>
         <result property="totalFee" column="total_fee"/>
         <result property="standFee" column="stand_fee"/>
         <result property="override" column="override"/>
@@ -46,6 +45,18 @@
         <result property="insureRegCode" column="insure_reg_code"/>
         <result property="hospName" column="hosp_name"/>
         <result property="orgCode" column="org_code"/>
+        <result property="proMedicMater" column="pro_medic_mater"/>
+        <result property="weightValue" column="weight_value"/>
+        <result property="proConsum" column="pro_consum"/>
+        <result property="diagFeeSco" column="diag_fee_sco"/>
+        <result property="withCcormcc" column="with_ccormcc"/>
+        <result property="ccmccName" column="ccmcc_name"/>
+        <result property="bl" column="bl"/>
+        <result property="rate" column="rate"/>
+        <result property="feePay" column="fee_Pay"/>
+        <result property="standProMedicMater" column="stand_pro_medic_mater"/>
+        <result property="standProConsum" column="stand_pro_consum"/>
+        <result property="profit" column="profit"/>
         <result property="validFlag" column="valid_flag"/>
         <result property="crtId" column="crt_id"/>
         <result property="crtName" column="crt_name"/>
@@ -54,9 +65,9 @@
 
     <select id="queryListByVisitIdDesc" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
             resultType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO">
-        select
-        id <!--主键-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        psn_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        gend <!--性别-->,        age <!--年龄-->,        insutype <!--险种-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        in_time <!--入院时间-->,        out_time <!--出院时间-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        dept_id <!--科室id-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        insure_settle_id <!--医保结算id-->,        drg_dip_code <!--drg\dip组编码-->,        drg_dip_name <!--drg\dip组名称-->,        icd10 <!--主要诊断-->,        icd9 <!--主要手术-->,        weight <!--权重-->,        total_fee <!--总费用-->,        stand_fee <!--标杆费用-->,        override <!--倍率-->,        cdntn_pay <!--统筹金额-->,        diff_fee <!--预计偏差-->,        yp_fee <!--药品费-->,        cl_fee <!--耗材费-->,        states <!--质控完成状态-->,        type <!--质控类型-->,        business_type <!--业务类型-->,        business_id <!--业务id-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
-        from drg_dip_result where
+        select   *
+        from drg_dip_result
+        where
         visit_id = #{visitId} and valid_flag = 1 order by crt_time desc limit 1
     </select>
 
@@ -138,9 +149,6 @@
         icd9 <!--主要手术--> ,
 
 
-        weight <!--权重--> ,
-
-
         total_fee <!--总费用--> ,
 
 
@@ -186,6 +194,42 @@
         org_code <!--机构编码--> ,
 
 
+        pro_medic_mater <!--药占比--> ,
+
+
+        weight_value <!--权重--> ,
+
+
+        pro_consum <!--耗材占比--> ,
+
+
+        diag_fee_sco <!--费用分值--> ,
+
+
+        with_ccormcc <!--cc/mcc信息--> ,
+
+
+        ccmcc_name <!--cc/mcc信息--> ,
+
+
+        bl <!--倍率--> ,
+
+
+        rate <!--费率--> ,
+
+
+        fee_Pay <!--支付费用--> ,
+
+
+        stand_pro_medic_mater <!--标杆药占比--> ,
+
+
+        stand_pro_consum <!--标杆耗材占比--> ,
+
+
+        profit <!--盈亏额--> ,
+
+
         valid_flag <!--有效标志--> ,
 
 
@@ -199,106 +243,38 @@
 
         )
         values (
-
         #{id},
-
-
         #{visitId},
-
-
         #{psnNo},
-
-
         #{psnName},
-
-
         #{certno},
-
-
         #{gend},
-
-
         #{age},
-
-
         #{insutype},
-
-
         #{medType},
-
-
         #{medTypeName},
-
-
         #{inTime},
-
-
         #{outTime},
-
-
         #{inptDiagnose},
-
-
         #{outptDiagnose},
-
-
         #{deptId},
-
-
         #{deptName},
-
-
         #{doctorId},
-
-
         #{doctorName},
-
-
         #{medicalRegNo},
-
-
         #{settleId},
-
-
         #{insureSettleId},
-
-
         #{drgDipCode},
-
-
         #{drgDipName},
-
-
         #{icd10},
-
-
         #{icd9},
-
-
-        #{weight},
-
-
         #{totalFee},
-
-
         #{standFee},
-
-
         #{override},
-
-
         #{cdntnPay},
-
-
         #{diffFee},
-
-
         #{ypFee},
-
-
         #{clFee},
-
-
         #{states},
         #{type},
         #{businessType},
@@ -307,19 +283,30 @@
         #{insureRegCode},
         #{hospName},
         #{orgCode},
+        #{proMedicMater},
+        #{weightValue},
+        #{proConsum},
+        #{diagFeeSco},
+        #{withCcormcc},
+        #{ccmccName},
+        #{bl},
+        #{rate},
+        #{feePay},
+        #{standProMedicMater},
+        #{standProConsum},
+        #{profit},
         #{validFlag},
         #{crtId},
         #{crtName},
         #{crtTime}
-
         )
     </insert>
 
     <select id="selectById" resultMap="drgDipResultMap" >
-        select
-        id <!--主键-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        psn_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        gend <!--性别-->,        age <!--年龄-->,        insutype <!--险种-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        in_time <!--入院时间-->,        out_time <!--出院时间-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        dept_id <!--科室id-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        insure_settle_id <!--医保结算id-->,        drg_dip_code <!--drg\dip组编码-->,        drg_dip_name <!--drg\dip组名称-->,        icd10 <!--主要诊断-->,        icd9 <!--主要手术-->,        weight <!--权重-->,        total_fee <!--总费用-->,        stand_fee <!--标杆费用-->,        override <!--倍率-->,        cdntn_pay <!--统筹金额-->,        diff_fee <!--预计偏差-->,        yp_fee <!--药品费-->,        cl_fee <!--耗材费-->,        states <!--质控完成状态-->,        type <!--质控类型-->,        business_type <!--业务类型-->,        business_id <!--业务id-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
-        from drg_dip_result where
-            id = #{id}
+        select    *
+        from drg_dip_result
+        where
+        id = #{id}
     </select>
 
     <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >

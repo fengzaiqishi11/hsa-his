@@ -13,6 +13,9 @@
         <result property="checkFiled" column="check_filed"/>
         <result property="resultMsg" column="result_msg"/>
         <result property="originalValue" column="original_value"/>
+        <result property="isMain" column="is_main"/>
+        <result property="sort" column="sort"/>
+        <result property="ruletType" column="rulet_type"/>
         <result property="validFlag" column="valid_flag"/>
         <result property="crtId" column="crt_id"/>
         <result property="crtName" column="crt_name"/>
@@ -20,8 +23,7 @@
     </resultMap>
 
     <select id="selectListByVisitId" resultMap="drgDipResultDetailMap" >
-        select
-        id <!--id-->,        result_id <!--质控结果主表id-->,        rule_level <!--规则等级-->,        rule_score <!--规则分数-->,        field_id <!--错误字段字段名-->,        check_filed <!--错误字段字段中文名-->,        result_msg <!--质控结果信息-->,        original_value <!--字段原始值-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人编号-->,        crt_name <!--创建人姓名-->,        crt_time <!--创建时间-->
+        select *
         from drg_dip_result_detail where
         result_id = #{id} and valid_flag = 1
     </select>
@@ -36,6 +38,9 @@
         check_filed <!--错误字段字段中文名--> ,
         result_msg <!--质控结果信息--> ,
         original_value <!--字段原始值--> ,
+        is_main <!--主次标识--> ,
+        sort <!--排序号--> ,
+        rulet_type <!--规则类型--> ,
         valid_flag <!--有效标志--> ,
         crt_id <!--创建人编号--> ,
         crt_name <!--创建人姓名--> ,
@@ -50,6 +55,9 @@
         #{checkFiled},
         #{resultMsg},
         #{originalValue},
+        #{isMain},
+        #{sort},
+        #{ruletType},
         #{validFlag},
         #{crtId},
         #{crtName},
@@ -91,9 +99,8 @@
     </insert>
 
     <select id="selectById" resultMap="drgDipResultDetailMap" >
-        select
-        id <!--id-->,        result_id <!--质控结果主表id-->,        rule_level <!--规则等级-->,        rule_score <!--规则分数-->,        field_id <!--错误字段字段名-->,        check_filed <!--错误字段字段中文名-->,        result_msg <!--质控结果信息-->,        original_value <!--字段原始值-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人编号-->,        crt_name <!--创建人姓名-->,        crt_time <!--创建时间-->
-        from drg_dip_result_detail where
+        select *
+                from drg_dip_result_detail where
             id = #{id}
                                                     </select>
 

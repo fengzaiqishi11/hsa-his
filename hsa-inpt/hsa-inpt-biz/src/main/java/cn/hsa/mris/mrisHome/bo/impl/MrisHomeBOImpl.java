@@ -472,21 +472,34 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
         /**===================获取系统参数中配置的病案质控drg地址 End==============**/
 
+        /**======调用DRG begin=========**/
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
         String result = HttpConnectUtil.doPost(paramMap);
+        /**======调用DRG begin=========**/
+
+        /**======获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
-        logMap.put("respTime",DateUtils.getNow());//响应时间
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
+        if (responseCode != responseCode){
+            throw new AppException("调用DRG接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
+
         // todo 此处调用插入日志
+        logMap.put("respTime",DateUtils.getNow());//响应时间
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
         logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
-        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+        logMap.put("resultCode",responseCode);
         logMap.put("type","1");
         logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
@@ -541,18 +554,18 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
         responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
-        responseDataMap.put("drgCode",resultMap.get("drg_code"));// DRG组编码
-        responseDataMap.put("drgName",resultMap.get("drg_name"));// DRG组名称
-        responseDataMap.put("weightValue",resultMap.get("weight_value"));// DRG权重
-        responseDataMap.put("ratio",resultMap.get("bl"));// 倍率
-        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
-        responseDataMap.put("totalFee",resultMap.get("total_fee"));// 总费用
-        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// 总费用标杆
-        responseDataMap.put("proMedicMater",resultMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",resultMap.get("proMedicMaterStand"));// todo 药占比标杆
-        responseDataMap.put("proConsum",resultMap.get("pro_consum"));// 耗材占比
-        responseDataMap.put("proConsumStand",resultMap.get("proConsumStand"));// todo 耗材占比标杆
-        responseDataMap.put("quality",resultMap.get("quality"));// 质控信息list
+        responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
+        responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
+        responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
+        responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
+        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));//盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息list
         /**==========返回参数封装 End ===========**/
         return responseDataMap;
     }
@@ -580,22 +593,34 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         } else {
             throw new AppException("请在系统参数中配置病案上传dip时，dip地址  例：BA_DIP: url");
         }
-
+        /**=========== 调用DIP接口 begin ==========**/
         paramMap.put("url", url);
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
         String result = HttpConnectUtil.doPost(paramMap);
+        /**=========== 调用DIP接口 end ==========**/
+
+        /**======获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
-        logMap.put("respTime",DateUtils.getNow());//响应时间
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");
+        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
+        if (responseCode != responseCode){
+            throw new AppException("调用DRG接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
+
         // todo 此处调用插入日志
+        logMap.put("respTime",DateUtils.getNow());//响应时间
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
         logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
         logMap.put("respContent",JSONObject.toJSONString(responseMap));
-        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+        logMap.put("resultCode",responseCode);
         logMap.put("type","2");
         logMap.put("businessType","2");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
@@ -650,17 +675,17 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
         responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
-        responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
-        responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
-        responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值
-        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
-        responseDataMap.put("totalFee",resultMap.get("total_fee"));// TODO 总费用
-        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// 总费用标杆
-        responseDataMap.put("proMedicMater",resultMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",resultMap.get("proMedicMaterStand"));// todo 药占比标杆
-        responseDataMap.put("proConsum",resultMap.get("pro_consum"));// 耗材占比
-        responseDataMap.put("proConsumStand",resultMap.get("proConsumStand"));// todo 耗材占比标杆
-        responseDataMap.put("quality",resultMap.get("quality"));// 质控信息
+        responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
+        responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
+        responseDataMap.put("diagFeeSco",groupInfoMap.get("feePay"));// 分值
+        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         return responseDataMap;
     }

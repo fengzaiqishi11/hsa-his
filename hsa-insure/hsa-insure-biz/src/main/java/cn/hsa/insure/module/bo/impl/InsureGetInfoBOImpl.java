@@ -800,9 +800,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
         Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
-        //此处根据返回的参数状态进行判断，成功就写入日志表
+
+        /**======获取返回的参数 begin=========**/
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        Map<String, Object> resultMap = MapUtils.get(responseMap, "result");// 返回结果
+        if (0 != responseCode){
+            throw new AppException("调用DRG接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
+
         logMap.put("respTime",DateUtils.getNow());//响应时间
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
@@ -819,29 +828,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (MapUtils.isEmpty(resultMap)){
             throw new AppException("调用DRG,返回结果为空");
         }
-        Map<String, Object> groupInfo = MapUtils.get(resultMap, "groupInfo");// 分组信息，可以使用fastjson转成dto
-        List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 结果明细,可以使用fastjson转成List<dto>
-        if (0 == responseCode) { // 成功
-            // TODO xxx写入日志的流程，为防止事务不一致的情况，请不要调用远程服务的insert
-        } else {
-            String message = MapUtils.get(responseMap, "message");
-            throw new AppException("调用DRG质控失败，原因：" + message);
-        }
         /**==========返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
         responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("inNO",baseInfoMap.get("visitId"));// 住院号
         responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
-        responseDataMap.put("drgCode",groupInfo.get("drg_code"));// DRG组编码
-        responseDataMap.put("drgName",groupInfo.get("drg_name"));// DRG组名称
-        responseDataMap.put("weightValue",groupInfo.get("weight_value"));// DRG权重
-        responseDataMap.put("ratio",groupInfo.get("bl"));// 倍率
-        responseDataMap.put("profitAndLossAmount",groupInfo.get("profitAndLossAmount"));// todo 盈亏额
-        responseDataMap.put("totalFee",groupInfo.get("total_fee"));// 总费用
-        responseDataMap.put("feeStand",groupInfo.get("fee_stand"));// 总费用标杆
-        responseDataMap.put("quality",qualityInfo);// 质控信息
+        responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
+        responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
+        responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
+        responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
+        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
         dataMap.put("crtId",MapUtils.get(map, "crteId"));
@@ -997,12 +998,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         /**===================获取系统参数中配置的结算清单质控drg地址 End==============**/
 
+        /**===================调用DIP Begin==============**/
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
         Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
-        //此处根据返回的参数状态进行判断，成功就写入日志表
+        /**===================调用DIP End==============**/
+
+        /**======获取返回的参数 begin=========**/
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        Map<String, Object> resultMap = MapUtils.get(responseMap, "result");// 返回结果
+        if (responseCode != 0){
+            throw new AppException("调用DIP接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
+
+        //此处根据返回的参数状态进行判断，成功就写入日志表
         logMap.put("respTime",DateUtils.getNow());//响应时间
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
@@ -1016,29 +1029,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
-        if (MapUtils.isEmpty(resultMap)){
-            throw new AppException("调用DIP,返回结果为空");
-        }
-        if (0 == responseCode) { // 成功
-            // TODO xxx写入日志的流程，为防止事务不一致的情况，请不要调用远程服务的insert
-        } else {
-            String message = MapUtils.get(responseMap, "message");
-            throw new AppException("调用DIP质控失败，原因：" + message);
-        }
         /**==========返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
         responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("inNO",baseInfoMap.get("visitId"));//住院号
         responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
-        responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
-        responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
-        responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值
-        responseDataMap.put("profitAndLossAmount",resultMap.get("profitAndLossAmount"));// todo 盈亏额
-        responseDataMap.put("totalFee",resultMap.get("total_fee"));// todo 总费用
-        responseDataMap.put("feeStand",resultMap.get("fee_stand"));// todo 总费用标杆
-        responseDataMap.put("quality",resultMap.get("qualityInfo"));// 质控信息
+        responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
+        responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
+        responseDataMap.put("diagFeeSco",resultMap.get("feePay"));// 分值
+        responseDataMap.put("profitAndLossAmount",resultMap.get("profit"));// 盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
 //        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(resultMap.get("baseInfo")),DrgDipResultDTO.class);

@@ -259,10 +259,10 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         Map<String,Object> drgData = new HashMap<>();
         Map<String,Object> dipData = new HashMap<>();
         if ("true".equals(drgDipAuthDTO.getDrg())){
-            drgData = insureGetInfoBO.uploadInsureSettleInfoForDRG(map);
+            drgData = insureGetInfoBO.insertInsureSettleInfoForDRG(map);
         }
         if ("true".equals(drgDipAuthDTO.getDip())){
-            dipData = insureGetInfoBO.uploadInsureSettleInfoForDIP(map);
+            dipData = insureGetInfoBO.insertInsureSettleInfoForDIP(map);
         }
         Map resultMap = new HashMap<>();
         resultMap.put("drgData",drgData);

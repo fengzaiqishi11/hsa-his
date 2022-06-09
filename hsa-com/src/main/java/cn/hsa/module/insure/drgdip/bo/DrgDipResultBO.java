@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.drgdip.bo;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
@@ -47,7 +48,7 @@ public interface DrgDipResultBO {
      * @Date 2022-06-08 9:42
      * @return java.lang.Boolean
      */
-    Boolean checkDrgDipBizAuthorization(Map<String, Object> map);
+    DrgDipAuthDTO checkDrgDipBizAuthorization(Map<String, Object> map);
 
   /**
    * 质控结果保存

@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.drgdip.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -49,7 +50,7 @@ public interface DrgDipResultService {
      * @Date 2022-06-08 9:33
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
-    WrapperResponse<Boolean> checkDrgDipBizAuthorization(Map<String, Object> map);
+    WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(Map<String, Object> map);
 
     /**
      * @return

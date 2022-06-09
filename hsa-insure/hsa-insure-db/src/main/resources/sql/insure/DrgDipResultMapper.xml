@@ -67,8 +67,7 @@
             resultType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO">
         select   *
         from drg_dip_result
-        where
-        visit_id = #{visitId} and valid_flag = 1 order by crt_time desc limit 1
+        where visit_id = #{visitId} and valid_flag = 1
     </select>
 
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >

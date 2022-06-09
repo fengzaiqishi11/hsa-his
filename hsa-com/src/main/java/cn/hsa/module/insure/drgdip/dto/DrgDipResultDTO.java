@@ -222,6 +222,14 @@ public class DrgDipResultDTO implements Serializable {
    */
   private BigDecimal profit;
   /**
+   * 可疑条数
+   */
+  private Integer suspiciousNum;
+  /**
+   * 违规条数
+   */
+  private Integer violationNum;
+  /**
    * 有效标志
    */
   private String validFlag;

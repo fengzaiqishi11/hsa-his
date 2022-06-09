@@ -9,6 +9,7 @@ import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -97,6 +98,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     DrgDipBusinessOptInfoBO drgDipBusinessOptInfoBO;
+
+    @Resource
+    private UnifiedCommon unifiedCommon;
 
     /**
      * @Method getSettleInfo
@@ -811,15 +815,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         /**======获取返回的参数 begin=========**/
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (0 != responseCode){
-            throw new AppException("调用DRG接口失败");
-        }
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
-        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
-        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
-        /**======获取返回的参数 end=========**/
-
         logMap.put("respTime",DateUtils.getNow());//响应时间
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
@@ -833,6 +828,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
+        if (0 != responseCode){
+            throw new AppException("调用DRG接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
         if (MapUtils.isEmpty(resultMap)){
             throw new AppException("调用DRG,返回结果为空");
         }
@@ -858,7 +861,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
         dataMap.put("type",MapUtils.get(map, "1"));
         dataMap.put("businessType",MapUtils.get(map, "1"));
-//        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
+//        insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
 
@@ -2831,9 +2834,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     }
 
     //保存质控结果
-    private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
-        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(groupInfo),DrgDipResultDTO.class);
+    private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> baseInfoMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
         Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");// 基础信息
+        //查询患者信息
+        Map<String,Object> map = new HashMap<>() ;
+        map.put("hospCode",MapUtils.get(dataMap, "hospCode"));
+        map.put("visitId",MapUtils.get(baseInfo, "visit_id"));
+        InsureIndividualVisitDTO insureIndividualVisitDTO = unifiedCommon.commonGetVisitInfo(map);
+//        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(groupInfo),DrgDipResultDTO.class);
+        //冗余基本信息
+        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
         drgDipResultDTO.setVisitId(MapUtils.get(baseInfo, "visit_id"));
         drgDipResultDTO.setPsnNo(MapUtils.get(baseInfo, "psn_no"));
         drgDipResultDTO.setAge(MapUtils.get(baseInfo, "age"));
@@ -2845,10 +2855,32 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setDoctorId(MapUtils.get(baseInfo, "chfpdr_code"));
         drgDipResultDTO.setDoctorName(MapUtils.get(baseInfo, "chfpdr_name"));
         drgDipResultDTO.setInsutype(MapUtils.get(baseInfo, "hi_type"));
+        drgDipResultDTO.setInsureSettleId(MapUtils.get(baseInfo, "set1_id"));
         drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));
         drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
         drgDipResultDTO.setBusinessType(MapUtils.get(dataMap, "businessType"));
         drgDipResultDTO.setType(MapUtils.get(dataMap, "type"));
+        drgDipResultDTO.setMedType(insureIndividualVisitDTO.getAka130());
+        drgDipResultDTO.setMedTypeName(insureIndividualVisitDTO.getAka130Name());
+        drgDipResultDTO.setInptDiagnose(insureIndividualVisitDTO.getInDiseaseName());
+        drgDipResultDTO.setOutptDiagnose(insureIndividualVisitDTO.getOutDiseaseName());
+        drgDipResultDTO.setDeptId(insureIndividualVisitDTO.getOutDeptId());
+        drgDipResultDTO.setDeptName(insureIndividualVisitDTO.getOutDeptName());
+        drgDipResultDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
+        //保存质控结果
+
+        drgDipResultDTO.setTotalFee(MapUtils.get(baseInfoMap, "totalFee"));
+        drgDipResultDTO.setProMedicMater(MapUtils.get(baseInfoMap, "pro_medic_mater"));
+        drgDipResultDTO.setProConsum(MapUtils.get(baseInfoMap, "pro_consum"));
+        drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
+        drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));
+        drgDipResultDTO.setWeightValue(MapUtils.get(groupInfo, "weight"));
+        drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
+        drgDipResultDTO.setProfit(MapUtils.get(groupInfo, "profit"));
+        drgDipResultDTO.setStandFee(MapUtils.get(groupInfo, "feeStand"));
+        drgDipResultDTO.setFeePay(MapUtils.get(groupInfo, "feePay"));
+        drgDipResultDTO.setStandProMedicMater(MapUtils.get(groupInfo, "pro_medic_mater"));
+        drgDipResultDTO.setStandProConsum(MapUtils.get(groupInfo, "pro_consum"));
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("hospCode",MapUtils.get(dataMap, "hospCode"));

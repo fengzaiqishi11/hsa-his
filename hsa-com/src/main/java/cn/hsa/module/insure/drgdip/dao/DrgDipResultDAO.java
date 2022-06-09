@@ -46,7 +46,7 @@ public interface DrgDipResultDAO {
      * @param
      * @return int
      */
-    int updateByVisitId(String visitId);
+    int updateByVisitId(DrgDipResultDTO drgDipResultDTO);
 
     /**
      * @Author 医保开发二部-湛康

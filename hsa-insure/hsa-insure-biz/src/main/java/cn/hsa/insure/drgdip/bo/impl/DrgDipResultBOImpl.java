@@ -168,7 +168,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                 drgDipResultDTO.setStates("1");
             }
             //插入之前先更新之前的数据
-            drgDipResultDAO.updateByVisitId(drgDipResultDTO.getVisitId());
+            drgDipResultDAO.updateByVisitId(drgDipResultDTO);
             drgDipResultDAO.insertDrgDipResult(drgDipResultDTO);
         }
         //保存质控结果明细表

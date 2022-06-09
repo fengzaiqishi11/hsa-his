@@ -26,6 +26,7 @@ import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureMrisAdvicePatientInfoDTO;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
+import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.mris.service.MrisService;
 import cn.hsa.module.mris.mrisHome.bo.MrisHomeBO;
 import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
@@ -45,6 +46,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +105,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private DrgDipBusinessOptInfoLogService drgDipBusinessOptInfoLogService_consumer;
+
+    @Resource
+    private InsureIndividualVisitService insureIndividualVisitService_consumer;
 
 
     /**
@@ -482,6 +487,19 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         /**======获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
+        // todo 此处调用插入日志
+        logMap.put("respTime",DateUtils.getNow());//响应时间
+        logMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
+        logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
+        logMap.put("reqContent",JSONObject.toJSONString(dataMap));
+        logMap.put("respContent",JSONObject.toJSONString(responseMap));
+        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+        logMap.put("type","1");
+        logMap.put("businessType","2");
+        logMap.put("crtId",MapUtils.get(map, "crteId"));
+        logMap.put("crtName",MapUtils.get(map, "crteName"));
+        drgDipResultService.insertDrgDipQulityInfoLog(logMap);
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
         if (responseCode != responseCode){
             throw new AppException("调用DRG接口失败");
@@ -492,19 +510,6 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
         /**======获取返回的参数 end=========**/
 
-        // todo 此处调用插入日志
-        logMap.put("respTime",DateUtils.getNow());//响应时间
-        logMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
-        logMap.put("visitId",MapUtils.get(baseInfoStr, "visit_id"));
-        logMap.put("reqContent",JSONObject.toJSONString(dataMap));
-        logMap.put("respContent",JSONObject.toJSONString(responseMap));
-        logMap.put("resultCode",responseCode);
-        logMap.put("type","1");
-        logMap.put("businessType","2");
-        logMap.put("crtId",MapUtils.get(map, "crteId"));
-        logMap.put("crtName",MapUtils.get(map, "crteName"));
-        drgDipResultService.insertDrgDipQulityInfoLog(logMap);
         //TODO 此处插入业务操作日志 类型为4.上传
         Map<String, Object> businessLogMap = new HashMap<>();
         businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
@@ -567,6 +572,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
         responseDataMap.put("quality",qualityInfoList);// 质控信息list
         /**==========返回参数封装 End ===========**/
+        //保存质控结果
+        baseInfoStr.put("crteId",MapUtils.get(map, "crteId"));
+        baseInfoStr.put("crteName",MapUtils.get(map, "crteName"));
+        baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
+        baseInfoStr.put("type","1");
+        baseInfoStr.put("businessType","2");
+//        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
     // 整理病案首页数据，上传drg
@@ -687,6 +699,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
         responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
+        //保存质控结果
+        baseInfoStr.put("crteId",MapUtils.get(map, "crteId"));
+        baseInfoStr.put("crteName",MapUtils.get(map, "crteName"));
+        baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
+        baseInfoStr.put("type","2");
+        baseInfoStr.put("businessType","2");
+//        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
 
@@ -2107,6 +2126,79 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             }
             mrisHomeDAO.insertMrisBabyBatch(mrisBabyInfoDOList);
         }
+    }
+    //保存质控结果
+    private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> baseInfoMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
+        //查询患者信息
+        Map<String,Object> map = new HashMap<>() ;
+        map.put("hospCode",MapUtils.get(dataMap, "hospCode"));
+        map.put("visitId",MapUtils.get(dataMap, "visit_id"));
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(map);
+        //冗余基本信息
+        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
+        drgDipResultDTO.setVisitId(MapUtils.get(dataMap, "visit_id"));
+        drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "medcasno"));
+        drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "chfpdr_code"));
+        drgDipResultDTO.setDoctorName(MapUtils.get(dataMap, "chfpdr_name"));
+        drgDipResultDTO.setInsureSettleId(MapUtils.get(dataMap, "set1_id"));
+        drgDipResultDTO.setPsnNo(insureIndividualVisitDTO.getAac001());
+        drgDipResultDTO.setAge(insureIndividualVisitDTO.getAge());
+        drgDipResultDTO.setGend(insureIndividualVisitDTO.getGendCode());
+        drgDipResultDTO.setCertno(insureIndividualVisitDTO.getAac002());
+        drgDipResultDTO.setPsnName(insureIndividualVisitDTO.getAac003());
+        drgDipResultDTO.setInTime(insureIndividualVisitDTO.getInTime());
+        drgDipResultDTO.setOutTime(insureIndividualVisitDTO.getOutTime());
+        drgDipResultDTO.setInsutype(insureIndividualVisitDTO.getAae140());
+        drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));
+        drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
+        drgDipResultDTO.setBusinessType(MapUtils.get(dataMap, "businessType"));
+        drgDipResultDTO.setType(MapUtils.get(dataMap, "type"));
+        drgDipResultDTO.setMedType(insureIndividualVisitDTO.getAka130());
+        drgDipResultDTO.setMedTypeName(insureIndividualVisitDTO.getAka130Name());
+        drgDipResultDTO.setInptDiagnose(insureIndividualVisitDTO.getInDiseaseName());
+        drgDipResultDTO.setOutptDiagnose(insureIndividualVisitDTO.getOutDiseaseName());
+        drgDipResultDTO.setDeptId(insureIndividualVisitDTO.getOutDeptId());
+        drgDipResultDTO.setDeptName(insureIndividualVisitDTO.getOutDeptName());
+        drgDipResultDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
+        drgDipResultDTO.setVisitNo(insureIndividualVisitDTO.getVisitNo());
+        //保存质控结果
+        drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
+        drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));
+        drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
+        if(MapUtils.get(baseInfoMap, "totalFee") !=null){
+            drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2));
+        }
+        if(MapUtils.get(baseInfoMap, "pro_medic_mater") !=null){
+            drgDipResultDTO.setProMedicMater(MapUtils.get(baseInfoMap, "pro_medic_mater").toString());
+        }
+        if(MapUtils.get(baseInfoMap, "pro_consum") !=null){
+            drgDipResultDTO.setProConsum(MapUtils.get(baseInfoMap, "pro_consum").toString());
+        }
+        if(MapUtils.get(groupInfo, "weight") !=null){
+            drgDipResultDTO.setWeightValue(MapUtils.get(groupInfo, "weight").toString());
+        }
+        if(MapUtils.get(groupInfo, "profit") !=null){
+            drgDipResultDTO.setProfit(BigDecimalUtils.convert(MapUtils.get(groupInfo, "profit").toString()).setScale(2));
+        }
+        if(MapUtils.get(groupInfo, "feeStand") !=null){
+            drgDipResultDTO.setStandFee(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feeStand").toString()).setScale(2));
+        }
+        if(MapUtils.get(groupInfo, "feePay") !=null){
+            drgDipResultDTO.setFeePay(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feePay").toString()).setScale(2));
+        }
+        if(MapUtils.get(groupInfo, "pro_medic_mater") !=null){
+            drgDipResultDTO.setStandProMedicMater(MapUtils.get(groupInfo, "pro_medic_mater").toString());
+        }
+        if(MapUtils.get(groupInfo, "pro_consum") !=null){
+            drgDipResultDTO.setStandProConsum(MapUtils.get(groupInfo, "pro_consum").toString());
+        }
+        List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("hospCode",MapUtils.get(dataMap, "hospCode"));
+        resultMap.put("drgDipResultDTO",drgDipResultDTO);
+        resultMap.put("drgDipResultDetailDTOList",drgDipResultDetailDTOList);
+        drgDipResultService.insertDrgDipResult(resultMap);
+        return true;
     }
 
 }

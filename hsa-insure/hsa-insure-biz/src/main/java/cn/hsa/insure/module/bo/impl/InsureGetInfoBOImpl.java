@@ -843,8 +843,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("quality",qualityInfo);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
+        dataMap.put("crtId",MapUtils.get(map, "crteId"));
+        dataMap.put("crtName",MapUtils.get(map, "crteName"));
+        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
 //        insertDrgDipResult(dataMap,groupInfo,qualityInfo);
-        return resultMap;
+        return responseDataMap;
     }
 
     /**
@@ -1039,7 +1042,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 //        DrgDipResultDTO drgDipResultDTO = FastJsonUtils.fromJson(JSONObject.toJSONString(resultMap.get("baseInfo")),DrgDipResultDTO.class);
 //        List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(resultMap.get("qualityInfo")),DrgDipResultDetailDTO.class);
 //        drgDipResultBO.insertDrgDipResult(drgDipResultDTO,drgDipResultDetailDTOList);
-        return resultMap;
+        return responseDataMap;
     }
 
     /**
@@ -2825,8 +2828,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setOutTime(MapUtils.get(baseInfo, "dscg_time"));
         drgDipResultDTO.setDoctorId(MapUtils.get(baseInfo, "chfpdr_code"));
         drgDipResultDTO.setDoctorName(MapUtils.get(baseInfo, "chfpdr_name"));
+        drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));
+        drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
-        drgDipResultBO.insertDrgDipResult(drgDipResultDTO,drgDipResultDetailDTOList);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("hospCode",MapUtils.get(dataMap, "hospCode"));
+        resultMap.put("drgDipResultDTO",drgDipResultDTO);
+        resultMap.put("drgDipResultDetailDTOList",drgDipResultDetailDTOList);
+        drgDipResultService.insertDrgDipResult(resultMap);
         return true;
     }
 }

@@ -2191,10 +2191,12 @@
            '' as disch_dept_id,
            '' as hsptzd_dept_id,
            IFNULL(iiv.bka006_name,'') as insur_type,
-           iiv.medicine_org_code as medicine_org_code
+           iiv.medicine_org_code as medicine_org_code,
+            iib.aae140 as health_care_type
             FROM mris_base_info mbi
-           left join insure_individual_visit iiv
+            join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
+            left join insure_individual_basic iib on iiv.mib_id = iib.id and iib.hosp_code = iiv.hosp_code
            LEFT JOIN mris_cost c on mbi.visit_id = c.visit_id and mbi.hosp_code = c.hosp_code
            WHERE  mbi.hosp_code = #{hospCode}
             AND  mbi.visit_id = #{visitId}

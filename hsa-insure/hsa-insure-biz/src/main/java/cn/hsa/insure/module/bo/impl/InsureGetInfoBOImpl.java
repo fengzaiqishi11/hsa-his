@@ -833,6 +833,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
         responseDataMap.put("drgCode",groupInfo.get("drg_code"));// DRG组编码
         responseDataMap.put("drgName",groupInfo.get("drg_name"));// DRG组名称
         responseDataMap.put("weightValue",groupInfo.get("weight_value"));// DRG权重
@@ -1030,6 +1031,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfo.get("adm_no"));// todo 住院号
+        responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
         responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
         responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
         responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值

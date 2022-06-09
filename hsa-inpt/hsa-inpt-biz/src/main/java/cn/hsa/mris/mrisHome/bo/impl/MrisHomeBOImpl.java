@@ -540,6 +540,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
         responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
         responseDataMap.put("drgCode",resultMap.get("drg_code"));// DRG组编码
         responseDataMap.put("drgName",resultMap.get("drg_name"));// DRG组名称
         responseDataMap.put("weightValue",resultMap.get("weight_value"));// DRG权重
@@ -648,6 +649,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
         responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
         responseDataMap.put("diagCode",resultMap.get("diag_code"));// DIP组编码
         responseDataMap.put("diagName",resultMap.get("diag_name"));// DIP组名称
         responseDataMap.put("diagFeeSco",resultMap.get("diag_fee_sco"));// 分值

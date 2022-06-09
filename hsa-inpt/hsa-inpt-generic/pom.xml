@@ -22,12 +22,6 @@
     <dependencies>
 
         <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
-        </dependency>
-
-        <dependency>
             <groupId>cn.hsa.inpt</groupId>
             <artifactId>hsa-inpt-biz</artifactId>
             <version>1.0.0</version>
@@ -55,30 +49,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-<!--        &lt;!&ndash;3.分布式消息队列组件&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-generic-mq</artifactId>-->
-<!--        </dependency>-->
 
-<!--        &lt;!&ndash;4.对象存储组件&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
-<!--        </dependency>-->
-
-        <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-ali-gateway</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-tencent-gateway</artifactId>-->
-<!--        </dependency>-->
+        <!-- gateway dependencies -->
         <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-generic-gateway</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
 
         <!-- 6.分布式数据库 -->

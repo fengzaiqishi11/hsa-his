@@ -578,7 +578,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
         baseInfoStr.put("type","1");
         baseInfoStr.put("businessType","2");
-//        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
+        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
     // 整理病案首页数据，上传drg
@@ -705,7 +705,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
         baseInfoStr.put("type","2");
         baseInfoStr.put("businessType","2");
-//        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
+        insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
 
@@ -2129,38 +2129,32 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     }
     //保存质控结果
     private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> baseInfoMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
-        //查询患者信息
-        Map<String,Object> map = new HashMap<>() ;
-        map.put("hospCode",MapUtils.get(dataMap, "hospCode"));
-        map.put("visitId",MapUtils.get(dataMap, "visit_id"));
-        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitService_consumer.getInsureIndividualVisitById(map);
         //冗余基本信息
         DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
         drgDipResultDTO.setVisitId(MapUtils.get(dataMap, "visit_id"));
-        drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "medcasno"));
-        drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "chfpdr_code"));
-        drgDipResultDTO.setDoctorName(MapUtils.get(dataMap, "chfpdr_name"));
-        drgDipResultDTO.setInsureSettleId(MapUtils.get(dataMap, "set1_id"));
-        drgDipResultDTO.setPsnNo(insureIndividualVisitDTO.getAac001());
-        drgDipResultDTO.setAge(insureIndividualVisitDTO.getAge());
-        drgDipResultDTO.setGend(insureIndividualVisitDTO.getGendCode());
-        drgDipResultDTO.setCertno(insureIndividualVisitDTO.getAac002());
-        drgDipResultDTO.setPsnName(insureIndividualVisitDTO.getAac003());
-        drgDipResultDTO.setInTime(insureIndividualVisitDTO.getInTime());
-        drgDipResultDTO.setOutTime(insureIndividualVisitDTO.getOutTime());
-        drgDipResultDTO.setInsutype(insureIndividualVisitDTO.getAae140());
+        drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "patient_no"));
+        drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "att_doctor_id"));
+        drgDipResultDTO.setDoctorName(MapUtils.get(dataMap, "att_doctor"));
+        if( MapUtils.get(dataMap, "age")!= null){
+            drgDipResultDTO.setAge(Integer.parseInt(MapUtils.get(dataMap, "age")));
+        }
+        drgDipResultDTO.setGend(MapUtils.get(dataMap, "sex_id"));
+        drgDipResultDTO.setCertno(MapUtils.get(dataMap, "id_card"));
+        drgDipResultDTO.setPsnName(MapUtils.get(dataMap, "name"));
+        if(MapUtils.get(dataMap, "hsptzd_date") != null){
+            drgDipResultDTO.setInTime(DateUtils.parse(MapUtils.get(dataMap, "hsptzd_date"), DateUtils.Y_M_D));
+        }
+        if(MapUtils.get(dataMap, "hosp_disch_date") != null){
+            drgDipResultDTO.setOutTime(DateUtils.parse(MapUtils.get(dataMap, "hosp_disch_date"), DateUtils.Y_M_D));
+        }
         drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));
         drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
         drgDipResultDTO.setBusinessType(MapUtils.get(dataMap, "businessType"));
         drgDipResultDTO.setType(MapUtils.get(dataMap, "type"));
-        drgDipResultDTO.setMedType(insureIndividualVisitDTO.getAka130());
-        drgDipResultDTO.setMedTypeName(insureIndividualVisitDTO.getAka130Name());
-        drgDipResultDTO.setInptDiagnose(insureIndividualVisitDTO.getInDiseaseName());
-        drgDipResultDTO.setOutptDiagnose(insureIndividualVisitDTO.getOutDiseaseName());
-        drgDipResultDTO.setDeptId(insureIndividualVisitDTO.getOutDeptId());
-        drgDipResultDTO.setDeptName(insureIndividualVisitDTO.getOutDeptName());
-        drgDipResultDTO.setMedicalRegNo(insureIndividualVisitDTO.getMedicalRegNo());
-        drgDipResultDTO.setVisitNo(insureIndividualVisitDTO.getVisitNo());
+        drgDipResultDTO.setInptDiagnose(MapUtils.get(dataMap, "hosp_diag_name"));
+        drgDipResultDTO.setDeptId(MapUtils.get(dataMap, "disch_unified_dept"));
+        drgDipResultDTO.setDeptName(MapUtils.get(dataMap, "disch_dept"));
+        drgDipResultDTO.setMedicalRegNo(MapUtils.get(dataMap, "serial_no"));
         //保存质控结果
         drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
         drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));

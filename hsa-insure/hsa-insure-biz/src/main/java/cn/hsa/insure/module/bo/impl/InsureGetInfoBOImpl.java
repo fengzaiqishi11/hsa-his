@@ -831,6 +831,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
+        //保存操作日志
+        dataMap.put("crteId",MapUtils.get(map, "crteId"));
+        dataMap.put("crteName",MapUtils.get(map, "crteName"));
+        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        dataMap.put("type","1");
+        dataMap.put("businessType","1");
+        dataMap.put("optTypeName","结算清单DRG质控");
+        insertDrgDipBusinessOptInfoLog(dataMap);
         if (0 != responseCode){
             throw new AppException("调用DRG接口失败");
         }
@@ -863,11 +871,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
-        dataMap.put("crteId",MapUtils.get(map, "crteId"));
-        dataMap.put("crteName",MapUtils.get(map, "crteName"));
-        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        dataMap.put("type","1");
-        dataMap.put("businessType","1");
         insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
@@ -1039,6 +1042,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
+        //保存操作日志
+        dataMap.put("crteId",MapUtils.get(map, "crteId"));
+        dataMap.put("crteName",MapUtils.get(map, "crteName"));
+        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        dataMap.put("type","2");
+        dataMap.put("businessType","1");
+        dataMap.put("optTypeName","结算清单DIP质控");
+        insertDrgDipBusinessOptInfoLog(dataMap);
         /**======获取返回的参数 begin=========**/
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
         if (responseCode != 0){
@@ -1070,12 +1081,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
-        //保存质控结果
-        dataMap.put("crteId",MapUtils.get(map, "crteId"));
-        dataMap.put("crteName",MapUtils.get(map, "crteName"));
-        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        dataMap.put("type","2");
-        dataMap.put("businessType","1");
         insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
     }
@@ -2869,6 +2874,50 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         return (T) map.get(key);
     }
 
+    //保存操作日志
+    private void insertDrgDipBusinessOptInfoLog(Map<String, Object> dataMap){
+        Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");// 基础信息
+        Map<String, Object> businessLogMap = new HashMap<>();
+        businessLogMap.put("businessId",MapUtils.get(baseInfo, "id"));
+        businessLogMap.put("optType","3");
+        businessLogMap.put("optTypeName",MapUtils.get(dataMap, "optTypeName"));
+        businessLogMap.put("type",MapUtils.get(dataMap, "type"));
+        businessLogMap.put("businessType",MapUtils.get(dataMap, "businessType"));
+        businessLogMap.put("isForce",MapUtils.get(baseInfo, "isForce"));
+        businessLogMap.put("forceUploadInfo",MapUtils.get(baseInfo, "forceUploadInfo"));
+        businessLogMap.put("hospCode",MapUtils.get(dataMap, "hospCode"));
+        businessLogMap.put("insureRegCode",MapUtils.get(baseInfo, "insureRegCode"));
+        businessLogMap.put("hospName",MapUtils.get(baseInfo, "hospName"));
+        businessLogMap.put("orgCode",MapUtils.get(baseInfo, "orgCode"));
+        businessLogMap.put("insureSettleId",MapUtils.get(baseInfo, "insureSettleId"));
+        businessLogMap.put("medicalRegNo",MapUtils.get(baseInfo, "medicalRegCode"));
+        businessLogMap.put("settleId",MapUtils.get(baseInfo, "settleId"));
+        businessLogMap.put("visitId",MapUtils.get(baseInfo, "visit_id"));
+        businessLogMap.put("psnNo",MapUtils.get(baseInfo, "psn_no"));
+        businessLogMap.put("psnName",MapUtils.get(baseInfo, "psn_name"));
+        businessLogMap.put("certNo",MapUtils.get(baseInfo, "certno"));
+        businessLogMap.put("sex",MapUtils.get(baseInfo, "gend"));
+//        businessLogMap.put("age",MapUtils.get(baseInfo, "age"));
+        businessLogMap.put("insueType",MapUtils.get(baseInfo, "hi_type"));
+        businessLogMap.put("inptTime",MapUtils.get(baseInfo, "adm_time"));
+        businessLogMap.put("outptTime,",MapUtils.get(baseInfo, "dscg_time"));
+        businessLogMap.put("medType",MapUtils.get(baseInfo, "medType"));
+        businessLogMap.put("medTypeName",MapUtils.get(baseInfo, "medTypeName"));
+        businessLogMap.put("doctorId",MapUtils.get(baseInfo, "chfpdr_code"));
+        businessLogMap.put("doctorName",MapUtils.get(baseInfo, "chfpdr_name"));
+
+        businessLogMap.put("inptDiagnose",MapUtils.get(baseInfo, "inptDiagnose"));
+        businessLogMap.put("outptDiagnose",MapUtils.get(baseInfo, "outptDiagnose"));
+        businessLogMap.put("totalFee",MapUtils.get(baseInfo, "totalFee"));
+        businessLogMap.put("payFee",MapUtils.get(baseInfo, "payFee"));
+        businessLogMap.put("selfFee",MapUtils.get(baseInfo, "selfFee"));
+        businessLogMap.put("cashPayFee",MapUtils.get(baseInfo, "cashPayFee"));
+        businessLogMap.put("inputJosn",dataMap);
+        businessLogMap.put("crtId",MapUtils.get(dataMap, "crteId"));
+        businessLogMap.put("crtName",MapUtils.get(dataMap, "crtName"));
+        drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
+    }
+
     //保存质控结果
     private Boolean insertDrgDipResult(Map<String, Object> dataMap,Map<String, Object> baseInfoMap,Map<String, Object> groupInfo,List<Map<String, Object>> qualityInfo) {
         Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");// 基础信息
@@ -2908,6 +2957,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
         drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));
         drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
+        drgDipResultDTO.setGroupMessages(JSONObject.toJSONString(MapUtils.get(groupInfo, "groupMessages")));
         if(MapUtils.get(baseInfoMap, "totalFee") !=null){
             drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2));
         }

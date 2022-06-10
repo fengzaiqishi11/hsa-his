@@ -498,6 +498,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("resultCode",MapUtils.get(responseMap, "code"));
         logMap.put("type","1");
         logMap.put("businessType","2");
+        logMap.put("infNo","34081");
+        logMap.put("infName","病案首页DRG质控");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
@@ -643,6 +645,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("resultCode",responseCode);
         logMap.put("type","2");
         logMap.put("businessType","2");
+        logMap.put("infNo","34082");
+        logMap.put("infName","病案首页DIP质控");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
@@ -2169,6 +2173,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
         drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));
         drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
+        drgDipResultDTO.setGroupMessages(JSONObject.toJSONString(MapUtils.get(groupInfo, "groupMessages")));
         if(MapUtils.get(baseInfoMap, "totalFee") !=null){
             drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2));
         }

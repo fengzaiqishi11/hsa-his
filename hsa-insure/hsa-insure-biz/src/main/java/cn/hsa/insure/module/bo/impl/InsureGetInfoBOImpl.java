@@ -989,7 +989,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     @Override
     public Map<String, Object> insertInsureSettleInfoForDIP(Map<String, Object> map) {
-        //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
         List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息

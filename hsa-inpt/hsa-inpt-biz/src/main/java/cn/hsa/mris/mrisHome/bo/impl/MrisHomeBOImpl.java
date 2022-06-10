@@ -449,16 +449,20 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     // 整理病案首页数据，上传drg
     @Override
     public Map<String, Object> insertMrisForDRG(Map<String, Object> map) {
-        //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
+        if (MapUtils.isEmpty(baseInfoStr)){
+            throw new AppException("病案基本信息不能为空");
+        }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
+        if (MapUtils.isEmpty(strArr)){
+            throw new AppException("病案诊断信息不能为空");
+        }
         dataMap.put("strArr", JSONObject.toJSONString(strArr));
         List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
         dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
-        Map<String, Object> paramMap = new HashMap<>();
         /**=============获取系统参数中配置的病案质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -473,11 +477,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         /**===================获取系统参数中配置的病案质控drg地址 End==============**/
 
         /**======调用DRG begin=========**/
-        paramMap.put("url", url);
-        paramMap.put("param", JSONObject.toJSONString(dataMap));
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
-        String result = HttpConnectUtil.doPost(paramMap);
+        String result = HttpConnectUtil.doPostByXXX(url,dataMap);
         /**======调用DRG begin=========**/
 
         /**======获取返回的参数 begin=========**/
@@ -560,11 +562,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
         responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));//盈亏额
         responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand").toString());// 总费用标杆
         responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater").toString());// 药占比标杆
         responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
-        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
         responseDataMap.put("quality",qualityInfoList);// 质控信息list
         /**==========返回参数封装 End ===========**/
         return responseDataMap;
@@ -576,8 +578,14 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
+        if (MapUtils.isEmpty(baseInfoStr)){
+            throw new AppException("病案基本信息不能为空");
+        }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
+        if (MapUtils.isEmpty(strArr)){
+            throw new AppException("病案诊断信息不能为空");
+        }
         dataMap.put("strArr", JSONObject.toJSONString(strArr));
         List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
         dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
@@ -598,7 +606,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         paramMap.put("param", JSONObject.toJSONString(dataMap));
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
-        String result = HttpConnectUtil.doPost(paramMap);
+//        String result = HttpConnectUtil.doPost(paramMap);
+        String result = HttpConnectUtil.doPostByXXX(url,dataMap);
         /**=========== 调用DIP接口 end ==========**/
 
         /**======获取返回的参数 begin=========**/
@@ -680,7 +689,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("diagFeeSco",groupInfoMap.get("feePay"));// 分值
         responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
         responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("feeStand",baseInfoMap.get("feeStand"));// 总费用标杆
         responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
         responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
         responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比

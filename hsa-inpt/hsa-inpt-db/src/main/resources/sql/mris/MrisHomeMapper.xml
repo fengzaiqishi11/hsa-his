@@ -2192,7 +2192,7 @@
            '' as hsptzd_dept_id,
            IFNULL(iiv.bka006_name,'') as insur_type,
            iiv.medicine_org_code as medicine_org_code,
-            ifnull((select name from insure_dict where code = 'XZLX' and value = iib.aae140),'自费病人') as health_care_type
+            ifnull((select name from insure_dict where code = 'XZLX' and value = iib.aae140 limit 1),'自费病人') as health_care_type
             FROM mris_base_info mbi
             left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code

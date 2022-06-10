@@ -275,7 +275,7 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
             drgData = upMrisForDRG(map);
         }
         if ("true".equals(drgDipAuthDTO.getDip())){
-            //dipData = upMrisForDIP(map);
+            dipData = upMrisForDIP(map);
         }
         Map resultMap = new HashMap<>();
         resultMap.put("drgData",drgData);

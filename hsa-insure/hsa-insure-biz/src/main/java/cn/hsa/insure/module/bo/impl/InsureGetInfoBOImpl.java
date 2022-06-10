@@ -2,6 +2,7 @@ package cn.hsa.insure.module.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
@@ -16,6 +17,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
@@ -787,7 +789,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRG(Map<String, Object> map) {
-        //todo 此处需要校验授权码
         Map<String, Object> dataMap = new HashMap<>();
         Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
         List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
@@ -855,6 +856,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
         responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
         responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
         responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
@@ -896,6 +901,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private Map<String, Object> getInsureSettleBaseInfo(Map<String, Object> map) {
         Map setlinfo = selectLoadingSetlMsg(map);
+        //Map setlinfo = MapUtils.get(baseMap,"setlinfo");
         Map resultMap = new HashMap<>();
         resultMap.put("visit_id", setlinfo.get("visitId"));// 就诊id
         resultMap.put("psn_no", setlinfo.get("psnNo"));// 人员编号
@@ -1057,6 +1063,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         responseDataMap.put("profitAndLossAmount",resultMap.get("profit"));// 盈亏额
         responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
         responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
         responseDataMap.put("quality",qualityInfoList);// 质控信息
         /**==========返回参数封装 End ===========**/
         //保存质控结果
@@ -1068,6 +1078,26 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         dataMap.put("businessType","1");
         insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
         return responseDataMap;
+    }
+
+    @Override
+    public Map<String, Object> insertInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        Map<String,Object> drgData = new HashMap<>();
+        Map<String,Object> dipData = new HashMap<>();
+        if ("true".equals(drgDipAuthDTO.getDrg())){
+            drgData = insertInsureSettleInfoForDRG(map);
+
+        }
+        if ("true".equals(drgDipAuthDTO.getDip())){
+            dipData = insertInsureSettleInfoForDIP(map);
+
+        }
+        Map resultMap = new HashMap<>();
+        resultMap.put("drgData",drgData);
+        resultMap.put("dipData",dipData);
+        return resultMap;
     }
 
     /**

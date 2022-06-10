@@ -231,6 +231,14 @@ public class DrgDipResultDO implements Serializable {
    */
   private Integer violationNum;
   /**
+   * 分组结果
+   */
+  private String groupResult;
+  /**
+   * 分组提示
+   */
+  private String groupMessages;
+  /**
    * 有效标志
    */
   private String validFlag;

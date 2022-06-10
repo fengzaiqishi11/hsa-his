@@ -1041,18 +1041,24 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                         }
                     }
                     if(!"1".equals(cashPayValue)){
+                        //start 2022-06-10 zhangjinping 抛异常要将之前上传的结算费用取消上传，否则会累加，再次结算时会出现医保费用和结算费用不匹配
                         unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                         updateCancelFeeSubmit(unifiedPayMap);
+                        //end
                         throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                     }
                 }else{
+                    //start 2022-06-10 zhangjinping 抛异常要将之前上传的结算费用取消上传，否则会累加，再次结算时会出现医保费用和结算费用不匹配
                     unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                     updateCancelFeeSubmit(unifiedPayMap);
+                    //end
                     throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                 }
             }else{
+                //start 2022-06-10 zhangjinping 抛异常要将之前上传的结算费用取消上传，否则会累加，再次结算时会出现医保费用和结算费用不匹配
                 unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                 updateCancelFeeSubmit(unifiedPayMap);
+                //end
                 throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
             }
         }

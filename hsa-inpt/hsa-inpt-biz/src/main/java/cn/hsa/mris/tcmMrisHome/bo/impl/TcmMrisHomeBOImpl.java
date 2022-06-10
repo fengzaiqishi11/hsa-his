@@ -826,7 +826,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         }
 
         mrisBaseInfoDTO.setInCnt(inCnt);
-        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getInNo());
+        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getHealthCard());
 
         // 获取医疗机构名称与医疗机构编码
         Map<String, String> sysParamterMap = new HashMap<>();

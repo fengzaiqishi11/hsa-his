@@ -980,9 +980,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
 //        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        Map<String, Object> unifiedPayMap = new HashMap<>();
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             // 直接切换统一支付平台
-            Map<String, Object> unifiedPayMap = new HashMap<>();
+           // Map<String, Object> unifiedPayMap = new HashMap<>();
             unifiedPayMap.put("outptVisitDTO", outptVisitDTO);
             unifiedPayMap.put("outptCostDTOList", outptCostDTOList);
             unifiedPayMap.put("settleId", settleId);
@@ -1040,12 +1041,18 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                         }
                     }
                     if(!"1".equals(cashPayValue)){
+                        unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
+                        updateCancelFeeSubmit(unifiedPayMap);
                         throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                     }
                 }else{
+                    unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
+                    updateCancelFeeSubmit(unifiedPayMap);
                     throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                 }
             }else{
+                unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
+                updateCancelFeeSubmit(unifiedPayMap);
                 throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
             }
         }

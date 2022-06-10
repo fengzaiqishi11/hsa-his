@@ -2878,6 +2878,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setDrgDipName(MapUtils.get(groupInfo, "name"));
         drgDipResultDTO.setDrgDipCode(MapUtils.get(groupInfo, "code"));
         drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
+        drgDipResultDTO.setGroupMessages(JSONObject.toJSONString(MapUtils.get(groupInfo, "groupMessages")));
         if(MapUtils.get(baseInfoMap, "totalFee") !=null){
             drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2));
         }

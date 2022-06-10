@@ -11,7 +11,7 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
 import cn.hsa.module.insure.drgdip.dto.*;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
-import cn.hsa.util.MapUtils;
+import cn.hsa.util.*;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
@@ -21,9 +21,7 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipQulityInfoLogDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO;
-import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
-import cn.hsa.util.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.stereotype.Component;
@@ -166,6 +164,16 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                 drgDipResultDTO.setStates("2");
             }else {
                 drgDipResultDTO.setStates("1");
+            }
+            //判断分组结果
+            if(StringUtils.isEmpty(drgDipResultDTO.getDrgDipCode())){
+                drgDipResultDTO.setGroupResult("0");
+            }else if("0000".equals(drgDipResultDTO.getDrgDipCode())){
+                drgDipResultDTO.setGroupResult("1");
+            }else if(drgDipResultDTO.getDrgDipCode().length() == 3){
+                drgDipResultDTO.setGroupResult("2");
+            }else {
+                drgDipResultDTO.setGroupResult("3");
             }
             //插入之前先更新之前的数据
             drgDipResultDAO.updateByVisitId(drgDipResultDTO);

@@ -21,6 +21,8 @@
         <result property="splitPrice" column="split_price" jdbcType="OTHER"/>
         <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         <result property="splitRatio" column="split_ratio" jdbcType="OTHER"/>
         <result property="dosage" column="dosage" jdbcType="VARCHAR"/>
         <result property="dosageUnitCode" column="dosage_unit_code" jdbcType="VARCHAR"/>
@@ -64,7 +66,7 @@
           min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
           '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
           max(b.prod_code) prod_code,
-          (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model
+          (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model,b.nation_name,b.nation_code
           from stro_stock_detail a
           JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
           <if test="keyword != null and keyword != ''">
@@ -194,7 +196,7 @@
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
         max(b.prod_code) prod_code,
-        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,b.model as model
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,b.model as model,b.nation_name,b.nation_code
         from stro_stock_detail a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="keyword != null and keyword != ''">
@@ -300,7 +302,7 @@
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
         max(b.prod_code) prod_code,
-        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) as prodName,min(b.code) as code,"" as model,b.nation_name,b.nation_code
         from stro_stock_detail a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="keyword != null and keyword != ''">
@@ -362,7 +364,7 @@
         min(b.spec) as spec,min(b.split_ratio) as split_ratio ,min(b.split_price) as split_price,
         '' AS dosage, '' AS dosage_unit_code, '' AS bigTypeCode,min(c.location_no) locationNo,b.avg_buy_price as avgBuyPrice,
         max(b.prod_code) prod_code,
-        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) prodName,min(b.code) as code,b.model as model
+        (select name from base_product where hosp_code=a.hosp_code and code = max(b.prod_code)) prodName,min(b.code) as code,b.model as model,b.nation_name,b.nation_code
         from stro_stock_detail a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         <if test="keyword != null and keyword != ''">

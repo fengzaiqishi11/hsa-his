@@ -1186,7 +1186,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);
                 break;
-            case Constants.SBLX.CXJM_ZY: // 城乡居民（非一站式住院）
+            case Constants.SBLX.CXJM_ZY: // 城乡居民
                 paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
                 paraMap.put("isValidOneSettle",Constants.SF.F);
                 resultList = insureReversalTradeDAO.queryDeclareInfos(paraMap);

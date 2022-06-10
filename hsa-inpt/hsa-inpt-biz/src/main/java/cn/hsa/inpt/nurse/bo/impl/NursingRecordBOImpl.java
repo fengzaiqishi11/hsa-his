@@ -510,6 +510,10 @@ public class NursingRecordBOImpl extends HsafBO implements NursingRecordBO {
         if ("xtdjb".equals(orderDTO.getCode())) {
             inptNurseRecordDTO.setOrderFlag("2");
         }
+        // 血运记录单排序
+        if ("xyjld".equals(orderDTO.getCode())) {
+            inptNurseRecordDTO.setOrderFlag("3");
+        }
         List<InptNurseRecordDTO> list = nursingRecordDAO.queryNursingRecord(inptNurseRecordDTO);
         return PageDTO.of(list);
     }

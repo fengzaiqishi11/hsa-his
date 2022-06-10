@@ -1218,8 +1218,8 @@ public class BedListBOImpl implements BedListBO {
         if (ListUtils.isEmpty(bedList)) {
             throw new AppException("换科失败：病人无在床信息");
         }
-		inptVisitDTO.setInDeptId(MapUtils.get(map, "inDeptId"));
-        inptVisitDTO.setInWardId(MapUtils.get(map, "inWardId"));
+		inptVisitDTO.setInDeptId(MapUtils.getEmptyErr(map, "inDeptId", "换科科室ID为空"));
+        inptVisitDTO.setInWardId(MapUtils.getEmptyErr(map, "inWardId", "换科病区ID为空"));
 
         // 查询科室名字
         String inDeptName = bedListDAO.getDeptName(map);

@@ -229,9 +229,9 @@
         profit <!--盈亏额--> ,
         suspicious_num,
         violation_num,
-
-
         valid_flag <!--有效标志--> ,
+        medcasno,
+        visit_no,
 
 
         crt_id <!--创建人--> ,
@@ -299,6 +299,8 @@
         #{suspiciousNum},
         #{violationNum},
         #{validFlag},
+        #{medcasno},
+        #{visitNo},
         #{crtId},
         #{crtName},
         #{crtTime}
@@ -312,10 +314,10 @@
         id = #{id}
     </select>
 
-    <update id="updateByVisitId" parameterType="java.lang.String" >
+    <update id="updateByVisitId" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
       update drg_dip_result
       set valid_flag = '0'
-      where visit_id = #{visitId}
+      where visit_id = #{visitId} and type = #{type}
     </update>
 
     <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >

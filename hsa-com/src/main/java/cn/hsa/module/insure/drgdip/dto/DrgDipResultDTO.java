@@ -234,6 +234,14 @@ public class DrgDipResultDTO implements Serializable {
    */
   private String validFlag;
   /**
+   * 病案号
+   */
+  private String medcasno;
+  /**
+   * 住院号/就诊号
+   */
+  private String visitNo;
+  /**
    * 创建人
    */
   private String crtId;

@@ -67,6 +67,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import kafka.utils.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
@@ -3282,6 +3283,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                    }
 //                }
 
+                // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
+                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
+                    continue;
+                }
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);
                 BigDecimal tzCost = BigDecimal.valueOf(0);
@@ -3339,10 +3344,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if(baseRateDTO != null){
                         dailyTimes = baseRateDTO.getDailyTimes();
                     }
-
                     //总数量 - （总数量*停止次数/每日次数）
-                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes)));
+                    BigDecimal  backNum =BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes));
+                    backNum = BigDecimal.valueOf(Math.ceil(backNum.doubleValue()));
+                    costDTO.setBackNum(backNum);
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+
+                    // costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    // costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }
 
                 //过滤掉退费数量为0的费用

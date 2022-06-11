@@ -75,12 +75,10 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             String insueType = MapUtils.get(map,"insueType");
             Date inptTime=null;
             Date outptTime=null;
-           /* if(ObjectUtil.isNotEmpty(MapUtils.get(map, "inptTime"))){
-                inptTime = DateUtils.parse(MapUtils.get(map, "inptTime").toString(), DateUtils.Y_M_DH_M_S);
-            }
-            if(ObjectUtil.isNotEmpty(MapUtils.get(map,"outptTime"))){
-               outptTime = DateUtils.parse(MapUtils.get(map,"outptTime").toString(),DateUtils.Y_M_DH_M_S);
-            }*/
+
+            inptTime = MapUtils.get(map, "inptTime");
+            outptTime = MapUtils.get(map,"outptTime");
+
             String medType = MapUtils.get(map,"medType");
 
             String medTypeName = MapUtils.get(map,"medTypeName");

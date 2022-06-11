@@ -987,7 +987,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultMap.put("resp_nurs_code", setlinfo.get("zrNurseCode"));// 责任护士代码
         resultMap.put("setl_begn_date", setlinfo.get("setlBegnDate"));// 结算开始日期
         resultMap.put("setl_end_date", setlinfo.get("setlEndDate"));// 结算结束日期
-        resultMap.put("total_fee", setlinfo.get("totalFee"));// todo 总费用
+        // 通过his结算id去获取总费用
+        String settleId = MapUtils.get(map,"settleId");
+        String hospCode = MapUtils.get(map,"hospCode");
+        BigDecimal totalFee = insureGetInfoDAO.queryTotalFee(settleId, hospCode);
+        totalFee = totalFee.setScale(4);
+        resultMap.put("total_fee", totalFee);// todo 总费用
         resultMap.put("hi_paymtd", setlinfo.get("hiPaymtd"));//医保支付方式代码
         return resultMap;
     }

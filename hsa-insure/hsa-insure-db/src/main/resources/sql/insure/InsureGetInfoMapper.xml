@@ -1896,6 +1896,9 @@
           and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
         order by  mid.disease_code desc
     </select>
+    <select id="queryTotalFee" resultType="java.math.BigDecimal">
+        select total_price from insure_individual_settle where settle_id = #{settleId} and hosp_code = #{hospCode}
+    </select>
 
     <update id="updateSpecialAttribute">
         update

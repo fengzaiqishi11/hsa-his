@@ -8,6 +8,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -796,4 +797,6 @@ public interface InsureGetInfoDAO {
     List<Map<String, Object>> selectMriOperInfoForDRGorDIP(Map<String, Object> map);
 
     List<Map<String, Object>> selectMriInptDiagNoseForDRGorDIP(Map<String, Object> map);
+
+    BigDecimal queryTotalFee(@Param("settleId") String settleId,@Param("hospCode") String hospCode);
 }

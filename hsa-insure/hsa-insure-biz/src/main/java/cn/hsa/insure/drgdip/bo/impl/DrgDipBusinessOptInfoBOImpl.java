@@ -8,6 +8,7 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -72,8 +73,14 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             String sex = MapUtils.get(map,"sex");
             String age = MapUtils.get(map,"age");
             String insueType = MapUtils.get(map,"insueType");
-            Date inptTime = DateUtils.parse(MapUtils.get(map, "inptTime"), DateUtils.Y_M_D);
-            Date outptTime = DateUtils.parse(MapUtils.get(map,"outptTime"),DateUtils.Y_M_D);
+            Date inptTime=null;
+            Date outptTime=null;
+           /* if(ObjectUtil.isNotEmpty(MapUtils.get(map, "inptTime"))){
+                inptTime = DateUtils.parse(MapUtils.get(map, "inptTime").toString(), DateUtils.Y_M_DH_M_S);
+            }
+            if(ObjectUtil.isNotEmpty(MapUtils.get(map,"outptTime"))){
+               outptTime = DateUtils.parse(MapUtils.get(map,"outptTime").toString(),DateUtils.Y_M_DH_M_S);
+            }*/
             String medType = MapUtils.get(map,"medType");
 
             String medTypeName = MapUtils.get(map,"medTypeName");
@@ -82,10 +89,10 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             String doctorName = MapUtils.get(map,"doctorName");
             String inptDiagnose = MapUtils.get(map,"outptDiagnose");
             String outptDiagnose = MapUtils.get(map,"outptDiagnose");
-            BigDecimal totalFee = BigDecimalUtils.convert(MapUtils.get(map,"totalFee").toString());
-//            BigDecimal payFee = BigDecimalUtils.convert(MapUtils.get(map,"payFee").toString());
-//            BigDecimal selfFee = BigDecimalUtils.convert(MapUtils.get(map,"selfFee").toString());
-//            BigDecimal cashPayFee = BigDecimalUtils.convert(MapUtils.get(map,"cashPayFee").toString());
+            BigDecimal totalFee = BigDecimalUtils.convert(MapUtils.get(map,"totalFee")!=null?MapUtils.get(map,"totalFee").toString():null);
+            BigDecimal payFee = BigDecimalUtils.convert(MapUtils.get(map,"payFee")!=null?MapUtils.get(map,"payFee").toString():null);
+            BigDecimal selfFee = BigDecimalUtils.convert(MapUtils.get(map,"selfFee")!=null?MapUtils.get(map,"selfFee").toString():null);
+            BigDecimal cashPayFee = BigDecimalUtils.convert(MapUtils.get(map,"cashPayFee")!=null?MapUtils.get(map,"cashPayFee").toString():null);
             String inputJson = MapUtils.get(map,"inputJson");
 
             // 开启独立新事务
@@ -96,7 +103,7 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             drgDipBusinessOptInfoLogDO.setAge(age);
             drgDipBusinessOptInfoLogDO.setBusinessId(businessId);
             drgDipBusinessOptInfoLogDO.setBusinessType(businessType);
-//            drgDipBusinessOptInfoLogDO.setCashPayFee(cashPayFee);
+             drgDipBusinessOptInfoLogDO.setCashPayFee(cashPayFee);
             drgDipBusinessOptInfoLogDO.setCertno(certno);
             drgDipBusinessOptInfoLogDO.setCrtId(crteId);
             drgDipBusinessOptInfoLogDO.setCrtName(crteName);
@@ -124,14 +131,14 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             drgDipBusinessOptInfoLogDO.setOrgCode(orgCode);
             drgDipBusinessOptInfoLogDO.setOutptDiagnose(outptDiagnose);
             drgDipBusinessOptInfoLogDO.setOutptTime(outptTime);
-//            drgDipBusinessOptInfoLogDO.setPayFee(payFee);
+            drgDipBusinessOptInfoLogDO.setPayFee(payFee);
             drgDipBusinessOptInfoLogDO.setPsName(psName);
             drgDipBusinessOptInfoLogDO.setPsnNo(psnNo);
             drgDipBusinessOptInfoLogDO.setQulityId(qulityId);
-//            drgDipBusinessOptInfoLogDO.setSelfFee(selfFee);
+            drgDipBusinessOptInfoLogDO.setSelfFee(selfFee);
             drgDipBusinessOptInfoLogDO.setSettleId(settleId);
             drgDipBusinessOptInfoLogDO.setSex(sex);
-//            drgDipBusinessOptInfoLogDO.setTotalFee(totalFee);
+            drgDipBusinessOptInfoLogDO.setTotalFee(totalFee);
             drgDipBusinessOptInfoLogDO.setType(type);
             drgDipBusinessOptInfoLogDO.setValidFlag("1");
             drgDipBusinessOptInfoLogDO.setVisitId(visitId);

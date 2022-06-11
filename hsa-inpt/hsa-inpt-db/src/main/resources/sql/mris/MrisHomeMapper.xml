@@ -1044,6 +1044,27 @@
             AND md.visit_id = #{id}
     </select>
 
+    <!--查询中医病案诊断信息-->
+    <select id="queryTcmMrisDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO">
+            SELECT
+                md.id,
+                md.hosp_code,
+                mbi_id,
+                md.visit_id,
+                disease_code,
+                disease_name,
+                md.icd_version,
+                md.disease_icd10,
+                md.disease_icd10_name,
+                md.in_situation_code,
+                columns_num,
+                mbi.in_blh
+            FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id}
+    </select>
+
     <!--病案诊断数据批量插入-->
     <insert id="insertMrisDiagnoseBatch" parameterType="list">
         INSERT INTO mris_diagnose (
@@ -1113,6 +1134,15 @@
             resultType="cn.hsa.module.mris.mrisHome.dto.MrisOperDTO">
             SELECT *, oper_disease_name as 'name'
             FROM mris_oper_info
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+    <!--查询中医病案手术信息-->
+    <select id="queryTcmMrisOperInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+            SELECT *, oper_disease_name as 'name'
+            FROM tcm_mris_oper_info
             WHERE hosp_code = #{hospCode}
             AND visit_id = #{id}
     </select>
@@ -1814,6 +1844,15 @@
                zdl02, zdl03, zdl04, zll01, zll02, zll03, zll04, zll05, kfl01,
                xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03, xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01,
                zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06 from mris_cost
+                where hosp_code = #{hospCode} and visit_id = #{visitId}
+    </select>
+
+    <select id="queryTcmMriCost" resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        select id, hosp_code, mbi_id, visit_id, fy01, fy02, fy03, fy04, fy05, fy06,
+               fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05, zhylfwl06, zdl01,
+               zdl02, zdl03, zdl04, zll01, zll02, zll03, zll04, zll05, kfl01,
+               xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03, xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01,
+               zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06 from tcm_mris_cost
                 where hosp_code = #{hospCode} and visit_id = #{visitId}
     </select>
 

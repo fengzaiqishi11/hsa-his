@@ -1097,6 +1097,33 @@
           order by moi.columns_num asc
     </select>
 
+    <select id="selectTcmMriOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select '2'                            as oprn_oprt_type,
+               moi.oper_disease_name          as oprnOprtName,
+               moi.oper_disease_icd9,
+               moi.oper_time                  as oprnOprtDate,
+               ''                             as anst_way,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and oper_doctor_id = su.id) as oper_dr_code,
+               moi.oper_doctor_name           as operDrName,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and ana_id1 = su.id)        as anst_dr_code,
+               moi.ana_name1                  as anst_dr_name,
+               moi.oper_time                  as oprnOprtDate,
+               idm.insure_illness_code        as oprnOprtCode
+        from tcm_mris_oper_info moi
+                 left join insure_disease_match idm on moi.oper_disease_id = idm.hosp_illness_id
+            and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+          and moi.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode}
+          and idm.audit_code = '1'
+          order by moi.columns_num asc
+    </select>
     <select id="selectOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
         select '2'                           as oprn_oprt_type,
                oir.oper_disease_name,
@@ -1488,12 +1515,32 @@
     </select>
     <select id="selectMriBaseInfo" resultType="java.util.Map">
         select mbi.*,
+               (select prac_certi_no from sys_user su where mbi.zz_doctor_id = su.id) zz_doctor_code,
+               (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
+               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
+               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
                (select bd.nation_code
-                from base_dept bd
-                where bd.hosp_code =
-                      mbi.hosp_code
-                  and bd.id = mbi.turn_dept_ids) as nation_code
+                    from base_dept bd
+                    where bd.hosp_code =
+                    mbi.hosp_code
+                    and bd.id = mbi.turn_dept_ids) as nation_code
         from mris_base_info mbi
+        where mbi.hosp_code = #{hospCode}
+          and mbi.visit_id = #{visitId}
+    </select>
+
+    <select id="selectTcmMriBaseInfo" resultType="java.util.Map">
+        select mbi.*,
+               (select prac_certi_no from sys_user su where mbi.zz_doctor_id = su.id) zz_doctor_code,
+               (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
+               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
+               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
+               (select bd.nation_code
+                    from base_dept bd
+                    where bd.hosp_code =
+                    mbi.hosp_code
+                    and bd.id = mbi.turn_dept_ids) as nation_code
+        from tcm_mris_base_info mbi
         where mbi.hosp_code = #{hospCode}
           and mbi.visit_id = #{visitId}
     </select>
@@ -1689,6 +1736,24 @@
                in_situation_code as    admCondType,
                mid.disease_code  as    isMain
         from mris_inpt_diagnose mid
+                 join insure_disease_match idm on mid.hosp_code = idm.hosp_code
+            and idm.hosp_illness_code = mid.disease_icd10
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
+        order by  mid.disease_code desc
+    </select>
+
+    <select id="selectTcmMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id,
+               idm.insure_illness_code diseaseCode,
+               idm.insure_illness_name diseaseName,
+               in_situation_code as    admCondType,
+               mid.disease_code  as    isMain
+        from tcm_mris_diagnose mid
                  join insure_disease_match idm on mid.hosp_code = idm.hosp_code
             and idm.hosp_illness_code = mid.disease_icd10
         WHERE mid.visit_id = #{visitId}

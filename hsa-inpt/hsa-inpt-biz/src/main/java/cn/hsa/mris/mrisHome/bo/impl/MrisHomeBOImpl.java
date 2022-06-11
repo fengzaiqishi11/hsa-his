@@ -39,6 +39,10 @@ import cn.hsa.module.mris.mrisHome.dto.MrisTurnDeptDTO;
 import cn.hsa.module.mris.mrisHome.entity.*;
 import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
+import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisDiagnoseDTO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -56,7 +60,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
-import scala.App;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Field;
@@ -602,9 +605,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }catch(Exception e){
             e.printStackTrace();
             logger.info("病案首页DRG质控插入日志失败！");
-        }finally {
-            return responseDataMap;
         }
+        return responseDataMap;
 
     }
     // 整理病案首页数据，上传drg
@@ -750,9 +752,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }catch(Exception e){
             e.printStackTrace();
             logger.info("病案首页DIP质控插入日志失败！");
-        }finally {
-            return responseDataMap;
         }
+        return responseDataMap;
 
     }
 
@@ -914,12 +915,23 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         // 病案主体信息数据集
         TcmMrisBaseInfoDTO tcmMrisBaseInfo = new TcmMrisBaseInfoDTO();
+        TcmMrisCostDO tcmmrisCostDO = new TcmMrisCostDO();
+        List<TcmMrisDiagnoseDO> tcmmrisDiagnoseList = new ArrayList<>();
+        List<TcmMrisOperInfoDO> tcmmrisOperList = new ArrayList<>();
+
         MrisBaseInfoDTO mrisBaseInfoDTO = new MrisBaseInfoDTO();
+        List<MrisOperInfoDO> mrisOperList = new ArrayList<>();
+        MrisCostDO mrisCostDO =  new MrisCostDO();
+        List<MrisDiagnoseDO> mrisDiagnoseList = new ArrayList<>();
+
         if ("1".equals(mrisPageType)) {
             tcmMrisBaseInfo = tcmMrisHomeDAO.getTcmMrisBaseInfo(inptVisitDTO);
             if (tcmMrisBaseInfo == null) {
                 throw new AppException("请先加载病人病案信息再上传");
             }
+            tcmmrisCostDO =  mrisHomeDAO.queryTcmMriCost(map);
+            tcmmrisOperList = mrisHomeDAO.queryTcmMrisOperInfoPage(inptVisitDTO);
+            tcmmrisDiagnoseList = mrisHomeDAO.queryTcmMrisDiagnosePage(inptVisitDTO);
         }else {
             mrisBaseInfoDTO = mrisHomeDAO.getMrisBaseInfo(inptVisitDTO);
             if (mrisBaseInfoDTO == null) {
@@ -944,158 +956,237 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             map.put("mrisDiagnoseList",mrisDiagnoseList);
             map.put("mrisBaseInfoDTO",mrisBaseInfoDTO);
             map.put("mrisCostDO",mrisCostDO);
+
             map.put("tcmMrisBaseInfo",tcmMrisBaseInfo);
+            map.put("tcmmrisCostDO",tcmmrisCostDO);
+            map.put("tcmmrisOperList",tcmmrisOperList);
+            map.put("tcmmrisDiagnoseList",tcmmrisDiagnoseList);
             map.put("mrisPageType",mrisPageType);
             insureUnifiedEmrUploadService_consumer.updateInsureUnifiedMri(map);
             return true;
-        }else{
-            Map<String,Object> httpParams = new HashMap<String,Object>();
+        }else {
+            Map<String, Object> httpParams = new HashMap<String, Object>();
             // TODO 主体参数
-            httpParams.put("hospCode",hospCode);
-            httpParams.put("insureOrgCode",insureIndividualVisitDTO.getInsureOrgCode());
-            httpParams.put("akb020",insureIndividualVisitDTO.getInsureOrgCode());
-            httpParams.put("aaz217",insureIndividualVisitDTO.getMedicalRegNo());
-            httpParams.put("aac001",insureIndividualBasicDTO.getAac001());
-            httpParams.put( "akc190",inptVisitDTO.getInNo());
+            httpParams.put("hospCode", hospCode);
+            httpParams.put("insureOrgCode", insureIndividualVisitDTO.getInsureOrgCode());
+            httpParams.put("akb020", insureIndividualVisitDTO.getInsureOrgCode());
+            httpParams.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo());
+            httpParams.put("aac001", insureIndividualBasicDTO.getAac001());
+            httpParams.put("akc190", inptVisitDTO.getInNo());
             httpParams.put("aae011", map.get("userName"));
 
             // TODO 数据集参数-病案首页主体信息
             BigDecimal bkr264 = mrisHomeDAO.getInptSettleTotalPrice(map);
             insureIndividualVisitDTO.setBkr264(bkr264);
-            Map<String,Object> medicalRecord = this.getMedicalRecordInfo(mrisBaseInfoDTO,insureIndividualVisitDTO,inptVisitDTO);
-            httpParams.put("medicalRecord",medicalRecord);
+            //中医病案首页
+            if ("1".equals(mrisPageType)) {
+                Map<String, Object> medicalRecord = this.getTcmMedicalRecordInfo(tcmMrisBaseInfo, insureIndividualVisitDTO, inptVisitDTO);
+                httpParams.put("medicalRecord", medicalRecord);
+                // TODO 数据集参数 - 病案手术信息
+                List<Map<String, Object>> operList = new ArrayList<>();
+                if (!ListUtils.isEmpty(tcmmrisOperList)) {
+                    for (TcmMrisOperInfoDO mrisOperInfoDO : tcmmrisOperList) {
+                        Map<String, Object> operMap = new HashMap<>();
 
+                        // (必要入参)
+                        operMap.put("bkr322", mrisOperInfoDO.getAnaCode()); // 手术编号
+                        operMap.put("akb020", insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
+                        operMap.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
+                        operMap.put("bkr300", ""); // 手术明细流水(系统中找不到）
+                        operMap.put("bkr301", ""); // 日间手术标志 （0：否；1：是）（系统中找不到）
+                        operMap.put("bkr302", ""); // 手术类型 1 一般，2抢救，3术中急抢救， 9其他(系统种找不到)
+                        operMap.put("bkr303", mrisOperInfoDO.getOperDiseaseIcd9() == null ? "" : mrisOperInfoDO.getOperDiseaseIcd9()); // 手术操作编码
+                        operMap.put("bkr304", mrisOperInfoDO.getOperDiseaseName() == null ? "" : mrisOperInfoDO.getOperDiseaseName()); // 手术操作名称
+                        operMap.put("bkr321", map.get("bkr321")); // 切口、愈合等级
+                        operMap.put("akc190", inptVisitDTO.getInNo()); // 住院号
 
-            // TODO 数据集参数 - 病案手术信息
-            List<Map<String,Object>> operList = new ArrayList<>();
-            if (!ListUtils.isEmpty(mrisOperList)) {
-                for (MrisOperInfoDO mrisOperInfoDO:mrisOperList) {
-                    Map<String,Object> operMap = new HashMap<>();
-
-                    // (必要入参)
-                    operMap.put("bkr322",mrisOperInfoDO.getAnaCode()); // 手术编号
-                    operMap.put("akb020",insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
-                    operMap.put("aaz217",insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
-                    operMap.put("bkr300",""); // 手术明细流水(系统中找不到）
-                    operMap.put("bkr301",""); // 日间手术标志 （0：否；1：是）（系统中找不到）
-                    operMap.put("bkr302",""); // 手术类型 1 一般，2抢救，3术中急抢救， 9其他(系统种找不到)
-                    operMap.put("bkr303",mrisOperInfoDO.getOperDiseaseIcd9() == null ? "" : mrisOperInfoDO.getOperDiseaseIcd9()); // 手术操作编码
-                    operMap.put("bkr304",mrisOperInfoDO.getOperDiseaseName() == null ? "" : mrisOperInfoDO.getOperDiseaseName()); // 手术操作名称
-                    operMap.put("bkr321",map.get("bkr321")); // 切口、愈合等级
-                    operMap.put("akc190",inptVisitDTO.getInNo()); // 住院号
-
-                    // (非必要入参)
-                    httpParams.put("bkr305","");//手术前诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
-                    httpParams.put("bkr306","");//手术前诊断名称	VARCHAR2(50)	Y
-                    httpParams.put("bkr307","");//手术后诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
-                    httpParams.put("bkr308","");//手术后诊断名称	VARCHAR2(50)	Y
-                    httpParams.put("bkr309","");//手术起始时间	DATE	Y
-                    httpParams.put("bkr310","");//手术结束时间	DATE	Y
-                    httpParams.put("bkr311",mrisOperInfoDO.getOperCode() == null ? "" : mrisOperInfoDO.getOperCode());//手术级别	VARCHAR2(2)	Y
-                    httpParams.put("bkr312",mrisOperInfoDO.getOperDoctorId() == null ? "" : mrisOperInfoDO.getOperDoctorId());//手术医生工号	VARCHAR2(30)	Y
-                    httpParams.put("bkr313",mrisOperInfoDO.getOperDoctorName() == null ? "" : mrisOperInfoDO.getOperDoctorName());//手术医生姓名	VARCHAR2(50)	Y
-                    httpParams.put("bkr314",mrisOperInfoDO.getAssistantId4() == null ? "" : mrisOperInfoDO.getAssistantId4());//手术医生I助工号	VARCHAR2(30)	Y
-                    httpParams.put("bkr315",mrisOperInfoDO.getAssistantName1() == null ? "" : mrisOperInfoDO.getAssistantName1());//手术医生I助姓名	VARCHAR2(50)	Y
-                    httpParams.put("bkr316",mrisOperInfoDO.getAssistantId2() == null ? "" : mrisOperInfoDO.getAssistantId2());//手术医生II助工号	VARCHAR2(30)	Y
-                    httpParams.put("bkr317",mrisOperInfoDO.getAssistantName2() == null ? "" : mrisOperInfoDO.getAssistantName2());//手术医生II助姓名	VARCHAR2(50)	Y
-                    httpParams.put("bkr318",mrisOperInfoDO.getAnaId1() == null ? "" : mrisOperInfoDO.getAnaId1());//麻醉医师工号	VARCHAR2(30)	Y
-                    httpParams.put("bkr319",mrisOperInfoDO.getAnaName1() == null ? "" : mrisOperInfoDO.getAnaName1());//麻醉医师姓名	VARCHAR2(50)	Y
-                    operList.add(operMap);
+                        // (非必要入参)
+                        httpParams.put("bkr305", "");//手术前诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
+                        httpParams.put("bkr306", "");//手术前诊断名称	VARCHAR2(50)	Y
+                        httpParams.put("bkr307", "");//手术后诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
+                        httpParams.put("bkr308", "");//手术后诊断名称	VARCHAR2(50)	Y
+                        httpParams.put("bkr309", "");//手术起始时间	DATE	Y
+                        httpParams.put("bkr310", "");//手术结束时间	DATE	Y
+                        httpParams.put("bkr311", mrisOperInfoDO.getOperCode() == null ? "" : mrisOperInfoDO.getOperCode());//手术级别	VARCHAR2(2)	Y
+                        httpParams.put("bkr312", mrisOperInfoDO.getOperDoctorId() == null ? "" : mrisOperInfoDO.getOperDoctorId());//手术医生工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr313", mrisOperInfoDO.getOperDoctorName() == null ? "" : mrisOperInfoDO.getOperDoctorName());//手术医生姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr314", mrisOperInfoDO.getAssistantId4() == null ? "" : mrisOperInfoDO.getAssistantId4());//手术医生I助工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr315", mrisOperInfoDO.getAssistantName1() == null ? "" : mrisOperInfoDO.getAssistantName1());//手术医生I助姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr316", mrisOperInfoDO.getAssistantId2() == null ? "" : mrisOperInfoDO.getAssistantId2());//手术医生II助工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr317", mrisOperInfoDO.getAssistantName2() == null ? "" : mrisOperInfoDO.getAssistantName2());//手术医生II助姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr318", mrisOperInfoDO.getAnaId1() == null ? "" : mrisOperInfoDO.getAnaId1());//麻醉医师工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr319", mrisOperInfoDO.getAnaName1() == null ? "" : mrisOperInfoDO.getAnaName1());//麻醉医师姓名	VARCHAR2(50)	Y
+                        operList.add(operMap);
+                    }
+                    httpParams.put("ops", operList);
                 }
-                httpParams.put("ops",operList);
-            }
 
-            // TODO 数据集参数 - 病案诊断信息
-            List<Map<String,Object>> diagnoseList = new ArrayList<>();
-            if (!ListUtils.isEmpty(mrisDiagnoseList)) {
-                for (MrisDiagnoseDO mrisDiagnoseDO:mrisDiagnoseList) {
-                    Map<String,Object> diagnoseMap = new HashMap<>();
+                // TODO 数据集参数 - 病案诊断信息
+                List<Map<String, Object>> diagnoseList = new ArrayList<>();
+                if (!ListUtils.isEmpty(tcmmrisDiagnoseList)) {
+                    for (TcmMrisDiagnoseDO mrisDiagnoseDO : tcmmrisDiagnoseList) {
+                        Map<String, Object> diagnoseMap = new HashMap<>();
 
-                    // 必要入参
-                    diagnoseMap.put("bkr343",DateUtils.SDF_YMDHMS.format(DateUtils.getNow())); // 诊断编号
-                    diagnoseMap.put("akb020",insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
-                    diagnoseMap.put("aaz217",insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
-                    diagnoseMap.put("bkr331",mrisDiagnoseDO.getId()); // 诊断流水号
-                    diagnoseMap.put("bkr332","1"); // 诊断类型区分 1：西医、2：中医
-                    diagnoseMap.put("bkr333","20"); // 诊断类别代码 西医采用CV5502.20，中医采用CV5502.21
-                    diagnoseMap.put("bkr334","西医"); // 诊断类别代码名称
-                    diagnoseMap.put("bkr335",this.getDay(insureIndividualVisitDTO.getCrteTime())); // 诊断时间
-                    diagnoseMap.put("bkr336",mrisDiagnoseDO.getDiseaseIcd101() == null ? "" : mrisDiagnoseDO.getDiseaseIcd101()); // 诊断编码
-                    diagnoseMap.put("bkr337","01"); // 诊断编码类型 01：ICD-10；02：国标-95
-                    diagnoseMap.put("bkr339","1"); // 主要诊断标志、编码 1：主要诊断、2：其他诊断
-                    diagnoseMap.put("bkr340","0"); // 疑似诊断标志 1：仍疑似；0：已确诊
-                    diagnoseMap.put("bkr341","4"); // 入院病情 1.有，2.临床未确定，3.情况不明，4.无
+                        // 必要入参
+                        diagnoseMap.put("bkr343", DateUtils.SDF_YMDHMS.format(DateUtils.getNow())); // 诊断编号
+                        diagnoseMap.put("akb020", insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
+                        diagnoseMap.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
+                        diagnoseMap.put("bkr331", mrisDiagnoseDO.getId()); // 诊断流水号
+                        diagnoseMap.put("bkr332", "1"); // 诊断类型区分 1：西医、2：中医
+                        diagnoseMap.put("bkr333", "20"); // 诊断类别代码 西医采用CV5502.20，中医采用CV5502.21
+                        diagnoseMap.put("bkr334", "西医"); // 诊断类别代码名称
+                        diagnoseMap.put("bkr335", this.getDay(insureIndividualVisitDTO.getCrteTime())); // 诊断时间
+                        diagnoseMap.put("bkr336", mrisDiagnoseDO.getDiseaseIcd10() == null ? "" : mrisDiagnoseDO.getDiseaseIcd10()); // 诊断编码
+                        diagnoseMap.put("bkr337", "01"); // 诊断编码类型 01：ICD-10；02：国标-95
+                        diagnoseMap.put("bkr339", "1"); // 主要诊断标志、编码 1：主要诊断、2：其他诊断
+                        diagnoseMap.put("bkr340", "0"); // 疑似诊断标志 1：仍疑似；0：已确诊
+                        diagnoseMap.put("bkr341", "4"); // 入院病情 1.有，2.临床未确定，3.情况不明，4.无
 
-                    // 文档中未写，实际要求上传的字段
-                    diagnoseMap.put("bkr368",map.get("userName")); // 创建人
+                        // 文档中未写，实际要求上传的字段
+                        diagnoseMap.put("bkr368", map.get("userName")); // 创建人
 
-                    // 非必要入参
-                    httpParams.put("bkr338","");// 诊断说明	VARCHAR2(512)	Y
-                    String bkr342 = mrisBaseInfoDTO.getOutSituationCode() == null ? "" : mrisBaseInfoDTO.getOutSituationCode();
-                    httpParams.put("bkr342",bkr342 == "9" ? "5" : bkr342);// 出院情况编码,	VARCHAR2(1)	Y		1：治愈、2：好转、3：未愈、4：死亡、5：其它（出院时 必填）
-                    diagnoseList.add(diagnoseMap);
+                        // 非必要入参
+                        httpParams.put("bkr338", "");// 诊断说明	VARCHAR2(512)	Y
+                        String bkr342 = mrisBaseInfoDTO.getOutSituationCode() == null ? "" : mrisBaseInfoDTO.getOutSituationCode();
+                        httpParams.put("bkr342", bkr342 == "9" ? "5" : bkr342);// 出院情况编码,	VARCHAR2(1)	Y		1：治愈、2：好转、3：未愈、4：死亡、5：其它（出院时 必填）
+                        diagnoseList.add(diagnoseMap);
+                    }
+                    httpParams.put("disease", diagnoseList);
                 }
-                httpParams.put("disease",diagnoseList);
-            }
 
-            try {
-                //TODO 此处插入业务操作日志 类型为4.上传
-                //查询住院登记信息
-                Map<String,Object> objectMap = new HashMap<>();
-                objectMap.put("id",MapUtils.get(map,"visitId"));
-                objectMap.put("hospCode",MapUtils.get(map,"hospCode"));
-                WrapperResponse<InptVisitDTO> response = inptVisitService.getInptVisitById(objectMap);
-                InptVisitDTO dto = response.getData();
-                //计算年龄
-                String birth = insureIndividualBasicDTO.getAac006();
-                Date birthDate = DateUtil.stringToDate(birth,"yyyy-MM-dd");
-                Map<String, Object> businessLogMap = new HashMap<>();
-                //  businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
-                businessLogMap.put("optType","4");
-                businessLogMap.put("optTypeName","病案首页上传");
-                businessLogMap.put("type","1");
-                businessLogMap.put("businessType","2");
-                businessLogMap.put("isForce",MapUtils.get(map, "isForce"));
-                businessLogMap.put("forceUploadInfo",MapUtils.get(map, "forceUploadInfo"));
-                businessLogMap.put("hospCode",MapUtils.get(map, "hospCode"));
-                businessLogMap.put("insureRegCode",insureConfigurationDTO.getRegCode());
-                businessLogMap.put("hospName",insureConfigurationDTO.getHospName());
-                businessLogMap.put("orgCode",insureConfigurationDTO.getOrgCode());
-                // businessLogMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
-                businessLogMap.put("medicalRegNo",insureIndividualVisitDTO.getMedicalRegNo());
-                //  businessLogMap.put("settleId",MapUtils.get(map, "settleId"));
-                businessLogMap.put("visitId",insureIndividualVisitDTO.getVisitId());
-                //  businessLogMap.put("psnNo",insureIndividualBasicDTO.getBka896());
-                businessLogMap.put("psnName",insureIndividualBasicDTO.getAac003());
-                businessLogMap.put("certNo",insureIndividualBasicDTO.getAac002());
-                businessLogMap.put("deptId",insureIndividualVisitDTO.getVisitDrptId());
-                businessLogMap.put("sex",insureIndividualBasicDTO.getAac004());
-                businessLogMap.put("age", DateUtil.getAge(birthDate,new Date()));
-                businessLogMap.put("insueType",insureIndividualBasicDTO.getBka006());
-                businessLogMap.put("inptTime",dto.getInTime());
-                businessLogMap.put("outptTime,",dto.getOutTime());
-                businessLogMap.put("medType",insureIndividualBasicDTO.getAka130());
-                businessLogMap.put("medTypeName",insureIndividualBasicDTO.getAka130Name());
-                businessLogMap.put("deptName",insureIndividualVisitDTO.getVisitDrptName());
-                businessLogMap.put("doctorId",dto.getZzDoctorId());
-                businessLogMap.put("doctorName",dto.getZzDoctorName());
-                businessLogMap.put("inptDiagnose",dto.getInDiseaseName());
-                businessLogMap.put("outptDiagnose",dto.getOutDiseaseName());
-                businessLogMap.put("crtId","1");
-                businessLogMap.put("crtName","1");
-                businessLogMap.put("crtTime",new Date());
-                drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
-            }catch (Exception e){
-                e.printStackTrace();
-                logger.info("病案首页上传插入日志失败！");
-            }finally {
+                //西医病案首页
+            } else {
+                Map<String, Object> medicalRecord = this.getMedicalRecordInfo(mrisBaseInfoDTO, insureIndividualVisitDTO, inptVisitDTO);
+                httpParams.put("medicalRecord", medicalRecord);
+
+
+                // TODO 数据集参数 - 病案手术信息
+                List<Map<String, Object>> operList = new ArrayList<>();
+                if (!ListUtils.isEmpty(mrisOperList)) {
+                    for (MrisOperInfoDO mrisOperInfoDO : mrisOperList) {
+                        Map<String, Object> operMap = new HashMap<>();
+
+                        // (必要入参)
+                        operMap.put("bkr322", mrisOperInfoDO.getAnaCode()); // 手术编号
+                        operMap.put("akb020", insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
+                        operMap.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
+                        operMap.put("bkr300", ""); // 手术明细流水(系统中找不到）
+                        operMap.put("bkr301", ""); // 日间手术标志 （0：否；1：是）（系统中找不到）
+                        operMap.put("bkr302", ""); // 手术类型 1 一般，2抢救，3术中急抢救， 9其他(系统种找不到)
+                        operMap.put("bkr303", mrisOperInfoDO.getOperDiseaseIcd9() == null ? "" : mrisOperInfoDO.getOperDiseaseIcd9()); // 手术操作编码
+                        operMap.put("bkr304", mrisOperInfoDO.getOperDiseaseName() == null ? "" : mrisOperInfoDO.getOperDiseaseName()); // 手术操作名称
+                        operMap.put("bkr321", map.get("bkr321")); // 切口、愈合等级
+                        operMap.put("akc190", inptVisitDTO.getInNo()); // 住院号
+
+                        // (非必要入参)
+                        httpParams.put("bkr305", "");//手术前诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
+                        httpParams.put("bkr306", "");//手术前诊断名称	VARCHAR2(50)	Y
+                        httpParams.put("bkr307", "");//手术后诊断,编码。	VARCHAR2(20)	Y		按规定的ICD-10字典执行
+                        httpParams.put("bkr308", "");//手术后诊断名称	VARCHAR2(50)	Y
+                        httpParams.put("bkr309", "");//手术起始时间	DATE	Y
+                        httpParams.put("bkr310", "");//手术结束时间	DATE	Y
+                        httpParams.put("bkr311", mrisOperInfoDO.getOperCode() == null ? "" : mrisOperInfoDO.getOperCode());//手术级别	VARCHAR2(2)	Y
+                        httpParams.put("bkr312", mrisOperInfoDO.getOperDoctorId() == null ? "" : mrisOperInfoDO.getOperDoctorId());//手术医生工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr313", mrisOperInfoDO.getOperDoctorName() == null ? "" : mrisOperInfoDO.getOperDoctorName());//手术医生姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr314", mrisOperInfoDO.getAssistantId4() == null ? "" : mrisOperInfoDO.getAssistantId4());//手术医生I助工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr315", mrisOperInfoDO.getAssistantName1() == null ? "" : mrisOperInfoDO.getAssistantName1());//手术医生I助姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr316", mrisOperInfoDO.getAssistantId2() == null ? "" : mrisOperInfoDO.getAssistantId2());//手术医生II助工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr317", mrisOperInfoDO.getAssistantName2() == null ? "" : mrisOperInfoDO.getAssistantName2());//手术医生II助姓名	VARCHAR2(50)	Y
+                        httpParams.put("bkr318", mrisOperInfoDO.getAnaId1() == null ? "" : mrisOperInfoDO.getAnaId1());//麻醉医师工号	VARCHAR2(30)	Y
+                        httpParams.put("bkr319", mrisOperInfoDO.getAnaName1() == null ? "" : mrisOperInfoDO.getAnaName1());//麻醉医师姓名	VARCHAR2(50)	Y
+                        operList.add(operMap);
+                    }
+                    httpParams.put("ops", operList);
+                }
+
+                // TODO 数据集参数 - 病案诊断信息
+                List<Map<String, Object>> diagnoseList = new ArrayList<>();
+                if (!ListUtils.isEmpty(mrisDiagnoseList)) {
+                    for (MrisDiagnoseDO mrisDiagnoseDO : mrisDiagnoseList) {
+                        Map<String, Object> diagnoseMap = new HashMap<>();
+
+                        // 必要入参
+                        diagnoseMap.put("bkr343", DateUtils.SDF_YMDHMS.format(DateUtils.getNow())); // 诊断编号
+                        diagnoseMap.put("akb020", insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
+                        diagnoseMap.put("aaz217", insureIndividualVisitDTO.getMedicalRegNo()); // 就医登记号
+                        diagnoseMap.put("bkr331", mrisDiagnoseDO.getId()); // 诊断流水号
+                        diagnoseMap.put("bkr332", "1"); // 诊断类型区分 1：西医、2：中医
+                        diagnoseMap.put("bkr333", "20"); // 诊断类别代码 西医采用CV5502.20，中医采用CV5502.21
+                        diagnoseMap.put("bkr334", "西医"); // 诊断类别代码名称
+                        diagnoseMap.put("bkr335", this.getDay(insureIndividualVisitDTO.getCrteTime())); // 诊断时间
+                        diagnoseMap.put("bkr336", mrisDiagnoseDO.getDiseaseIcd101() == null ? "" : mrisDiagnoseDO.getDiseaseIcd101()); // 诊断编码
+                        diagnoseMap.put("bkr337", "01"); // 诊断编码类型 01：ICD-10；02：国标-95
+                        diagnoseMap.put("bkr339", "1"); // 主要诊断标志、编码 1：主要诊断、2：其他诊断
+                        diagnoseMap.put("bkr340", "0"); // 疑似诊断标志 1：仍疑似；0：已确诊
+                        diagnoseMap.put("bkr341", "4"); // 入院病情 1.有，2.临床未确定，3.情况不明，4.无
+
+                        // 文档中未写，实际要求上传的字段
+                        diagnoseMap.put("bkr368", map.get("userName")); // 创建人
+
+                        // 非必要入参
+                        httpParams.put("bkr338", "");// 诊断说明	VARCHAR2(512)	Y
+                        String bkr342 = mrisBaseInfoDTO.getOutSituationCode() == null ? "" : mrisBaseInfoDTO.getOutSituationCode();
+                        httpParams.put("bkr342", bkr342 == "9" ? "5" : bkr342);// 出院情况编码,	VARCHAR2(1)	Y		1：治愈、2：好转、3：未愈、4：死亡、5：其它（出院时 必填）
+                        diagnoseList.add(diagnoseMap);
+                    }
+                    httpParams.put("disease", diagnoseList);
+                }
+
+                try {
+                    //TODO 此处插入业务操作日志 类型为4.上传
+                    //查询住院登记信息
+                    Map<String, Object> objectMap = new HashMap<>();
+                    objectMap.put("id", MapUtils.get(map, "visitId"));
+                    objectMap.put("hospCode", MapUtils.get(map, "hospCode"));
+                    WrapperResponse<InptVisitDTO> response = inptVisitService.getInptVisitById(objectMap);
+                    InptVisitDTO dto = response.getData();
+                    //计算年龄
+                    String birth = insureIndividualBasicDTO.getAac006();
+                    Date birthDate = DateUtil.stringToDate(birth, "yyyy-MM-dd");
+                    Map<String, Object> businessLogMap = new HashMap<>();
+                    //  businessLogMap.put("businessId",MapUtils.get(baseInfoStr, "id"));
+                    businessLogMap.put("optType", "4");
+                    businessLogMap.put("optTypeName", "病案首页上传");
+                    businessLogMap.put("type", "1");
+                    businessLogMap.put("businessType", "2");
+                    businessLogMap.put("isForce", MapUtils.get(map, "isForce"));
+                    businessLogMap.put("forceUploadInfo", MapUtils.get(map, "forceUploadInfo"));
+                    businessLogMap.put("hospCode", MapUtils.get(map, "hospCode"));
+                    businessLogMap.put("insureRegCode", insureConfigurationDTO.getRegCode());
+                    businessLogMap.put("hospName", insureConfigurationDTO.getHospName());
+                    businessLogMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+                    // businessLogMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
+                    businessLogMap.put("medicalRegNo", insureIndividualVisitDTO.getMedicalRegNo());
+                    //  businessLogMap.put("settleId",MapUtils.get(map, "settleId"));
+                    businessLogMap.put("visitId", insureIndividualVisitDTO.getVisitId());
+                    //  businessLogMap.put("psnNo",insureIndividualBasicDTO.getBka896());
+                    businessLogMap.put("psnName", insureIndividualBasicDTO.getAac003());
+                    businessLogMap.put("certNo", insureIndividualBasicDTO.getAac002());
+                    businessLogMap.put("deptId", insureIndividualVisitDTO.getVisitDrptId());
+                    businessLogMap.put("sex", insureIndividualBasicDTO.getAac004());
+                    businessLogMap.put("age", DateUtil.getAge(birthDate, new Date()));
+                    businessLogMap.put("insueType", insureIndividualBasicDTO.getBka006());
+                    businessLogMap.put("inptTime", dto.getInTime());
+                    businessLogMap.put("outptTime,", dto.getOutTime());
+                    businessLogMap.put("medType", insureIndividualBasicDTO.getAka130());
+                    businessLogMap.put("medTypeName", insureIndividualBasicDTO.getAka130Name());
+                    businessLogMap.put("deptName", insureIndividualVisitDTO.getVisitDrptName());
+                    businessLogMap.put("doctorId", dto.getZzDoctorId());
+                    businessLogMap.put("doctorName", dto.getZzDoctorName());
+                    businessLogMap.put("inptDiagnose", dto.getInDiseaseName());
+                    businessLogMap.put("outptDiagnose", dto.getOutDiseaseName());
+                    businessLogMap.put("crtId", "1");
+                    businessLogMap.put("crtName", "1");
+                    businessLogMap.put("crtTime", new Date());
+                    drgDipBusinessOptInfoLogService_consumer.insertDrgDipBusinessOptInfoLog(businessLogMap);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.info("病案首页上传插入日志失败！");
+                }
                 return mrisService_consumer.insertMrisHomeInfo(httpParams);
             }
-
-
         }
     }
-
 
     /**
      * @Method: deleteInsureMrisInfo
@@ -1211,8 +1302,6 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }finally {
             return true;
         }
-
-
     }
 
     /**保存反而数据信息
@@ -2210,6 +2299,200 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         httpParams.put("bkr298","");//科主任	VARCHAR2(100)	Y
         return httpParams;
     }
+
+    private Map<String,Object> getTcmMedicalRecordInfo(TcmMrisBaseInfoDTO mrisBaseInfoDTO,InsureIndividualVisitDTO insureIndividualVisitDTO,InptVisitDTO inptVisitDTO) {
+        Map<String,Object> httpParams = new HashMap<>();
+
+        // TODO 数据集参数-病案首页主体信息(必要入参)
+        httpParams.put("bkr294",DateUtils.format(mrisBaseInfoDTO.getCrteTime(),DateUtils.YMDHMS)); // 病案首页编号
+        httpParams.put("akb020",insureIndividualVisitDTO.getInsureOrgCode()); // 医疗机构编码
+        httpParams.put("aaz217",insureIndividualVisitDTO.getMedicalRegNo()); // 业务序列号
+        httpParams.put("akc190",inptVisitDTO.getInNo()); // 住院号
+        httpParams.put("bkr121",inptVisitDTO.getId()); // 就诊流水号
+        httpParams.put("bkr122",this.getDay(inptVisitDTO.getInTime())); // 入院时间
+        // RYTJ (0直接入院 ;1急诊;2门诊;3其他医疗机构转入;9其他) | 医保入院类型 1：门诊入院、2：急诊入院、3：其他医疗机构转入、9：其他
+        httpParams.put("bkr123",this.getRytj(inptVisitDTO.getInModeCode()));
+        httpParams.put("bkr129",mrisBaseInfoDTO.getInCnt() == null ? "" : mrisBaseInfoDTO.getInCnt()); // 住院次数
+        httpParams.put("bkr130",inptVisitDTO.getInProfile()); // 病案号
+        httpParams.put("bkr169",this.getDay(inptVisitDTO.getOutTime())); // 出院时间
+        httpParams.put("bkr295",inptVisitDTO.getAge()); // 年龄
+        httpParams.put("bkr264",insureIndividualVisitDTO.getBkr264()); // 总费用
+
+        // TODO 数据集参数-病案首页主体信息(非必要入参)
+        httpParams.put("bkr124","");//卡号	VARCHAR2(50)	Y		必须与患者基本信息关联
+        httpParams.put("bkr125","");//卡类型	VARCHAR2(20)	Y
+        httpParams.put("bkr126","");//保险类型，用来区分对象所属保险类型。	VARCHAR2(20)	Y
+        httpParams.put("bkr127","");//健康卡号	VARCHAR2(50)	Y
+        httpParams.put("bkr128","");//医疗付费方式	VARCHAR2(4)	Y		01.城镇职工基本医疗保险；02.城镇居民基本医疗保险；03.新型农村合作医疗；04.贫困救助；05.商业医疗保险；06.全公费；07.全自费；99.其他
+        httpParams.put("bkr131","");//床号	VARCHAR2(20)	Y
+        httpParams.put("bkr132","");//入院病区(房)	VARCHAR2(50)	Y
+        httpParams.put("bkr133","");//出院病区(房)	VARCHAR2(50)	Y
+        httpParams.put("bkr134","");//姓名	VARCHAR2(30)	Y
+        httpParams.put("bkr135","");//性别，按国标GB/T2261.1-2003	VARCHAR2(1)	Y
+        httpParams.put("bkr136","");//出生日期,格式：YYYYMMDD	VARCHAR2(8)	Y
+        httpParams.put("bkr137","");//新生儿出生体重	NUMBER	Y		单位：克，精确到10克
+        httpParams.put("bkr138","");//新生儿入院体重	NUMBER	Y		单位：克，精确到10克
+        httpParams.put("bkr139","");//婚姻状况	VARCHAR2(2)	Y		婚姻GB/T2261.2-2003
+        httpParams.put("bkr140","");//民族	VARCHAR2(2)	Y		按国标GB3304-91执行
+        httpParams.put("bkr141","");//国籍	VARCHAR2(50)	Y
+        httpParams.put("bkr142","");//籍贯	VARCHAR2(50)	Y		格式：“X省（区、市）X市
+        httpParams.put("bkr143","");//出生地	VARCHAR2(50)	Y
+        httpParams.put("bkr144","");//身份证号	VARCHAR2(18)	Y
+        httpParams.put("bkr145","");//联系电话	VARCHAR2(20)	Y
+        httpParams.put("bkr146","");//工作单位	VARCHAR2(50)	Y
+        httpParams.put("bkr147","");//工作单位电话	VARCHAR2(20)	Y
+        httpParams.put("bkr148","");//工作单位邮编	VARCHAR2(6)	Y
+        httpParams.put("bkr149","");//职业编码	VARCHAR2(20)	Y		按国标GB/T6565-2009
+        httpParams.put("bkr150","");//居住地	VARCHAR2(50)	Y		格式：“X省（区、市）X市X县”
+        httpParams.put("bkr151","");//现住址电话	VARCHAR2(20)	Y
+        httpParams.put("bkr152","");//现住址邮编	VARCHAR2(6)	Y
+        httpParams.put("bkr153","");//户口地址	VARCHAR2(50)	Y		格式：“X省（区、市）X市X县”
+        httpParams.put("bkr154","");//户口电话	VARCHAR2(20)	Y
+        httpParams.put("bkr155","");//户口邮编	VARCHAR2(6)	Y
+        httpParams.put("bkr156","");//地区	VARCHAR2(50)	Y
+        httpParams.put("bkr157","");//区县	VARCHAR2(20)	Y		按国标编码执行
+        httpParams.put("bkr158","");//街道，卫生局的街道编码执行	VARCHAR2(20)	Y
+        httpParams.put("bkr159","");//联系人姓名	VARCHAR2(30)	Y
+        httpParams.put("bkr160","");//联系人关系	VARCHAR2(4)	Y
+        httpParams.put("bkr161","");//联系人地址	VARCHAR2(128)	Y		按国标GB/T4761-2008执行
+        httpParams.put("bkr162","");//联系人电话	VARCHAR2(20)	Y
+        httpParams.put("bkr163","");//联系人通信地址	VARCHAR2(128)	Y
+        httpParams.put("bkr164","");//入院科室编码	VARCHAR2(20)	Y
+        httpParams.put("bkr165","");//转科科室编码1	VARCHAR2(20)	Y
+        httpParams.put("bkr166","");//转科科室编码2	VARCHAR2(20)	Y
+        httpParams.put("bkr167","");//转科科室编码3	VARCHAR2(20)	Y
+        httpParams.put("bkr168","");//所转病区	VARCHAR2(128)	Y		指“入院病区”和“出院病区”外，患者在本次住院中住过的所有病区。如有多个，以“,”间隔
+        httpParams.put("bkr170","");//出院科室编码	VARCHAR2(20)	Y
+        httpParams.put("bkr171","");//实际住院天数	NUMBER	Y
+        httpParams.put("bkr172","");//出院方式，	VARCHAR2(1)	Y		编码。1：常规、2：自动、3：转院
+        httpParams.put("bkr173","");//入院时情况，	VARCHAR2(2)	Y		CV5501.12入院病情代码。1危重、2：急诊、3：一般、9：其他
+        httpParams.put("bkr174","");//入院前经外院诊治，	VARCHAR2(1)	Y		编码。1：有、2：无
+        httpParams.put("bkr175","");//确诊日期	VARCHAR2(8)	Y		YYYYMMDD
+        httpParams.put("bkr176","");//医院感染名称，	VARCHAR2(128)	Y
+        httpParams.put("bkr177","");//医院感染结果，编码。	VARCHAR2(1)	Y		1：治愈、2：好转、3：未愈、4：死亡、5：其它；新版“病案首页”中取消
+        httpParams.put("bkr178","");//门诊出院诊断符合编码，	VARCHAR2(1)	Y		CV5501.13诊断符合情况代码。0：未作、1：符合、2：不符合、X：诊断符合情况扩充内容、9：无对照
+        httpParams.put("bkr179","");//入院出院诊断符合编码，	VARCHAR2(1)	Y		CV5501.13诊断符合情况代码。0：未作、1：符合、2：不符合、X：诊断符合情况扩充内容、9：无对照
+        httpParams.put("bkr180","");//术前术手诊断符合编码，	VARCHAR2(1)	Y		CV5501.13诊断符合情况代码。0：未作、1：符合、2：不符合、X：诊断符合情况扩充内容、9：无对照
+        httpParams.put("bkr181","");//临床病理诊断符合编码，	VARCHAR2(1)	Y		CV5501.13诊断符合情况代码。0：未作、1：符合、2：不符合、X：诊断符合情况扩充内容、9：无对照
+        httpParams.put("bkr182","");//放射病理诊断符合编码，CV5501.13诊断符合情况代码。0：未作、1：符合、2：不符合、X：诊断符合情况扩充内容、9：无对照	VARCHAR2(1)	Y
+        httpParams.put("bkr183","");//损伤中毒的外部因素，填写造成损伤的外部原因及引起中毒的物质	VARCHAR2(256)	Y
+        httpParams.put("bkr184","");//损伤中毒的外部原因的疾病编码，ICD-10	VARCHAR2(20)	Y
+        httpParams.put("bkr185","");//药物过敏	VARCHAR2(256)	Y		填写具体药物的名称，多种以“;”间隔，没有必填“无”
+        httpParams.put("bkr186","");//HBSAG检查结果编码，编码。	VARCHAR2(1)	Y		0：未作、1：阴性、2：阳性；新版“病案首页”中取消
+        httpParams.put("bkr187","");//HCVab检查结果编码，编码。	VARCHAR2(1)	Y		0：未作、1：阴性、2：阳性；新版“病案首页”中取消
+        httpParams.put("bkr188","");//HIVab检查结果编码，编码。	VARCHAR2(1)	Y		0：未作、1：阴性、2：阳性；新版“病案首页”中取消
+        httpParams.put("bkr189","");//抢救次数	NUMBER	Y
+        httpParams.put("bkr190","");//成功次数	NUMBER	Y
+        httpParams.put("bkr191","");//住院是否出现危重、急症、疑难	VARCHAR2(3)	Y
+        httpParams.put("bkr192","");//手术治疗检查诊断为本院第一例,编码。	VARCHAR2(4)	Y		1：是、2：否。新版“病案首页”中取消
+        httpParams.put("bkr193","");//血型,	VARCHAR2(2)	Y		CV04.50.005ABO血型代码表。
+        httpParams.put("bkr194","");//红细胞输血量,计量单位：单位；新版“病案首页”中取消	NUMBER	Y
+        httpParams.put("bkr195","");//血小板输血量,计量单位：袋；新版“病案首页”中取消	NUMBER	Y
+        httpParams.put("bkr196","");//血浆输血量,计量单位：ml；新版“病案首页”中取消	NUMBER	Y
+        httpParams.put("bkr197","");//全血输血量,计量单位：ml；新版“病案首页”中取消	NUMBER	Y
+        httpParams.put("bkr198","");//其它输血量,计量单位：ml；新版“病案首页”中取消	NUMBER	Y
+        httpParams.put("bkr199","");//有输血反应,编码。1：有、2：无；	VARCHAR2(1)	Y
+        httpParams.put("bkr200","");//有传染病报告,编码。1：有、2：无	VARCHAR2(1)	Y
+        httpParams.put("bkr201","");//有肿瘤报告,编码。1：有、2：无	VARCHAR2(1)	Y
+        httpParams.put("bkr202","");//有新生儿死亡报告,编码。1：有、2：无	VARCHAR2(1)	Y
+        httpParams.put("bkr203","");//孕产妇死亡报告,编码。1：有、2：无	VARCHAR2(1)	Y
+        httpParams.put("bkr204","");//有其它报告,编码。1：有、2：无	VARCHAR2(1)	Y
+        httpParams.put("bkr205","");//是否随诊,编码。1：是、2：否；新版“病案首页”中取消	VARCHAR2(1)	Y
+        httpParams.put("bkr206","");//随诊期限	NUMBER	Y
+        httpParams.put("bkr207","");//随诊期限单位,编码。1：周、2：月、3：年；	VARCHAR2(1)	Y
+        httpParams.put("bkr208","");//是否示教病例,编码。1：是、2：否	VARCHAR2(1)	Y
+        httpParams.put("bkr209","");//（死亡患者）是否尸检,编码。1：是、2：否	VARCHAR2(1)	Y
+        httpParams.put("bkr210","");//是否妊娠梅毒筛查,编码。1：是、2：否	VARCHAR2(1)	Y
+        httpParams.put("bkr211","");//新生儿疾病筛查	VARCHAR2(3)	Y
+        httpParams.put("bkr212","");//产后出血量,单位为ml	NUMBER	Y
+        httpParams.put("bkr213","");//新生儿性别,按国标GB/T2261.1-2003	VARCHAR2(1)	Y
+        httpParams.put("bkr214","");//新生儿体重,单位为g	NUMBER	Y
+        httpParams.put("bkr215","");//主任医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr216","");//主任医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr217","");//主治医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr218","");//主治医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr219","");//住院医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr220","");//住院医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr221","");//护士长工号	VARCHAR2(30)	Y
+        httpParams.put("bkr222","");//护士长姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr223","");//责任护士工号	VARCHAR2(30)	Y
+        httpParams.put("bkr224","");//责任护士姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr225","");//进修医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr226","");//进修医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr227","");//实习医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr228","");//实习医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr229","");//编码员工号	VARCHAR2(30)	Y
+        httpParams.put("bkr230","");//编码员姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr231","");//病案质量,CV5501.15病案质量代码。1：甲、2：乙、3：丙	VARCHAR2(1)	Y
+        httpParams.put("bkr232","");//质控医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr233","");//质控医师姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr234","");//质控护士工号	VARCHAR2(30)	Y
+        httpParams.put("bkr235","");//质控护士姓名	VARCHAR2(50)	Y
+        httpParams.put("bkr236","");//质控日期	DATE	Y
+        httpParams.put("bkr237","");//病理号	VARCHAR2(50)	Y
+        httpParams.put("bkr238","");//死亡根本原因	VARCHAR2(256)	Y
+        httpParams.put("bkr239","");//死亡时间	DATE	Y
+        httpParams.put("bkr240","");//门诊医师工号	VARCHAR2(30)	Y
+        httpParams.put("bkr241","");//门诊医师姓名	VARCHAR2(50)	Y		aa
+        httpParams.put("bkr242","");//输液反应,编码。1：有输、2：有反应、3：未输	VARCHAR2(1)	Y
+        httpParams.put("bkr243","");//是否为科研病案,编码。1：是、2：否	VARCHAR2(1)	Y
+        httpParams.put("bkr244","");//离院方式,1.医嘱离院  2.医嘱转院，拟接收医疗机构名称 3.医嘱转社区卫生服务机构/乡镇卫生院，拟接收医疗机构名称 4.非医嘱离院5.死亡9.其他	VARCHAR2(1)	Y
+        httpParams.put("bkr245","");//离院后拟接收医疗机构名称,“离院方式”填2和3时，必填写此项	VARCHAR2(50)	Y
+        httpParams.put("bkr246","");//是否有出院31天内再住院计划,如有，请填写再入院目的；否则填写“无”	VARCHAR2(50)	Y
+        httpParams.put("bkr247","");//颅脑损伤患者入院前昏迷时间,格式：“X天X小时X分钟”	VARCHAR2(50)	Y
+        httpParams.put("bkr248","");//颅脑损伤患者入院后昏迷时间,格式：“X天X小时X分钟”	VARCHAR2(50)	Y
+        httpParams.put("bkr249","");//住院费	NUMBER(12,3)	Y
+        httpParams.put("bkr250","");//诊疗费	NUMBER(12,3)	Y
+        httpParams.put("bkr251","");//治疗费	NUMBER(12,3)	Y
+        httpParams.put("bkr252","");//护理费	NUMBER(12,3)	Y
+        httpParams.put("bkr253","");//手术材料费	NUMBER(12,3)	Y
+        httpParams.put("bkr254","");//检查费	NUMBER(12,3)	Y
+        httpParams.put("bkr255","");//化验费	NUMBER(12,3)	Y
+        httpParams.put("bkr256","");//透视费	NUMBER(12,3)	Y
+        httpParams.put("bkr257","");//摄片费	NUMBER(12,3)	Y
+        httpParams.put("bkr258","");//输血费	NUMBER(12,3)	Y
+        httpParams.put("bkr259","");//输氧费	NUMBER(12,3)	Y
+        httpParams.put("bkr260","");//西药费	NUMBER(12,3)	Y
+        httpParams.put("bkr261","");//中成药费	NUMBER(12,3)	Y
+        httpParams.put("bkr262","");//中草药费	NUMBER(12,3)	Y
+        httpParams.put("bkr263","");//其他费用	NUMBER(12,3)	Y
+        httpParams.put("bkr264","");//总费用	NUMBER(12,3)	N
+        httpParams.put("bkr265","");//自付金额	NUMBER(12,3)	Y
+        httpParams.put("bkr266","");//一般医疗服务费	NUMBER(12,3)	Y
+        httpParams.put("bkr267","");//一般治疗操作费	NUMBER(12,3)	Y
+        httpParams.put("bkr268","");//病理诊断费	NUMBER(12,3)	Y
+        httpParams.put("bkr269","");//实验室诊断费	NUMBER(12,3)	Y
+        httpParams.put("bkr270","");//影像学诊断费	NUMBER(12,3)	Y
+        httpParams.put("bkr271","");//临床诊断项目费	NUMBER(12,3)	Y
+        httpParams.put("bkr272","");//非手术治疗项目费	NUMBER(12,3)	Y
+        httpParams.put("bkr273","");//临床物理治疗费	NUMBER(12,3)	Y
+        httpParams.put("bkr274","");//手术治疗费	NUMBER(12,3)	Y
+        httpParams.put("bkr275","");//麻醉费	NUMBER(12,3)	Y
+        httpParams.put("bkr276","");//手术费	NUMBER(12,3)	Y
+        httpParams.put("bkr277","");//康复费	NUMBER(12,3)	Y
+        httpParams.put("bkr278","");//中医治疗费	NUMBER(12,3)	Y
+        httpParams.put("bkr279","");//抗菌药物费用	NUMBER(12,3)	Y
+        httpParams.put("bkr280","");//血费	NUMBER(12,3)	Y
+        httpParams.put("bkr281","");//白蛋白类制品费	NUMBER(12,3)	Y
+        httpParams.put("bkr282","");//球蛋白类制品费	NUMBER(12,3)	Y
+        httpParams.put("bkr283","");//凝血因子类制品费	NUMBER(12,3)	Y
+        httpParams.put("bkr284","");//细胞因子类制品费	NUMBER(12,3)	Y
+        httpParams.put("bkr285","");//检查用一次性医用材料费	NUMBER(12,3)	Y
+        httpParams.put("bkr286","");//治疗用一次性医用材料费	NUMBER(12,3)	Y
+        httpParams.put("bkr287","");//手术用一次性医用材料费	NUMBER(12,3)	Y
+        httpParams.put("bkr288","");//其他费	NUMBER(12,3)	Y
+        httpParams.put("bkr289","");//备注	VARCHAR2(256)	Y
+        httpParams.put("bkr290","");//密级	VARCHAR2(20)	Y
+        httpParams.put("bkr291","");//修改标志,编码。	VARCHAR2(2)	Y		0：正常、1：撤销；
+        httpParams.put("bkr292","");//预留一	VARCHAR2(128)	Y
+        httpParams.put("bkr293","");//预留二	VARCHAR2(128)	Y
+        httpParams.put("bkr295","");//年龄	NUMBER(10)	N
+        httpParams.put("bkr296","");//(年龄不足1周岁的)年龄(月)	NUMBER(4)	Y
+        httpParams.put("bkr297","");//过敏药物疾病	VARCHAR2(254)	Y
+        httpParams.put("bkr298","");//科主任	VARCHAR2(100)	Y
+        return httpParams;
+    }
+
 
     /**
      * 病案婴儿信息数据处理

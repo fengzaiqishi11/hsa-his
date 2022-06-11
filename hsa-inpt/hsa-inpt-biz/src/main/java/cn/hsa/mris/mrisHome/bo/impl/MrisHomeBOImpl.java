@@ -460,6 +460,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         if (MapUtils.isEmpty(baseInfoStr)){
             throw new AppException("病案基本信息不能为空");
         }
+        // 处理年龄
+        String age = MapUtils.get(baseInfoStr, "age");
+        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
+            String substring = age.substring(1);
+            baseInfoStr.put("age",substring);
+        }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
         if (MapUtils.isEmpty(strArr)){
@@ -504,7 +510,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != responseCode){
+        if (responseCode != 0){
             throw new AppException("调用DRG接口失败");
         }
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
@@ -594,6 +600,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         if (MapUtils.isEmpty(baseInfoStr)){
             throw new AppException("病案基本信息不能为空");
         }
+        // 处理年龄
+        String age = MapUtils.get(baseInfoStr, "age");
+        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
+            String substring = age.substring(1);
+            baseInfoStr.put("age",substring);
+        }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
         if (MapUtils.isEmpty(strArr)){
@@ -626,7 +638,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         /**======获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != responseCode){
+        if (responseCode != 0){
             throw new AppException("调用DRG接口失败");
         }
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集

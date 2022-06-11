@@ -941,10 +941,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
 
         // 病案手术信息数据集
-        List<MrisOperInfoDO> mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
-        MrisCostDO mrisCostDO =  mrisHomeDAO.queryMriCost(map);
+        mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
+        mrisCostDO =  mrisHomeDAO.queryMriCost(map);
         // 病案诊断信息数据集
-        List<MrisDiagnoseDO> mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
+        mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
         /*map.put("code","UNIFIED_PAY");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();*/
 
@@ -1186,6 +1186,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 return mrisService_consumer.insertMrisHomeInfo(httpParams);
             }
         }
+        return true;
     }
 
     /**

@@ -2252,7 +2252,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         if(MapUtils.get(dataMap, "hsptzd_date") != null){
             drgDipResultDTO.setInTime(DateUtils.parse(MapUtils.get(dataMap, "hsptzd_date").toString(), DateUtils.Y_M_D));
         }
-       /* if(MapUtils.get(dataMap, "hosp_disch_date") != null){
+        /*if(MapUtils.get(dataMap, "hosp_disch_date") != null){
             drgDipResultDTO.setOutTime(DateUtils.parse(MapUtils.get(dataMap, "hosp_disch_date").toString(), DateUtils.Y_M_D));
         }*/
         drgDipResultDTO.setCrtId(MapUtils.get(dataMap, "crteId"));

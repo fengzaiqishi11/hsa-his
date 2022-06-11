@@ -921,6 +921,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
             medicalApplyDTO.setIsMerge(Constants.SF.S);
         }
+        //防止合管id为空，导致合管打印数据有误
+        if(StringUtils.isEmpty(mergeId)){
+            medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+        }
         medicalApplyDTO.setDocumentSta("01");
         medicalApplyDTO.setCrteId(medicalAdviceDTO.getCheckId());
         medicalApplyDTO.setCrteName(medicalAdviceDTO.getCheckName());

@@ -1329,7 +1329,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
 
         // 门诊合同单位支付表冲红
-        this.outptInsurePayChangeRed(selectDTO);
+        this.outptInsurePayChangeRed1(selectDTO,redSettleId);
 
         return redSettleId;
     }
@@ -1364,7 +1364,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
      * @Author liaojiguang
      * @Date 2020/9/07 09:15
      */
-    private void outptInsurePayChangeRed(OutptSettleDTO outptSettleDTO) {
+    private void outptInsurePayChangeRed(OutptSettleDTO outptSettleDTO ) {
         List<OutptInsurePayDTO> outptInsurePayDTOList = outptInsurePayDAO.getOutptInsurePayByParams(outptSettleDTO);
         if (!ListUtils.isEmpty(outptInsurePayDTOList)) {
             for (OutptInsurePayDTO outptInsurePayDTO : outptInsurePayDTOList) {
@@ -1375,6 +1375,27 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
     }
 
+    /**
+     * @param outptSettleDTO
+     * @Menthod outptInsurePayChangeRed
+     * @Desrciption 门诊合同单位支付表冲红
+     * @Author liaojiguang
+     * @Date 2020/9/07 09:15
+     */
+    private void outptInsurePayChangeRed1(OutptSettleDTO outptSettleDTO,String redSettleId) {
+        List<OutptInsurePayDTO> outptInsurePayDTOList = outptInsurePayDAO.getOutptInsurePayByParams(outptSettleDTO);
+        if (!ListUtils.isEmpty(outptInsurePayDTOList)) {
+            for (OutptInsurePayDTO outptInsurePayDTO : outptInsurePayDTOList) {
+                //设置冲红结算id zjp 2022-06-09 【ID1003392】
+                //报表查询>财务报表>收费员收入明细 中，把收费和退费都统计到了 黄萍 的收入中 reason:医保支付冲红和被冲红结算id一致导致
+                outptInsurePayDTO.setSettleId(redSettleId);
+                ////
+                outptInsurePayDTO.setId(SnowflakeUtils.getId());
+                outptInsurePayDTO.setTotalPrice(BigDecimalUtils.negate(outptInsurePayDTO.getTotalPrice()));
+            }
+            outptInsurePayDAO.insertOutptInsurePays(outptInsurePayDTOList);
+        }
+    }
 
     /**
      * @param outptSettleDTO

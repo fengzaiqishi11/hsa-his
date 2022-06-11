@@ -980,9 +980,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("code", "UNIFIED_PAY");
         SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();*/
 //        if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台
+        Map<String, Object> unifiedPayMap = new HashMap<>();
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)){
             // 直接切换统一支付平台
-            Map<String, Object> unifiedPayMap = new HashMap<>();
+           // Map<String, Object> unifiedPayMap = new HashMap<>();
             unifiedPayMap.put("outptVisitDTO", outptVisitDTO);
             unifiedPayMap.put("outptCostDTOList", outptCostDTOList);
             unifiedPayMap.put("settleId", settleId);
@@ -1024,153 +1025,162 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
          * 增加参数控制  零费用报销是否让走医保结算
          */
-        if(BigDecimalUtils.equals(akb067,akc264)){
-            resultMap.put("hospCode",hospCode);
-            resultMap.put("code","HOSP_APPR_FLAG");
-            String cashPayValue = "";
-            SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(resultMap).getData();
-            if(parameterDTO !=null){
-                String value = parameterDTO.getValue();
-                if(StringUtils.isNotEmpty(value)){
-                    Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
-                    for (String key : stringObjectMap.keySet()) {
-                        if ("cashPay".equals(key)) {
-                            cashPayValue = MapUtils.get(stringObjectMap,key);
-                            break;
+        try{
+            if(BigDecimalUtils.equals(akb067,akc264)){
+                resultMap.put("hospCode",hospCode);
+                resultMap.put("code","HOSP_APPR_FLAG");
+                String cashPayValue = "";
+                SysParameterDTO parameterDTO = sysParameterService_consumer.getParameterByCode(resultMap).getData();
+                if(parameterDTO !=null){
+                    String value = parameterDTO.getValue();
+                    if(StringUtils.isNotEmpty(value)){
+                        Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+                        for (String key : stringObjectMap.keySet()) {
+                            if ("cashPay".equals(key)) {
+                                cashPayValue = MapUtils.get(stringObjectMap,key);
+                                break;
+                            }
                         }
-                    }
-                    if(!"1".equals(cashPayValue)){
+                        if(!"1".equals(cashPayValue)){
+                            throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
+                        }
+                    }else{
                         throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                     }
                 }else{
                     throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
                 }
-            }else{
-                throw new AppException("零费用报销,不能走医保报销流程,请走自费结算流程。");
             }
+
+            BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
+            BigDecimal ake039 = BigDecimalUtils.convert(payinfo.get("ake039"));//医疗保险统筹基金支付
+            BigDecimal ake035 = BigDecimalUtils.convert(payinfo.get("ake035"));//公务员医疗补助基金支付
+            BigDecimal ake026 = BigDecimalUtils.convert(payinfo.get("ake026"));//企业补充医疗保险基金支付
+            BigDecimal ake029 = BigDecimalUtils.convert(payinfo.get("ake029"));//大额医疗费用补助基金支付
+            BigDecimal acctInjPay = BigDecimalUtils.convert(payinfo.get("acctInjPay"));//职工意外伤害基金
+            BigDecimal retAcctInjPay = BigDecimalUtils.convert(payinfo.get("retAcctInjPay"));//居民意外伤害基金
+            BigDecimal governmentPay = BigDecimalUtils.convert(payinfo.get("governmentPay"));//政府兜底
+            BigDecimal thbPay = BigDecimalUtils.convert(payinfo.get("thbPay"));//特惠保
+            BigDecimal hospPrice = BigDecimalUtils.convert(payinfo.get("hospPrice"));//医院垫付
+            BigDecimal carePay = BigDecimalUtils.convert(payinfo.get("carePay"));//优抚对象医疗补助基金
+            BigDecimal lowInPay = BigDecimalUtils.convert(payinfo.get("lowInPay"));//农村低收入人口医疗补充保险
+            BigDecimal othPay = BigDecimalUtils.convert(payinfo.get("othPay"));//其他基金支付 - 基金单项
+            BigDecimal mafPay = BigDecimalUtils.convert(payinfo.get("mafPay"));//民政救助金支付
+            BigDecimal hospExemAmount = BigDecimalUtils.convert(payinfo.get("hospExemAmount"));//医院减免
+            BigDecimal retiredPay = BigDecimalUtils.convert(payinfo.get("retiredPay"));// 离休基金
+            BigDecimal fertilityPay = BigDecimalUtils.convert(payinfo.get("fertilityPay"));// 生育基金
+            BigDecimal preselfpayAmt = BigDecimalUtils.convert(payinfo.get("preselfpayAmt"));// 先行自付金额
+            BigDecimal inscpScpAmt = BigDecimalUtils.convert(payinfo.get("inscpScpAmt"));// 符合政策范围金额
+            BigDecimal poolPropSelfpay = BigDecimalUtils.convert(payinfo.get("poolPropSelfpay"));// 基本医疗保险统筹基金支付比例
+            BigDecimal acctMulaidPay = BigDecimalUtils.convert(payinfo.get("acctMulaidPay"));// 个人账户共计支付金额
+            BigDecimal soldierPay = BigDecimalUtils.convert(payinfo.get("soldierPay"));// 一至六级残疾军人医疗补助基金
+            BigDecimal retiredOutptPay = BigDecimalUtils.convert(payinfo.get("soldierPay"));// 离休老工人门慢保障基金
+            BigDecimal injuryPay = BigDecimalUtils.convert(payinfo.get("injuryPay"));// 工伤保险基金
+            BigDecimal hallPay = BigDecimalUtils.convert(payinfo.get("hallPay"));// 厅级干部补助基金
+            BigDecimal soldierToPay = BigDecimalUtils.convert(payinfo.get("soldierToPay"));// 军转干部医疗补助基金
+            BigDecimal welfarePay = BigDecimalUtils.convert(payinfo.get("welfarePay"));// 公益补充保险基金
+            BigDecimal COVIDPay = BigDecimalUtils.convert(payinfo.get("COVIDPay"));// 新冠肺炎核酸检测财政补助
+            BigDecimal familyPay = BigDecimalUtils.convert(payinfo.get("familyPay"));// 居民家庭账户金
+            BigDecimal behalfPay = BigDecimalUtils.convert(payinfo.get("behalfPay"));// 代缴基金（破产改制）
+
+            //TODO 计算医保支付金额 = 医保支付
+            BigDecimal miPrice = bka832;
+            //TODO 计算本次还需支付金额 = 优惠后总金额 - 医保支付金额
+            BigDecimal selfPrice = BigDecimalUtils.subtract(realityPrice, miPrice);
+
+            //获取医保个人信息
+            Map<String, String> personinfo = (Map<String, String>) insure.get("personinfo");
+            BigDecimal bacu18 = BigDecimalUtils.convert(personinfo.get("bacu18"));//账户余额
+
+            Map<String, String> delIndividualSettleParam = new HashMap<String, String>();
+            delIndividualSettleParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+            delIndividualSettleParam.put("visitId", outptVisitDTO.getId());//就诊id
+            delIndividualSettleParam.put("settleState", Constants.YBJSZT.SS);//结算标志 = 试算
+            insureIndividualSettleService.delInsureIndividualSettleByVisitId(delIndividualSettleParam);
+            //医保结算表 insure_individual_settle
+            InsureIndividualSettleDO insureIndividualSettleDO = new InsureIndividualSettleDO();
+            insureIndividualSettleDO.setId(SnowflakeUtils.getId());//主键
+            insureIndividualSettleDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+            insureIndividualSettleDO.setVisitId(outptVisitDTO.getId());//就诊id
+            insureIndividualSettleDO.setSettleId(settleId);//结算id
+            insureIndividualSettleDO.setIsHospital(Constants.SF.F);//是否住院（SF）
+            insureIndividualSettleDO.setVisitNo(outptVisitDTO.getVisitNo());//就诊登记号
+            insureIndividualSettleDO.setDischargeDnCode(null);//出院疾病诊断编码
+            insureIndividualSettleDO.setInsureOrgCode(insureConfigurationDTO.getCode());//医保机构编码
+            insureIndividualSettleDO.setInsureRegCode(insureConfigurationDTO.getRegCode());//医保注册编码
+            insureIndividualSettleDO.setMedicineOrgCode(insureConfigurationDTO.getOrgCode());//医疗机构编码
+            insureIndividualSettleDO.setDischargeDnName(null);//出院疾病诊断名称
+            insureIndividualSettleDO.setDischargedDate(null);//出院日期
+            insureIndividualSettleDO.setDischargedCase(null);//出院情况
+            insureIndividualSettleDO.setSettleway(Constants.JSFS.PTJS);//结算方式,01 普通结算,02 包干结算
+            insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额
+            insureIndividualSettleDO.setLastSettle(BigDecimalUtils.isZero(bacu18) ? bacu18 : BigDecimalUtils.greater(bka831, bacu18) ? new BigDecimal(0) : BigDecimalUtils.subtract(bacu18, akb066));//结算后账户余额
+            insureIndividualSettleDO.setState(Constants.ZTBZ.ZC);//状态标志,0正常，2冲红，1，被冲红
+            insureIndividualSettleDO.setSettleState(Constants.YBJSZT.SS);//医保结算状态;0试算，1结算
+            insureIndividualSettleDO.setCostbatch(null);//费用批次
+            insureIndividualSettleDO.setAka130(insureIndividualVisitById.getAka130());//业务类型
+            insureIndividualSettleDO.setBka006(insureIndividualVisitById.getBka006());//待遇类型
+            insureIndividualSettleDO.setInjuryBorthSn(null);//业务申请号,门诊特病，工伤，生育
+            insureIndividualSettleDO.setIsAccount(BigDecimalUtils.isZero(akb066) ? Constants.SF.F : Constants.SF.S);//当前结算是否使用个人账户;0是，1否
+            insureIndividualSettleDO.setRemark(null);//备注
+            insureIndividualSettleDO.setCrteId(outptVisitDTO.getCrteId());//创建人ID
+            insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());//创建人姓名
+            insureIndividualSettleDO.setCrteTime(new Date());//创建时间
+
+            // 处理金额
+            insureIndividualSettleDO.setTotalPrice(akc264);// 本次医疗总费用
+            insureIndividualSettleDO.setStartingPrice(aka151);//起付线金额
+            insureIndividualSettleDO.setAllPortionPrice(bka825);//全自费金额
+            insureIndividualSettleDO.setPortionPrice(bka826);//部分自付金额 - 超限价
+            insureIndividualSettleDO.setInsurePrice(miPrice);//医保支付
+            insureIndividualSettleDO.setPlanPrice(ake039);//统筹基金支付
+            insureIndividualSettleDO.setPlanAccountPrice(poolPropSelfpay);//统筹段自负金额***
+            insureIndividualSettleDO.setPreselfpayAmt(preselfpayAmt);// 先行自付金额
+            insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
+            insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
+            insureIndividualSettleDO.setRetirePrice(retiredPay);// 离休人员医疗保证基金
+            insureIndividualSettleDO.setMafPay(mafPay); // 医疗救助基金
+            insureIndividualSettleDO.setHospExemAmount(hospExemAmount); // 医院减免
+            insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
+            insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
+            insureIndividualSettleDO.setRestsPrice(bka839);//其他支付
+            insureIndividualSettleDO.setFertilityPay(fertilityPay);// 生育基金
+            insureIndividualSettleDO.setComPay(ake026);// 企业补充医疗保险基金
+            insureIndividualSettleDO.setHospPrice("990101".equals(insureIndividualVisitById.getAka130())?othPay:hospPrice);//医院垫付
+            insureIndividualSettleDO.setAcctInjPay(acctInjPay);
+            insureIndividualSettleDO.setRetAcctInjPay(retAcctInjPay);
+            insureIndividualSettleDO.setGovernmentPay(governmentPay);
+            insureIndividualSettleDO.setThbPay(thbPay);
+            insureIndividualSettleDO.setCarePay(carePay);
+            insureIndividualSettleDO.setLowInPay(lowInPay);
+            insureIndividualSettleDO.setOthPay(othPay);
+            insureIndividualSettleDO.setInscpScpAmt(inscpScpAmt);
+            insureIndividualSettleDO.setPoolPropSelfpay(poolPropSelfpay);
+            insureIndividualSettleDO.setAcctMulaidPay(acctMulaidPay);
+            insureIndividualSettleDO.setSoldierPay(soldierPay);
+            insureIndividualSettleDO.setRetiredOutptPay(retiredOutptPay);
+            insureIndividualSettleDO.setInjuryPay(injuryPay);
+            insureIndividualSettleDO.setHallPay(hallPay);
+            insureIndividualSettleDO.setSoldierToPay(soldierToPay);
+            insureIndividualSettleDO.setWelfarePay(welfarePay);
+            insureIndividualSettleDO.setCOVIDPay(COVIDPay);
+            insureIndividualSettleDO.setFamilyPay(familyPay);
+            insureIndividualSettleDO.setBehalfPay(behalfPay);
+            Map<String, Object> insureSettleParam = new HashMap<String, Object>();
+            insureSettleParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+            insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
+            insureIndividualSettleService.insertSelective(insureSettleParam);
+            resultMap.put("payinfo", payinfo);
+            resultMap.put("miPrice", miPrice);
+            resultMap.put("selfPrice", selfPrice);
+        }catch (Exception e){
+            //start 2022-06-10 zhangjinping 抛异常要将之前上传的结算费用取消上传，否则会累加，再次结算时会出现医保费用和结算费用不匹配
+            unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
+            updateCancelFeeSubmit(unifiedPayMap);
+            //end
+            throw  new AppException(e.getMessage());
         }
 
-        BigDecimal bka839 = BigDecimalUtils.convert(payinfo.get("bka839"));//其他支付
-        BigDecimal ake039 = BigDecimalUtils.convert(payinfo.get("ake039"));//医疗保险统筹基金支付
-        BigDecimal ake035 = BigDecimalUtils.convert(payinfo.get("ake035"));//公务员医疗补助基金支付
-        BigDecimal ake026 = BigDecimalUtils.convert(payinfo.get("ake026"));//企业补充医疗保险基金支付
-        BigDecimal ake029 = BigDecimalUtils.convert(payinfo.get("ake029"));//大额医疗费用补助基金支付
-        BigDecimal acctInjPay = BigDecimalUtils.convert(payinfo.get("acctInjPay"));//职工意外伤害基金
-        BigDecimal retAcctInjPay = BigDecimalUtils.convert(payinfo.get("retAcctInjPay"));//居民意外伤害基金
-        BigDecimal governmentPay = BigDecimalUtils.convert(payinfo.get("governmentPay"));//政府兜底
-        BigDecimal thbPay = BigDecimalUtils.convert(payinfo.get("thbPay"));//特惠保
-        BigDecimal hospPrice = BigDecimalUtils.convert(payinfo.get("hospPrice"));//医院垫付
-        BigDecimal carePay = BigDecimalUtils.convert(payinfo.get("carePay"));//优抚对象医疗补助基金
-        BigDecimal lowInPay = BigDecimalUtils.convert(payinfo.get("lowInPay"));//农村低收入人口医疗补充保险
-        BigDecimal othPay = BigDecimalUtils.convert(payinfo.get("othPay"));//其他基金支付 - 基金单项
-        BigDecimal mafPay = BigDecimalUtils.convert(payinfo.get("mafPay"));//民政救助金支付
-        BigDecimal hospExemAmount = BigDecimalUtils.convert(payinfo.get("hospExemAmount"));//医院减免
-        BigDecimal retiredPay = BigDecimalUtils.convert(payinfo.get("retiredPay"));// 离休基金
-        BigDecimal fertilityPay = BigDecimalUtils.convert(payinfo.get("fertilityPay"));// 生育基金
-        BigDecimal preselfpayAmt = BigDecimalUtils.convert(payinfo.get("preselfpayAmt"));// 先行自付金额
-        BigDecimal inscpScpAmt = BigDecimalUtils.convert(payinfo.get("inscpScpAmt"));// 符合政策范围金额
-        BigDecimal poolPropSelfpay = BigDecimalUtils.convert(payinfo.get("poolPropSelfpay"));// 基本医疗保险统筹基金支付比例
-        BigDecimal acctMulaidPay = BigDecimalUtils.convert(payinfo.get("acctMulaidPay"));// 个人账户共计支付金额
-        BigDecimal soldierPay = BigDecimalUtils.convert(payinfo.get("soldierPay"));// 一至六级残疾军人医疗补助基金
-        BigDecimal retiredOutptPay = BigDecimalUtils.convert(payinfo.get("soldierPay"));// 离休老工人门慢保障基金
-        BigDecimal injuryPay = BigDecimalUtils.convert(payinfo.get("injuryPay"));// 工伤保险基金
-        BigDecimal hallPay = BigDecimalUtils.convert(payinfo.get("hallPay"));// 厅级干部补助基金
-        BigDecimal soldierToPay = BigDecimalUtils.convert(payinfo.get("soldierToPay"));// 军转干部医疗补助基金
-        BigDecimal welfarePay = BigDecimalUtils.convert(payinfo.get("welfarePay"));// 公益补充保险基金
-        BigDecimal COVIDPay = BigDecimalUtils.convert(payinfo.get("COVIDPay"));// 新冠肺炎核酸检测财政补助
-        BigDecimal familyPay = BigDecimalUtils.convert(payinfo.get("familyPay"));// 居民家庭账户金
-        BigDecimal behalfPay = BigDecimalUtils.convert(payinfo.get("behalfPay"));// 代缴基金（破产改制）
-
-        //TODO 计算医保支付金额 = 医保支付
-        BigDecimal miPrice = bka832;
-        //TODO 计算本次还需支付金额 = 优惠后总金额 - 医保支付金额
-        BigDecimal selfPrice = BigDecimalUtils.subtract(realityPrice, miPrice);
-
-        //获取医保个人信息
-        Map<String, String> personinfo = (Map<String, String>) insure.get("personinfo");
-        BigDecimal bacu18 = BigDecimalUtils.convert(personinfo.get("bacu18"));//账户余额
-
-        Map<String, String> delIndividualSettleParam = new HashMap<String, String>();
-        delIndividualSettleParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
-        delIndividualSettleParam.put("visitId", outptVisitDTO.getId());//就诊id
-        delIndividualSettleParam.put("settleState", Constants.YBJSZT.SS);//结算标志 = 试算
-        insureIndividualSettleService.delInsureIndividualSettleByVisitId(delIndividualSettleParam);
-        //医保结算表 insure_individual_settle
-        InsureIndividualSettleDO insureIndividualSettleDO = new InsureIndividualSettleDO();
-        insureIndividualSettleDO.setId(SnowflakeUtils.getId());//主键
-        insureIndividualSettleDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
-        insureIndividualSettleDO.setVisitId(outptVisitDTO.getId());//就诊id
-        insureIndividualSettleDO.setSettleId(settleId);//结算id
-        insureIndividualSettleDO.setIsHospital(Constants.SF.F);//是否住院（SF）
-        insureIndividualSettleDO.setVisitNo(outptVisitDTO.getVisitNo());//就诊登记号
-        insureIndividualSettleDO.setDischargeDnCode(null);//出院疾病诊断编码
-        insureIndividualSettleDO.setInsureOrgCode(insureConfigurationDTO.getCode());//医保机构编码
-        insureIndividualSettleDO.setInsureRegCode(insureConfigurationDTO.getRegCode());//医保注册编码
-        insureIndividualSettleDO.setMedicineOrgCode(insureConfigurationDTO.getOrgCode());//医疗机构编码
-        insureIndividualSettleDO.setDischargeDnName(null);//出院疾病诊断名称
-        insureIndividualSettleDO.setDischargedDate(null);//出院日期
-        insureIndividualSettleDO.setDischargedCase(null);//出院情况
-        insureIndividualSettleDO.setSettleway(Constants.JSFS.PTJS);//结算方式,01 普通结算,02 包干结算
-        insureIndividualSettleDO.setBeforeSettle(bacu18);//结算前账户余额
-        insureIndividualSettleDO.setLastSettle(BigDecimalUtils.isZero(bacu18) ? bacu18 : BigDecimalUtils.greater(bka831, bacu18) ? new BigDecimal(0) : BigDecimalUtils.subtract(bacu18, akb066));//结算后账户余额
-        insureIndividualSettleDO.setState(Constants.ZTBZ.ZC);//状态标志,0正常，2冲红，1，被冲红
-        insureIndividualSettleDO.setSettleState(Constants.YBJSZT.SS);//医保结算状态;0试算，1结算
-        insureIndividualSettleDO.setCostbatch(null);//费用批次
-        insureIndividualSettleDO.setAka130(insureIndividualVisitById.getAka130());//业务类型
-        insureIndividualSettleDO.setBka006(insureIndividualVisitById.getBka006());//待遇类型
-        insureIndividualSettleDO.setInjuryBorthSn(null);//业务申请号,门诊特病，工伤，生育
-        insureIndividualSettleDO.setIsAccount(BigDecimalUtils.isZero(akb066) ? Constants.SF.F : Constants.SF.S);//当前结算是否使用个人账户;0是，1否
-        insureIndividualSettleDO.setRemark(null);//备注
-        insureIndividualSettleDO.setCrteId(outptVisitDTO.getCrteId());//创建人ID
-        insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());//创建人姓名
-        insureIndividualSettleDO.setCrteTime(new Date());//创建时间
-
-        // 处理金额
-        insureIndividualSettleDO.setTotalPrice(akc264);// 本次医疗总费用
-        insureIndividualSettleDO.setStartingPrice(aka151);//起付线金额
-        insureIndividualSettleDO.setAllPortionPrice(bka825);//全自费金额
-        insureIndividualSettleDO.setPortionPrice(bka826);//部分自付金额 - 超限价
-        insureIndividualSettleDO.setInsurePrice(miPrice);//医保支付
-        insureIndividualSettleDO.setPlanPrice(ake039);//统筹基金支付
-        insureIndividualSettleDO.setPlanAccountPrice(poolPropSelfpay);//统筹段自负金额***
-        insureIndividualSettleDO.setPreselfpayAmt(preselfpayAmt);// 先行自付金额
-        insureIndividualSettleDO.setSeriousPrice(ake029);//大病互助支付
-        insureIndividualSettleDO.setCivilPrice(ake035);//公务员补助支付
-        insureIndividualSettleDO.setRetirePrice(retiredPay);// 离休人员医疗保证基金
-        insureIndividualSettleDO.setMafPay(mafPay); // 医疗救助基金
-        insureIndividualSettleDO.setHospExemAmount(hospExemAmount); // 医院减免
-        insureIndividualSettleDO.setPersonalPrice(akb066);//个人账户支付
-        insureIndividualSettleDO.setPersonPrice(akb067);//个人支付
-        insureIndividualSettleDO.setRestsPrice(bka839);//其他支付
-        insureIndividualSettleDO.setFertilityPay(fertilityPay);// 生育基金
-        insureIndividualSettleDO.setComPay(ake026);// 企业补充医疗保险基金
-        insureIndividualSettleDO.setHospPrice("990101".equals(insureIndividualVisitById.getAka130())?othPay:hospPrice);//医院垫付
-        insureIndividualSettleDO.setAcctInjPay(acctInjPay);
-        insureIndividualSettleDO.setRetAcctInjPay(retAcctInjPay);
-        insureIndividualSettleDO.setGovernmentPay(governmentPay);
-        insureIndividualSettleDO.setThbPay(thbPay);
-        insureIndividualSettleDO.setCarePay(carePay);
-        insureIndividualSettleDO.setLowInPay(lowInPay);
-        insureIndividualSettleDO.setOthPay(othPay);
-        insureIndividualSettleDO.setInscpScpAmt(inscpScpAmt);
-        insureIndividualSettleDO.setPoolPropSelfpay(poolPropSelfpay);
-        insureIndividualSettleDO.setAcctMulaidPay(acctMulaidPay);
-        insureIndividualSettleDO.setSoldierPay(soldierPay);
-        insureIndividualSettleDO.setRetiredOutptPay(retiredOutptPay);
-        insureIndividualSettleDO.setInjuryPay(injuryPay);
-        insureIndividualSettleDO.setHallPay(hallPay);
-        insureIndividualSettleDO.setSoldierToPay(soldierToPay);
-        insureIndividualSettleDO.setWelfarePay(welfarePay);
-        insureIndividualSettleDO.setCOVIDPay(COVIDPay);
-        insureIndividualSettleDO.setFamilyPay(familyPay);
-        insureIndividualSettleDO.setBehalfPay(behalfPay);
-        Map<String, Object> insureSettleParam = new HashMap<String, Object>();
-        insureSettleParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
-        insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
-        insureIndividualSettleService.insertSelective(insureSettleParam);
-        resultMap.put("payinfo", payinfo);
-        resultMap.put("miPrice", miPrice);
-        resultMap.put("selfPrice", selfPrice);
         return resultMap;
     }
 

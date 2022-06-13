@@ -89,4 +89,6 @@ public interface InsureUnifiedEmrUploadDAO {
      * @Return
      **/
     void updateTcmEmrBaseInfo(TcmMrisBaseInfoDTO tcmmrisBaseInfoDTO);
+
+    Map<String, Object> selectInsureDiseaseMatch(Map<String, Object> map);
 }

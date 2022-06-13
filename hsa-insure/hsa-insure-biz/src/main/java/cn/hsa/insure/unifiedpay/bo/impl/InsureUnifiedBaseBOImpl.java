@@ -1608,7 +1608,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         // 返参map
         Map<String, Object> resultMap = new HashMap<>();
         //如果是甘肃，海南的医保的就走3401接口 因为3401a接口没开 医保编码为 甘肃：620102 海南的：460100
-        if(StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("62") && attrCode.startsWith("46")){
+        if(StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("62") || attrCode.startsWith("46"))){
             log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
             resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
         }else {
@@ -1626,6 +1626,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         baseDeptService_consumer.updateBatchDept(map).getData();
         return resultMap;
     }
+
+
 
     /**
      * @param map

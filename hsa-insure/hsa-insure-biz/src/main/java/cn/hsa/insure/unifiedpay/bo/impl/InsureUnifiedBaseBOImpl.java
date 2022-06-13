@@ -1643,8 +1643,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
         String code = MapUtils.get(map, "hosp_dept_codg");
         String deptName = MapUtils.get(map, "hosp_dept_name");
-        String startTime = Long.toString(MapUtils.get(map, "begntime"));
-
+        //start 2022-06-13 zhangjinping 注释的这行代码会报类转换异常问题
+       // String startTime = Long.toString(MapUtils.get(map, "begntime"));
+        Long longTime = Long.parseLong(MapUtils.get(map, "begntime"));
+        String dateSting = DateUtils.getDateStr(longTime,DateUtils.Y_M_DH_M_S);
+        Date startTime = DateUtils.parse(dateSting,DateUtils.Y_M_DH_M_S);
+        //end
         BaseDeptDTO deptDTO = new BaseDeptDTO();
         deptDTO.setHospCode(hospCode);
         deptDTO.setCode(code);

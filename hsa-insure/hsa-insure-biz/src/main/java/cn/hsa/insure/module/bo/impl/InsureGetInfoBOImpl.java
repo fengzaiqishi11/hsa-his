@@ -1917,8 +1917,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private Map<String, Object> handerMriBaseInfo(Map<String, Object> map) {
-
-        return insureGetInfoDAO.selectMriBaseInfo(map);
+        Map<String, Object> baseInfo = insureGetInfoDAO.selectMriBaseInfo(map);
+        if (ObjectUtil.isEmpty(baseInfo)) {
+            baseInfo = insureGetInfoDAO.selectTcmMriBaseInfo(map);
+        }
+        if (ObjectUtil.isEmpty(baseInfo)) {
+            throw new AppException("未获取到患者病案首页基础信息，请检查！");
+        }
+        return  baseInfo;
 
     }
 
@@ -2013,9 +2019,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<OperInfoRecordDTO> handerOperInfo(Map<String, Object> map) {
-        List<OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
+        List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
         infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
-        if (!ListUtils.isEmpty(infoRecordDTOList)) {
+        //西医病案首页手术信息没取到则取中医病案首页
+        if (ObjectUtil.isEmpty(infoRecordDTOList)) {
+            infoRecordDTOList = insureGetInfoDAO.selectTcmMriOperInfo(map);
+        }
+        if(!ListUtils.isEmpty(infoRecordDTOList)){
             infoRecordDTOList.get(0).setOprnOprtType("1");
         }
         return infoRecordDTOList;
@@ -2034,8 +2044,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private Map<String, Object> handerInptDiagnose(Map<String, Object> map) {
         Map<String, Object> diseaseMap = new HashMap<>();
         List<InptDiagnoseDTO> inptDiagnoseDTOList = insureGetInfoDAO.selectMriInptDiagNose(map);
+        if (ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
+            inptDiagnoseDTOList = insureGetInfoDAO.selectTcmMriInptDiagNose(map);
+        }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();
+        Integer diseaseCount = 0;
         if (!ListUtils.isEmpty(inptDiagnoseDTOList)) {
             inptDiagnoseDTOList = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !"201".equals(inptDiagnoseDTO.getTypeCode())).collect(Collectors.toList());
             inptDiagnoseDTOList.stream().forEach(inptDiagnoseDTO -> {
@@ -2059,10 +2073,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     inptDiagnoseDTO.setTypeCode("1");
                 });
             }
+            diseaseCount = inptDiagnoseDTOList.size();
         }
-        diseaseMap.put("xiCollect", xiCollect);
-        diseaseMap.put("zxCollect", zxCollect);
-        diseaseMap.put("diseaseCount", inptDiagnoseDTOList.size());
+        diseaseMap.put("xiCollect",xiCollect);
+        diseaseMap.put("zxCollect",zxCollect);
+        diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;
     }
 

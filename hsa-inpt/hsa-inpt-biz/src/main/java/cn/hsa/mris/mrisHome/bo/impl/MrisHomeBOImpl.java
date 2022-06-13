@@ -949,14 +949,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (mrisBaseInfoDTO == null) {
                 throw new AppException("请先加载病人病案信息再上传");
             }
+            // 病案手术信息数据集
+            mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
+            mrisCostDO =  mrisHomeDAO.queryMriCost(map);
+            // 病案诊断信息数据集
+            mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
         }
 
-
-        // 病案手术信息数据集
-        mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
-        mrisCostDO =  mrisHomeDAO.queryMriCost(map);
-        // 病案诊断信息数据集
-        mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
         /*map.put("code","UNIFIED_PAY");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();*/
 

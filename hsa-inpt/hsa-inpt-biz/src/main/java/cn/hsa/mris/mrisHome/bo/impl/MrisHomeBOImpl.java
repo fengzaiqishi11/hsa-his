@@ -12,6 +12,7 @@ import cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService;
 import cn.hsa.module.inpt.inregister.service.InptVisitService;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
@@ -463,9 +464,22 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         return resultMap;
     }
 
-    // 整理病案首页数据，上传drg
+    /**
+     * @Author gory
+     * @Description 病案首页DRG质控
+     * 1.封装请求参数
+     * 2.获取系统参数中配置的病案质控drg地址
+     * 3.调用DRG质控地址
+     * 4.获取返回参数
+     * 5.插入日志
+     * 6.保存质控结果
+     * 7.封装返回参数
+     * @Date 2022/6/13 8:48
+     * @Param [map]
+     **/
     @Override
     public Map<String, Object> insertMrisForDRG(Map<String, Object> map) {
+        /**========= 1.封装请求参数 Begin=========**/
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
@@ -486,7 +500,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         dataMap.put("strArr", JSONObject.toJSONString(strArr));
         List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
         dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
-        /**=============获取系统参数中配置的病案质控drg地址 Begin=========**/
+        /**========= 封装请求参数 End=========**/
+
+        /**==========2.获取系统参数中配置的病案质控drg地址 Begin=========**/
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
         sysMap.put("code", "BA_DRG");
@@ -497,17 +513,36 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         } else {
             throw new AppException("请在系统参数中配置病案上传drg时，drg地址  例：BA_DRG: url");
         }
-        /**===================获取系统参数中配置的病案质控drg地址 End==============**/
+        /**========== 获取系统参数中配置的病案质控drg地址 End==============**/
 
-        /**======调用DRG begin=========**/
+        /**====== 3.调用DRG begin=========**/
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
         String result = HttpConnectUtil.doPostByXXX(url,dataMap);
-        /**======调用DRG begin=========**/
+        /**====== 调用DRG begin=========**/
 
-        /**======获取返回的参数 begin=========**/
+        /**====== 4.获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
-        // todo 此处调用插入日志
+        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
+        if (responseCode !=null && responseCode != 0){
+            throw new AppException("调用DRG接口失败");
+        }
+        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        if (MapUtils.isEmpty(resultMap)){
+            throw new AppException("DRG调用获取的结果集为null,请联系管理员");
+        }
+        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        if (MapUtils.isEmpty(baseInfoMap)){
+            throw new AppException("DRG调用获取的基本信息对象为null,请联系管理员");
+        }
+        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        if (MapUtils.isEmpty(groupInfoMap)){
+            throw new AppException("DRG调用获取的分组信息对象为null,请联系管理员");
+        }
+        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+        /**======获取返回的参数 end=========**/
+
+        /**====== 5.插入日志 begin=========**/
         logMap.put("respTime",DateUtils.getNow());//响应时间
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
@@ -522,45 +557,15 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
-        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != 0){
-            throw new AppException("调用DRG接口失败");
-        }
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
-        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
-        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
-        /**======获取返回的参数 end=========**/
+        /**====== 插入日志 end=========**/
 
-
-        /**==========返回参数封装 Begin ===========**/
-        Map responseDataMap = new HashMap<>();
-        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
-        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
-        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
-        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
-        responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
-        responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
-        responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
-        responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
-        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));//盈亏额
-        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",groupInfoMap.get("feeStand").toString());// 总费用标杆
-        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater").toString());// 药占比标杆
-        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
-        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息list
-        /**==========返回参数封装 End ===========**/
-        //保存质控结果
+        /**======6.保存质控结果 begin=========**/
         baseInfoStr.put("crteId",MapUtils.get(map, "crteId"));
         baseInfoStr.put("crteName",MapUtils.get(map, "crteName"));
         baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
         baseInfoStr.put("type","1");
         baseInfoStr.put("businessType","2");
         insertDrgDipResult(baseInfoStr,baseInfoMap,groupInfoMap,qualityInfoList);
-
         try{
             //TODO 此处插入业务操作日志 类型为3.质控
             Map<String, Object> businessLogMap = new HashMap<>();
@@ -606,13 +611,48 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             e.printStackTrace();
             logger.info("病案首页DRG质控插入日志失败！");
         }
+        /**======保存质控结果 end=========**/
+
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
+        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
+        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
+        responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
+        responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
+        responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
+        responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
+        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));//盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",groupInfoMap.get("feeStand").toString());// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater").toString());// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息list
+        /**==========返回参数封装 End ===========**/
+
         return responseDataMap;
 
     }
-    // 整理病案首页数据，上传drg
-    @Override
+
+    @Override/**
+     * @Author gory
+     * @Description 病案首页DIP质控
+     * 1.封装请求参数
+     * 2.获取系统参数中配置的病案质控dip地址
+     * 3.调用DIP质控地址
+     * 4.获取返回参数
+     * 5.插入日志
+     * 6.保存质控结果
+     * 7.封装返回参数
+     * @Date 2022/6/13 8:37
+     * @Param [map]
+     **/
     public Map<String, Object> insertMrisForDIP(Map<String, Object> map) {
-        // todo 此处调用授权码
+        /**=========== 1.封装请求参数 begin ==========**/
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
@@ -633,40 +673,49 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         dataMap.put("strArr", JSONObject.toJSONString(strArr));
         List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
         dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
-        Map<String, Object> paramMap = new HashMap<>();
+        /**=========== 封装请求参数 end ==========**/
 
+        /**=========== 2.获取请求地址 begin ==========**/
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
         sysMap.put("code", "BA_DIP");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
-        String url = "http://172.18.22.8:8080/drg_web/drgGroupThird/dipGroupAndQuality.action";
+        String url = "";
         if (sysParameterDTO != null && sysParameterDTO.getValue() != null && !"".equals(sysParameterDTO.getValue())) {
             url = sysParameterDTO.getValue();
         } else {
             throw new AppException("请在系统参数中配置病案上传dip时，dip地址  例：BA_DIP: url");
         }
-        /**=========== 调用DIP接口 begin ==========**/
-        paramMap.put("url", url);
-        paramMap.put("param", JSONObject.toJSONString(dataMap));
+        /**=========== 获取请求地址 end ==========**/
+
+        /**=========== 3.调用DIP接口 begin ==========**/
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
-//        String result = HttpConnectUtil.doPost(paramMap);
         String result = HttpConnectUtil.doPostByXXX(url,dataMap);
         /**=========== 调用DIP接口 end ==========**/
 
-        /**======获取返回的参数 begin=========**/
+        /**====== 4.获取返回的参数 begin=========**/
         Map<String,Object> responseMap = JSONObject.parseObject(result);
         Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != 0){
-            throw new AppException("调用DRG接口失败");
+        if (responseCode !=null && responseCode != 0){
+            throw new AppException("调用DIP接口失败");
         }
         Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+        if (MapUtils.isEmpty(resultMap)){
+            throw new AppException("DIP调用获取的结果集为null,请联系管理员");
+        }
         Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+        if (MapUtils.isEmpty(baseInfoMap)){
+            throw new AppException("DIP调用获取的基本信息对象为null,请联系管理员");
+        }
         Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+        if (MapUtils.isEmpty(groupInfoMap)){
+            throw new AppException("DIP调用获取的分组信息对象为null,请联系管理员");
+        }
         List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
         /**======获取返回的参数 end=========**/
 
-        // todo 此处调用插入日志
+        /**====== 5.调用插入日志 begin=========**/
         logMap.put("respTime",DateUtils.getNow());//响应时间
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfoStr, "medicine_org_code"));
@@ -681,27 +730,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
         drgDipResultService.insertDrgDipQulityInfoLog(logMap);
+        /**====== 调用插入日志 end=========**/
 
-        /**==========返回参数封装 Begin ===========**/
-        Map responseDataMap = new HashMap<>();
-        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
-        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
-        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
-        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
-        responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
-        responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
-        responseDataMap.put("diagFeeSco",groupInfoMap.get("feePay"));// 分值
-        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
-        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",baseInfoMap.get("feeStand"));// 总费用标杆
-        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
-        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
-        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息
-        /**==========返回参数封装 End ===========**/
-        //保存质控结果
+        /**====== 保存质控结果 begin=========**/
         baseInfoStr.put("crteId",MapUtils.get(map, "crteId"));
         baseInfoStr.put("crteName",MapUtils.get(map, "crteName"));
         baseInfoStr.put("hospCode",MapUtils.get(map, "hospCode"));
@@ -753,8 +784,49 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             e.printStackTrace();
             logger.info("病案首页DIP质控插入日志失败！");
         }
+        /**====== 保存质控结果 end=========**/
+
+        /**==========返回参数封装 Begin ===========**/
+        Map responseDataMap = new HashMap<>();
+        responseDataMap.put("name",baseInfoStr.get("name"));// 姓名
+        responseDataMap.put("sex",baseInfoStr.get("sex"));// 性别
+        responseDataMap.put("age",baseInfoStr.get("age"));// 年龄
+        responseDataMap.put("inNO",baseInfoStr.get("adm_no"));// 住院号
+        responseDataMap.put("hiType",baseInfoStr.get("health_care_type"));// 医保类型
+        responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
+        responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
+        responseDataMap.put("diagFeeSco",groupInfoMap.get("feePay"));// 分值
+        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
+        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+        responseDataMap.put("feeStand",baseInfoMap.get("feeStand"));// 总费用标杆
+        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材占比
+        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材占比标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息
+        /**==========返回参数封装 End ===========**/
         return responseDataMap;
 
+    }
+
+    @Override
+    public Map<String, Object> insertMrisForDIPorDRG(Map<String, Object> map) {
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        Map<String,Object> drgData = new HashMap<>();
+        Map<String,Object> dipData = new HashMap<>();
+        if ("true".equals(drgDipAuthDTO.getDrg())){
+            drgData = insertMrisForDRG(map);
+
+        }
+        if ("true".equals(drgDipAuthDTO.getDip())){
+            dipData = insertMrisForDIP(map);
+
+        }
+        Map resultMap = new HashMap<>();
+        resultMap.put("drgData",drgData);
+        resultMap.put("dipData",dipData);
+        return resultMap;
     }
 
     public Map<String, Object> getMaisPatientInfo(Map<String, Object> map) {

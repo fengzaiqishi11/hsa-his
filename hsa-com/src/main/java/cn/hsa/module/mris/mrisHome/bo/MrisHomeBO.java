@@ -266,4 +266,6 @@ public interface MrisHomeBO {
     List<MrisDiagnoseDO> queryAllDiagnose(InptVisitDTO inptVisitDTO);
 
     Map<String, Object> insertMrisForDIP(Map<String, Object> map);
+
+    Map<String,Object> insertMrisForDIPorDRG(Map<String, Object> map);
 }

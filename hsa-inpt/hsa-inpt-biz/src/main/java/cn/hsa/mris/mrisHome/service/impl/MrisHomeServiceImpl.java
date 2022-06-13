@@ -266,21 +266,8 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
      **/
     @Override
     public WrapperResponse<Map<String, Object>> upMrisForDIPorDRG(Map<String, Object> map) {
-        //调用授权
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService_consumer.checkDrgDipBizAuthorization(map);
-        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
-        Map<String,Object> drgData = new HashMap<>();
-        Map<String,Object> dipData = new HashMap<>();
-        if ("true".equals(drgDipAuthDTO.getDrg())){
-            drgData = upMrisForDRG(map);
-        }
-        if ("true".equals(drgDipAuthDTO.getDip())){
-            dipData = upMrisForDIP(map);
-        }
-        Map resultMap = new HashMap<>();
-        resultMap.put("drgData",drgData);
-        resultMap.put("dipData",dipData);
-        return WrapperResponse.success(resultMap);
+
+        return WrapperResponse.success(mrisHomeBO.insertMrisForDIPorDRG(map));
     }
 
     /**

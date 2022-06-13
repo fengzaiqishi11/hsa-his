@@ -760,6 +760,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }else{
           resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+            drgDipResultService.checkDrgDipBizAuthorization(map2);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+          resultDataMap.put("hasAuth",false);
+        }else{
+          resultDataMap.put("hasAuth",true);
+        }
         return resultDataMap;
     }
 
@@ -1599,6 +1610,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
               resultDataMap.put("DIP_DRG_MODEL",null);
             }else{
               resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
+            }
+            //返回给前端  提示是否有这个权限
+            Map<String,Object> map2 = new HashMap<>();
+            map2.put("hospCode",map.get("hospCode").toString());
+            WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+                drgDipResultService.checkDrgDipBizAuthorization(map2);
+            DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+            if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+              resultDataMap.put("hasAuth",false);
+            }else{
+              resultDataMap.put("hasAuth",true);
             }
         }
         return resultDataMap;

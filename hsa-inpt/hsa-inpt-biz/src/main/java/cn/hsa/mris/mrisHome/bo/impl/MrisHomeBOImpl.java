@@ -461,6 +461,17 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }else{
             resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+            drgDipResultService.checkDrgDipBizAuthorization(map2);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+          resultMap.put("hasAuth",false);
+        }else{
+          resultMap.put("hasAuth",true);
+        }
         return resultMap;
     }
 
@@ -1009,14 +1020,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (mrisBaseInfoDTO == null) {
                 throw new AppException("请先加载病人病案信息再上传");
             }
+            // 病案手术信息数据集
+            mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
+            mrisCostDO =  mrisHomeDAO.queryMriCost(map);
+            // 病案诊断信息数据集
+            mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
         }
 
-
-        // 病案手术信息数据集
-        mrisOperList = mrisHomeDAO.queryMrisOperInfoPage(inptVisitDTO);
-        mrisCostDO =  mrisHomeDAO.queryMriCost(map);
-        // 病案诊断信息数据集
-        mrisDiagnoseList = mrisHomeDAO.queryMrisDiagnosePage(inptVisitDTO);
         /*map.put("code","UNIFIED_PAY");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(map).getData();*/
 

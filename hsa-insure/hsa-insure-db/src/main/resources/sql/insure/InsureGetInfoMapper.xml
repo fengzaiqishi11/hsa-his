@@ -420,7 +420,7 @@
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
         is_uplod_cost,is_uplod_dise,cplt_flag,DATE_FORMAT(in_time, "%Y-%m-%d") as visitDate,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
-        patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
+        CONVERT(patient_code,SIGNED) &lt;= 0 and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
@@ -445,7 +445,7 @@
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
-        ov.patient_code = '0' and os.id is not null and ov.hosp_code =#{hospCode}
+        CONVERT(ov.patient_code,SIGNED) &lt;= 0 and os.id is not null and ov.hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))

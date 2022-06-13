@@ -8,6 +8,7 @@ import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
@@ -24,6 +25,7 @@ import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO;
+import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
 import cn.hsa.module.mris.tcmMrisHome.bo.TcmMrisHomeBO;
 import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmDiagnoseDTO;
@@ -92,6 +94,9 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
     @Resource
     private DrgDipResultService drgDipResultService;
+
+    @Resource
+    private MrisHomeService mrisHomeService_consumer;
 
 
     /**
@@ -265,7 +270,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         resultMap.put("mrisTcmDiagnose", tcmMrisHomeDAO.queryTcmDiagnosePage(inptVisitDTO));
         resultMap.put("mrisOperInfo", tcmMrisHomeDAO.queryTcmMrisOperInfoPage(inptVisitDTO));
         resultMap.put("mrisTurnDeptList", tcmMrisHomeDAO.queryTcmMrisTurnDeptPage(inptVisitDTO));
-        //新增质控信息
+        //1.新增质控信息
         DrgDipResultDTO dto = new DrgDipResultDTO();
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
@@ -274,7 +279,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         map1.put("hospCode",map.get("hospCode").toString());
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
         resultMap.put("drgInfo",combo);
-        //DIP_DRG_MODE值
+        //2.获取DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
         sysMap.put("code", "DIP_DRG_MODEL");
@@ -284,6 +289,17 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         }else{
           resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+            drgDipResultService.checkDrgDipBizAuthorization(map2);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+         if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+           resultMap.put("hasAuth",false);
+         }else{
+           resultMap.put("hasAuth",true);
+         }
         return resultMap;
     }
 

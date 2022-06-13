@@ -12,6 +12,7 @@ import cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService;
 import cn.hsa.module.inpt.inregister.service.InptVisitService;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
@@ -459,6 +460,17 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             resultMap.put("DIP_DRG_MODEL",null);
         }else{
             resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
+        }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+            drgDipResultService.checkDrgDipBizAuthorization(map2);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+        if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+          resultMap.put("hasAuth",false);
+        }else{
+          resultMap.put("hasAuth",true);
         }
         return resultMap;
     }

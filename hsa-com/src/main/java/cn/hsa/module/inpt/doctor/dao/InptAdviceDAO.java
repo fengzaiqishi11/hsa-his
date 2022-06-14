@@ -907,4 +907,12 @@ public interface InptAdviceDAO {
     List<InptVisitDTO> querySubmitAdviceList(Map param);
 
     List<BaseAdviceDetailDTO> getAdviceDataDetail(BaseDrugDTO baseDrugDTO);
+
+    /**
+     * 根据就诊ID查询对应的LIS医嘱，PACS医嘱
+     * @param inptAdviceDTO
+     * @return
+     */
+    List<InptAdviceDTO> getLisOrPacsInptAdviceNew(InptAdviceDTO inptAdviceDTO);
+
 }

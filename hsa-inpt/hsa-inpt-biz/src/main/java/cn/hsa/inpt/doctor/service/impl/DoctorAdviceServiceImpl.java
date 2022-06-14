@@ -319,4 +319,18 @@ public class DoctorAdviceServiceImpl extends HsafService implements DoctorAdvice
         doctorAdviceBO.insertUnsubmitAdviceList(map, Constants.YZ_TYPE.YZ_TYPE_WTJ);
         return WrapperResponse.success(true);
     }
+
+    /**
+     * @param map
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询某人的LIS或者PACS医嘱信息
+     * @Author: pengbo
+     * @Date: 2022-06-13 10:29
+     * @Return:
+     */
+    @Override
+    public WrapperResponse<List<InptAdviceDTO>> queryLisOrPacsAdvice(Map map) {
+        InptAdviceDTO inptAdviceDTO = MapUtils.get(map,"inptAdviceDTO");
+        return WrapperResponse.success(doctorAdviceBO.queryLisOrPacsAdvice(inptAdviceDTO));
+    }
 }

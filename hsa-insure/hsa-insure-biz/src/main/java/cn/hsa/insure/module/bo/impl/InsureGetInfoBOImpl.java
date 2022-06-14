@@ -2063,36 +2063,51 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private Map<String, Object> handerInptDiagnose(Map<String, Object> map) {
         Map<String, Object> diseaseMap = new HashMap<>();
         List<InptDiagnoseDTO> inptDiagnoseDTOList = insureGetInfoDAO.selectMriInptDiagNose(map);
+        List<InptDiagnoseDTO> tcmXyDiagnoseDTOS = new ArrayList<>();//中医病案的西医诊断信息
+        List<InptDiagnoseDTO> tcmZyDiagnoseDTOS = new ArrayList<>();//中医病案的中医诊断信息
         if (ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
-            inptDiagnoseDTOList = insureGetInfoDAO.selectTcmMriInptDiagNose(map);
+            tcmXyDiagnoseDTOS = insureGetInfoDAO.selectTcmMriInptDiagNose(map);//中医病案的西医诊断信息
+            tcmZyDiagnoseDTOS = insureGetInfoDAO.selectTcmSyndromesMriInptDiagNose(map);
+        }
+        if (ObjectUtil.isEmpty(inptDiagnoseDTOList) && ObjectUtil.isEmpty(tcmXyDiagnoseDTOS) && ObjectUtil.isEmpty(tcmZyDiagnoseDTOS)) {
+            throw new AppException("未获取到诊断信息，请检查！");
         }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();
         Integer diseaseCount = 0;
         if (!ListUtils.isEmpty(inptDiagnoseDTOList)) {
-            inptDiagnoseDTOList = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !"201".equals(inptDiagnoseDTO.getTypeCode())).collect(Collectors.toList());
             inptDiagnoseDTOList.stream().forEach(inptDiagnoseDTO -> {
                 if ("0".equals(inptDiagnoseDTO.getAdmCondType())) {
                     inptDiagnoseDTO.setAdmCondType("4");
                 }
             });
-            zxCollect = inptDiagnoseDTOList.stream().filter
-                            (inptDiagnoseDTO -> "303".equals(inptDiagnoseDTO.getTypeCode()) || "301".equals(inptDiagnoseDTO.getTypeCode()) ||
-                                    "302".equals(inptDiagnoseDTO.getTypeCode()))
-                    .collect(Collectors.toList());
-            if (!ListUtils.isEmpty(zxCollect)) {
-                zxCollect.stream().forEach(inptDiagnoseDTO -> {
-                    inptDiagnoseDTO.setTypeCode("2");
-                });
-            }
-            List<InptDiagnoseDTO> finalZxCollect = zxCollect;
-            xiCollect = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !finalZxCollect.contains(inptDiagnoseDTO)).collect(Collectors.toList());
+            xiCollect = inptDiagnoseDTOList;
             if (!ListUtils.isEmpty(xiCollect)) {
                 xiCollect.stream().forEach(inptDiagnoseDTO -> {
                     inptDiagnoseDTO.setTypeCode("1");
                 });
             }
             diseaseCount = inptDiagnoseDTOList.size();
+        }else {
+            if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
+                tcmZyDiagnoseDTOS.stream().forEach(diag ->{
+                    diag.setTypeCode("2");
+                    if ("1".equals(diag.getIsMain())) {
+                        diag.setDiseaseCode(diag.getTcmSyndromesId());
+                        diag.setDiseaseName(diag.getTcmSyndromesName());
+                    }
+                });
+                zxCollect = tcmZyDiagnoseDTOS;
+            }
+            if (ObjectUtil.isNotEmpty(tcmXyDiagnoseDTOS)) {
+                xiCollect = tcmXyDiagnoseDTOS;
+                if (!ListUtils.isEmpty(xiCollect)) {
+                    xiCollect.stream().forEach(inptDiagnoseDTO -> {
+                        inptDiagnoseDTO.setTypeCode("1");
+                    });
+                }
+            }
+            diseaseCount = zxCollect.size()+xiCollect.size();
         }
         diseaseMap.put("xiCollect",xiCollect);
         diseaseMap.put("zxCollect",zxCollect);

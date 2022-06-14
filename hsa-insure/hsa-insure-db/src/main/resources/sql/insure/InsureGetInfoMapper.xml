@@ -1762,6 +1762,22 @@
         order by  mid.disease_code desc
     </select>
 
+    <select id="selectTcmSyndromesMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+       select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id,
+               mid.disease_icd10 diseaseCode,
+               mid.disease_icd10_name diseaseName,
+               mid.in_situation_code as    admCondType,
+               mid.tcm_syndromes_id tcmSyndromesId,
+               mid.tcm_syndromes_name tcmSyndromesName,
+               mid.disease_code  as    isMain
+        from tcm_mris_syndromes_diagnose mid
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+    </select>
+
     <!-- 根据主键删除表信息 -->
     <delete id="deleteByVisitID" parameterType="java.lang.String">
         DELETE

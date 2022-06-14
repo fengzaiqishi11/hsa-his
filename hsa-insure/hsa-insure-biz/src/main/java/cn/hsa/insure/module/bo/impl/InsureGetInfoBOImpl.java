@@ -2004,8 +2004,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private Map<String, Object> handerMriBaseInfo(Map<String, Object> map) {
-
-        return insureGetInfoDAO.selectMriBaseInfo(map);
+        Map<String, Object> baseInfo = insureGetInfoDAO.selectMriBaseInfo(map);
+        if (ObjectUtil.isEmpty(baseInfo)) {
+            baseInfo = insureGetInfoDAO.selectTcmMriBaseInfo(map);
+        }
+        if (ObjectUtil.isEmpty(baseInfo)) {
+            throw new AppException("未获取到患者病案首页基础信息，请检查！");
+        }
+        return  baseInfo;
 
     }
 
@@ -2100,9 +2106,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<OperInfoRecordDTO> handerOperInfo(Map<String, Object> map) {
-        List<OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
+        List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
         infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
-        if (!ListUtils.isEmpty(infoRecordDTOList)) {
+        //西医病案首页手术信息没取到则取中医病案首页
+        if (ObjectUtil.isEmpty(infoRecordDTOList)) {
+            infoRecordDTOList = insureGetInfoDAO.selectTcmMriOperInfo(map);
+        }
+        if(!ListUtils.isEmpty(infoRecordDTOList)){
             infoRecordDTOList.get(0).setOprnOprtType("1");
         }
         return infoRecordDTOList;
@@ -2121,35 +2131,55 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private Map<String, Object> handerInptDiagnose(Map<String, Object> map) {
         Map<String, Object> diseaseMap = new HashMap<>();
         List<InptDiagnoseDTO> inptDiagnoseDTOList = insureGetInfoDAO.selectMriInptDiagNose(map);
+        List<InptDiagnoseDTO> tcmXyDiagnoseDTOS = new ArrayList<>();//中医病案的西医诊断信息
+        List<InptDiagnoseDTO> tcmZyDiagnoseDTOS = new ArrayList<>();//中医病案的中医诊断信息
+        if (ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
+            tcmXyDiagnoseDTOS = insureGetInfoDAO.selectTcmMriInptDiagNose(map);//中医病案的西医诊断信息
+            tcmZyDiagnoseDTOS = insureGetInfoDAO.selectTcmSyndromesMriInptDiagNose(map);
+        }
+        if (ObjectUtil.isEmpty(inptDiagnoseDTOList) && ObjectUtil.isEmpty(tcmXyDiagnoseDTOS) && ObjectUtil.isEmpty(tcmZyDiagnoseDTOS)) {
+            throw new AppException("未获取到诊断信息，请检查！");
+        }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();
+        Integer diseaseCount = 0;
         if (!ListUtils.isEmpty(inptDiagnoseDTOList)) {
-            inptDiagnoseDTOList = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !"201".equals(inptDiagnoseDTO.getTypeCode())).collect(Collectors.toList());
             inptDiagnoseDTOList.stream().forEach(inptDiagnoseDTO -> {
                 if ("0".equals(inptDiagnoseDTO.getAdmCondType())) {
                     inptDiagnoseDTO.setAdmCondType("4");
                 }
             });
-            zxCollect = inptDiagnoseDTOList.stream().filter
-                            (inptDiagnoseDTO -> "303".equals(inptDiagnoseDTO.getTypeCode()) || "301".equals(inptDiagnoseDTO.getTypeCode()) ||
-                                    "302".equals(inptDiagnoseDTO.getTypeCode()))
-                    .collect(Collectors.toList());
-            if (!ListUtils.isEmpty(zxCollect)) {
-                zxCollect.stream().forEach(inptDiagnoseDTO -> {
-                    inptDiagnoseDTO.setTypeCode("2");
-                });
-            }
-            List<InptDiagnoseDTO> finalZxCollect = zxCollect;
-            xiCollect = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !finalZxCollect.contains(inptDiagnoseDTO)).collect(Collectors.toList());
+            xiCollect = inptDiagnoseDTOList;
             if (!ListUtils.isEmpty(xiCollect)) {
                 xiCollect.stream().forEach(inptDiagnoseDTO -> {
                     inptDiagnoseDTO.setTypeCode("1");
                 });
             }
+            diseaseCount = inptDiagnoseDTOList.size();
+        }else {
+            if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
+                tcmZyDiagnoseDTOS.stream().forEach(diag ->{
+                    diag.setTypeCode("2");
+                    if ("1".equals(diag.getIsMain())) {
+                        diag.setDiseaseCode(diag.getTcmSyndromesId());
+                        diag.setDiseaseName(diag.getTcmSyndromesName());
+                    }
+                });
+                zxCollect = tcmZyDiagnoseDTOS;
+            }
+            if (ObjectUtil.isNotEmpty(tcmXyDiagnoseDTOS)) {
+                xiCollect = tcmXyDiagnoseDTOS;
+                if (!ListUtils.isEmpty(xiCollect)) {
+                    xiCollect.stream().forEach(inptDiagnoseDTO -> {
+                        inptDiagnoseDTO.setTypeCode("1");
+                    });
+                }
+            }
+            diseaseCount = zxCollect.size()+xiCollect.size();
         }
-        diseaseMap.put("xiCollect", xiCollect);
-        diseaseMap.put("zxCollect", zxCollect);
-        diseaseMap.put("diseaseCount", inptDiagnoseDTOList.size());
+        diseaseMap.put("xiCollect",xiCollect);
+        diseaseMap.put("zxCollect",zxCollect);
+        diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;
     }
 

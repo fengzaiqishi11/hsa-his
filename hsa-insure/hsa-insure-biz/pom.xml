@@ -197,5 +197,11 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.powersi</groupId>
+            <artifactId>yhaf-gateway-sdk</artifactId>
+            <version>1.0.0-RELEASE</version>
+            <classifier>RELEASE</classifier>
+        </dependency>
     </dependencies>
 </project>

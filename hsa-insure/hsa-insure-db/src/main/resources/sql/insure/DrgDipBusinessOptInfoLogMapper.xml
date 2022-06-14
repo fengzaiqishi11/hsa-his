@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO" id="drgDipBusinessOptInfoLogMap">
+        <result property="id" column="id"/>
+        <result property="qulityId" column="qulity_id"/>
+        <result property="businessId" column="business_id"/>
+        <result property="optType" column="opt_type"/>
+        <result property="optTypeName" column="opt_type_name"/>
+        <result property="type" column="type"/>
+        <result property="businessType" column="business_type"/>
+        <result property="isForce" column="is_force"/>
+        <result property="forceUploadInfo" column="force_upload_info"/>
+        <result property="hospCode" column="hosp_code"/>
+        <result property="insureRegCode" column="insure_reg_code"/>
+        <result property="hospName" column="hosp_name"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="insureSettleId" column="insure_settle_id"/>
+        <result property="medicalRegNo" column="medical_reg_no"/>
+        <result property="settleId" column="settle_id"/>
+        <result property="visitId" column="visit_id"/>
+        <result property="psnNo" column="psn_no"/>
+        <result property="psName" column="ps_name"/>
+        <result property="certno" column="certno"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="sex" column="sex"/>
+        <result property="age" column="age"/>
+        <result property="insueType" column="insue_type"/>
+        <result property="inptTime" column="inpt_time"/>
+        <result property="outptTime" column="outpt_time"/>
+        <result property="medType" column="med_type"/>
+        <result property="medTypeName" column="med_type_name"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="doctorId" column="doctor_id"/>
+        <result property="doctorName" column="doctor_name"/>
+        <result property="inptDiagnose" column="inpt_diagnose"/>
+        <result property="outptDiagnose" column="outpt_diagnose"/>
+        <result property="totalFee" column="total_fee"/>
+        <result property="payFee" column="pay_fee"/>
+        <result property="selfFee" column="self_fee"/>
+        <result property="cashPayFee" column="cash_pay_fee"/>
+        <result property="inputJson" column="input_json"/>
+        <result property="validFlag" column="valid_flag"/>
+        <result property="crtId" column="crt_id"/>
+        <result property="crtName" column="crt_name"/>
+        <result property="crtTime" column="crt_time"/>
+    </resultMap>
+
+    <insert id="insertDrgDipBusinessOptInfoLog" parameterType="cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO" >
+        insert into drg_dip_business_opt_info_log (
+
+        id <!--主键id--> ,
+
+
+        qulity_id <!--质控结果主表id--> ,
+
+
+        business_id <!--业务id--> ,
+
+
+        opt_type <!--操作类型1.修改 2.保存 3.质控 4.上传--> ,
+
+
+        opt_type_name <!--操作类型名称--> ,
+
+
+        type <!--类型1.DRG 2.DIP--> ,
+
+
+        business_type <!--业务类型1.结算清单 2.病案首页--> ,
+
+
+        is_force <!--是否强制上传1.是 2.否（默认）--> ,
+
+
+        force_upload_info <!--操作提示信息--> ,
+
+
+        hosp_code <!--医院编码--> ,
+
+
+        insure_reg_code <!--医保注册编码--> ,
+
+
+        hosp_name <!--医院名称--> ,
+
+
+        org_code <!--机构编码（H码）--> ,
+
+
+        insure_settle_id <!--医保结算id--> ,
+
+
+        medical_reg_no <!--就医登记号--> ,
+
+
+        settle_id <!--his结算id--> ,
+
+
+        visit_id <!--就诊id--> ,
+
+
+        psn_no <!--人员编号--> ,
+
+
+        ps_name <!--患者姓名--> ,
+
+
+        certno <!--患者身份证号码--> ,
+
+
+        dept_id <!--科室id--> ,
+
+
+        sex <!--性别--> ,
+
+
+        age <!--年龄--> ,
+
+
+        insue_type <!--险种类型--> ,
+
+
+        inpt_time <!--入院时间--> ,
+
+
+        outpt_time <!--出院时间--> ,
+
+
+        med_type <!--业务类型--> ,
+
+
+        med_type_name <!--业务类型名称--> ,
+
+
+        dept_name <!--科室名称--> ,
+
+
+        doctor_id <!--医生id--> ,
+
+
+        doctor_name <!--医生姓名--> ,
+
+
+        inpt_diagnose <!--入院诊断--> ,
+
+
+        outpt_diagnose <!--出院诊断--> ,
+
+
+        total_fee <!--总费用--> ,
+
+
+        pay_fee <!--基金支付合计--> ,
+
+
+        self_fee <!--个人账户支付--> ,
+
+
+        cash_pay_fee <!--现金支付--> ,
+
+
+        input_json <!--数据保存入参--> ,
+
+
+        valid_flag <!--有效标志--> ,
+
+
+        crt_id <!--创建人--> ,
+
+
+        crt_name <!--创建姓名--> ,
+
+
+        crt_time <!--创建时间-->
+
+        )
+        values (
+
+        #{id},
+
+
+        #{qulityId},
+
+
+        #{businessId},
+
+
+        #{optType},
+
+
+        #{optTypeName},
+
+
+        #{type},
+
+
+        #{businessType},
+
+
+        #{isForce},
+
+
+        #{forceUploadInfo},
+
+
+        #{hospCode},
+
+
+        #{insureRegCode},
+
+
+        #{hospName},
+
+
+        #{orgCode},
+
+
+        #{insureSettleId},
+
+
+        #{medicalRegNo},
+
+
+        #{settleId},
+
+
+        #{visitId},
+
+
+        #{psnNo},
+
+
+        #{psName},
+
+
+        #{certno},
+
+
+        #{deptId},
+
+
+        #{sex},
+
+
+        #{age},
+
+
+        #{insueType},
+
+
+        #{inptTime},
+
+
+        #{outptTime},
+
+
+        #{medType},
+
+
+        #{medTypeName},
+
+
+        #{deptName},
+
+
+        #{doctorId},
+
+
+        #{doctorName},
+
+
+        #{inptDiagnose},
+
+
+        #{outptDiagnose},
+
+
+        #{totalFee},
+
+
+        #{payFee},
+
+
+        #{selfFee},
+
+
+        #{cashPayFee},
+
+
+        #{inputJson},
+
+
+        #{validFlag},
+
+
+        #{crtId},
+
+
+        #{crtName},
+
+
+        #{crtTime}
+
+        )
+    </insert>
+
+    <select id="selectById" resultMap="drgDipBusinessOptInfoLogMap" >
+        select
+        id <!--主键id-->,        qulity_id <!--质控结果主表id-->,        business_id <!--业务id-->,        opt_type <!--操作类型1.修改 2.保存 3.质控 4.上传-->,        opt_type_name <!--操作类型名称-->,        type <!--类型1.DRG 2.DIP-->,        business_type <!--业务类型1.结算清单 2.病案首页-->,        is_force <!--是否强制上传1.是 2.否（默认）-->,        force_upload_info <!--操作提示信息-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码（H码）-->,        insure_settle_id <!--医保结算id-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        ps_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        dept_id <!--科室id-->,        sex <!--性别-->,        age <!--年龄-->,        insue_type <!--险种类型-->,        inpt_time <!--入院时间-->,        outpt_time <!--出院时间-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        total_fee <!--总费用-->,        pay_fee <!--基金支付合计-->,        self_fee <!--个人账户支付-->,        cash_pay_fee <!--现金支付-->,        input_json <!--数据保存入参-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
+        from drg_dip_business_opt_info_log where
+        id = #{id}
+    </select>
+
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.dao.DrgDipBusinessOptInfoLogDAO" >
+        update drg_dip_business_opt_info_log set
+        if(#{id} != null and #{id} != ''){
+        id = #{id} <!--主键id-->,
+        }
+        if(#{qulityId} != null and #{qulityId} != ''){
+        qulity_id = #{qulityId} <!--质控结果主表id-->,
+        }
+        if(#{businessId} != null and #{businessId} != ''){
+        business_id = #{businessId} <!--业务id-->,
+        }
+        if(#{optType} != null and #{optType} != ''){
+        opt_type = #{optType} <!--操作类型1.修改 2.保存 3.质控 4.上传-->,
+        }
+        if(#{optTypeName} != null and #{optTypeName} != ''){
+        opt_type_name = #{optTypeName} <!--操作类型名称-->,
+        }
+        if(#{type} != null and #{type} != ''){
+        type = #{type} <!--类型1.DRG 2.DIP-->,
+        }
+        if(#{businessType} != null and #{businessType} != ''){
+        business_type = #{businessType} <!--业务类型1.结算清单 2.病案首页-->,
+        }
+        if(#{isForce} != null and #{isForce} != ''){
+        is_force = #{isForce} <!--是否强制上传1.是 2.否（默认）-->,
+        }
+        if(#{forceUploadInfo} != null and #{forceUploadInfo} != ''){
+        force_upload_info = #{forceUploadInfo} <!--操作提示信息-->,
+        }
+        if(#{hospCode} != null and #{hospCode} != ''){
+        hosp_code = #{hospCode} <!--医院编码-->,
+        }
+        if(#{insureRegCode} != null and #{insureRegCode} != ''){
+        insure_reg_code = #{insureRegCode} <!--医保注册编码-->,
+        }
+        if(#{hospName} != null and #{hospName} != ''){
+        hosp_name = #{hospName} <!--医院名称-->,
+        }
+        if(#{orgCode} != null and #{orgCode} != ''){
+        org_code = #{orgCode} <!--机构编码（H码）-->,
+        }
+        if(#{insureSettleId} != null and #{insureSettleId} != ''){
+        insure_settle_id = #{insureSettleId} <!--医保结算id-->,
+        }
+        if(#{medicalRegNo} != null and #{medicalRegNo} != ''){
+        medical_reg_no = #{medicalRegNo} <!--就医登记号-->,
+        }
+        if(#{settleId} != null and #{settleId} != ''){
+        settle_id = #{settleId} <!--his结算id-->,
+        }
+        if(#{visitId} != null and #{visitId} != ''){
+        visit_id = #{visitId} <!--就诊id-->,
+        }
+        if(#{psnNo} != null and #{psnNo} != ''){
+        psn_no = #{psnNo} <!--人员编号-->,
+        }
+        if(#{psName} != null and #{psName} != ''){
+        ps_name = #{psName} <!--患者姓名-->,
+        }
+        if(#{certno} != null and #{certno} != ''){
+        certno = #{certno} <!--患者身份证号码-->,
+        }
+        if(#{deptId} != null and #{deptId} != ''){
+        dept_id = #{deptId} <!--科室id-->,
+        }
+        if(#{sex} != null and #{sex} != ''){
+        sex = #{sex} <!--性别-->,
+        }
+        if(#{age} != null and #{age} != ''){
+        age = #{age} <!--年龄-->,
+        }
+        if(#{insueType} != null and #{insueType} != ''){
+        insue_type = #{insueType} <!--险种类型-->,
+        }
+        if(#{inptTime} != null and #{inptTime} != ''){
+        inpt_time = #{inptTime} <!--入院时间-->,
+        }
+        if(#{outptTime} != null and #{outptTime} != ''){
+        outpt_time = #{outptTime} <!--出院时间-->,
+        }
+        if(#{medType} != null and #{medType} != ''){
+        med_type = #{medType} <!--业务类型-->,
+        }
+        if(#{medTypeName} != null and #{medTypeName} != ''){
+        med_type_name = #{medTypeName} <!--业务类型名称-->,
+        }
+        if(#{deptName} != null and #{deptName} != ''){
+        dept_name = #{deptName} <!--科室名称-->,
+        }
+        if(#{doctorId} != null and #{doctorId} != ''){
+        doctor_id = #{doctorId} <!--医生id-->,
+        }
+        if(#{doctorName} != null and #{doctorName} != ''){
+        doctor_name = #{doctorName} <!--医生姓名-->,
+        }
+        if(#{inptDiagnose} != null and #{inptDiagnose} != ''){
+        inpt_diagnose = #{inptDiagnose} <!--入院诊断-->,
+        }
+        if(#{outptDiagnose} != null and #{outptDiagnose} != ''){
+        outpt_diagnose = #{outptDiagnose} <!--出院诊断-->,
+        }
+        if(#{totalFee} != null and #{totalFee} != ''){
+        total_fee = #{totalFee} <!--总费用-->,
+        }
+        if(#{payFee} != null and #{payFee} != ''){
+        pay_fee = #{payFee} <!--基金支付合计-->,
+        }
+        if(#{selfFee} != null and #{selfFee} != ''){
+        self_fee = #{selfFee} <!--个人账户支付-->,
+        }
+        if(#{cashPayFee} != null and #{cashPayFee} != ''){
+        cash_pay_fee = #{cashPayFee} <!--现金支付-->,
+        }
+        if(#{inputJson} != null and #{inputJson} != ''){
+        input_json = #{inputJson} <!--数据保存入参-->,
+        }
+        if(#{validFlag} != null and #{validFlag} != ''){
+        valid_flag = #{validFlag} <!--有效标志-->,
+        }
+        if(#{crtId} != null and #{crtId} != ''){
+        crt_id = #{crtId} <!--创建人-->,
+        }
+        if(#{crtName} != null and #{crtName} != ''){
+        crt_name = #{crtName} <!--创建姓名-->,
+        }
+        if(#{crtTime} != null and #{crtTime} != ''){
+        crt_time = #{crtTime} <!--创建时间-->
+        }
+        where
+        id = #{id}
+    </update>
+    <delete id="deleteById">delete drg_dip_business_opt_info_log whereid = #{id} </delete>
+
+    <select id="queryDrgDipBusinessOptInfoLogList" resultType="cn.hsa.module.insure.drgdip.entity.DrgDipBusinessOptInfoLogDO">
+        select
+        id <!--主键id-->,        qulity_id <!--质控结果主表id-->,        business_id <!--业务id-->,        opt_type <!--操作类型1.修改 2.保存 3.质控 4.上传-->,        opt_type_name <!--操作类型名称-->,        type <!--类型1.DRG 2.DIP-->,        business_type <!--业务类型1.结算清单 2.病案首页-->,        is_force <!--是否强制上传1.是 2.否（默认）-->,        force_upload_info <!--操作提示信息-->,        hosp_code <!--医院编码-->,        insure_reg_code <!--医保注册编码-->,        hosp_name <!--医院名称-->,        org_code <!--机构编码（H码）-->,        insure_settle_id <!--医保结算id-->,        medical_reg_no <!--就医登记号-->,        settle_id <!--his结算id-->,        visit_id <!--就诊id-->,        psn_no <!--人员编号-->,        ps_name <!--患者姓名-->,        certno <!--患者身份证号码-->,        dept_id <!--科室id-->,        sex <!--性别-->,        age <!--年龄-->,        insue_type <!--险种类型-->,        inpt_time <!--入院时间-->,        outpt_time <!--出院时间-->,        med_type <!--业务类型-->,        med_type_name <!--业务类型名称-->,        dept_name <!--科室名称-->,        doctor_id <!--医生id-->,        doctor_name <!--医生姓名-->,        inpt_diagnose <!--入院诊断-->,        outpt_diagnose <!--出院诊断-->,        total_fee <!--总费用-->,        pay_fee <!--基金支付合计-->,        self_fee <!--个人账户支付-->,        cash_pay_fee <!--现金支付-->,        input_json <!--数据保存入参-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人-->,        crt_name <!--创建姓名-->,        crt_time <!--创建时间-->
+        from drg_dip_business_opt_info_log where 1=1
+        <if test="doctorName!=null and doctorName!=''">
+            and doctor_name=#{doctorName}
+        </if>
+
+        <if test="psName!=null and psName!=''">
+            and ps_name=#{psName}
+        </if>
+
+        <if test="certno!=null and certno!=''">
+            and certno=#{certno}
+        </if>
+        <if test="crtTime!=null">
+            and  date_format(crt_time,'%y-%m-%d')=#{crtTime}
+        </if>
+
+    </select>
+</mapper>

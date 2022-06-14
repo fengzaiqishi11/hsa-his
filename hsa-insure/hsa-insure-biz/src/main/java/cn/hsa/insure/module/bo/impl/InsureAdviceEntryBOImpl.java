@@ -8,27 +8,26 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.drg.DrgFunction;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
-import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
+
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.drg.bo.InsureAdviceEntryBO;
 import cn.hsa.module.insure.drg.dao.InsureAdviceEntryDAO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
+
 import cn.hsa.module.insure.module.dto.DoctorAdviceDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
+
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.entity.InsureEntryLogDO;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
-import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+
 import cn.hsa.module.sys.parameter.service.SysParameterService;
-import cn.hsa.module.sys.system.service.SysSystemService;
+
 import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.framework.AbstractAdvisingBeanPostProcessor;
+
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -519,7 +518,6 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         return PageDTO.of(adviceDTOList);
     }
 
-
     @Override
     public WrapperResponse<Boolean> BIZC300001(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         InsureIndividualVisitDTO visitDTO = insureAdviceEntryDAO.queryInsurePatientInfo(insureIndividualVisitDTO);
@@ -552,7 +550,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         //医嘱明细信息
         List<DoctorAdviceDTO> doctoradvice = new ArrayList<>();
         for (int i = 0; i < adviceDTOList.size(); i++) {
-            DoctorAdviceDTO dto  = new DoctorAdviceDTO();
+            DoctorAdviceDTO dto = new DoctorAdviceDTO();
             InptAdviceDTO inptAdviceDTO = adviceDTOList.get(i);
             dto.setBegin_date(inptAdviceDTO.getLongStartTime());//医嘱开始时间
             dto.setEnd_date(inptAdviceDTO.getLongStartTime());//停止用药时间
@@ -594,7 +592,7 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         }
         Map<String, Object> resultMap = null;
         //拼接入参 两种删除所有医嘱信息的方法 如果住院号为空就用就医登记号
-        if(StringUtils.isNotEmpty(insureIndividualVisitDTO.getInNo())){
+        if (StringUtils.isNotEmpty(insureIndividualVisitDTO.getInNo())) {
             //入参
             Map<String, Object> httpParamMap = new HashMap<>();
 
@@ -603,13 +601,13 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
             httpParamMap.put("patient_id", insureIndividualVisitDTO.getInptVisitNo());//住院号
             logger.info("远程调用（" + Constant.HuNanSheng.ADVICE.BIZC300001 + "）的入参为：" + JSONObject.toJSONString(httpParamMap));
             resultMap = transpond.to(visitDTO.getHospCode(), visitDTO.getInsureRegCode(), Constant.HuNanSheng.ADVICE.BIZC300001, httpParamMap);
-        }else {
+        } else {
             //入参
             Map<String, Object> httpParamMap = new HashMap<>();
             httpParamMap.put("type", "S");
             httpParamMap.put("hospital_id", visitDTO.getMedicineOrgCode());//定点医疗机构编码
             httpParamMap.put("serial_no", visitDTO.getMedicalRegNo()); //就医登记号
-            logger.info("远程调用（"+Constant.HuNanSheng.ADVICE.BIZC300001+"）的入参为："+JSONObject.toJSONString(httpParamMap));
+            logger.info("远程调用（" + Constant.HuNanSheng.ADVICE.BIZC300001 + "）的入参为：" + JSONObject.toJSONString(httpParamMap));
             resultMap = transpond.to(visitDTO.getHospCode(), visitDTO.getInsureRegCode(), Constant.HuNanSheng.ADVICE.BIZC300001, httpParamMap);
         }
         Integer returnCode = Integer.valueOf(resultMap.get("return_code").toString());
@@ -620,7 +618,6 @@ public class InsureAdviceEntryBOImpl extends HsafBO implements InsureAdviceEntry
         }
         return WrapperResponse.success(true);
     }
-
 
     /**
      * @Method: queryMatchAdvice()

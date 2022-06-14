@@ -75,10 +75,8 @@ public class OnlinePayController  extends BaseController {
     //是否打印发票
     outptSettleDTO.setIsInvoice((Boolean) param.get("isInvoice"));
     //支付方式信息
-    List<OutptPayDO> outptPayDOList = JSONArray.parseArray(JSON.toJSONString(param.get("outptPay")), OutptPayDO.class);
     //获取订单查询入参
-    SetlResultQueryDTO setlResultQueryDTO = JSON.parseObject (JSON.toJSONString(param.get("setlResultQueryDTO")),
-        SetlResultQueryDTO.class);
+    //SetlResultQueryDTO setlResultQueryDTO = JSON.parseObject (JSON.toJSONString(param.get("setlResultQueryDTO")),SetlResultQueryDTO.class);
     //判断参数是否正确（费用信息、就诊id、结算id）
     if (outptSettleDTO == null || outptVisitDTO == null
         || outptVisitDTO.getOutptCostDTOList() == null || outptVisitDTO.getOutptCostDTOList().isEmpty()
@@ -105,12 +103,6 @@ public class OnlinePayController  extends BaseController {
     params.put("hospCode",userDTO.getHospCode());
     //(个人信息、费用信息)
     params.put("outptVisitDTO",outptVisitDTO);
-    //结算信息
-    params.put("outptSettleDTO",outptSettleDTO);
-    //支付信息
-    params.put("outptPayDOList",outptPayDOList);
-    //订单查询入参
-    params.put("setlResultQueryDTO", setlResultQueryDTO);
     return outptTmakePriceFormService_consumer.queryInsureSetlResult(params);
   }
 

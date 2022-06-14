@@ -88,13 +88,12 @@ public interface InsureAdviceEntryService {
     WrapperResponse<Boolean> BIZC300001(Map map);
 
     /**
-      * @method deleteInjuryAdvice
-      * @author wang'qiao
-      * @date 2022/6/9 14:16
-      *	@description
-      * @param  map
-      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
-      *
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @method deleteInjuryAdvice
+     * @author wang'qiao
+     * @date 2022/6/9 14:16
+     * @description
      **/
     WrapperResponse<Boolean> deleteInjuryAdvice(Map map);
 }

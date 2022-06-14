@@ -24,6 +24,7 @@ import org.springframework.context.annotation.ImportResource;
 @MapperScan({"cn.hsa.module.emr.*.dao"})
 @MapperScan({"cn.hsa.module.mris.*.dao"})
 @MapperScan({"cn.hsa.module.upload.*.dao"})
+@MapperScan({"cn.hsa.module.insure.drgdip.dao"})
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
 @EnableEncryptableProperties
 public class HsaGenericApplication {

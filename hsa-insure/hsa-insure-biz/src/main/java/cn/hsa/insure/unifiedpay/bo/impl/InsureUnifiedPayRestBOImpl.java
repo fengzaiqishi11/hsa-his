@@ -1556,6 +1556,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
         Map<String, Object> dataMap = new HashMap<>();
         Map httpParam = new HashMap();
+        map.put("subRegCode",insureRegCode.substring(0,2));
         if (Constant.UnifiedPay.JBLIST.containsKey(itemType)) {
             InsureDiseaseDTO insureDiseaseDTO = insureDiseaseDAO.selectLatestVer(map);
             if (ObjectUtil.isNotEmpty(insureDiseaseDTO)) {

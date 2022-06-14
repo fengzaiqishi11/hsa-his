@@ -50,7 +50,7 @@
     <select id="selectLatestVer" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseDTO" parameterType="map">
         select id, hosp_code, insure_reg_code, insure_illness_id, insure_illness_code, insure_illness_name, icd10, pym, wbm, take_date,
                lose_date, remark, crte_id, crte_name, crte_time, ver, ver_name, down_load_type,num,size,record_counts from insure_disease
-        where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code =#{insureRegCode}
+        where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code like concat (#{subRegCode},'%')
         order by crte_time desc limit 1
     </select>
 </mapper>

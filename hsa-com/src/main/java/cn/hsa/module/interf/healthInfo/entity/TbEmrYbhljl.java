@@ -204,11 +204,11 @@ public class TbEmrYbhljl implements Serializable {
     /**
      * 呼吸频率(次/min)
      */
-    private Integer fxpl;
+    private String fxpl;
     /**
      * 脉率(次/min)
      */
-    private Integer ml;
+    private String ml;
     /**
      * 收缩压(mmHg)
      */
@@ -276,19 +276,19 @@ public class TbEmrYbhljl implements Serializable {
     /**
      * 入量(ML)
      */
-    private Integer rl;
+    private String rl;
     /**
      * 大便出量
      */
-    private Integer dbcl;
+    private String dbcl;
     /**
      * 小便出量
      */
-    private Integer xbcl;
+    private String xbcl;
     /**
      * 总出量(ML)
      */
-    private Integer zcl;
+    private String zcl;
     /**
      * 吸痰
      */
@@ -368,7 +368,7 @@ public class TbEmrYbhljl implements Serializable {
     /**
      * 心率
      */
-    private Integer xl;
+    private String xl;
     /**
      * 出量颜色性状
      */

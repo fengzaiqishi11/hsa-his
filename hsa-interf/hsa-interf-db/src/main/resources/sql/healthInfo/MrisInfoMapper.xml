@@ -277,7 +277,7 @@
 	mris_base_info a
 	left join mris_cost b on a.visit_id = b.visit_id and a.id = b.mbi_id and a.hosp_code = b.hosp_code
 	where  a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
 	union all
 	select
@@ -554,7 +554,7 @@
 	tcm_mris_base_info a
 	left join tcm_mris_cost b on a.visit_id = b.visit_id and a.id = b.mbi_id and a.hosp_code = b.hosp_code
     where  a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     ) dd order by dd.appetime asc
     </select>
@@ -582,7 +582,7 @@
     mris_base_info b
     join mris_inpt_diagnose a on a.mbi_id =b.id and b.visit_id = a.visit_id
 	where  b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
 	union all
@@ -607,7 +607,7 @@
     tcm_mris_base_info b
     join tcm_mris_diagnose a on a.mbi_id =b.id and b.visit_id = a.visit_id
 	where  b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
 	) dd
@@ -643,7 +643,7 @@
    mris_base_info a
    join mris_oper_info b on b.mbi_id=a.id and a.visit_id = b.visit_id
    where a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
    union
@@ -674,7 +674,7 @@
    tcm_mris_base_info a
    join tcm_mris_oper_info b on b.mbi_id=a.id and a.visit_id = b.visit_id
    where a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
    ) dd

@@ -1674,7 +1674,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
           map2.put("hospCode",map.get("hospCode").toString());
           DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
           try {
-            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
             resultDataMap.put("hasAuth",true);
           }catch (Exception e){
             if (e.getMessage().contains("400-987-5000")){
@@ -1915,10 +1915,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("daysRinpFlag31", MapUtils.getMapVS(mriBaseInfo, "is_inpt", "")); // 是否有出院31天再住院计划 *******
         setlinfo.put("daysRinpPup31", MapUtils.getMapVS(mriBaseInfo, "aim", "")); // 出院31天内再住院目的 *******
         // 更换主治医生和责任医生的数据源 从inpt_visit表 切换至 mris_base_info表
-        setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_name","")); // 主诊医生姓名 *******
-        setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_id","")); // 主诊医生代码 *******
-        setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_name","")); // 责任护士名 *******
-        setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code","")); // 责任护士代码 *******
+        setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zzDoctor_name",null)); // 主诊医生姓名 *******
+        setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_code",null)); // 主诊医生代码 *******
+        setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zrNurse_name",null)); // 责任护士名 *******
+        setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code",null)); // 责任护士代码 *******
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
         if (setlBegnDate == null) {
             throw new AppException("结算开始时间为空");

@@ -247,6 +247,15 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public DrgDipComboDTO getDrgDipInfoByParam(HashMap map) {
       DrgDipComboDTO combo = new DrgDipComboDTO();
       DrgDipResultDTO dto =MapUtils.get(map, "drgDipResultDTO");
+      DrgDipAuthDTO drgDipAuthDTO =MapUtils.get(map, "drgDipAuthDTO");
+      if (!("true".equals(drgDipAuthDTO.getDip())&&"true".equals(drgDipAuthDTO.getDrg()))){
+        if ("true".equals(drgDipAuthDTO.getDip())){
+          dto.setType("1");
+        }
+        if ("true".equals(drgDipAuthDTO.getDrg())){
+          dto.setType("2");
+        }
+      }
       //新增质控信息
       List<DrgDipResultDO> list = drgDipResultDAO.queryListByVisitIdDesc(dto);
       //未质控过

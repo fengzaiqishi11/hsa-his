@@ -6,7 +6,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
-
+import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
@@ -49,7 +49,10 @@ import org.springframework.stereotype.Component;
 
 
 import javax.annotation.Resource;
-
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -742,11 +745,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         DrgDipResultDTO dto = new DrgDipResultDTO();
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
-        HashMap map1 = new HashMap();
-        map1.put("drgDipResultDTO",dto);
-        map1.put("hospCode",map.get("hospCode").toString());
-        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-        resultDataMap.put("drgInfo",combo);
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -760,14 +758,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //返回给前端  提示是否有这个权限
         Map<String,Object> map2 = new HashMap<>();
         map2.put("hospCode",map.get("hospCode").toString());
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
-            drgDipResultService.checkDrgDipBizAuthorization(map2);
-        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
-        if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
-          resultDataMap.put("hasAuth",false);
-        }else{
+        DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
+        try {
+          drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
           resultDataMap.put("hasAuth",true);
+        }catch (Exception e){
+          if (e.getMessage().contains("400-987-5000")){
+            resultDataMap.put("hasAuth",false);
+          }
         }
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        map1.put("drgDipAuthDTO",drgDipAuthDTO);
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultDataMap.put("drgInfo",combo);
         return resultDataMap;
     }
 
@@ -1593,11 +1598,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             DrgDipResultDTO dto = new DrgDipResultDTO();
             dto.setVisitId(map.get("visitId").toString());
             dto.setHospCode(map.get("hospCode").toString());
-            HashMap map1 = new HashMap();
-            map1.put("drgDipResultDTO",dto);
-            map1.put("hospCode",map.get("hospCode").toString());
-            DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-            resultDataMap.put("drgInfo",combo);
             //DIP_DRG_MODE值
             Map<String, Object> sysMap = new HashMap<>();
             sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -1608,17 +1608,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }else{
               resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
             }
-            //返回给前端  提示是否有这个权限
-            Map<String,Object> map2 = new HashMap<>();
-            map2.put("hospCode",map.get("hospCode").toString());
-            WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
-                drgDipResultService.checkDrgDipBizAuthorization(map2);
-            DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
-            if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+          //返回给前端  提示是否有这个权限
+          Map<String,Object> map2 = new HashMap<>();
+          map2.put("hospCode",map.get("hospCode").toString());
+          DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
+          try {
+            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+            resultDataMap.put("hasAuth",true);
+          }catch (Exception e){
+            if (e.getMessage().contains("400-987-5000")){
               resultDataMap.put("hasAuth",false);
-            }else{
-              resultDataMap.put("hasAuth",true);
             }
+          }
+          HashMap map1 = new HashMap();
+          map1.put("drgDipResultDTO",dto);
+          map1.put("hospCode",map.get("hospCode").toString());
+          map1.put("drgDipAuthDTO",drgDipAuthDTO);
+          DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+          resultDataMap.put("drgInfo",combo);
         }
         return resultDataMap;
     }
@@ -1936,14 +1943,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private Map<String, Object> handerMriBaseInfo(Map<String, Object> map) {
-        Map<String, Object> baseInfo = insureGetInfoDAO.selectMriBaseInfo(map);
-        if (ObjectUtil.isEmpty(baseInfo)) {
-            baseInfo = insureGetInfoDAO.selectTcmMriBaseInfo(map);
-        }
-        if (ObjectUtil.isEmpty(baseInfo)) {
-            throw new AppException("未获取到患者病案首页基础信息，请检查！");
-        }
-        return  baseInfo;
+
+        return insureGetInfoDAO.selectMriBaseInfo(map);
 
     }
 
@@ -2038,13 +2039,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<OperInfoRecordDTO> handerOperInfo(Map<String, Object> map) {
-        List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
+        List<OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
         infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
-        //西医病案首页手术信息没取到则取中医病案首页
-        if (ObjectUtil.isEmpty(infoRecordDTOList)) {
-            infoRecordDTOList = insureGetInfoDAO.selectTcmMriOperInfo(map);
-        }
-        if(!ListUtils.isEmpty(infoRecordDTOList)){
+        if (!ListUtils.isEmpty(infoRecordDTOList)) {
             infoRecordDTOList.get(0).setOprnOprtType("1");
         }
         return infoRecordDTOList;
@@ -2063,12 +2060,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private Map<String, Object> handerInptDiagnose(Map<String, Object> map) {
         Map<String, Object> diseaseMap = new HashMap<>();
         List<InptDiagnoseDTO> inptDiagnoseDTOList = insureGetInfoDAO.selectMriInptDiagNose(map);
-        if (ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
-            inptDiagnoseDTOList = insureGetInfoDAO.selectTcmMriInptDiagNose(map);
-        }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();
-        Integer diseaseCount = 0;
         if (!ListUtils.isEmpty(inptDiagnoseDTOList)) {
             inptDiagnoseDTOList = inptDiagnoseDTOList.stream().filter(inptDiagnoseDTO -> !"201".equals(inptDiagnoseDTO.getTypeCode())).collect(Collectors.toList());
             inptDiagnoseDTOList.stream().forEach(inptDiagnoseDTO -> {
@@ -2092,11 +2085,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     inptDiagnoseDTO.setTypeCode("1");
                 });
             }
-            diseaseCount = inptDiagnoseDTOList.size();
         }
-        diseaseMap.put("xiCollect",xiCollect);
-        diseaseMap.put("zxCollect",zxCollect);
-        diseaseMap.put("diseaseCount",diseaseCount);
+        diseaseMap.put("xiCollect", xiCollect);
+        diseaseMap.put("zxCollect", zxCollect);
+        diseaseMap.put("diseaseCount", inptDiagnoseDTOList.size());
         return diseaseMap;
     }
 

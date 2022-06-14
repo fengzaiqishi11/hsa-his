@@ -68,6 +68,9 @@
         select   *
         from drg_dip_result
         where visit_id = #{visitId} and valid_flag = 1
+        <if test="type != null">
+            AND type = #{type}
+        </if>
     </select>
 
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >

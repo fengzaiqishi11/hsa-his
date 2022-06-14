@@ -46,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import scala.App;
+
 
 import javax.annotation.Resource;
 import java.io.BufferedReader;
@@ -745,11 +745,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         DrgDipResultDTO dto = new DrgDipResultDTO();
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
-        HashMap map1 = new HashMap();
-        map1.put("drgDipResultDTO",dto);
-        map1.put("hospCode",map.get("hospCode").toString());
-        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-        resultDataMap.put("drgInfo",combo);
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -763,14 +758,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //返回给前端  提示是否有这个权限
         Map<String,Object> map2 = new HashMap<>();
         map2.put("hospCode",map.get("hospCode").toString());
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
-            drgDipResultService.checkDrgDipBizAuthorization(map2);
-        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
-        if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
-          resultDataMap.put("hasAuth",false);
-        }else{
+        DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
+        try {
+          drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
           resultDataMap.put("hasAuth",true);
+        }catch (Exception e){
+          if (e.getMessage().contains("400-987-5000")){
+            resultDataMap.put("hasAuth",false);
+          }
         }
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        map1.put("drgDipAuthDTO",drgDipAuthDTO);
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultDataMap.put("drgInfo",combo);
         return resultDataMap;
     }
 
@@ -1657,11 +1659,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             DrgDipResultDTO dto = new DrgDipResultDTO();
             dto.setVisitId(map.get("visitId").toString());
             dto.setHospCode(map.get("hospCode").toString());
-            HashMap map1 = new HashMap();
-            map1.put("drgDipResultDTO",dto);
-            map1.put("hospCode",map.get("hospCode").toString());
-            DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-            resultDataMap.put("drgInfo",combo);
             //DIP_DRG_MODE值
             Map<String, Object> sysMap = new HashMap<>();
             sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -1672,17 +1669,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }else{
               resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
             }
-            //返回给前端  提示是否有这个权限
-            Map<String,Object> map2 = new HashMap<>();
-            map2.put("hospCode",map.get("hospCode").toString());
-            WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
-                drgDipResultService.checkDrgDipBizAuthorization(map2);
-            DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
-            if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+          //返回给前端  提示是否有这个权限
+          Map<String,Object> map2 = new HashMap<>();
+          map2.put("hospCode",map.get("hospCode").toString());
+          DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
+          try {
+            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+            resultDataMap.put("hasAuth",true);
+          }catch (Exception e){
+            if (e.getMessage().contains("400-987-5000")){
               resultDataMap.put("hasAuth",false);
-            }else{
-              resultDataMap.put("hasAuth",true);
             }
+          }
+          HashMap map1 = new HashMap();
+          map1.put("drgDipResultDTO",dto);
+          map1.put("hospCode",map.get("hospCode").toString());
+          map1.put("drgDipAuthDTO",drgDipAuthDTO);
+          DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+          resultDataMap.put("drgInfo",combo);
         }
         return resultDataMap;
     }
@@ -1911,9 +1915,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("daysRinpFlag31", MapUtils.getMapVS(mriBaseInfo, "is_inpt", "")); // 是否有出院31天再住院计划 *******
         setlinfo.put("daysRinpPup31", MapUtils.getMapVS(mriBaseInfo, "aim", "")); // 出院31天内再住院目的 *******
         // 更换主治医生和责任医生的数据源 从inpt_visit表 切换至 mris_base_info表
-        setlinfo.put("chfpdrName", MapUtils.get(mriBaseInfo, "zz_doctor_name")); // 主诊医生姓名 *******
-        setlinfo.put("chfpdrCode", MapUtils.get(mriBaseInfo, "zz_doctor_id")); // 主诊医生代码 *******
-        setlinfo.put("zrNurseName", MapUtils.get(mriBaseInfo, "zr_nurse_name")); // 责任护士名 *******
+        setlinfo.put("chfpdrName", MapUtils.get(mriBaseInfo, "zzDoctor_name")); // 主诊医生姓名 *******
+        setlinfo.put("chfpdrCode", MapUtils.get(mriBaseInfo, "zz_doctor_code")); // 主诊医生代码 *******
+        setlinfo.put("zrNurseName", MapUtils.get(mriBaseInfo, "zrNurse_name")); // 责任护士名 *******
         setlinfo.put("zrNurseCode", MapUtils.get(mriBaseInfo, "zr_nurse_code")); // 责任护士代码 *******
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
         if (setlBegnDate == null) {

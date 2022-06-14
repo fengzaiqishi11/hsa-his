@@ -138,4 +138,7 @@ public interface InsureAdviceEntryDAO {
     Boolean deleteLog(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     int updateInsureUploadById(List<InptAdviceDTO> adviceDTOList);
+
+    //根据visit_id修改上传标志位未上传
+    int updateInsureUploadByVisitId(String visitId);
 }

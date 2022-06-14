@@ -236,6 +236,7 @@ public interface Constant {
         public static final String BIZC320007 = "320007";  // DRG 分组调用
         public static final String BIZC320003 = "320003";  // DRG 分组调用
         public static final String BIZC320001 = "320001";  // 医嘱录入上传
+        public static final String BIZC300001 = "300001";  // 工伤医嘱录入上传
 
         /*电子凭证*/
         public static final String FC_EMD_11001 = "EMD11001";//门诊电子凭证获取个人信息

@@ -74,6 +74,20 @@ public class SysUserDTO extends SysUserDO implements Serializable {
 
     private String flag;
 
-    // 操作科室编码
+    /**
+     *  操作科室编码
+     */
     private String loginDeptCode;
+    /**
+     *  是否显示提示框(非持久化字段)
+     */
+    private String whetherEnableReminderBox;
+    /**
+     *   医保专网访问地址
+     */
+    private String insurePrivateInternetAddress;
+    /**
+     *  是否属于内网访问
+     */
+    private String whetherPrivateInnerAddress;
 }

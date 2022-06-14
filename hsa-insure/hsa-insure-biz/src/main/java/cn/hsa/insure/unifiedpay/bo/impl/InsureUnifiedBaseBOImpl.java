@@ -629,16 +629,16 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
             insureIndividualSettleDTO.setInsureRegCode(configurationDTO.getRegCode());
             insureIndividualSettleDTO.setHospCode(hospCode);
             insureIndividualSettleDTO.setInsureSettleId(MapUtils.get(setlinfo,"setl_id"));
-            insureIndividualSettleDTO.setAllPortionPrice(MapUtils.get(setlinfo,"fulamt_ownpay_amt"));
-            insureIndividualSettleDTO.setOverSelfPrice(MapUtils.get(setlinfo,"overlmt_selfpay"));
-            insureIndividualSettleDTO.setInscpScpAmt(MapUtils.get(setlinfo,"inscp_scp_amt"));
-            insureIndividualSettleDTO.setPreselfpayAmt(MapUtils.get(setlinfo,"preselfpay_amt"));
-            insureIndividualSettleDTO.setPoolPropSelfpay(MapUtils.get(setlinfo,"pool_prop_selfpay"));
-            insureIndividualSettleDTO.setPlanPrice(MapUtils.get(setlinfo,"hifp_pay"));
+            insureIndividualSettleDTO.setAllPortionPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"fulamt_ownpay_amt").toString()));
+            insureIndividualSettleDTO.setOverSelfPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"overlmt_selfpay").toString()));
+            insureIndividualSettleDTO.setInscpScpAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"inscp_scp_amt").toString()));
+            insureIndividualSettleDTO.setPreselfpayAmt(BigDecimalUtils.convert(MapUtils.get(setlinfo,"preselfpay_amt").toString()));
+            insureIndividualSettleDTO.setPoolPropSelfpay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"pool_prop_selfpay").toString()));
+            insureIndividualSettleDTO.setPlanPrice(BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifp_pay").toString()));
             BigDecimal hifmi_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifmi_pay").toString());
             BigDecimal hifob_pay = BigDecimalUtils.convert(MapUtils.get(setlinfo,"hifob_pay").toString());
             insureIndividualSettleDTO.setSeriousPrice(BigDecimalUtils.add(hifmi_pay,hifob_pay));
-            insureIndividualSettleDTO.setMafPay(MapUtils.get(setlinfo,"maf_pay"));
+            insureIndividualSettleDTO.setMafPay(BigDecimalUtils.convert(MapUtils.get(setlinfo,"maf_pay").toString()));
             List <Map<String,Object>> setldetailList = MapUtils.get(outptMap,"setldetail");
             if (!ListUtils.isEmpty(setldetailList)) {
                 BigDecimal othPay = BigDecimal.ZERO;
@@ -1643,8 +1643,12 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         if (StringUtils.isEmpty(regCode)) throw new RuntimeException("未选择医保机构，请选择后在操作！");
         String code = MapUtils.get(map, "hosp_dept_codg");
         String deptName = MapUtils.get(map, "hosp_dept_name");
-        String startTime = Long.toString(MapUtils.get(map, "begntime"));
-
+        //start 2022-06-13 zhangjinping 注释的这行代码会报类转换异常问题
+       // String startTime = Long.toString(MapUtils.get(map, "begntime"));
+        Long longTime = Long.parseLong(MapUtils.get(map, "begntime"));
+        String dateSting = DateUtils.getDateStr(longTime,DateUtils.Y_M_DH_M_S);
+        Date startTime = DateUtils.parse(dateSting,DateUtils.Y_M_DH_M_S);
+        //end
         BaseDeptDTO deptDTO = new BaseDeptDTO();
         deptDTO.setHospCode(hospCode);
         deptDTO.setCode(code);

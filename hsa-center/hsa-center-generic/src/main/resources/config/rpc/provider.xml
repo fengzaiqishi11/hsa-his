@@ -82,4 +82,7 @@
     <!-- 中心端密码修改日志信息记录生产者 -->
     <dubbo:service interface="cn.hsa.module.center.log.service.CenterPasswordModifyLogService" ref="centerPasswordModifyLogService_provider"/>
 
+    <!-- 中心端业务功能权限信息查询生产者 -->
+    <dubbo:service interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" ref="centerFunctionAuthorizationService_provider"/>
+
 </beans>

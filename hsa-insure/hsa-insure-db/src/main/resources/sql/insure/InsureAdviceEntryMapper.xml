@@ -14,7 +14,7 @@
     </delete>
     <select id="queryInsurePatientInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         select iiv.visit_no,iiv.medicine_org_code,iiv.aka130 ,iiv.visit_id,iiv.hosp_code,iiv.medical_reg_no,iiv.insure_reg_code,iiv.insure_org_code,
-        iib.aaz500,iib.aac003,iib.aac002,iib.aac001,iib.aaa027,iiv.is_hospital,
+        iib.aaz500,iib.aac003,iib.aac002,iib.aac001,iib.aaa027,iiv.is_hospital,iib.aka130,
                (select patient_code from inpt_visit iv where iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code) as patientCode
         from insure_individual_visit iiv left join insure_individual_basic iib
         on iiv.mib_id = iib.id and iiv.hosp_code =iib.hosp_code
@@ -99,6 +99,10 @@
         <foreach item="dto" collection="list" open="(" separator="," close=")">
             #{dto.id}
         </foreach>
+    </update>
+
+    <update id="updateInsureUploadByVisitId" parameterType="java.util.List">
+        update inpt_advice set is_insure_upload = '0' where visit_id = #{visitId}
     </update>
 
 

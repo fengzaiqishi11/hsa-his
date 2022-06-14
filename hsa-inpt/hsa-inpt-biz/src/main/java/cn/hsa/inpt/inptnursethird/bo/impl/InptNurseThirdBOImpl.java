@@ -58,6 +58,12 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             inptNurseThirdDTO.setQueryTime(recordTime);
         }
         inptNurseThirdDao.deleteById(inptNurseThirdDTO);
+        //三册单时间重复bug，本地无法复现，大致定位位置在本段代码，采取去除重复数据再进行保存操作 yuelong.chen 2022/06/09
+        if(list.size() > 6){
+            list = list.stream().
+                    collect(Collectors.collectingAndThen(Collectors.toCollection(
+                            ()->new TreeSet<>(Comparator.comparing(InptNurseThirdDTO::getRecordTime))),ArrayList::new));
+        }
         for (int i = 0; i < list.size(); i++) {
             list.get(i).setId(SnowflakeUtils.getId());
             list.get(i).setVisitId(visitid);

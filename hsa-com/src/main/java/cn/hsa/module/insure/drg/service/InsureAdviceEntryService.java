@@ -76,4 +76,24 @@ public interface InsureAdviceEntryService {
      * @Retrun: 医嘱分页信息
      */
     WrapperResponse<PageDTO> queryAdvicePage(Map map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @method BIZC300001
+     * @author wangqiao
+     * @date 2022/5/31 11:21
+     * @description 工伤医保录入
+     **/
+    WrapperResponse<Boolean> BIZC300001(Map map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @method deleteInjuryAdvice
+     * @author wang'qiao
+     * @date 2022/6/9 14:16
+     * @description
+     **/
+    WrapperResponse<Boolean> deleteInjuryAdvice(Map map);
 }

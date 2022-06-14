@@ -317,6 +317,9 @@
         <if test="orderFlag != null and orderFlag == '2'.toString()">
             order by concat(item_001, " ", ifnull('00:00:00', item_014)) asc
         </if>
+        <if test="orderFlag != null and orderFlag == '3'.toString()">
+            order by concat(item_001, " ", ifnull(item_002, '00:00:00')) asc
+        </if>
         <if test="orderFlag == null">
             order by item_001, crte_time ASC
         </if>

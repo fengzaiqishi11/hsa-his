@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.drg.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 
 /**
@@ -50,4 +51,27 @@ public interface InsureAdviceEntryBO {
      * @Retrun: 医嘱分页信息
      */
     PageDTO queryAdvicePage(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+
+    /**
+      * @method BIZC300001
+      * @author wang'qiao
+      * @date 2022/6/9 13:deleteInjuryAdvice
+      *	@description  工伤医嘱上传
+      * @param  insureIndividualVisitDTO
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+      *
+     **/
+    WrapperResponse<Boolean> BIZC300001(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+      * @method deleteInjuryAdvice
+      * @author wang'qiao
+      * @date 2022/6/9 14:17
+      *	@description 	工伤医嘱批量删除
+      * @param  insureIndividualVisitDTO
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+      *
+     **/
+    WrapperResponse<Boolean> deleteInjuryAdvice(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

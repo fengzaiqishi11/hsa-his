@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO" >
+
+  <!-- 表所有字段 -->
+  <sql id="Base_Column_List">
+        id,
+        hosp_code,
+        order_type_code,
+        start_date,
+        end_date,
+        encrypt_start_date,
+        encrypt_end_date,
+        remark,
+        audit_status,
+        audit_id,
+        audit_name,
+        audit_time,
+        is_valid,
+        crte_id,
+        crte_name,
+        crte_time,
+        update_id,
+        update_name,
+        update_time
+    </sql>
+
+
+  <!-- 根据主键查询表信息 -->
+  <select id="queryBizAuthorizationByOrderTypeCode" resultType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
+    select
+    <include refid="Base_Column_List" />
+    from
+      center_function_authorization
+    where
+     hosp_code =#{hospCode} and order_type_code = #{orderTypeCode} and is_valid = '1'
+  </select>
+
+    <insert id="insertAuthorization"  parameterType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
+        INSERT INTO `center_function_authorization`(`id`, `hosp_code`, `order_type_code`, `start_date`, `end_date`, `encrypt_start_date`,
+                                                    `encrypt_end_date`, `remark`, `audit_status`, `audit_id`, `audit_name`, `audit_time`,
+                                                    `is_valid`, `crte_id`, `crte_name`, `crte_time`, `update_id`, `update_name`, `update_time`)
+        VALUES (#{id}, #{hospCode}, #{orderTypeCode}, #{startDate},#{endDate}, #{encryptStartDate}, #{encryptEndDate},#{remark},#{auditStatus},#{auditId} ,#{auditName}, #{auditTime}, #{isValid}, #{crteId},#{crteName}, #{crteTime}, #{updateId}, #{updateName},#{updateTime});
+    </insert>
+
+</mapper>

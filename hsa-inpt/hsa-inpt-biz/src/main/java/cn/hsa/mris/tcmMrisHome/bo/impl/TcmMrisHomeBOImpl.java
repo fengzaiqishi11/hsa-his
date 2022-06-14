@@ -6,9 +6,18 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.mris.service.MrisService;
@@ -16,6 +25,7 @@ import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO;
+import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
 import cn.hsa.module.mris.tcmMrisHome.bo.TcmMrisHomeBO;
 import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmDiagnoseDTO;
@@ -27,6 +37,9 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -72,6 +85,18 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private DrgDipResultDAO drgDipResultDAO;
+
+    @Resource
+    private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
+
+    @Resource
+    private MrisHomeService mrisHomeService_consumer;
 
 
     /**
@@ -245,6 +270,36 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         resultMap.put("mrisTcmDiagnose", tcmMrisHomeDAO.queryTcmDiagnosePage(inptVisitDTO));
         resultMap.put("mrisOperInfo", tcmMrisHomeDAO.queryTcmMrisOperInfoPage(inptVisitDTO));
         resultMap.put("mrisTurnDeptList", tcmMrisHomeDAO.queryTcmMrisTurnDeptPage(inptVisitDTO));
+        //1.新增质控信息
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultMap.put("drgInfo",combo);
+        //2.获取DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODEL");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultMap.put("DIP_DRG_MODEL",null);
+        }else{
+          resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
+        }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse =
+            drgDipResultService.checkDrgDipBizAuthorization(map2);
+        DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
+         if ("false".equals(drgDipAuthDTO.getDrg()) && "false".equals(drgDipAuthDTO.getDip())){
+           resultMap.put("hasAuth",false);
+         }else{
+           resultMap.put("hasAuth",true);
+         }
         return resultMap;
     }
 
@@ -826,7 +881,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         }
 
         mrisBaseInfoDTO.setInCnt(inCnt);
-        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getInNo());
+        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getHealthCard());
 
         // 获取医疗机构名称与医疗机构编码
         Map<String, String> sysParamterMap = new HashMap<>();

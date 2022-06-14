@@ -49,6 +49,7 @@ public interface DrgDipResultBO {
      * @return java.lang.Boolean
      */
     DrgDipAuthDTO checkDrgDipBizAuthorization(Map<String, Object> map);
+    DrgDipAuthDTO checkDrgDipBizAuthorizationSettle(Map<String, Object> map);
 
   /**
    * 质控结果保存

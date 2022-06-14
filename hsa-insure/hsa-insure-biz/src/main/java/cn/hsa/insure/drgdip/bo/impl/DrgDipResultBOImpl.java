@@ -218,7 +218,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
           (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
       //都没有权限 报错
       if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
-        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+//        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
       }
       //dip
       if (ObjectUtil.isNotEmpty(dipAuth)){
@@ -233,6 +233,39 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         dto.setDrg("false");
       }
       return dto;
+    }
+
+    @Override
+    public DrgDipAuthDTO checkDrgDipBizAuthorizationSettle(Map<String, Object> map) {
+        DrgDipAuthDTO dto = new DrgDipAuthDTO();
+        HashMap param = new HashMap();
+        param.put("hospCode",MapUtils.get(map, "hospCode"));
+        //循环查询DRG和DIP质控权限1：DIP 2:DRG
+        Boolean dip = false;
+        Boolean drg = false;
+        param.put("orderTypeCode","1");
+        CenterFunctionAuthorizationDO dipAuth =
+                (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        param.put("orderTypeCode","2");
+        CenterFunctionAuthorizationDO drgAuth =
+                (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        //都没有权限 报错
+        if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
+
+        }
+        //dip
+        if (ObjectUtil.isNotEmpty(dipAuth)){
+            dto.setDip("true");
+        }else{
+            dto.setDip("false");
+        }
+        //drg
+        if (ObjectUtil.isNotEmpty(drgAuth)){
+            dto.setDrg("true");
+        }else{
+            dto.setDrg("false");
+        }
+        return dto;
     }
 
 

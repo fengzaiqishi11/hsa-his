@@ -292,7 +292,7 @@ public class HealthInfoUniversalController {
             }
             return WrapperResponse.error(-1, clazz.getName()+"不存在【" + method + "】方法", null);
         }catch(Exception e){
-            return WrapperResponse.error(-1, e.getMessage(), null);
+            return WrapperResponse.error(-1, e.toString(), null);
         }
     }
 }

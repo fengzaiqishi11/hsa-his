@@ -72,7 +72,7 @@
 	inpt_visit a
 	join oper_info_record b on a.hosp_code = b.hosp_code and a.id = b.visit_id
     where b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
     </select>

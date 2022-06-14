@@ -218,7 +218,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
           (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
       //都没有权限 报错
       if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
-//        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
       }
       //dip
       if (ObjectUtil.isNotEmpty(dipAuth)){

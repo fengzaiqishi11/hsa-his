@@ -8,6 +8,7 @@ import cn.hsa.module.center.user.dto.CenterUserDTO;
 import cn.hsa.module.center.user.service.CenterUserService;
 import cn.hsa.util.MD5Utils;
 import cn.hsa.util.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -62,12 +63,12 @@ public class LoginController extends CenterBaseController {
         String authCodeSession = getAndRemoveSession(SESSION_AUTH_CODE);
         // 验证码已失效
        if (StringUtils.isEmpty(authCodeSession)) {
-            throw new AppException("验证码已失效");
+            return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "验证码已失效",null);
         }
 
         // 验证码错误
         if (!authCode.equalsIgnoreCase(authCodeSession)) {
-            throw new AppException("验证码错误");
+            return WrapperResponse.error(HttpStatus.EXPECTATION_FAILED.value(), "验证码错误",null);
         }
 
         // 指定医院数据源查询用户信息
@@ -79,17 +80,17 @@ public class LoginController extends CenterBaseController {
 
         // 校验用户信息
         if (centerUserDTO == null) {
-            throw new AppException("员工账号不存在！");
+            return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "用户不存在",null);
         }
 
         // 是否停用
         if ("2".equals(centerUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被停用！");
+            return WrapperResponse.error(HttpStatus.NOT_ACCEPTABLE.value(), "当前账号已被停用",null);
         }
 
         // 是否锁定
         if ("3".equals(centerUserDTO.getStatusCode())) {
-            throw new AppException("当前账号已被锁定！");
+            return WrapperResponse.error(HttpStatus.LOCKED.value(), "当前账号已被锁定！",null);
         }
 
         // 账号或密码错误

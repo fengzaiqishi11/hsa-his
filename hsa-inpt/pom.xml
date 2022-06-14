@@ -30,6 +30,24 @@
                 <groupId>cn.hsa.com</groupId>
                 <artifactId>hsa-com</artifactId>
                 <version>1.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.albfernandez</groupId>
+                        <artifactId>javadbf</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.pdfbox</groupId>
+                        <artifactId>pdfbox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka-examples</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <!--动态数据源-->

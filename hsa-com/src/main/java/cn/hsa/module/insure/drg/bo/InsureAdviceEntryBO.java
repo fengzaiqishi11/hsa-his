@@ -52,23 +52,26 @@ public interface InsureAdviceEntryBO {
      */
     PageDTO queryAdvicePage(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
+
     /**
-     * @param insureIndividualVisitDTO
-     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
-     * @method BIZC300001
-     * @author wang'qiao
-     * @date 2022/6/9 13:deleteInjuryAdvice
-     * @description 工伤医嘱上传
+      * @method BIZC300001
+      * @author wang'qiao
+      * @date 2022/6/9 13:deleteInjuryAdvice
+      *	@description  工伤医嘱上传
+      * @param  insureIndividualVisitDTO
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+      *
      **/
     WrapperResponse<Boolean> BIZC300001(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     /**
-     * @param insureIndividualVisitDTO
-     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
-     * @method deleteInjuryAdvice
-     * @author wang'qiao
-     * @date 2022/6/9 14:17
-     * @description 工伤医嘱批量删除
+      * @method deleteInjuryAdvice
+      * @author wang'qiao
+      * @date 2022/6/9 14:17
+      *	@description 	工伤医嘱批量删除
+      * @param  insureIndividualVisitDTO
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+      *
      **/
     WrapperResponse<Boolean> deleteInjuryAdvice(InsureIndividualVisitDTO insureIndividualVisitDTO);
 }

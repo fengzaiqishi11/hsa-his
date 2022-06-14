@@ -250,10 +250,10 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
       DrgDipAuthDTO drgDipAuthDTO =MapUtils.get(map, "drgDipAuthDTO");
       if (!("true".equals(drgDipAuthDTO.getDip())&&"true".equals(drgDipAuthDTO.getDrg()))){
         if ("true".equals(drgDipAuthDTO.getDip())){
-          dto.setType("1");
+          dto.setType("2");
         }
         if ("true".equals(drgDipAuthDTO.getDrg())){
-          dto.setType("2");
+          dto.setType("1");
         }
       }
       //新增质控信息

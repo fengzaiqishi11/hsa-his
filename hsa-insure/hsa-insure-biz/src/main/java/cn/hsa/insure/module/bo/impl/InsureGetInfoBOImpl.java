@@ -760,7 +760,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         map2.put("hospCode",map.get("hospCode").toString());
         DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
         try {
-          drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+          drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
           resultDataMap.put("hasAuth",true);
         }catch (Exception e){
           if (e.getMessage().contains("400-987-5000")){

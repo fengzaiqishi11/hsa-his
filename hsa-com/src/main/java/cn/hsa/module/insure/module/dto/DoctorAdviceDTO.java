@@ -12,11 +12,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- *@ClassName DoctorAdviceDTO
- *@Author wangqiao
- *@Date 2022/5/31 11:32
- *@Version 1.0
- *
+ * @ClassName DoctorAdviceDTO
+ * @Author wangqiao
+ * @Date 2022/5/31 11:32
+ * @Version 1.0
  **/
 @Data
 @AllArgsConstructor

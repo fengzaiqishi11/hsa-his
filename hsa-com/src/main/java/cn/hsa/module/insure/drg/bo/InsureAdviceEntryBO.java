@@ -52,6 +52,7 @@ public interface InsureAdviceEntryBO {
      */
     PageDTO queryAdvicePage(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
+
     /**
       * @method BIZC300001
       * @author wang'qiao

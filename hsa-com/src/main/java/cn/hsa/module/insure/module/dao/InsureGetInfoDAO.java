@@ -8,6 +8,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -577,6 +578,17 @@ public interface InsureGetInfoDAO {
     Map<String, Object> selectMriBaseInfo(Map<String, Object> map);
 
     /**
+     * @Method selectMriBaseInfo
+     * @Desrciption  根据就诊id  查询中医病案首页信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/5 10:17
+     * @Return
+     **/
+    Map<String, Object> selectTcmMriBaseInfo(Map<String, Object> map);
+
+    /**
      * @Method selectMriOperInfo
      * @Desrciption  查询病案首页手术信息
      * @Param
@@ -586,7 +598,17 @@ public interface InsureGetInfoDAO {
      * @Return
     **/
     List<OperInfoRecordDTO> selectMriOperInfo(Map<String, Object> map);
-    
+    /**
+     * @Method selectTcmMriOperInfo
+     * @Desrciption  查询中医病案首页手术信息
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/5 11:00
+     * @Return
+     **/
+    List<OperInfoRecordDTO> selectTcmMriOperInfo(Map<String, Object> map);
+
     /**
      * @Method deleteDisease
      * @Desrciption  
@@ -792,4 +814,12 @@ public interface InsureGetInfoDAO {
     void updateSpecialAttribute(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     void deleteFmiOwnPayPatnCost(@Param("feeIdList")List<String> feeIdList,@Param("hospCode")String hospCode);
+
+    List<InptDiagnoseDTO> selectTcmMriInptDiagNose(Map<String, Object> map);
+
+    List<Map<String, Object>> selectMriOperInfoForDRGorDIP(Map<String, Object> map);
+
+    List<Map<String, Object>> selectMriInptDiagNoseForDRGorDIP(Map<String, Object> map);
+
+    BigDecimal queryTotalFee(@Param("settleId") String settleId,@Param("hospCode") String hospCode);
 }

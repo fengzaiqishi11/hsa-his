@@ -1099,7 +1099,7 @@
         SELECT DISTINCT
         c.aac003 AS psnName,
         c.aac004 AS gend,
-        (select name from insure_dict where value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
+        (select name from insure_dict where insure_reg_code = c.aaa027 and value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
         c.bka008 insureUnit,

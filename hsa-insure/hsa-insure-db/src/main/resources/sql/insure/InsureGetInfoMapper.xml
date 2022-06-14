@@ -1980,6 +1980,33 @@
     <select id="queryTotalFee" resultType="java.math.BigDecimal">
         select total_price from insure_individual_settle where settle_id = #{settleId} and hosp_code = #{hospCode}
     </select>
+    <!--获取到匹配表信息-->
+    <select id="querySettleClockMatchByMap" resultType="java.util.Map">
+        select
+            id,
+            hosp_code as hospCode,
+            platform_type as platformType,
+            platform_dictionary_name as platformDictionaryName,
+            platform_dictionary_code as platformDictionaryCode,
+            platform_code_name as platformCodeName,
+            platform_code_value as platformCodeValue,
+            his_dictionary_name as hisDictionaryName,
+            his_dictionary_code as hisDictionaryCode,
+            his_code_name as hisCodeName,
+            his_code_value as hisCodeValue
+        from settle_clock_match
+        where hosp_code = #{hospCode}
+        <if test="platformType !=null and platformType != ''">
+            and platform_type = #{platformType}
+        </if>
+        <if test="platformDictionaryCode !=null and platformDictionaryCode != ''">
+            and platform_dictionary_code = #{platformDictionaryCode}
+        </if>
+        <if test="hisCodeValue !=null and hisCodeValue != ''">
+            and his_code_value = #{hisCodeValue}
+        </if>
+        LIMIT 1
+    </select>
 
     <update id="updateSpecialAttribute">
         update

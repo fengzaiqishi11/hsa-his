@@ -14,6 +14,7 @@ import cn.hsa.module.insure.drg.bo.InsureAdviceEntryBO;
 import cn.hsa.module.insure.drg.dao.InsureAdviceEntryDAO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 
+import cn.hsa.module.insure.module.dto.DoctorAdviceDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;

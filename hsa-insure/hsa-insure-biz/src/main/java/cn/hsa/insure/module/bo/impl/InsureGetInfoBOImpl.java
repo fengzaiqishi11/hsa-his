@@ -1635,9 +1635,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 map.put("operCount", infoRecordDTOList.size());
                 // 6.查询重症监护信息   得到重症监护信息节点
                 icuInfoMapList = handerIcuInfo(map);
+                // 4.查询住院诊断信息   得到住院诊断节点信息
+                diseaMap = handerInptDiagnose(map);
             }
-            // 4.查询住院诊断信息   得到住院诊断节点信息
-            diseaMap = handerInptDiagnose(map);
+
             map.put("diseaseCount", MapUtils.get(diseaMap, "diseaseCount"));
             // 7.结算清单基本信息
             Map<String, Object> setlInfoMap = handerBaseSetlInfo(map, setlinfo);
@@ -2007,9 +2008,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> baseInfo = insureGetInfoDAO.selectMriBaseInfo(map);
         if (ObjectUtil.isEmpty(baseInfo)) {
             baseInfo = insureGetInfoDAO.selectTcmMriBaseInfo(map);
-        }
-        if (ObjectUtil.isEmpty(baseInfo)) {
-            throw new AppException("未获取到患者病案首页基础信息，请检查！");
         }
         return  baseInfo;
 

@@ -36,6 +36,7 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
@@ -228,13 +229,20 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     break;
                 }
             }
+
             Integer k = 1;
+            String regCode = insureConfigurationDTO.getRegCode();
             Integer maxUseDays=0;
-            for (Map<String, Object> map1 : costList) {
-                //获取费用明细中最大用药天数
-                Integer useDays =  MapUtils.get(map1, "useDays");
-                if(useDays!=null&&useDays>maxUseDays){
-                    maxUseDays = useDays;
+            if("54".equals(regCode.substring(0, 2))){//西藏业务
+                for (Map<String, Object> map1 : costList) {
+                    if(ObjectUtil.isNotEmpty( MapUtils.get(map1, "useDays"))){
+                        //获取费用明细中最大用药天数
+                        Integer useDays =  MapUtils.get(map1, "useDays");
+                        if(useDays!=null&&useDays>maxUseDays){
+                            maxUseDays = useDays;
+                        }
+                    }
+
                 }
             }
             for (Map<String, Object> map : costList) {
@@ -291,7 +299,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("sin_dos_dscr", ""); // 单次计量描述
                 costInfoMap.put("used_frqu_dscr", null); // 使用频次描述
                 //2022-06-14 zhangjinping 西藏门特病人费用上传报周期天数不能为空
-                String regCode = insureConfigurationDTO.getRegCode();
+
                 if("54".equals(regCode.substring(0, 2))){
                     String medType = insureIndividualVisitDTO.getAka130();
                        if(Constant.UnifiedPay.YWLX.MZMXB.equals(medType)&&(maxUseDays==null||maxUseDays==0)) {

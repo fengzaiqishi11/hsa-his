@@ -230,6 +230,13 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             }
             Integer k = 1;
             Integer maxUseDays=0;
+            for (Map<String, Object> map1 : costList) {
+                //获取费用明细中最大用药天数
+                Integer useDays =  MapUtils.get(map1, "useDays");
+                if(useDays!=null&&useDays>maxUseDays){
+                    maxUseDays = useDays;
+                }
+            }
             for (Map<String, Object> map : costList) {
                 costInfoMap = new HashMap<>();
                 if ("1".equals(hnFeedetlSn)) {
@@ -286,12 +293,6 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 //2022-06-14 zhangjinping 西藏门特病人费用上传报周期天数不能为空
                 String regCode = insureConfigurationDTO.getRegCode();
                 if("54".equals(regCode.substring(0, 2))){
-                    String itemCode = MapUtils.get(map, "itemCode");
-                    Integer useDays =  MapUtils.get(map, "useDays");
-                    //获取费用明细中最大用药天数
-                    if(useDays>maxUseDays){
-                        maxUseDays = useDays;
-                    }
                     String medType = insureIndividualVisitDTO.getAka130();
                        if(Constant.UnifiedPay.YWLX.MZMXB.equals(medType)&&(maxUseDays==null||maxUseDays==0)) {
                            throw new AppException("该门慢门特病人的用药天数为空或为0");

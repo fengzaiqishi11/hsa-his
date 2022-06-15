@@ -7,8 +7,10 @@ import cn.hsa.module.center.admdvs.service.CenterInsureAdmdvsService;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
+import cn.hsa.util.DateUtils;
 import cn.hsa.util.ServletUtils;
 import cn.hsa.util.SnowflakeUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +27,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/center/centerFunctionAuthorization")
+@Slf4j
 public class CenterInsureAuthorizationController {
 
     @Value("${rsa.public.key}")
@@ -34,14 +37,11 @@ public class CenterInsureAuthorizationController {
     @Resource
     private CenterFunctionAuthorizationService centerFunctionAuthorizationService;
 
-    @GetMapping("/queryAuthorizationInfo")
-    public WrapperResponse<CenterFunctionAuthorizationDO> queryAdmdvsInfoPage(HttpServletResponse res){
+    @GetMapping("/queryAuthorizationInfo/{hospCode}")
+    public WrapperResponse<CenterFunctionAuthorizationDO> queryAdmdvsInfoPage(@PathVariable("hospCode") String hospCode ,HttpServletResponse res){
         Map<String,Object> map = new HashMap<>();
-        map.put("hospCode", "0012");
+        map.put("hospCode", hospCode);
         map.put("orderTypeCode", "1");
-
-        HttpSession session =  ServletUtils.getCurrentRequest().get().getSession();
-
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Methods", "GET");
         res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -75,7 +75,15 @@ public class CenterInsureAuthorizationController {
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode", "0001");
         map.put("orderTypeCode", "1");
-        CenterFunctionAuthorizationDO authorizationDO = centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(map).getData();
+        CenterFunctionAuthorizationDO authorizationDO = new CenterFunctionAuthorizationDO();
+        authorizationDO.setStartDate(DateUtils.parse("2022-06-14 00:00:00",DateUtils.Y_M_DH_M_S));
+        authorizationDO.setEndDate(DateUtils.parse("2023-06-15 00:00:00",DateUtils.Y_M_DH_M_S));
+        authorizationDO.setAuditId("1");
+        authorizationDO.setAuditName("admin");
+        authorizationDO.setAuditStatus("1");
+        authorizationDO.setIsValid("1");
+        authorizationDO.setRemark("DRG/DIP相关授权信息");
+        authorizationDO.setUpdateTime(new Date());
         authorizationDO.setId(SnowflakeUtils.getId());
         authorizationDO.setAuditTime(new Date());
         authorizationDO.setCrteTime(new Date());
@@ -91,7 +99,7 @@ public class CenterInsureAuthorizationController {
             String encryptEndTime = RSAUtil.encryptByPublicKey(str2EncryptEndDate.getBytes(), rsaPublicKey);
             authorizationDO.setEncryptEndDate(encryptEndTime);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("加密时间出现问题",e);
         }
             return  centerFunctionAuthorizationService.insertBizAuthorization(authorizationDO);
     }

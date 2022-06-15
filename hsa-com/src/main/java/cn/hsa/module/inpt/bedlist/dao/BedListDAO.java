@@ -388,7 +388,9 @@ public interface BedListDAO {
     List<String> checkIsAllowHk(@Param("type") int type, @Param("hospCode") String hospCode, @Param("visitId") String visitId);
 
     // 更新患者开医嘱科室id，执行科室id
-    void updateVisitKS(InptVisitDTO inptVisitDTO);
+    void updateAdviceHK(InptVisitDTO inptVisitDTO);
+    void updateAdviceExecHK(InptVisitDTO inptVisitDTO);
+    void updateInptCostHK(InptVisitDTO inptVisitDTO);
 
 	String getDeptName(Map map);
 }

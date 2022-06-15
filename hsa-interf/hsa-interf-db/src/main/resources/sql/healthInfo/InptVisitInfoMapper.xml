@@ -65,7 +65,7 @@
     from
 	inpt_visit a
 	left join sys_code_detail ss on a.patient_code =ss.value and ss.hosp_code = a.hosp_code and ss.c_code ='BRLX'
-	where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+	where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}) and a.hosp_code =#{hospCode}
         order by a.crte_time asc
     </select>
     <select id="queryInptTurnDeptInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZkjl">
@@ -85,7 +85,7 @@
 	a.crte_name as MODIFYTNAME
     from
 	inpt_bed_change a
-	where a.change_code ='3' and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+	where a.change_code ='3' and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}) and a.hosp_code =#{hospCode}
         order by a.crte_time asc
     </select>
     <select id="queryInptAdviceInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyyzmx">
@@ -165,7 +165,7 @@
   left join inpt_advice_detail c on a.id = c.ia_id and a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
   left join inpt_visit b on a.visit_id =b.id and a.hosp_code = b.hosp_code
   left join base_drug d on c.item_id = d.id and c.hosp_code =d.hosp_code
-  where  a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
+  where  a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}) and a.hosp_code =#{hospCode}
   order by a.crte_time asc
     </select>
   <select id="queryInptAdviceExecuteInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbZyyzzxjl">
@@ -199,7 +199,7 @@
   from inpt_advice a
   join inpt_advice_exec b on a.id = b.advice_id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code
   left join inpt_visit c on a.visit_id = c.id and a.hosp_code =c.hosp_code
-  where  b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}) and b.hosp_code =#{hospCode}
+  where  b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt; date(#{endTime}) and b.hosp_code =#{hospCode}
   order by b.crte_time asc
   </select>
 
@@ -249,7 +249,7 @@
    join inpt_settle c on c.visit_id=a.visit_id and c.id = a.settle_id and c.hosp_code = a.hosp_code
    left join base_finance_classify d on a.bfc_id = d.id and a.hosp_code = d.hosp_code
    where a.crte_time &gt;= date(#{startTime})
-   and a.crte_time &lt;= date(#{endTime})
+   and a.crte_time &lt; date(#{endTime})
    and a.hosp_code =#{hospCode}
    and b.hosp_code =#{hospCode}
    and c.hosp_code =#{hospCode}
@@ -288,7 +288,7 @@
 	join inpt_visit b on b.id =a.visit_id and a.hosp_code = b.hosp_code
 	left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX'
 	where a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
     and a.is_settle ='1' and a.status_code ='0'
@@ -350,7 +350,7 @@
 	inpt_nurse_third a
     join inpt_visit b on a.visit_id = b.id 	and a.hosp_code = b.hosp_code
     where a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
     order by a.crte_time asc
@@ -406,7 +406,7 @@
       join emr_patient_html c on b.patient_html_id = c.id and c.hosp_code =#{hospCode}
       join emr_classify d on et.classify_code=d.code and et.dept_id = d.dept_id and  d.hosp_code =#{hospCode}
       where c.crte_time &gt;= date(#{startTime})
-      and c.crte_time &lt;= date(#{endTime})
+      and c.crte_time &lt; date(#{endTime})
       and a.hosp_code =#{hospCode}
       group by c.id
       order by c.crte_time asc
@@ -511,7 +511,7 @@
 	join base_nurse_order d on b.bno_id = d.id and a.hosp_code = b.hosp_code
 	where d.code ='hljld'
 	and b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     order by b.crte_time asc
     </select>
@@ -600,7 +600,7 @@
     from inpt_visit a
     left join oper_info_record b on a.id = b.visit_id and a.hosp_code = b.hosp_code
     where a.status_code ='7' and a.out_time &gt;= date(#{startTime})
-    and a.out_time &lt;= date(#{endTime})
+    and a.out_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     group by a.id
     order by a.out_time asc
@@ -631,7 +631,7 @@
     where a.change_code ='0'
     and d.type_code ='1109'
     and a.crte_time &gt;= date(#{startTime})
-    and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     group by a.after_dept_id
     order by a.crte_time asc

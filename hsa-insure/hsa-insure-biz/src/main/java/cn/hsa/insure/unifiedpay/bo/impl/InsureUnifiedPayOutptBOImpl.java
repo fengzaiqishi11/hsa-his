@@ -287,10 +287,16 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("sin_dos_dscr", ""); // 单次计量描述
                 costInfoMap.put("used_frqu_dscr", null); // 使用频次描述
                 //2022-06-14 zhangjinping 西藏门特病人费用上传报周期天数不能为空
-                Integer useDays =  MapUtils.get(map, "useDays");
-                String medType = insureIndividualVisitDTO.getAka130();
-                if("14".equals(medType)&&(useDays==null||useDays==0)){
-                    throw new AppException("该门慢门特病人的用药天数为空或为0");
+                String regCode = insureConfigurationDTO.getRegCode();
+                if("54".equals(regCode.substring(0, 2))){
+                    String itemCode = MapUtils.get(map, "itemCode");
+                    Integer useDays =  MapUtils.get(map, "useDays");
+                    String medType = insureIndividualVisitDTO.getAka130();
+                   if("1".equals(itemCode)){//药品类型
+                       if("14".equals(medType)&&(useDays==null||useDays==0)){
+                           throw new AppException("该门慢门特病人的用药天数为空或为0");
+                       }
+                   }
                 }
                 costInfoMap.put("prd_days", MapUtils.get(map, "useDays")); // 周期天数
                 costInfoMap.put("medc_way_dscr", null); // TODO 用药途径描述

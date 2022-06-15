@@ -145,4 +145,24 @@ public class OnlinePayController  extends BaseController {
     map.put("setlRefundQueryDTO", dto);
     return outptTmakePriceFormService_consumer.insureRefund(map);
   }
+
+  /**
+   * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+   * @param dto
+   * @param req
+   * @param res
+   * @Author 医保开发二部-湛康
+   * @Date 2022-06-15 8:57
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+   */
+  @PostMapping("/ampRefund")
+  public WrapperResponse<Boolean> ampRefund(@RequestBody SetlRefundQueryDTO dto,
+                                               HttpServletRequest req,
+                                               HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlRefundQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.ampRefund(map);
+  }
 }

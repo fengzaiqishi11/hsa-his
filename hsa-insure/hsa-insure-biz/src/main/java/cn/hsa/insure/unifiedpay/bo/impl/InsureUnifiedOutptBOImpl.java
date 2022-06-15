@@ -1,6 +1,7 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.BaseReqUtil;
@@ -39,6 +40,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.TypeReference;
+import com.yhtech.nmpay.common.client.YhGatewayClient;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -577,6 +580,89 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       return resultMap;
     }
 
+    /**
+     * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 9:38
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> AmpRefund(Map<String, Object> map) {
+      //医保信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+      //医保结算信息
+      InsureIndividualSettleDTO insureIndividualSettleDTO = MapUtils.get(map, "insureIndividualSettleDTO");
+      //根据医院编码、医保机构编码查询医保配置信息
+      InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+      configDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+      configDTO.setRegCode(insureIndividualSettleDTO.getInsureRegCode());
+      InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+      if (insureConfigurationDTO == null)
+        throw new RuntimeException("未发现【" + insureIndividualSettleDTO.getInsureRegCode() + "】相关医保配置信息");
+      Map paramMap = new HashMap();
+      // 一、初始化Client
+      YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
+      // 二、入参拼装
+      JSONObject param = new JSONObject() {{
+        // 卡类型
+        put("cardType", "01");
+        // 卡号
+        put("cardNo", "D3508701966");
+      }};
+      //请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
+      com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
+          "/api/amp/hos/refund",
+          param,
+          new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
+          }
+      );
+      boolean requestSuccess = gatewayResponse.isSuccess();
+      if (requestSuccess) {
+        JSONObject outParam = gatewayResponse.getParam();
+        // 出参接收与处理
+        log.info("响应出参：{}", JSON.toJSONString(outParam));
+        // todo 接收成功后的处理
+      } else {
+        log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
+        // todo 请求失败的处理
+      }
+      return null;
+    }
+
+    /**
+     * 初始化Client
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 10:56
+     * @return com.yhtech.nmpay.common.client.YhGatewayClient
+     */
+    private YhGatewayClient CreateYHGatewayClient(Map paramMap){
+      paramMap.put("codeList", new String[]{"HN_URL", "HN_CLIENT_PRV_KEY", "HN_APP_ID", "HN_APP_SECRET", "HN_SERVER_PUB_KEY", "HN_DZPZ_FLAG"});
+      WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
+      Map<String, SysParameterDTO> sysMap = getData(wr);
+      SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HN_URL");
+      SysParameterDTO prvKeyPrameter = MapUtils.get(sysMap, "HN_CLIENT_PRV_KEY");
+      SysParameterDTO appIdPrameter = MapUtils.get(sysMap, "HN_APP_ID");
+      SysParameterDTO secretPrameter = MapUtils.get(sysMap, "HN_APP_SECRET");
+      SysParameterDTO pubKeyPrameter = MapUtils.get(sysMap, "HN_SERVER_PUB_KEY");
+      if (ObjectUtil.isEmpty(urlPrameter)){
+        throw new RuntimeException("未配置服务网关地址");
+      }
+      // 一、初始化Client
+      YhGatewayClient yhGatewayClient = new YhGatewayClient(urlPrameter.getValue(),
+          prvKeyPrameter.getValue(),
+          appIdPrameter.getValue(),
+          secretPrameter.getValue(),
+          pubKeyPrameter.getValue(),
+          // 默认加密方式
+          "SM4",
+          // 默认的签名方式
+          "SM3"
+      );
+      return yhGatewayClient;
+    }
+
   /**
      * 封装onlinePayFeeDTO参数信息
      * @param map
@@ -997,6 +1083,13 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         rgstinfo.put("medfee_paymtd_code", null); // 医疗费用支付方式代码
         rgstinfo.put("vali_flag", Constants.SF.S); // 有效标志
         return rgstinfo;
+    }
+
+    protected <T> T getData(WrapperResponse wr) {
+      if (wr.getCode() != 0) {
+        throw new AppException(wr.getMessage());
+      }
+      return (T)wr.getData();
     }
 
 }

@@ -4959,4 +4959,54 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }
     }
 
+  /**
+   * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+   * @param map
+   * @return
+   */
+    @Override
+    public Boolean ampRefund(Map map) {
+      //医院编码
+      String hospCode = map.get("hospCode").toString();
+      SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+      if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      if (ObjectUtil.isEmpty(setlRefundQueryDTO.getSettleId())) {
+        throw new AppException("请传入结算ID!");
+      }
+      //查询医保就诊信息
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记！");
+      }
+      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+        throw new AppException("未找到支付订单号，请先上传费用！");
+      }
+      //判断是否已医保结算
+      InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+      settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
+      settleDTO.setHospCode(hospCode);
+      settleDTO.setSettleId(setlRefundQueryDTO.getSettleId());
+      settleDTO.setState("0");
+      Map<String, Object> dataMap = new HashMap<>();
+      dataMap.put("hospCode", hospCode);
+      dataMap.put("insureIndividualSettleDTO", settleDTO);
+      settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+      //判断医保结算信息
+      if (ObjectUtil.isEmpty(settleDTO)){
+        throw new AppException("未查找到医保结算信息，请先做医保结算！");
+      }
+      //接口调用
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("insureIndividualSettleDTO",settleDTO);
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();
+      return null;
+    }
+
 }

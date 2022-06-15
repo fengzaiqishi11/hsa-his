@@ -420,4 +420,13 @@ public interface OutptTmakePriceFormBO {
      * @return java.lang.Boolean
      */
     Boolean insureRefund(Map map);
+
+    /**
+     * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 9:10
+     * @return java.lang.Boolean
+     */
+    Boolean ampRefund(Map map);
 }

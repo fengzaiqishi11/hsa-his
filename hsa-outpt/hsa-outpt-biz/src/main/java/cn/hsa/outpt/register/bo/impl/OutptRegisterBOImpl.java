@@ -416,7 +416,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             //规格
             outptCostDTO.setSpec(outptRegisterDetailDto.getSpec());
             //数量单位
-            outptCostDTO.setNumUnitCode(outptRegisterDetailDto.getUnitCode());
+            String unitCode = outptRegisterDetailDto.getUnitCode();
+            String itemUnitCode = outptRegisterDetailDto.getItemUnitCode();
+            outptCostDTO.setNumUnitCode(unitCode == null ? itemUnitCode : unitCode);
             //总数量
             outptCostDTO.setTotalNum(outptRegisterDetailDto.getNum());
             //项目总金额

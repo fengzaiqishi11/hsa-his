@@ -289,7 +289,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                     String itemCode = MapUtils.get(map, "itemCode");
                     Integer useDays =  MapUtils.get(map, "useDays");
                     //获取费用明细中最大用药天数
-                    if(useDays>maxUseDays){
+                    if(useDays!=null&&useDays>maxUseDays){
                         maxUseDays = useDays;
                     }
                     String medType = insureIndividualVisitDTO.getAka130();

@@ -5,6 +5,12 @@
         update mris_base_info set is_upload_insure ='1'
         where  hosp_code =#{hospCode} and id =#{id}
     </update>
+
+    <update id="updateTcmEmrBaseInfo">
+        update tcm_mris_base_info set is_upload_insure ='1'
+        where  hosp_code =#{hospCode} and id =#{id}
+    </update>
+
     <update id="updateEmrPatientFlag">
         update emr_patient set emr_insure_upload ='1' where hosp_code =#{hospCode} and visit_id =#{id}
     </update>
@@ -133,5 +139,13 @@
           and idm.insure_reg_code = #{insureRegCode}
           and idm.audit_code = '1'
         order by moi.columns_num asc
+    </select>
+
+    <select id="selectInsureDiseaseMatch" resultType="java.util.Map">
+        select *
+        from insure_disease_match
+        where insure_reg_code = #{insureRegCode}
+           and hosp_illness_id = #{operDiseaseId}
+           and audit_code = '1'
     </select>
 </mapper>

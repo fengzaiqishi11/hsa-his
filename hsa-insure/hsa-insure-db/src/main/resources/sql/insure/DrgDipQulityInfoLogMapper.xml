@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipQulityInfoLogDAO">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" id="drgDipQulityInfoLogMap">
+        <result property="id" column="id"/>
+        <result property="msgId" column="msg_id"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="hospCode" column="hosp_code"/>
+        <result property="visitId" column="visit_id"/>
+        <result property="infNo" column="inf_no"/>
+        <result property="infName" column="inf_name"/>
+        <result property="reqTime" column="req_time"/>
+        <result property="respTime" column="resp_time"/>
+        <result property="reqContent" column="req_content"/>
+        <result property="respContent" column="resp_content"/>
+        <result property="status" column="status"/>
+        <result property="type" column="type"/>
+        <result property="businessType" column="business_type"/>
+        <result property="forceUploadInfo" column="force_upload_info"/>
+        <result property="validFlag" column="valid_flag"/>
+        <result property="crtId" column="crt_id"/>
+        <result property="crtName" column="crt_name"/>
+        <result property="crtTime" column="crt_time"/>
+    </resultMap>
+
+    <insert id="insertDrgDipQulityInfoLog" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipQulityInfoLogDTO" >
+        insert into drg_dip_qulity_info_log (
+
+        id <!--主键ID--> ,
+
+
+        msg_id <!--交易流水号--> ,
+
+
+        org_code <!--机构编码--> ,
+
+
+        hosp_code <!--医院编码--> ,
+
+
+        visit_id <!--就诊ID--> ,
+
+
+        inf_no <!--功能编号--> ,
+
+
+        inf_name <!--功能名称--> ,
+
+
+        req_time <!--请求时间--> ,
+
+
+        resp_time <!--响应时间--> ,
+
+
+        req_content <!--请求入参--> ,
+
+
+        resp_content <!--返回入参--> ,
+
+
+        status <!--状态 Y正常 N异常--> ,
+
+
+        type <!--类型 1.DRG 2.DIP--> ,
+
+
+        business_type <!--业务类型 1结算清单 2病案首页--> ,
+
+
+        force_upload_info <!--质控提示信息--> ,
+
+
+        valid_flag <!--有效标志--> ,
+
+
+        crt_id <!--创建人ID--> ,
+
+
+        crt_name <!--创建人名称--> ,
+
+
+        crt_time <!--创建时间-->
+
+        )
+        values (
+
+        #{id},
+
+
+        #{msgId},
+
+
+        #{orgCode},
+
+
+        #{hospCode},
+
+
+        #{visitId},
+
+
+        #{infNo},
+
+
+        #{infName},
+
+
+        #{reqTime},
+
+
+        #{respTime},
+
+
+        #{reqContent},
+
+
+        #{respContent},
+
+
+        #{status},
+
+
+        #{type},
+
+
+        #{businessType},
+
+
+        #{forceUploadInfo},
+
+
+        #{validFlag},
+
+
+        #{crtId},
+
+
+        #{crtName},
+
+
+        #{crtTime}
+
+        )
+    </insert>
+
+    <select id="selectById" resultMap="drgDipQulityInfoLogMap" >
+        select
+        id <!--主键ID-->,        msg_id <!--交易流水号-->,        org_code <!--机构编码-->,        hosp_code <!--医院编码-->,        visit_id <!--就诊ID-->,        inf_no <!--功能编号-->,        inf_name <!--功能名称-->,        req_time <!--请求时间-->,        resp_time <!--响应时间-->,        req_content <!--请求入参-->,        resp_content <!--返回入参-->,        status <!--状态 Y正常 N异常-->,        type <!--类型 1.DRG 2.DIP-->,        business_type <!--业务类型 1结算清单 2病案首页-->,        force_upload_info <!--质控提示信息-->,        valid_flag <!--有效标志-->,        crt_id <!--创建人ID-->,        crt_name <!--创建人名称-->,        crt_time <!--创建时间-->
+        from drg_dip_qulity_info_log where
+            id = #{id}
+                                                                                </select>
+
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO" >
+        update drg_dip_qulity_info_log set
+            if(#{id} != null and #{id} != ''){
+                id = #{id} <!--主键ID-->,
+            }
+            if(#{msgId} != null and #{msgId} != ''){
+                msg_id = #{msgId} <!--交易流水号-->,
+            }
+            if(#{orgCode} != null and #{orgCode} != ''){
+                org_code = #{orgCode} <!--机构编码-->,
+            }
+            if(#{hospCode} != null and #{hospCode} != ''){
+                hosp_code = #{hospCode} <!--医院编码-->,
+            }
+            if(#{visitId} != null and #{visitId} != ''){
+                visit_id = #{visitId} <!--就诊ID-->,
+            }
+            if(#{infNo} != null and #{infNo} != ''){
+                inf_no = #{infNo} <!--功能编号-->,
+            }
+            if(#{infName} != null and #{infName} != ''){
+                inf_name = #{infName} <!--功能名称-->,
+            }
+            if(#{reqTime} != null and #{reqTime} != ''){
+                req_time = #{reqTime} <!--请求时间-->,
+            }
+            if(#{respTime} != null and #{respTime} != ''){
+                resp_time = #{respTime} <!--响应时间-->,
+            }
+            if(#{reqContent} != null and #{reqContent} != ''){
+                req_content = #{reqContent} <!--请求入参-->,
+            }
+            if(#{respContent} != null and #{respContent} != ''){
+                resp_content = #{respContent} <!--返回入参-->,
+            }
+            if(#{status} != null and #{status} != ''){
+                status = #{status} <!--状态 Y正常 N异常-->,
+            }
+            if(#{type} != null and #{type} != ''){
+                type = #{type} <!--类型 1.DRG 2.DIP-->,
+            }
+            if(#{businessType} != null and #{businessType} != ''){
+                business_type = #{businessType} <!--业务类型 1结算清单 2病案首页-->,
+            }
+            if(#{forceUploadInfo} != null and #{forceUploadInfo} != ''){
+                force_upload_info = #{forceUploadInfo} <!--质控提示信息-->,
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                valid_flag = #{validFlag} <!--有效标志-->,
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                crt_id = #{crtId} <!--创建人ID-->,
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                crt_name = #{crtName} <!--创建人名称-->,
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                crt_time = #{crtTime} <!--创建时间-->
+            }
+        where
+            id = #{id}
+                                                                                </update>
+
+    <delete id="deleteById"  >
+        delete drg_dip_qulity_info_log where
+                id = #{id}
+                                                                                </delete>
+</mapper>

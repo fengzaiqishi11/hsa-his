@@ -195,4 +195,21 @@ public interface InsureGetInfoService {
      **/
 
     WrapperResponse<PageDTO> querySetlePage(Map<String, Object> map);
+    /**
+     * @Author gory
+     * @Description 结算清单质控DRG
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRG(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 结算清单质控DIP
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map);
+
+    WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRGorDIP(Map<String, Object> map);
 }

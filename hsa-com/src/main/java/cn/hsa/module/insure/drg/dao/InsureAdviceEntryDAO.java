@@ -66,12 +66,12 @@ public interface InsureAdviceEntryDAO {
      * @Date: 2020/12/12
      * @Retrun: 医嘱信息数据传输对象
      */
-    List<InptAdviceDTO> queryDoctorAdvice(@Param("map") Map<String,Object> map);
+    List<InptAdviceDTO> queryDoctorAdvice(@Param("map") Map<String, Object> map);
 
     /**
      * @Method: queryInptDisease()
      * @Descrition: 根据就诊id查询诊断信息
-     * @Pramas:  insureIndividualVisitDTO：vsisitId:就诊Id
+     * @Pramas: insureIndividualVisitDTO：vsisitId:就诊Id
      * @Author: fuhui
      * @mail: 3277857701@qq.com
      * @Date: 2020/12/12
@@ -100,7 +100,7 @@ public interface InsureAdviceEntryDAO {
      * @Date: 2020/12/17
      * @Retrun: a
      */
-    boolean  insertInsureAdviceLog(InsureIndividualVisitDTO visitDTO);
+    boolean insertInsureAdviceLog(InsureIndividualVisitDTO visitDTO);
 
     /**
      * @Method: queryInsurePatientLog()
@@ -122,7 +122,7 @@ public interface InsureAdviceEntryDAO {
      * @Date: 2020/12/17
      * @Retrun: 医保就诊表费用传输对象
      */
-    List<Map<String,Object>> queryCostId(InsureIndividualVisitDTO insureIndividualVisitDTO);
+    List<Map<String, Object>> queryCostId(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     /**
      * @Method: queryAdviceId()
@@ -138,4 +138,7 @@ public interface InsureAdviceEntryDAO {
     Boolean deleteLog(InsureIndividualVisitDTO insureIndividualVisitDTO);
 
     int updateInsureUploadById(List<InptAdviceDTO> adviceDTOList);
+
+    //根据visit_id修改上传标志位未上传
+    int updateInsureUploadByVisitId(String visitId);
 }

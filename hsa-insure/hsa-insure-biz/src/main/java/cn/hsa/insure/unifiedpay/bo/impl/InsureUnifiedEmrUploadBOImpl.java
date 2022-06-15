@@ -19,6 +19,7 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
+import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -28,6 +29,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -352,13 +354,28 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 
         insureItfBO.executeInsur(FunctionEnum.INSUR_MRI_UPLOAD, interfaceParamDTO);
 
+        //病案首页类型
+        String mrisPageType = MapUtil.getStr(map, "mrisPageType");
+        //中医病案首页
+        if ("1".equals(mrisPageType)) {
+            TcmMrisBaseInfoDTO tcmmrisBaseInfoDTO = MapUtils.get(map, "tcmMrisBaseInfo");
+            // 上传完医保以后  更新病案首页表数据 标注为已经上传
+            insureUnifiedEmrUploadDAO.updateTcmEmrBaseInfo(tcmmrisBaseInfoDTO);
+        //西医病案首页
+        }else {
+            MrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"mrisBaseInfoDTO");
+            // 上传完医保以后  更新病案首页表数据 标注为已经上传
+            insureUnifiedEmrUploadDAO.updateEmrBaseInfo(mrisBaseInfoDTO);
+        }
+
+
 //        String orgCode = insureIndividualVisitDTO.getInsureOrgCode();
 //        StringBuffer stringBuffer = new StringBuffer();
 //        String mdtrtSn = stringBuffer.append(insureIndividualVisitDTO.getMedicineOrgCode()).append(insureIndividualVisitDTO.getMedicalRegNo()).toString();
 //        //  输入-基本信息（节点标识：baseinfo）
 //        Map<String,Object> baseinfoMap = queryEmcBaseInfo(map,mdtrtSn);
 //        // 病案首页流水号
-        MrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"mrisBaseInfoDTO");
+//        MrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"mrisBaseInfoDTO");
 //        // 输入-诊断信息（节点标识：diseinfo）
 //        String mid = mrisBaseInfoDTO.getId();
 //        Map<String,Object> diseaseInfoMap = queryDiseaseInfo(map,mid,mdtrtSn);
@@ -375,8 +392,8 @@ public class InsureUnifiedEmrUploadBOImpl extends HsafBO implements InsureUnifie
 //        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
 //        map.put("visitId",insureIndividualVisitDTO.getVisitId());
 //        insureUnifiedCommonUtil.commonInsureUnified(hospCode,orgCode,Constant.UnifiedPay.INPT.UP_4401,paramMap,map);
-        // 上传完医保以后  更新病案首页表数据 标注为已经上传
-        insureUnifiedEmrUploadDAO.updateEmrBaseInfo(mrisBaseInfoDTO);
+//        // 上传完医保以后  更新病案首页表数据 标注为已经上传
+//        insureUnifiedEmrUploadDAO.updateEmrBaseInfo(mrisBaseInfoDTO);
         return true;
     }
 

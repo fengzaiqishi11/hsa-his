@@ -38,16 +38,46 @@
             </exclusions>
         </dependency>
 
-        <!--ID唯一生成-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.core</groupId>-->
-        <!--            <artifactId>hsaf-idgenerator</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- 认证安全组件 -->
         <dependency>
-            <groupId>cn.hsa.hsaf.auth.security</groupId>
-            <artifactId>hsaf-auth-security</artifactId>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.ant</groupId>
+                    <artifactId>ant</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.albfernandez</groupId>
+                    <artifactId>javadbf</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.pdfbox</groupId>
+                    <artifactId>pdfbox</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.kafka</groupId>
+                    <artifactId>kafka-examples</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.google.guava</groupId>
+                    <artifactId>guava</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.csb.sdk</groupId>
+                    <artifactId>http-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <!--动态数据源-->
+        <dependency>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
         </dependency>
 
         <!--MVC框架-->
@@ -104,23 +134,6 @@
             <artifactId>spring-data-redis</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <!--定时任务-->
-        <dependency>
-            <groupId>com.xuxueli</groupId>
-            <artifactId>xxl-job-core</artifactId>
-        </dependency>
-
-        <!--工作流依赖-->
-        <dependency>
-            <!--
-            <groupId>cn.hsa.hsaf.workflow</groupId>
-            <artifactId>workflow-sdk</artifactId>
-            -->
-            <groupId>cn.hsa.cep.wfc</groupId>
-            <artifactId>hsa-cep-wfc-sdk</artifactId>
-        </dependency>
-        <!--工作流结束-->
 
         <!--工具类-->
         <dependency>
@@ -183,6 +196,12 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.powersi</groupId>
+            <artifactId>yhaf-gateway-sdk</artifactId>
+            <version>1.0.0-RELEASE</version>
+            <classifier>RELEASE</classifier>
         </dependency>
     </dependencies>
 </project>

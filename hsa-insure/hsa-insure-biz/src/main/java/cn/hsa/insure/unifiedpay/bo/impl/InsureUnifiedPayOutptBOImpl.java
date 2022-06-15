@@ -47,11 +47,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -233,6 +229,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 }
             }
             Integer k = 1;
+            Integer maxUseDays=0;
             for (Map<String, Object> map : costList) {
                 costInfoMap = new HashMap<>();
                 if ("1".equals(hnFeedetlSn)) {
@@ -287,12 +284,23 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 costInfoMap.put("sin_dos_dscr", ""); // 单次计量描述
                 costInfoMap.put("used_frqu_dscr", null); // 使用频次描述
                 //2022-06-14 zhangjinping 西藏门特病人费用上传报周期天数不能为空
-                Integer useDays =  MapUtils.get(map, "useDays");
-                String medType = insureIndividualVisitDTO.getAka130();
-                if("14".equals(medType)&&(useDays==null||useDays==0)){
-                    throw new AppException("该门慢门特病人的用药天数为空或为0");
+                String regCode = insureConfigurationDTO.getRegCode();
+                if("54".equals(regCode.substring(0, 2))){
+                    String itemCode = MapUtils.get(map, "itemCode");
+                    Integer useDays =  MapUtils.get(map, "useDays");
+                    //获取费用明细中最大用药天数
+                    if(useDays>maxUseDays){
+                        maxUseDays = useDays;
+                    }
+                    String medType = insureIndividualVisitDTO.getAka130();
+                       if(Constant.UnifiedPay.YWLX.MZMXB.equals(medType)&&(maxUseDays==null||maxUseDays==0)) {
+                           throw new AppException("该门慢门特病人的用药天数为空或为0");
+                       }
+                    costInfoMap.put("prd_days", maxUseDays); // 最大周期天数
+                }else {
+                    costInfoMap.put("prd_days",null); // 周期天数
                 }
-                costInfoMap.put("prd_days", MapUtils.get(map, "useDays")); // 周期天数
+
                 costInfoMap.put("medc_way_dscr", null); // TODO 用药途径描述
                 costInfoMap.put("bilg_dept_codg", MapUtils.get(map, "deptId")); // 开单科室编码
                 costInfoMap.put("bilg_dept_name", MapUtils.get(map, "deptName")); // 开单科室名称

@@ -995,11 +995,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             unifiedPayMap.put("crteId", outptVisitDTO.getCrteId());
             unifiedPayMap.put("code", outptVisitDTO.getCode());
             unifiedPayMap.put("crteName", outptVisitDTO.getCrteName());
-
-            //2022-06-13 zhangjinping 门诊费用结算的时候，每次点击结算都会调这个方法并且进行费用上传，在费用上传之前应该调用撤销接口
-            //把之前上传的费用删除
-            unifiedPayMap.put("isError","2"); // 用来区分是异常取消结算 还是手动操作
-            updateCancelFeeSubmit(unifiedPayMap);
             try {
                 Map<String, Object> stringObjectMap = updateFeeSubmit(unifiedPayMap);
                 unifiedPayMap.put("batchNo",MapUtils.get(stringObjectMap,"batchNo"));
@@ -1007,7 +1002,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 unifiedPayMap.put("costList", costDOList);
                 trialMap = insureUnifiedPayOutptService_consumer.UP_2206(unifiedPayMap);
             } catch (Exception e) {
-                unifiedPayMap.put("isError","2"); // 用来区分是异常取消结算 还是手动操作
+                unifiedPayMap.put("isError","1"); // 用来区分是异常取消结算 还是手动操作
                 updateCancelFeeSubmit(unifiedPayMap);
                 throw new RuntimeException(e.getMessage());
             }
@@ -1031,7 +1026,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
          * 试算的时候如果现金支付 >= 医疗总费用 则不允许走医保
          * 增加参数控制  零费用报销是否让走医保结算
          */
-        try{
+
             if(BigDecimalUtils.equals(akb067,akc264)){
                 resultMap.put("hospCode",hospCode);
                 resultMap.put("code","HOSP_APPR_FLAG");
@@ -1179,14 +1174,6 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             resultMap.put("payinfo", payinfo);
             resultMap.put("miPrice", miPrice);
             resultMap.put("selfPrice", selfPrice);
-        }catch (Exception e){
-            //start 2022-06-10 zhangjinping 抛异常要将之前上传的结算费用取消上传，否则会累加，再次结算时会出现医保费用和结算费用不匹配
-            unifiedPayMap.put("isError","2"); // 用来区分是异常取消结算 还是手动操作
-            updateCancelFeeSubmit(unifiedPayMap);
-            //end
-            throw  new AppException(e.getMessage());
-        }
-
         return resultMap;
     }
 

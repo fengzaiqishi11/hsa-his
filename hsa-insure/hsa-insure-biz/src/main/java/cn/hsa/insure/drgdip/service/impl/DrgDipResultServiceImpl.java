@@ -63,6 +63,11 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
       return WrapperResponse.success(drgDipResultBO.checkDrgDipBizAuthorization(map));
     }
 
+  @Override
+  public WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorizationSettle(Map<String, Object> map) {
+    return WrapperResponse.success(drgDipResultBO.checkDrgDipBizAuthorizationSettle(map));
+  }
+
     /**
      * @return
      * @Method getInsureCost

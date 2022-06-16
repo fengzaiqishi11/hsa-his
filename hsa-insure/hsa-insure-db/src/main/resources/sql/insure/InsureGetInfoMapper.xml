@@ -1762,6 +1762,22 @@
         order by  mid.disease_code desc
     </select>
 
+    <select id="selectTcmSyndromesMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+       select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id,
+               mid.disease_icd10 diseaseCode,
+               mid.disease_icd10_name diseaseName,
+               mid.in_situation_code as    admCondType,
+               mid.tcm_syndromes_id tcmSyndromesId,
+               mid.tcm_syndromes_name tcmSyndromesName,
+               mid.disease_code  as    isMain
+        from tcm_mris_syndromes_diagnose mid
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+    </select>
+
     <!-- 根据主键删除表信息 -->
     <delete id="deleteByVisitID" parameterType="java.lang.String">
         DELETE
@@ -1963,6 +1979,33 @@
     </select>
     <select id="queryTotalFee" resultType="java.math.BigDecimal">
         select total_price from insure_individual_settle where settle_id = #{settleId} and hosp_code = #{hospCode}
+    </select>
+    <!--获取到匹配表信息-->
+    <select id="querySettleClockMatchByMap" resultType="java.util.Map">
+        select
+            id,
+            hosp_code as hospCode,
+            platform_type as platformType,
+            platform_dictionary_name as platformDictionaryName,
+            platform_dictionary_code as platformDictionaryCode,
+            platform_code_name as platformCodeName,
+            platform_code_value as platformCodeValue,
+            his_dictionary_name as hisDictionaryName,
+            his_dictionary_code as hisDictionaryCode,
+            his_code_name as hisCodeName,
+            his_code_value as hisCodeValue
+        from settle_clock_match
+        where hosp_code = #{hospCode}
+        <if test="platformType !=null and platformType != ''">
+            and platform_type = #{platformType}
+        </if>
+        <if test="platformDictionaryCode !=null and platformDictionaryCode != ''">
+            and platform_dictionary_code = #{platformDictionaryCode}
+        </if>
+        <if test="hisCodeValue !=null and hisCodeValue != ''">
+            and his_code_value = #{hisCodeValue}
+        </if>
+        LIMIT 1
     </select>
 
     <update id="updateSpecialAttribute">

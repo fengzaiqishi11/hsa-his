@@ -235,6 +235,39 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
       return dto;
     }
 
+    @Override
+    public DrgDipAuthDTO checkDrgDipBizAuthorizationSettle(Map<String, Object> map) {
+        DrgDipAuthDTO dto = new DrgDipAuthDTO();
+        HashMap param = new HashMap();
+        param.put("hospCode",MapUtils.get(map, "hospCode"));
+        //循环查询DRG和DIP质控权限1：DIP 2:DRG
+        Boolean dip = false;
+        Boolean drg = false;
+        param.put("orderTypeCode","1");
+        CenterFunctionAuthorizationDO dipAuth =
+                (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        param.put("orderTypeCode","2");
+        CenterFunctionAuthorizationDO drgAuth =
+                (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+        //都没有权限 报错
+        if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
+
+        }
+        //dip
+        if (ObjectUtil.isNotEmpty(dipAuth)){
+            dto.setDip("true");
+        }else{
+            dto.setDip("false");
+        }
+        //drg
+        if (ObjectUtil.isNotEmpty(drgAuth)){
+            dto.setDrg("true");
+        }else{
+            dto.setDrg("false");
+        }
+        return dto;
+    }
+
 
   /**
    * 获取质控信息
@@ -247,6 +280,15 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public DrgDipComboDTO getDrgDipInfoByParam(HashMap map) {
       DrgDipComboDTO combo = new DrgDipComboDTO();
       DrgDipResultDTO dto =MapUtils.get(map, "drgDipResultDTO");
+      DrgDipAuthDTO drgDipAuthDTO =MapUtils.get(map, "drgDipAuthDTO");
+      if (!("true".equals(drgDipAuthDTO.getDip())&&"true".equals(drgDipAuthDTO.getDrg()))){
+        if ("true".equals(drgDipAuthDTO.getDip())){
+          dto.setType("2");
+        }
+        if ("true".equals(drgDipAuthDTO.getDrg())){
+          dto.setType("1");
+        }
+      }
       //新增质控信息
       List<DrgDipResultDO> list = drgDipResultDAO.queryListByVisitIdDesc(dto);
       //未质控过

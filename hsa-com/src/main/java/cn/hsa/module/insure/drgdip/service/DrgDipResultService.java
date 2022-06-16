@@ -51,6 +51,7 @@ public interface DrgDipResultService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(Map<String, Object> map);
+    WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorizationSettle(Map<String, Object> map);
 
     /**
      * @return

@@ -822,4 +822,13 @@ public interface InsureGetInfoDAO {
     List<Map<String, Object>> selectMriInptDiagNoseForDRGorDIP(Map<String, Object> map);
 
     BigDecimal queryTotalFee(@Param("settleId") String settleId,@Param("hospCode") String hospCode);
+
+    List<InptDiagnoseDTO> selectTcmSyndromesMriInptDiagNose(Map<String, Object> map);
+    /**
+     * @Author gory
+     * @Description 获取到匹配表信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    Map<String, Object> querySettleClockMatchByMap(Map<String, Object> deptMap);
 }

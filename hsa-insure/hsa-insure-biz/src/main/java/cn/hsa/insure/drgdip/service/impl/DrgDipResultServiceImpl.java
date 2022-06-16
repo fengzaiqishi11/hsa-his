@@ -1,5 +1,6 @@
 package cn.hsa.insure.drgdip.service.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -82,5 +84,74 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
         return WrapperResponse.success(drgDipResultBO.insertDrgDipResult(MapUtils.get(map,"drgDipResultDTO"),MapUtils.get(map,"drgDipResultDetailDTOList")));
     }
 
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询汇总-结算清单
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryDrgDipResultSetlinfo(Map<String,Object> map) {
+        return WrapperResponse.success(drgDipResultBO.queryDrgDipResultSetlinfo(MapUtils.get(map,"drgDipResultDTO")));
+    }
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询汇总-结算清单
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> queryDrgDipResultSetlinfoSum(Map<String,Object> map) {
+        return WrapperResponse.success(drgDipResultBO.queryDrgDipResultSetlinfoSum(MapUtils.get(map,"drgDipResultDTO")));
+    }
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询-详细
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> queryDrgDipResultDetail(Map<String,Object> map) {
+        return WrapperResponse.success(drgDipResultBO.queryDrgDipResultDetail(MapUtils.get(map,"drgDipResultDTO")));
+    }
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询-病案首页
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryDrgDipResultMris(Map<String,Object> map) {
+        return WrapperResponse.success(drgDipResultBO.queryDrgDipResultMris(MapUtils.get(map,"drgDipResultDTO")));
+    }
+
+  /**
+   * @return
+   * @Method getInsureCost
+   * @Desrciption 质控结果查询汇总-病案首页
+   * @Param [insureSettleInfoDTO]
+   * @Author zhangxuan
+   * @Date 2021-04-11 22:54
+   * @Return
+   */
+  @Override
+   public WrapperResponse<Map<String, Object>> queryDrgDipResultMrisSum(Map<String, Object> map) {
+     return WrapperResponse.success(drgDipResultBO.queryDrgDipResultMrisSum(MapUtils.get(map, "drgDipResultDTO")));
+   }
 
 }

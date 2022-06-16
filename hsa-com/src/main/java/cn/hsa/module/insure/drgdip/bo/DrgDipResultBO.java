@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.drgdip.bo;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
@@ -59,4 +60,49 @@ public interface DrgDipResultBO {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
   Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList);
+
+  /**
+   * 质控结果查询-结算清单
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  PageDTO queryDrgDipResultSetlinfo(DrgDipResultDTO drgDipResultDTO);
+
+  /**
+   * 质控结果查询汇总-结算清单
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  Map<String, Object>  queryDrgDipResultSetlinfoSum(DrgDipResultDTO drgDipResultDTO);
+
+  /**
+   * 质控结果查询-详细
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  Map<String, Object>  queryDrgDipResultDetail(DrgDipResultDTO drgDipResultDTO);
+
+  /**
+   * 质控结果查询-详细
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  PageDTO  queryDrgDipResultMris(DrgDipResultDTO drgDipResultDTO);
+
+  /**
+   * 质控结果查询汇总-病案首页
+   * @param
+   * @Author
+   * @Date 2022-06-07 15:54
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+   */
+  Map<String, Object>  queryDrgDipResultMrisSum(DrgDipResultDTO drgDipResultDTO);
 }

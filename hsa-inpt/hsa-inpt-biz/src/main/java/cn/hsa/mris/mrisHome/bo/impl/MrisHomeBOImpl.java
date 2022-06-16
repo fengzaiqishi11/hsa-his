@@ -2628,6 +2628,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "patient_no"));
         drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "att_doctor_id"));
         drgDipResultDTO.setDoctorName(MapUtils.get(dataMap, "att_doctor"));
+        drgDipResultDTO.setInsutype(MapUtils.get(dataMap, "insur_type"));
         if( MapUtils.get(dataMap, "age")!= null){
             drgDipResultDTO.setAge(Integer.parseInt(MapUtils.get(dataMap, "age")));
         }

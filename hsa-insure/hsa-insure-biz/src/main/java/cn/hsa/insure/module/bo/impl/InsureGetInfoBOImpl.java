@@ -9,6 +9,7 @@ import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
@@ -2175,7 +2176,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
                 tcmZyDiagnoseDTOS.stream().forEach(diag ->{
                     diag.setTypeCode("2");
-                    if ("1".equals(diag.getIsMain())) {
+                    if (Constant.UnifiedPay.ISMAN.F.equals(diag.getIsMain())) {
                         diag.setDiseaseCode(diag.getTcmSyndromesId());
                         diag.setDiseaseName(diag.getTcmSyndromesName());
                     }

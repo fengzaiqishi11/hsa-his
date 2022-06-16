@@ -895,6 +895,11 @@ public interface Constant {
             public static final String CXJM = "390"; // 城乡居民
             public static final String LX = "340"; // 离休
         }
+
+        public static class ISMAN {
+            public static final String S = "1"; // 是
+            public static final String F = "0"; // 否
+        }
     }
 
 

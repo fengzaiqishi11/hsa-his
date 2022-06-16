@@ -324,8 +324,151 @@
     <update id="updateByVisitId" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
       update drg_dip_result
       set valid_flag = '0'
-      where visit_id = #{visitId} and type = #{type}
+      where visit_id = #{visitId} and type = #{type} and business_type = #{businessType}
     </update>
+
+    <select id="queryDrgDipResultByVisitId" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select   *
+        from drg_dip_result
+        where visit_id = #{visitId} and valid_flag = 1
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        <if test="businessType != null and businessType != ''">
+            AND business_type = #{businessType}
+        </if>
+    </select>
+
+    <select id="queryDrgDipResultById" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO">
+        select   *
+        from drg_dip_result_detail
+        where result_id = #{id}
+    </select>
+
+    <select id="queryDrgDipResultSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select * from (select
+        isi.psn_name, isi.gend, isi.age, isi.medcasno, isi.chfpdr_code as doctor_id, isi.chfpdr_name as doctor_name,if(isi.settle_no is null,'0','1') as is_uplod ,
+        isi.visit_id, isi.insure_settle_id, iis.settle_id, iis.is_hospital, iis.insure_reg_code, iis.medicalRegNo,
+        iiv.visit_icd_code , iiv.visit_icd_name , iiv.visit_drpt_id as dept_id, iiv.visit_drpt_name as dept_name,iiv.visit_no,
+        iis.crte_time, DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time, iis.total_price, ddr.id, ddr.stand_fee,
+        if(ddr.states is null,'0',ddr.states) as states,
+        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
+        if(ddr.violation_num > 0,'1','0') as violation_states,
+        if(ddr.group_result is null,'0',ddr.group_result) as group_result
+	    from insure_setl_info isi left join insure_individual_visit iiv on isi.visit_id =iiv.visit_id and isi.mdtrt_id =iiv.medical_reg_no
+        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1'  and ddr.type=#{type})A
+        <where>
+            <if test="doctorId != null and doctorId != '' ">
+               and A.doctor_id = #{doctorId}
+            </if>
+            <if test="deptId != null and deptId != '' ">
+               and A.dept_Id = #{deptId}
+            </if>
+            <if test="isUplod != null and isUplod != '' ">
+               and A.is_uplod = #{isUplod}
+            </if>
+            <if test="states != null and states != '' ">
+               and A.states = #{states}
+            </if>
+            <if test="suspiciousStates != null and suspiciousStates != '' ">
+               and A.suspicious_states = #{suspiciousStates}
+            </if>
+            <if test="violationStates != null and violationStates != '' ">
+               and A.violation_states = #{violationStates}
+            </if>
+            <if test="groupResult != null and groupResult != '' ">
+               and A.group_result = #{groupResult}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( A.psn_name like concat('%',#{keyword},'%')
+                or A.visit_no like concat('%',#{keyword},'%')
+                or A.medcasno like concat('%',#{keyword},'%')
+                )
+            </if>
+            <if test="year != null and year != '' ">
+                and DATE_FORMAT(A.crte_time, '%Y') = #{year}
+            </if>
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            <if test="startYearMonth != '' and startYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &gt;= #{startYearMonth}
+            </if>
+            <if test="endYearMonth != '' and endYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &lt;= #{endYearMonth}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDrgDipResultMris" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select * from (select
+        mbi.name as psn_name, mbi.gender_code as gend, iv.age, mbi.in_profile as medcasno, mbi.zz_doctor_id as doctor_id, mbi.zz_doctor_name as doctor_name,
+        mbi.is_upload_insure as is_uplod ,mbi.visit_id, mbi.disease_icd10 as visit_icd_code , mbi.disease_icd10_name as visit_icd_name ,
+        iv.in_dept_id as dept_id, iv.in_dept_name as dept_name,iv.in_no as visit_no,iv.status_code,
+        ie.settle_time, DATE_FORMAT(ie.settle_time, '%Y-%m-%d %H:%i:%S') as setl_time, ie.total_price, ddr.id, ddr.stand_fee,
+        if(ddr.states is null,'0',ddr.states) as states,
+        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
+        if(ddr.violation_num > 0,'1','0') as violation_states,
+        if(ddr.group_result is null,'0',ddr.group_result) as group_result
+        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id
+        left join inpt_settle ie on ie.visit_id = mbi.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id  and ddr.valid_flag ='1'  and ddr.type=#{type})A
+        <where>
+            <if test="doctorId != null and doctorId != '' ">
+                and A.doctor_id = #{doctorId}
+            </if>
+            <if test="deptId != null and deptId != '' ">
+                and A.dept_Id = #{deptId}
+            </if>
+            <if test="isUplod != null and isUplod != '' ">
+                and A.is_uplod = #{isUplod}
+            </if>
+            <if test="states != null and states != '' ">
+                and A.states = #{states}
+            </if>
+            <if test="suspiciousStates != null and suspiciousStates != '' ">
+                and A.suspicious_states = #{suspiciousStates}
+            </if>
+            <if test="violationStates != null and violationStates != '' ">
+                and A.violation_states = #{violationStates}
+            </if>
+            <if test="statusCode != null and statusCode != '' ">
+                and A.status_code = #{statusCode}
+            </if>
+            <if test="groupResult != null and groupResult != '' ">
+                and A.group_result = #{groupResult}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( A.psn_name like concat('%',#{keyword},'%')
+                or A.visit_no like concat('%',#{keyword},'%')
+                or A.medcasno like concat('%',#{keyword},'%')
+                )
+            </if>
+            <if test="year != null and year != '' ">
+                and DATE_FORMAT(A.crte_time, '%Y') = #{year}
+            </if>
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            <if test="startYearMonth != '' and startYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &gt;= #{startYearMonth}
+            </if>
+            <if test="endYearMonth != '' and endYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &lt;= #{endYearMonth}
+            </if>
+        </where>
+    </select>
 
     <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >
         update drg_dip_result set

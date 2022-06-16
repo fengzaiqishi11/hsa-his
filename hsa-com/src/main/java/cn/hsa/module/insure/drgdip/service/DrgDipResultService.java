@@ -1,11 +1,13 @@
 package cn.hsa.module.insure.drgdip.service;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import java.util.List;
 import java.util.Map;
 
 import java.util.HashMap;
@@ -63,4 +65,59 @@ public interface DrgDipResultService {
      * @Return
      */
     WrapperResponse<Boolean> insertDrgDipResult(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询-结算清单
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<PageDTO> queryDrgDipResultSetlinfo(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询汇总-结算清单
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<Map<String, Object>> queryDrgDipResultSetlinfoSum(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询汇总-详细
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<Map<String, Object>> queryDrgDipResultDetail(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询-病案首页
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<PageDTO> queryDrgDipResultMris(Map<String, Object> map);
+
+    /**
+     * @return
+     * @Method getInsureCost
+     * @Desrciption 质控结果查询汇总-病案首页
+     * @Param [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date 2021-04-11 22:54
+     * @Return
+     */
+    WrapperResponse<Map<String, Object>> queryDrgDipResultMrisSum(Map<String, Object> map);
 }

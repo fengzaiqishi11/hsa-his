@@ -529,6 +529,7 @@
     <dubbo:reference id="insureUnifiedEmrService_comsumer" interface="cn.hsa.module.insure.emr.service.InsureUnifiedEmrService" check="false"/>
 
     <dubbo:reference id="insurePolicyService_consumer" interface="cn.hsa.module.insure.other.service.InsurePolicyService" check="false"/>
+    <dubbo:reference id="drgDipResultService_consumer" interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" check="false"/>
     <dubbo:reference id="insureSpecialAttributeService_consumer" interface="cn.hsa.module.insure.module.service.InsureSpecialAttributeService" check="false"/>
     <!-- *************************************************** 月度进销存 *************************************************************** -->
     <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false" retries="0"/>

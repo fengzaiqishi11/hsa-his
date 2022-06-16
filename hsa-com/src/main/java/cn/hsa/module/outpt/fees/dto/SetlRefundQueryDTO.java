@@ -41,6 +41,11 @@ public class SetlRefundQueryDTO implements Serializable {
   private String settleId;
 
   /**
+   * 退款结算ID
+   */
+  private String redSettleId;
+
+  /**
    * 支付订单号
    */
   private String payOrdId;

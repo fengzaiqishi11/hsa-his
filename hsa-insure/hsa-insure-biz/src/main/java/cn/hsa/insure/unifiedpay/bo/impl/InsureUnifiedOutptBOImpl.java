@@ -593,6 +593,8 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
       //医保结算信息
       InsureIndividualSettleDTO insureIndividualSettleDTO = MapUtils.get(map, "insureIndividualSettleDTO");
+      //页面入参
+      SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
       //根据医院编码、医保机构编码查询医保配置信息
       InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
       configDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
@@ -601,33 +603,49 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       if (insureConfigurationDTO == null)
         throw new RuntimeException("未发现【" + insureIndividualSettleDTO.getInsureRegCode() + "】相关医保配置信息");
       Map paramMap = new HashMap();
+      paramMap.put("hospCode",insureIndividualVisitDTO.getHospCode());
       // 一、初始化Client
       YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
       // 二、入参拼装
       JSONObject param = new JSONObject() {{
-        // 卡类型
-        put("cardType", "01");
-        // 卡号
-        put("cardNo", "D3508701966");
+        // 区域医保服务平台系统跟踪号
+        put("ampTraceId", insureIndividualVisitDTO.getVisitId());
+        // 平台结算跟踪号
+        put("traceId", insureIndividualSettleDTO.getId());
+        // 机构交易订单号
+        put("orgTraceNo", "D3508701966");
+        // 机构编号(国标医院编码)
+        put("orgCode", insureConfigurationDTO.getOrgCode());
+        // 分院编号
+        put("subOrgCode", null);
+        // 退款原因
+        put("refundReason", "退款");
+        // 退款类型如果传02，则只支持全额退款（医保和自费全额进行退款） todo 默认全退
+        put("refundType", null);
+        // 外部退款流水号，到时候查询退款结果根据此订单号可以进行查询，每个机构内保证唯一 todo 系统退款ID
+        put("outRefundNo", setlRefundQueryDTO.getRedSettleId());
+        // 机构退款流水号  todo 系统退款ID
+        put("orgRefundSn", setlRefundQueryDTO.getRedSettleId());
       }};
       //请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
       com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
-          "/api/amp/hos/refund",
-          param,
+          "/api/amp/hos/refund", param,
           new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
           }
       );
       boolean requestSuccess = gatewayResponse.isSuccess();
+      JSONObject outParam = new JSONObject();
       if (requestSuccess) {
-        JSONObject outParam = gatewayResponse.getParam();
+        outParam = gatewayResponse.getParam();
         // 出参接收与处理
+        //todo 写表操作
         log.info("响应出参：{}", JSON.toJSONString(outParam));
-        // todo 接收成功后的处理
+        RefundResponseDTO dto = FastJsonUtils.fromJson(outParam.toJSONString(),RefundResponseDTO.class);
       } else {
         log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
-        // todo 请求失败的处理
+        throw new AppException("请求省医保移动支付官方门户失败,失败编码:"+gatewayResponse.getRespCode()+",失败原因:"+gatewayResponse.getRespMsg());
       }
-      return null;
+      return outParam;
     }
 
     /**
@@ -638,7 +656,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
      * @return com.yhtech.nmpay.common.client.YhGatewayClient
      */
     private YhGatewayClient CreateYHGatewayClient(Map paramMap){
-      paramMap.put("codeList", new String[]{"HN_URL", "HN_CLIENT_PRV_KEY", "HN_APP_ID", "HN_APP_SECRET", "HN_SERVER_PUB_KEY", "HN_DZPZ_FLAG"});
+      paramMap.put("codeList", new String[]{"HN_URL", "HN_CLIENT_PRV_KEY", "HN_APP_ID", "HN_APP_SECRET", "HN_SERVER_PUB_KEY", "HN_YDZF_FLAG"});
       WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
       Map<String, SysParameterDTO> sysMap = getData(wr);
       SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HN_URL");

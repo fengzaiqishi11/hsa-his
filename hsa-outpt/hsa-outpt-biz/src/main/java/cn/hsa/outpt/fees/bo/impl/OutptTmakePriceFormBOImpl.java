@@ -4952,7 +4952,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
    * @return
    */
     @Override
-    public Boolean ampRefund(Map map) {
+    public Map<String, Object> ampRefund(Map map) {
       //医院编码
       String hospCode = map.get("hospCode").toString();
       SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
@@ -4993,7 +4993,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       map.put("insureIndividualSettleDTO",settleDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();
-      return null;
+      return resultMap;
     }
 
 }

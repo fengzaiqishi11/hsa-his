@@ -156,7 +156,7 @@ public class OnlinePayController  extends BaseController {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
    */
   @PostMapping("/ampRefund")
-  public WrapperResponse<Boolean> ampRefund(@RequestBody SetlRefundQueryDTO dto,
+  public WrapperResponse<Map<String, Object>> ampRefund(@RequestBody SetlRefundQueryDTO dto,
                                                HttpServletRequest req,
                                                HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);

@@ -533,8 +533,22 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             return WrapperResponse.success(true);
         }
 
+        //判断是否是移动支付，是移动支付退款则推送退款申请
+        /*Map<String, String> ydzfMap = new HashMap<>();
+        ydzfMap.put("code", "HN_YDZF_FLAG");
+        ydzfMap.put("hospCode", hospCode);
+        SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if(ydzfParameterDTO !=null && "1".equals(ydzfParameterDTO.getValue())) {
+          SetlRefundQueryDTO dto = new SetlRefundQueryDTO();
+          dto.setVisitId(visitId);
+          dto.setSettleId(settleId);
+          dto.setRedSettleId(redSettleId);
+          Map<String, Object> map = new HashMap<>();
+          map.put("hospCode", hospCode);
+          map.put("setlRefundQueryDTO", dto);
+          outptTmakePriceFormService_consumer.ampRefund(map);
+        }*/
         /**END*****************医保病人处理********************************************************************/
-
        // TODO 非医保病人自动退费
         // 如果有再收的费用且是普通病人，自动收费
 

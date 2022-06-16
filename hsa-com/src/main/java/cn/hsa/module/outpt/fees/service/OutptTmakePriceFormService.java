@@ -450,5 +450,5 @@ public interface OutptTmakePriceFormService {
      * @Date 2022-06-15 9:02
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
-    WrapperResponse<Boolean> ampRefund(Map<String, Object> map);
+    WrapperResponse<Map<String, Object>> ampRefund(Map<String, Object> map);
 }

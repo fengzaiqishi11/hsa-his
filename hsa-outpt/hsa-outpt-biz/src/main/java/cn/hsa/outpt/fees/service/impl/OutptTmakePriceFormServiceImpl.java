@@ -560,7 +560,7 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     @Override
-    public WrapperResponse<Boolean> ampRefund(Map<String, Object> map) {
+    public WrapperResponse<Map<String, Object>> ampRefund(Map<String, Object> map) {
       return WrapperResponse.success(outptTmakePriceFormBO.ampRefund(map));
     }
 

@@ -428,5 +428,5 @@ public interface OutptTmakePriceFormBO {
      * @Date 2022-06-15 9:10
      * @return java.lang.Boolean
      */
-    Boolean ampRefund(Map map);
+    Map<String, Object>  ampRefund(Map map);
 }

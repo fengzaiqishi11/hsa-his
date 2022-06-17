@@ -590,8 +590,20 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
      * @Date 2022-05-07 15:12
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
-  @Override
-  public InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map<String, Object> insureVisitParam) {
-    return insureIndividualVisitDAO.getInsureIndividualVisitByMedRegNo(insureVisitParam);
-  }
+    @Override
+    public InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map<String, Object> insureVisitParam) {
+      return insureIndividualVisitDAO.getInsureIndividualVisitByMedRegNo(insureVisitParam);
+    }
+
+    /**
+     * 根据就诊凭证类型和就诊凭证编号获取医保就诊信息
+     * @param insureVisitParam
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 16:38
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    @Override
+    public InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam) {
+      return insureIndividualVisitDAO.getInsureIndividualVisitByMdtrtCertNo(insureVisitParam);
+    }
 }

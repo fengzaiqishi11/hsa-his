@@ -84,6 +84,9 @@ import java.util.stream.Collectors;
 @Component
 public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
+    private static final String RET_CODE00 = "00";
+    private static final String RET_CODE02 = "02";
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
@@ -4994,6 +4997,52 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       map.put("insureIndividualSettleDTO",settleDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();
       return resultMap;
+    }
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:48
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> querySettleResult(Map map) {
+      Map<String, Object> responseMap = new HashMap<>();
+      if (ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_type"))||ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_no"))){
+        responseMap.put("ret_code",RET_CODE02);
+        responseMap.put("ret_msg","必传参数未传!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }
+      Map<String, Object> param = new HashMap<>();
+      param.put("hospCode",MapUtils.get(map, "hospCode"));
+      param.put("mdtrtCertType",MapUtils.get(map, "mdtrt_cert_type"));
+      param.put("mdtrtCertNo",MapUtils.get(map, "mdtrt_cert_no"));
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitByMdtrtCertNo(param);
+      if (ObjectUtil.isEmpty(insureIndividualVisitDTO)){
+        responseMap.put("ret_code",RET_CODE02);
+        responseMap.put("ret_msg","未查询到就医信息!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }
+      //根据就诊ID获取最新一条结算信息
+      param.put("visitId",insureIndividualVisitDTO.getVisitId());
+      InsureIndividualSettleDTO insureIndividualSettleDTO =
+          insureIndividualSettleService.getInsureSettleByVisitId(param);
+      if (ObjectUtil.isEmpty(insureIndividualSettleDTO)){
+        responseMap.put("ret_code",RET_CODE00);
+        responseMap.put("ret_msg","查询成功,未查到院内结算信息!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }else{
+        responseMap.put("ret_code",RET_CODE00);
+        responseMap.put("ret_msg","查询成功!");
+        responseMap.put("result","succ");
+        return responseMap;
+      }
     }
 
 }

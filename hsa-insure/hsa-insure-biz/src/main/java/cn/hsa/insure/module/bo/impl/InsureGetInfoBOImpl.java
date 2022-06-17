@@ -657,9 +657,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (StringUtils.isEmpty(functionCode)) {
             throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医疗结算清单功能号");
         }
-        if (!"4101A".equals(functionCode)) {
-            throw new AppException("上传到4101A接口的数据才能修改状态");
-        }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());

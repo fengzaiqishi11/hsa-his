@@ -40,7 +40,6 @@ import cn.hsa.module.mris.mrisHome.dto.MrisTurnDeptDTO;
 import cn.hsa.module.mris.mrisHome.entity.*;
 import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
-import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisDiagnoseDTO;
 import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
 import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO;
 import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO;
@@ -49,8 +48,6 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
@@ -657,26 +654,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
      **/
     public Map<String, Object> insertMrisForDIP(Map<String, Object> map) {
         /**=========== 1.封装请求参数 begin ==========**/
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
-        Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
-        if (MapUtils.isEmpty(baseInfoStr)){
-            throw new AppException("病案基本信息不能为空");
-        }
-        // 处理年龄
-        String age = MapUtils.get(baseInfoStr, "age");
-        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
-            String substring = age.substring(1);
-            baseInfoStr.put("age",substring);
-        }
-        dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
-        List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
-        if (MapUtils.isEmpty(strArr)){
-            throw new AppException("病案诊断信息不能为空");
-        }
-        dataMap.put("strArr", JSONObject.toJSONString(strArr));
-        List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
-        dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
+        Map<String, Object> dataMap = MapUtils.get(map,"dataMap");
+        Map<String, Object> baseInfoStr = JSONObject.parseObject(MapUtils.get(dataMap, "baseInfoStr"));
         /**=========== 封装请求参数 end ==========**/
 
         /**=========== 2.获取请求地址 begin ==========**/
@@ -826,6 +805,30 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
         return responseDataMap;
 
+    }
+
+    private Map<String, Object> requestDRGorDIPDataMap(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
+        if (MapUtils.isEmpty(baseInfoStr)){
+            throw new AppException("病案基本信息不能为空");
+        }
+        // 处理年龄
+        String age = MapUtils.get(baseInfoStr, "age");
+        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
+            String substring = age.substring(1);
+            baseInfoStr.put("age",substring);
+        }
+        dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
+        List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
+        if (MapUtils.isEmpty(strArr)){
+            throw new AppException("病案诊断信息不能为空");
+        }
+        dataMap.put("strArr", JSONObject.toJSONString(strArr));
+        List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
+        dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
+        return dataMap;
     }
 
     @Override

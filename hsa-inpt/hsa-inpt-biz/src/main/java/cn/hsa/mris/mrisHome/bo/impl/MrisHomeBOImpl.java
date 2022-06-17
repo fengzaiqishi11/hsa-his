@@ -644,54 +644,40 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     /**
      * @Author gory
-     * @Description 封装请求参数
-     * @Date 2022/6/16 9:48
+     * @Description 病案首页DIP质控
+     * 1.封装请求参数
+     * 2.获取系统参数中配置的病案质控dip地址
+     * 3.调用DIP质控地址
+     * 4.获取返回参数
+     * 5.插入日志
+     * 6.保存质控结果
+     * 7.封装返回参数
+     * @Date 2022/6/13 8:37
      * @Param [map]
      **/
-    private Map<String, Object> requestDRGorDIPDataMap(Map<String, Object> map) {
+    public Map<String, Object> insertMrisForDIP(Map<String, Object> map) {
+        /**=========== 1.封装请求参数 begin ==========**/
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
-        if (MapUtils.isEmpty(baseInfoStr)) {
+        if (MapUtils.isEmpty(baseInfoStr)){
             throw new AppException("病案基本信息不能为空");
         }
         // 处理年龄
         String age = MapUtils.get(baseInfoStr, "age");
-        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)) {// 珠海病案首页的年龄格式是 Y + number
+        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
             String substring = age.substring(1);
-            baseInfoStr.put("age", substring);
+            baseInfoStr.put("age",substring);
         }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
-        if (MapUtils.isEmpty(strArr)) {
+        if (MapUtils.isEmpty(strArr)){
             throw new AppException("病案诊断信息不能为空");
         }
         dataMap.put("strArr", JSONObject.toJSONString(strArr));
         List<Map<String, Object>> mrisOperInfoForDRG = getMrisOperInfoForDRG(map);// 病案手术信息
         dataMap.put("strSsxxArr", JSONObject.toJSONString(mrisOperInfoForDRG));
-        return dataMap;
-    }
-
-    @Override
-/**
- * @Author gory
- * @Description 病案首页DIP质控
- * 1.封装请求参数
- * 2.获取系统参数中配置的病案质控dip地址
- * 3.调用DIP质控地址
- * 4.获取返回参数
- * 5.插入日志
- * 6.保存质控结果
- * 7.封装返回参数
- * @Date 2022/6/13 8:37
- * @Param [map]
- **/
-    public Map<String, Object> insertMrisForDIP(Map<String, Object> map) {
-        /**=========== 1.封装请求参数 begin ==========**/
-        Map<String, Object> dataMap = MapUtils.get(map,"dataMap");
-        Map<String, Object> baseInfoStr = JSONObject.parseObject(MapUtils.get(dataMap, "baseInfoStr"));
-        /**========= 封装请求参数 End=========**/
-
+        /**=========== 封装请求参数 end ==========**/
 
         /**=========== 2.获取请求地址 begin ==========**/
         Map<String, Object> sysMap = new HashMap<>();
@@ -1407,15 +1393,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
     }
 
-    /**
-     * 保存反而数据信息
-     *
-     * @param mrisBaseInfoDTO
-     * @param mbiId
+    /**保存反而数据信息
      * @Method handleBackData
      * @Desrciption
      * @Author liuqi1
-     * @Date 2021/4/27 21:01
+     * @Date   2021/4/27 21:01
      * @Return void
      **/
     private void saveBackData(MrisBaseInfoDTO mrisBaseInfoDTO, String mbiId) {
@@ -1592,14 +1574,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         return mbiId;
     }
 
-    /**
-     * 保存正面数据信息(更新操作)
-     *
-     * @param mrisBaseInfoDTO
+    /**保存正面数据信息(更新操作)
      * @Method saveFrontData
      * @Desrciption
+     * @param mrisBaseInfoDTO
      * @Author liuliyun
-     * @Date 2021/1/7 9:47
+     * @Date   2021/1/7 9:47
      * @Return java.lang.String
      **/
     private String saveUpdateFrontData(MrisBaseInfoDTO mrisBaseInfoDTO) {
@@ -2643,7 +2623,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "patient_no"));
         drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "att_doctor_id"));
         drgDipResultDTO.setDoctorName(MapUtils.get(dataMap, "att_doctor"));
-        if (MapUtils.get(dataMap, "age") != null) {
+        if( MapUtils.get(dataMap, "age")!= null){
             drgDipResultDTO.setAge(Integer.parseInt(MapUtils.get(dataMap, "age")));
         }
         drgDipResultDTO.setGend(MapUtils.get(dataMap, "sex_id"));

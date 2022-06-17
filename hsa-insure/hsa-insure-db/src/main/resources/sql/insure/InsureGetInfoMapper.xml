@@ -662,7 +662,7 @@
                 #{dscgTime}, #{dscgCaty}, #{actIptDays}, #{otpWmDise}, #{wmDiseCode}, #{otpTcmDise}, #{tcmDiseCode},
                 #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDura}, #{pwcryBfadmComaDura}, #{pwcryAfadmComaDura},
                 #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscareDays}, #{lv1NurscareDays}, #{scdNurscareDays},
-                #{lv3NursecareDays},
+                #{lv3NurscareDays},
                 #{dscgWay}, #{acpMedinsName}, #{acpOptinsCode}, #{billCode}, #{billNo}, #{bizSn}, #{daysRinpFlag31},
                 #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEndDate}, #{psnSelfpay},
                 #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept},
@@ -1702,7 +1702,7 @@
         from insure_bldinfo
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
-          and insure_settle_id = #{insureSettleId}
+          and insure_settle_id = #{insureSettleId} and bld_cat is not null
     </select>
     <select id="selectBldInfoForMap" resultType="java.util.Map">
         select id,

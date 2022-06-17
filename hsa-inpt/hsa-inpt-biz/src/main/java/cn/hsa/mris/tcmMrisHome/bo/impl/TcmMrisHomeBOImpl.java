@@ -688,6 +688,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         List<InptDiagnoseDTO> inptDiagnoseList = tcmMrisHomeDAO.queryHisDiagnoseInfo(map);
         List<TcmMrisDiagnoseDTO> mrisDiagnoseDOList = new ArrayList<>();
         List<TcmDiagnoseDTO> tcmDiagnoseDTOS = new ArrayList<>();
+        int i =2;
         if (!ListUtils.isEmpty(inptDiagnoseList)) {
             for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseList) {
                 if ("301".equals(inptDiagnoseDTO.getTypeCode()) || "302".equals(inptDiagnoseDTO.getTypeCode())
@@ -730,9 +731,12 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                     if ("1".equals(inptDiagnoseDTO.getIsMain())) {
                         mrisDiagnoseDO.setDiseaseName("主要诊断");
                         mrisDiagnoseDO.setDiseaseCode("1");
+                        mrisDiagnoseDO.setColumnsNum("1");
                     } else {
                         mrisDiagnoseDO.setDiseaseName("其他诊断");
                         mrisDiagnoseDO.setDiseaseCode("0");
+                        mrisDiagnoseDO.setColumnsNum(i+"");
+                        i++;
                     }
                     mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
                     mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());

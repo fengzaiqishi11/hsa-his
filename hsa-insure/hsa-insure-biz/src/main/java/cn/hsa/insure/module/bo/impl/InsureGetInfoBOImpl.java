@@ -286,11 +286,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("ntly", "CHN"); // 国籍  默认是中国
 
         setlinfo.put("prfs", settleInfoDTO.getPrfs()); // 职业
-        setlinfo.put("curr_addr", settleInfoDTO.getAddress()); // 现住址
-        setlinfo.put("emp_name", settleInfoDTO.getWork()); // 工作单位 *******
-        setlinfo.put("emp_addr", settleInfoDTO.getWorkAddress()); // 工作单位地址 *******
-        setlinfo.put("emp_tel", settleInfoDTO.getWorkPhone()); // 工作单位电话 *******
-        setlinfo.put("poscode", settleInfoDTO.getWorkPostCode()); // 工作单位邮编 *******
+        setlinfo.put("curr_addr", settleInfoDTO.getCurrAddr()); // 现住址
+        setlinfo.put("emp_name", settleInfoDTO.getEmpName()); // 工作单位 *******
+        setlinfo.put("emp_addr", settleInfoDTO.getEmpAddr()); // 工作单位地址 *******
+        setlinfo.put("emp_tel", settleInfoDTO.getEmpTel()); // 工作单位电话 *******
+        setlinfo.put("poscode", settleInfoDTO.getPoscode()); // 工作单位邮编 *******
         setlinfo.put("coner_name", settleInfoDTO.getConerName()); // 联系人姓名
         setlinfo.put("patn_rlts", settleInfoDTO.getPatnRlts()); // 与患者关系
         setlinfo.put("coner_addr", settleInfoDTO.getConerAddr()); // 联系人地址
@@ -303,8 +303,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("opsp_diag_caty", settleInfoDTO.getVisitDrptName()); // 诊断科别 *******
         setlinfo.put("opsp_mdtrt_date", settleInfoDTO.getOpspMdtrtDate()); // 就诊日期 *******
 
-        setlinfo.put("adm_way", settleInfoDTO.getInWay()); // 入院途径 *******
-        setlinfo.put("trt_type", settleInfoDTO.getTrtType()); // 治疗类别 *******
+        setlinfo.put("adm_way", settleInfoDTO.getAdmWay()); // 入院途径 *******
+        // 治疗类别 *******
+        if (StringUtils.isNotEmpty(settleInfoDTO.getTrtType())) {
+            String trtType = settleInfoDTO.getTrtType();
+            if ("10".equals(trtType)) {
+                setlinfo.put("trt_type", "1"); // 西医
+            } else if ("21".equals(trtType)) {
+                setlinfo.put("trt_type", "2.1"); // 中医
+            } else if ("22".equals(trtType)) {
+                setlinfo.put("trt_type", "2.2"); // 民族医
+            } else {
+                setlinfo.put("trt_type", "3"); // 中西医
+            }
+        }
         if (ObjectUtil.isNotEmpty(settleInfoDTO.getAdmTime())) { //对时间对象做判空处理才能 用date工具类做处理
             setlinfo.put("adm_time", DateUtils.format(settleInfoDTO.getAdmTime(), DateUtils.Y_M_DH_M_S)); // 入院时间 *******
         }
@@ -317,7 +329,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
 
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
-        setlinfo.put("wm_dise_code", settleInfoDTO.getWmDiswCode()); // 西医诊断疾病代码 *******
+        setlinfo.put("wm_dise_code", settleInfoDTO.getOptWmDiseCode()); // 西医诊断疾病代码 *******
 
         setlinfo.put("otptcmdise", settleInfoDTO.getOptTcmDise()); // 门（急）诊中医诊断 *******
         setlinfo.put("tcmdisecode", settleInfoDTO.getTcmDiseCode()); // 中医诊断代码 *******

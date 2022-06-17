@@ -2200,10 +2200,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
                 tcmZyDiagnoseDTOS.stream().forEach(diag ->{
                     diag.setTypeCode("2");
+                    //中医病案的中医症候是存在TcmSyndromesId和TcmSyndromesName字段的，
+                    //这里取出来赋值给DiseaseCode和DiseaseName
                     if (Constant.UnifiedPay.ISMAN.F.equals(diag.getIsMain())) {
                         diag.setDiseaseCode(diag.getTcmSyndromesId());
                         diag.setDiseaseName(diag.getTcmSyndromesName());
                     }
+                    //ID1003812 结算清单以西医的主诊断为准
+                    diag.setIsMain(Constant.UnifiedPay.ISMAN.F);
                 });
                 zxCollect = tcmZyDiagnoseDTOS;
             }

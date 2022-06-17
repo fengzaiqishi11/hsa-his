@@ -900,6 +900,12 @@ public interface Constant {
             public static final String S = "1"; // 是
             public static final String F = "0"; // 否
         }
+
+        public static class ZKZT {
+            public static final String WZK = "0"; // 未质控
+            public static final String ZKWWC = "1"; // 质控未完成
+            public static final String ZKWC = "2"; // 质控完成
+        }
     }
 
 

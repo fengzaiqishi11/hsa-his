@@ -826,73 +826,81 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         /**===================获取系统参数中配置的结算清单质控drg地址 End==============**/
 
-        // 3.发送请求
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
-        Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
-
-        /**======4.获取返回的参数 begin=========**/
-        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != null && 0 != responseCode){
-            throw new AppException("调用DRG接口失败");
-        }
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
-        if (MapUtils.isEmpty(resultMap)){
-            throw new AppException("调用DRG,返回结果为空");
-        }
-        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
-        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
-        /**======获取返回的参数 end=========**/
         /**======5.保存日志 begin=========**/
-        logMap.put("respTime",DateUtils.getNow());//响应时间
         //记录日志
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
         logMap.put("visitId",MapUtils.get(baseInfo, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
-        logMap.put("respContent",JSONObject.toJSONString(responseMap));
-        logMap.put("resultCode",responseCode);
         logMap.put("type","1");
         logMap.put("businessType","1");
         logMap.put("infNo","34141");
         logMap.put("infName","结算清单DRG质控");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
-        drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
-        //保存操作日志
-        dataMap.put("crteId",MapUtils.get(map, "crteId"));
-        dataMap.put("crteName",MapUtils.get(map, "crteName"));
-        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        dataMap.put("type","1");
-        dataMap.put("businessType","1");
-        dataMap.put("optTypeName","结算清单DRG质控");
-        insertDrgDipBusinessOptInfoLog(dataMap);
-        //保存质控结果
-        insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
-        /**==========保存日志 end ===========**/
-
-        /**==========6.返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
         responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfoMap.get("visitId"));// 住院号
         responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
-        responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
-        responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
-        responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
-        responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
-        responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
-        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
-        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
-        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
-        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息
-        /**==========返回参数封装 End ===========**/
+        try{
+            // 3.发送请求
+            Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
 
+            /**======4.获取返回的参数 begin=========**/
+            logMap.put("respTime",DateUtils.getNow());//响应时间
+            logMap.put("respContent",JSONObject.toJSONString(responseMap));
+            logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+            //保存操作日志
+            dataMap.put("crteId",MapUtils.get(map, "crteId"));
+            dataMap.put("crteName",MapUtils.get(map, "crteName"));
+            dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
+            dataMap.put("type","1");
+            dataMap.put("businessType","1");
+            dataMap.put("optTypeName","结算清单DRG质控");
+            insertDrgDipBusinessOptInfoLog(dataMap);
+
+            Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
+            if (responseCode != null && 0 != responseCode){
+                throw new AppException("调用DRG接口失败");
+            }
+            Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+            if (MapUtils.isEmpty(resultMap)){
+                throw new AppException("调用DRG,返回结果为空");
+            }
+            Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+            Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+            List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            /**======获取返回的参数 end=========**/
+            //保存质控结果
+            insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
+            /**==========6.返回参数封装 Begin ===========**/
+            responseDataMap.put("inNO",baseInfoMap.get("visitId"));// 住院号
+            responseDataMap.put("drgCode",groupInfoMap.get("code"));// DRG组编码
+            responseDataMap.put("drgName",groupInfoMap.get("name"));// DRG组名称
+            responseDataMap.put("weightValue",groupInfoMap.get("weight"));// DRG权重
+            responseDataMap.put("ratio",groupInfoMap.get("bl"));// 倍率
+            responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
+            responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+            responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+            responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+            responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+            responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
+            responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
+            responseDataMap.put("quality",qualityInfoList);// 质控信息
+            /**==========返回参数封装 End ===========**/
+        }catch (Exception e){
+            if (e instanceof AppException) {
+                throw e;
+            } else {
+                throw new AppException(e.getMessage());
+            }
+        }finally {
+            drgDipResultService.insertDrgDipQulityInfoLog(logMap);
+            /**==========保存日志 end ===========**/
+        }
         return responseDataMap;
     }
 
@@ -1096,72 +1104,81 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         /**===================获取系统参数中配置的结算清单质控dip地址 End==============**/
 
-        /**===================3.调用DIP Begin==============**/
+
         Map<String, Object> logMap = new HashMap<>();
         logMap.put("reqTime",DateUtils.getNow());//请求时间
-        Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
-        /**===================调用DIP End==============**/
-
-        /**======4.获取返回的参数 begin=========**/
-        Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
-        if (responseCode != null && responseCode != 0){
-            throw new AppException("调用DIP接口失败");
-        }
-        Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
-        if (MapUtils.isEmpty(resultMap)){
-            throw new AppException("调用DIP接口失败,返回的结果集为null，请联系管理员");
-        }
-        Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
-        Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-        List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
-        /**======获取返回的参数 end=========**/
-
         /**======5.保存日志 begin=========**/
-        logMap.put("respTime",DateUtils.getNow());//响应时间
         logMap.put("hospCode",MapUtils.get(map, "hospCode"));
         logMap.put("orgCode",MapUtils.get(baseInfo, "fixmedins_code"));
         logMap.put("visitId",MapUtils.get(baseInfo, "visit_id"));
         logMap.put("reqContent",JSONObject.toJSONString(dataMap));
-        logMap.put("respContent",JSONObject.toJSONString(responseMap));
-        logMap.put("resultCode",MapUtils.get(responseMap, "code"));
         logMap.put("type","2");
         logMap.put("businessType","1");
         logMap.put("infNo","34142");
         logMap.put("infName","结算清单DIP质控");
         logMap.put("crtId",MapUtils.get(map, "crteId"));
         logMap.put("crtName",MapUtils.get(map, "crteName"));
-        drgDipResultBO.insertDrgDipQulityInfoLog(logMap);
-        //保存操作日志
-        dataMap.put("crteId",MapUtils.get(map, "crteId"));
-        dataMap.put("crteName",MapUtils.get(map, "crteName"));
-        dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
-        dataMap.put("type","2");
-        dataMap.put("businessType","1");
-        dataMap.put("optTypeName","结算清单DIP质控");
-        insertDrgDipBusinessOptInfoLog(dataMap);
-        /**======保存日志 end=========**/
-
-        //6.保存质控结果
-        insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
-        /**==========7.返回参数封装 Begin ===========**/
         Map responseDataMap = new HashMap<>();
         responseDataMap.put("name",baseInfo.get("psnName"));// 姓名
         responseDataMap.put("sex",baseInfo.get("gender"));// 性别
         responseDataMap.put("age",baseInfo.get("age"));// 年龄
-        responseDataMap.put("inNO",baseInfoMap.get("visitId"));//住院号
         responseDataMap.put("hiType",baseInfo.get("hi_type"));// 医保类型
-        responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
-        responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
-        responseDataMap.put("diagFeeSco",resultMap.get("feePay"));// 分值
-        responseDataMap.put("profitAndLossAmount",resultMap.get("profit"));// 盈亏额
-        responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
-        responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
-        responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
-        responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
-        responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
-        responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息
-        /**==========返回参数封装 End ===========**/
+        try{
+            /**===================3.调用DIP Begin==============**/
+            Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
+            /**===================调用DIP End==============**/
+            /**======4.获取返回的参数 begin=========**/
+            logMap.put("respTime",DateUtils.getNow());//响应时间
+            logMap.put("respContent",JSONObject.toJSONString(responseMap));
+            logMap.put("resultCode",MapUtils.get(responseMap, "code"));
+            //保存操作日志
+            dataMap.put("crteId",MapUtils.get(map, "crteId"));
+            dataMap.put("crteName",MapUtils.get(map, "crteName"));
+            dataMap.put("hospCode",MapUtils.get(map, "hospCode"));
+            dataMap.put("type","2");
+            dataMap.put("businessType","1");
+            dataMap.put("optTypeName","结算清单DIP质控");
+            insertDrgDipBusinessOptInfoLog(dataMap);
+            /**======保存日志 end=========**/
+            Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
+            if (responseCode != null && responseCode != 0){
+                throw new AppException("调用DIP接口失败");
+            }
+            Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
+            if (MapUtils.isEmpty(resultMap)){
+                throw new AppException("调用DIP接口失败,返回的结果集为null，请联系管理员");
+            }
+            Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
+            Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
+            List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            /**======获取返回的参数 end=========**/
+
+            //6.保存质控结果
+            insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
+            /**==========7.返回参数封装 Begin ===========**/
+            responseDataMap.put("inNO",baseInfoMap.get("visitId"));//住院号
+            responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
+            responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
+            responseDataMap.put("diagFeeSco",resultMap.get("feePay"));// 分值
+            responseDataMap.put("profitAndLossAmount",resultMap.get("profit"));// 盈亏额
+            responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
+            responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
+            responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
+            responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
+            responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
+            responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
+            responseDataMap.put("quality",qualityInfoList);// 质控信息
+            /**==========返回参数封装 End ===========**/
+        }catch (Exception e){
+            if (e instanceof AppException) {
+                throw e;
+            } else {
+                throw new AppException(e.getMessage());
+            }
+        }finally {
+            drgDipResultService.insertDrgDipQulityInfoLog(logMap);
+            /**====== 插入日志 end=========**/
+        }
         return responseDataMap;
     }
 

@@ -6,7 +6,6 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
-import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
@@ -816,13 +815,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRG(Map<String, Object> map) {
         /**=============1.请求参数封装 Begin=========**/
-        Map<String, Object> dataMap = new HashMap<>();
-        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
-        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
-        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
-        dataMap.put("baseInfo", baseInfo);
-        dataMap.put("diseInfo", diseInfo);
-        dataMap.put("oprtInfo", oprtInfo);
+        Map<String, Object> dataMap = MapUtils.get(map, "dataMap");
+        Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");
         /**=============请求参数封装 End=========**/
 
         /**=============2.获取系统参数中配置的结算清单质控drg地址 Begin=========**/
@@ -861,7 +855,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             // 3.发送请求
             Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
 
-            /**======4.获取返回的参数 begin=========**/
             logMap.put("respTime",DateUtils.getNow());//响应时间
             logMap.put("respContent",JSONObject.toJSONString(responseMap));
             logMap.put("resultCode",MapUtils.get(responseMap, "code"));
@@ -876,12 +869,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
             Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
             if (responseCode != null && 0 != responseCode){
+                logger.info("SettleInfoInterface调用DRG接口失败，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
                 throw new AppException("调用DRG接口失败");
+            }else {
+                logger.info("SettleInfoInterface调用DRG接口成功，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
             }
             Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
             if (MapUtils.isEmpty(resultMap)){
                 throw new AppException("调用DRG,返回结果为空");
             }
+            /**======4.获取返回的参数 begin=========**/
             Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
             Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
             List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
@@ -1094,13 +1093,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Map<String, Object> insertInsureSettleInfoForDIP(Map<String, Object> map) {
         /**=============1. dip入参封装 begin=========**/
-        Map<String, Object> dataMap = new HashMap<>();
-        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
-        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
-        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
-        dataMap.put("baseInfo", baseInfo);
-        dataMap.put("diseInfo", diseInfo);
-        dataMap.put("oprtInfo", oprtInfo);
+        Map<String, Object> dataMap = MapUtils.get(map, "dataMap");
+        Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");
         /**=============dip入参封装 end=========**/
 
         /**=============2.获取系统参数中配置的结算清单质控dip地址 Begin=========**/
@@ -1154,7 +1148,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             /**======保存日志 end=========**/
             Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
             if (responseCode != null && responseCode != 0){
+                logger.info("SettleInfoInterface调用DIP接口失败，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
                 throw new AppException("调用DIP接口失败");
+            }else{
+                logger.info("SettleInfoInterface调用DIP接口成功，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
             }
             Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
             if (MapUtils.isEmpty(resultMap)){
@@ -1194,12 +1193,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         return responseDataMap;
     }
 
+    private Map<String, Object> requestDIPorDRGDataMap(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
+        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
+        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
+        dataMap.put("baseInfo", baseInfo);
+        dataMap.put("diseInfo", diseInfo);
+        dataMap.put("oprtInfo", oprtInfo);
+        return dataMap;
+    }
+
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
         WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
         DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
         Map<String,Object> drgData = new HashMap<>();
         Map<String,Object> dipData = new HashMap<>();
+        Map<String, Object> dataMap = requestDIPorDRGDataMap(map);
+        map.put("dataMap",dataMap);
         if ("true".equals(drgDipAuthDTO.getDrg())){
             drgData = insertInsureSettleInfoForDRG(map);
 

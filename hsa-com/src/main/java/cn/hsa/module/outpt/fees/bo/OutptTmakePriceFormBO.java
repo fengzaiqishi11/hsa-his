@@ -429,4 +429,13 @@ public interface OutptTmakePriceFormBO {
      * @return java.lang.Boolean
      */
     Map<String, Object>  ampRefund(Map map);
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:43
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String, Object> querySettleResult(Map map);
 }

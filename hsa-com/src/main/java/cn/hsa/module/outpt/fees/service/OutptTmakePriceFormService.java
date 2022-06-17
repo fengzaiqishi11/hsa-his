@@ -451,4 +451,13 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     WrapperResponse<Map<String, Object>> ampRefund(Map<String, Object> map);
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:36
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map);
 }

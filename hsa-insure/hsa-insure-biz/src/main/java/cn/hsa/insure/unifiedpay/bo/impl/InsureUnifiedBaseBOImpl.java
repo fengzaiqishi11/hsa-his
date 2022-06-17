@@ -324,7 +324,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         paramMap .put("insureIndividualBasicDTO",insureIndividualBasicDTO);
         paramMap.putAll(map);
         // 参保地医保区划
-        paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
+        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("hospCode", hospCode);
         paramMap.put("isHospital",insureIndividualVisitDTO.getIsHospital());

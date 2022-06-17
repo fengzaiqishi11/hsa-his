@@ -39,13 +39,19 @@ public class drgDipResultController extends BaseController {
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
   @GetMapping("/checkDrgDipBizAuthorization")
-  public WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+  public WrapperResponse<Map<String,Object>> checkDrgDipBizAuthorization(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map<String,Object> map = new HashMap<>();
     drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("drgDipResultDTO",drgDipResultDTO);
-    return drgDipResultService_consumer.checkDrgDipBizAuthorization(map);
+    DrgDipAuthDTO drgDipAuthDTO = drgDipResultService_consumer.checkDrgDipBizAuthorization(map).getData();
+    Boolean drg = new Boolean(drgDipAuthDTO.getDrg());
+    Boolean dip = new Boolean(drgDipAuthDTO.getDip());
+    Map<String,Object> drgDipMap = new HashMap<>();
+    drgDipMap.put("drg",drg);
+    drgDipMap.put("dip",dip);
+    return WrapperResponse.success(drgDipMap);
   }
 
   /**

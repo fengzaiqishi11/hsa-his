@@ -63,8 +63,8 @@ public class drgDipResultController extends BaseController {
    * @Date 2022-05-07 9:10
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  @GetMapping("/queryDrgDipResultSetlinfo")
-  public WrapperResponse<PageDTO> queryDrgDipResultSetlinfo(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+  @PostMapping("/queryDrgDipResultSetlinfo")
+  public WrapperResponse<PageDTO> queryDrgDipResultSetlinfo(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map<String,Object> map = new HashMap<>();
     drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
@@ -82,8 +82,8 @@ public class drgDipResultController extends BaseController {
    * @Date 2022-05-07 9:10
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  @GetMapping("/queryDrgDipResultSetlinfoSum")
-  public WrapperResponse<Map<String, Object>> queryDrgDipResultSetlinfoSum(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+  @PostMapping("/queryDrgDipResultSetlinfoSum")
+  public WrapperResponse<Map<String, Object>> queryDrgDipResultSetlinfoSum(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map<String,Object> map = new HashMap<>();
     drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
@@ -120,8 +120,8 @@ public class drgDipResultController extends BaseController {
    * @Date 2022-05-07 9:10
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  @GetMapping("/queryDrgDipResultMris")
-  public WrapperResponse<PageDTO> queryDrgDipResultMris(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+  @PostMapping("/queryDrgDipResultMris")
+  public WrapperResponse<PageDTO> queryDrgDipResultMris(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map<String,Object> map = new HashMap<>();
     map.put("hospCode", sysUserDTO.getHospCode());
@@ -139,8 +139,8 @@ public class drgDipResultController extends BaseController {
    * @Date 2022-05-07 9:10
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  @GetMapping("/queryDrgDipResultMrisSum")
-  public WrapperResponse<Map<String, Object>> queryDrgDipResultMrisSum(DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+  @PostMapping("/queryDrgDipResultMrisSum")
+  public WrapperResponse<Map<String, Object>> queryDrgDipResultMrisSum(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     Map<String,Object> map = new HashMap<>();
     drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());

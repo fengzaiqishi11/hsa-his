@@ -404,6 +404,36 @@
             <if test="endYearMonth != '' and endYearMonth != null">
                 and DATE_FORMAT(A.crte_time, "%Y-%m") &lt;= #{endYearMonth}
             </if>
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_Id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            <if test="isUplods != null and isUplods.size()>0">
+                and A.is_uplod in
+                <foreach collection="isUplods" item="isUplod" separator="," open="(" close=")">
+                    #{isUplod}
+                </foreach>
+            </if>
+            <if test="statess != null and statess.size()>0">
+                and A.states in
+                <foreach collection="statess" item="states" separator="," open="(" close=")">
+                    #{states}
+                </foreach>
+            </if>
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -466,6 +496,42 @@
             </if>
             <if test="endYearMonth != '' and endYearMonth != null">
                 and DATE_FORMAT(A.crte_time, "%Y-%m") &lt;= #{endYearMonth}
+            </if>
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_Id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            <if test="isUplods != null and isUplods.size()>0">
+                and A.is_uplod in
+                <foreach collection="isUplods" item="isUplod" separator="," open="(" close=")">
+                    #{isUplod}
+                </foreach>
+            </if>
+            <if test="statess != null and statess.size()>0">
+                and A.states in
+                <foreach collection="statess" item="states" separator="," open="(" close=")">
+                    #{states}
+                </foreach>
+            </if>
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+            <if test="statusCodes != null and statusCodes.size()>0">
+                and A.status_code in
+                <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                    #{statusCode}
+                </foreach>
             </if>
         </where>
     </select>

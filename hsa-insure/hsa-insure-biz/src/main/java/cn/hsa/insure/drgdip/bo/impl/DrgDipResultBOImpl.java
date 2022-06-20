@@ -404,12 +404,19 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         }
         int drgDipSum = drgDipFinshSum + drgDipNoFinshSum;//质控人数
         int drgDipNotSum = drgDipResultDTOList.size() - drgDipSum ;//未质控人数
-        //格式化
-        NumberFormat numberFormat = NumberFormat.getInstance();
-        // 设置精确到小数点后2位
-        numberFormat.setMaximumFractionDigits(2);
-        String drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
-        String drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        String drgDipFinsh;//通过率
+        String drgDipNoFinsh;//未通过率
+        if(drgDipSum == 0){
+            drgDipFinsh ="0%";
+            drgDipNoFinsh ="0%";
+        }else {
+            //格式化
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            // 设置精确到小数点后2位
+            numberFormat.setMaximumFractionDigits(2);
+            drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
+            drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        }
         resultMap.put("drgDipFinshSum",drgDipFinshSum);
         resultMap.put("drgDipNoFinshSum",drgDipNoFinshSum);
         resultMap.put("drgDipSum",drgDipSum);
@@ -522,12 +529,19 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         }
         int drgDipSum = drgDipFinshSum + drgDipNoFinshSum;//质控人数
         int drgDipNotSum = drgDipResultDTOList.size() - drgDipSum ;//未质控人数
-        //格式化
-        NumberFormat numberFormat = NumberFormat.getInstance();
-        // 设置精确到小数点后2位
-        numberFormat.setMaximumFractionDigits(2);
-        String drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
-        String drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        String drgDipFinsh;//通过率
+        String drgDipNoFinsh;//未通过率
+        if(drgDipSum == 0){
+            drgDipFinsh ="0%";
+            drgDipNoFinsh ="0%";
+        }else {
+            //格式化
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            // 设置精确到小数点后2位
+            numberFormat.setMaximumFractionDigits(2);
+            drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
+            drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        }
         resultMap.put("drgDipFinshSum",drgDipFinshSum);
         resultMap.put("drgDipNoFinshSum",drgDipNoFinshSum);
         resultMap.put("drgDipSum",drgDipSum);

@@ -1501,6 +1501,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 date.setTime(MapUtils.get(setlInfoMap, "opspMdtrtDate"));
                 setlInfoMap.put("opspMdtrtDate", simpleDateFormat.format(date));
             }
+            //门特也需要处理入院时间，出院时间
+            if (MapUtils.get(setlInfoMap, "dscgTime") instanceof Long) {
+                date.setTime(MapUtils.get(setlInfoMap, "dscgTime"));
+                setlInfoMap.put("dscgTime", simpleDateFormat.format(date)); // 出院时间
+            }
+            if (MapUtils.get(setlInfoMap, "admTime") instanceof Long) {
+                date.setTime(MapUtils.get(setlInfoMap, "admTime"));
+                setlInfoMap.put("admTime", simpleDateFormat.format(date)); // 入院时间
+            }
         }
         if (MapUtils.get(setlInfoMap, "dclaTime") instanceof Long) {
             date.setTime(MapUtils.get(setlInfoMap, "dclaTime"));

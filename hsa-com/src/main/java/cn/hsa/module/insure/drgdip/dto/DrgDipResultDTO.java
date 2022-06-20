@@ -2,6 +2,7 @@ package cn.hsa.module.insure.drgdip.dto;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import cn.hsa.base.PageDO;
 import lombok.Data;
@@ -323,6 +324,30 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
    * 是否在院
    */
   private String isHospital;
+    /**
+     * 科室id集合
+     */
+    private List<String> deptIds;
+    /**
+     * 医生id集合
+     */
+    private List<String> doctorIds;
+    /**
+     * 上传状态集合
+     */
+    private List<String> isUplods;
+    /**
+     * 质控状态集合
+     */
+    private List<String> statess;
+    /**
+     * 分组结果集合
+     */
+    private List<String> groupResults;
+    /**
+     * 在院状态集合
+     */
+    private List<String> statusCodes;
 
 
   public void setId(String id) {

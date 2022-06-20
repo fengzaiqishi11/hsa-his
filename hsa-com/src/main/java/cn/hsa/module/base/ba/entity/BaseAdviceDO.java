@@ -172,7 +172,7 @@ public class BaseAdviceDO extends PageDO implements Serializable {
 
     //手术操作国家编码
     private String operNationCode;
-
+    private String operNationName;
     private String unionNationCode;
     private String unionNationName;
 }

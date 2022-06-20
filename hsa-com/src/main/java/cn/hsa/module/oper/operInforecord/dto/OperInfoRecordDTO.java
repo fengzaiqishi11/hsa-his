@@ -139,5 +139,6 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     private String operDiseaseAfter;
     //手术国家码
     private String operNationCode;
+    private String operNationName;
 
 }

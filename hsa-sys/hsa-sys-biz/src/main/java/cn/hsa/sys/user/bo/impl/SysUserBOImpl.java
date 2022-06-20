@@ -130,7 +130,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
      */
     private void fillPrivateInternetAccessInfo(SysUserDTO byId) {
         // 1.属于内网访问则无需填充多余信息
-        if("true".equals(byId.getWhetherPrivateInnerAddress())){
+        if(Constants.SF.S.equals(byId.getWhetherPrivateInnerAddress())){
             byId.setWhetherEnableReminderBox(Constants.SF.F);
             return;
         }

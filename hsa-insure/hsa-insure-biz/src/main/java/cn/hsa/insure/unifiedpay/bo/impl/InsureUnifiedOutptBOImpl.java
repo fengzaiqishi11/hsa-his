@@ -1,12 +1,15 @@
 package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.util.DateUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.base.dept.dao.BaseDeptDAO;
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
@@ -22,8 +25,10 @@ import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureUnifiedOutptBO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
+import cn.hsa.module.outpt.fees.dao.PayOnlineInfoDAO;
 import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.fees.dto.DiseInfoDTO;
+import cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
@@ -32,11 +37,16 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
+import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.module.sys.user.dao.SysUserDAO;
+import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.lang.generator.UUIDGenerator;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -45,6 +55,7 @@ import com.yhtech.nmpay.common.client.YhGatewayClient;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -104,6 +115,18 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
     private InsureItemMatchDAO insureItemMatchDAO;
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
+
+    @Resource
+    private SysParameterDAO  sysParameterDAO;
+
+    @Resource
+    private BaseDeptDAO baseDeptDAO;
+
+    @Resource
+    private SysUserDAO sysUserDAO;
+
+    @Resource
+    private PayOnlineInfoDAO payOnlineInfoDAO;
 
 
     /**
@@ -681,7 +704,196 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       return yhGatewayClient;
     }
 
-  /**
+
+    /**
+     * @param map
+     * @return java.util.Map
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/15 11:08
+     * @description 通过区域医保服务平台推送消息（待结算、结算成功、检查报告、挂号通知）等信息给用户,待结算消息推送（必选）
+     **/
+	@Override
+	public boolean AMP_HOS_001(Map<String, Object> map) {
+        Map<String, String> params = new HashMap<>();
+        //医保信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+        //处方信息
+        List<OutptCostDTO> outptCostDTOList = MapUtils.get(map, "outptCostDTOList");
+        //就诊信息
+        List outptDiagnoseDTO = MapUtils.get(map, "outptDiagnoseDTOList");
+        params.put("visit_id", insureIndividualVisitDTO.getVisitId());
+        params.put("hospCode", MapUtils.get(map, "hospCode"));
+        //门诊病人信息
+        OutptVisitDTO outptVisitDTO = outptVisitService.queryByVisitID(params);
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null)
+            throw new RuntimeException("未发现【" + insureIndividualVisitDTO.getInsureRegCode() + "】相关医保配置信息");
+        Map paramMap = new HashMap();
+        // 一、初始化Client
+        YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
+
+        //查找科室位置
+        BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
+        baseDeptDTO.setId(outptVisitDTO.getDeptId());
+        BaseDeptDTO deptRes = baseDeptDAO.getById(baseDeptDTO);
+        String deptPlace = deptRes.getPlace();
+        //查询医生职称
+        SysUserDTO sysUserDTO = new SysUserDTO();
+        sysUserDTO.setId(outptVisitDTO.getDoctorId());
+        SysUserDTO sysUserRes = sysUserDAO.getById(sysUserDTO);
+        String drLvName = sysUserRes.getDutiesCode();
+
+        PayOnlineInfoDTO payOnlineInfoDTO = new PayOnlineInfoDTO();
+        // 二、入参拼装
+        // 卡类型
+        payOnlineInfoDTO.setHisCustType(outptVisitDTO.getCertCode());
+        // 卡号
+        payOnlineInfoDTO.setHisCustId(outptVisitDTO.getCertNo());
+        // 应用类型
+        payOnlineInfoDTO.setAppType("01");
+        // 定点机构自己的订单ID，自己定义的id
+        String medOrgOrd = UUID.randomUUID().toString();
+        payOnlineInfoDTO.setMedOrgOrd(medOrgOrd);
+        // 退款相关的推送才需要赋值这个
+        /*put("refundReason", "退款原因，退款成功的推送才需要赋值这个~");*/
+        // 省医保订单号
+        /* put("payOrdId", "ORD324976159723947394273416");*/
+        // 分院编号
+                /*
+                推送类型  因为pushType为支付订单 所以需要填
+                MERCHANT_WAIT_PAY 待支付
+                MERCHANT_PAID 已支付
+                MERCHANT_PART_REFUNDED 已部分退款
+                MERCHANT_REFUNDED 已全额退款
+                */
+        if (MapUtils.get(map, "pushType") != null && MapUtils.get(map, "pushType").equals("HOSPITAL_PAYMENT")) {
+            // 前端默认传待支付状态
+            payOnlineInfoDTO.setOrderStatus(MapUtils.get(map, "orderStatus"));
+        }
+        // 机构编号
+        payOnlineInfoDTO.setOrgCode(insureConfigurationDTO.getOrgCode());
+        //推送类型 默认为  前端传送支付单
+        payOnlineInfoDTO.setPushType(MapUtils.get(map, "pushType"));
+        // 用户姓名
+        payOnlineInfoDTO.setPatientName(outptVisitDTO.getName());
+        // 身份类型
+        payOnlineInfoDTO.setIdType(outptVisitDTO.getCertCode());
+        // 身份证号
+        payOnlineInfoDTO.setIdNo(outptVisitDTO.getCertNo());
+        // 只有医药单才需要填写
+        if (MapUtils.get(map, "pushType") != null && MapUtils.get(map, "pushType").equals("HOSPITAL_MEDICINE")) {
+            payOnlineInfoDTO.setTakeMedicineLoc("西药房");
+        }
+        // 预约时间 yyyy-MM-dd HH:mm:ss
+        payOnlineInfoDTO.setScheduledTime(DateUtil.dateToString(new Date(), DateUtils.Y_M_DH_M_S));
+        //当推送类型是支付单或检查单或挂号单类型时候才需要填写
+        if ((MapUtils.get(map, "pushType") != null && jugePushType((MapUtils.get(map, "pushType"))))) {
+            // 科室名称
+            payOnlineInfoDTO.setDeptName(outptVisitDTO.getDeptName());
+            // 科室编码
+            payOnlineInfoDTO.setDeptCode(outptVisitDTO.getDeptId());
+            // 科室位置
+            payOnlineInfoDTO.setDeptLoc(deptPlace);
+            // 医生姓名
+            payOnlineInfoDTO.setDrName(outptVisitDTO.getDoctorName());
+            // 医生职级
+            payOnlineInfoDTO.setDrLvName(drLvName);
+            // 医生编号
+            payOnlineInfoDTO.setDrLvNo(outptVisitDTO.getDoctorId());
+        }
+        //当推送类型是医药单或挂号单时，才需要填写此候诊号，推送提醒用户排队情况
+        if (MapUtils.get(map, "pushType") != null && (MapUtils.get(map, "pushType").equals("HOSPITAL_MEDICINE") || MapUtils.get(map, "pushType").equals("HOSPITAL_APPOINTMENT"))) {
+            // 排队人数 候诊号
+            payOnlineInfoDTO.setWaitingNum("01");
+        }
+        //当推送类型是检查单 时才需要填写
+        if (MapUtils.get(map, "pushType") != null && MapUtils.get(map, "pushType").equals("HOSPITAL_CHECK")) {
+            // 检查项目名称
+            payOnlineInfoDTO.setCheckItem("核磁共振"); // todo 项目名称
+        }
+        //当推送的状态为已支付或已退款或已部分退款类型的状态时候才需要填写
+        if (MapUtils.get(map, "orderStatus") != null && jugeOrderStatus(MapUtils.get(map, "orderStatus"))) {
+            // 订单创建时间
+            payOnlineInfoDTO.setCreateTime("2022-03-30 13:15:46"); // todo 订单时间
+            // 订单更新时间
+            payOnlineInfoDTO.setUpdateTime("2022-03-30 13:15:46"); //  todo 订单时间
+        }
+        payOnlineInfoDTO.setAmpTraceId("");
+        payOnlineInfoDTO.setTraceId("");
+        payOnlineInfoDTO.setOrgTraceNo("");
+        // bean对象转化为json对象
+        JSONObject param = new JSONObject(MapUtils.object2Map(payOnlineInfoDTO));
+        PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
+        // 属性拷贝
+        BeanUtils.copyProperties(payOnlineInfoDTO, payOnlineInfoDO);
+        // 存入本地信息推送表
+        payOnlineInfoDAO.insertPayOnlineInfo(payOnlineInfoDO);
+
+        // ！！！请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
+        com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
+                "/api/amp/hos/pushMsg",
+                param,
+                new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
+                }
+        );
+        boolean requestSuccess = gatewayResponse.isSuccess();
+        if (requestSuccess) {
+            JSONObject outParam = gatewayResponse.getParam();
+            // 出参接收与处理
+            logger.info("响应出参：{}", JSON.toJSONString(outParam));
+            // todo 接收成功后的处理
+        } else {
+            logger.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
+            throw new AppException("请求远程接口失败："+ gatewayResponse.getRespMsg());
+        }
+
+        return requestSuccess;
+	}
+
+    /**
+      * @method jugePushType
+      * @author wang'qiao
+      * @date 2022/6/20 8:46
+      *	@description 当推送类型是支付单或检查单或挂号单类型时候返回true
+      * @param  pushType
+      * @return boolean
+      *
+     **/
+    public static boolean jugePushType(String pushType){
+        if(pushType == null){
+            return  false;
+        }
+        if(pushType.equals("HOSPITAL_APPOINTMENT") || pushType.equals("HOSPITAL_CHECK") || pushType.equals("HOSPITAL_PAYMENT")){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+      * @method jugeOrderStatus
+      * @author wang'qiao
+      * @date 2022/6/20 9:29
+      *	@description 	判断支付状态orderStatus不是 待支付
+      * @param  orderStatus
+      * @return boolean
+      *
+     **/
+    public static boolean jugeOrderStatus(String orderStatus) {
+        if (orderStatus == null) {
+            return false;
+        }
+        if (orderStatus.equals("MERCHANT_PAID") || orderStatus.equals("MERCHANT_PART_REFUNDED") || orderStatus.equals("MERCHANT_REFUNDED")) {
+            return true;
+        }
+        return false;
+    }
+
+	/**
      * 封装onlinePayFeeDTO参数信息
      * @param map
      * @Author 医保开发二部-湛康

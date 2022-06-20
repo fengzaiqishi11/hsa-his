@@ -183,4 +183,13 @@ public class OnlinePayController  extends BaseController {
     param.put("hospCode",sysUserDTO.getHospCode());
     return outptTmakePriceFormService_consumer.querySettleResult(param);
   }
+
+  @PostMapping("/medicalMsgPush")
+  public WrapperResponse<Map<String, Object>> AMP_HOS_001(@RequestBody Map<String, Object> param,
+                                                                HttpServletRequest req,
+                                                                HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    param.put("hospCode", sysUserDTO.getHospCode());
+    return outptTmakePriceFormService_consumer.AMP_HOS_001(param);
+  }
 }

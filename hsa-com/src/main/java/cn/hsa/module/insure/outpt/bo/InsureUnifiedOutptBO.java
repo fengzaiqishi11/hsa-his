@@ -1,6 +1,5 @@
 package cn.hsa.module.insure.outpt.bo;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -64,6 +63,16 @@ public interface InsureUnifiedOutptBO {
     Map<String, Object> UP_6401(Map<String, Object> map);
 
     Map<String, Object> UP_6203(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return java.lang.Object
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/14 16:22
+     * @description 通过区域医保服务平台推送消息（待结算、结算成功、检查报告、挂号通知）等信息给用户,待结算消息推送（必选）
+     **/
+    boolean AMP_HOS_001(Map<String, Object> map);
 
     /**
      * 线上医保移动支付完成的结算订单，可通过此接口进行退款

@@ -460,4 +460,15 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map);
+
+    /**
+      * @method AMP_HOS_001
+      * @author wang'qiao
+      * @date 2022/6/20 11:43
+      *	@description  消息推送
+      * @param  map
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    public WrapperResponse AMP_HOS_001(Map map);
 }

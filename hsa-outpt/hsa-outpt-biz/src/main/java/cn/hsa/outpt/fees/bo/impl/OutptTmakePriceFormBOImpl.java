@@ -11,7 +11,6 @@ import cn.hsa.module.dzpz.hainan.ExtData;
 import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
-import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
@@ -5045,4 +5044,45 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }
     }
 
+    /**
+     * @param map
+     * @return java.lang.Boolean
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/15 13:54
+     * @description 医疗消息推送
+     **/
+    @Override
+    public WrapperResponse AMP_HOS_001(Map map) {
+        //医院编码
+        String hospCode = map.get("hospCode").toString();
+        PayOnlineInfoDTO payOnlineInfoDTO = MapUtils.get(map, "payOnlineInfoDTO");
+        if (ObjectUtil.isEmpty(payOnlineInfoDTO.getVisitId())) {
+            throw new AppException("请传入就诊ID!");
+        }
+        //查询医保就诊信息
+        Map<String, Object> insureVisitParam = new HashMap<>();
+        insureVisitParam.put("id", payOnlineInfoDTO.getVisitId());
+        insureVisitParam.put("hospCode", hospCode);
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记！");
+        }
+        //查询门诊费用
+        WrapperResponse wrapperResponse = queryOutptCostList(map);
+        JSONObject obj = (JSONObject) wrapperResponse.getData();
+        //处方费用信息
+        List outptCostDTOList = (List) obj.get("outptCost");
+        //诊断信息
+        List outptDiagnoseDTOList = (List) obj.get("outptDiagnose");
+
+        //接口调用
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        map.put("outptCostDTOList", outptCostDTOList);
+        map.put("outptDiagnoseDTOList", outptDiagnoseDTOList);
+
+        return insureUnifiedPayOutptService_consumer.AMP_HOS_001(map);
+    }
 }

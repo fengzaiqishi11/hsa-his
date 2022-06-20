@@ -438,4 +438,14 @@ public interface OutptTmakePriceFormBO {
      * @return java.util.Map<java.lang.String,java.lang.Object>
      */
     Map<String, Object> querySettleResult(Map map);
+
+    /**
+     * @param map
+     * @return java.lang.Boolean
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/15 13:54
+     * @description 医疗消息推送
+     **/
+    WrapperResponse AMP_HOS_001(Map map);
 }

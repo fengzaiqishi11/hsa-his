@@ -576,4 +576,17 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       return WrapperResponse.success(outptTmakePriceFormBO.querySettleResult(map));
     }
 
+    /**
+      * @method AMP_HOS_001
+      * @author wang'qiao
+      * @date 2022/6/20 11:47
+      *	@description 	医疗消息推送
+      * @param  map
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @Override
+    public WrapperResponse AMP_HOS_001(Map map){
+        return outptTmakePriceFormBO.AMP_HOS_001(map);
+    }
 }

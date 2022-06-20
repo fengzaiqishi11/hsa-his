@@ -1,17 +1,9 @@
 package cn.hsa.module.insure.outpt.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
-import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
-import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -194,6 +186,16 @@ public interface InsureUnifiedPayOutptService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     WrapperResponse<Map<String, Object>> UP6203(Map<String, Object> map);
+
+	/**
+	 * @param map
+	 * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+	 * @method AMP_HOS_001
+	 * @author wang'qiao
+	 * @date 2022/6/14 16:20
+	 * @description
+	 **/
+	WrapperResponse<Boolean> AMP_HOS_001(Map<String, Object> map);
 
     /**
      * 线上医保移动支付完成的结算订单，可通过此接口进行退款

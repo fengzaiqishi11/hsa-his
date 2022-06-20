@@ -2,6 +2,7 @@ package cn.hsa.module.insure.outpt.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.Map;
@@ -206,4 +207,14 @@ public interface InsureUnifiedPayOutptService {
      */
     WrapperResponse<Map<String, Object>> AmpRefund(Map<String, Object> map);
 
+	/**
+	  * @method refundInquiry
+	  * @author wang'qiao
+	  * @date 2022/6/20 14:55
+	  *	@description 查询退款结果（AMP_HOS_003） 调用AMP_HOS_002平台退款申请接口后，根据此状态来查询对应的退款具体结果
+	  * @param  map
+	  * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+	  *
+	 **/
+	WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> map);
 }

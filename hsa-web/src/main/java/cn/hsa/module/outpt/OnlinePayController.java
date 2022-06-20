@@ -184,6 +184,15 @@ public class OnlinePayController  extends BaseController {
     return outptTmakePriceFormService_consumer.querySettleResult(param);
   }
 
+  /**
+    * @method AMP_HOS_001
+    * @author wang'qiao
+    * @date 2022/6/20 15:42
+    * @description 	医疗信息推送
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
   @PostMapping("/medicalMsgPush")
   public WrapperResponse<Map<String, Object>> AMP_HOS_001(@RequestBody Map<String, Object> param,
                                                                 HttpServletRequest req,
@@ -191,5 +200,25 @@ public class OnlinePayController  extends BaseController {
     SysUserDTO sysUserDTO = getSession(req, res);
     param.put("hospCode", sysUserDTO.getHospCode());
     return outptTmakePriceFormService_consumer.AMP_HOS_001(param);
+  }
+
+  /**
+    * @method refundInquiry
+    * @author wang'qiao
+    * @date 2022/6/20 14:44
+    * @description 查询退款结果（AMP_HOS_003）
+    * @param  dto,req,res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/refundInquiry")
+  public WrapperResponse<Map<String, Object>> refundInquiry(@RequestBody SetlRefundQueryDTO dto,
+                                                          HttpServletRequest req,
+                                                          HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlRefundQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.refundInquiry(map);
   }
 }

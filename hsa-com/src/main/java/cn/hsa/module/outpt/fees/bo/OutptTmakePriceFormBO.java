@@ -448,4 +448,15 @@ public interface OutptTmakePriceFormBO {
      * @description 医疗消息推送
      **/
     WrapperResponse AMP_HOS_001(Map map);
+
+    /**
+      * @method refundInquiry
+      * @author wang'qiao
+      * @date 2022/6/20 14:45
+      *	@description 查询退款结果（AMP_HOS_003）
+      * @param  param
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+      *
+     **/
+    WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> param);
 }

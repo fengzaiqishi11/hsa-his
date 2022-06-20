@@ -589,4 +589,17 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     public WrapperResponse AMP_HOS_001(Map map){
         return outptTmakePriceFormBO.AMP_HOS_001(map);
     }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:44
+     * @description 查询退款结果（AMP_HOS_003）
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> param) {
+        return outptTmakePriceFormBO.refundInquiry(param);
+    }
 }

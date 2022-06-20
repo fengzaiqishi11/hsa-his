@@ -5056,13 +5056,13 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     public WrapperResponse AMP_HOS_001(Map map) {
         //医院编码
         String hospCode = map.get("hospCode").toString();
-        PayOnlineInfoDTO payOnlineInfoDTO = MapUtils.get(map, "payOnlineInfoDTO");
-        if (ObjectUtil.isEmpty(payOnlineInfoDTO.getVisitId())) {
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
             throw new AppException("请传入就诊ID!");
         }
         //查询医保就诊信息
         Map<String, Object> insureVisitParam = new HashMap<>();
-        insureVisitParam.put("id", payOnlineInfoDTO.getVisitId());
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
         insureVisitParam.put("hospCode", hospCode);
         //医保就医信息
         InsureIndividualVisitDTO insureIndividualVisitDTO =
@@ -5084,5 +5084,58 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("outptDiagnoseDTOList", outptDiagnoseDTOList);
 
         return insureUnifiedPayOutptService_consumer.AMP_HOS_001(map);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:45
+     * @description 查询退款结果（AMP_HOS_003）
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> map) {
+        //医院编码
+        String hospCode = map.get("hospCode").toString();
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+            throw new AppException("请传入就诊ID!");
+        }
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getSettleId())) {
+            throw new AppException("请传入结算ID!");
+        }
+        //查询医保就诊信息
+        Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+        insureVisitParam.put("hospCode", hospCode);
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记！");
+        }
+        if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+            throw new AppException("未找到支付订单号，请先上传费用！");
+        }
+        //判断是否已医保结算
+        InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+        settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
+        settleDTO.setHospCode(hospCode);
+        settleDTO.setSettleId(setlRefundQueryDTO.getSettleId());
+        settleDTO.setState("0");
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hospCode", hospCode);
+        dataMap.put("insureIndividualSettleDTO", settleDTO);
+        settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+        //判断医保结算信息
+        if (ObjectUtil.isEmpty(settleDTO)) {
+            throw new AppException("未查找到医保结算信息，请先做医保结算！");
+        }
+        //接口调用
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        map.put("insureIndividualSettleDTO", settleDTO);
+        Map<String, Object> resultMap = insureUnifiedPayOutptService_consumer.refundInquiry(map).getData();
+        return WrapperResponse.success(resultMap);
     }
 }

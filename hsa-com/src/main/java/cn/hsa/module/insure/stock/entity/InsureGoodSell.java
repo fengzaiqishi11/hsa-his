@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @NoArgsConstructor
@@ -59,5 +60,13 @@ public class InsureGoodSell   extends PageDO implements Serializable {
     private String insureItemCode;// 医保中心编码
     private String insureItemName;// 医保中心项目名称
     private String insureRegCode;// 医保机构编码
+    /**
+     * 结算的开始时间
+     */
+    private String startTime;
+    /**
+     * 结算结束时间
+     */
+    private String endTime;
 
 }

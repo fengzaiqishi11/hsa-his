@@ -240,4 +240,16 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
     public InsureIndividualVisitDTO getInsureIndividualVisitByMedRegNo(Map<String, Object> insureVisitParam) {
       return insureIndividualVisitBO.getInsureIndividualVisitByMedRegNo(insureVisitParam);
     }
+
+    /**
+     * 根据就诊凭证类型和就诊凭证编号获取医保就诊信息
+     * @param insureVisitParam
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 16:35
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    @Override
+    public InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam) {
+      return insureIndividualVisitBO.getInsureIndividualVisitByMdtrtCertNo(insureVisitParam);
+    }
 }

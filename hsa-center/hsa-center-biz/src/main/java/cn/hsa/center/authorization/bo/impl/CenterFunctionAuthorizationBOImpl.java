@@ -38,11 +38,15 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     @Override
     public WrapperResponse<CenterFunctionAuthorizationDO> queryBizAuthorizationByOrderTypeCode(String hospCode, String orderTypeCode) {
         CenterFunctionAuthorizationDO functionAuthorizationDO = centerFunctionAuthorizationDAO.queryBizAuthorizationByOrderTypeCode(hospCode,orderTypeCode);
-        if(null == functionAuthorizationDO)
-            return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "权限单据类型不存在",null);
+        if(null == functionAuthorizationDO) {
+            log.error("==-==权限单据类型不存在==-==hospCode：{},orderTypeCode：{}", hospCode, orderTypeCode);
+            return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "权限单据类型不存在", null);
+        }
         // 1.校验是否审核完成
-        if(!Constants.SF.S.equals(functionAuthorizationDO.getAuditStatus()))
-            return WrapperResponse.error(HttpStatus.UNAUTHORIZED.value(), "权限未审核，请等待管理员审核完成后再调用",null);
+        if(!Constants.SF.S.equals(functionAuthorizationDO.getAuditStatus())) {
+            log.info("==-==Permissions not audit==-==hospCode：{},orderTypeCode：{}", hospCode, orderTypeCode);
+            return WrapperResponse.error(HttpStatus.UNAUTHORIZED.value(), "权限未审核，请等待管理员审核完成后再调用", null);
+        }
         // 2.校验时间是否被人为修改，医院编码与权限类型是否一致  医院编码:单据类型:时间戳 加密串解密
         String encryptStartDate = functionAuthorizationDO.getEncryptStartDate();
         String encryptEndDate = functionAuthorizationDO.getEncryptEndDate();
@@ -61,7 +65,8 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         if(!(startDateTimeStamp.equals(functionAuthorizationDO.getStartDate().getTime())
                 && endDateTimeStamp.equals(functionAuthorizationDO.getEndDate().getTime())
                 && hospCode.equals(decryptHospCode))){
-            log.warn("医院编码【 {} 】非法调用授权接口",hospCode);
+            log.info("==-==医院编码【 {} 】非法调用授权接口,解密后的开始时间：{},结束时间：{};数据库数据读取的开始时间：{},结束时间戳 ：{}",hospCode,startDateTimeStamp,endDateTimeStamp,
+                    functionAuthorizationDO.getStartDate().getTime(),functionAuthorizationDO.getEndDate().getTime());
             return WrapperResponse.error(HttpStatus.NOT_FOUND.value(), "医院授权时间已被非法篡改,调用不合法,请联系管理员! ",null);
         }
         // 3.校验是否在有效期内调用
@@ -69,7 +74,8 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         if(!(nowTimeStamp.compareTo(startDateTimeStamp) > 0 && nowTimeStamp.compareTo(endDateTimeStamp) < 0)){
             StringBuilder builder = new StringBuilder();
             builder.append("医院编码为【 ").append(functionAuthorizationDO.getHospCode()).append('】')
-                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用");
+                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用").append("权限类型代码：").append(orderTypeCode);
+            log.info("==-=="+builder);
             return WrapperResponse.error(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(),builder.toString(),null);
         }
         return WrapperResponse.success(functionAuthorizationDO);

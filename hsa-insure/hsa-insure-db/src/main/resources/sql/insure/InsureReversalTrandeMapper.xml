@@ -449,7 +449,7 @@
         AND e.state = '0'
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
-        AND ifnull(t.is_one_settle,0) != '1'
+--         AND ifnull(t.is_one_settle,0) != '1'
         AND e.insure_price > 0
         <if test="aae140 != null and aae140 != '' ">
             and c.aae140 = #{aae140}
@@ -549,7 +549,7 @@
         AND e.settle_state = '1'
         AND e.insureSettleId IS NOT NULL
         AND e.state = '0'
-        AND ifnull(t.is_one_settle,0) != '1'
+--         AND ifnull(t.is_one_settle,0) != '1'
         AND e.insure_price > 0
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
@@ -1099,7 +1099,7 @@
         SELECT DISTINCT
         c.aac003 AS psnName,
         c.aac004 AS gend,
-        (select name from insure_dict where value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
+        (select name from insure_dict where insure_reg_code = c.aaa027 and value = gend and code = 'gend') AS sexName, /*取出gend的码值*/
         c.aac002 AS idCard,
         c.bka035_name AS psnType,
         c.bka008 insureUnit,

@@ -560,8 +560,20 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     @Override
-    public WrapperResponse<Boolean> ampRefund(Map<String, Object> map) {
+    public WrapperResponse<Map<String, Object>> ampRefund(Map<String, Object> map) {
       return WrapperResponse.success(outptTmakePriceFormBO.ampRefund(map));
+    }
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:38
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.querySettleResult(map));
     }
 
 }

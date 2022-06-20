@@ -1555,4 +1555,13 @@
         </if>
     </select>
 
+    <select id="getInsureIndividualVisitByMdtrtCertNo" parameterType="map"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select * from insure_individual_visit
+        where mdtrt_cert_type = #{mdtrtCertType}
+        AND mdtrt_cert_no = #{mdtrtCertNo}
+        AND hosp_code =#{hospCode}
+        ORDER BY crte_time DESC LIMIT 1
+    </select>
+
 </mapper>

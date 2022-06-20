@@ -100,6 +100,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public SysUserDTO getById(SysUserDTO sysUserDTO) {
         SysUserDTO byId = this.sysUserDAO.getById(sysUserDTO);
+        byId.setInsurePrivateInternetAddress(sysUserDTO.getInsurePrivateInternetAddress());
         List<SysUserSystemDTO> sysUserSystemDTOS = sysUserDAO.querySysUserSystemAll(byId);
         if (!ListUtils.isEmpty(sysUserSystemDTOS)) {
             try {

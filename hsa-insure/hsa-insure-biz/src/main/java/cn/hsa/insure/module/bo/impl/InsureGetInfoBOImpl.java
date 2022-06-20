@@ -450,6 +450,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if ("204".equals(diagType)) {
                 item.put("diag_type", "1");
             }
+            //【ID1003812】【广州科大】结算清单上传主诊断取西医主诊断
+            if (Constant.UnifiedPay.ISMAN.S.equals(isMain) && "2".equals(diagType)){
+                item.put("maindiag_flag", "0");
+            }
         });
         return mapList;
     }

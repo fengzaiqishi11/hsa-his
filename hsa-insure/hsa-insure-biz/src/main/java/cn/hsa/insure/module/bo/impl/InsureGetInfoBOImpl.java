@@ -38,6 +38,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -435,7 +436,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<Map<String, Object>> selectDiseaseInfo(Map<String, Object> map) {
-        List<Map<String, Object>> mapList = insureGetInfoDAO.selectDiseaseInfo(map);
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "ONLY_QUERY_WMDIAG");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isNotEmpty(sysParameterDTO) && "1".equals(sysParameterDTO.getValue())){
+            //只查询西医诊断信息
+            mapList = insureGetInfoDAO.selectXyDisease(map);
+        }else {
+            //查询西医诊断信息和中医诊断信息
+            mapList = insureGetInfoDAO.selectDiseaseInfo(map);
+        }
+
         List<String> diagnoseList = Stream.of("101", "102", "201", "202", "203").collect(Collectors.toList());
         mapList.stream().forEach(item -> {
             String typeCode = MapUtils.get(item, "diag_type");
@@ -453,6 +466,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             //【ID1003812】【广州科大】结算清单上传主诊断取西医主诊断
             if (Constant.UnifiedPay.ISMAN.S.equals(isMain) && "2".equals(diagType)){
                 item.put("maindiag_flag", "0");
+            }
+            //中医诊断码值转换成医保的中医诊断类型码值  1:西医主要诊断 2:西医其它诊断 3: 中医主病诊断 4.中医主证诊断
+            if ("2".equals(diagType)) {
+                item.put("diag_type", "3");
+            }
+            if ("3".equals(diagType)) {
+                item.put("diag_type", "4");
             }
         });
         return mapList;
@@ -720,7 +740,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         // 手术操作信息
         List<Map<String, Object>> oprnfoList = insureGetInfoDAO.selectOprninfoForMap(map);
         // 住院诊断信息
-        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
+//        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
+        Map<String, Object> diseaseMap = handerInptDiagnose(map);
         //  门诊慢特病诊断信息
         List<Map<String, Object>> opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
         // 基金支付信息

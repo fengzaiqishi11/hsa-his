@@ -469,4 +469,14 @@ public interface OutptTmakePriceFormBO {
      * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
      **/
     WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    Map<String, Object> queryUnsettleList(Map map);
 }

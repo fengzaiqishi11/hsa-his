@@ -2975,7 +2975,11 @@
     <!-- 查询已提交的处方费用 -->
     <select id="queryOutptCostSourceidNotNUll" parameterType="java.util.Map" resultMap="outptCostDtoMap">
         select
-        <include refid="Base_ColumnAlias_List"/>, d.name as xmlbname, oc.reality_price as lastrealityprice, d.value as xmlbcode
+        <include refid="Base_ColumnAlias_List"/>, d.name as xmlbname, oc.reality_price as lastrealityprice, d.value as xmlbcode,
+        (select insure_item_code from insure_item_match iim where iim.hosp_item_id = oc.item_id group by item_id)
+        insure_item_code,
+        (select hosp_item_code from insure_item_match iim where iim.hosp_item_id = oc.item_id group by item_id)
+        hosp_item_code
         from
         outpt_cost oc
         LEFT JOIN

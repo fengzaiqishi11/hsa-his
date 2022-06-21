@@ -615,4 +615,17 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     public WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map) {
         return outptTmakePriceFormBO.reconciliationDocument(map);
     }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryUnsettleList(Map param) {
+        return WrapperResponse.success(outptTmakePriceFormBO.queryUnsettleList(param));
+    }
 }

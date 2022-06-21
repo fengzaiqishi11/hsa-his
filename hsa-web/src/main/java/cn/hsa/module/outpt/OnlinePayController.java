@@ -240,4 +240,22 @@ public class OnlinePayController  extends BaseController {
     map.put("reconciliationDate", reconciliationDate);
     return outptTmakePriceFormService_consumer.reconciliationDocument(map);
   }
+
+
+  /**
+    * @method queryFeeList
+    * @author wang'qiao
+    * @date 2022/6/21 10:30
+    *	@description 查询用户院内现在的待缴费费用列表，用于展示给用户进行确认和选择
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/queryUnsettleList")
+  public WrapperResponse<Map<String, Object>> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+
+    param.put("hospCode", sysUserDTO.getHospCode());
+    return outptTmakePriceFormService_consumer.queryUnsettleList(param);
+  }
 }

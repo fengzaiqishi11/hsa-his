@@ -1463,6 +1463,26 @@
           and insure_settle_id = #{insureSettleId}
         order by maindiag_flag desc
     </select>
+<!--    查询西医诊断信息-->
+    <select id="selectXyDisease" resultType="java.util.Map">
+        select id,
+               hosp_code,
+               visit_id,
+               medical_reg_no,
+               insure_settle_id,
+               diag_type,
+               diag_code,
+               diag_name,
+               maindiag_flag,
+               adm_cond_type
+        from insure_diseinfo
+        where visit_id = #{visitId}
+          and hosp_code = #{hospCode}
+          and insure_settle_id = #{insureSettleId}
+          and diag_type != '2'
+          and diag_type != '3'
+        order by maindiag_flag desc
+    </select>
     <select id="selectBaseSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select id, visit_id, insure_settle_id, settle_no, fixmedins_name, fixmedins_code,
                (select name from insure_dict where code = 'HI_SETL_LV' and  value= hi_setl_lv limit 1) hi_setl_lv ,

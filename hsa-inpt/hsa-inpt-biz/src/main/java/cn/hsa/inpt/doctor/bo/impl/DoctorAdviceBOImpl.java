@@ -1696,7 +1696,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
      */
     @Override
     public List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO) {
-            return inptAdviceDAO.getLisOrPacsInptAdviceNew(inptAdviceDTO);
+            return inptAdviceDAO.queryLisOrPacsAdvice(inptAdviceDTO);
     }
 
     // 提交消息消费  lly 2021-12-03

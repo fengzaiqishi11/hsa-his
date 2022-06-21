@@ -733,6 +733,67 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
     }
 
     /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    @Override
+    public Map<String, Object> reconciliationDocument(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode").toString();
+        String orgCode = MapUtils.get(map, "orgCode").toString();
+
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode);
+        configDTO.setOrgCode(orgCode);
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null)
+            throw new RuntimeException("未发现【" + orgCode + "】相关医保配置信息");
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode",hospCode);
+        //从系统参数中查找对账秘钥信息
+        paramMap.put("codeList", new String[]{"HN_ORG_SECRET"});
+        WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
+        Map<String, SysParameterDTO> sysMap = getData(wr);
+        SysParameterDTO orgSecret = MapUtils.get(sysMap, "HN_ORG_SECRET");
+        // 一、初始化Client
+        YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
+        // 二、入参拼装
+        JSONObject param = new JSONObject() {{
+            // 机构编号(国标医院编码)
+            put("orgCode", orgCode);
+            // 分院编号
+            put("subOrgCode", null);
+            // 机构获取对账文件秘钥
+            put("orgSecret", orgSecret.getValue()); // 系统参数 TODO 关于机构秘钥的发放对接时会进行分配
+            // 账单日期，格式yyyy-MM-dd
+            put("billDate", MapUtils.get(map,"reconciliationDate"));
+            // 账单类型
+            put("billType", "ALL");
+        }};
+        //请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
+        com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
+                "/api/amp/hos/getCheckFile", param,
+                new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
+                }
+        );
+        boolean requestSuccess = gatewayResponse.isSuccess();
+        JSONObject outParam = new JSONObject();
+        if (requestSuccess) {
+            outParam = gatewayResponse.getParam();
+            // 出参接收与处理
+            log.info("响应出参：{}", JSON.toJSONString(outParam));
+        } else {
+            log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
+            throw new AppException("请求省医保移动支付官方门户失败,失败编码:" + gatewayResponse.getRespCode() + ",失败原因:" + gatewayResponse.getRespMsg());
+        }
+        return outParam;
+    }
+
+    /**
      * 初始化Client
      * @param paramMap
      * @Author 医保开发二部-湛康
@@ -800,6 +861,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         if (insureConfigurationDTO == null)
             throw new RuntimeException("未发现【" + insureIndividualVisitDTO.getInsureRegCode() + "】相关医保配置信息");
         Map paramMap = new HashMap();
+        paramMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
         // 一、初始化Client
         YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
 

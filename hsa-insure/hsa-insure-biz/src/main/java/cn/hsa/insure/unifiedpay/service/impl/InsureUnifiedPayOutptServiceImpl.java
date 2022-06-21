@@ -272,6 +272,19 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
 	}
 
 	/**
+	 * @param map
+	 * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+	 * @method reconciliationDocument
+	 * @author wang'qiao
+	 * @date 2022/6/20 19:48
+	 * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+	 **/
+	@Override
+	public WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map) {
+		return WrapperResponse.success(insureUnifiedOutptBO.reconciliationDocument(map));
+	}
+
+	/**
    * @param map
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
    * @method AMP_HOS_001

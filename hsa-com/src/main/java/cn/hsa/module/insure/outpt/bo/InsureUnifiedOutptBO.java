@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.outpt.bo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -92,4 +93,14 @@ public interface InsureUnifiedOutptBO {
      * @description 查询退款结果（AMP_HOS_003） 调用AMP_HOS_002平台退款申请接口后，根据此状态来查询对应的退款具体结果
      **/
     Map<String, Object> refundInquiry(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    Map<String, Object> reconciliationDocument(Map<String, Object> map);
 }

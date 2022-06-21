@@ -221,4 +221,23 @@ public class OnlinePayController  extends BaseController {
     map.put("setlRefundQueryDTO", dto);
     return outptTmakePriceFormService_consumer.refundInquiry(map);
   }
+
+  /**
+    * @method reconciliationDocument
+    * @author wang'qiao
+    * @date 2022/6/20 19:48
+    * @description 	对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+    * @param   req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/reconciliationDocument")
+  public WrapperResponse<Map<String, Object>> reconciliationDocument(String orgCode,String reconciliationDate,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("orgCode", orgCode);
+    map.put("reconciliationDate", reconciliationDate);
+    return outptTmakePriceFormService_consumer.reconciliationDocument(map);
+  }
 }

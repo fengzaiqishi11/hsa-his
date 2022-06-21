@@ -359,7 +359,7 @@
         if(ddr.violation_num > 0,'1','0') as violation_states,
         if(ddr.group_result is null,'0',ddr.group_result) as group_result
 	    from insure_setl_info isi left join insure_individual_visit iiv on isi.visit_id =iiv.visit_id and isi.mdtrt_id =iiv.medical_reg_no
-        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId
+        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId and iis.state = '0' and iis.settle_state = '1'
         left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type})A
         <where>
             <if test="doctorId != null and doctorId != '' ">
@@ -449,7 +449,7 @@
         if(ddr.violation_num > 0,'1','0') as violation_states,
         if(ddr.group_result is null,'0',ddr.group_result) as group_result
         from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id
-        left join inpt_settle ie on ie.visit_id = mbi.visit_id
+        left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1' and ie.status_code = '0'
         left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='2'  and ddr.type=#{type})A
         <where>
             <if test="doctorId != null and doctorId != '' ">

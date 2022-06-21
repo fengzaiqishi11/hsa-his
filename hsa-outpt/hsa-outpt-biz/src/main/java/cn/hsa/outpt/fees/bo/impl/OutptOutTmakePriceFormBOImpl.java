@@ -18,6 +18,7 @@ import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
+import cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -110,6 +111,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private OutptRegisterDAO outptRegisterDAO;
     @Resource
     private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    @Resource
+    private PayOnlineInfoDAO payOnlineInfoDAO;
 
     @Resource
     private OutptElectronicBillService outptElectronicBillService;
@@ -534,11 +538,16 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
 
         //判断是否是移动支付，是移动支付退款则推送退款申请 todo 并且这一笔结算是移动支付
-        /*Map<String, String> ydzfMap = new HashMap<>();
+        Map<String, String> ydzfMap = new HashMap<>();
         ydzfMap.put("code", "HN_YDZF_FLAG");
         ydzfMap.put("hospCode", hospCode);
         SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
         if(ydzfParameterDTO !=null && "1".equals(ydzfParameterDTO.getValue())) {
+          Map<String, Object> map1 = new HashMap<>();
+          map1.put("hospCode", hospCode);
+          map1.put("id",visitId);
+          InsureIndividualVisitDTO insureIndividualVisitDTO =
+              insureIndividualVisitService_consumer.getInsureIndividualVisitById(map1);
           SetlRefundQueryDTO dto = new SetlRefundQueryDTO();
           dto.setVisitId(visitId);
           dto.setSettleId(settleId);
@@ -546,8 +555,15 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
           Map<String, Object> map = new HashMap<>();
           map.put("hospCode", hospCode);
           map.put("setlRefundQueryDTO", dto);
-          outptTmakePriceFormService_consumer.ampRefund(map);
-        }*/
+          map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+          Map<String, Object> response = outptTmakePriceFormService_consumer.ampRefund(map).getData();
+          PayOnlineInfoDO pay = new PayOnlineInfoDO();
+          pay.setVisitId(insureIndividualVisitDTO.getVisitId());
+          pay.setRedSettleId(redSettleId);
+          pay.setAmpTraceId(insureIndividualVisitDTO.getVisitId());
+          pay.setTraceId(settleId);
+          payOnlineInfoDAO.updateByVisitId(pay);
+        }
         /**END*****************医保病人处理********************************************************************/
        // TODO 非医保病人自动退费
         // 如果有再收的费用且是普通病人，自动收费

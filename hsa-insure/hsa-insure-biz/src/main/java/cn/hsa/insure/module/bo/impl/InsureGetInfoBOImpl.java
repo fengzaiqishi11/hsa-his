@@ -735,6 +735,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> setlinfo = selectLoadingSetlMsg(map);
         // 查询收费项目信息
         List<Map<String, Object>> itemInfoList = insureGetInfoDAO.selectItemInfo(map);
+        //固定项目名称
+        List<String> medChrgitmTypeList = Stream.of("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15").collect(Collectors.toList());
+        Map<String, List<Map<String, Object>>> groupMap = itemInfoList.stream().
+                collect(Collectors.groupingBy(item -> MapUtils.get(item, "medChrgitm")));
+        for(String medChrgitmType:medChrgitmTypeList){
+            if(!groupMap.containsKey(medChrgitmType)){
+                Map<String, Object> pMap = new HashMap<>();
+                pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("medChrgitm", medChrgitmType);
+                itemInfoList.add(pMap);
+            }
+        }
         // 查询重症监护信息
         List<Map<String, Object>> icuinfoList = insureGetInfoDAO.selectIcuInfoForMap(map);
         // 手术操作信息
@@ -2446,7 +2462,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> list = insureGetInfoDAO.selectItemInfo(map);
         List<Map<String, Object>> feeDetailMapList;
         List<Map<String, Object>> groupListMap = new ArrayList<>();
+        //固定项目名称
+        List<String> medChrgitmTypeList = Stream.of("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15").collect(Collectors.toList());
         if (!ListUtils.isEmpty(list)) {
+            Map<String, List<Map<String, Object>>> groupMap = list.stream().
+                    collect(Collectors.groupingBy(item -> MapUtils.get(item, "medChrgitm")));
+            for(String medChrgitmType:medChrgitmTypeList){
+                if(!groupMap.containsKey(medChrgitmType)){
+                    Map<String, Object> pMap = new HashMap<>();
+                    pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                    pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("medChrgitm", medChrgitmType);
+                    list.add(pMap);
+                }
+            }
             return list;
         }
         Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
@@ -2454,46 +2486,94 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (ListUtils.isEmpty(feeDetailMapList)) {
             throw new AppException("没有获取到医保费用明细数据");
         }
+
         Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
                 collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
-        Map<String, Object> pMap = null;
-        for (String key : groupMap.keySet()) {
-            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
-            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
-            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
-            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
-            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
-            System.out.println(key + "=====" + groupMap.get(key));
-            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
-            if (iterator.hasNext()) {
-                pMap = new HashMap<>();
-                List<Map<String, Object>> listMap = groupMap.get(key);
-                for (Map<String, Object> item : listMap) {
-                    DecimalFormat df1 = new DecimalFormat("0.00");
-                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
-                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
-                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
-                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                    if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+        for(String medChrgitmType:medChrgitmTypeList){
+            if(groupMap.containsKey(medChrgitmType)){
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+                BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+                BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+                BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+                BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+                System.out.println(medChrgitmType + "=====" + groupMap.get(medChrgitmType));
+                Iterator<Map<String, Object>> iterator = groupMap.get(medChrgitmType).iterator();
+                if (iterator.hasNext()) {
+                    Map<String, Object> pMap = new HashMap<>();
+                    List<Map<String, Object>> listMap = groupMap.get(medChrgitmType);
+                    for (Map<String, Object> item : listMap) {
+                        DecimalFormat df1 = new DecimalFormat("0.00");
+                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
+                                BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+                                        (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
+                                                MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        }
+                        if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        }
+                        if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                        }
                     }
-                    if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                    }
-                    if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-                    }
+                    otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
+                    pMap.put("amt", sumDetItemFeeSumamt);
+                    pMap.put("claaSumfee", AClassFee);
+                    pMap.put("clabAmt", BClassFee);
+                    pMap.put("fulamtOwnpayAmt", CClassFee);
+                    pMap.put("othAmt", otherClassFee);
+                    pMap.put("medChrgitm", medChrgitmType);
+                    groupListMap.add(pMap);
                 }
-                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
-                pMap.put("amt", sumDetItemFeeSumamt);
-                pMap.put("claaSumfee", AClassFee);
-                pMap.put("clabAmt", BClassFee);
-                pMap.put("fulamtOwnpayAmt", CClassFee);
-                pMap.put("othAmt", otherClassFee);
-                pMap.put("medChrgitm", key);
+            }else {
+                Map<String, Object> pMap = new HashMap<>();
+                pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("medChrgitm", medChrgitmType);
                 groupListMap.add(pMap);
             }
         }
+//        for (String key : groupMap.keySet()) {
+//            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+//            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+//            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+//            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+//            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+//            System.out.println(key + "=====" + groupMap.get(key));
+//            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+//            if (iterator.hasNext()) {
+//                pMap = new HashMap<>();
+//                List<Map<String, Object>> listMap = groupMap.get(key);
+//                for (Map<String, Object> item : listMap) {
+//                    DecimalFormat df1 = new DecimalFormat("0.00");
+//                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
+//                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+//                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
+//                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+//                    }
+//                }
+//                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
+//                pMap.put("amt", sumDetItemFeeSumamt);
+//                pMap.put("claaSumfee", AClassFee);
+//                pMap.put("clabAmt", BClassFee);
+//                pMap.put("fulamtOwnpayAmt", CClassFee);
+//                pMap.put("othAmt", otherClassFee);
+//                pMap.put("medChrgitm", key);
+//                groupListMap.add(pMap);
+//            }
+//        }
         List<Map<String, Object>> mapList = insertCommonSettleInfo(map, groupListMap);
         insureGetInfoDAO.deleteItemInfo(map);
         insureGetInfoDAO.insertItemInfo(mapList);

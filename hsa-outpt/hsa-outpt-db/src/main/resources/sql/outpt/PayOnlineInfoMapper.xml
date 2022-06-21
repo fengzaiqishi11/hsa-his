@@ -259,6 +259,15 @@
             id = #{id}
                                                                                                                                             </select>
 
+    <update id="updateByVisitId" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
+        update pay_online_info set
+               amp_trace_id = #{ampTraceId},
+               trace_id = #{traceId},
+               red_settle_id = #{redSettleId}
+            where
+               visit_id = #{visitId}
+    </update>
+
     <update id="updateById" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
         update pay_online_info set
             if(#{id} != null and #{id} != ''){

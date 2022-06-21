@@ -614,17 +614,15 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
     public Map<String, Object> AmpRefund(Map<String, Object> map) {
       //医保信息
       InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
-      //医保结算信息
-      InsureIndividualSettleDTO insureIndividualSettleDTO = MapUtils.get(map, "insureIndividualSettleDTO");
       //页面入参
       SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
       //根据医院编码、医保机构编码查询医保配置信息
       InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
       configDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
-      configDTO.setRegCode(insureIndividualSettleDTO.getInsureRegCode());
+      configDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
       InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
       if (insureConfigurationDTO == null)
-        throw new RuntimeException("未发现【" + insureIndividualSettleDTO.getInsureRegCode() + "】相关医保配置信息");
+        throw new RuntimeException("未发现【" + insureIndividualVisitDTO.getInsureRegCode() + "】相关医保配置信息");
       Map paramMap = new HashMap();
       paramMap.put("hospCode",insureIndividualVisitDTO.getHospCode());
       // 一、初始化Client
@@ -632,11 +630,11 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
       // 二、入参拼装
       JSONObject param = new JSONObject() {{
         // 区域医保服务平台系统跟踪号
-        put("ampTraceId", insureIndividualVisitDTO.getVisitId());
+        put("ampTraceId", setlRefundQueryDTO.getVisitId());
         // 平台结算跟踪号
-        put("traceId", insureIndividualSettleDTO.getId());
+        put("traceId", setlRefundQueryDTO.getSettleId());
         // 机构交易订单号
-        put("orgTraceNo", "D3508701966");
+        put("orgTraceNo", SnowflakeUtils.getId());
         // 机构编号(国标医院编码)
         put("orgCode", insureConfigurationDTO.getOrgCode());
         // 分院编号
@@ -662,13 +660,14 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         outParam = gatewayResponse.getParam();
         // 出参接收与处理
         //todo 写表操作
-        log.info("响应出参：{}", JSON.toJSONString(outParam));
-        RefundResponseDTO dto = FastJsonUtils.fromJson(outParam.toJSONString(),RefundResponseDTO.class);
+        Map<String, Object> response = new HashMap<>();
+        response.put("outParam",outParam);
+        response.put("inParam",param);
+        return response;
       } else {
         log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
         throw new AppException("请求省医保移动支付官方门户失败,失败编码:"+gatewayResponse.getRespCode()+",失败原因:"+gatewayResponse.getRespMsg());
       }
-      return outParam;
     }
 
     /**

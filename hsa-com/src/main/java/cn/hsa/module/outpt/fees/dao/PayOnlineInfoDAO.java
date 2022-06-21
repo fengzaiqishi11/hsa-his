@@ -46,4 +46,13 @@ public interface PayOnlineInfoDAO {
      * @return int
      */
      PayOnlineInfoDO selectById(PayOnlineInfoDO payOnlineInfoDO);
+
+     /**
+      * 根据就诊ID修改移动支付信息
+      * @param payOnlineInfoDO
+      * @Author 医保开发二部-湛康
+      * @Date 2022-06-20 15:02
+      * @return int
+      */
+     int updateByVisitId(PayOnlineInfoDO payOnlineInfoDO);
 }

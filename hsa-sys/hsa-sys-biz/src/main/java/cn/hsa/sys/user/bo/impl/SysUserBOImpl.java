@@ -145,7 +145,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         }
         byId.setWhetherEnableReminderBox(reminderParameterDTO.getValue());
         // 3.查询配置的系统参数医保专网地址
-        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,whetherEnableReminderBoxParamName);
+        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,insurePrivateInternetAddressParamName);
         if(null == insureAddressParameterDTO){
             byId.setInsurePrivateInternetAddress("请配置医保专网访问ip地址系统参数：【INSURE_PRIVATE_ADDRESS】的值");
             return;

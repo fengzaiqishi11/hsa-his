@@ -724,6 +724,7 @@
                a.item_code itemCode, a.item_id itemId, a.item_name itemName,
                a.price , a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage dosage,
                a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,
+               br.remark as rateRemark, -- 频率描述
                a.speed_code speedCode, a.use_days useDays, a.num num, a.num_unit_code numUnitCode, a.total_num totalNum,
                a.herb_note_code herbNoteCode, a.is_skin isSkin, a.is_positive isPositive, a.content content, a.phar_id pharId, a.bfc_id bfcId,
                a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,

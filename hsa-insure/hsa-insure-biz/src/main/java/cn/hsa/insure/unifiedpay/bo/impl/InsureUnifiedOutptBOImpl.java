@@ -10,6 +10,7 @@ import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dao.BaseDeptDAO;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
@@ -42,6 +43,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dao.SysUserDAO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
@@ -116,14 +118,13 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
-    @Resource
-    private SysParameterDAO  sysParameterDAO;
+
 
     @Resource
-    private BaseDeptDAO baseDeptDAO;
+    private BaseDeptService baseDeptService;
 
     @Resource
-    private SysUserDAO sysUserDAO;
+    private SysUserService sysUserService;
 
     @Resource
     private PayOnlineInfoDAO payOnlineInfoDAO;
@@ -867,12 +868,19 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         //查找科室位置
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
         baseDeptDTO.setId(outptVisitDTO.getDeptId());
-        BaseDeptDTO deptRes = baseDeptDAO.getById(baseDeptDTO);
+        baseDeptDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        Map baseDeptMap = new HashMap();
+        baseDeptMap.put("baseDeptDTO",baseDeptDTO);
+        BaseDeptDTO deptRes = baseDeptService.getById(baseDeptMap).getData();
         String deptPlace = deptRes.getPlace();
+
         //查询医生职称
         SysUserDTO sysUserDTO = new SysUserDTO();
         sysUserDTO.setId(outptVisitDTO.getDoctorId());
-        SysUserDTO sysUserRes = sysUserDAO.getById(sysUserDTO);
+        sysUserDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        Map sysUserMap = new HashMap();
+        baseDeptMap.put("sysUserDTO", sysUserDTO);
+        SysUserDTO sysUserRes = sysUserService.getById(sysUserMap).getData();
         String drLvName = sysUserRes.getDutiesCode();
 
         PayOnlineInfoDTO payOnlineInfoDTO = new PayOnlineInfoDTO();

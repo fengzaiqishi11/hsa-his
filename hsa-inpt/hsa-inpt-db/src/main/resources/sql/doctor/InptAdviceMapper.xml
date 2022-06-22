@@ -2303,7 +2303,7 @@
             select
             a.id,
             a.item_name as itemName,
-            a.crte_time as crteTime,
+            a.long_start_time as crteTime,
             c.name as execDeptName
             from
             inpt_advice a
@@ -2330,7 +2330,7 @@
             select
             a.id,
             c.item_name  as itemName,
-            a.crte_time as crteTime,
+            a.long_start_time as crteTime,
             d.name as execDeptName
             from
             inpt_advice a
@@ -2363,7 +2363,8 @@
             select
             group_concat(a.id) as id ,
             group_concat(a.item_name) as itemName,
-            d.name as execDeptName
+            d.name as execDeptName,
+            a.long_start_time as crteTime
             from
             inpt_advice a
             left join base_dept d on

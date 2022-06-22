@@ -457,14 +457,14 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         Map<String, Object> map2 = new HashMap<>();
         map2.put("hospCode", map.get("hospCode").toString());
         DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-        try {
-            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
-            resultMap.put("hasAuth", true);
-        } catch (Exception e) {
-            if (e.getMessage().contains("400-987-5000")) {
-                resultMap.put("hasAuth", false);
-            }
+        drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
+        //都提示false  没权限
+        if ("false".equals(drgDipAuthDTO.getDip())&&"false".equals(drgDipAuthDTO.getDrg())){
+          resultMap.put("hasAuth", false);
+        }else{
+          resultMap.put("hasAuth", true);
         }
+
         HashMap map1 = new HashMap();
         map1.put("drgDipResultDTO", dto);
         map1.put("hospCode", map.get("hospCode").toString());
@@ -833,7 +833,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Override
     public Map<String, Object> insertMrisForDIPorDRG(Map<String, Object> map) {
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorizationSettle(map);
         DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
         Map<String, Object> drgData = new HashMap<>();
         Map<String, Object> dipData = new HashMap<>();

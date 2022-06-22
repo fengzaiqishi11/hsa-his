@@ -1244,7 +1244,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorizationSettle(map);
         DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
         Map<String,Object> drgData = new HashMap<>();
         Map<String,Object> dipData = new HashMap<>();

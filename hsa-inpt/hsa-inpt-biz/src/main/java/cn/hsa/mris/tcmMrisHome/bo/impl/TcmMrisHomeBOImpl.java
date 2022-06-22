@@ -289,21 +289,20 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         Map<String,Object> map2 = new HashMap<>();
         map2.put("hospCode",map.get("hospCode").toString());
         DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-        try {
-          drgDipAuthDTO= drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
-          resultMap.put("hasAuth",true);
-        }catch (Exception e){
-          if (e.getMessage().contains("400-987-5000")){
-            resultMap.put("hasAuth",false);
-          }
+        drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
+        //都提示false  没权限
+        if ("false".equals(drgDipAuthDTO.getDip())&&"false".equals(drgDipAuthDTO.getDrg())){
+          resultMap.put("hasAuth", false);
+        }else{
+          resultMap.put("hasAuth", true);
         }
-      HashMap map1 = new HashMap();
-      map1.put("drgDipResultDTO",dto);
-      map1.put("hospCode",map.get("hospCode").toString());
-      map1.put("drgDipAuthDTO",drgDipAuthDTO);
-      DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-      resultMap.put("drgInfo",combo);
-      return resultMap;
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        map1.put("drgDipAuthDTO",drgDipAuthDTO);
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        resultMap.put("drgInfo",combo);
+        return resultMap;
     }
 
 

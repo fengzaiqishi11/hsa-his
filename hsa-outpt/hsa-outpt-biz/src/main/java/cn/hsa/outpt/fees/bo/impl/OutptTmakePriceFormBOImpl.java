@@ -14,10 +14,7 @@ import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
-import cn.hsa.module.insure.module.service.InsureConfigurationService;
-import cn.hsa.module.insure.module.service.InsureIndividualCostService;
-import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
-import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
+import cn.hsa.module.insure.module.service.*;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
 import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
@@ -40,6 +37,7 @@ import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO;
 import cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService;
@@ -54,6 +52,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,12 +170,18 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     SysParameterService sysParameterService;
 
     @Resource
+    private OutptVisitService outptVisitService;
+
+    @Resource
     private BaseCardRechargeChangeDAO baseCardRechargeChangeDAO;
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
     @Resource
     private SysParameterService getSysParameterService_consumer;
+
+    @Resource
+    private InsureItemMatchService itemMatchService;
 
 
     /**
@@ -5056,13 +5061,13 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     public WrapperResponse AMP_HOS_001(Map map) {
         //医院编码
         String hospCode = map.get("hospCode").toString();
-        PayOnlineInfoDTO payOnlineInfoDTO = MapUtils.get(map, "payOnlineInfoDTO");
-        if (ObjectUtil.isEmpty(payOnlineInfoDTO.getVisitId())) {
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
             throw new AppException("请传入就诊ID!");
         }
         //查询医保就诊信息
         Map<String, Object> insureVisitParam = new HashMap<>();
-        insureVisitParam.put("id", payOnlineInfoDTO.getVisitId());
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
         insureVisitParam.put("hospCode", hospCode);
         //医保就医信息
         InsureIndividualVisitDTO insureIndividualVisitDTO =
@@ -5084,5 +5089,286 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         map.put("outptDiagnoseDTOList", outptDiagnoseDTOList);
 
         return insureUnifiedPayOutptService_consumer.AMP_HOS_001(map);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:45
+     * @description 查询退款结果（AMP_HOS_003）
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> map) {
+        //医院编码
+        String hospCode = map.get("hospCode").toString();
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+            throw new AppException("请传入就诊ID!");
+        }
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getSettleId())) {
+            throw new AppException("请传入结算ID!");
+        }
+        //查询医保就诊信息
+        Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+        insureVisitParam.put("hospCode", hospCode);
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记！");
+        }
+        if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+            throw new AppException("未找到支付订单号，请先上传费用！");
+        }
+        //判断是否已医保结算
+        InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+        settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
+        settleDTO.setHospCode(hospCode);
+        settleDTO.setSettleId(setlRefundQueryDTO.getSettleId());
+        settleDTO.setState("0");
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hospCode", hospCode);
+        dataMap.put("insureIndividualSettleDTO", settleDTO);
+        settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+        //判断医保结算信息
+        if (ObjectUtil.isEmpty(settleDTO)) {
+            throw new AppException("未查找到医保结算信息，请先做医保结算！");
+        }
+        //接口调用
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        map.put("insureIndividualSettleDTO", settleDTO);
+        Map<String, Object> resultMap = insureUnifiedPayOutptService_consumer.refundInquiry(map).getData();
+        return WrapperResponse.success(resultMap);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map) {
+        return insureUnifiedPayOutptService_consumer.reconciliationDocument(map);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    @Override
+    public Map<String, Object> queryUnsettleList(Map map) {
+        Map<String, Object> responseMap = new HashMap<>();
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_type")) || ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_no")) || ObjectUtil.isEmpty(MapUtils.get(map, "org_code"))) {
+            responseMap.put("ret_code", RET_CODE02);
+            responseMap.put("ret_msg", "必传参数未传!");
+            responseMap.put("result", "fail");
+            return responseMap;
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("hospCode", MapUtils.get(map, "hospCode"));
+        param.put("mdtrtCertType", MapUtils.get(map, "mdtrt_cert_type"));
+        param.put("mdtrtCertNo", MapUtils.get(map, "mdtrt_cert_no"));
+        // 收费批次号
+        String chrgBchno = SnowflakeUtils.getId();
+        OutptVisitDTO outptVisitDTO = null;
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitByMdtrtCertNo(param);
+        Map params = new HashMap();
+        //如果医保就诊信息不为空则直接用visit_id 查即可
+        if(ObjectUtil.isNotEmpty(insureIndividualVisitDTO)){
+            //门诊病人信息查询
+            params.put("id", insureIndividualVisitDTO.getVisitId());
+            params.put("hospCode", MapUtils.get(map, "hospCode"));
+            outptVisitDTO = outptVisitService.queryByVisitID(params);
+        }else {
+            //如果医保就诊信息为空则 使用certNo查询门诊病人信息
+            OutptVisitDTO outptVisit = new OutptVisitDTO();
+            outptVisit.setCertNo(MapUtils.get(map, "mdtrt_cert_no"));
+            outptVisit.setCertCode(MapUtils.get(map, "mdtrt_cert_type"));
+            param.put("outptVisitDTO", outptVisit);
+            outptVisitDTO = outptVisitService.selectOutptVisitByCertNo(param).getData();
+        }
+        if(ObjectUtil.isEmpty(outptVisitDTO)){
+            responseMap.put("ret_code", RET_CODE02);
+            responseMap.put("ret_msg", "未查询到就医信息!");
+            responseMap.put("result", "fail");
+            return responseMap;
+        }
+        //根据就诊ID获取最新一条结算信息
+        param.put("visitId", outptVisitDTO.getVisitId());
+        param.put("hospCode", MapUtils.get(map, "hospCode"));
+        //查询门诊费用
+        WrapperResponse wrapperResponse = queryOutptCostList(param);
+        JSONObject obj = (JSONObject) wrapperResponse.getData();
+        BigDecimal medfeeSumamt = new BigDecimal(0);
+        //诊断明细
+        List<JSONObject> diaglist = new ArrayList<>();
+        //处方明细
+        List<JSONObject> rxlist = new ArrayList<>();
+        //处方费用信息
+        List<OutptCostDTO> outptCostDTOList = (List) obj.get("outptCost");
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = (List) obj.get("outptDiagnose");
+        // 组装处方明细
+        for (OutptCostDTO outptCostDTO : outptCostDTOList) {
+            medfeeSumamt = medfeeSumamt.add(outptCostDTO.getLastRealityPrice());
+            InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
+            insureItemMatchDTO.setHospCode(MapUtils.get(map, "hospCode"));
+            insureItemMatchDTO.setHospItemId(outptCostDTO.getItemCode());
+            List<InsureItemMatchDTO> insureItemMatchDTOS = itemMatchService.queryByHospItemId(insureItemMatchDTO);
+            JSONObject outptJsonObject = new JSONObject() {{
+                put("chrg_bchno", chrgBchno); //“收费批次号”
+                put("rx_no", outptCostDTO.getOpdId()); //“处方号”
+                put("rx_circ_flag", null); //“外购处方标志”
+                put("feedetl_sn", outptCostDTO.getId()); //“费用明细流水号”
+                put("drord_no", null); //“医嘱号”
+                put("med_list_codg", outptCostDTO.getInsureItemCode()); //“医疗目录编码”
+                put("medins_list_codg", outptCostDTO.getHospItemCode()); //“医药机构目录编码”
+                put("pric", outptCostDTO.getPrice()); //“项目单价”
+                put("cnt", outptCostDTO.getNum()); //“项目数量”
+                put("det_item_fee_sumamt", outptCostDTO.getRealityPrice()); //“明细项目费用总额”
+                put("used_frqu_dscr", outptCostDTO.getRateId()); //“使用频次描述”
+                put("sin_dos_dscr", outptCostDTO.getDosage()); //“单次剂量描述”
+                put("prd_days", outptCostDTO.getUseDays()); //“周期天数”
+                put("medc_way_dscr", outptCostDTO.getUsageCode()); //“用药途径描述”
+                put("fee_ocur_time", outptCostDTO.getCrteTime()); //“费用发生时间”
+                put("bilg_dr_name", outptCostDTO.getDoctorName()); //“开单医师姓名”
+                put("bilg_dr_codg", outptCostDTO.getDoctorId()); //“开单医生编码”
+                put("orders_dr_code", null); //“受单医生编码”
+                put("orders_dr_name", null); //“受单医生姓名”
+                put("bilg_dept_codg", outptCostDTO.getDeptId()); //“开单科室编码”
+                put("bilg_dept_name", outptCostDTO.getDeptName()); //开单科室名称
+                put("acord_dept_codg", null); //受单科室编码
+                put("acord_dept_name", null); //受单科室名称
+                put("prod_barc", null); //商品条形编码
+                put("hosp_appr_flag", null); //医院审批标志
+                put("tcmdrug_used_way", outptCostDTO.getUseCode()); //中药使用方式
+                put("etip_flag", null); //外检标志
+                put("etip_hosp_code", null); //外检医院编码
+                put("dscg_tkdrug_flag",null); //出院带药标志
+                put("matn_fee_flag",null); //生育费用标志
+                put("item_name", outptCostDTO.getItemName()); //项目名称
+                put("invo_item_no", SnowflakeUtils.getId()); //发票项目编码
+                put("hi_item", insureItemMatchDTOS.get(0).getIsMatch()); //是否医保项目
+                put("item_emp", insureItemMatchDTOS.get(0).getInsureItemUnitCode()); //项目单位
+                put("item_spec", insureItemMatchDTOS.get(0).getInsureItemSpec()); //项目规格
+                put("dos_form", insureItemMatchDTOS.get(0).getInsureItemPrepCode()); //剂型
+                put("emp_medc_emp", insureItemMatchDTOS.get(0).getInsureItemSpec()); //单位用药单位
+                put("drug_to_int", outptCostDTO.getTotalNum()); //取药总量
+                put("drug_to_int_emp", insureItemMatchDTOS.get(0).getInsureItemUnitCode()); //取药总量单位
+                put("drug_cnt_days", outptCostDTO.getUseDays()); //药量天数
+                put("drug_medc_way_code", null); //给药途径编码
+            }};
+            rxlist.add(outptJsonObject);
+        }
+        // 组装诊断明细
+        for (OutptDiagnoseDTO outptDiagnoseDTO : outptDiagnoseDTOList) {
+            JSONObject outptJsonObject = new JSONObject(){{
+               put("diag_type", outptDiagnoseDTO.getTypeCode());   //诊断类别
+               put("diag_srt_no",null);  //诊断排序号
+               put("diag_code", outptDiagnoseDTO.getDiseaseCode());  //诊断代码
+               put("diag_name", outptDiagnoseDTO.getDiseaseName());  //诊断名称
+               put("diag_dept", outptDiagnoseDTO.getDeptName());  //诊断科室
+               put("diag_dept_name", outptDiagnoseDTO.getDeptName());  //诊断科室名称
+               put("dise_dor_no", outptDiagnoseDTO.getDoctorId());  //诊断医生编码
+               put("dise_dor_name", outptDiagnoseDTO.getDoctorName());  //诊断医生姓名
+               put("diag_time", DateUtils.format(outptDiagnoseDTO.getCrteTime(),DateUtils.Y_M_DH_M_S)); //诊断时间（yyyy-MM-dd HH:mm:ss）
+               put("vali_flag", outptDiagnoseDTO.getIsValid());  //有效标志
+               put("maindiag_flag", outptDiagnoseDTO.getIsMain());  //主诊断标志
+            }};
+            diaglist.add(outptJsonObject);
+        }
+        //待结算列表
+        List<JSONObject> unsettlelist = new ArrayList<>();
+        BigDecimal finalMedfeeSumamt = medfeeSumamt;
+        OutptVisitDTO finalOutptVisitDTO = outptVisitDTO;
+        JSONObject unsettle = new JSONObject(){{
+            put("org_trace_no",RET_CODE00);  //机构跟踪号
+            put("doc_trace_no","查询成功");  //单据流水号
+            put("ipt_otp_no",null);  //院内门诊号/住院号
+            put("ipt_no", null);  //住院号
+            // 如果医保就诊信息为空则 患者是自费病人
+            if(ObjectUtil.isEmpty(insureIndividualVisitDTO)){
+                put("patient_type", "00");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
+            }else {
+                put("patient_type", "01");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
+            }
+            put("mdtrt_cert_type", MapUtils.get(map, "mdtrt_cert_type"));  //就诊凭证类型
+            put("mdtrt_cert_no", MapUtils.get(map, "mdtrt_cert_no"));  //就诊凭证编号
+            put("cert_no", finalOutptVisitDTO.getCertNo());  //证件号
+            put("psn_name", finalOutptVisitDTO.getName());  //姓名
+            put("gend", finalOutptVisitDTO.getGenderCode());  //性别
+            put("age", finalOutptVisitDTO.getAge());  //年龄
+            put("mdtrt_id", insureIndividualVisitDTO.getVisitId());  //门诊/住院流水号(医保门诊挂号/入院办理返回的就诊id)
+            put("dise_codg", null);  //特殊病种的编码
+            put("dise_name", null);  //特殊病种名称
+            put("dept_name", finalOutptVisitDTO.getDeptName());  //科室名称
+            put("dept_code", finalOutptVisitDTO.getDeptId());  //科室编码
+            put("caty", finalOutptVisitDTO.getDeptName());  //科室编码
+            put("atddr_no", finalOutptVisitDTO.getDoctorId());  //医生编码
+            put("dr_name", finalOutptVisitDTO.getDoctorName());  //医生姓名
+            put("chfpdr_no", finalOutptVisitDTO.getDoctorId());  //主治医生编码
+            put("chfpdr_name", finalOutptVisitDTO.getDoctorName());  //主诊医师姓名
+            put("adm_diag_dscr",null);  //入院诊断描述（住院不可空）
+            put("adm_dept_codg",null);  //入院科室编码（住院不可空）
+            put("adm_dept_name",null);  //入院科室名称（住院不可空）
+            put("adm_bed",null);  //入院床位（住院不可空）
+            put("dscg_maindiag_code",null); //住院主诊断代码
+            put("dscg_maindiag_name",null); //住院主诊断名称
+            put("oprn_oprt_code",null); //手术操作代码
+            put("oprn_oprt_name",null); //手术操作名称
+            put("medfee_sumamt", finalMedfeeSumamt.toString()); //医疗费总额
+            put("psn_setlway",null); //个人结算方式
+            put("acct_used_flag",null); //个人账户使用标志
+            put("invono",null); //发票号
+            put("fulamt_ownpay_amt",null); //全自费金额
+            put("overlmt_selfpay",null); //超限价金额
+            put("preselfpay_amt",null); //先行自付金额
+            put("inscp_scp_amt",null); //符合政策范围金额
+            put("mid_setl_flag",null); //中途结算标志
+            put("med_type",insureIndividualVisitDTO.getAka130Name()); //医疗类别
+            put("fpsc_no",null); //计划生育服务证号
+            put("birctrl_type",null); //计划生育手术类别
+            put("matn_type",null); //生育类别
+            put("fetus_cnt",null); //胎儿数
+            put("birctrl_matn_date",null); //计划生育手术或生育日期
+            put("latechb_flag",null); //晚育标志
+            put("geso_val",null); //孕周数
+            put("fetts",null); //胎次
+            put("pret_flag",null); //早产标志
+            put("dise_type_code",null); //病种类型
+            put("begn_time",null); //就诊时间(yyyyMMddHHmmss)
+            put("dscg_way",null); //离院方式
+            put("cop_flag",null); //伴有并发症标志
+            put("dscg_dept_codg",null); //出院科室编码
+            put("dscg_dept_name",null); //出院科室名称
+            put("dscg_bed",null); //出院床位
+            put("die_date",null); //死亡日期
+            put("main_cond_dscr",null); //主要病情描述
+            put("insu_code",null); //参保人所在统筹区编码
+            put("chrg_bchno", chrgBchno); //“收费批次号”
+            put("psn_no",null); //人员编码
+            put("insu_type",null); //险种类型
+            put("medrcdno",null); //病历号
+
+            put("diaglist", diaglist); //诊断明细
+            put("rxlist", rxlist); //处方明细
+
+        }};
+        unsettlelist.add(unsettle);
+        responseMap.put("ret_code", RET_CODE00);
+        responseMap.put("ret_msg", "查询成功");
+        responseMap.put("unsettlelist", unsettlelist);
+        return responseMap;
     }
 }

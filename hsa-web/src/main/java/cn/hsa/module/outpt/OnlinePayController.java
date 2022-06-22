@@ -184,6 +184,15 @@ public class OnlinePayController  extends BaseController {
     return outptTmakePriceFormService_consumer.querySettleResult(param);
   }
 
+  /**
+    * @method AMP_HOS_001
+    * @author wang'qiao
+    * @date 2022/6/20 15:42
+    * @description 	医疗信息推送
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
   @PostMapping("/medicalMsgPush")
   public WrapperResponse<Map<String, Object>> AMP_HOS_001(@RequestBody Map<String, Object> param,
                                                                 HttpServletRequest req,
@@ -191,5 +200,62 @@ public class OnlinePayController  extends BaseController {
     SysUserDTO sysUserDTO = getSession(req, res);
     param.put("hospCode", sysUserDTO.getHospCode());
     return outptTmakePriceFormService_consumer.AMP_HOS_001(param);
+  }
+
+  /**
+    * @method refundInquiry
+    * @author wang'qiao
+    * @date 2022/6/20 14:44
+    * @description 查询退款结果（AMP_HOS_003）
+    * @param  dto,req,res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/refundInquiry")
+  public WrapperResponse<Map<String, Object>> refundInquiry(@RequestBody SetlRefundQueryDTO dto,
+                                                          HttpServletRequest req,
+                                                          HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("setlRefundQueryDTO", dto);
+    return outptTmakePriceFormService_consumer.refundInquiry(map);
+  }
+
+  /**
+    * @method reconciliationDocument
+    * @author wang'qiao
+    * @date 2022/6/20 19:48
+    * @description 	对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+    * @param   req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/reconciliationDocument")
+  public WrapperResponse<Map<String, Object>> reconciliationDocument(String orgCode,String reconciliationDate,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String, Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("orgCode", orgCode);
+    map.put("reconciliationDate", reconciliationDate);
+    return outptTmakePriceFormService_consumer.reconciliationDocument(map);
+  }
+
+
+  /**
+    * @method queryFeeList
+    * @author wang'qiao
+    * @date 2022/6/21 10:30
+    *	@description 查询用户院内现在的待缴费费用列表，用于展示给用户进行确认和选择
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/queryUnsettleList")
+  public WrapperResponse<Map<String, Object>> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+
+    param.put("hospCode", sysUserDTO.getHospCode());
+    return outptTmakePriceFormService_consumer.queryUnsettleList(param);
   }
 }

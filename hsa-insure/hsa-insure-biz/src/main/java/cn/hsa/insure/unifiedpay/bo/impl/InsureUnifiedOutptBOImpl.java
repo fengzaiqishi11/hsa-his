@@ -10,6 +10,7 @@ import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.base.dept.dao.BaseDeptDAO;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
+import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.doctor.service.DoctorAdviceService;
@@ -42,6 +43,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dao.SysUserDAO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
@@ -116,14 +118,13 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
 
     private final AtomicInteger atomicInteger = new AtomicInteger(1);
 
-    @Resource
-    private SysParameterDAO  sysParameterDAO;
+
 
     @Resource
-    private BaseDeptDAO baseDeptDAO;
+    private BaseDeptService baseDeptService;
 
     @Resource
-    private SysUserDAO sysUserDAO;
+    private SysUserService sysUserService;
 
     @Resource
     private PayOnlineInfoDAO payOnlineInfoDAO;
@@ -671,6 +672,128 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
     }
 
     /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:55
+     * @description 查询退款结果（AMP_HOS_003） 调用AMP_HOS_002平台退款申请接口后，根据此状态来查询对应的退款具体结果
+     **/
+    @Override
+    public Map<String, Object> refundInquiry(Map<String, Object> map) {
+        //医保信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
+        //医保结算信息
+        InsureIndividualSettleDTO insureIndividualSettleDTO = MapUtils.get(map, "insureIndividualSettleDTO");
+        //页面入参
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        configDTO.setRegCode(insureIndividualSettleDTO.getInsureRegCode());
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null)
+            throw new RuntimeException("未发现【" + insureIndividualSettleDTO.getInsureRegCode() + "】相关医保配置信息");
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
+        // 一、初始化Client
+        YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
+        // 二、入参拼装
+        JSONObject param = new JSONObject() {{
+            // 区域医保服务平台系统跟踪号
+            put("ampTraceId", insureIndividualVisitDTO.getVisitId());
+            // 平台结算跟踪号
+            put("traceId", insureIndividualSettleDTO.getId());
+            // 机构编号(国标医院编码)
+            put("orgCode", insureConfigurationDTO.getOrgCode());
+            // 分院编号
+            put("subOrgCode", null);
+            // 外部退款流水号，到时候查询退款结果根据此订单号可以进行查询，每个机构内保证唯一 todo 系统退款ID
+            put("outRefundNo", setlRefundQueryDTO.getRedSettleId());
+        }};
+        //请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
+        com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
+                "/api/amp/hos/queryRefundResult", param,
+                new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
+                }
+        );
+        boolean requestSuccess = gatewayResponse.isSuccess();
+        JSONObject outParam = new JSONObject();
+        if (requestSuccess) {
+            outParam = gatewayResponse.getParam();
+            // 出参接收与处理
+            //todo 写表操作
+            log.info("响应出参：{}", JSON.toJSONString(outParam));
+            RefundResponseDTO dto = FastJsonUtils.fromJson(outParam.toJSONString(), RefundResponseDTO.class);
+        } else {
+            log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
+            throw new AppException("请求省医保移动支付官方门户失败,失败编码:" + gatewayResponse.getRespCode() + ",失败原因:" + gatewayResponse.getRespMsg());
+        }
+        return outParam;
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    @Override
+    public Map<String, Object> reconciliationDocument(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode").toString();
+        String orgCode = MapUtils.get(map, "orgCode").toString();
+
+        //根据医院编码、医保机构编码查询医保配置信息
+        InsureConfigurationDTO configDTO = new InsureConfigurationDTO();
+        configDTO.setHospCode(hospCode);
+        configDTO.setOrgCode(orgCode);
+        InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
+        if (insureConfigurationDTO == null)
+            throw new RuntimeException("未发现【" + orgCode + "】相关医保配置信息");
+        Map paramMap = new HashMap();
+        paramMap.put("hospCode",hospCode);
+        //从系统参数中查找对账秘钥信息
+        paramMap.put("codeList", new String[]{"HN_ORG_SECRET"});
+        WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
+        Map<String, SysParameterDTO> sysMap = getData(wr);
+        SysParameterDTO orgSecret = MapUtils.get(sysMap, "HN_ORG_SECRET");
+        // 一、初始化Client
+        YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
+        // 二、入参拼装
+        JSONObject param = new JSONObject() {{
+            // 机构编号(国标医院编码)
+            put("orgCode", orgCode);
+            // 分院编号
+            put("subOrgCode", null);
+            // 机构获取对账文件秘钥
+            put("orgSecret", orgSecret.getValue()); // 系统参数 TODO 关于机构秘钥的发放对接时会进行分配
+            // 账单日期，格式yyyy-MM-dd
+            put("billDate", MapUtils.get(map,"reconciliationDate"));
+            // 账单类型
+            put("billType", "ALL");
+        }};
+        //请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
+        com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
+                "/api/amp/hos/getCheckFile", param,
+                new TypeReference<com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject>>() {
+                }
+        );
+        boolean requestSuccess = gatewayResponse.isSuccess();
+        JSONObject outParam = new JSONObject();
+        if (requestSuccess) {
+            outParam = gatewayResponse.getParam();
+            // 出参接收与处理
+            log.info("响应出参：{}", JSON.toJSONString(outParam));
+        } else {
+            log.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
+            throw new AppException("请求省医保移动支付官方门户失败,失败编码:" + gatewayResponse.getRespCode() + ",失败原因:" + gatewayResponse.getRespMsg());
+        }
+        return outParam;
+    }
+
+    /**
      * 初始化Client
      * @param paramMap
      * @Author 医保开发二部-湛康
@@ -719,9 +842,14 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
         //处方信息
         List<OutptCostDTO> outptCostDTOList = MapUtils.get(map, "outptCostDTOList");
+        // 从处方信息中总结获得待结算金额  金额
+        BigDecimal amount = new BigDecimal(0);
+        for (OutptCostDTO costDTO : outptCostDTOList) {
+            amount = amount.add(costDTO.getLastRealityPrice());
+        }
         //就诊信息
         List outptDiagnoseDTO = MapUtils.get(map, "outptDiagnoseDTOList");
-        params.put("visit_id", insureIndividualVisitDTO.getVisitId());
+        params.put("id", insureIndividualVisitDTO.getVisitId());
         params.put("hospCode", MapUtils.get(map, "hospCode"));
         //门诊病人信息
         OutptVisitDTO outptVisitDTO = outptVisitService.queryByVisitID(params);
@@ -733,18 +861,26 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         if (insureConfigurationDTO == null)
             throw new RuntimeException("未发现【" + insureIndividualVisitDTO.getInsureRegCode() + "】相关医保配置信息");
         Map paramMap = new HashMap();
+        paramMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
         // 一、初始化Client
         YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
 
         //查找科室位置
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
         baseDeptDTO.setId(outptVisitDTO.getDeptId());
-        BaseDeptDTO deptRes = baseDeptDAO.getById(baseDeptDTO);
+        baseDeptDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        Map baseDeptMap = new HashMap();
+        baseDeptMap.put("baseDeptDTO",baseDeptDTO);
+        BaseDeptDTO deptRes = baseDeptService.getById(baseDeptMap).getData();
         String deptPlace = deptRes.getPlace();
+
         //查询医生职称
         SysUserDTO sysUserDTO = new SysUserDTO();
         sysUserDTO.setId(outptVisitDTO.getDoctorId());
-        SysUserDTO sysUserRes = sysUserDAO.getById(sysUserDTO);
+        sysUserDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
+        Map sysUserMap = new HashMap();
+        baseDeptMap.put("sysUserDTO", sysUserDTO);
+        SysUserDTO sysUserRes = sysUserService.getById(sysUserMap).getData();
         String drLvName = sysUserRes.getDutiesCode();
 
         PayOnlineInfoDTO payOnlineInfoDTO = new PayOnlineInfoDTO();
@@ -756,7 +892,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         // 应用类型
         payOnlineInfoDTO.setAppType("01");
         // 定点机构自己的订单ID，自己定义的id
-        String medOrgOrd = UUID.randomUUID().toString();
+        String medOrgOrd = SnowflakeUtils.getId();
         payOnlineInfoDTO.setMedOrgOrd(medOrgOrd);
         // 退款相关的推送才需要赋值这个
         /*put("refundReason", "退款原因，退款成功的推送才需要赋值这个~");*/
@@ -790,6 +926,10 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         }
         // 预约时间 yyyy-MM-dd HH:mm:ss
         payOnlineInfoDTO.setScheduledTime(DateUtil.dateToString(new Date(), DateUtils.Y_M_DH_M_S));
+        //重定向地址
+        payOnlineInfoDTO.setRedirectUrl(null);
+        //金额
+        payOnlineInfoDTO.setAmount(String.valueOf(amount));
         //当推送类型是支付单或检查单或挂号单类型时候才需要填写
         if ((MapUtils.get(map, "pushType") != null && jugePushType((MapUtils.get(map, "pushType"))))) {
             // 科室名称
@@ -827,11 +967,12 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         payOnlineInfoDTO.setOrgTraceNo("");
         // bean对象转化为json对象
         JSONObject param = new JSONObject(MapUtils.object2Map(payOnlineInfoDTO));
+
+
         PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
         // 属性拷贝
         BeanUtils.copyProperties(payOnlineInfoDTO, payOnlineInfoDO);
-        // 存入本地信息推送表
-        payOnlineInfoDAO.insertPayOnlineInfo(payOnlineInfoDO);
+
 
         // ！！！请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
         com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
@@ -845,7 +986,9 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
             JSONObject outParam = gatewayResponse.getParam();
             // 出参接收与处理
             logger.info("响应出参：{}", JSON.toJSONString(outParam));
-            // todo 接收成功后的处理
+            // 接收成功后的处理 存入本地信息推送表
+            payOnlineInfoDAO.insertPayOnlineInfo(payOnlineInfoDO);
+
         } else {
             logger.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
             throw new AppException("请求远程接口失败："+ gatewayResponse.getRespMsg());

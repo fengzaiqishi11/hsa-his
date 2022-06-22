@@ -995,6 +995,51 @@
         </foreach>
         )
     </select>
+    <select id="queryByHospItemIdIsItemId"  resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
+        SELECT
+        id,
+        hosp_code,
+        insure_reg_code,
+        item_code,
+        pqcc_item_id,
+        hosp_item_id,
+        hosp_item_name,
+        hosp_item_code,
+        hosp_item_type,
+        hosp_item_spec,
+        hosp_item_unit_code,
+        hosp_item_prep_code,
+        hosp_item_price,
+        insure_item_name,
+        insure_item_code,
+        insure_item_type,
+        insure_item_spec,
+        insure_item_unit_code,
+        insure_item_prep_code,
+        insure_item_price,
+        deductible,
+        standard_code,
+        check_price,
+        manufacturer,
+        audit_code,
+        is_match,
+        is_trans,
+        is_valid,
+        take_date,
+        lose_date,
+        pym,
+        wbm,
+        crte_id,
+        crte_name,
+        crte_time
+        FROM
+        insure_item_match
+        where
+        hosp_code = #{hospCode}
+        AND is_valid = '1'
+        AND hosp_item_id  = #{hospItemId}
+        group by hosp_item_id
+    </select>
     <select id="queryItemIsMatch" resultType="cn.hsa.module.insure.module.dto.InsureItemMatchDTO">
         select id,
                insure_reg_code,

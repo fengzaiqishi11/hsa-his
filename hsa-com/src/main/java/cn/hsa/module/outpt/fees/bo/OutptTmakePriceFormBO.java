@@ -448,4 +448,35 @@ public interface OutptTmakePriceFormBO {
      * @description 医疗消息推送
      **/
     WrapperResponse AMP_HOS_001(Map map);
+
+    /**
+      * @method refundInquiry
+      * @author wang'qiao
+      * @date 2022/6/20 14:45
+      *	@description 查询退款结果（AMP_HOS_003）
+      * @param  param
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+      *
+     **/
+    WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> param);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    Map<String, Object> queryUnsettleList(Map map);
 }

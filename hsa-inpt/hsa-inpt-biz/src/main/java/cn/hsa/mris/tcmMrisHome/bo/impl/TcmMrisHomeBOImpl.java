@@ -495,7 +495,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 if (StringUtils.isEmpty(tcmDiagnoseDTO.getDiseaseIcd10())&&StringUtils.isEmpty(tcmDiagnoseDTO.getTcmSyndromesId())) {
                     continue;
                 }
-                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())||StringUtils.isNotEmpty(tcmDiagnoseDTO.getDiseaseIcd10())) {
+                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())) {
                     tcmDiagnoseDTO.setDiseaseName("主要诊断");
                     tcmDiagnoseDTO.setDiseaseCode("1");
                 } else {
@@ -691,8 +691,8 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         int i =2;
         if (!ListUtils.isEmpty(inptDiagnoseList)) {
             for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseList) {
-                if ("301".equals(inptDiagnoseDTO.getTypeCode()) || "302".equals(inptDiagnoseDTO.getTypeCode())
-                        || "303".equals(inptDiagnoseDTO.getTypeCode())) {
+                // 只取中医出院诊断
+                if ("303".equals(inptDiagnoseDTO.getTypeCode())) {
                     if ("1".equals(inptDiagnoseDTO.getIsMain())) {
                         TcmDiagnoseDTO tcmDiagnoseDTO = new TcmDiagnoseDTO();
                         tcmDiagnoseDTO.setId(SnowflakeUtils.getId());
@@ -722,26 +722,29 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                         tcmDiagnoseDTOS.add(tcmDiagnoseDTO1);
                     }
                 } else {
-                    TcmMrisDiagnoseDTO mrisDiagnoseDO = new TcmMrisDiagnoseDTO();
-                    mrisDiagnoseDO.setId(SnowflakeUtils.getId());
-                    mrisDiagnoseDO.setMbiId(String.valueOf(map.get("mrisId")));
-                    mrisDiagnoseDO.setVisitId(String.valueOf(map.get("visitId")));
-                    mrisDiagnoseDO.setHospCode(String.valueOf(map.get("hospCode")));
-                    mrisDiagnoseDO.setDiseaseCode(inptDiagnoseDTO.getIsMain());
-                    if ("1".equals(inptDiagnoseDTO.getIsMain())) {
-                        mrisDiagnoseDO.setDiseaseName("主要诊断");
-                        mrisDiagnoseDO.setDiseaseCode("1");
-                        mrisDiagnoseDO.setColumnsNum("1");
-                    } else {
-                        mrisDiagnoseDO.setDiseaseName("其他诊断");
-                        mrisDiagnoseDO.setDiseaseCode("0");
-                        mrisDiagnoseDO.setColumnsNum(i+"");
-                        i++;
+                    // 只取西医出院诊断
+                    if ("204".equals(inptDiagnoseDTO.getTypeCode())) {
+                        TcmMrisDiagnoseDTO mrisDiagnoseDO = new TcmMrisDiagnoseDTO();
+                        mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                        mrisDiagnoseDO.setMbiId(String.valueOf(map.get("mrisId")));
+                        mrisDiagnoseDO.setVisitId(String.valueOf(map.get("visitId")));
+                        mrisDiagnoseDO.setHospCode(String.valueOf(map.get("hospCode")));
+                        mrisDiagnoseDO.setDiseaseCode(inptDiagnoseDTO.getIsMain());
+                        if ("1".equals(inptDiagnoseDTO.getIsMain())) {
+                            mrisDiagnoseDO.setDiseaseName("主要诊断");
+                            mrisDiagnoseDO.setDiseaseCode("1");
+                            mrisDiagnoseDO.setColumnsNum("1");
+                        } else {
+                            mrisDiagnoseDO.setDiseaseName("其他诊断");
+                            mrisDiagnoseDO.setDiseaseCode("0");
+                            mrisDiagnoseDO.setColumnsNum(i + "");
+                            i++;
+                        }
+                        mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
+                        mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
+                        mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
+                        mrisDiagnoseDOList.add(mrisDiagnoseDO);
                     }
-                    mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
-                    mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
-                    mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
-                    mrisDiagnoseDOList.add(mrisDiagnoseDO);
                 }
             }
             // 西医诊断

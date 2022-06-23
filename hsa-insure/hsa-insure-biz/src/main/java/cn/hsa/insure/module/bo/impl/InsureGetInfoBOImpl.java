@@ -751,6 +751,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 itemInfoList.add(pMap);
             }
         }
+        //重新排序
+        itemInfoList.sort((o1, o2) -> o1.get("medChrgitm").toString().compareTo(o2.get("medChrgitm").toString()));
         // 查询重症监护信息
         List<Map<String, Object>> icuinfoList = insureGetInfoDAO.selectIcuInfoForMap(map);
         // 手术操作信息
@@ -1833,8 +1835,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("setlId", MapUtils.get(map, "insureSettleId")); // 结算ID
         setlinfo.put("fixmedinsName", MapUtils.get(setlinfoMap, "fixmedins_name")); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", insureIndividualVisitDTO.getMedicineOrgCode()); // 定点医药机构编号
-        map.put("code", "SETTLELEVEL");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
+        //门特空指针问题修改
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("code", "SETTLELEVEL");
+        sysMap.put("hospCode", hospCode);
+        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(sysMap).getData();
         if (data == null) {
             throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
         }
@@ -2462,6 +2467,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> list = insureGetInfoDAO.selectItemInfo(map);
         List<Map<String, Object>> feeDetailMapList;
         List<Map<String, Object>> groupListMap = new ArrayList<>();
+        List<Map<String, Object>> feeListMap = new ArrayList<>();
         //固定项目名称
         List<String> medChrgitmTypeList = Stream.of("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15").collect(Collectors.toList());
         if (!ListUtils.isEmpty(list)) {
@@ -2479,6 +2485,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     list.add(pMap);
                 }
             }
+            //重新排序
+            list.sort((o1, o2) -> o1.get("medChrgitm").toString().compareTo(o2.get("medChrgitm").toString()));
             return list;
         }
         Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
@@ -2525,6 +2533,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     pMap.put("othAmt", otherClassFee);
                     pMap.put("medChrgitm", medChrgitmType);
                     groupListMap.add(pMap);
+                    feeListMap.add(pMap);
                 }
             }else {
                 Map<String, Object> pMap = new HashMap<>();
@@ -2574,9 +2583,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 //                groupListMap.add(pMap);
 //            }
 //        }
-        List<Map<String, Object>> mapList = insertCommonSettleInfo(map, groupListMap);
+        List<Map<String, Object>> mapList = insertCommonSettleInfo(map, feeListMap);
         insureGetInfoDAO.deleteItemInfo(map);
         insureGetInfoDAO.insertItemInfo(mapList);
+        //重新排序
+        groupListMap.sort((o1, o2) -> o1.get("medChrgitm").toString().compareTo(o2.get("medChrgitm").toString()));
         return groupListMap;
     }
 

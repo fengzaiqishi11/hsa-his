@@ -479,4 +479,24 @@ public interface OutptTmakePriceFormBO {
      * @description
      **/
     Map<String, Object> queryUnsettleList(Map map);
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryAccount
+     * @author wang'qiao
+     * @date 2022/6/22 15:10
+     * @description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
+     **/
+    Map<String,Object> queryAccount(Map param);
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method rechargeSettle
+     * @author wang'qiao
+     * @date 2022/6/23 15:27
+     * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+     **/
+    Map<String, Object> rechargeSettle(Map param);
 }

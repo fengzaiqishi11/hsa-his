@@ -85,6 +85,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     private static final String RET_CODE00 = "00";
     private static final String RET_CODE02 = "02";
 
+    // 自费病人编号
+    private static final String ZIFEI_PATAIENT = "0";
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Resource
@@ -5298,10 +5301,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             put("ipt_otp_no",null);  //院内门诊号/住院号
             put("ipt_no", null);  //住院号
             // 如果医保就诊信息为空则 患者是自费病人
-            if(ObjectUtil.isEmpty(insureIndividualVisitDTO)){
-                put("patient_type", "00");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
-            }else {
-                put("patient_type", "01");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
+            if (finalOutptVisitDTO.getPatientCode() != null && finalOutptVisitDTO.getPatientCode().equals(ZIFEI_PATAIENT)) {
+                responseMap.put("patient_type", "00"); //“患者费别” 自费 00  医保 01
+            } else {
+                responseMap.put("patient_type", "01"); //“患者费别” 自费 00  医保 01
             }
             put("mdtrt_cert_type", MapUtils.get(map, "mdtrt_cert_type"));  //就诊凭证类型
             put("mdtrt_cert_no", MapUtils.get(map, "mdtrt_cert_no"));  //就诊凭证编号
@@ -5370,5 +5373,100 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         responseMap.put("ret_msg", "查询成功");
         responseMap.put("unsettlelist", unsettlelist);
         return responseMap;
+    }
+
+    @Override
+    public Map<String, Object> queryAccount(Map param) {
+        String mdtrtCertType = MapUtils.get(param, "mdtrt_cert_type");
+        String mdtrtCertNo = MapUtils.get(param, "mdtrt_cert_no");
+        String orgCode = MapUtils.get(param, "org_code");
+        String certNo = MapUtils.get(param, "cert_no");
+        String accountType = MapUtils.get(param, "account_type");
+        Map<String, Object> responseMap = new HashMap<>();
+        //  必传参数检测
+        if (ObjectUtil.isEmpty(mdtrtCertType) || ObjectUtil.isEmpty(mdtrtCertNo)
+                || ObjectUtil.isEmpty(orgCode) || ObjectUtil.isEmpty(accountType)
+                || ObjectUtil.isEmpty(certNo)) {
+            responseMap.put("ret_code", RET_CODE02);
+            responseMap.put("ret_msg", "必传参数未传!");
+            responseMap.put("result", "fail");
+            return responseMap;
+        }
+
+        OutptVisitDTO outptVisitDTO = null;
+        Map params = new HashMap();
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitByMdtrtCertNo(param);
+
+        //如果医保就诊信息不为空则直接用visit_id 查即可
+        if (ObjectUtil.isNotEmpty(insureIndividualVisitDTO)) {
+            //门诊病人信息查询
+            params.put("id", insureIndividualVisitDTO.getVisitId());
+            params.put("hospCode", MapUtils.get(param, "hospCode"));
+            outptVisitDTO = outptVisitService.queryByVisitID(params);
+        } else {
+            //如果医保就诊信息为空则 使用certNo查询门诊病人信息
+            OutptVisitDTO outptVisit = new OutptVisitDTO();
+            outptVisit.setCertNo(MapUtils.get(param, "mdtrt_cert_no"));
+            outptVisit.setCertCode(MapUtils.get(param, "mdtrt_cert_type"));
+            params.put("outptVisitDTO", outptVisit);
+            outptVisitDTO = (OutptVisitDTO) outptVisitService.selectOutptVisitByCertNo(params).getData();
+        }
+
+        //人员信息获取：1101接口
+        params.put("mdtrt_cert_type", mdtrtCertType);
+        params.put("mdtrt_cert_no", mdtrtCertNo);
+        Map<String, Object> resultMap = (Map<String, Object>) outptService_consumer.getOutptVisitInfo(params).getData();
+        List<Map<String, Object>> personInfo = (List) resultMap.get("personinfo");
+        Map<String, Object> tempMap = (Map<String, Object>) resultMap.get("tempMap");
+        Map<String, Object> ybxzList = (Map<String, Object>) resultMap.get("ybxzList");
+        Map<String, Object> baseinfo = (Map<String, Object>) tempMap.get("baseinfo");
+        Map<String, Object> insuinfo = (Map<String, Object>) tempMap.get("insuinfo");
+        //响应参数整理：
+        responseMap.put("ret_code", RET_CODE00);
+        responseMap.put("ret_msg", "查询成功");
+        responseMap.put("psn_no", MapUtils.getVS(personInfo.get(0), "aac001")); //人员编号
+        responseMap.put("mdtrt_cert_type", mdtrtCertType); //就诊凭证类型
+        responseMap.put("mdtrt_cert_no", mdtrtCertNo); //就诊凭证编号
+        // 如果这个病人的BRLX是 0 也就是自费类型则：
+        if(outptVisitDTO.getPatientCode() != null && outptVisitDTO.getPatientCode().equals(ZIFEI_PATAIENT)){
+            responseMap.put("patient_type", "00"); //“患者费别” 自费 00  医保 01
+        }else {
+            responseMap.put("patient_type", "01"); //“患者费别” 自费 00  医保 01
+        }
+        responseMap.put("his_cust_id", "查询成功"); //持卡人院内默认ID
+        responseMap.put("balance",MapUtils.getVS(personInfo.get(0), "balc", "0")); //余额(元)
+        responseMap.put("psn_cert_type", MapUtils.getVS(personInfo.get(0), "psn_cert_type)")); //证件类型
+        responseMap.put("cert_no", MapUtils.getVS(personInfo.get(0), "aac002")); //证件号
+        responseMap.put("psn_name", MapUtils.getVS(personInfo.get(0), "aac003")); //人员姓名
+        responseMap.put("gend", MapUtils.getVS(personInfo.get(0), "aac004")); //性别
+        responseMap.put("account_type",null); //账户类型
+        responseMap.put("phone", null); //用户手机号
+        responseMap.put("disease_area", MapUtils.getVS(personInfo.get(0), "bka008")); //住院所在病区
+        responseMap.put("adm_bed", null); //住院床位号
+        responseMap.put("inpatient_total_fee", null); //住院总费用
+        responseMap.put("inpatient_start_date",null); //住院计费开始日期
+        responseMap.put("inpatient_end_date", null); //住院计费结束日期
+        responseMap.put("brdy", MapUtils.getVS(personInfo.get(0), "aac006")); //出生日期（yyyy-MM-dd）
+        responseMap.put("naty", MapUtils.getVS(baseinfo,"naty")); //民族
+        responseMap.put("age", MapUtils.getVS(baseinfo, "age")); //年龄
+        responseMap.put("ipt_no", null); //住院号
+        responseMap.put("insu_type", MapUtils.getVS(personInfo.get(0), "aae140")); //险种类型
+        responseMap.put("his_cust_list", null); //院内卡列表
+        return responseMap;
+    }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method rechargeSettle
+     * @author wang'qiao
+     * @date 2022/6/23 15:27
+     * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+     **/
+    @Override
+    public Map<String, Object> rechargeSettle(Map param) {
+        return null;
     }
 }

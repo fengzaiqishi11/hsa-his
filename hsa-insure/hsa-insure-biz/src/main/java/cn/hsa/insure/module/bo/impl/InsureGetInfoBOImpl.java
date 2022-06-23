@@ -6,9 +6,9 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
-import cn.hsa.insure.unifiedpay.bo.impl.InsureUnifiedBaseBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
@@ -38,6 +38,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -286,11 +287,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("ntly", "CHN"); // 国籍  默认是中国
 
         setlinfo.put("prfs", settleInfoDTO.getPrfs()); // 职业
-        setlinfo.put("curr_addr", settleInfoDTO.getAddress()); // 现住址
-        setlinfo.put("emp_name", settleInfoDTO.getWork()); // 工作单位 *******
-        setlinfo.put("emp_addr", settleInfoDTO.getWorkAddress()); // 工作单位地址 *******
-        setlinfo.put("emp_tel", settleInfoDTO.getWorkPhone()); // 工作单位电话 *******
-        setlinfo.put("poscode", settleInfoDTO.getWorkPostCode()); // 工作单位邮编 *******
+        setlinfo.put("curr_addr", settleInfoDTO.getCurrAddr()); // 现住址
+        setlinfo.put("emp_name", settleInfoDTO.getEmpName()); // 工作单位 *******
+        setlinfo.put("emp_addr", settleInfoDTO.getEmpAddr()); // 工作单位地址 *******
+        setlinfo.put("emp_tel", settleInfoDTO.getEmpTel()); // 工作单位电话 *******
+        setlinfo.put("poscode", settleInfoDTO.getPoscode()); // 工作单位邮编 *******
         setlinfo.put("coner_name", settleInfoDTO.getConerName()); // 联系人姓名
         setlinfo.put("patn_rlts", settleInfoDTO.getPatnRlts()); // 与患者关系
         setlinfo.put("coner_addr", settleInfoDTO.getConerAddr()); // 联系人地址
@@ -303,8 +304,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("opsp_diag_caty", settleInfoDTO.getVisitDrptName()); // 诊断科别 *******
         setlinfo.put("opsp_mdtrt_date", settleInfoDTO.getOpspMdtrtDate()); // 就诊日期 *******
 
-        setlinfo.put("adm_way", settleInfoDTO.getInWay()); // 入院途径 *******
-        setlinfo.put("trt_type", settleInfoDTO.getTrtType()); // 治疗类别 *******
+        setlinfo.put("adm_way", settleInfoDTO.getAdmWay()); // 入院途径 *******
+        // 治疗类别 *******
+        if (StringUtils.isNotEmpty(settleInfoDTO.getTrtType())) {
+            String trtType = settleInfoDTO.getTrtType();
+            if ("10".equals(trtType)) {
+                setlinfo.put("trt_type", "1"); // 西医
+            } else if ("21".equals(trtType)) {
+                setlinfo.put("trt_type", "2.1"); // 中医
+            } else if ("22".equals(trtType)) {
+                setlinfo.put("trt_type", "2.2"); // 民族医
+            } else {
+                setlinfo.put("trt_type", "3"); // 中西医
+            }
+        }
         if (ObjectUtil.isNotEmpty(settleInfoDTO.getAdmTime())) { //对时间对象做判空处理才能 用date工具类做处理
             setlinfo.put("adm_time", DateUtils.format(settleInfoDTO.getAdmTime(), DateUtils.Y_M_DH_M_S)); // 入院时间 *******
         }
@@ -317,7 +330,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("dscg_caty", settleInfoDTO.getDscgCaty()); // 出院科别
 
         setlinfo.put("otp_wm_dise", settleInfoDTO.getOptWmDise()); // 门（急）诊诊断 *******
-        setlinfo.put("wm_dise_code", settleInfoDTO.getWmDiswCode()); // 西医诊断疾病代码 *******
+        setlinfo.put("wm_dise_code", settleInfoDTO.getOptWmDiseCode()); // 西医诊断疾病代码 *******
 
         setlinfo.put("otptcmdise", settleInfoDTO.getOptTcmDise()); // 门（急）诊中医诊断 *******
         setlinfo.put("tcmdisecode", settleInfoDTO.getTcmDiseCode()); // 中医诊断代码 *******
@@ -423,7 +436,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     private List<Map<String, Object>> selectDiseaseInfo(Map<String, Object> map) {
-        List<Map<String, Object>> mapList = insureGetInfoDAO.selectDiseaseInfo(map);
+        List<Map<String, Object>> mapList = new ArrayList<>();
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "ONLY_QUERY_WMDIAG");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isNotEmpty(sysParameterDTO) && "1".equals(sysParameterDTO.getValue())){
+            //只查询西医诊断信息
+            mapList = insureGetInfoDAO.selectXyDisease(map);
+        }else {
+            //查询西医诊断信息和中医诊断信息
+            mapList = insureGetInfoDAO.selectDiseaseInfo(map);
+        }
+
         List<String> diagnoseList = Stream.of("101", "102", "201", "202", "203").collect(Collectors.toList());
         mapList.stream().forEach(item -> {
             String typeCode = MapUtils.get(item, "diag_type");
@@ -437,6 +462,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
             if ("204".equals(diagType)) {
                 item.put("diag_type", "1");
+            }
+            //【ID1003812】【广州科大】结算清单上传主诊断取西医主诊断
+            if (Constant.UnifiedPay.ISMAN.S.equals(isMain) && "2".equals(diagType)){
+                item.put("maindiag_flag", "0");
+            }
+            //中医诊断码值转换成医保的中医诊断类型码值  1:西医主要诊断 2:西医其它诊断 3: 中医主病诊断 4.中医主证诊断
+            if ("2".equals(diagType)) {
+                item.put("diag_type", "3");
+            }
+            if ("3".equals(diagType)) {
+                item.put("diag_type", "4");
             }
         });
         return mapList;
@@ -645,9 +681,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (StringUtils.isEmpty(functionCode)) {
             throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医疗结算清单功能号");
         }
-        if (!"4101A".equals(functionCode)) {
-            throw new AppException("上传到4101A接口的数据才能修改状态");
-        }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());
@@ -702,12 +735,29 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> setlinfo = selectLoadingSetlMsg(map);
         // 查询收费项目信息
         List<Map<String, Object>> itemInfoList = insureGetInfoDAO.selectItemInfo(map);
+        //固定项目名称
+        List<String> medChrgitmTypeList = Stream.of("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15").collect(Collectors.toList());
+        Map<String, List<Map<String, Object>>> groupMap = itemInfoList.stream().
+                collect(Collectors.groupingBy(item -> MapUtils.get(item, "medChrgitm")));
+        for(String medChrgitmType:medChrgitmTypeList){
+            if(!groupMap.containsKey(medChrgitmType)){
+                Map<String, Object> pMap = new HashMap<>();
+                pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("medChrgitm", medChrgitmType);
+                itemInfoList.add(pMap);
+            }
+        }
         // 查询重症监护信息
         List<Map<String, Object>> icuinfoList = insureGetInfoDAO.selectIcuInfoForMap(map);
         // 手术操作信息
         List<Map<String, Object>> oprnfoList = insureGetInfoDAO.selectOprninfoForMap(map);
         // 住院诊断信息
-        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
+//        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
+        Map<String, Object> diseaseMap = handerInptDiagnose(map);
         //  门诊慢特病诊断信息
         List<Map<String, Object>> opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
         // 基金支付信息
@@ -803,13 +853,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRG(Map<String, Object> map) {
         /**=============1.请求参数封装 Begin=========**/
-        Map<String, Object> dataMap = new HashMap<>();
-        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
-        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
-        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
-        dataMap.put("baseInfo", baseInfo);
-        dataMap.put("diseInfo", diseInfo);
-        dataMap.put("oprtInfo", oprtInfo);
+        Map<String, Object> dataMap = MapUtils.get(map, "dataMap");
+        Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");
         /**=============请求参数封装 End=========**/
 
         /**=============2.获取系统参数中配置的结算清单质控drg地址 Begin=========**/
@@ -848,7 +893,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             // 3.发送请求
             Map<String, Object> responseMap = HttpConnectUtil.sendPost(url, JSONObject.toJSONString(dataMap));
 
-            /**======4.获取返回的参数 begin=========**/
             logMap.put("respTime",DateUtils.getNow());//响应时间
             logMap.put("respContent",JSONObject.toJSONString(responseMap));
             logMap.put("resultCode",MapUtils.get(responseMap, "code"));
@@ -863,12 +907,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
             Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
             if (responseCode != null && 0 != responseCode){
+                logger.info("SettleInfoInterface调用DRG接口失败，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
                 throw new AppException("调用DRG接口失败");
+            }else {
+                logger.info("SettleInfoInterface调用DRG接口成功，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
             }
             Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
             if (MapUtils.isEmpty(resultMap)){
                 throw new AppException("调用DRG,返回结果为空");
             }
+            /**======4.获取返回的参数 begin=========**/
             Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
             Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
             List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
@@ -1081,13 +1131,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Map<String, Object> insertInsureSettleInfoForDIP(Map<String, Object> map) {
         /**=============1. dip入参封装 begin=========**/
-        Map<String, Object> dataMap = new HashMap<>();
-        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
-        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
-        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
-        dataMap.put("baseInfo", baseInfo);
-        dataMap.put("diseInfo", diseInfo);
-        dataMap.put("oprtInfo", oprtInfo);
+        Map<String, Object> dataMap = MapUtils.get(map, "dataMap");
+        Map<String, Object> baseInfo = MapUtils.get(dataMap, "baseInfo");
         /**=============dip入参封装 end=========**/
 
         /**=============2.获取系统参数中配置的结算清单质控dip地址 Begin=========**/
@@ -1141,7 +1186,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             /**======保存日志 end=========**/
             Integer responseCode = MapUtils.get(responseMap, "code");// 返回码
             if (responseCode != null && responseCode != 0){
+                logger.info("SettleInfoInterface调用DIP接口失败，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
                 throw new AppException("调用DIP接口失败");
+            }else{
+                logger.info("SettleInfoInterface调用DIP接口成功，入参为：{},返参为：{}"
+                        , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
             }
             Map<String,Object> resultMap = MapUtils.get(responseMap, "result");// 结果集
             if (MapUtils.isEmpty(resultMap)){
@@ -1181,12 +1231,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         return responseDataMap;
     }
 
+    private Map<String, Object> requestDIPorDRGDataMap(Map<String, Object> map) {
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> baseInfo = getInsureSettleBaseInfo(map);// 基础信息
+        List<Map<String, Object>> diseInfo = getInsureSettleDiseInfo(map);// 诊断信息
+        List<Map<String, Object>> oprtInfo = getInsureSettleOprtInfo(map);// 手术信息
+        dataMap.put("baseInfo", baseInfo);
+        dataMap.put("diseInfo", diseInfo);
+        dataMap.put("oprtInfo", oprtInfo);
+        return dataMap;
+    }
+
     @Override
     public Map<String, Object> insertInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
-        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorization(map);
+        WrapperResponse<DrgDipAuthDTO> drgDipAuthDTOWrapperResponse = drgDipResultService.checkDrgDipBizAuthorizationSettle(map);
         DrgDipAuthDTO drgDipAuthDTO = drgDipAuthDTOWrapperResponse.getData();
         Map<String,Object> drgData = new HashMap<>();
         Map<String,Object> dipData = new HashMap<>();
+        Map<String, Object> dataMap = requestDIPorDRGDataMap(map);
+        map.put("dataMap",dataMap);
         if ("true".equals(drgDipAuthDTO.getDrg())){
             drgData = insertInsureSettleInfoForDRG(map);
 
@@ -1474,6 +1537,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if (MapUtils.get(setlInfoMap, "opspMdtrtDate") instanceof Long) {
                 date.setTime(MapUtils.get(setlInfoMap, "opspMdtrtDate"));
                 setlInfoMap.put("opspMdtrtDate", simpleDateFormat.format(date));
+            }
+            //门特也需要处理入院时间，出院时间
+            if (MapUtils.get(setlInfoMap, "dscgTime") instanceof Long) {
+                date.setTime(MapUtils.get(setlInfoMap, "dscgTime"));
+                setlInfoMap.put("dscgTime", simpleDateFormat.format(date)); // 出院时间
+            }
+            if (MapUtils.get(setlInfoMap, "admTime") instanceof Long) {
+                date.setTime(MapUtils.get(setlInfoMap, "admTime"));
+                setlInfoMap.put("admTime", simpleDateFormat.format(date)); // 入院时间
             }
         }
         if (MapUtils.get(setlInfoMap, "dclaTime") instanceof Long) {
@@ -2175,10 +2247,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
                 tcmZyDiagnoseDTOS.stream().forEach(diag ->{
                     diag.setTypeCode("2");
-                    if ("1".equals(diag.getIsMain())) {
+                    //中医病案的中医症候是存在TcmSyndromesId和TcmSyndromesName字段的，
+                    //这里取出来赋值给DiseaseCode和DiseaseName
+                    if (Constant.UnifiedPay.ISMAN.F.equals(diag.getIsMain())) {
                         diag.setDiseaseCode(diag.getTcmSyndromesId());
                         diag.setDiseaseName(diag.getTcmSyndromesName());
                     }
+                    //ID1003812 结算清单以西医的主诊断为准
+                    diag.setIsMain(Constant.UnifiedPay.ISMAN.F);
                 });
                 zxCollect = tcmZyDiagnoseDTOS;
             }
@@ -2386,7 +2462,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> list = insureGetInfoDAO.selectItemInfo(map);
         List<Map<String, Object>> feeDetailMapList;
         List<Map<String, Object>> groupListMap = new ArrayList<>();
+        //固定项目名称
+        List<String> medChrgitmTypeList = Stream.of("01","02","03","04","05","06","07","08","09","10","11","12","13","14","15").collect(Collectors.toList());
         if (!ListUtils.isEmpty(list)) {
+            Map<String, List<Map<String, Object>>> groupMap = list.stream().
+                    collect(Collectors.groupingBy(item -> MapUtils.get(item, "medChrgitm")));
+            for(String medChrgitmType:medChrgitmTypeList){
+                if(!groupMap.containsKey(medChrgitmType)){
+                    Map<String, Object> pMap = new HashMap<>();
+                    pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                    pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                    pMap.put("medChrgitm", medChrgitmType);
+                    list.add(pMap);
+                }
+            }
             return list;
         }
         Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
@@ -2394,46 +2486,94 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (ListUtils.isEmpty(feeDetailMapList)) {
             throw new AppException("没有获取到医保费用明细数据");
         }
+
         Map<String, List<Map<String, Object>>> groupMap = feeDetailMapList.stream().
                 collect(Collectors.groupingBy(item -> MapUtils.get(item, "med_chrgitm_type")));
-        Map<String, Object> pMap = null;
-        for (String key : groupMap.keySet()) {
-            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
-            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
-            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
-            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
-            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
-            System.out.println(key + "=====" + groupMap.get(key));
-            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
-            if (iterator.hasNext()) {
-                pMap = new HashMap<>();
-                List<Map<String, Object>> listMap = groupMap.get(key);
-                for (Map<String, Object> item : listMap) {
-                    DecimalFormat df1 = new DecimalFormat("0.00");
-                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
-                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
-                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
-                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                    if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+        for(String medChrgitmType:medChrgitmTypeList){
+            if(groupMap.containsKey(medChrgitmType)){
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+                BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+                BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+                BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+                BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+                System.out.println(medChrgitmType + "=====" + groupMap.get(medChrgitmType));
+                Iterator<Map<String, Object>> iterator = groupMap.get(medChrgitmType).iterator();
+                if (iterator.hasNext()) {
+                    Map<String, Object> pMap = new HashMap<>();
+                    List<Map<String, Object>> listMap = groupMap.get(medChrgitmType);
+                    for (Map<String, Object> item : listMap) {
+                        DecimalFormat df1 = new DecimalFormat("0.00");
+                        sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
+                                BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+                                        (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
+                                                MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        }
+                        if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+                        }
+                        if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
+                            CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+                        }
                     }
-                    if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
-                    }
-                    if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
-                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
-                    }
+                    otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
+                    pMap.put("amt", sumDetItemFeeSumamt);
+                    pMap.put("claaSumfee", AClassFee);
+                    pMap.put("clabAmt", BClassFee);
+                    pMap.put("fulamtOwnpayAmt", CClassFee);
+                    pMap.put("othAmt", otherClassFee);
+                    pMap.put("medChrgitm", medChrgitmType);
+                    groupListMap.add(pMap);
                 }
-                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
-                pMap.put("amt", sumDetItemFeeSumamt);
-                pMap.put("claaSumfee", AClassFee);
-                pMap.put("clabAmt", BClassFee);
-                pMap.put("fulamtOwnpayAmt", CClassFee);
-                pMap.put("othAmt", otherClassFee);
-                pMap.put("medChrgitm", key);
+            }else {
+                Map<String, Object> pMap = new HashMap<>();
+                pMap.put("amt", BigDecimal.ZERO.setScale(2));
+                pMap.put("claaSumfee", BigDecimal.ZERO.setScale(2));
+                pMap.put("clabAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("fulamtOwnpayAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("othAmt", BigDecimal.ZERO.setScale(2));
+                pMap.put("medChrgitm", medChrgitmType);
                 groupListMap.add(pMap);
             }
         }
+//        for (String key : groupMap.keySet()) {
+//            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+//            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+//            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+//            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+//            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+//            System.out.println(key + "=====" + groupMap.get(key));
+//            Iterator<Map<String, Object>> iterator = groupMap.get(key).iterator();
+//            if (iterator.hasNext()) {
+//                pMap = new HashMap<>();
+//                List<Map<String, Object>> listMap = groupMap.get(key);
+//                for (Map<String, Object> item : listMap) {
+//                    DecimalFormat df1 = new DecimalFormat("0.00");
+//                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,
+//                            BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert
+//                                    (MapUtils.get(item, "det_item_fee_sumamt") == null ? "" :
+//                                            MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    if ("01".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        AClassFee = BigDecimalUtils.add(AClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if ("02".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        BClassFee = BigDecimalUtils.add(BClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "det_item_fee_sumamt") == null ? "" : MapUtils.get(item, "det_item_fee_sumamt").toString()))));
+//                    }
+//                    if ("03".equals(MapUtils.get(item, "chrgitm_lv"))) {
+//                        CClassFee = BigDecimalUtils.add(CClassFee, BigDecimalUtils.convert(df1.format(BigDecimalUtils.convert(MapUtils.get(item, "fulamt_ownpay_amt") == null ? "" : MapUtils.get(item, "fulamt_ownpay_amt").toString()))));
+//                    }
+//                }
+//                otherClassFee = BigDecimalUtils.subtractMany(sumDetItemFeeSumamt, AClassFee, BClassFee, CClassFee);
+//                pMap.put("amt", sumDetItemFeeSumamt);
+//                pMap.put("claaSumfee", AClassFee);
+//                pMap.put("clabAmt", BClassFee);
+//                pMap.put("fulamtOwnpayAmt", CClassFee);
+//                pMap.put("othAmt", otherClassFee);
+//                pMap.put("medChrgitm", key);
+//                groupListMap.add(pMap);
+//            }
+//        }
         List<Map<String, Object>> mapList = insertCommonSettleInfo(map, groupListMap);
         insureGetInfoDAO.deleteItemInfo(map);
         insureGetInfoDAO.insertItemInfo(mapList);

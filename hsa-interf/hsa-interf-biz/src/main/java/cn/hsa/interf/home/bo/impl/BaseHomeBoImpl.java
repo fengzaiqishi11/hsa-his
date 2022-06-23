@@ -223,11 +223,11 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
 //        Map<String,Object> dbMap = baseHomeDao.getYfDrDbsx(praMap);
 
         //趋势图数据：查询出药房门诊发药趋势图数据
-        List<Map<String,Object>> mzcsList = baseHomeDao.getYfMzCstData(praMap);
+//        List<Map<String,Object>> mzcsList = baseHomeDao.getYfMzCstData(praMap);
         //趋势图数据：查询出药房住院发药趋势图数据
-        List<Map<String,Object>> zycsList = baseHomeDao.getYfZyCstData(praMap);
+//        List<Map<String,Object>> zycsList = baseHomeDao.getYfZyCstData(praMap);
         //药房趋势数据转换成页面可识别的数据
-        Map csMap = handleYfCsData(mzcsList, zycsList);
+//        Map csMap = handleYfCsData(mzcsList, zycsList);
 
 
         //饼图数据：查询出门诊发药退药数量
@@ -240,7 +240,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         resultMap.put("ywMap",null);//今日业务
         resultMap.put("yjMap",yjMap);//今日预警
 //        resultMap.put("dbMap",null);//待办事项
-        resultMap.put("csMap",csMap);//矩形趋势图数据
+        resultMap.put("csMap",null);//矩形趋势图数据
         resultMap.put("btMap",btMap);//饼图数据
     }
 
@@ -514,7 +514,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         //今日业务
         Map<String, Object> zyJryw = baseHomeDao.getZyJryw(praMap);
         //今日预警
-        Map<String, Object> zyJryj = baseHomeDao.getZyJryj(praMap);
+//        Map<String, Object> zyJryj = baseHomeDao.getZyJryj(praMap);
         //今日待办
         Map<String, Object> zyJrdb = new HashMap<>();
 
@@ -542,7 +542,7 @@ public class BaseHomeBoImpl extends HsafBO implements BaseHomeBo {
         Map<String, Object> btMap = handZyBtData(zyRcyRshz);
 
         resultMap.put("ywMap", zyJryw);//今日业务
-        resultMap.put("yjMap", zyJryj);//今日预警
+        resultMap.put("yjMap", null);//今日预警
         resultMap.put("dbMap", zyJrdb);//今日待办
         resultMap.put("csMap", csMap);//矩形趋势
         resultMap.put("btMap", btMap);//饼图

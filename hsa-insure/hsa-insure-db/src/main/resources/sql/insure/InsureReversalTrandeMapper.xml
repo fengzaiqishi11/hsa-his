@@ -1523,6 +1523,7 @@
         Round(ifnull(e.retired_pay,0),2) AS retiredPay,
         e.clr_optins AS clrOptins,
         e.clr_type AS clrType,
+        e.aka130 AS medType,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'CLR_TYPE' and e.clr_type = value ) as clrTypeName,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'MED_TYPE' and e.aka130 = value ) as medTypeName,
         e.medicine_org_code AS medicineOrgCode,
@@ -1551,7 +1552,8 @@
         Round(e.inscp_scp_amt,2) as inscpScpAmt,
         Round(e.pool_prop_selfpay,2) as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
-        ia.admdvs_name as insuplcAdmdvsName,
+--         ia.admdvs_name as insuplcAdmdvsName,
+        (select ia.admdvs_name from insure_admdvs ia where t.insuplc_admdvs = ia.admdvs_code) as insuplcAdmdvsName,
         (select tt.out_dept_name from inpt_visit tt where e.visit_id = tt.id) as outDeptName,
         (select tt.out_disease_name from inpt_visit tt where e.visit_id = tt.id) as outDiseaseName,
         (select DATE_FORMAT(tt.in_time,'%Y-%m-%d') from inpt_visit tt where e.visit_id = tt.id) as inTime,
@@ -1564,13 +1566,13 @@
         DATEDIFF( tt.out_time, tt.in_time )
         ) from inpt_visit tt where e.visit_id = tt.id) as inDay,
         c.aac004 AS sex,
+        c.bka035 AS psnType,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'GEND' and c.aac004 = value ) as sexName,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'PSN_TYPE' and c.bka035 = value) as psnAttrName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
-        insure_individual_basic c,
-        insure_admdvs ia
+        insure_individual_basic c
         WHERE
         e.hosp_code = t.hosp_code
         AND e.visit_id = t.visit_id
@@ -1583,7 +1585,6 @@
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
         AND e.insure_price > 0
-        AND t.insuplc_admdvs = ia.admdvs_code
         <if test="isValidOneSettle == '1'.toString()">
             and ifnull(t.is_one_settle,'0') != '1'
         </if>

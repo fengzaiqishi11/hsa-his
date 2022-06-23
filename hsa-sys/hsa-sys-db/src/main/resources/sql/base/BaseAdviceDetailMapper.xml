@@ -115,7 +115,7 @@
         </if>
         left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
         left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-        where a.hosp_code = #{hospCode} and a.is_valid = '1'
+        where a.hosp_code = #{hospCode} and a.is_valid = '1' and a.is_supp_curtain = '1'
         <if test="keyword != null and keyword != ''">
             and  (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
         </if>

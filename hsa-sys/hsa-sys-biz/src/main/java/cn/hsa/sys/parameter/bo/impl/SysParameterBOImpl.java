@@ -157,10 +157,13 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
      * @Return: int
      */
     private boolean save(SysParameterDTO sysParameterDTO) {
-        //判断编码(名称)是否重复
-        if (sysParameterDao.queryNameIsExist(sysParameterDTO) > 0) {
-            throw new AppException("该参数名称已存在");
+        //判断编码(名称)是否重复   （编码可以重复）【ID1003299】系统参数维护，判断重复值不能以名称来判断，建议用编码来判断唯一性
+        if (sysParameterDao.queryCodeIsExist(sysParameterDTO) > 0) {
+            throw new AppException("该参数编码已存在");
         }
+        /*if (sysParameterDao.queryNameIsExist(sysParameterDTO) > 0) {
+            throw new AppException("该参数名称已存在");
+        }*/
         //生成拼音码五笔码
         String namePym = PinYinUtils.toFirstPY(sysParameterDTO.getName());
         String nameWbm = WuBiUtils.getWBCode(sysParameterDTO.getName());

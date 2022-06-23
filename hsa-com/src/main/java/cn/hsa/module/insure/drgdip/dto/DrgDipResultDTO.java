@@ -2,6 +2,9 @@ package cn.hsa.module.insure.drgdip.dto;
 import java.math.BigDecimal;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
+import cn.hsa.base.PageDO;
 import lombok.Data;
 
 /**
@@ -10,7 +13,7 @@ import lombok.Data;
  * @date： 2022-06-07 08:41:51
  */
 @Data
-public class DrgDipResultDTO implements Serializable {
+public class DrgDipResultDTO extends PageDO implements Serializable {
 	private static final long serialVersionUID = 1L;
 
   /**
@@ -261,6 +264,90 @@ public class DrgDipResultDTO implements Serializable {
    * 创建时间
    */
   private Date crtTime;
+  /**
+   * 是否上次
+   */
+  private String isUplod;
+  /**
+   * 是否存在可疑条数
+   */
+  private String suspiciousStates;
+  /**
+   * 是否存在违规条数
+   */
+  private String violationStates;
+  /**
+   * 结算时间
+   */
+  private String setlTime;
+  /**
+   * 模糊查询条件
+   */
+  private String keyword;
+  /**
+   * 主诊断代码
+   */
+  private String visitIcdCode;
+  /**
+   * 主诊断名称
+   */
+  private String visitIcdName;
+  /**
+   * 年份
+   */
+  private String year;
+  /**
+   * 开始年月
+   */
+  private String startYearMonth;
+  /**
+   * 结束年月
+   */
+  private String endYearMonth;
+  /**
+   * 开始时间
+   */
+  private String startDate;
+  /**
+   * 结束时间
+   */
+  private String endDate;
+  /**
+   * 在院状态
+   */
+  private String statusCode;
+  /**
+   * 姓名年龄性别
+   */
+  private String nameGendAge;
+  /**
+   * 是否在院
+   */
+  private String isHospital;
+    /**
+     * 科室id集合
+     */
+    private List<String> deptIds;
+    /**
+     * 医生id集合
+     */
+    private List<String> doctorIds;
+    /**
+     * 上传状态集合
+     */
+    private List<String> isUplods;
+    /**
+     * 质控状态集合
+     */
+    private List<String> statess;
+    /**
+     * 分组结果集合
+     */
+    private List<String> groupResults;
+    /**
+     * 在院状态集合
+     */
+    private List<String> statusCodes;
 
 
   public void setId(String id) {

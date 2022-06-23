@@ -1,5 +1,6 @@
 package cn.hsa.insure.drgdip.bo.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -11,6 +12,8 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
 import cn.hsa.module.insure.drgdip.dto.*;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
+import cn.hsa.module.insure.module.service.InsureDictService;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.util.*;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
@@ -22,6 +25,7 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO;
 import cn.hsa.util.MapUtils;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.stereotype.Component;
@@ -31,6 +35,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 
 import javax.annotation.Resource;
+import java.text.NumberFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -60,6 +65,9 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
 
     @Resource
     private CenterFunctionAuthorizationService centerFunctionAuthorizationService;
+
+    @Resource
+    private InsureDictService insureDictService_consumer;
 
     /**
      * @return
@@ -343,5 +351,223 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         combo.setDetails(dtoList);*/
       }
       return combo;
+    }
+
+    /**
+     * 质控结果查询-结算清单
+     * @param
+     * @Author
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public PageDTO queryDrgDipResultSetlinfo(DrgDipResultDTO drgDipResultDTO){
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        //可疑违规查询条件处理
+        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+
+    /**
+     * 质控结果查询汇总-结算清单
+     * @param
+     * @Author
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public Map<String, Object> queryDrgDipResultSetlinfoSum(DrgDipResultDTO drgDipResultDTO){
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//总数
+        int drgDipFinshSum = 0;//质控通过人数
+        int drgDipNoFinshSum = 0;//质控未通过完成人数
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            if(Constant.UnifiedPay.ZKZT.ZKWWC.equals(drgDipResultDTO1.getStates())){
+                drgDipNoFinshSum++;
+            }
+            if(Constant.UnifiedPay.ZKZT.ZKWC.equals(drgDipResultDTO1.getStates())){
+                drgDipFinshSum++;
+            }
+        }
+        int drgDipSum = drgDipFinshSum + drgDipNoFinshSum;//质控人数
+        int drgDipNotSum = drgDipResultDTOList.size() - drgDipSum ;//未质控人数
+        String drgDipFinsh;//通过率
+        String drgDipNoFinsh;//未通过率
+        if(drgDipSum == 0){
+            drgDipFinsh ="0%";
+            drgDipNoFinsh ="0%";
+        }else {
+            //格式化
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            // 设置精确到小数点后2位
+            numberFormat.setMaximumFractionDigits(2);
+            drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
+            drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        }
+        resultMap.put("drgDipFinshSum",drgDipFinshSum);
+        resultMap.put("drgDipNoFinshSum",drgDipNoFinshSum);
+        resultMap.put("drgDipSum",drgDipSum);
+        resultMap.put("drgDipNotSum",drgDipNotSum);
+        resultMap.put("drgDipFinsh",drgDipFinsh);
+        resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        return resultMap;
+    }
+
+    /**
+     * 质控结果查询-详细
+     * @param
+     * @Author
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public Map<String, Object>  queryDrgDipResultDetail(DrgDipResultDTO drgDipResultDTO){
+        Map<String, Object> responseDataMap = new HashMap<>();
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        if(StringUtils.isEmpty(drgDipResultDTO.getBusinessType())){
+            throw new AppException("请选择业务类型");
+        }
+        DrgDipResultDTO drgDipResultDTO1 = drgDipResultDAO.queryDrgDipResultByVisitId(drgDipResultDTO);
+        if(drgDipResultDTO1 == null){
+            throw new AppException("该患者还未进行质控，未查到质控结果");
+        }
+        List<DrgDipResultDetailDTO>  qualityInfoList = drgDipResultDAO.queryDrgDipResultById(drgDipResultDTO1);
+        responseDataMap.put("name",drgDipResultDTO1.getPsnName());// 姓名
+        responseDataMap.put("sex",drgDipResultDTO1.getGend());// 性别
+        responseDataMap.put("age",drgDipResultDTO1.getAge());// 年龄
+        if(StringUtils.isNotEmpty(drgDipResultDTO1.getInsutype())){
+            if(Constant.UnifiedPay.XZLX.CXJM.equals(drgDipResultDTO1.getInsutype())){
+                responseDataMap.put("hiType","城乡居民基本医疗保险");// 医保类型
+            }else if(Constant.UnifiedPay.XZLX.CZZG.equals(drgDipResultDTO1.getInsutype())){
+                responseDataMap.put("hiType","职工基本医疗保险");// 医保类型
+            }else if(Constant.UnifiedPay.XZLX.LX.equals(drgDipResultDTO1.getInsutype())){
+                responseDataMap.put("hiType","离休人员医疗保障");// 医保类型
+            }else {
+                responseDataMap.put("hiType","自费病人");// 医保类型
+            }
+        }else {
+            responseDataMap.put("hiType","自费病人");// 医保类型
+        }
+        responseDataMap.put("inNO",drgDipResultDTO1.getVisitId());//住院号
+        responseDataMap.put("diagCode",drgDipResultDTO1.getDrgDipCode());// DIP组编码
+        responseDataMap.put("diagName",drgDipResultDTO1.getDrgDipName());// DIP组名称
+        responseDataMap.put("diagFeeSco",drgDipResultDTO1.getFeePay());// 分值
+        responseDataMap.put("profitAndLossAmount",drgDipResultDTO1.getProfit());// 盈亏额
+        responseDataMap.put("totalFee",drgDipResultDTO1.getTotalFee());// 总费用
+        responseDataMap.put("feeStand",drgDipResultDTO1.getStandFee());// 总费用标杆
+        responseDataMap.put("proMedicMater",drgDipResultDTO1.getProMedicMater());// 药占比
+        responseDataMap.put("proMedicMaterStand",drgDipResultDTO1.getStandProMedicMater());// 药占比标杆
+        responseDataMap.put("proConsum",drgDipResultDTO1.getProConsum());// 耗材比
+        responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
+        responseDataMap.put("quality",qualityInfoList);// 质控信息
+        return responseDataMap;
+    }
+
+    /**
+     * 质控结果查询-病案首页
+     * @param
+     * @Author
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public PageDTO queryDrgDipResultMris(DrgDipResultDTO drgDipResultDTO){
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+
+    /**
+     * 质控结果查询汇总-病案首页
+     * @param
+     * @Author
+     * @Date 2022-06-07 15:54
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public Map<String, Object> queryDrgDipResultMrisSum(DrgDipResultDTO drgDipResultDTO){
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//总数
+        int drgDipFinshSum = 0;//质控通过人数
+        int drgDipNoFinshSum = 0;//质控未通过完成人数
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            if(Constant.UnifiedPay.ZKZT.ZKWWC.equals(drgDipResultDTO1.getStates())){
+                drgDipNoFinshSum++;
+            }
+            if(Constant.UnifiedPay.ZKZT.ZKWC.equals(drgDipResultDTO1.getStates())){
+                drgDipFinshSum++;
+            }
+        }
+        int drgDipSum = drgDipFinshSum + drgDipNoFinshSum;//质控人数
+        int drgDipNotSum = drgDipResultDTOList.size() - drgDipSum ;//未质控人数
+        String drgDipFinsh;//通过率
+        String drgDipNoFinsh;//未通过率
+        if(drgDipSum == 0){
+            drgDipFinsh ="0%";
+            drgDipNoFinsh ="0%";
+        }else {
+            //格式化
+            NumberFormat numberFormat = NumberFormat.getInstance();
+            // 设置精确到小数点后2位
+            numberFormat.setMaximumFractionDigits(2);
+            drgDipFinsh = numberFormat.format((float)drgDipFinshSum/(float)drgDipSum*100) + "%";//通过率
+            drgDipNoFinsh = numberFormat.format((float)drgDipNoFinshSum/(float)drgDipSum*100) + "%";//未通过率
+        }
+        resultMap.put("drgDipFinshSum",drgDipFinshSum);
+        resultMap.put("drgDipNoFinshSum",drgDipNoFinshSum);
+        resultMap.put("drgDipSum",drgDipSum);
+        resultMap.put("drgDipNotSum",drgDipNotSum);
+        resultMap.put("drgDipFinsh",drgDipFinsh);
+        resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        return resultMap;
+    }
+
+    //字典转义
+    private String getSysCodeName(String hospCode, String code, String value) {
+        Map map = new HashMap(2);
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        Map<String, String> dictMap = insureDictService_consumer.querySysCodeByCode(map).getData();
+        return MapUtils.isEmpty(dictMap) ? "" : dictMap.get(value);
     }
 }

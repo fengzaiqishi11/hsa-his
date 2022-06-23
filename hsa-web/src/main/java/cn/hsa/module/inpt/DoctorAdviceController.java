@@ -503,6 +503,7 @@ public class DoctorAdviceController extends BaseController {
     public WrapperResponse<List<InptAdviceDTO>> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         inptAdviceDTO.setHospCode(sysUserDTO.getHospCode());
+        inptAdviceDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptAdviceDTO", inptAdviceDTO);

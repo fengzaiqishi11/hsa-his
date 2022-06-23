@@ -1282,7 +1282,7 @@ public class BedListBOImpl implements BedListBO {
         bedListDAO.updateAdviceExecHK(inptVisitDTO);
 
         // 费用表来源科室id、就诊科室id、开医嘱科室id、执行科室id
-        bedListDAO.updateInptCostHK(inptVisitDTO);
+//        bedListDAO.updateInptCostHK(inptVisitDTO);
 
     }
 

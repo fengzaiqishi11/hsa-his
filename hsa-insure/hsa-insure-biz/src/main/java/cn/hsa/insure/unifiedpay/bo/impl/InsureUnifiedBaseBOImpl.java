@@ -324,7 +324,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         paramMap .put("insureIndividualBasicDTO",insureIndividualBasicDTO);
         paramMap.putAll(map);
         // 参保地医保区划
-        paramMap.put("insuplcAdmdvs", insureIndividualBasicDTO.getInsuplc_admdvs());
+        paramMap.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("hospCode", hospCode);
         paramMap.put("isHospital",insureIndividualVisitDTO.getIsHospital());
@@ -1103,6 +1103,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         dataMap.put("psn_no", MapUtils.get(map, "psnNo"));
         InsureIndividualVisitDTO insureIndividualVisit = new InsureIndividualVisitDTO();
         insureIndividualVisit.setVisitId(MapUtils.get(map, "visitId"));
+        insureIndividualVisit.setHospCode(hospCode);
         InsureIndividualVisitDTO result = insureIndividualVisitBO.selectInsureInfo(insureIndividualVisit);
         if (ObjectUtil.isEmpty(result)) {
             throw new AppException("没有该就诊信息");
@@ -1608,7 +1609,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         // 返参map
         Map<String, Object> resultMap = new HashMap<>();
         //如果是甘肃，海南的医保的就走3401接口 因为3401a接口没开 医保编码为 甘肃：620102 海南的：460100
-        if(StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("62") || attrCode.startsWith("46"))){
+        if(StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.GS) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.HN))){
             log.debug("科室上传【3401】待上传数据：" + JSONObject.toJSONString(deptDTOList));
             resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_3401, inputMap, map);
         }else {

@@ -64,6 +64,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.inpt.medicalRecode.bo.impl
@@ -555,7 +556,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (MapUtils.isEmpty(groupInfoMap)) {
                 throw new AppException("DRG调用获取的分组信息对象为null,请联系管理员");
             }
-            List<Map<String, Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>>  qualityInfo = MapUtils.get(resultMap, "qualityInfo");
+            List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
+                    qualityInfo.stream().sorted((a, b) ->
+                                    (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                            .toString()
+                                            .compareTo(a.get("rule_level").toString()))
+                            .collect(Collectors.toList());// 质控信息集合
             /**======获取返回的参数 end=========**/
 
             /**======6.保存质控结果 begin=========**/
@@ -820,6 +827,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             String substring = age.substring(1);
             baseInfoStr.put("age",substring);
         }
+        // 防止drg那边报错，数据库已经进行了一次非空转换，所以这里放心使用toString
+        baseInfoStr.put("newborn_age",StringUtils.getNumberFromString(baseInfoStr.get("newborn_age").toString()));
+        baseInfoStr.put("newborn_weight",StringUtils.getNumberFromString(baseInfoStr.get("newborn_weight").toString()));
+        baseInfoStr.put("newborn_hsptzd_weight",StringUtils.getNumberFromString(baseInfoStr.get("newborn_hsptzd_weight").toString()));
+
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
         if (MapUtils.isEmpty(strArr)){

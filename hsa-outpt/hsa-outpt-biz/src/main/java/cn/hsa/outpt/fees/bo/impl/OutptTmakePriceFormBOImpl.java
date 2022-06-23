@@ -5166,7 +5166,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @method queryUnsettleList
      * @author wang'qiao
      * @date 2022/6/21 10:37
-     * @description
+     * @description 拉取待结算费用信息 org_trace_no充当结算ID，方便寻找这一批费用信息
      **/
     @Override
     public Map<String, Object> queryUnsettleList(Map map) {
@@ -5211,7 +5211,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         //根据就诊ID获取最新一条结算信息
         param.put("visitId", outptVisitDTO.getVisitId());
         param.put("hospCode", MapUtils.get(map, "hospCode"));
-        //查询门诊费用
+        //查询门诊费用 todo 部分参数没有
         WrapperResponse wrapperResponse = queryOutptCostList(param);
         JSONObject obj = (JSONObject) wrapperResponse.getData();
         BigDecimal medfeeSumamt = new BigDecimal(0);
@@ -5467,6 +5467,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      **/
     @Override
     public Map<String, Object> rechargeSettle(Map param) {
+      //根据org_trace_no（充当结算ID）获取费用列表信息
+      Map costMap = new HashMap();
+      //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
+      costMap.put("hospCode",MapUtils.get(param, "hospCode"));
+      costMap.put("statusCode", Constants.ZTBZ.ZC);//statusCode（状态标志 = 正常）
+      costMap.put("settleCode", Constants.JSZT.YUJS);//settleCode（结算状态 = 预结算）
+      costMap.put("settleId", MapUtils.get(param, "org_trace_no"));//settleId（结算id）
+      List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param); //可以获取本次就诊ID visitId
+
+      //1.根据当前结算id，查询费用表,更新医技申请单状态
+
+      //2.保存支付方式（结算）
+
+      //3.根据费用信息修改本次结算的费用状态
+
+      //4.修改门诊结算表此次结算信息状态
+
+      //5.修改处方表结算信息
+
+      //6.修改医保结算表， 插入门诊医保明细（也许没有）
+
+      //7.如果是医保病人，修改医保结算表， 插入门诊医保明细 updateInsureSettle
         return null;
     }
 }

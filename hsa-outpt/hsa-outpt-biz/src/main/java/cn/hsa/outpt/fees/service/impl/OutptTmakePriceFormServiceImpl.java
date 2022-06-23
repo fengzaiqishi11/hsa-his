@@ -552,4 +552,80 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       return WrapperResponse.success(outptTmakePriceFormBO.insureRefund(map));
     }
 
+    /**
+     * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 9:04
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> ampRefund(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.ampRefund(map));
+    }
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:38
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map) {
+      return WrapperResponse.success(outptTmakePriceFormBO.querySettleResult(map));
+    }
+
+    /**
+      * @method AMP_HOS_001
+      * @author wang'qiao
+      * @date 2022/6/20 11:47
+      *	@description 	医疗消息推送
+      * @param  map
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @Override
+    public WrapperResponse AMP_HOS_001(Map map){
+        return outptTmakePriceFormBO.AMP_HOS_001(map);
+    }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:44
+     * @description 查询退款结果（AMP_HOS_003）
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> param) {
+        return outptTmakePriceFormBO.refundInquiry(param);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map) {
+        return outptTmakePriceFormBO.reconciliationDocument(map);
+    }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryUnsettleList(Map param) {
+        return WrapperResponse.success(outptTmakePriceFormBO.queryUnsettleList(param));
+    }
 }

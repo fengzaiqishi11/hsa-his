@@ -50,9 +50,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
-import cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassesDoctorDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -61,13 +59,9 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import kafka.utils.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
@@ -3287,6 +3281,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                    }
 //                }
 
+                // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
+                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
+                    continue;
+                }
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);
                 BigDecimal tzCost = BigDecimal.valueOf(0);

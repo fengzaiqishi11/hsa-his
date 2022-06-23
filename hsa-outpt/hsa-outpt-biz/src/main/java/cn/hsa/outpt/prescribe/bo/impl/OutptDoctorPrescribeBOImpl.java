@@ -659,6 +659,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptCostDTO.setCrteName(outptVisitDTO.getCrteName());
             //创建时间
             outptCostDTO.setCrteTime(DateUtils.getNow());
+            // 处方id置空（处方id为null 医保结算不了） lly 2022-06-01
+            outptCostDTO.setOpId("");
             //费用数据
             outptCostDTOList.add(outptCostDTO);
         }

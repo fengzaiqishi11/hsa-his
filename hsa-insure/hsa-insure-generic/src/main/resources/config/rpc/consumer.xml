@@ -52,4 +52,7 @@
     <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
     <dubbo:reference interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" id="drgDipResultService_consumer" check="false"/>
 
+    <!--SysUserService-->
+    <dubbo:reference interface="cn.hsa.module.sys.user.service.SysUserService" id="SysUserService_consumer" check="false"/>
+
 </beans>

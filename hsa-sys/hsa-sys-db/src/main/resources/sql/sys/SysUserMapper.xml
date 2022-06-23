@@ -1371,7 +1371,7 @@
 	</select>
 
 	<select id="queryMZAndSFYAllUser" resultMap="SysUserMap" >
-		select * from sys_user where hosp_code = #{hospCode} and dept_code != 'powersi' and work_type_code in ('1','101', '102', '103', '104', '105', '106', '107', '108')
+		select * from sys_user where hosp_code = #{hospCode} and dept_code != 'powersi' and work_type_code in ('1','101', '102', '103', '104', '105', '106', '107', '108','301','302','303','304','305')
 	</select>
 
 

@@ -197,4 +197,16 @@ public class InsureIndividualSettleBOImpl extends HsafBO implements InsureIndivi
     public InsureIndividualSettleDTO selectInsureIndividualSettleById(Map<String, Object> map) {
         return insureIndividualSettleDAO.selectInsureIndividualSettleById(map);
     }
+
+    /**
+     * 根据就诊ID获取最新一条结算信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-17 8:48
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO
+     */
+    @Override
+    public InsureIndividualSettleDTO getInsureSettleByVisitId(Map<String, Object> map) {
+      return insureIndividualSettleDAO.getInsureSettleByVisitId(map);
+    }
 }

@@ -37,17 +37,11 @@
             </exclusions>
         </dependency>
 
-        <!--ID唯一生成-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.core</groupId>-->
-        <!--            <artifactId>hsaf-idgenerator</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- 认证安全组件 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.auth.security</groupId>-->
-<!--            <artifactId>hsaf-auth-security</artifactId>-->
-<!--        </dependency>-->
+        <!--公共包依赖-->
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+        </dependency>
 
         <!--MVC框架-->
         <dependency>

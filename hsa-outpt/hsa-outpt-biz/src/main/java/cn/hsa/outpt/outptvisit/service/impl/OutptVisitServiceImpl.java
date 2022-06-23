@@ -156,4 +156,17 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     public WrapperResponse<Boolean> updateOutptVisitUploadFlag(Map<String, Object> map) {
         return WrapperResponse.success(outptVisitBO.updateOutptVisitUploadFlag(MapUtils.get(map,"outptVisitDTO")));
     }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.outpt.visit.dto.OutptVisitDTO>
+     * @method selectOutptVisitByCertNo
+     * @author wang'qiao
+     * @date 2022/6/21 21:29
+     * @description 根据证件类型和证件号码 查询信息
+     **/
+    @Override
+    public WrapperResponse<OutptVisitDTO> selectOutptVisitByCertNo(Map<String, Object> map) {
+        return WrapperResponse.success(outptVisitBO.selectOutptVisitByCertNo(MapUtils.get(map, "outptVisitDTO")));
+    }
 }

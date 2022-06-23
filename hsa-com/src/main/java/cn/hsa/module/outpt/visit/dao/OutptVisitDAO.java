@@ -226,4 +226,14 @@ public interface OutptVisitDAO {
     int updateUplod(OutptVisitDTO outptVisitDTO);
 
     int updateOutptVisitUploadFlag(OutptVisitDTO outptVisitDTO);
+
+    /**
+     * @param outptVisitDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.outpt.visit.dto.OutptVisitDTO>
+     * @method selectOutptVisitByCertNo
+     * @author wang'qiao
+     * @date 2022/6/21 21:29
+     * @description 根据证件类型和证件号码 查询信息
+     **/
+    OutptVisitDTO selectOutptVisitByCertNo(OutptVisitDTO outptVisitDTO);
 }

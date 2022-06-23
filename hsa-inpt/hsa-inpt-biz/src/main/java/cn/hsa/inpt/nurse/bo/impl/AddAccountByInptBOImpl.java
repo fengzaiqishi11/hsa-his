@@ -303,26 +303,6 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
 
 
     }
-    /**
-       * 将属性从Map中复制到bean中
-       * @Author: luonianxin
-       * @Email: nianxin.luo@powersi.com
-       * @Date: 2021/5/28 13:57
-    **/
-    private <T> void copyProperties(Map<String,Object> srcParam,T destBean){
-        Set<Map.Entry<String,Object>> entrySet = srcParam.entrySet();
-        for (Map.Entry<String,Object> entry:entrySet){
-            Object value = entry.getValue();
-            if(value != null){
-                try {
-                    org.apache.commons.beanutils.BeanUtils.setProperty(destBean,entry.getKey(),value);
-                } catch (Exception e) {
-                    log.error("从Map{} 复制 到对象 {} 属性{} 错误key{} 异常",
-                            srcParam.getClass(),destBean.getClass(), entry.getKey(),e);
-                }
-            }
-        }
-    }
 
     /**
     * @Menthod checkAddAccountPamar

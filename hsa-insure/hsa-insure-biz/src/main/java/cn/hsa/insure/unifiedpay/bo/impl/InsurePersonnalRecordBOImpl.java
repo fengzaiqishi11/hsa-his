@@ -439,14 +439,21 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         if(ObjectUtil.isEmpty(inptRecordDTO)){
             throw new AppException("未查询到转院备案数据");
         }
+        Map<String,Object> visitMap  = new HashMap<>();
         String hospCode = inptRecordDTO.getHospCode();
-        String orgCode = inptRecordDTO.getInsureRegCode();
-        String regCode = inptRecordDTO.getMdtrtareaAdmdvs();
+        visitMap.put("visitId",inptRecordDTO.getVisitId());
+        visitMap.put("hospCode",hospCode);
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(visitMap);
+        String orgCode = insureIndividualVisitDTO.getMedicineOrgCode();
+        String regCode = insureIndividualVisitDTO.getInsureRegCode();
         InsureConfigurationDTO configurationDTO = new InsureConfigurationDTO();
         configurationDTO.setHospCode(inptRecordDTO.getHospCode());
         configurationDTO.setOrgCode(orgCode);
         configurationDTO.setRegCode(regCode);
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
+        if (configurationDTO == null) {
+            throw new AppException("根据" + orgCode + "医保机构编码获取医保机构配置信息为空");
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
         map.put("regsiterTime",inptRecordDTO.getRegsiterTime());

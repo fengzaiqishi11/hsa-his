@@ -243,7 +243,7 @@ public class OnlinePayController  extends BaseController {
 
 
   /**
-    * @method queryFeeList
+    * @method queryUnsettleList
     * @author wang'qiao
     * @date 2022/6/21 10:30
     *	@description 查询用户院内现在的待缴费费用列表，用于展示给用户进行确认和选择
@@ -257,5 +257,21 @@ public class OnlinePayController  extends BaseController {
 
     param.put("hospCode", sysUserDTO.getHospCode());
     return outptTmakePriceFormService_consumer.queryUnsettleList(param);
+  }
+  /**
+    * @method queryAccount
+    * @author wang'qiao
+    * @date 2022/6/22 14:22
+    *	@description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    * 
+   **/ 
+  @PostMapping("/queryAccount")
+  public WrapperResponse<Map<String, Object>> queryAccount( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+
+    param.put("hospCode", sysUserDTO.getHospCode());
+    return outptTmakePriceFormService_consumer.queryAccount(param);
   }
 }

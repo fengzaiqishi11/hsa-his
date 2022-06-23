@@ -479,4 +479,14 @@ public interface OutptTmakePriceFormBO {
      * @description
      **/
     Map<String, Object> queryUnsettleList(Map map);
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryAccount
+     * @author wang'qiao
+     * @date 2022/6/22 15:10
+     * @description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
+     **/
+    Map<String,Object> queryAccount(Map param);
 }

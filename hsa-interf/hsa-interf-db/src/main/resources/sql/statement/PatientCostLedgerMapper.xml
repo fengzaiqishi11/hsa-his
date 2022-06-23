@@ -3571,7 +3571,7 @@
             <if test="statement == '2'.toString() or statement == '3'.toString()">
                 inpt_settle A
                 inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
-                inner join inpt_cost_settle ics on B.id=ics.cost_id
+                inner join inpt_cost_settle ics on B.id=ics.cost_id and A.id = ics.settle_id
                 inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
                 where
                 A.hosp_code = #{hospCode}

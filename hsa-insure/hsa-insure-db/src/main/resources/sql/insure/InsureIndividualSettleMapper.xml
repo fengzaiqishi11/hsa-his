@@ -1723,4 +1723,17 @@
         where id =#{settleId} and hosp_code =#{hospCode}
     </update>
 
+    <select id="getInsureSettleByVisitId" resultMap="insureIndividualSettleMap"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO">
+        SELECT
+        <include refid="Base_ColumnAlias_List"/>
+        FROM insure_individual_settle iis
+        where
+        iis.hosp_code = #{hospCode} and iis.is_cancel ='0'
+        <if test="visitId != null and visitId != ''">
+            AND iis.visit_id = #{visitId}
+        </if>
+            AND iis.state = '0'
+    </select>
+
 </mapper>

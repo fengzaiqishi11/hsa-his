@@ -11,14 +11,10 @@ import cn.hsa.module.dzpz.hainan.ExtData;
 import cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO;
 import cn.hsa.module.dzpz.hainan.UploadFee;
 import cn.hsa.module.insure.emd.service.OutptElectronicBillService;
-import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
-import cn.hsa.module.insure.module.service.InsureConfigurationService;
-import cn.hsa.module.insure.module.service.InsureIndividualCostService;
-import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
-import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
+import cn.hsa.module.insure.module.service.*;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.module.insure.outpt.service.OutptService;
 import cn.hsa.module.outpt.card.dao.BaseCardRechargeChangeDAO;
@@ -41,6 +37,7 @@ import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO;
 import cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService;
@@ -49,11 +46,13 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +81,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
+
+    private static final String RET_CODE00 = "00";
+    private static final String RET_CODE02 = "02";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -168,12 +170,18 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     SysParameterService sysParameterService;
 
     @Resource
+    private OutptVisitService outptVisitService;
+
+    @Resource
     private BaseCardRechargeChangeDAO baseCardRechargeChangeDAO;
     @Resource
     private BaseCardRechargeChangeService baseCardRechargeChangeService;
 
     @Resource
     private SysParameterService getSysParameterService_consumer;
+
+    @Resource
+    private InsureItemMatchService itemMatchService;
 
 
     /**
@@ -4359,13 +4367,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      */
     @Override
     public Boolean uploadOnlineFeeDetail(Map map) {
+      OnlinePayFeeDTO onlinePayFeeDTO = MapUtils.get(map, "onlinePayFeeDTO");
       String hospCode = map.get("hospCode").toString();
       InsureIndividualVisitDTO insureIndividualVisitDTO = null;
       //判断入参是否传入
-      if (ObjectUtil.isEmpty(map.get("visitId"))) {
+      if (ObjectUtil.isEmpty(onlinePayFeeDTO.getId())) {
         throw new AppException("请传入就诊ID!");
       }
-      String visitId = (String) map.get("visitId");//就诊id
+      //就诊id
+      String visitId = onlinePayFeeDTO.getId();
       Map<String, Object> insureVisitParam = new HashMap<String, Object>();
       insureVisitParam.put("id", visitId);
       insureVisitParam.put("hospCode", hospCode);
@@ -4375,52 +4385,54 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       // 调用 统一支付平台-【6201】费用明细上传
-      insureUnifiedPayOutptService_consumer.UP6201(map);
+      insureUnifiedPayOutptService_consumer.UP6201(map).getData();
       return true;
     }
 
-  /**
-   * 6301-医保订单结算结果查询
-   * @param map
-   * @Author 医保开发二部-湛康
-   * @Date 2022-05-09 15:17
-   * @return cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO
-   */
-  @Override
-  public WrapperResponse queryInsureSetlResult(Map map) {
-    logger.info("UP_6301-页面组合入参map-{}",  JSON.toJSONString(map));
-    String hospCode = map.get("hospCode").toString();
-    //判断入参是否传入
-    SetlResultQueryDTO setlResultQueryDTO = MapUtils.get(map, "setlResultQueryDTO");
-    if (ObjectUtil.isEmpty(setlResultQueryDTO.getVisitId())) {
-      throw new AppException("请传入就诊ID!");
+    /**
+     * 6301-医保订单结算结果查询
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-09 15:17
+     * @return cn.hsa.module.dzpz.hainan.SeltSucCallbackDTO
+     */
+    @Override
+    public WrapperResponse queryInsureSetlResult(Map map) {
+      logger.info("UP_6301-页面组合入参map-{}",  JSON.toJSONString(map));
+      String hospCode = map.get("hospCode").toString();
+      OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+
+      if (ObjectUtil.isEmpty(outptVisitDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      //就诊id
+      String visitId = outptVisitDTO.getVisitId();
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", visitId);
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记。");
+      }
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("outptVisitDTO",outptVisitDTO);
+      // 调用 【6301】医保订单结算结果查询
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6301(map).getData();
+      Map<String, Object> dataMap = MapUtils.get(resultMap, "data");
+      SeltSucCallbackDTO seltSucCallbackDTO = FastJsonUtils.fromJson(FastJsonUtils.toJson(dataMap),
+          SeltSucCallbackDTO.class);
+      //判断是否结算完成，修改结算信息数据
+      Map<String, Object> result =  updateSettleInfo(map,seltSucCallbackDTO);
+      //成功
+      if ("6".equals(MapUtils.get(result, "resultCode"))) {
+        return WrapperResponse.success("支付成功", result);
+      }else{
+        return WrapperResponse.success("支付失败", MapUtils.get(result, "resultCode"));
+      }
+
     }
-    String visitId = setlResultQueryDTO.getVisitId();//就诊id
-    Map<String, Object> insureVisitParam = new HashMap<String, Object>();
-    insureVisitParam.put("id", visitId);
-    insureVisitParam.put("hospCode", hospCode);
-    //医保就医信息
-    InsureIndividualVisitDTO insureIndividualVisitDTO =
-        insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
-    if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
-      throw new AppException("未查找到医保就诊信息，请做医保登记。");
-    }
-    map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-    map.put("setlResultQueryDTO",setlResultQueryDTO);
-    // 调用 【6301】医保订单结算结果查询
-    Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6301(map).getData();
-    Map<String, Object> dataMap = MapUtils.get(resultMap, "data");
-    SeltSucCallbackDTO seltSucCallbackDTO = FastJsonUtils.fromJson(FastJsonUtils.toJson(dataMap),
-        SeltSucCallbackDTO.class);
-    //判断是否结算完成，修改结算信息数据
-    Map<String, Object> result =  updateSettleInfo(map,seltSucCallbackDTO);
-    //成功
-    if ("6".equals(MapUtils.get(result, "resultCode"))) {
-      return WrapperResponse.success("支付成功", result);
-    }else{
-      return WrapperResponse.success("支付失败", MapUtils.get(result, "resultCode"));
-    }
-  }
 
     /**
      * 0	已保存
@@ -4450,9 +4462,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
     private Map<String, Object> updateSettleInfo(Map map,SeltSucCallbackDTO seltSucCallbackDTO){
       //订单状态为6 结算成功才修改信息
       if (ObjectUtil.isNotEmpty(seltSucCallbackDTO.getOrdStas())&&"6".equals(seltSucCallbackDTO.getOrdStas())){
-        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");//获取个人信息
-        OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");//获取结算信息
-        List<OutptPayDO> outptPayDOList = MapUtils.get(map, "outptPayDOList");//支付方式信息
+        //获取个人信息
+        OutptVisitDTO outptVisitDTO = MapUtils.get(map, "outptVisitDTO");
+        //获取结算信息
+        OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");
 
         //参数获取
         String hospCode = outptVisitDTO.getHospCode(); //医院编码
@@ -4460,10 +4473,32 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         String userId = outptVisitDTO.getCrteId(); //当前登录用户id
         String userName = outptVisitDTO.getCrteName(); //当前登录用户姓名
         String depId = outptVisitDTO.getDeptId(); //执行科室
-        String settleId = outptSettleDTO.getId();//结算id
         String code = outptVisitDTO.getCode(); // 操作人编码
         List<Map<String, Object>> outinInvoiceList = null;//返回发票打印的费用统计信息
+        String settleId = SnowflakeUtils.getId();//结算id
 
+        //先判断是否已经调用过接口，并返回成功，则不再更新表操作
+        OutptSettleDTO outptSettleDTO1 = new OutptSettleDTO();
+        outptSettleDTO1.setHospCode(outptVisitDTO.getHospCode());
+        outptSettleDTO1.setVisitId(visitId);
+        Map<String, Object> settleMap = new HashMap<>();
+        settleMap.put("id", settleId);
+        settleMap.put("hospCode", outptVisitDTO.getHospCode());
+        List<OutptSettleDTO> list = outptSettleDAO.findByCondition(outptSettleDTO1);
+        if (CollectionUtil.isNotEmpty(list)){
+          JSONObject result = new JSONObject();
+          result.put("outptVisit", outptVisitDTO);//个人信息
+          result.put("settleNo", list.get(0).getSettleNo());
+          result.put("resultCode","6");
+          return result;
+          /*if ("1".equals(dto.getIsSettle())){
+            JSONObject result = new JSONObject();
+            result.put("outptVisit", outptVisitDTO);//个人信息
+            result.put("settleNo", dto.getSettleNo());
+            result.put("resultCode","6");
+            return result;
+          }*/
+        }
         //发票制单
         saveInvoiceInfo(outptSettleDTO);
 
@@ -4474,7 +4509,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         List<OutptCostDTO> costDTOList = updateMedicApply(outptVisitDTO,settleId);
 
         //保存支付方式（结算）
-        saveOnlineOutptPays(outptPayDOList, outptVisitDTO, settleId);
+        saveOnlineOutptPays( outptVisitDTO, settleId,seltSucCallbackDTO);
+
+        //更新费用表结算ID  settleId
+        updateCostSettleId(costDTOList,settleId);
 
         // 生成领药申请单，校验库存、领药申请单明细
         Map<String, Object> queryParam = new HashMap<String, Object>();
@@ -4494,7 +4532,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         outptCostDAO.editCostSettleCodeByIDS(costParam);
 
         // 7、 修改门诊结算表此次结算信息状态 结算后需要将结算单号返回给前端
-        String settleNo = updateSettleStatus(settleId,outptVisitDTO);
+        String settleNo = updateSettleStatus(settleId,outptVisitDTO,seltSucCallbackDTO);
 
         // 8、 修改处方表结算信息
         List<String> outptPrescribeIds = (List<String>) tempMap.get("outptPrescribeIds");
@@ -4514,24 +4552,149 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         }
 
         // 10、 取最佳领药窗口，生成领药申请单（主单），保存领药申请单与领药申请单详单
-        List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList =
-            (List<PharOutReceiveDetailDO>) tempMap.get("pharOutReceiveDetailDOList");
-        Map<String, Map<String, Object>> pharOutReceiveMap =
-            (Map<String, Map<String, Object>>) tempMap.get("pharOutReceiveMap");
+        List<PharOutReceiveDetailDO> pharOutReceiveDetailDOList = (List<PharOutReceiveDetailDO>) tempMap.get("pharOutReceiveDetailDOList");
+        Map<String, Map<String, Object>> pharOutReceiveMap = (Map<String, Map<String, Object>>) tempMap.get("pharOutReceiveMap");
         this.savePharOutReceive(hospCode, visitId, depId, userId, userName, settleId,
             pharOutReceiveMap, costDTOList, pharOutReceiveDetailDOList);
-        checkUseInvoice(outptSettleDTO.getIsInvoice(),outptVisitDTO);
+
+        // 11.修改医保结算表， 插入门诊医保明细
+        updateInsureSettle(settleId,outptVisitDTO,seltSucCallbackDTO);
+
+        //12
+        Map<String, Object> outInvoiceParam = new HashMap<String, Object>();
+        outInvoiceParam.put("hospCode", hospCode);
+        OutinInvoiceDTO outinInvoiceDTO1 = new OutinInvoiceDTO();
+        outinInvoiceDTO1.setHospCode(hospCode);//医院编码
+        outinInvoiceDTO1.setInvoiceType(Constants.PJLX.MZ);//发票类型 = 门诊
+        outinInvoiceDTO1.setSettleId(settleId);//结算id
+        outInvoiceParam.put("outinInvoiceDTO", outinInvoiceDTO1);
+        outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
+        outptVisitDTO.setReceiveName(outinInvoiceDTO.getReceiveName());
+        outptVisitDTO.setPrefix(outinInvoiceDTO.getPrefix());
+        // 发票不分单返回发票号
+        outptVisitDTO.setInvoiceNo(outinInvoiceDTO.getCurrNo());
+
+        JSONObject result = new JSONObject();
+        result.put("outptVisit", outptVisitDTO);//个人信息
+        result.put("outinInvoice", outinInvoiceList);//费用统计信息
+        result.put("outinInvoiceDTO", outinInvoiceDTO);//费用统计信息
+        result.put("settleNo", settleNo);
+        result.put("resultCode","6");
+        return result;
+      }else{
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("resultCode",seltSucCallbackDTO.getOrdStas());
+        return result;
       }
+    }
 
-      // 13、 将优惠发票总金额返回给前端（优惠后总金额）
-      /*outptVisitDTO.setRealityPrice(realityPrice);
-      outinInvoiceList = outinInvoiceService.queryItemInfoByParams(outInvoiceParam).getData();
+    /**
+     *  更新费用表结算ID  settleId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-24 10:01
+     * @return void
+     */
+    private void updateCostSettleId(List<OutptCostDTO> costDTOList,String settleId){
+      outptCostDAO.updateCostSettleId(settleId,  costDTOList);
+    }
 
-      outptVisitDTO.setReceiveName(outinInvoiceDTO.getReceiveName());
-      outptVisitDTO.setPrefix(outinInvoiceDTO.getPrefix());
-      // 发票不分单返回发票号
-      outptVisitDTO.setInvoiceNo(outinInvoiceDTO.getCurrNo());*/
-      return null;
+    /**
+     * 修改医保结算表 insure_individual_settle；结算状态 = 结算
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 10:04
+     * @return void
+     */
+    private void updateInsureSettle(String settleId, OutptVisitDTO outptVisitDTO,SeltSucCallbackDTO seltSucCallbackDTO){
+      //获取医保结算信息
+      /*Map<String, Object> individualSettleParam = new HashMap<String, Object>();
+      individualSettleParam.put("hospCode", outptVisitDTO.getHospCode());
+      InsureIndividualSettleDTO insureIndividualSettleDTO = new InsureIndividualSettleDTO();
+      insureIndividualSettleDTO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+      insureIndividualSettleDTO.setVisitId(outptVisitDTO.getId());//就诊id
+      insureIndividualSettleDTO.setSettleId(settleId);//结算id
+      individualSettleParam.put("insureIndividualSettleDTO", insureIndividualSettleDTO);
+      insureIndividualSettleDTO = insureIndividualSettleService.findByCondition(individualSettleParam);
+      if (insureIndividualSettleDTO == null) {
+        throw new AppException("未获取到医保结算信息，请联系管理员。");
+      }*/
+
+      InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
+      insureIndividualVisitDTO.setVisitId(outptVisitDTO.getVisitId());
+      insureIndividualVisitDTO.setHospCode(outptVisitDTO.getHospCode());
+      Map<String,Object> visitMap = new HashMap<>();
+      visitMap.put("hospCode",outptVisitDTO.getHospCode());
+      visitMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      insureIndividualVisitDTO =  insureIndividualVisitService_consumer.selectInsureInfo(visitMap).getData();
+      if(insureIndividualVisitDTO == null){
+        throw new AppException("根据就诊未查询到医保就诊登记信息");
+      }
+      //查询医保机构信息
+      Map<String, Object> configurationParam = new HashMap<String, Object>();
+      configurationParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+      InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+
+      insureConfigurationDTO.setHospCode(outptVisitDTO.getHospCode());
+      insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode()); //医疗机构编码
+      configurationParam.put("insureConfigurationDTO", insureConfigurationDTO);
+      List<InsureConfigurationDTO> insureConfigurationDTOS = insureConfigurationService.queryAll(configurationParam).getData();
+      if (insureConfigurationDTOS == null || insureConfigurationDTOS.isEmpty()) {
+        throw new AppException("未找到医保配置信息。");
+      }
+      insureConfigurationDTO = insureConfigurationDTOS.get(0);
+      //门诊医保明细 outpt_insure_pay
+      OutptInsurePayDO outptInsurePayDO = new OutptInsurePayDO();
+      outptInsurePayDO.setId(SnowflakeUtils.getId());//id
+      outptInsurePayDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+      outptInsurePayDO.setSettleId(settleId);//结算id
+      outptInsurePayDO.setVisitId(outptVisitDTO.getId());//就诊id
+      outptInsurePayDO.setTypeCode(null);//合同单位明细代码
+      outptInsurePayDO.setOrgNo(insureConfigurationDTO.getOrgCode());//医保机构编码
+      outptInsurePayDO.setOrgName(insureConfigurationDTO.getName());//医保机构名称
+      outptInsurePayDO.setTotalPrice(seltSucCallbackDTO.getFundPay());//医保报销总金额
+      outptInsurePayDAO.insertSelective(outptInsurePayDO);
+
+      // 更新门诊结算表的个人账户支付
+      OutptSettleDO outptSettleDO = new OutptSettleDO();
+      outptSettleDO.setHospCode(outptVisitDTO.getHospCode());
+      outptSettleDO.setId(settleId);
+      outptSettleDO.setAcctPay(seltSucCallbackDTO.getPsnAcctPay());
+      outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);
+
+      //插入医保结算表 insure_individual_settle
+      InsureIndividualSettleDO insureIndividualSettleDO = new InsureIndividualSettleDO();
+      insureIndividualSettleDO.setId(SnowflakeUtils.getId());//主键
+      insureIndividualSettleDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+      insureIndividualSettleDO.setVisitId(outptVisitDTO.getId());//就诊id
+      insureIndividualSettleDO.setSettleId(settleId);//结算id
+      insureIndividualSettleDO.setIsHospital(Constants.SF.F);//是否住院（SF）
+      insureIndividualSettleDO.setVisitNo(outptVisitDTO.getVisitNo());//就诊登记号
+      insureIndividualSettleDO.setDischargeDnCode(null);//出院疾病诊断编码
+      insureIndividualSettleDO.setInsureOrgCode(insureConfigurationDTO.getCode());//医保机构编码
+      insureIndividualSettleDO.setInsureRegCode(insureConfigurationDTO.getRegCode());//医保注册编码
+      insureIndividualSettleDO.setMedicineOrgCode(insureConfigurationDTO.getOrgCode());//医疗机构编码
+      insureIndividualSettleDO.setSettleway(Constants.JSFS.PTJS);//结算方式,01 普通结算,02 包干结算
+      insureIndividualSettleDO.setBeforeSettle(null);//结算前账户余额 todo
+      insureIndividualSettleDO.setLastSettle(null);//结算后账户余额
+      insureIndividualSettleDO.setState(Constants.ZTBZ.ZC);//状态标志,0正常，2冲红，1，被冲红
+      insureIndividualSettleDO.setSettleState(Constants.YBJSZT.JS);//医保结算状态;0试算，1结算
+      insureIndividualSettleDO.setAka130(insureIndividualVisitDTO.getAka130());//业务类型
+      insureIndividualSettleDO.setBka006(insureIndividualVisitDTO.getBka006());//待遇类型
+      insureIndividualSettleDO.setIsAccount(BigDecimalUtils.isZero(seltSucCallbackDTO.getPsnAcctPay()) ? Constants.SF.F :
+          Constants.SF.S);//当前结算是否使用个人账户;0是，1否
+      insureIndividualSettleDO.setRemark(seltSucCallbackDTO.getRevsToken());//备注
+      insureIndividualSettleDO.setCrteId(outptVisitDTO.getCrteId());//创建人ID
+      insureIndividualSettleDO.setCrteName(outptVisitDTO.getCrteName());//创建人姓名
+      insureIndividualSettleDO.setCrteTime(new Date());//创建时间
+      // 处理金额
+      insureIndividualSettleDO.setTotalPrice(seltSucCallbackDTO.getFeeSumamt());// 本次医疗总费用
+      insureIndividualSettleDO.setInsurePrice(seltSucCallbackDTO.getFundPay());//医保支付
+      insureIndividualSettleDO.setPlanPrice(seltSucCallbackDTO.getFundPay());//统筹基金支付  todo
+      insureIndividualSettleDO.setPersonalPrice(seltSucCallbackDTO.getPsnAcctPay());//个人账户支付
+      Map<String, Object> insureSettleParam = new HashMap<String, Object>();
+      insureSettleParam.put("hospCode", outptVisitDTO.getHospCode());//医院编码
+      insureSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
+      insureIndividualSettleService.insertSelective(insureSettleParam);
+
     }
 
     /**
@@ -4540,32 +4703,41 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @Date 2022-05-13 10:39
      * @return void
      */
-    private String updateSettleStatus(String settleId, OutptVisitDTO outptVisitDTO){
-      OutptSettleDO outptSettleDO = new OutptSettleDO();//修改参数
-      BigDecimal realityPrice = new BigDecimal(0);
-      BigDecimal cardPrice = new BigDecimal(0);
+    private String updateSettleStatus(String settleId, OutptVisitDTO outptVisitDTO,SeltSucCallbackDTO seltSucCallbackDTO){
+      // 生成结算数据，保存门诊结算表
+      OutptSettleDO outptSettleDO = new OutptSettleDO();
+      outptSettleDO.setId(settleId);//id
+      outptSettleDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+      outptSettleDO.setVisitId(outptVisitDTO.getId());//就诊id
+      outptSettleDO.setSettleNo(getOrderNo(outptVisitDTO.getHospCode(), Constants.ORDERRULE.JZ));//结算单号
+      outptSettleDO.setPatientCode(outptVisitDTO.getPatientCode());//病人类型
+      outptSettleDO.setSettleTime(new Date());//结算时间
+      outptSettleDO.setTotalPrice(seltSucCallbackDTO.getFeeSumamt());//总金额
+      outptSettleDO.setRealityPrice(seltSucCallbackDTO.getFeeSumamt());//优惠后总金额
+      outptSettleDO.setTruncPrice(seltSucCallbackDTO.getFeeSumamt());//舍入金额（存在正负金额）
+      outptSettleDO.setActualPrice(null);//实收金额
+      outptSettleDO.setSelfPrice(new BigDecimal(0));// 个人自付金额减去舍人金额
+      outptSettleDO.setMiPrice(seltSucCallbackDTO.getFundPay());//统筹支付金额 医保基金支付
+      outptSettleDO.setIsSettle(Constants.SF.S);//是否结算（SF）
+      outptSettleDO.setDailySettleId(null);//日结缴款ID
+      outptSettleDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志代码（ZTBZ）;正常
+      outptSettleDO.setRedId(null);//冲红ID
+      outptSettleDO.setIsPrint(Constants.SF.F);//是否打印（SF）;否
+      outptSettleDO.setOldSettleId(null);//原结算ID
+      outptSettleDO.setIsPrintList(Constants.SF.F);//是否打印清单（SF）
+      outptSettleDO.setPrintListTime(null);//清单打印时间
+      outptSettleDO.setSourcePayCode("4");//支付来源代码（ZFLY，第三方对接） //4 移动支付
+      outptSettleDO.setOrderNo(seltSucCallbackDTO.getPayOrdId());//支付订单号（第三方订单号）
+      outptSettleDO.setCrteId(outptVisitDTO.getCrteId());//创建人id
+      outptSettleDO.setCrteName(outptVisitDTO.getCrteName());//创建人名称
+      outptSettleDO.setCrteTime(new Date());//创建时间
+      outptSettleDO.setOneSettleId(settleId); // 记录下第一次结算id
+      // 保存门诊结算（试算）费用信息
+      outptSettleDAO.insertSelective(outptSettleDO);
       outptSettleDO.setId(settleId);//结算id
       SysParameterDO sysParameterDO = getSysParameter(outptVisitDTO.getHospCode(), Constants.HOSPCODE_DISCOUNTS_KEY);
-      //获取当前医院优惠配置
-      BigDecimal ssje = new BigDecimal(0);
-      if (outptVisitDTO.getTfcsMark() != null && "tfcs".equals(outptVisitDTO.getTfcsMark())) {
-        ssje = BigDecimalUtils.subtract(realityPrice, outptVisitDTO.getTruncPrice());
-      } else {
-        ssje = BigDecimalUtils.subtract(realityPrice, BigDecimalUtils.rounding(sysParameterDO.getValue(), realityPrice));
-      }
-      outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
-      outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
-      outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
-      outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
-      outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
 
-      // 7.1 结算后需要将结算单号返回给前端
-      Map<String, Object> settleMap = new HashMap<>();
-      settleMap.put("id", settleId);
-      settleMap.put("hospCode", outptVisitDTO.getHospCode());
-      OutptSettleDTO dto = outptSettleDAO.getById(settleMap);
-      String settleNo = dto.getSettleNo();
-      return settleNo;
+      return outptSettleDO.getSettleNo();
     }
 
     /**
@@ -4574,22 +4746,18 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @Date 2022-05-12 20:58
      * @return void
      */
-    private void saveOnlineOutptPays(List<OutptPayDO> outptPayDOList,OutptVisitDTO outptVisitDTO, String settleId){
+    private void saveOnlineOutptPays(OutptVisitDTO outptVisitDTO, String settleId,SeltSucCallbackDTO seltSucCallbackDTO){
       List<OutptPayDO> outptPayDOS = new ArrayList<OutptPayDO>();
-      BigDecimal actualPrice = new BigDecimal(0);
-      if (outptPayDOList != null && !outptPayDOList.isEmpty()) {
-        for (OutptPayDO outptPayDO : outptPayDOList) {
-          if (StringUtils.isNotEmpty(outptPayDO.getPayCode()) && outptPayDO.getPrice() != null) {
-            outptPayDO.setId(SnowflakeUtils.getId());//id
-            outptPayDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
-            outptPayDO.setSettleId(settleId);//结算id
-            outptPayDO.setVisitId(outptVisitDTO.getVisitId());//就诊id
-            outptPayDO.setServicePrice(outptPayDO.getServicePrice() != null ? outptPayDO.getServicePrice() : new BigDecimal(0));//手续费
-            actualPrice = BigDecimalUtils.add(actualPrice, outptPayDO.getPrice());
-            outptPayDOS.add(outptPayDO);
-          }
-        }
-      }
+
+      OutptPayDO outptPayDO = new OutptPayDO();
+      outptPayDO.setId(SnowflakeUtils.getId());//id
+      outptPayDO.setHospCode(outptVisitDTO.getHospCode());//医院编码
+      outptPayDO.setSettleId(settleId);//结算id
+      outptPayDO.setVisitId(outptVisitDTO.getVisitId());//就诊id
+      outptPayDO.setPayCode("9");   //9：移动支付
+      outptPayDO.setServicePrice( new BigDecimal(0));//手续费
+      outptPayDO.setOrderNo(seltSucCallbackDTO.getPayOrdId());
+      outptPayDOS.add(outptPayDO);
       //批量保存结算信息
       if (!ListUtils.isEmpty(outptPayDOS)) {
         outptPayDAO.batchInsertOutptPay(outptPayDOS);
@@ -4603,13 +4771,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
      * @return void
      */
     private List<OutptCostDTO> updateMedicApply(OutptVisitDTO outptVisitDTO,String settleId){
-      Map<String, Object> param = new HashMap<String, Object>();
-      //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
-      param.put("hospCode", outptVisitDTO.getHospCode());//hospCode（医院编码）
-      param.put("statusCode", Constants.ZTBZ.ZC);//statusCode（状态标志 = 正常）
-      param.put("settleCode", Constants.JSZT.YUJS);//settleCode（结算状态 = 已结算）
-      param.put("settleId", settleId);//settleId（结算id）
-      List<OutptCostDTO> outptCostDTOList = outptCostDAO.queryBySettleId(param);
+      List<OutptCostDTO> outptCostDTOList = outptVisitDTO.getOutptCostDTOList();
       if (!ListUtils.isEmpty(outptCostDTOList)) {
         outptCostDAO.updateMedicApply(outptVisitDTO.getId(), outptVisitDTO.getHospCode(), "02", outptCostDTOList);
       }
@@ -4715,72 +4877,498 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }
     }
 
-  /**
-   * 6203-医保退费
-   * @param map
-   * @Author 医保开发二部-湛康
-   * @Date 2022-05-16 16:00
-   * @return java.lang.Boolean
-   */
-  @Override
-  public Boolean insureRefund(Map map) {
-    logger.info("UP_6203-页面入参map-{}",  JSON.toJSONString(map));
-    //医院编码
-    String hospCode = map.get("hospCode").toString();
-    //个人基本信息
-    OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");
-    if (ObjectUtil.isEmpty(outptSettleDTO.getVisitId())) {
-      throw new AppException("请传入就诊ID!");
-    }
-    if (ObjectUtil.isEmpty(outptSettleDTO.getId())) {
-      throw new AppException("请传入结算编号!");
-    }
-    //查询医保就诊信息
-    Map<String, Object> insureVisitParam = new HashMap<String, Object>();
-    insureVisitParam.put("id", outptSettleDTO.getVisitId());
-    insureVisitParam.put("hospCode", hospCode);
-    //医保就医信息
-    InsureIndividualVisitDTO insureIndividualVisitDTO =
-        insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
-    if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
-      throw new AppException("未查找到医保就诊信息，请做医保登记！");
-    }
-    if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
-      throw new AppException("未找到支付订单号，请先上传费用！");
-    }
-    InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
-    settleDTO.setVisitId(outptSettleDTO.getVisitId());
-    settleDTO.setHospCode(hospCode);
-    settleDTO.setSettleId(outptSettleDTO.getId());
-    settleDTO.setState("0");
-    Map<String, Object> dataMap = new HashMap<>();
-    dataMap.put("hospCode", hospCode);
-    dataMap.put("insureIndividualSettleDTO", settleDTO);
-    settleDTO = insureIndividualSettleService.findByCondition(dataMap);
-    //判断医保结算信息
-    if (ObjectUtil.isEmpty(settleDTO)){
-      throw new AppException("未查找到医保结算信息，请做医保结算！");
-    }
-    map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-    map.put("insureIndividualSettleDTO",settleDTO);
-    Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6203(map).getData();
-    logger.info("UP_6203-医保接口出参map-{}",  JSON.toJSONString(resultMap));
-    Map<String, Object> data = MapUtils.get(resultMap, "code");
-    //判断退费成功，删除本地表数据 0：成功
-    if ("SUCC".equals(MapUtils.get(data, "refStatus"))){
+    /**
+     * 6203-医保退费
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-16 16:00
+     * @return java.lang.Boolean
+     */
+    @Override
+    public Boolean insureRefund(Map map) {
+      logger.info("UP_6203-页面入参map-{}",  JSON.toJSONString(map));
+      //医院编码
+      String hospCode = map.get("hospCode").toString();
+      //个人基本信息
+      OutptSettleDTO outptSettleDTO = MapUtils.get(map, "outptSettleDTO");
+      if (ObjectUtil.isEmpty(outptSettleDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      if (ObjectUtil.isEmpty(outptSettleDTO.getId())) {
+        throw new AppException("请传入结算编号!");
+      }
+      //查询医保就诊信息
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", outptSettleDTO.getVisitId());
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记！");
+      }
+      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+        throw new AppException("未找到支付订单号，请先上传费用！");
+      }
+      InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+      settleDTO.setVisitId(outptSettleDTO.getVisitId());
+      settleDTO.setHospCode(hospCode);
+      settleDTO.setSettleId(outptSettleDTO.getId());
+      settleDTO.setState("0");
+      Map<String, Object> dataMap = new HashMap<>();
+      dataMap.put("hospCode", hospCode);
+      dataMap.put("insureIndividualSettleDTO", settleDTO);
+      settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+      //判断医保结算信息
+      if (ObjectUtil.isEmpty(settleDTO)){
+        throw new AppException("未查找到医保结算信息，请做医保结算！");
+      }
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("insureIndividualSettleDTO",settleDTO);
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.UP6203(map).getData();
+      logger.info("UP_6203-医保接口出参map-{}",  JSON.toJSONString(resultMap));
+      Map<String, Object> data = MapUtils.get(resultMap, "code");
+      //判断退费成功，删除本地表数据 0：成功
+      if ("SUCC".equals(MapUtils.get(data, "refStatus"))){
 
-      Map map1 = new HashMap();
-      map1.put("payToken", "");
-      map1.put("payOrdId", "");
-      map1.put("hospCode", hospCode);
-      map1.put("visitId", outptSettleDTO.getVisitId());
-      // 删除his的医保费用表数据
-      outptSettleDAO.deleteInsureCost(map);
-      outptSettleDAO.updateIndividualVisitToken(map);
-      //todo 结算表状态
-      return true;
-    }else{
-      throw new AppException("医保退费失败！");
+        Map map1 = new HashMap();
+        map1.put("payToken", "");
+        map1.put("payOrdId", "");
+        map1.put("hospCode", hospCode);
+        map1.put("visitId", outptSettleDTO.getVisitId());
+        // 删除his的医保费用表数据
+        outptSettleDAO.deleteInsureCost(map);
+        outptSettleDAO.updateIndividualVisitToken(map);
+        //todo 结算表状态 删除结算表数据
+        outptSettleDAO.deleteById(outptSettleDTO.getId());
+        //医保结算表删除数据
+        Map<String, String> delIndividualSettleParam = new HashMap<String, String>();
+        delIndividualSettleParam.put("hospCode", hospCode);//医院编码
+        delIndividualSettleParam.put("visitId", outptSettleDTO.getVisitId());//就诊id
+        delIndividualSettleParam.put("settleState", Constants.YBJSZT.JS);//结算标志 = 结算
+        insureIndividualSettleService.delInsureIndividualSettleByVisitId(delIndividualSettleParam);
+        return true;
+      }else{
+        throw new AppException("医保退费失败！");
+      }
     }
-  }
+
+  /**
+   * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+   * @param map
+   * @return
+   */
+    @Override
+    public Map<String, Object> ampRefund(Map map) {
+      //医院编码
+      String hospCode = map.get("hospCode").toString();
+      SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+      if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+        throw new AppException("请传入就诊ID!");
+      }
+      if (ObjectUtil.isEmpty(setlRefundQueryDTO.getSettleId())) {
+        throw new AppException("请传入结算ID!");
+      }
+      //查询医保就诊信息
+      Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+      insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+      insureVisitParam.put("hospCode", hospCode);
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+      if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+        throw new AppException("未查找到医保就诊信息，请做医保登记！");
+      }
+      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+        throw new AppException("未找到支付订单号，请先上传费用！");
+      }
+      //判断是否已医保结算
+      InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+      settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
+      settleDTO.setHospCode(hospCode);
+      settleDTO.setSettleId(setlRefundQueryDTO.getSettleId());
+      settleDTO.setState("0");
+      Map<String, Object> dataMap = new HashMap<>();
+      dataMap.put("hospCode", hospCode);
+      dataMap.put("insureIndividualSettleDTO", settleDTO);
+      settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+      //判断医保结算信息
+      if (ObjectUtil.isEmpty(settleDTO)){
+        throw new AppException("未查找到医保结算信息，请先做医保结算！");
+      }
+      //接口调用
+      map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
+      map.put("insureIndividualSettleDTO",settleDTO);
+      Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();
+      return resultMap;
+    }
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:48
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> querySettleResult(Map map) {
+      Map<String, Object> responseMap = new HashMap<>();
+      if (ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_type"))||ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_no"))){
+        responseMap.put("ret_code",RET_CODE02);
+        responseMap.put("ret_msg","必传参数未传!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }
+      Map<String, Object> param = new HashMap<>();
+      param.put("hospCode",MapUtils.get(map, "hospCode"));
+      param.put("mdtrtCertType",MapUtils.get(map, "mdtrt_cert_type"));
+      param.put("mdtrtCertNo",MapUtils.get(map, "mdtrt_cert_no"));
+      //医保就医信息
+      InsureIndividualVisitDTO insureIndividualVisitDTO =
+          insureIndividualVisitService_consumer.getInsureIndividualVisitByMdtrtCertNo(param);
+      if (ObjectUtil.isEmpty(insureIndividualVisitDTO)){
+        responseMap.put("ret_code",RET_CODE02);
+        responseMap.put("ret_msg","未查询到就医信息!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }
+      //根据就诊ID获取最新一条结算信息
+      param.put("visitId",insureIndividualVisitDTO.getVisitId());
+      InsureIndividualSettleDTO insureIndividualSettleDTO =
+          insureIndividualSettleService.getInsureSettleByVisitId(param);
+      if (ObjectUtil.isEmpty(insureIndividualSettleDTO)){
+        responseMap.put("ret_code",RET_CODE00);
+        responseMap.put("ret_msg","查询成功,未查到院内结算信息!");
+        responseMap.put("result","fail");
+        return responseMap;
+      }else{
+        responseMap.put("ret_code",RET_CODE00);
+        responseMap.put("ret_msg","查询成功!");
+        responseMap.put("result","succ");
+        return responseMap;
+      }
+    }
+
+    /**
+     * @param map
+     * @return java.lang.Boolean
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/15 13:54
+     * @description 医疗消息推送
+     **/
+    @Override
+    public WrapperResponse AMP_HOS_001(Map map) {
+        //医院编码
+        String hospCode = map.get("hospCode").toString();
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+            throw new AppException("请传入就诊ID!");
+        }
+        //查询医保就诊信息
+        Map<String, Object> insureVisitParam = new HashMap<>();
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+        insureVisitParam.put("hospCode", hospCode);
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记！");
+        }
+        //查询门诊费用
+        WrapperResponse wrapperResponse = queryOutptCostList(map);
+        JSONObject obj = (JSONObject) wrapperResponse.getData();
+        //处方费用信息
+        List outptCostDTOList = (List) obj.get("outptCost");
+        //诊断信息
+        List outptDiagnoseDTOList = (List) obj.get("outptDiagnose");
+
+        //接口调用
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        map.put("outptCostDTOList", outptCostDTOList);
+        map.put("outptDiagnoseDTOList", outptDiagnoseDTOList);
+
+        return insureUnifiedPayOutptService_consumer.AMP_HOS_001(map);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method refundInquiry
+     * @author wang'qiao
+     * @date 2022/6/20 14:45
+     * @description 查询退款结果（AMP_HOS_003）
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> map) {
+        //医院编码
+        String hospCode = map.get("hospCode").toString();
+        SetlRefundQueryDTO setlRefundQueryDTO = MapUtils.get(map, "setlRefundQueryDTO");
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getVisitId())) {
+            throw new AppException("请传入就诊ID!");
+        }
+        if (ObjectUtil.isEmpty(setlRefundQueryDTO.getSettleId())) {
+            throw new AppException("请传入结算ID!");
+        }
+        //查询医保就诊信息
+        Map<String, Object> insureVisitParam = new HashMap<String, Object>();
+        insureVisitParam.put("id", setlRefundQueryDTO.getVisitId());
+        insureVisitParam.put("hospCode", hospCode);
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitById(insureVisitParam);
+        if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
+            throw new AppException("未查找到医保就诊信息，请做医保登记！");
+        }
+        if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+            throw new AppException("未找到支付订单号，请先上传费用！");
+        }
+        //判断是否已医保结算
+        InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
+        settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
+        settleDTO.setHospCode(hospCode);
+        settleDTO.setSettleId(setlRefundQueryDTO.getSettleId());
+        settleDTO.setState("0");
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("hospCode", hospCode);
+        dataMap.put("insureIndividualSettleDTO", settleDTO);
+        settleDTO = insureIndividualSettleService.findByCondition(dataMap);
+        //判断医保结算信息
+        if (ObjectUtil.isEmpty(settleDTO)) {
+            throw new AppException("未查找到医保结算信息，请先做医保结算！");
+        }
+        //接口调用
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        map.put("insureIndividualSettleDTO", settleDTO);
+        Map<String, Object> resultMap = insureUnifiedPayOutptService_consumer.refundInquiry(map).getData();
+        return WrapperResponse.success(resultMap);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map) {
+        return insureUnifiedPayOutptService_consumer.reconciliationDocument(map);
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    @Override
+    public Map<String, Object> queryUnsettleList(Map map) {
+        Map<String, Object> responseMap = new HashMap<>();
+        if (ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_type")) || ObjectUtil.isEmpty(MapUtils.get(map, "mdtrt_cert_no")) || ObjectUtil.isEmpty(MapUtils.get(map, "org_code"))) {
+            responseMap.put("ret_code", RET_CODE02);
+            responseMap.put("ret_msg", "必传参数未传!");
+            responseMap.put("result", "fail");
+            return responseMap;
+        }
+        Map<String, Object> param = new HashMap<>();
+        param.put("hospCode", MapUtils.get(map, "hospCode"));
+        param.put("mdtrtCertType", MapUtils.get(map, "mdtrt_cert_type"));
+        param.put("mdtrtCertNo", MapUtils.get(map, "mdtrt_cert_no"));
+        // 收费批次号
+        String chrgBchno = SnowflakeUtils.getId();
+        OutptVisitDTO outptVisitDTO = null;
+        //医保就医信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO =
+                insureIndividualVisitService_consumer.getInsureIndividualVisitByMdtrtCertNo(param);
+        Map params = new HashMap();
+        //如果医保就诊信息不为空则直接用visit_id 查即可
+        if(ObjectUtil.isNotEmpty(insureIndividualVisitDTO)){
+            //门诊病人信息查询
+            params.put("id", insureIndividualVisitDTO.getVisitId());
+            params.put("hospCode", MapUtils.get(map, "hospCode"));
+            outptVisitDTO = outptVisitService.queryByVisitID(params);
+        }else {
+            //如果医保就诊信息为空则 使用certNo查询门诊病人信息
+            OutptVisitDTO outptVisit = new OutptVisitDTO();
+            outptVisit.setCertNo(MapUtils.get(map, "mdtrt_cert_no"));
+            outptVisit.setCertCode(MapUtils.get(map, "mdtrt_cert_type"));
+            param.put("outptVisitDTO", outptVisit);
+            outptVisitDTO = outptVisitService.selectOutptVisitByCertNo(param).getData();
+        }
+        if(ObjectUtil.isEmpty(outptVisitDTO)){
+            responseMap.put("ret_code", RET_CODE02);
+            responseMap.put("ret_msg", "未查询到就医信息!");
+            responseMap.put("result", "fail");
+            return responseMap;
+        }
+        //根据就诊ID获取最新一条结算信息
+        param.put("visitId", outptVisitDTO.getVisitId());
+        param.put("hospCode", MapUtils.get(map, "hospCode"));
+        //查询门诊费用
+        WrapperResponse wrapperResponse = queryOutptCostList(param);
+        JSONObject obj = (JSONObject) wrapperResponse.getData();
+        BigDecimal medfeeSumamt = new BigDecimal(0);
+        //诊断明细
+        List<JSONObject> diaglist = new ArrayList<>();
+        //处方明细
+        List<JSONObject> rxlist = new ArrayList<>();
+        //处方费用信息
+        List<OutptCostDTO> outptCostDTOList = (List) obj.get("outptCost");
+        List<OutptDiagnoseDTO> outptDiagnoseDTOList = (List) obj.get("outptDiagnose");
+        // 组装处方明细
+        for (OutptCostDTO outptCostDTO : outptCostDTOList) {
+            medfeeSumamt = medfeeSumamt.add(outptCostDTO.getLastRealityPrice());
+            InsureItemMatchDTO insureItemMatchDTO = new InsureItemMatchDTO();
+            insureItemMatchDTO.setHospCode(MapUtils.get(map, "hospCode"));
+            insureItemMatchDTO.setHospItemId(outptCostDTO.getItemCode());
+            List<InsureItemMatchDTO> insureItemMatchDTOS = itemMatchService.queryByHospItemId(insureItemMatchDTO);
+            JSONObject outptJsonObject = new JSONObject() {{
+                put("chrg_bchno", chrgBchno); //“收费批次号”
+                put("rx_no", outptCostDTO.getOpdId()); //“处方号”
+                put("rx_circ_flag", null); //“外购处方标志”
+                put("feedetl_sn", outptCostDTO.getId()); //“费用明细流水号”
+                put("drord_no", null); //“医嘱号”
+                put("med_list_codg", outptCostDTO.getInsureItemCode()); //“医疗目录编码”
+                put("medins_list_codg", outptCostDTO.getHospItemCode()); //“医药机构目录编码”
+                put("pric", outptCostDTO.getPrice()); //“项目单价”
+                put("cnt", outptCostDTO.getNum()); //“项目数量”
+                put("det_item_fee_sumamt", outptCostDTO.getRealityPrice()); //“明细项目费用总额”
+                put("used_frqu_dscr", outptCostDTO.getRateId()); //“使用频次描述”
+                put("sin_dos_dscr", outptCostDTO.getDosage()); //“单次剂量描述”
+                put("prd_days", outptCostDTO.getUseDays()); //“周期天数”
+                put("medc_way_dscr", outptCostDTO.getUsageCode()); //“用药途径描述”
+                put("fee_ocur_time", outptCostDTO.getCrteTime()); //“费用发生时间”
+                put("bilg_dr_name", outptCostDTO.getDoctorName()); //“开单医师姓名”
+                put("bilg_dr_codg", outptCostDTO.getDoctorId()); //“开单医生编码”
+                put("orders_dr_code", null); //“受单医生编码”
+                put("orders_dr_name", null); //“受单医生姓名”
+                put("bilg_dept_codg", outptCostDTO.getDeptId()); //“开单科室编码”
+                put("bilg_dept_name", outptCostDTO.getDeptName()); //开单科室名称
+                put("acord_dept_codg", null); //受单科室编码
+                put("acord_dept_name", null); //受单科室名称
+                put("prod_barc", null); //商品条形编码
+                put("hosp_appr_flag", null); //医院审批标志
+                put("tcmdrug_used_way", outptCostDTO.getUseCode()); //中药使用方式
+                put("etip_flag", null); //外检标志
+                put("etip_hosp_code", null); //外检医院编码
+                put("dscg_tkdrug_flag",null); //出院带药标志
+                put("matn_fee_flag",null); //生育费用标志
+                put("item_name", outptCostDTO.getItemName()); //项目名称
+                put("invo_item_no", SnowflakeUtils.getId()); //发票项目编码
+                put("hi_item", insureItemMatchDTOS.get(0).getIsMatch()); //是否医保项目
+                put("item_emp", insureItemMatchDTOS.get(0).getInsureItemUnitCode()); //项目单位
+                put("item_spec", insureItemMatchDTOS.get(0).getInsureItemSpec()); //项目规格
+                put("dos_form", insureItemMatchDTOS.get(0).getInsureItemPrepCode()); //剂型
+                put("emp_medc_emp", insureItemMatchDTOS.get(0).getInsureItemSpec()); //单位用药单位
+                put("drug_to_int", outptCostDTO.getTotalNum()); //取药总量
+                put("drug_to_int_emp", insureItemMatchDTOS.get(0).getInsureItemUnitCode()); //取药总量单位
+                put("drug_cnt_days", outptCostDTO.getUseDays()); //药量天数
+                put("drug_medc_way_code", null); //给药途径编码
+            }};
+            rxlist.add(outptJsonObject);
+        }
+        // 组装诊断明细
+        for (OutptDiagnoseDTO outptDiagnoseDTO : outptDiagnoseDTOList) {
+            JSONObject outptJsonObject = new JSONObject(){{
+               put("diag_type", outptDiagnoseDTO.getTypeCode());   //诊断类别
+               put("diag_srt_no",null);  //诊断排序号
+               put("diag_code", outptDiagnoseDTO.getDiseaseCode());  //诊断代码
+               put("diag_name", outptDiagnoseDTO.getDiseaseName());  //诊断名称
+               put("diag_dept", outptDiagnoseDTO.getDeptName());  //诊断科室
+               put("diag_dept_name", outptDiagnoseDTO.getDeptName());  //诊断科室名称
+               put("dise_dor_no", outptDiagnoseDTO.getDoctorId());  //诊断医生编码
+               put("dise_dor_name", outptDiagnoseDTO.getDoctorName());  //诊断医生姓名
+               put("diag_time", DateUtils.format(outptDiagnoseDTO.getCrteTime(),DateUtils.Y_M_DH_M_S)); //诊断时间（yyyy-MM-dd HH:mm:ss）
+               put("vali_flag", outptDiagnoseDTO.getIsValid());  //有效标志
+               put("maindiag_flag", outptDiagnoseDTO.getIsMain());  //主诊断标志
+            }};
+            diaglist.add(outptJsonObject);
+        }
+        //待结算列表
+        List<JSONObject> unsettlelist = new ArrayList<>();
+        BigDecimal finalMedfeeSumamt = medfeeSumamt;
+        OutptVisitDTO finalOutptVisitDTO = outptVisitDTO;
+        JSONObject unsettle = new JSONObject(){{
+            put("org_trace_no",RET_CODE00);  //机构跟踪号
+            put("doc_trace_no","查询成功");  //单据流水号
+            put("ipt_otp_no",null);  //院内门诊号/住院号
+            put("ipt_no", null);  //住院号
+            // 如果医保就诊信息为空则 患者是自费病人
+            if(ObjectUtil.isEmpty(insureIndividualVisitDTO)){
+                put("patient_type", "00");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
+            }else {
+                put("patient_type", "01");  //患者费别00 自费 01 医保 为空时候使用查询账户信息时候的费别
+            }
+            put("mdtrt_cert_type", MapUtils.get(map, "mdtrt_cert_type"));  //就诊凭证类型
+            put("mdtrt_cert_no", MapUtils.get(map, "mdtrt_cert_no"));  //就诊凭证编号
+            put("cert_no", finalOutptVisitDTO.getCertNo());  //证件号
+            put("psn_name", finalOutptVisitDTO.getName());  //姓名
+            put("gend", finalOutptVisitDTO.getGenderCode());  //性别
+            put("age", finalOutptVisitDTO.getAge());  //年龄
+            put("mdtrt_id", insureIndividualVisitDTO.getVisitId());  //门诊/住院流水号(医保门诊挂号/入院办理返回的就诊id)
+            put("dise_codg", null);  //特殊病种的编码
+            put("dise_name", null);  //特殊病种名称
+            put("dept_name", finalOutptVisitDTO.getDeptName());  //科室名称
+            put("dept_code", finalOutptVisitDTO.getDeptId());  //科室编码
+            put("caty", finalOutptVisitDTO.getDeptName());  //科室编码
+            put("atddr_no", finalOutptVisitDTO.getDoctorId());  //医生编码
+            put("dr_name", finalOutptVisitDTO.getDoctorName());  //医生姓名
+            put("chfpdr_no", finalOutptVisitDTO.getDoctorId());  //主治医生编码
+            put("chfpdr_name", finalOutptVisitDTO.getDoctorName());  //主诊医师姓名
+            put("adm_diag_dscr",null);  //入院诊断描述（住院不可空）
+            put("adm_dept_codg",null);  //入院科室编码（住院不可空）
+            put("adm_dept_name",null);  //入院科室名称（住院不可空）
+            put("adm_bed",null);  //入院床位（住院不可空）
+            put("dscg_maindiag_code",null); //住院主诊断代码
+            put("dscg_maindiag_name",null); //住院主诊断名称
+            put("oprn_oprt_code",null); //手术操作代码
+            put("oprn_oprt_name",null); //手术操作名称
+            put("medfee_sumamt", finalMedfeeSumamt.toString()); //医疗费总额
+            put("psn_setlway",null); //个人结算方式
+            put("acct_used_flag",null); //个人账户使用标志
+            put("invono",null); //发票号
+            put("fulamt_ownpay_amt",null); //全自费金额
+            put("overlmt_selfpay",null); //超限价金额
+            put("preselfpay_amt",null); //先行自付金额
+            put("inscp_scp_amt",null); //符合政策范围金额
+            put("mid_setl_flag",null); //中途结算标志
+            put("med_type",insureIndividualVisitDTO.getAka130Name()); //医疗类别
+            put("fpsc_no",null); //计划生育服务证号
+            put("birctrl_type",null); //计划生育手术类别
+            put("matn_type",null); //生育类别
+            put("fetus_cnt",null); //胎儿数
+            put("birctrl_matn_date",null); //计划生育手术或生育日期
+            put("latechb_flag",null); //晚育标志
+            put("geso_val",null); //孕周数
+            put("fetts",null); //胎次
+            put("pret_flag",null); //早产标志
+            put("dise_type_code",null); //病种类型
+            put("begn_time",null); //就诊时间(yyyyMMddHHmmss)
+            put("dscg_way",null); //离院方式
+            put("cop_flag",null); //伴有并发症标志
+            put("dscg_dept_codg",null); //出院科室编码
+            put("dscg_dept_name",null); //出院科室名称
+            put("dscg_bed",null); //出院床位
+            put("die_date",null); //死亡日期
+            put("main_cond_dscr",null); //主要病情描述
+            put("insu_code",null); //参保人所在统筹区编码
+            put("chrg_bchno", chrgBchno); //“收费批次号”
+            put("psn_no",null); //人员编码
+            put("insu_type",null); //险种类型
+            put("medrcdno",null); //病历号
+
+            put("diaglist", diaglist); //诊断明细
+            put("rxlist", rxlist); //处方明细
+
+        }};
+        unsettlelist.add(unsettle);
+        responseMap.put("ret_code", RET_CODE00);
+        responseMap.put("ret_msg", "查询成功");
+        responseMap.put("unsettlelist", unsettlelist);
+        return responseMap;
+    }
 }

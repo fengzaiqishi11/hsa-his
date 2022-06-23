@@ -279,5 +279,14 @@ public interface InsureIndividualSettleDAO {
      * @Return
     **/
     BigDecimal selectTotalAdvance(Map<String, Object> map);
+
+    /**
+     * 根据就诊ID获取最新一条结算信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-17 8:50
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO
+     */
+    InsureIndividualSettleDTO getInsureSettleByVisitId(Map<String, Object> map);
 }
 

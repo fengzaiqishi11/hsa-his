@@ -217,4 +217,16 @@ public class InsureIndividualSettleServiceImpl extends HsafService implements In
         return WrapperResponse.success(insureIndividualSettleBO.selectInsureIndividualSettleById(map));
     }
 
+    /**
+     * 根据就诊ID获取最新一条结算信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-17 8:44
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO
+     */
+    @Override
+    public InsureIndividualSettleDTO getInsureSettleByVisitId(Map<String, Object> map) {
+      return insureIndividualSettleBO.getInsureSettleByVisitId(map);
+    }
+
 }

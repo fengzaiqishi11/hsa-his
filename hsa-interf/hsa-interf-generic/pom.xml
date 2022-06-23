@@ -20,12 +20,11 @@
 
     <dependencies>
 
+        <!--动态数据源-->
         <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
         </dependency>
-
         <dependency>
             <groupId>cn.hsa.interf</groupId>
             <artifactId>hsa-interf-biz</artifactId>

@@ -327,4 +327,14 @@ public interface InsureItemMatchDAO {
      * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
      */
     List<InsureItemMatchDTO> selectItemsByParams(Map selectMap);
+
+    /**
+     * @param itemMatchDTO
+     * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
+     * @method queryByHospItemId
+     * @author wang'qiao
+     * @date 2022/6/21 21:28
+     * @description 根据hospItemId查询项目信息
+     **/
+    List<InsureItemMatchDTO> queryByHospItemIdIsItemId(InsureItemMatchDTO itemMatchDTO);
 }

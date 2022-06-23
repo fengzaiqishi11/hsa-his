@@ -5,10 +5,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.module.bo.impl.InsureIndividualVisitBOImpl;
-import cn.hsa.insure.util.BaseReqUtil;
-import cn.hsa.insure.util.BaseReqUtilFactory;
-import cn.hsa.insure.util.Constant;
-import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.*;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -99,6 +96,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private Transpond transpond;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -194,13 +194,73 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","就诊信息查询");
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5201, paramMap,map);
-        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
-        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "mdtrtinfo");
+        map.put("regCode",insureIndividualVisitDTO.getInsureRegCode());
+
+        String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> outptMap = new HashMap<>();
+        List<Map<String, Object>> resultDataMap = new ArrayList<>();
+
+        //2022-06-17 zhangjinping 需要做判断是调省工伤医保还是通过云助手调医保
+        String medType = MapUtils.get(map,"medType");
+        if(Constant.UnifiedPay.YWLX.GSMZ.equals(medType)){//业务类型为41，工伤门诊
+           resultDataMap =  transpond.to(hospCode,insureRegCode, Constant.HuNanSheng.OUTPT.BIZC200102,map);
+        }else {
+            //调用统一支付平台公共接口方法
+           resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5201, paramMap, map);
+           outptMap = MapUtils.get(resultMap, "output");
+           resultDataMap = MapUtils.get(outptMap, "mdtrtinfo");
+        }
         map.put("resultDataMap", resultDataMap);
         return map;
     }
 
+    public Map<String, Object> commonInsureUnified(String hospCode, String orgCode, String functionCode, Map<String, Object> paramMap,Map<String,Object> logParamMap) throws Exception {
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(orgCode);
+        insureConfigurationDTO.setIsValid(Constants.SF.S);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(insureConfigurationDTO ==null){
+            throw new AppException("查询医保机构配置信息为空");
+        }
+        Map httpParam = new HashMap();
+        httpParam.put("infno", functionCode);  //交易编号
+        if(StringUtils.isEmpty(MapUtils.get(paramMap,"insuplcAdmdvs"))){
+            httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        }else{
+            httpParam.put("insuplc_admdvs", MapUtils.get(paramMap,"insuplcAdmdvs")); //参保地医保区划分
+            MapUtils.remove(paramMap,"insuplcAdmdvs");
+        }
+        httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
+        httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
+        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        httpParam.put("input", paramMap);
+        String json = JSONObject.toJSONString(httpParam);
+        logger.info("调用功能号【" + functionCode + "】的入参为" + json);
+        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        logParamMap.put("medisCode",insureConfigurationDTO.getOrgCode());
+        logParamMap.put("paramMapJson",json);
+        logParamMap.put("msgId",msgId);
+        logParamMap.put("msgInfo",functionCode);
+        logParamMap.put("resultStr",resultJson);
+        insureUnifiedLogService_consumer.insertInsureFunctionLog(logParamMap);
+        MapUtils.remove(logParamMap,"msgName");
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问工伤医保请求地址");
+        }
+        logger.info("调用功能号【" + functionCode + "】的反参为" + resultJson);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap = HygeiaUtil.xml2map(resultJson);
+      /*  Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);*/
+        int errortype = Integer.parseInt((String) resultMap.get("errortype"));
+        if (errortype != 0){
+            throw new   AppException("【" + resultMap.get("errorno") + "】" +  resultMap.get("errormessage"));
+        }
+        return resultMap;
+    }
 
     /**
      * @Method queryDiagnoseInfo

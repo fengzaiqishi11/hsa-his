@@ -621,6 +621,7 @@ public interface Constant {
             public static final String SYZY = "52"; // 生育住院
             public static final String JBYLSYZY = "54"; // 基本医疗生育门诊
             public static final String QTSYMZ = "9932"; // 其他生育门诊
+            public static final String GSMZ = "41"; // 工伤门诊
         }
 
 

@@ -101,6 +101,10 @@
         </foreach>
     </update>
 
+    <update id="updateInsureUploadByVisitId" parameterType="java.util.List">
+        update inpt_advice set is_insure_upload = '0' where visit_id = #{visitId}
+    </update>
+
 
 
     <select id="queryInptVisitDisease" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">

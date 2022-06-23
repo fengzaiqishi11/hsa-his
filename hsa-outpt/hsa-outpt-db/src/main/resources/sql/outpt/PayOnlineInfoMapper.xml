@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.outpt.fees.dao.PayOnlineInfoDAO">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" id="payOnlineInfoMap">
+        <result property="id" column="id"/>
+        <result property="visitId" column="visit_id"/>
+        <result property="settleId" column="settle_id"/>
+        <result property="hisCustType" column="his_cust_type"/>
+        <result property="hisCustId" column="his_cust_id"/>
+        <result property="appType" column="app_type"/>
+        <result property="medOrgOrd" column="med_org_ord"/>
+        <result property="subOrgCode" column="sub_org_code"/>
+        <result property="refundReason" column="refund_reason"/>
+        <result property="payOrdId" column="pay_ord_id"/>
+        <result property="orderStatus" column="order_status"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="patientName" column="patient_name"/>
+        <result property="idType" column="id_type"/>
+        <result property="idNo" column="id_no"/>
+        <result property="takeMedicineLoc" column="take_medicine_loc"/>
+        <result property="pushType" column="push_type"/>
+        <result property="scheduledTime" column="scheduled_time"/>
+        <result property="redirectUrl" column="redirect_url"/>
+        <result property="amount" column="amount"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="deptCode" column="dept_code"/>
+        <result property="deptLoc" column="dept_loc"/>
+        <result property="drName" column="dr_name"/>
+        <result property="drLvName" column="dr_lv_name"/>
+        <result property="drLvNo" column="dr_lv_no"/>
+        <result property="waitingNum" column="waiting_num"/>
+        <result property="checkItem" column="check_item"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="ampTraceId" column="amp_trace_id"/>
+        <result property="traceId" column="trace_id"/>
+        <result property="orgTraceNo" column="org_trace_no"/>
+        <result property="redSettleId" column="red_settle_id"/>
+    </resultMap>
+
+    <insert id="insertPayOnlineInfo" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
+        insert into pay_online_info (
+
+                id <!--主键--> ,
+
+
+                visit_id <!--就诊ID--> ,
+
+
+                settle_id <!--结算ID--> ,
+
+
+                his_cust_type <!--和ORG_001的his_cust_list内的his_cust_type是同样的意思--> ,
+
+
+                his_cust_id <!--和ORG_001his_cust_list内的his_cust_type是同样的意思--> ,
+
+
+                app_type <!--应用类型 01 门诊 02 住院 03 挂号 04 线上--> ,
+
+
+                med_org_ord <!--医疗机构的订单号，必填，通过这个单号来回查推送--> ,
+
+
+                sub_org_code <!--内部机构编号，以用来区分分院或者基卫，如果为空则默认为本院该字典需由定点机构提供--> ,
+
+
+                refund_reason <!--只有pushType未支付单，且状态为已退款或已部分退款的时候才需要进行填写--> ,
+
+
+                pay_ord_id <!--省平台订单号，如果自行上传了省医保移动支付中心的情况下才需要进行填写--> ,
+
+
+                order_status <!--pushType类型为HOSPITAL_PAYMENT时必填  MERCHANT_WAIT_PAY 待支付 MERCHANT_PAID 已支付 MERCHANT_PART_REFUNDED 已部分退款 MERCHANT_REFUNDED 已全额退款 MERCHANT_CLOSED 已取消--> ,
+
+
+                org_code <!--机构国家统一编码，必填--> ,
+
+
+                patient_name <!--用户姓名，必填--> ,
+
+
+                id_type <!--用户证件类型，必填--> ,
+
+
+                id_no <!--用户证件号，必填--> ,
+
+
+                take_medicine_loc <!--只有当pushType为医药单，且状态为已支付的情况下才需要填写此取药地址进行取药信息推送--> ,
+
+
+                push_type <!--HOSPITAL_APPOINTMENT 挂号单 HOSPITAL_CHECK检查单 HOSPITAL_MEDICINE医药单 HOSPITAL_PAYMENT支付单--> ,
+
+
+                scheduled_time <!--格式：yyyy-MM-dd HH:mm:ss--> ,
+
+
+                redirect_url <!--当有“自定义页面时”，可进行传入，用户点击详情时将进入此自定义详情--> ,
+
+
+                amount <!--当推送类型为“支付单”时必填，当为“退款通知”时传“退款金额”，待结算或已结算请传“费用总额”--> ,
+
+
+                dept_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                dept_code <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                dept_loc <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                dr_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                dr_lv_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                dr_lv_no <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写--> ,
+
+
+                waiting_num <!--当推送类型是医药单或挂号单时，才需要填写此候诊号，推送提醒用户排队情况--> ,
+
+
+                check_item <!--只有当推送类型是检查单时，才需要填写--> ,
+
+
+                create_time <!--当推送的状态为已支付或已退款或已部分退款类型的状态时候才需要填写--> ,
+
+
+                update_time <!--当推送的状态为已支付或已退款或已部分退款类型的状态时，才需要填写--> ,
+
+
+                amp_trace_id <!--区域平台交易跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到--> ,
+
+
+                trace_id <!--平台结算跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到--> ,
+
+
+                org_trace_no <!--该值与接口ORG_002(查询待结算费用列表与明细) 的返回值org_trace_no一样--> ,
+
+
+                red_settle_id <!--结算退款ID--> 
+
+    )
+        values (
+
+                #{id},
+
+
+                #{visitId},
+
+
+                #{settleId},
+
+
+                #{hisCustType},
+
+
+                #{hisCustId},
+
+
+                #{appType},
+
+
+                #{medOrgOrd},
+
+
+                #{subOrgCode},
+
+
+                #{refundReason},
+
+
+                #{payOrdId},
+
+
+                #{orderStatus},
+
+
+                #{orgCode},
+
+
+                #{patientName},
+
+
+                #{idType},
+
+
+                #{idNo},
+
+
+                #{takeMedicineLoc},
+
+
+                #{pushType},
+
+
+                #{scheduledTime},
+
+
+                #{redirectUrl},
+
+
+                #{amount},
+
+
+                #{deptName},
+
+
+                #{deptCode},
+
+
+                #{deptLoc},
+
+
+                #{drName},
+
+
+                #{drLvName},
+
+
+                #{drLvNo},
+
+
+                #{waitingNum},
+
+
+                #{checkItem},
+
+
+                #{createTime},
+
+
+                #{updateTime},
+
+
+                #{ampTraceId},
+
+
+                #{traceId},
+
+
+                #{orgTraceNo},
+
+
+                #{redSettleId}
+
+        )
+    </insert>
+
+    <select id="selectById" resultMap="payOnlineInfoMap" >
+        select
+        id <!--主键-->,        visit_id <!--就诊ID-->,        settle_id <!--结算ID-->,        his_cust_type <!--和ORG_001的his_cust_list内的his_cust_type是同样的意思-->,        his_cust_id <!--和ORG_001his_cust_list内的his_cust_type是同样的意思-->,        app_type <!--应用类型 01 门诊 02 住院 03 挂号 04 线上-->,        med_org_ord <!--医疗机构的订单号，必填，通过这个单号来回查推送-->,        sub_org_code <!--内部机构编号，以用来区分分院或者基卫，如果为空则默认为本院该字典需由定点机构提供-->,        refund_reason <!--只有pushType未支付单，且状态为已退款或已部分退款的时候才需要进行填写-->,        pay_ord_id <!--省平台订单号，如果自行上传了省医保移动支付中心的情况下才需要进行填写-->,        order_status <!--pushType类型为HOSPITAL_PAYMENT时必填  MERCHANT_WAIT_PAY 待支付 MERCHANT_PAID 已支付 MERCHANT_PART_REFUNDED 已部分退款 MERCHANT_REFUNDED 已全额退款 MERCHANT_CLOSED 已取消-->,        org_code <!--机构国家统一编码，必填-->,        patient_name <!--用户姓名，必填-->,        id_type <!--用户证件类型，必填-->,        id_no <!--用户证件号，必填-->,        take_medicine_loc <!--只有当pushType为医药单，且状态为已支付的情况下才需要填写此取药地址进行取药信息推送-->,        push_type <!--HOSPITAL_APPOINTMENT 挂号单 HOSPITAL_CHECK检查单 HOSPITAL_MEDICINE医药单 HOSPITAL_PAYMENT支付单-->,        scheduled_time <!--格式：yyyy-MM-dd HH:mm:ss-->,        redirect_url <!--当有“自定义页面时”，可进行传入，用户点击详情时将进入此自定义详情-->,        amount <!--当推送类型为“支付单”时必填，当为“退款通知”时传“退款金额”，待结算或已结算请传“费用总额”-->,        dept_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        dept_code <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        dept_loc <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        dr_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        dr_lv_name <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        dr_lv_no <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,        waiting_num <!--当推送类型是医药单或挂号单时，才需要填写此候诊号，推送提醒用户排队情况-->,        check_item <!--只有当推送类型是检查单时，才需要填写-->,        create_time <!--当推送的状态为已支付或已退款或已部分退款类型的状态时候才需要填写-->,        update_time <!--当推送的状态为已支付或已退款或已部分退款类型的状态时，才需要填写-->,        amp_trace_id <!--区域平台交易跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到-->,        trace_id <!--平台结算跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到-->,        org_trace_no <!--该值与接口ORG_002(查询待结算费用列表与明细) 的返回值org_trace_no一样-->,        red_settle_id <!--结算退款ID-->
+        from pay_online_info where
+            id = #{id}
+                                                                                                                                            </select>
+
+    <update id="updateByVisitId" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
+        update pay_online_info set
+               amp_trace_id = #{ampTraceId},
+               trace_id = #{traceId},
+               red_settle_id = #{redSettleId}
+            where
+               visit_id = #{visitId}
+    </update>
+
+    <update id="updateById" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
+        update pay_online_info set
+            if(#{id} != null and #{id} != ''){
+                id = #{id} <!--主键-->,
+            }
+            if(#{visitId} != null and #{visitId} != ''){
+                visit_id = #{visitId} <!--就诊ID-->,
+            }
+            if(#{settleId} != null and #{settleId} != ''){
+                settle_id = #{settleId} <!--结算ID-->,
+            }
+            if(#{hisCustType} != null and #{hisCustType} != ''){
+                his_cust_type = #{hisCustType} <!--和ORG_001的his_cust_list内的his_cust_type是同样的意思-->,
+            }
+            if(#{hisCustId} != null and #{hisCustId} != ''){
+                his_cust_id = #{hisCustId} <!--和ORG_001his_cust_list内的his_cust_type是同样的意思-->,
+            }
+            if(#{appType} != null and #{appType} != ''){
+                app_type = #{appType} <!--应用类型 01 门诊 02 住院 03 挂号 04 线上-->,
+            }
+            if(#{medOrgOrd} != null and #{medOrgOrd} != ''){
+                med_org_ord = #{medOrgOrd} <!--医疗机构的订单号，必填，通过这个单号来回查推送-->,
+            }
+            if(#{subOrgCode} != null and #{subOrgCode} != ''){
+                sub_org_code = #{subOrgCode} <!--内部机构编号，以用来区分分院或者基卫，如果为空则默认为本院该字典需由定点机构提供-->,
+            }
+            if(#{refundReason} != null and #{refundReason} != ''){
+                refund_reason = #{refundReason} <!--只有pushType未支付单，且状态为已退款或已部分退款的时候才需要进行填写-->,
+            }
+            if(#{payOrdId} != null and #{payOrdId} != ''){
+                pay_ord_id = #{payOrdId} <!--省平台订单号，如果自行上传了省医保移动支付中心的情况下才需要进行填写-->,
+            }
+            if(#{orderStatus} != null and #{orderStatus} != ''){
+                order_status = #{orderStatus} <!--pushType类型为HOSPITAL_PAYMENT时必填  MERCHANT_WAIT_PAY 待支付 MERCHANT_PAID 已支付 MERCHANT_PART_REFUNDED 已部分退款 MERCHANT_REFUNDED 已全额退款 MERCHANT_CLOSED 已取消-->,
+            }
+            if(#{orgCode} != null and #{orgCode} != ''){
+                org_code = #{orgCode} <!--机构国家统一编码，必填-->,
+            }
+            if(#{patientName} != null and #{patientName} != ''){
+                patient_name = #{patientName} <!--用户姓名，必填-->,
+            }
+            if(#{idType} != null and #{idType} != ''){
+                id_type = #{idType} <!--用户证件类型，必填-->,
+            }
+            if(#{idNo} != null and #{idNo} != ''){
+                id_no = #{idNo} <!--用户证件号，必填-->,
+            }
+            if(#{takeMedicineLoc} != null and #{takeMedicineLoc} != ''){
+                take_medicine_loc = #{takeMedicineLoc} <!--只有当pushType为医药单，且状态为已支付的情况下才需要填写此取药地址进行取药信息推送-->,
+            }
+            if(#{pushType} != null and #{pushType} != ''){
+                push_type = #{pushType} <!--HOSPITAL_APPOINTMENT 挂号单 HOSPITAL_CHECK检查单 HOSPITAL_MEDICINE医药单 HOSPITAL_PAYMENT支付单-->,
+            }
+            if(#{scheduledTime} != null and #{scheduledTime} != ''){
+                scheduled_time = #{scheduledTime} <!--格式：yyyy-MM-dd HH:mm:ss-->,
+            }
+            if(#{redirectUrl} != null and #{redirectUrl} != ''){
+                redirect_url = #{redirectUrl} <!--当有“自定义页面时”，可进行传入，用户点击详情时将进入此自定义详情-->,
+            }
+            if(#{amount} != null and #{amount} != ''){
+                amount = #{amount} <!--当推送类型为“支付单”时必填，当为“退款通知”时传“退款金额”，待结算或已结算请传“费用总额”-->,
+            }
+            if(#{deptName} != null and #{deptName} != ''){
+                dept_name = #{deptName} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{deptCode} != null and #{deptCode} != ''){
+                dept_code = #{deptCode} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{deptLoc} != null and #{deptLoc} != ''){
+                dept_loc = #{deptLoc} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{drName} != null and #{drName} != ''){
+                dr_name = #{drName} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{drLvName} != null and #{drLvName} != ''){
+                dr_lv_name = #{drLvName} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{drLvNo} != null and #{drLvNo} != ''){
+                dr_lv_no = #{drLvNo} <!--当推送类型是支付单或检查单或挂号单类型时候才需要填写-->,
+            }
+            if(#{waitingNum} != null and #{waitingNum} != ''){
+                waiting_num = #{waitingNum} <!--当推送类型是医药单或挂号单时，才需要填写此候诊号，推送提醒用户排队情况-->,
+            }
+            if(#{checkItem} != null and #{checkItem} != ''){
+                check_item = #{checkItem} <!--只有当推送类型是检查单时，才需要填写-->,
+            }
+            if(#{createTime} != null and #{createTime} != ''){
+                create_time = #{createTime} <!--当推送的状态为已支付或已退款或已部分退款类型的状态时候才需要填写-->,
+            }
+            if(#{updateTime} != null and #{updateTime} != ''){
+                update_time = #{updateTime} <!--当推送的状态为已支付或已退款或已部分退款类型的状态时，才需要填写-->,
+            }
+            if(#{ampTraceId} != null and #{ampTraceId} != ''){
+                amp_trace_id = #{ampTraceId} <!--区域平台交易跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到-->,
+            }
+            if(#{traceId} != null and #{traceId} != ''){
+                trace_id = #{traceId} <!--平台结算跟踪号，在ORG_003接口会写入给到机构，机构需要进行存储，需要进行线上自费退款时会用到-->,
+            }
+            if(#{orgTraceNo} != null and #{orgTraceNo} != ''){
+                org_trace_no = #{orgTraceNo} <!--该值与接口ORG_002(查询待结算费用列表与明细) 的返回值org_trace_no一样-->,
+            }
+            if(#{redSettleId} != null and #{redSettleId} != ''){
+                red_settle_id = #{redSettleId} <!--结算退款ID-->
+            }
+        where
+            id = #{id}
+                                                                                                                                            </update>
+
+    <delete id="deleteById"  >
+        delete pay_online_info where
+                id = #{id}
+                                                                                                                                            </delete>
+</mapper>

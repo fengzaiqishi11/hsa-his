@@ -490,5 +490,14 @@ public interface InsureIndividualVisitDAO {
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
     InsureIndividualVisitDTO queryInsureIndividualVisitByNo(InsureIndividualVisitDTO insureIndividualVisitDTO);
+
+    /**
+     * 根据就诊凭证类型和就诊凭证编号获取医保就诊信息
+     * @param param
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-07 15:12
+     * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map param);
 }
 

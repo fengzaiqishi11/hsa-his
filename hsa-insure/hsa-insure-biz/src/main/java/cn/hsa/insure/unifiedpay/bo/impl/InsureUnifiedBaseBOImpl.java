@@ -1688,6 +1688,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return resultMap;
     }
 
+
+
     /**
      * @param map
      * @Method deleteUnifiedDeptInfo

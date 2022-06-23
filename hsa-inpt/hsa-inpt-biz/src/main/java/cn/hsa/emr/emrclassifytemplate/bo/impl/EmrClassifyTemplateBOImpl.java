@@ -231,16 +231,21 @@ public class EmrClassifyTemplateBOImpl extends HsafBO implements EmrClassifyTemp
                             emrClassifyTemplateDTOS2.subList(0,pointsDataLimit).clear();
                         }
                         if(!ListUtils.isEmpty(emrClassifyTemplateDTOS2)){
-                            emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                            if(emrClassifyTemplateDTOS2!=null&&emrClassifyTemplateDTOS2.size()>0) {
+                                emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                            }
                         }
                     } else {
-                        emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                        if(emrClassifyTemplateDTOS2!=null&&emrClassifyTemplateDTOS2.size()>0) {
+                            emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                        }
                     }
 
 
 
-
-                    emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                    if(emrClassifyTemplateDTOS2!=null&&emrClassifyTemplateDTOS2.size()>0) {
+                        emrClassifyTemplateDAO.updateTemplate(emrClassifyTemplateDTOS2);
+                    }
                 }
             }
             //删除分类表

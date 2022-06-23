@@ -5456,4 +5456,17 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         responseMap.put("his_cust_list", null); //院内卡列表
         return responseMap;
     }
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method rechargeSettle
+     * @author wang'qiao
+     * @date 2022/6/23 15:27
+     * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+     **/
+    @Override
+    public Map<String, Object> rechargeSettle(Map param) {
+        return null;
+    }
 }

@@ -274,4 +274,23 @@ public class OnlinePayController  extends BaseController {
     param.put("hospCode", sysUserDTO.getHospCode());
     return outptTmakePriceFormService_consumer.queryAccount(param);
   }
+  /**
+    * @method rechargeSettle
+    * @author wang'qiao
+    * @date 2022/6/23 15:26
+    *	@description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+    * @param  param, req, res
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+    *
+   **/
+  @PostMapping("/rechargeSettle")
+  public WrapperResponse<Map<String, Object>> rechargeSettle( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+
+    param.put("hospCode", sysUserDTO.getHospCode());
+    return outptTmakePriceFormService_consumer.rechargeSettle(param);
+  }
+
+
+
 }

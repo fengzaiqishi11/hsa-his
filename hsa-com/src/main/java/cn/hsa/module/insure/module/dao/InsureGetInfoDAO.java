@@ -831,4 +831,6 @@ public interface InsureGetInfoDAO {
      * @Param [deptMap]
      **/
     Map<String, Object> querySettleClockMatchByMap(Map<String, Object> deptMap);
+
+    List<Map<String, Object>> selectXyDisease(Map<String, Object> map);
 }

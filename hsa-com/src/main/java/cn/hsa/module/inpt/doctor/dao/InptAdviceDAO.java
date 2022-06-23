@@ -913,6 +913,6 @@ public interface InptAdviceDAO {
      * @param inptAdviceDTO
      * @return
      */
-    List<InptAdviceDTO> getLisOrPacsInptAdviceNew(InptAdviceDTO inptAdviceDTO);
+    List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
 
 }

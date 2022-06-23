@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.drgdip.dao;
 
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 
 import java.util.List;
@@ -65,4 +66,40 @@ public interface DrgDipResultDAO {
       * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
       */
      List<DrgDipResultDO> queryListByVisitIdDesc(DrgDipResultDTO result);
+
+     /**
+      * 质控结果-结算清单
+      * @param result
+      * @Author lhm
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     List<DrgDipResultDTO> queryDrgDipResultSetlinfo(DrgDipResultDTO result);
+
+     /**
+      * 质控结果-病案首页
+      * @param result
+      * @Author lhm
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     List<DrgDipResultDTO> queryDrgDipResultMris(DrgDipResultDTO result);
+
+     /**
+      * 质控结果查询-详细
+      * @param result
+      * @Author lhm
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     DrgDipResultDTO queryDrgDipResultByVisitId(DrgDipResultDTO result);
+
+     /**
+      * 质控结果查询-详细明细
+      * @param result
+      * @Author lhm
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     List<DrgDipResultDetailDTO> queryDrgDipResultById(DrgDipResultDTO result);
 }

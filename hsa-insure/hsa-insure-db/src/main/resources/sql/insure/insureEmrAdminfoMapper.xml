@@ -212,6 +212,7 @@
     AND c.id = t.mib_id
     left join insure_emr_adminfo a on a.mdtrt_sn = e.visit_id
     <where>
+      and e.state = '0'
       <if test="visitDrptId != null and visitDrptId != '' ">
         and t.visit_drpt_id = #{visitDrptId}
       </if>
@@ -241,6 +242,7 @@
       <if test="endTime != null and endTime != ''">
         and date(e.crte_time) &lt;= date(#{endTime})
       </if>
+      group by e.visit_id
     </where>
   </select>
 

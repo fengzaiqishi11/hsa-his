@@ -100,6 +100,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public SysUserDTO getById(SysUserDTO sysUserDTO) {
         SysUserDTO byId = this.sysUserDAO.getById(sysUserDTO);
+        byId.setWhetherPrivateInnerAddress(sysUserDTO.getWhetherPrivateInnerAddress());
         List<SysUserSystemDTO> sysUserSystemDTOS = sysUserDAO.querySysUserSystemAll(byId);
         if (!ListUtils.isEmpty(sysUserSystemDTOS)) {
             try {
@@ -130,7 +131,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
      */
     private void fillPrivateInternetAccessInfo(SysUserDTO byId) {
         // 1.属于内网访问则无需填充多余信息
-        if("true".equals(byId.getWhetherPrivateInnerAddress())){
+        if(Constants.SF.S.equals(byId.getWhetherPrivateInnerAddress())){
             byId.setWhetherEnableReminderBox(Constants.SF.F);
             return;
         }
@@ -144,7 +145,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
         }
         byId.setWhetherEnableReminderBox(reminderParameterDTO.getValue());
         // 3.查询配置的系统参数医保专网地址
-        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,whetherEnableReminderBoxParamName);
+        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,insurePrivateInternetAddressParamName);
         if(null == insureAddressParameterDTO){
             byId.setInsurePrivateInternetAddress("请配置医保专网访问ip地址系统参数：【INSURE_PRIVATE_ADDRESS】的值");
             return;

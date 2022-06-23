@@ -216,6 +216,8 @@
         AND c.id = t.mib_id
         AND c.aae140 IS NOT NULL
         AND e.settle_state = '1'
+        /*是否作废 0表示正常*/
+        AND e.is_cancel = '0'
         AND e.insureSettleId IS NOT NULL
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}
@@ -330,6 +332,7 @@
         AND c.id = t.mib_id
         AND c.aae140 IS NOT NULL
         AND e.settle_state = '1'
+        AND e.is_cancel = '0'
         AND e.insureSettleId IS NOT NULL
         AND e.insure_reg_code = #{insureRegCode}
         AND e.hosp_code = #{hospCode}

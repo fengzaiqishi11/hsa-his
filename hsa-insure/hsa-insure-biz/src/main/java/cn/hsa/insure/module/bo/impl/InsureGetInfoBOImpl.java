@@ -1430,8 +1430,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("acctPay", infoDTO.getAcctPay()); // 个人账户支出
         setlinfo.put("psnCashpay", infoDTO.getPsnCashpay()); // 个人现金支付
         setlinfo.put("hiPaymtd", infoDTO.getHiPaymtd()); // 医保支付方式
-        setlinfo.put("hsorg", ""); // 医保机构经办人
-        setlinfo.put("hsorgOpter", ""); // 医保机构经办人
+        setlinfo.put("hsorg", infoDTO.getHsorg()); // 医保机构经办人
+        setlinfo.put("hsorgOpter", infoDTO.getHosrgOpter()); // 医保机构经办人
         setlinfo.put("medinsFillDept", infoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medinsFillPsn", infoDTO.getMedinsFillPsn()); // 医疗机构填报人
         return setlinfo;
@@ -1794,6 +1794,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> setlinfo = new HashMap<>();
         Map<String, Object> baseInfoMap = handerBaseInfo(map);
         Map<String, Object> mriBaseInfo = handerMriBaseInfo(map);
+        String otpTcmDise = "";
+        List<InptDiagnoseDTO> tcmZyDiagnoseDTOS = insureGetInfoDAO.selectTcmSyndromesMriInptDiagNose(map);
+        if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS) && tcmZyDiagnoseDTOS.size() > 0) {
+            for (InptDiagnoseDTO diagnoseDTO : tcmZyDiagnoseDTOS) {
+                if ("1".equals(diagnoseDTO.getIsMain())) {
+                    otpTcmDise = diagnoseDTO.getDiseaseName();
+                }
+            }
+        }
+
         if (MapUtils.isEmpty(baseInfoMap)) {
             throw new AppException("结算清单的基本信息数据为空，请先维护数据");
         }
@@ -1834,7 +1844,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("fixmedinsName", MapUtils.get(setlinfoMap, "fixmedins_name")); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", insureIndividualVisitDTO.getMedicineOrgCode()); // 定点医药机构编号
         map.put("code", "SETTLELEVEL");
-        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(map).getData();
+        SysParameterDTO data = insureGetInfoDAO.getParameterByCode(hospCode,"SETTLELEVEL");
         if (data == null) {
             throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
         }
@@ -1947,7 +1957,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("admWay", MapUtils.getMapVS(mriBaseInfo, "in_way", MapUtils.get(baseInfoMap, "adm_way"))); // 入院途径 *******
         setlinfo.put("trtType", "1"); // 治疗类别
         setlinfo.put("admTime", MapUtils.get(baseInfoMap, "inTime")); // 入院时间 *******
-
         String refldeptDept = selectRefldeptDept(map);
         setlinfo.put("refldeptDept", refldeptDept); // 转科科别
         setlinfo.put("dscgTime", MapUtils.get(baseInfoMap, "out_time")); // 出院时间 *******
@@ -1957,7 +1966,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("otpWmDise", MapUtils.getMapVS(mriBaseInfo, "disease_icd10_name", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断名称 *******
         setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(mriBaseInfo, "disease_icd10", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断编码 *******
         setlinfo.put("wmDiseCcode", ""); // 西医诊断疾病代码 *******
-        setlinfo.put("otpTcmDise", ""); // 门（急）诊中医诊断 *******
+        setlinfo.put("otpTcmDise", otpTcmDise); // 门（急）诊中医诊断 *******
         setlinfo.put("tcmDiseCode", ""); // 中医诊断代码 *******
         setlinfo.put("diagCodeCnt", MapUtils.get(map, "diseaseCount")); // 诊断代码计数 *******
         setlinfo.put("oprnOprtCodeCnt", MapUtils.get(map, "operCount")); // 手术操作代码计数 *******
@@ -1985,7 +1994,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("bldCat", null); //输血品种
         setlinfo.put("bldAmt", null); //输血量
         setlinfo.put("bldUnt", null); //输血计量单位
-
         setlinfo.put("spgaNurscareDays", MapUtils.get(baseInfoMap, "spgaNurscareDays")); // 特级护理天数 *******
         setlinfo.put("lv1NurscareDays", MapUtils.get(baseInfoMap, "lv1NurscareDays")); // 一级护理天数 *******
         setlinfo.put("scdNurscareDays", MapUtils.get(baseInfoMap, "scdNurscareDays")); // 二级护理天数 *******

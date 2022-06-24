@@ -1,7 +1,6 @@
 package cn.hsa.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import com.linuxense.javadbf.DBFDataType;
-import com.linuxense.javadbf.DBFException;
 import com.linuxense.javadbf.DBFField;
 import com.linuxense.javadbf.DBFWriter;
 

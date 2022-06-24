@@ -293,7 +293,7 @@
             and iib.aka130_name  like concat('%',#{businessType},'%')
         </if>
         <if test="queryType != null and queryType == '2'.toString() ">
-            <![CDATA[ and  iic.aka130 = <> '41' ]]>
+            <![CDATA[ and iic.aka130 <> '41' ]]>
         </if>
         <!--疾病名称-->
         <if test="diseaseName != null and diseaseName !=''">

@@ -1562,7 +1562,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
         // 入参封装
         Map<String, Object> inputMap = new HashMap<>();
-        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+        if (StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("43"))|| attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.GS) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
             BaseDeptDTO deptDTO = deptDTOList.get(0);
             // 设置上传状态未已上传
             deptDTO.setIsUpload(Constants.SF.S); // 已上传

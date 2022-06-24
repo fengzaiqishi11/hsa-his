@@ -1798,6 +1798,13 @@
           and mid.hosp_code = #{hospCode}
     </select>
 
+    <select id="getParameterByCode" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select
+        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from sys_parameter
+        where is_valid='1' and hosp_code=#{hospCode} and code=#{code}
+    </select>
+
     <!-- 根据主键删除表信息 -->
     <delete id="deleteByVisitID" parameterType="java.lang.String">
         DELETE

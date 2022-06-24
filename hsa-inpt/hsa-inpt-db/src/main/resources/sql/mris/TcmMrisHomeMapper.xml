@@ -890,7 +890,8 @@
             a.contact_name as contactName,
             a.contact_rela_code as contactRelaCode,
             a.contact_address as contactAddress,
-            a.contact_phone as contactPhone
+            a.contact_phone as contactPhone,
+            a.total_in_count as inCnt
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

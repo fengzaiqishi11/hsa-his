@@ -69,15 +69,18 @@ public class CenterInsureAuthorizationController {
         return centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(map);
     }
 
-    @GetMapping("/insertAuthorization/{hospCode}/{orderTypeCode}")
-    public WrapperResponse<CenterFunctionAuthorizationDO>  insertAuthorization(@PathVariable("hospCode") String hospCode,@PathVariable("orderTypeCode") String orderTypeCode){
+    @GetMapping("/insertAuthorization/{hospCode}/{orderTypeCode}/{startDate}/{endDate}")
+    public WrapperResponse<CenterFunctionAuthorizationDO>  insertAuthorization(@PathVariable("hospCode") String hospCode,@PathVariable("orderTypeCode") String orderTypeCode,
+                                                                               @PathVariable("startDate") String startDate,@PathVariable("endDate") String endDate){
 
         Map<String,Object> map = new HashMap<>();
         map.put("hospCode", "0001");
         map.put("orderTypeCode", "1");
         CenterFunctionAuthorizationDO authorizationDO = new CenterFunctionAuthorizationDO();
-        authorizationDO.setStartDate(DateUtils.parse("2022-06-14 00:00:00",DateUtils.Y_M_DH_M_S));
-        authorizationDO.setEndDate(DateUtils.parse("2023-06-15 00:00:00",DateUtils.Y_M_DH_M_S));
+        String defaultStartDate = "2022-06-14";
+        String defaultEndDate = "2023-06-15";
+        authorizationDO.setStartDate(DateUtils.parse(startDate==null?defaultStartDate:startDate,DateUtils.Y_M_D));
+        authorizationDO.setEndDate(DateUtils.parse(endDate==null?defaultEndDate:endDate,DateUtils.Y_M_D));
         authorizationDO.setAuditId("1");
         authorizationDO.setAuditName("admin");
         authorizationDO.setAuditStatus("1");

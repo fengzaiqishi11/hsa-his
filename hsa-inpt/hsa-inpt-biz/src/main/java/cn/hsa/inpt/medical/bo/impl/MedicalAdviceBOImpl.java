@@ -1520,6 +1520,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptCostDTO.setNum(baseAssistCalcDetailDO.getNum());
                 //inptCostDTO.setNumUnitCode(itemDTO.getUnitCode());
                 inptCostDTO.setId(SnowflakeUtils.getId());
+                inptCostDTO.setAdvanceId(medicalAdviceDTO.getSfTqly());
                 //用法
                 inptCostDTO.setUsageCode(usageCode);
                 inptCostDTO.setHospCode(medicalAdviceDTO.getHospCode());
@@ -1961,6 +1962,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             return null;
         }
         InptCostDTO inptCostDTO = new InptCostDTO();
+        inptCostDTO.setAdvanceId(medicalAdviceDTO.getSfTqly());
         //用量单位和数量不变
         inptCostDTO.setNum(inptAdviceDetailDTO.getNum());
         inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
@@ -2396,6 +2398,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         }
 
         waitReceiveDTO.setId(SnowflakeUtils.getId());
+        waitReceiveDTO.setAdvanceId(inptCostDTO.getAdvanceId());
         waitReceiveDTO.setHospCode(inptCostDTO.getHospCode());
         waitReceiveDTO.setAdviceId(adviceDTO.getId());
         waitReceiveDTO.setGroupNo(adviceDTO.getGroupNo()==null?"":adviceDTO.getGroupNo().toString());
@@ -2880,13 +2883,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (hour <= 0) {
             hour = 1;
         }
-
+        String advanceId = medicalAdviceDTO.getSfTqly();
         for (int i=0;i<dailyTimes;i++) {
             if (i < execDTOListNum) {
                 continue;
             }
             InptAdviceExecDTO InptAdviceExecDTO = new InptAdviceExecDTO();
             InptAdviceExecDTO.setId(SnowflakeUtils.getId());
+            InptAdviceExecDTO.setAdvanceId(advanceId);
             InptAdviceExecDTO.setHospCode(inptAdviceDTO.getHospCode());
             InptAdviceExecDTO.setAdviceId(inptAdviceDTO.getId());
             //医嘱明细ID

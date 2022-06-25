@@ -345,4 +345,9 @@ public class InptCostDO extends PageDO implements Serializable {
      * 费用类型标识
      */
     private String attributionCode;
+
+    /**
+     * 提前领药ID
+     */
+    private String advanceId;
 }

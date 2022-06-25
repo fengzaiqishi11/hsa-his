@@ -92,49 +92,10 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     String hospCode = MapUtils.get(map, "hospCode");
     String id = MapUtils.get(map, "id");
     String deptId = MapUtils.get(map, "deptId");
-
-    Map adviceMap = new HashMap();
-    adviceMap.put("deptId",deptId);
-    adviceMap.put("hospCode", hospCode);
-    adviceMap.put("typeCode", id);
     String key = hospCode + deptId + "_MEDICALADVICE";
     try {
       if(!redisUtils.setIfAbsent(key,deptId,600)) {
         throw new AppException("有人正在进行预配药,请稍后再试!");
-      }
-      List<InptAdviceDTO> inptAdviceDTOList = inptAdviceDAO.queryInptAdviceAdvanceTake(adviceMap);
-      if(!ListUtils.isEmpty(inptAdviceDTOList)){
-        List<String> adviceIds = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).distinct().collect(Collectors.toList());
-        TransactionStatus status = null;
-        try{
-          // 开启独立新事务
-          DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-          def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-          status = transactionManager.getTransaction(def);
-          //根据提前领药天数,跑一遍长期费用接口
-          MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
-          medicalAdviceDTO.setHospCode(hospCode);
-          medicalAdviceDTO.setDeptId(deptId);
-          medicalAdviceDTO.setCheckTime(DateUtils.getNow());
-          medicalAdviceDTO.setCheckName(MapUtils.getVS(map,"crteName",""));
-          medicalAdviceDTO.setCheckId(MapUtils.getVS(map,"crteId",""));
-          medicalAdviceDTO.setSfTqly("1");
-          medicalAdviceDTO.setIds(adviceIds);
-          adviceMap.put("medicalAdviceDTO", medicalAdviceDTO);
-          MedicalAdviceBO bean = SpringUtils.getBean(MedicalAdviceBO.class);
-          bean.modifyLongCost(medicalAdviceDTO);
-          medicalAdviceService_consumer.longCost(adviceMap);
-          //回写提前领药天数为0
-          adviceMap.put("advanceDays", "0");
-          saveAdvanceTakeMedicine(adviceMap,"ypy");
-          // 提交独立事务
-          transactionManager.commit(status);
-        }catch (RuntimeException e){
-          if (status != null) {
-            transactionManager.rollback(status);
-          }
-          throw new RuntimeException("提前领药异常，原因："+e.getMessage());
-        }
       }
       Map baseOrderReceiveMap = new HashMap();
       BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
@@ -684,45 +645,91 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       //9.是否按病人
       parmMap.put("isPatient",baseOrderReceiveDTO.getIsPatient());
 
-      List <String> adviceIds = inptAdviceDAO.selectAdviceByDeptAndType(parmMap);
-      if(ListUtils.isEmpty(adviceIds)){
+      List <InptAdviceDTO> inptAdviceDTOS = inptAdviceDAO.selectAdviceByDeptAndType(parmMap);
+      if(ListUtils.isEmpty(inptAdviceDTOS)){
         throw new RuntimeException("没有需要提前领药的数据!");
       }
-      //新增提前领药记录
-      map.put("id",SnowflakeUtils.getId());
-      map.put("typeCode",advanceType);
-      map.put("sfpy","0");
-      inptAdviceDAO.insertMedicineAdvance(map);
-      Map<String, Object> paramMap = null ;
-      if(!ListUtils.isEmpty(adviceIds)){
-        List<Map<String,Object>> mapList = new ArrayList<>();
-        for (String adviceId: adviceIds){
-          paramMap = new HashMap<>();
-          paramMap.put("id",SnowflakeUtils.getId());
-          paramMap.put("advance_id",MapUtils.get(map,"id",""));
-          paramMap.put("advice_id",adviceId);
-          paramMap.put("hosp_code",hospCode);
-          mapList.add(paramMap);
-        }
-        //新增关联表
-        inptAdviceDAO.insertMedicineAdvanceAdvice(mapList);
-        //修改医嘱提前领药天数
-        inptAdviceDAO.updateAdvanceDays(adviceIds,days);
-      }
-    }
-    //预配药修改状态
-    else{
 
-      //修改医嘱提前领药天数
-      MedicalAdviceDTO medicalAdviceDTO = MapUtils.get(map,"medicalAdviceDTO");
-      List<String> adviceIds = medicalAdviceDTO.getIds();
-      List<List<String>>  groupedList = splitList(adviceIds,50);
-      for(List<String> subList : groupedList){
-        inptAdviceDAO.updateAdvanceDaysLastExcTime(subList,"0");
-      }
-      //修改提前领药记录
-      map.put("sfpy", Constants.SF.S);
-      inptAdviceDAO.updateMedicineAdvance(map);
+
+      TransactionStatus status = null;
+      try{
+        // 开启独立新事务
+        DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+        def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        status = transactionManager.getTransaction(def);
+        //新增提前领药记录
+        map.put("id",SnowflakeUtils.getId());
+        map.put("typeCode",advanceType);
+        map.put("sfpy","0");
+        inptAdviceDAO.insertMedicineAdvance(map);
+        Map<String, Object> paramMap = null ;
+        if(!ListUtils.isEmpty(inptAdviceDTOS)){
+          List<Map<String,Object>> mapList = new ArrayList<>();
+          for (InptAdviceDTO adviceDTO: inptAdviceDTOS){
+            paramMap = new HashMap<>();
+            paramMap.put("id",SnowflakeUtils.getId());
+            paramMap.put("advance_id",MapUtils.get(map,"id",""));
+            paramMap.put("advice_id",adviceDTO.getId());
+            paramMap.put("hosp_code",hospCode);
+            paramMap.put("last_exec_time",adviceDTO.getLastExecTime());
+            paramMap.put("this_exec_time",map.get("endDate"));
+
+            mapList.add(paramMap);
+          }
+          //新增关联表
+          inptAdviceDAO.insertMedicineAdvanceAdvice(mapList);
+          //修改医嘱提前领药天数
+          inptAdviceDAO.updateAdvanceDays(inptAdviceDTOS,days);
+        }
+
+
+        //---------------------------------------------
+        if(!ListUtils.isEmpty(inptAdviceDTOS)){
+          List <String> adviceIds = inptAdviceDTOS.stream().map(InptAdviceDTO::getId).collect(Collectors.toList());
+          Map adviceMap = new HashMap();
+          adviceMap.put("deptId",deptId);
+          adviceMap.put("hospCode", hospCode);
+          adviceMap.put("typeCode", advanceType);
+            //根据提前领药天数,跑一遍长期费用接口
+            MedicalAdviceDTO medicalAdviceDTO = new MedicalAdviceDTO();
+            medicalAdviceDTO.setHospCode(hospCode);
+            medicalAdviceDTO.setDeptId(deptId);
+            medicalAdviceDTO.setCheckTime(DateUtils.getNow());
+            medicalAdviceDTO.setCheckName(MapUtils.getVS(map,"crteName",""));
+            medicalAdviceDTO.setCheckId(MapUtils.getVS(map,"crteId",""));
+            //是否提前领药字段改为提前领药表主键ID
+            medicalAdviceDTO.setSfTqly((String) map.get("id"));
+            medicalAdviceDTO.setIds(adviceIds);
+            adviceMap.put("medicalAdviceDTO", medicalAdviceDTO);
+            MedicalAdviceBO bean = SpringUtils.getBean(MedicalAdviceBO.class);
+            bean.modifyLongCost(medicalAdviceDTO);
+            medicalAdviceService_consumer.longCost(adviceMap);
+            //回写提前领药天数为0
+            adviceMap.put("advanceDays", "0");
+
+
+  //          //修改医嘱提前领药天数
+  //          List<List<String>>  groupedList = splitList(adviceIds,50);
+  //          for(List<String> subList : groupedList){
+  //            inptAdviceDAO.updateAdvanceDaysLastExcTime(subList,"0");
+  //          }
+  //          //修改提前领药记录
+  //          map.put("sfpy", Constants.SF.S);
+  //          inptAdviceDAO.updateMedicineAdvance(map);
+
+
+
+            // 提交独立事务
+            transactionManager.commit(status);
+        }
+
+        }catch (RuntimeException e){
+          if (status != null) {
+            transactionManager.rollback(status);
+          }
+          throw new RuntimeException("提前领药异常，原因："+e.getMessage());
+        }
+
     }
 
 

@@ -150,12 +150,12 @@
   <!--批量新增-->
   <insert id="insertInptAdviceExecBatch" keyProperty="id" useGeneratedKeys="true">
     insert into inpt_advice_exec(id,hosp_code, advice_id,advice_detail_id, visit_id, baby_id, dept_id, exec_dept_id, sign_code, plan_exec_time,
-    exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time)
+    exec_time, exec_id, exec_name, second_exec_id, second_exec_name, is_skin, is_positive, remark, is_print, crte_id, crte_name, crte_time,advance_id)
     values
     <foreach collection="inptAdviceExecDTOList" item="item" index="index" separator=",">
       (#{item.id}, #{item.hospCode}, #{item.adviceId}, #{item.adviceDetailId}, #{item.visitId}, #{item.babyId}, #{item.deptId}, #{item.execDeptId}, #{item.signCode},
       #{item.planExecTime}, #{item.execTime}, #{item.execId}, #{item.execName}, #{item.secondExecId}, #{item.secondExecName}, #{item.isSkin},
-      #{item.isPositive}, #{item.remark}, #{item.isPrint}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+      #{item.isPositive}, #{item.remark}, #{item.isPrint}, #{item.crteId}, #{item.crteName}, #{item.crteTime},#{item.advanceId})
     </foreach>
   </insert>
 

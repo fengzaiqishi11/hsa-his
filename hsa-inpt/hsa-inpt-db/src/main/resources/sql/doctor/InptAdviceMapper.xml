@@ -1773,8 +1773,8 @@
     <update id="updateAdvanceDays" >
         update  inpt_advice a  set advance_days = #{advance_days}  where
         id in
-        <foreach collection="list" item="id" separator="," open="(" close=")">
-            #{id}
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item.id}
         </foreach>
     </update>
 
@@ -1944,10 +1944,10 @@
     </select>
 
     <insert id="insertMedicineAdvanceAdvice" parameterType="list">
-        insert into inpt_medicine_advance_advice (id,advance_id,advice_id,hosp_code)
+        insert into inpt_medicine_advance_advice (id,advance_id,advice_id,hosp_code,last_exec_time,this_exec_time)
         values
         <foreach collection="list" index="index" item="item" separator=",">
-            (#{item.id}, #{item.advance_id}, #{item.advice_id},#{item.hosp_code})
+            (#{item.id}, #{item.advance_id}, #{item.advice_id},#{item.hosp_code},#{item.last_exec_time},#{item.this_exec_time})
         </foreach>
     </insert>
 
@@ -2005,9 +2005,9 @@
 
     <!--根据科室,领药单据，查询提前领药的医嘱-->
 
-    <select id="selectAdviceByDeptAndType" resultType="String">
-        select DISTINCT aaa.id from (select
-        distinct a.id,a.item_code,(case when a.item_code ='1' then c.good_name else d.name end ) as item_name,c.is_lvp,
+    <select id="selectAdviceByDeptAndType" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select aaa.* from (select
+        distinct a.id,a.last_exec_time AS lastExecTime,a.item_code,(case when a.item_code ='1' then c.good_name else d.name end ) as item_name,c.is_lvp,
         c.ph_code,c.big_type_code,a.use_code,a.usage_code,a.yylx
         from
         inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code

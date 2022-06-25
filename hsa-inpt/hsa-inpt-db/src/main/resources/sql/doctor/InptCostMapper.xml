@@ -701,7 +701,7 @@
         speed_code, use_days, num_unit_code, total_num, total_num_unit_code, herb_note_code, use_code, herb_num, total_price, preferential_price,
         reality_price, back_num, doctor_id, doctor_name, dept_id, phar_id, is_dist, is_give, back_code, is_ok, ok_id, ok_name, ok_time, settle_code, settle_id, is_check, check_id, check_name, check_time, zz_doctor_id,
          zz_doctor_name, jz_doctor_id, jz_doctor_name, zg_doctor_id, zg_doctor_name, exec_id, exec_name, exec_time, exec_dept_id,
-          plan_exec_time, status_code, is_cost, cost_time, crte_id, crte_name, crte_time, is_wait,distribute_all_detail_id,lmt_user_flag,lim_user_explain,is_reimburse,attribution_code)
+          plan_exec_time, status_code, is_cost, cost_time, crte_id, crte_name, crte_time, is_wait,distribute_all_detail_id,lmt_user_flag,lim_user_explain,is_reimburse,attribution_code,advance_id)
         values
         <foreach collection="list" item="dto" index="index" separator="," >
             (#{dto.id}, #{dto.hospCode}, #{dto.visitId}, #{dto.babyId}, #{dto.iatId}, #{dto.iatdGroupNo}, #{dto.iatdSeqNo}, #{dto.adviceExecId}, #{dto.sourceCode},
@@ -712,7 +712,7 @@
               #{dto.isGive},#{dto.backCode}, #{dto.isOk}, #{dto.okId}, #{dto.okName}, #{dto.okTime}, #{dto.settleCode}, #{dto.settleId},
                #{dto.isCheck}, #{dto.checkId}, #{dto.checkName}, #{dto.checkTime}, #{dto.zzDoctorId}, #{dto.zzDoctorName}, #{dto.jzDoctorId}, #{dto.jzDoctorName},
                #{dto.zgDoctorId}, #{dto.zgDoctorName}, #{dto.execId}, #{dto.execName}, #{dto.execTime}, #{dto.execDeptId}, #{dto.planExecTime}, #{dto.statusCode}, #{dto.isCost}, #{dto.costTime},
-                #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.isWait},#{dto.distributeAllDetailId},#{dto.lmtUserFlag},#{dto.limUserExplain},#{dto.isReimburse},#{dto.attributionCode})
+                #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.isWait},#{dto.distributeAllDetailId},#{dto.lmtUserFlag},#{dto.limUserExplain},#{dto.isReimburse},#{dto.attributionCode},#{dto.advanceId})
         </foreach>
     </insert>
 
@@ -1735,14 +1735,14 @@
         spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code,
         split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name,
         assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency,
-        is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code)
+        is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code,advance_id)
         values
         <foreach collection="list" item="dto" separator=",">
             (#{dto.id},#{dto.hospCode}, #{dto.adviceId}, #{dto.groupNo}, #{dto.visitId}, #{dto.babyId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName},
             #{dto.spec}, #{dto.dosage}, #{dto.dosageUnitCode}, #{dto.num}, #{dto.unitCode}, #{dto.price}, #{dto.splitRatio}, #{dto.splitUnitCode},
             #{dto.splitNum}, #{dto.splitPrice}, #{dto.totalPrice}, #{dto.chineseDrugNum}, #{dto.statusCode}, #{dto.pharId}, #{dto.assignUserId}, #{dto.assignUserName},
             #{dto.assignTime}, #{dto.distUserId}, #{dto.distUserName}, #{dto.distTime}, #{dto.usageCode}, #{dto.useCode}, #{dto.deptId}, #{dto.isEmergency},
-            #{dto.isBack}, #{dto.costId}, #{dto.oldWrId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.currUnitCode})
+            #{dto.isBack}, #{dto.costId}, #{dto.oldWrId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.currUnitCode},#{dto.advanceId})
         </foreach>
     </insert>
 

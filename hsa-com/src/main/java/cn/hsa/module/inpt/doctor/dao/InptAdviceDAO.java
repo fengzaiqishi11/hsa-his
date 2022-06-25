@@ -758,7 +758,7 @@ public interface InptAdviceDAO {
      * @Date   2021/05/12 14:44
      * @Return list
      */
-    Map<String, Object> getMedicineAdvance(Map<String, Object> map);
+    List<Map<String, Object>> getMedicineAdvance(Map<String, Object> map);
 
     List<BaseAdviceDTO> getIllnessAdviceByVisitId(@Param("list") List<InptVisitDTO> inptVisitDTOList);
     /**

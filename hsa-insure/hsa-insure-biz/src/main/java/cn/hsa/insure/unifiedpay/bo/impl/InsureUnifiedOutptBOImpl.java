@@ -801,14 +801,14 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
      * @return com.yhtech.nmpay.common.client.YhGatewayClient
      */
     private YhGatewayClient CreateYHGatewayClient(Map paramMap){
-      paramMap.put("codeList", new String[]{"HN_URL", "HN_CLIENT_PRV_KEY", "HN_APP_ID", "HN_APP_SECRET", "HN_SERVER_PUB_KEY", "HN_YDZF_FLAG"});
+      paramMap.put("codeList", new String[]{"HAINAN_URL", "HAINAN_CLIENT_PRV_KEY", "HAINAN_APP_ID", "HAINAN_APP_SECRET", "HAINAN_SERVER_PUB_KEY", "HAINAN_YDZF_FLAG"});
       WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
       Map<String, SysParameterDTO> sysMap = getData(wr);
-      SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HN_URL");
-      SysParameterDTO prvKeyPrameter = MapUtils.get(sysMap, "HN_CLIENT_PRV_KEY");
-      SysParameterDTO appIdPrameter = MapUtils.get(sysMap, "HN_APP_ID");
-      SysParameterDTO secretPrameter = MapUtils.get(sysMap, "HN_APP_SECRET");
-      SysParameterDTO pubKeyPrameter = MapUtils.get(sysMap, "HN_SERVER_PUB_KEY");
+      SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HAINAN_URL");
+      SysParameterDTO prvKeyPrameter = MapUtils.get(sysMap, "HAINAN_CLIENT_PRV_KEY");
+      SysParameterDTO appIdPrameter = MapUtils.get(sysMap, "HAINAN_APP_ID");
+      SysParameterDTO secretPrameter = MapUtils.get(sysMap, "HAINAN_APP_SECRET");
+      SysParameterDTO pubKeyPrameter = MapUtils.get(sysMap, "HAINAN_SERVER_PUB_KEY");
       if (ObjectUtil.isEmpty(urlPrameter)){
         throw new RuntimeException("未配置服务网关地址");
       }

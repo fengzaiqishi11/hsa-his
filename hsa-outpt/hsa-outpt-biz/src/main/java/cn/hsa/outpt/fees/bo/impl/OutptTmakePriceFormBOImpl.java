@@ -4997,9 +4997,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
         throw new AppException("未查找到医保就诊信息，请做医保登记！");
       }
-      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+      /*if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
         throw new AppException("未找到支付订单号，请先上传费用！");
-      }
+      }*/
       //判断是否已医保结算
       InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
       settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());

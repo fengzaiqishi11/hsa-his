@@ -1296,7 +1296,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","人员定点备案信息查询");
         map.put("isHospital","");
         map.put("visitId","");
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_5302, paramMap,map);
+        // 这里要求传的是regCode  不是orgCode
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_5302, paramMap,map);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = (List<Map<String, Object>>) MapUtils.get(outptMap, "psnfixmedin");
         map.put("mapList", mapList);

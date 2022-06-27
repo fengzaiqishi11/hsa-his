@@ -56,4 +56,9 @@ public class DrgDipComboDTO  implements Serializable {
      */
     private String drg;
 
+    private String drgMsg;
+
+    private String dipMsg;
+
+
 }

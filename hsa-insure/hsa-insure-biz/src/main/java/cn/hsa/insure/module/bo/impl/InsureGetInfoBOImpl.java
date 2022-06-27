@@ -819,6 +819,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
         combo.setDip(drgDipAuthDTO.getDip());
         combo.setDrg(drgDipAuthDTO.getDrg());
+        combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+        combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
         resultDataMap.put("drgInfo",combo);
         return resultDataMap;
     }
@@ -1767,6 +1769,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
             combo.setDip(drgDipAuthDTO.getDip());
             combo.setDrg(drgDipAuthDTO.getDrg());
+            combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+            combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
             resultDataMap.put("drgInfo",combo);
         }
         return resultDataMap;

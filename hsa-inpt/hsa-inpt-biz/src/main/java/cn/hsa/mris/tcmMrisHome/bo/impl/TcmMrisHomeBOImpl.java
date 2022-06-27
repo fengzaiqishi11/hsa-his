@@ -296,6 +296,8 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
         combo.setDip(drgDipAuthDTO.getDip());
         combo.setDrg(drgDipAuthDTO.getDrg());
+        combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+        combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
         resultMap.put("drgInfo",combo);
         return resultMap;
     }

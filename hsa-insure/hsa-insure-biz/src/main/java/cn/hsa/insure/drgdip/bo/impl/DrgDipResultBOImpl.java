@@ -227,6 +227,8 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
       if (ObjectUtil.isEmpty(dipWrapper.getData())&&ObjectUtil.isEmpty(drgWrapper.getData())){
         dto.setDip(String.valueOf(dipWrapper.getCode()));
         dto.setDrg(String.valueOf(drgWrapper.getCode()));
+        dto.setDipMsg(dipWrapper.getMessage());
+        dto.setDrgMsg(dipWrapper.getMessage());
         return dto;
       }
       CenterFunctionAuthorizationDO dipAuth = dipWrapper.getData();
@@ -234,14 +236,18 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
       //dip
       if (ObjectUtil.isNotEmpty(dipAuth)){
         dto.setDip("true");
+        dto.setDipMsg(dipWrapper.getMessage());
       }else{
         dto.setDip(String.valueOf(dipWrapper.getCode()));
+        dto.setDipMsg(dipWrapper.getMessage());
       }
       //drg
       if (ObjectUtil.isNotEmpty(drgAuth)){
         dto.setDrg("true");
+        dto.setDrgMsg(drgWrapper.getMessage());
       }else{
         dto.setDrg(String.valueOf(drgWrapper.getCode()));
+        dto.setDrgMsg(drgWrapper.getMessage());
       }
       return dto;
     }

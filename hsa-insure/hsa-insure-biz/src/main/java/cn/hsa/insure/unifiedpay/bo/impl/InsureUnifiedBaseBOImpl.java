@@ -1548,7 +1548,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         baseDeptDTO.setIsValid(Constants.SF.S); // 有效
         baseDeptDTO.setHospCode(hospCode);
         String attrCode = insureConfigurationDTO.getAttrCode(); // 医保归属地区划
-        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+        if (StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("43")) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.GS) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
             // 湖南省科室上传为单条数据上传
             String code = MapUtils.get(map, "code");
             if (StringUtils.isEmpty(code)) throw new RuntimeException("湖南省科室上传需单条记录上传，请先选择需要上传的科室");

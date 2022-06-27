@@ -653,7 +653,10 @@
         <if test="isEmergency != null and isEmergency !=''">
           and a.is_emergency = #{isEmergency}
         </if>
-
+        /*仅查询出提前领药的待领数据*/
+        <if test="isAdvance != null and isAdvance != ''" >
+          and a.advance_id is not null and a.advance_id != ''
+        </if>
     </select>
 
     <!--批量修改发药状态-->

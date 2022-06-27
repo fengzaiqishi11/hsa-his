@@ -91,8 +91,8 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             String paramMapJson = MapUtils.get(map,"paramMapJson");
             String medisCode = MapUtils.get(map,"medisCode");
             String resultStr = MapUtils.get(map,"resultStr");
-  //        Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-            String resultCode = MapUtils.get(map,"infcode","");
+            Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
+            String resultCode = MapUtils.get(m,"infcode","");
             // 开启独立新事务
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

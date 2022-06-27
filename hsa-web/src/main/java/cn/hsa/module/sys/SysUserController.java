@@ -60,7 +60,7 @@ public class SysUserController extends BaseController {
     public WrapperResponse<SysUserDTO> getById(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTOSession = getSession(req, res);
         String whetherPrivateInnerAddress = req.getHeader("Internet-Flag");
-        logger.error("==-==request.getHeader('Internet-Flag')= {}({})",whetherPrivateInnerAddress,whetherPrivateInnerAddress.getClass().getName());
+        logger.error("==-==request.getHeader('Internet-Flag')= {}(String)",whetherPrivateInnerAddress);
         logger.error("==-==request.getIp= {}",ServletUtils.getRequestIp());
         logger.error("==-==request.getHeader('Host')= {}",req.getHeader("Host"));
         sysUserDTO.setWhetherPrivateInnerAddress(whetherPrivateInnerAddress);

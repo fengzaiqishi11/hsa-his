@@ -621,6 +621,7 @@ public interface Constant {
             public static final String SYZY = "52"; // 生育住院
             public static final String JBYLSYZY = "54"; // 基本医疗生育门诊
             public static final String QTSYMZ = "9932"; // 其他生育门诊
+            public static final String GSMZ = "41"; // 工伤门诊
         }
 
 
@@ -905,6 +906,11 @@ public interface Constant {
             public static final String WZK = "0"; // 未质控
             public static final String ZKWWC = "1"; // 质控未完成
             public static final String ZKWC = "2"; // 质控完成
+        }
+
+        public static class ZKLX {
+            public static final String DRG = "1"; // DRG
+            public static final String DIP = "2"; // DIP
         }
         /*医保编码为 甘肃：620102 海南的：460100*/
         public static class YBBMQZ {

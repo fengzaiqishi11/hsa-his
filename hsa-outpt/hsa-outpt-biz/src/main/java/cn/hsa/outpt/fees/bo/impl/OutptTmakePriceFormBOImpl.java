@@ -1963,6 +1963,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     insureUnifiedPayOutptService_consumer.UP_2208(map).getData();
                     updateCancelFeeSubmit(map);
                 }
+                //修改医保结算表 insure_individual_settle；结算状态 = 试算 回滚
+                InsureIndividualSettleDO insureIndividualSettleDO1 = new InsureIndividualSettleDO();
+                insureIndividualSettleDO.setId(insureIndividualSettleDTO.getId());//id
+                insureIndividualSettleDO.setSettleState(Constants.YBJSZT.SS);//结算状态 = 试算
+                individualSettleParam.put("insureIndividualSettleDO", insureIndividualSettleDO);
+                insureIndividualSettleService.updateByPrimaryKeySelective(individualSettleParam);
                 throw new RuntimeException(e.getMessage());
             }
         }

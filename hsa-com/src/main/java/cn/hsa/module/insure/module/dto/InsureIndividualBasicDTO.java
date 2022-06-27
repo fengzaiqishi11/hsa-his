@@ -101,4 +101,5 @@ public class InsureIndividualBasicDTO extends InsureIndividualBasicDO implements
         private String psnCertType; // 类型
         private String hcardBasinfo; // 广州读卡就医基本信息
         private String hcardChkinfo; // 广州读卡就医校验信息
+        private String queryType;//查询类型 1就诊信息查询 2诊断信息查询
 }

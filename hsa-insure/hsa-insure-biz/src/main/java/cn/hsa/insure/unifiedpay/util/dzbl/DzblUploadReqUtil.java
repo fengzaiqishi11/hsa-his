@@ -5,14 +5,22 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO;
 import cn.hsa.module.insure.emr.dto.InsureEmrDetailDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrDieinfoDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrOprninfoDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.HumpUnderlineUtils;
 import cn.hsa.util.MapUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,6 +37,7 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
     public InsureInterfaceParamDTO initRequest(T param) {
         Map map = (Map) param;
         InsureEmrDetailDTO insureEmrDetailDTO = MapUtils.get(map, "insureEmrDetailDTO");
+        String insuplcAdmdvs = MapUtils.get(map, "insuplcAdmdvs");
 
         Map<String, Object> dataMap = new HashMap<>(3);
         // 入院信息
@@ -37,20 +46,50 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         // 诊断信息
         dataMap.put("diseinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDiseinfoDTOList()));
 
-        // 病程记录信息
-        dataMap.put("coursrinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrCoursrinfoDTOList()));
+        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")) {
+            if (ObjectUtil.isNotEmpty(insureEmrDetailDTO.getInsureEmrCoursrinfoDTOList())) {
+                dataMap.put("coursrinfo", HumpUnderlineUtils.humpToUnderline(insureEmrDetailDTO.getInsureEmrCoursrinfoDTOList().get(0)));
+            }else {
+                dataMap.put("coursrinfo", new JSONObject());
+            }
+        }else {
+            // 病程记录信息
+            dataMap.put("coursrinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrCoursrinfoDTOList()));
+        }
 
-        // 手术信息
-        dataMap.put("oprninfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrOprninfoDTOList()));
+        //广州医保如果没有手术记录信息则传null
+        List<InsureEmrOprninfoDTO> oprninfoDTOList = insureEmrDetailDTO.getInsureEmrOprninfoDTOList();
+        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")
+                && ObjectUtil.isEmpty(oprninfoDTOList)) {
+            dataMap.put("oprninfo","null");
+        }else {
+            // 手术信息
+            dataMap.put("oprninfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrOprninfoDTOList()));
+        }
 
         // 抢救记录信息
         dataMap.put("rescinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrRescinfoDTOList()));
 
-        // 死亡信息
-        dataMap.put("dieinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDieinfoDTOList()));
+        //广州医保如果没有病程死亡记录信息则传null
+        List<InsureEmrDieinfoDTO> dieinfoDTOList = insureEmrDetailDTO.getInsureEmrDieinfoDTOList();
+        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")
+                && ObjectUtil.isEmpty(dieinfoDTOList)) {
+            dataMap.put("dieinfo","null");
+        }else {
+            // 死亡信息
+            dataMap.put("dieinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDieinfoDTOList()));
+        }
 
-        // 出院小结信息
-        dataMap.put("dscginfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDscginfoDTOList()));
+        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")) {
+            if (ObjectUtil.isNotEmpty(insureEmrDetailDTO.getInsureEmrDscginfoDTOList())) {
+                dataMap.put("dscginfo", HumpUnderlineUtils.humpToUnderline(insureEmrDetailDTO.getInsureEmrDscginfoDTOList().get(0)));
+            }else {
+                dataMap.put("dscginfo", new JSONObject());
+            }
+        }else {
+            // 出院小结信息
+            dataMap.put("dscginfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDscginfoDTOList()));
+        }
 
 
         HashMap commParam = new HashMap();

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.authorization.dao.CenterInterceptUrlRecordDAO">
+
+    <select id="queryAllCenterInterceptUrlRecords" resultType="cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO" >
+        select * from center_intercept_url_record where is_valid = '1'
+    </select>
+
+</mapper>

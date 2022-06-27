@@ -807,23 +807,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }else{
           resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
         }
+
         //返回给前端  提示是否有这个权限
-        Map<String,Object> map2 = new HashMap<>();
-        map2.put("hospCode",map.get("hospCode").toString());
-        DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-        try {
-          drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
-          resultDataMap.put("hasAuth",true);
-        }catch (Exception e){
-          if (e.getMessage().contains("400-987-5000")){
-            resultDataMap.put("hasAuth",false);
-          }
-        }
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("hospCode", map.get("hospCode").toString());
+        DrgDipAuthDTO drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
         HashMap map1 = new HashMap();
         map1.put("drgDipResultDTO",dto);
         map1.put("hospCode",map.get("hospCode").toString());
         map1.put("drgDipAuthDTO",drgDipAuthDTO);
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        combo.setDip(drgDipAuthDTO.getDip());
+        combo.setDrg(drgDipAuthDTO.getDrg());
+        combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+        combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
         resultDataMap.put("drgInfo",combo);
         return resultDataMap;
     }
@@ -1761,24 +1758,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }else{
               resultDataMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
             }
-          //返回给前端  提示是否有这个权限
-          Map<String,Object> map2 = new HashMap<>();
-          map2.put("hospCode",map.get("hospCode").toString());
-          DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-          try {
-            drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
-            resultDataMap.put("hasAuth",true);
-          }catch (Exception e){
-            if (e.getMessage().contains("400-987-5000")){
-              resultDataMap.put("hasAuth",false);
-            }
-          }
-          HashMap map1 = new HashMap();
-          map1.put("drgDipResultDTO",dto);
-          map1.put("hospCode",map.get("hospCode").toString());
-          map1.put("drgDipAuthDTO",drgDipAuthDTO);
-          DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
-          resultDataMap.put("drgInfo",combo);
+            //返回给前端  提示是否有这个权限
+            Map<String, Object> map2 = new HashMap<>();
+            map2.put("hospCode", map.get("hospCode").toString());
+            DrgDipAuthDTO drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+            HashMap map1 = new HashMap();
+            map1.put("drgDipResultDTO",dto);
+            map1.put("hospCode",map.get("hospCode").toString());
+            map1.put("drgDipAuthDTO",drgDipAuthDTO);
+            DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+            combo.setDip(drgDipAuthDTO.getDip());
+            combo.setDrg(drgDipAuthDTO.getDrg());
+            combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+            combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
+            resultDataMap.put("drgInfo",combo);
         }
         return resultDataMap;
     }

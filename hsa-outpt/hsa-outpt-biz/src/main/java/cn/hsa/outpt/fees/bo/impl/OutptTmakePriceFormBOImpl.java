@@ -5014,7 +5014,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (ObjectUtil.isEmpty(settleDTO)){
         throw new AppException("未查找到医保结算信息，请先做医保结算！");
       }
+      //查看移动支付表参数据
       //接口调用
+      //payOnlineInfoDAO
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       map.put("insureIndividualSettleDTO",settleDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();

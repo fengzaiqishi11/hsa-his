@@ -474,10 +474,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         }else {
             responseDataMap.put("hiType","自费病人");// 医保类型
         }
+        if(Constant.UnifiedPay.ZKLX.DRG.equals(drgDipResultDTO.getType())){
+            responseDataMap.put("drgCode",drgDipResultDTO1.getDrgDipCode());// DRG组编码
+            responseDataMap.put("drgName",drgDipResultDTO1.getDrgDipName());// DRG组名称
+            responseDataMap.put("weightValue",drgDipResultDTO1.getWeightValue());// DRG权重
+            responseDataMap.put("ratio",drgDipResultDTO1.getBl());// 倍率
+        } else if(Constant.UnifiedPay.ZKLX.DIP.equals(drgDipResultDTO.getType())){
+            responseDataMap.put("diagCode",drgDipResultDTO1.getDrgDipCode());// DIP组编码
+            responseDataMap.put("diagName",drgDipResultDTO1.getDrgDipName());// DIP组名称
+            responseDataMap.put("diagFeeSco",drgDipResultDTO1.getFeePay());// 分值
+        }
         responseDataMap.put("inNO",drgDipResultDTO1.getVisitId());//住院号
-        responseDataMap.put("diagCode",drgDipResultDTO1.getDrgDipCode());// DIP组编码
-        responseDataMap.put("diagName",drgDipResultDTO1.getDrgDipName());// DIP组名称
-        responseDataMap.put("diagFeeSco",drgDipResultDTO1.getFeePay());// 分值
         responseDataMap.put("profitAndLossAmount",drgDipResultDTO1.getProfit());// 盈亏额
         responseDataMap.put("totalFee",drgDipResultDTO1.getTotalFee());// 总费用
         responseDataMap.put("feeStand",drgDipResultDTO1.getStandFee());// 总费用标杆
@@ -485,7 +492,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         responseDataMap.put("proMedicMaterStand",drgDipResultDTO1.getStandProMedicMater());// 药占比标杆
         responseDataMap.put("proConsum",drgDipResultDTO1.getProConsum());// 耗材比
         responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息
+        responseDataMap.put("quality",HumpUnderlineUtils.humpToUnderlineArray(qualityInfoList));// 质控信息
         return responseDataMap;
     }
 

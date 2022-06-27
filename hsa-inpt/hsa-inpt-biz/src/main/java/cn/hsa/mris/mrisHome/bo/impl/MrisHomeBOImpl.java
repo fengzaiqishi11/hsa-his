@@ -456,20 +456,15 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         //返回给前端  提示是否有这个权限
         Map<String, Object> map2 = new HashMap<>();
         map2.put("hospCode", map.get("hospCode").toString());
-        DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-        drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
-        //都提示false  没权限
-        if ("false".equals(drgDipAuthDTO.getDip())&&"false".equals(drgDipAuthDTO.getDrg())){
-          resultMap.put("hasAuth", false);
-        }else{
-          resultMap.put("hasAuth", true);
-        }
+        DrgDipAuthDTO drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
 
         HashMap map1 = new HashMap();
         map1.put("drgDipResultDTO", dto);
         map1.put("hospCode", map.get("hospCode").toString());
         map1.put("drgDipAuthDTO", drgDipAuthDTO);
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        combo.setDip(drgDipAuthDTO.getDip());
+        combo.setDrg(drgDipAuthDTO.getDrg());
         resultMap.put("drgInfo", combo);
         return resultMap;
     }

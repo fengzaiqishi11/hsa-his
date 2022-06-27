@@ -4,7 +4,9 @@ import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.bo.CenterFunctionAuthorizationBO;
 import cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO;
+import cn.hsa.module.center.authorization.dao.CenterInterceptUrlRecordDAO;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author luonianxin
@@ -30,9 +35,15 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
     private CenterFunctionAuthorizationDAO centerFunctionAuthorizationDAO;
 
+    private CenterInterceptUrlRecordDAO centerInterceptUrlRecordDAO;
+
     @Autowired
     public void setCenterFunctionAuthorizationDAO(CenterFunctionAuthorizationDAO centerFunctionAuthorizationDAO) {
         this.centerFunctionAuthorizationDAO = centerFunctionAuthorizationDAO;
+    }
+    @Autowired
+    public void setCenterInterceptUrlRecordDAO(CenterInterceptUrlRecordDAO centerInterceptUrlRecordDAO) {
+        this.centerInterceptUrlRecordDAO = centerInterceptUrlRecordDAO;
     }
 
     @Override
@@ -74,7 +85,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         if(!(nowTimeStamp.compareTo(startDateTimeStamp) > 0 && nowTimeStamp.compareTo(endDateTimeStamp) < 0)){
             StringBuilder builder = new StringBuilder();
             builder.append("医院编码为【 ").append(functionAuthorizationDO.getHospCode()).append('】')
-                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用").append("权限类型代码：").append(orderTypeCode);
+                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用，授权时间范围：").append(functionAuthorizationDO.getStartDate() +" ")
+                    .append('-').append(" " +functionAuthorizationDO.getEndDate())
+                    .append(", 权限类型代码：").append(orderTypeCode);
             log.info("==-=="+builder);
             return WrapperResponse.error(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(),builder.toString(),null);
         }
@@ -91,5 +104,17 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     public WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO) {
         int affectRows = centerFunctionAuthorizationDAO.insertAuthorization(functionAuthorizationDO);
         return WrapperResponse.success(functionAuthorizationDO);
+    }
+
+    /**
+     * 查询中心端需要拦截的uri列表
+     *
+     * @param params 参数
+     * @return 需要拦截的uri列表
+     */
+    @Override
+    public WrapperResponse<List<CenterInterceptUrlRecordDO>> queryAllCenterInterceptUrlRecords(Map<String, Object> params) {
+        List<CenterInterceptUrlRecordDO> centerInterceptUrlRecordDOList = centerInterceptUrlRecordDAO.queryAllCenterInterceptUrlRecords();
+        return WrapperResponse.success(centerInterceptUrlRecordDOList);
     }
 }

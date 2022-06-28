@@ -523,6 +523,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("age", baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO", baseInfoStr.get("adm_no"));// 住院号
         responseDataMap.put("hiType", baseInfoStr.get("health_care_type"));// 医保类型
+        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
         try {
             //3.调用DRG
             String result = HttpConnectUtil.doPostByXXX(url, dataMap);
@@ -535,7 +536,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (responseCode != null && responseCode != 0) {
                 logger.info("病案首页调用DRG接口失败，入参为：{},返参为：{}"
                         , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
-                throw new AppException("调用DRG接口失败");
+//                throw new AppException("调用DRG接口失败");
+                throw new AppException("调用DRG接口报错："+MapUtils.get(responseMap, "massege").toString());
             } else {
                 logger.info("病案首页调用DRG接口成功，入参为：{},返参为：{}"
                         , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
@@ -561,7 +563,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             baseInfoStr.put("hospCode", MapUtils.get(map, "hospCode"));
             baseInfoStr.put("type", "1");
             baseInfoStr.put("businessType", "2");
-            insertDrgDipResult(baseInfoStr, baseInfoMap, groupInfoMap, qualityInfoList);
+            drgDipResultDTO = insertDrgDipResult(baseInfoStr, baseInfoMap, groupInfoMap, qualityInfoList);
             /**======保存质控结果 end=========**/
 
             /**==========返回参数封装 Begin ===========**/
@@ -595,6 +597,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             businessLogMap.put("optTypeName","病案首页DRG质控");
             businessLogMap.put("type","1");
             businessLogMap.put("businessType","2");
+            businessLogMap.put("qulityId", drgDipResultDTO.getId());
             businessLogMap.put("hospCode",MapUtils.get(baseInfoStr, "hospital_code"));
             businessLogMap.put("insureRegCode",MapUtils.get(baseInfoStr, "insureRegCode"));
             businessLogMap.put("hospName",MapUtils.get(baseInfoStr, MapUtils.get(baseInfoStr, "hospital_name")));
@@ -688,6 +691,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         responseDataMap.put("age", baseInfoStr.get("age"));// 年龄
         responseDataMap.put("inNO", baseInfoStr.get("adm_no"));// 住院号
         responseDataMap.put("hiType", baseInfoStr.get("health_care_type"));// 医保类型
+        DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
         try {
             /**=========== 3.调用DIP接口 begin ==========**/
             String result = HttpConnectUtil.doPostByXXX(url, dataMap);
@@ -701,7 +705,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (responseCode != null && responseCode != 0) {
                 logger.info("病案首页调用DIP接口失败，入参为：{},返参为：{}"
                         , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
-                throw new AppException("调用DIP接口失败");
+//                throw new AppException("调用DIP接口失败");
+                throw new AppException("调用DIP接口报错："+MapUtils.get(responseMap, "massege").toString());
             } else {
                 logger.info("病案首页调用DIP接口成功，入参为：{},返参为：{}"
                         , JSONObject.toJSONString(dataMap), JSONObject.toJSONString(responseMap));
@@ -727,7 +732,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             baseInfoStr.put("hospCode", MapUtils.get(map, "hospCode"));
             baseInfoStr.put("type", "2");
             baseInfoStr.put("businessType", "2");
-            insertDrgDipResult(baseInfoStr, baseInfoMap, groupInfoMap, qualityInfoList);
+            drgDipResultDTO = insertDrgDipResult(baseInfoStr, baseInfoMap, groupInfoMap, qualityInfoList);
             /**====== 保存质控结果 end=========**/
 
             /**==========返回参数封装 Begin ===========**/
@@ -763,6 +768,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             businessLogMap.put("optTypeName","病案首页DIP质控");
             businessLogMap.put("type","2");
             businessLogMap.put("businessType","2");
+            businessLogMap.put("qulityId", drgDipResultDTO.getId());
             businessLogMap.put("hospCode",MapUtils.get(baseInfoStr, "hospital_code"));
             businessLogMap.put("insureRegCode",MapUtils.get(baseInfoStr, "insureRegCode"));
             businessLogMap.put("hospName",MapUtils.get(baseInfoStr, MapUtils.get(baseInfoStr, "hospital_name")));
@@ -811,9 +817,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         if (MapUtils.isEmpty(baseInfoStr)){
             throw new AppException("病案基本信息不能为空");
         }
+        //去除横杠
+        baseInfoStr = deleteConstantBar(baseInfoStr);
         // 处理年龄
         String age = MapUtils.get(baseInfoStr, "age");
-        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
+        if (StringUtils.isNotEmpty(age) && !org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
             String substring = age.substring(1);
             baseInfoStr.put("age",substring);
         }
@@ -2620,7 +2628,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     }
 
     //保存质控结果
-    private Boolean insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> baseInfoMap, Map<String, Object> groupInfo, List<Map<String, Object>> qualityInfo) {
+    private DrgDipResultDTO insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> baseInfoMap, Map<String, Object> groupInfo, List<Map<String, Object>> qualityInfo) {
         //冗余基本信息
         DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
         drgDipResultDTO.setVisitId(MapUtils.get(dataMap, "visit_id"));
@@ -2684,8 +2692,18 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("hospCode", MapUtils.get(dataMap, "hospCode"));
         resultMap.put("drgDipResultDTO", drgDipResultDTO);
         resultMap.put("drgDipResultDetailDTOList", drgDipResultDetailDTOList);
-        drgDipResultService.insertDrgDipResult(resultMap);
-        return true;
+        DrgDipResultDTO drgDipResultDTO1 = drgDipResultService.insertDrgDipResult(resultMap).getData();
+        return drgDipResultDTO1;
+    }
+
+    //质控去除横杠
+    private Map<String, Object> deleteConstantBar(Map<String, Object> dataMap){
+        for (String key : dataMap.keySet()) {
+            if ("-".equals(MapUtils.get(dataMap, key))) {
+                dataMap.put(key, "");
+            }
+        }
+        return dataMap;
     }
 
 }

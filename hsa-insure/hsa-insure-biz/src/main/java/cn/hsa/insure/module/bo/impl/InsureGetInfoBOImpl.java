@@ -2051,7 +2051,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(MapUtils.get(setlinfo, "scdNurscareDays")!= null && "0".equals(MapUtil.getStr(setlinfo, "scdNurscareDays"))){
             setlinfo.put("scdNurscareDays", null); // 二级护理天数 *******
         }
-        if(MapUtils.get(setlinfo, "lv3NursecareDays")!= null && "0".equals(MapUtil.getStr(setlinfo, "lv3NursecareDays"))){
+        if(MapUtils.get(setlinfo, "lv3NurscareDays")!= null && "0".equals(MapUtil.getStr(setlinfo, "lv3NurscareDays"))){
             setlinfo.put("lv3NurscareDays", null); // 三级护理天数 *******
         }
 

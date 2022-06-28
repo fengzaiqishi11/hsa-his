@@ -37,6 +37,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSON;
@@ -1479,6 +1480,23 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         getEmptyErr(setlInfoMap, "medinsFillPsn", "医疗机构填报人不能为空");
 
 
+        //护理天数为空处理
+        String lv1NurscareDays = MapUtil.getStr(setlInfoMap, "lv1NurscareDays") ;
+        String lv3NurscareDays = MapUtil.getStr(setlInfoMap, "lv3NurscareDays");
+        String spgaNurscareDays = MapUtil.getStr(setlInfoMap, "spgaNurscareDays");
+        String scdNurscareDays = MapUtil.getStr(setlInfoMap, "scdNurscareDays");
+        if(StringUtils.isEmpty(lv1NurscareDays)){
+            setlInfoMap.put("lv1NurscareDays",null);
+        }
+        if(StringUtils.isEmpty(lv3NurscareDays)){
+            setlInfoMap.put("lv3NurscareDays",null);
+        }
+        if(StringUtils.isEmpty(spgaNurscareDays)){
+            setlInfoMap.put("spgaNurscareDays",null);
+        }
+        if(StringUtils.isEmpty(scdNurscareDays)){
+            setlInfoMap.put("scdNurscareDays",null);
+        }
         Object objNwbBirWt = MapUtils.get(setlInfoMap, "nwbBirWt"); // 新生儿出生体重
         if (objNwbBirWt instanceof String || objNwbBirWt == null) {
             setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
@@ -1966,6 +1984,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("tcmDiseCode", ""); // 中医诊断代码 *******
         setlinfo.put("diagCodeCnt", MapUtils.get(map, "diseaseCount")); // 诊断代码计数 *******
         setlinfo.put("oprnOprtCodeCnt", MapUtils.get(map, "operCount")); // 手术操作代码计数 *******
+        //计数为0则返回空
+        if(MapUtils.get(map, "diseaseCount")!= null && 0 == (int)MapUtils.get(map, "diseaseCount")){
+            setlinfo.put("diagCodeCnt", null); // 诊断代码计数 *******
+        }
+        if(MapUtils.get(map, "operCount")!= null && 0 == (int)MapUtils.get(map, "operCount")){
+            setlinfo.put("oprnOprtCodeCnt", null); // 诊断代码计数 *******
+        }
         setlinfo.put("ventUsedDura", ""); // 呼吸机使用时长 *******
         Object inptBeforeDay = "";
         Object inptBeforeHour = "";

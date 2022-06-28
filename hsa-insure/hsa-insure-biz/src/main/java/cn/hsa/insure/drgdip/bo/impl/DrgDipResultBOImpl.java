@@ -409,6 +409,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
         }
+        //可疑违规查询条件处理
+        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("total",drgDipResultDTOList.size());//总数
@@ -517,6 +528,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
         }
+        //可疑违规查询条件处理
+        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
@@ -540,6 +562,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public Map<String, Object> queryDrgDipResultMrisSum(DrgDipResultDTO drgDipResultDTO){
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
+        }
+        //可疑违规查询条件处理
+        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
         }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();

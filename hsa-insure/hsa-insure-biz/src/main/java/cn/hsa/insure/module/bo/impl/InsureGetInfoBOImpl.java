@@ -1207,8 +1207,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
             Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
             Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-            List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
-            /**======获取返回的参数 end=========**/
+            List<Map<String,Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
+                    qualityInfo.stream().sorted((a, b) ->
+                                    (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                            .toString()
+                                            .compareTo(a.get("rule_level").toString()))
+                            .collect(Collectors.toList());// 质控信息集合
 
             //6.保存质控结果
             insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);

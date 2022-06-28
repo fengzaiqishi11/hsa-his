@@ -816,10 +816,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
         // 处理年龄
         String age = MapUtils.get(baseInfoStr, "age");
-      /*  if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
+        if (!org.apache.commons.lang3.StringUtils.isNumeric(age)){// 珠海病案首页的年龄格式是 Y + number
             String substring = age.substring(1);
             baseInfoStr.put("age",substring);
-        }*/
+        }
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
         if (MapUtils.isEmpty(strArr)){

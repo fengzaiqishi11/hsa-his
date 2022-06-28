@@ -2269,8 +2269,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             xiCollect = inptDiagnoseDTOList;
             if (!ListUtils.isEmpty(xiCollect)) {
                 xiCollect.stream().forEach(inptDiagnoseDTO -> {
-                    inptDiagnoseDTO.setTypeCode("1");
+                    //2022-06-28 zhangjinping 西医病案诊断信息表中出现了中医病名，归纳到对应的中医和西医诊断信息中
+                    if(!"4".equals(inptDiagnoseDTO.getTypeCode())&&!"5".equals(inptDiagnoseDTO.getTypeCode())&&!"6".equals(inptDiagnoseDTO.getTypeCode())){
+                        inptDiagnoseDTO.setTypeCode("1");
+                    }
+
+                    if("4".equals(inptDiagnoseDTO.getTypeCode())||"5".equals(inptDiagnoseDTO.getTypeCode())||"6".equals(inptDiagnoseDTO.getTypeCode())){
+                        inptDiagnoseDTO.setTypeCode("2");
+                    }
+
                 });
+                List<InptDiagnoseDTO> zyDiagnoseList = zxCollect.stream().filter(dto->"2".equals(dto.getTypeCode())).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(zyDiagnoseList)){
+                    zxCollect = zyDiagnoseList;
+                }
             }
             diseaseCount = inptDiagnoseDTOList.size();
         }else {

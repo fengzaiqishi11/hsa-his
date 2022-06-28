@@ -6,7 +6,9 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -833,4 +835,6 @@ public interface InsureGetInfoDAO {
     Map<String, Object> querySettleClockMatchByMap(Map<String, Object> deptMap);
 
     List<Map<String, Object>> selectXyDisease(Map<String, Object> map);
+
+    SysParameterDTO getParameterByCode(@PathVariable("hospCode") String hospCode, @PathVariable("code") String code);
 }

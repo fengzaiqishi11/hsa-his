@@ -1026,7 +1026,8 @@
 
     <!--  检查处方是否结算 -->
     <select id="checkIsSettle" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select count(id) num from outpt_prescribe a where id = #{id} and a.hosp_code = #{hospCode} and a.is_settle = '1' and ifnull(a.settle_id, '') != ''
+        select count(id) num from outpt_cost oc where oc.op_id =#{id} and oc.visit_id =#{visitId} and oc.hosp_code =#{hospCode}
+        and oc.settle_code='2' and oc.settle_id is not null
     </select>
 
     <!--  检查处方是否提交 -->

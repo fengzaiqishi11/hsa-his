@@ -221,7 +221,7 @@ public class DrawMedicineController extends BaseController {
         param.put("endDate",DateUtils.format(DateUtils.dateAdd(new Date(),advanceDays),DateUtils.Y_M_D));
         param.put("crteId",sysUserDTO.getId());
         param.put("crteName",sysUserDTO.getName());
-        WrapperResponse<Boolean> wrapperResponse = drawMedicineService.saveAdvanceTakeMedicine(param,"tqly");
+        WrapperResponse<Boolean> wrapperResponse = drawMedicineService.saveAdvanceTakeMedicine(param);
         return wrapperResponse;
     }
 

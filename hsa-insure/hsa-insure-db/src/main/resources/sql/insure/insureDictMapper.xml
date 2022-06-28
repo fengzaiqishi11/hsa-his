@@ -52,6 +52,9 @@
         <if test="code !=null and code !=''">
             AND code = #{code}
         </if>
+        <if test="insureRegCode !=null and insureRegCode !=''">
+            AND insure_reg_code = #{insureRegCode}
+        </if>
         <if test="codeList != null and codeList.size() > 0">
             and code in
             <foreach collection="codeList" item="item" separator="," open="(" close=")">

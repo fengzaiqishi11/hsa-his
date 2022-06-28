@@ -269,14 +269,14 @@
         spec, dosage, dosage_unit_code, num, unit_code, price, split_ratio, split_unit_code,
         split_num, split_price, total_price, chinese_drug_num, status_code, phar_id, assign_user_id, assign_user_name,
         assign_time, dist_user_id, dist_user_name, dist_time, usage_code, use_code, dept_id, is_emergency,
-         is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code)
+         is_back, cost_id, old_wr_id, crte_id, crte_name, crte_time,curr_unit_code,advance_id)
         values
         <foreach collection="list" item="dto" separator=",">
             (#{dto.id},#{dto.hospCode}, #{dto.adviceId}, #{dto.groupNo}, #{dto.visitId}, #{dto.babyId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName},
             #{dto.spec}, #{dto.dosage}, #{dto.dosageUnitCode}, #{dto.num}, #{dto.unitCode}, #{dto.price}, #{dto.splitRatio}, #{dto.splitUnitCode},
             #{dto.splitNum}, #{dto.splitPrice}, #{dto.totalPrice}, #{dto.chineseDrugNum}, #{dto.statusCode}, #{dto.pharId}, #{dto.assignUserId}, #{dto.assignUserName},
             #{dto.assignTime}, #{dto.distUserId}, #{dto.distUserName}, #{dto.distTime}, #{dto.usageCode}, #{dto.useCode}, #{dto.deptId}, #{dto.isEmergency},
-            #{dto.isBack}, #{dto.costId}, #{dto.oldWrId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.currUnitCode})
+            #{dto.isBack}, #{dto.costId}, #{dto.oldWrId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime}, #{dto.currUnitCode},#{dto.advanceId})
         </foreach>
     </insert>
 
@@ -653,7 +653,10 @@
         <if test="isEmergency != null and isEmergency !=''">
           and a.is_emergency = #{isEmergency}
         </if>
-
+        /*仅查询出提前领药的待领数据*/
+        <if test="isAdvance != null and isAdvance != ''" >
+          and a.advance_id is not null and a.advance_id != ''
+        </if>
     </select>
 
     <!--批量修改发药状态-->

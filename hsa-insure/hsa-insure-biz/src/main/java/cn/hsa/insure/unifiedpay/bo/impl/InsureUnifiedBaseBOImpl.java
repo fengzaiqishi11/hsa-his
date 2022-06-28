@@ -5,10 +5,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.module.bo.impl.InsureIndividualVisitBOImpl;
-import cn.hsa.insure.util.BaseReqUtil;
-import cn.hsa.insure.util.BaseReqUtilFactory;
-import cn.hsa.insure.util.Constant;
-import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.*;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -99,6 +96,9 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
     @Resource
     private RedisUtils redisUtils;
+
+    @Resource
+    private Transpond transpond;
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -194,13 +194,26 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","就诊信息查询");
         map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
         map.put("visitId",insureIndividualVisitDTO.getVisitId());
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5201, paramMap,map);
-        Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
-        List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "mdtrtinfo");
+        map.put("regCode",insureIndividualVisitDTO.getInsureRegCode());
+
+        String insureRegCode = insureIndividualVisitDTO.getInsureRegCode();
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> outptMap = new HashMap<>();
+        List<Map<String, Object>> resultDataMap = new ArrayList<>();
+
+        //2022-06-17 zhangjinping 需要做判断是调省工伤医保还是通过云助手调医保
+        String medType = MapUtils.get(map,"medType");
+        if(Constant.UnifiedPay.YWLX.GSMZ.equals(medType)){//业务类型为41，工伤门诊
+           resultDataMap =  transpond.to(hospCode,insureRegCode, Constant.HuNanSheng.OUTPT.BIZC200102,map);
+        }else {
+            //调用统一支付平台公共接口方法
+           resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5201, paramMap, map);
+           outptMap = MapUtils.get(resultMap, "output");
+           resultDataMap = MapUtils.get(outptMap, "mdtrtinfo");
+        }
         map.put("resultDataMap", resultDataMap);
         return map;
     }
-
 
     /**
      * @Method queryDiagnoseInfo
@@ -1283,7 +1296,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         map.put("msgName","人员定点备案信息查询");
         map.put("isHospital","");
         map.put("visitId","");
-        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.REGISTER.UP_5302, paramMap,map);
+        // 这里要求传的是regCode  不是orgCode
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_5302, paramMap,map);
         Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = (List<Map<String, Object>>) MapUtils.get(outptMap, "psnfixmedin");
         map.put("mapList", mapList);
@@ -1535,7 +1549,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         baseDeptDTO.setIsValid(Constants.SF.S); // 有效
         baseDeptDTO.setHospCode(hospCode);
         String attrCode = insureConfigurationDTO.getAttrCode(); // 医保归属地区划
-        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+        if (StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("43")) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.GS) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
             // 湖南省科室上传为单条数据上传
             String code = MapUtils.get(map, "code");
             if (StringUtils.isEmpty(code)) throw new RuntimeException("湖南省科室上传需单条记录上传，请先选择需要上传的科室");
@@ -1549,7 +1563,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
         // 入参封装
         Map<String, Object> inputMap = new HashMap<>();
-        if (StringUtils.isNotEmpty(attrCode) && attrCode.startsWith("43")) {
+        if (StringUtils.isNotEmpty(attrCode) && (attrCode.startsWith("43"))|| attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.GS) || attrCode.startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
             BaseDeptDTO deptDTO = deptDTOList.get(0);
             // 设置上传状态未已上传
             deptDTO.setIsUpload(Constants.SF.S); // 已上传

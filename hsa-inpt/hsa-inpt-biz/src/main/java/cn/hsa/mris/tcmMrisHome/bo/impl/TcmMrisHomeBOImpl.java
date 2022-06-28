@@ -853,10 +853,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
-        if (ListUtils.isEmpty(allergylist)) {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.F);
+        if (ListUtils.isEmpty(allergylist)) { // 药物是否过敏 国家卫健委标准：RC037 有无药物过敏表 1: 无 2: 有
+            mrisBaseInfoDTO.setIsAllergy("1");
         } else {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.S);
+            mrisBaseInfoDTO.setIsAllergy("2");
             String alleryList = "";
             for (InptPastAllergyDTO inptPastAllergyDTO : allergylist) {
                 alleryList += inptPastAllergyDTO.getDrugName() + ",";
@@ -883,13 +883,13 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
             mrisBaseInfoDTO.setDirectorName2(doctorInfo.getDirectorName2());
         }
 
-        // 住院次数获取(未获取，默认1次)
-        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
-        if (inCnt == 0) {
-            inCnt = 1;
-        }
-
-        mrisBaseInfoDTO.setInCnt(inCnt);
+//        // 住院次数获取(未获取，默认1次)
+//        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
+//        if (inCnt == 0) {
+//            inCnt = 1;
+//        }
+//
+//        mrisBaseInfoDTO.setInCnt(inCnt);
         mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getHealthCard());
 
         // 获取医疗机构名称与医疗机构编码

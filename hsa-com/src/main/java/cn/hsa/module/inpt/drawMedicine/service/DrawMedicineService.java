@@ -125,7 +125,7 @@ public interface DrawMedicineService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @PostMapping("/service/inpt/drawMedicine/saveAdvanceTakeMedicine")
-    WrapperResponse<Boolean> saveAdvanceTakeMedicine(Map<String, Object> map,String type);
+    WrapperResponse<Boolean> saveAdvanceTakeMedicine(Map<String, Object> map);
     /**
      * @Method getTableTqlyData
      * @Desrciption 查询提前领药

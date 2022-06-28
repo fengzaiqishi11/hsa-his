@@ -2098,10 +2098,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
-        if (ListUtils.isEmpty(allergylist)) {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.F);
+        if (ListUtils.isEmpty(allergylist)) { // 药物是否过敏 国家卫健委标准：RC037 有无药物过敏表 1: 无 2: 有
+            mrisBaseInfoDTO.setIsAllergy("1");
         } else {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.S);
+            mrisBaseInfoDTO.setIsAllergy("2");
             String alleryList = "";
             for (InptPastAllergyDTO inptPastAllergyDTO : allergylist) {
                 alleryList += inptPastAllergyDTO.getDrugName() + ",";

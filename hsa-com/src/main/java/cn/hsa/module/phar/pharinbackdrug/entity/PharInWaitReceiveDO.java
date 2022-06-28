@@ -191,4 +191,8 @@ public class PharInWaitReceiveDO extends PageDO implements Serializable {
 
     /** 开单单位 */
     private String currUnitCode;
+    /**
+     * 提前领药ID
+     */
+    private String advanceId;
 }

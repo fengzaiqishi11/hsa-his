@@ -354,6 +354,9 @@ public class MrisHomeController extends BaseController {
         mrisBaseInfoDTO.setCrteTime(DateUtils.getNow());
         mrisBaseInfoDTO.setCrteName(sysUserDTO.getName());
         mrisBaseInfoDTO.setCrteId(sysUserDTO.getId());
+        mrisBaseInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        mrisBaseInfoDTO.setCrteId(sysUserDTO.getCrteId());
+        mrisBaseInfoDTO.setCrteName(sysUserDTO.getCrteName());
         selectMap.put("hospCode",sysUserDTO.getHospCode());
         selectMap.put("mrisBaseInfoDTO",mrisBaseInfoDTO);
         return WrapperResponse.success(mrisHomeService_consumer.saveMrisInfo(selectMap));

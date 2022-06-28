@@ -65,7 +65,7 @@ public class DrgDipBusinessOptInfoBOImpl extends HsafBO implements DrgDipBusines
             String settleId = MapUtils.get(map,"settleId");
             String visitId = MapUtils.get(map,"visitId");
             String psnNo = MapUtils.get(map,"psnNo");
-            String psName = MapUtils.get(map,"psName");
+            String psName = MapUtils.get(map,"psnName");
             String crteId = MapUtils.get(map,"crtId");
             String crteName = MapUtils.get(map,"crtName");
             String certno = MapUtils.get(map,"certno");

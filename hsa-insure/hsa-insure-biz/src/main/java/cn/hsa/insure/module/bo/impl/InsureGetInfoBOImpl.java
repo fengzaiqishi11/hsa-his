@@ -2279,7 +2279,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     }
 
                 });
-                List<InptDiagnoseDTO> zyDiagnoseList = zxCollect.stream().filter(dto->Constants.JBFL.ZLXT.equals(dto.getTypeCode())).collect(Collectors.toList());
+                List<InptDiagnoseDTO> zyDiagnoseList = xiCollect.stream().filter(dto->Constants.JBFL.ZLXT.equals(dto.getTypeCode())).collect(Collectors.toList());
                 if(!ListUtils.isEmpty(zyDiagnoseList)){
                     zxCollect = zyDiagnoseList;
                 }

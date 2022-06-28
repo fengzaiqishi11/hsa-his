@@ -145,7 +145,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
      * @Return
      */
     @Override
-    public Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
+    public DrgDipResultDTO insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
 
         //保存质控结果表
         if(drgDipResultDTO != null){
@@ -199,7 +199,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             }
             drgDipResultDetailDAO.insertDrgDipResultDetailList(drgDipResultDetailDTOList);
         }
-        return true;
+        return drgDipResultDTO;
 
     }
 
@@ -375,15 +375,20 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             throw new AppException("请选择质控类型");
         }
         //可疑违规查询条件处理
-        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setViolationStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
             drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
@@ -410,15 +415,20 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             throw new AppException("请选择质控类型");
         }
         //可疑违规查询条件处理
-        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setViolationStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
             drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();
@@ -529,15 +539,20 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             throw new AppException("请选择质控类型");
         }
         //可疑违规查询条件处理
-        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setViolationStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
             drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
@@ -564,15 +579,20 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             throw new AppException("请选择质控类型");
         }
         //可疑违规查询条件处理
-        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setViolationStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
             drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();

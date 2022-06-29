@@ -280,8 +280,6 @@ public class MrisBaseInfoDO implements Serializable {
     private String zkNurseName;
 
     /** 质控时间 */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GTM+8")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date zkTime;
 
     /** 是否尸检（SF）编码 */

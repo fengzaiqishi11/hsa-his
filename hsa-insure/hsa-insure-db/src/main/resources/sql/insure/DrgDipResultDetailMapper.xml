@@ -93,10 +93,10 @@
         #{entity.checkFiled},
         #{entity.resultMsg},
         #{entity.originalValue},
-        #{entity.validFlag},
         #{entity.isMain},
         #{entity.sort},
         #{entity.ruletType},
+        #{entity.validFlag},
         #{entity.crtId},
         #{entity.crtName},
         #{entity.crtTime}

@@ -945,6 +945,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
             responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
+            responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
+            //自行计算盈亏额
+            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
             responseDataMap.put("quality",qualityInfoList);// 质控信息
             /**==========返回参数封装 End ===========**/
         }catch (Exception e){
@@ -1230,6 +1235,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             responseDataMap.put("proMedicMaterStand",groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum",baseInfoMap.get("pro_consum"));// 耗材比
             responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
+            responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
+            //自行计算盈亏额
+            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
             responseDataMap.put("quality",qualityInfoList);// 质控信息
             /**==========返回参数封装 End ===========**/
         }catch (Exception e){
@@ -3335,11 +3345,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(MapUtils.get(groupInfo, "weight") !=null){
             drgDipResultDTO.setWeightValue(MapUtils.get(groupInfo, "weight").toString());
         }
-        if(MapUtils.get(groupInfo, "profit") !=null){
-            drgDipResultDTO.setProfit(BigDecimalUtils.convert(MapUtils.get(groupInfo, "profit").toString()).setScale(2));
-        }
         if(MapUtils.get(groupInfo, "feeStand") !=null){
             drgDipResultDTO.setStandFee(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feeStand").toString()).setScale(2));
+        }
+        if( drgDipResultDTO.getStandFee()!=null && drgDipResultDTO.getTotalFee() != null){
+            drgDipResultDTO.setProfit(BigDecimalUtils.subtract(drgDipResultDTO.getStandFee(),drgDipResultDTO.getTotalFee()));
         }
         if(MapUtils.get(groupInfo, "feePay") !=null){
             drgDipResultDTO.setFeePay(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feePay").toString()).setScale(2));
@@ -3349,6 +3359,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         if(MapUtils.get(groupInfo, "pro_consum") !=null){
             drgDipResultDTO.setStandProConsum(MapUtils.get(groupInfo, "pro_consum").toString());
+        }
+        if(MapUtils.get(groupInfo, "score_price") !=null){
+            drgDipResultDTO.setScorePrice(BigDecimalUtils.convert(MapUtils.get(groupInfo, "score_price").toString()).setScale(2));
         }
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo),DrgDipResultDetailDTO.class);
         Map<String, Object> resultMap = new HashMap<>();

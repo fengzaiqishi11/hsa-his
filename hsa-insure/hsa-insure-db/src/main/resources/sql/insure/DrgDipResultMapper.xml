@@ -245,7 +245,8 @@
         crt_name <!--创建姓名--> ,
 
 
-        crt_time <!--创建时间-->
+        crt_time <!--创建时间-->,
+        score_price
 
         )
         values (
@@ -310,7 +311,8 @@
         #{visitNo},
         #{crtId},
         #{crtName},
-        #{crtTime}
+        #{crtTime},
+        #{scorePrice}
         )
     </insert>
 

@@ -64,6 +64,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.inpt.medicalRecode.bo.impl
@@ -763,6 +764,25 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
             responseDataMap.put("quality", qualityInfoList);// 质控信息
+            //如果为空返回-
+            if(groupInfoMap.get("code") == null ||StringUtils.isEmpty(groupInfoMap.get("code").toString())){
+                responseDataMap.put("diagCode", "-");// DIP组编码
+            }
+            if(groupInfoMap.get("name") == null || StringUtils.isEmpty(groupInfoMap.get("name").toString())){
+                responseDataMap.put("diagName", "-");// DIP组名称
+            }
+            if(groupInfoMap.get("feePay") == null){
+                responseDataMap.put("diagFeeSco", "-");// 分值
+            }
+            if(responseDataMap.get("profitAndLossAmount") == null){
+                responseDataMap.put("profitAndLossAmount", "-");// 盈亏额
+            }
+            if(responseDataMap.get("feeStand") == null){
+                responseDataMap.put("feeStand", "-");// 总费用标杆
+            }
+            if(groupInfoMap.get("score_price") == null){
+                responseDataMap.put("scorePrice", "-");// 总费用标杆
+            }
             /**==========返回参数封装 End ===========**/
 
         } catch (Exception e) {

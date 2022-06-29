@@ -80,7 +80,7 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> insertDrgDipResult(Map<String,Object> map) {
+    public WrapperResponse<DrgDipResultDTO> insertDrgDipResult(Map<String,Object> map) {
         return WrapperResponse.success(drgDipResultBO.insertDrgDipResult(MapUtils.get(map,"drgDipResultDTO"),MapUtils.get(map,"drgDipResultDetailDTOList")));
     }
 

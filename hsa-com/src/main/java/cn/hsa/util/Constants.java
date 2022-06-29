@@ -680,6 +680,15 @@ public interface Constants {
         public static final String ZYCYZD = "204"; //住院出院诊断
     }
 
+    class JBFL{
+        public static final String LCJB = "1"; //ICD-10国家临床版疾病编码(ICD-10)
+        public static final String ZLXT = "2"; //ICD-10国家临床版肿瘤形态学编码(M码)
+        public static final String SSCZ ="3"; //ICD-9国家临床版手术操作编码(ICD-9-CM3)
+        public static final String ZYBM = "4"; //中医病名
+        public static final String ZYHZZD = "5"; //中医候诊诊断
+        public static final String ZYZH = "6"; //中医证侯
+    }
+
     /**
      * @Desrciption 医保配置KEY值
      * @Author Ou·Mr

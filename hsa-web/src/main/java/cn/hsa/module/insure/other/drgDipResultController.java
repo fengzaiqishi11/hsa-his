@@ -46,8 +46,18 @@ public class drgDipResultController extends BaseController {
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("drgDipResultDTO",drgDipResultDTO);
     DrgDipAuthDTO drgDipAuthDTO = drgDipResultService_consumer.checkDrgDipBizAuthorization(map).getData();
-    Boolean drg = new Boolean(drgDipAuthDTO.getDrg());
-    Boolean dip = new Boolean(drgDipAuthDTO.getDip());
+    Boolean drg ;
+    Boolean dip ;
+    if("true".equals(drgDipAuthDTO.getDrg())){
+      drg = true;
+    }else {
+      drg = false;
+    }
+    if("true".equals(drgDipAuthDTO.getDip())){
+      dip = true;
+    }else {
+      dip = false;
+    }
     Map<String,Object> drgDipMap = new HashMap<>();
     drgDipMap.put("drg",drg);
     drgDipMap.put("dip",dip);

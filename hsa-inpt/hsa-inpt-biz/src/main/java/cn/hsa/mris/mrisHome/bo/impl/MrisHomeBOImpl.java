@@ -585,6 +585,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("proMedicMaterStand", groupInfoMap.get("pro_medic_mater").toString());// 药占比标杆
             responseDataMap.put("proConsum", baseInfoMap.get("pro_consum"));// 耗材占比
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
+            responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
+            //自行计算盈亏额
+            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
             responseDataMap.put("quality", qualityInfoList);// 质控信息list
             /**==========返回参数封装 End ===========**/
         } catch (Exception e) {
@@ -759,7 +764,31 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("proMedicMaterStand", groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum", baseInfoMap.get("pro_consum"));// 耗材占比
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum"));// 耗材占比标杆
+            responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
+            //自行计算盈亏额
+            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
             responseDataMap.put("quality", qualityInfoList);// 质控信息
+            //如果为空返回-
+            if(groupInfoMap.get("code") == null ||StringUtils.isEmpty(groupInfoMap.get("code").toString())){
+                responseDataMap.put("diagCode", "-");// DIP组编码
+            }
+            if(groupInfoMap.get("name") == null || StringUtils.isEmpty(groupInfoMap.get("name").toString())){
+                responseDataMap.put("diagName", "-");// DIP组名称
+            }
+            if(groupInfoMap.get("feePay") == null){
+                responseDataMap.put("diagFeeSco", "-");// 分值
+            }
+            if(responseDataMap.get("profitAndLossAmount") == null){
+                responseDataMap.put("profitAndLossAmount", "-");// 盈亏额
+            }
+            if(responseDataMap.get("feeStand") == null){
+                responseDataMap.put("feeStand", "-");// 总费用标杆
+            }
+            if(groupInfoMap.get("score_price") == null){
+                responseDataMap.put("scorePrice", "-");// 总费用标杆
+            }
             /**==========返回参数封装 End ===========**/
 
         } catch (Exception e) {
@@ -2696,6 +2725,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         if (MapUtils.get(groupInfo, "feeStand") != null) {
             drgDipResultDTO.setStandFee(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feeStand").toString()).setScale(2));
         }
+        if( drgDipResultDTO.getStandFee()!=null && drgDipResultDTO.getTotalFee() != null){
+            drgDipResultDTO.setProfit(BigDecimalUtils.subtract(drgDipResultDTO.getStandFee(),drgDipResultDTO.getTotalFee()));
+        }
         if (MapUtils.get(groupInfo, "feePay") != null) {
             drgDipResultDTO.setFeePay(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feePay").toString()).setScale(2));
         }
@@ -2704,6 +2736,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
         if (MapUtils.get(groupInfo, "pro_consum") != null) {
             drgDipResultDTO.setStandProConsum(MapUtils.get(groupInfo, "pro_consum").toString());
+        }
+        if(MapUtils.get(groupInfo, "score_price") !=null){
+            drgDipResultDTO.setScorePrice(BigDecimalUtils.convert(MapUtils.get(groupInfo, "score_price").toString()).setScale(2));
         }
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo), DrgDipResultDetailDTO.class);
         Map<String, Object> resultMap = new HashMap<>();

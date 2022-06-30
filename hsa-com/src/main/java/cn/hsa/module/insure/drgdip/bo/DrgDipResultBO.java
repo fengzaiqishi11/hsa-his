@@ -59,7 +59,7 @@ public interface DrgDipResultBO {
    * @Date 2022-06-07 15:54
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
    */
-  Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList);
+  DrgDipResultDTO insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList);
 
   /**
    * 质控结果查询-结算清单

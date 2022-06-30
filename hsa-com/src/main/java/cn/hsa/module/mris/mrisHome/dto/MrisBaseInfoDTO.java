@@ -59,5 +59,7 @@ public class MrisBaseInfoDTO extends MrisBaseInfoDO implements Serializable {
 
     private String operFlag;
 
+    private String insureRegCode;
+
 }
 

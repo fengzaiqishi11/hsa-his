@@ -2232,7 +2232,13 @@
            '' as hsptzd_dept_id,/**入院科别代码**/
            IFNULL(iiv.bka006_name,'') as insur_type,/**险种类别**/
            iiv.medicine_org_code as medicine_org_code,
-            ifnull((select name from insure_dict where code = 'XZLX' and value = iib.aae140 limit 1),'自费病人') as health_care_type
+            ifnull((select name from insure_dict where code = 'XZLX' and value = iib.aae140 limit 1),'自费病人') as health_care_type,
+            mbi.id as id,
+            iiv.aka130 as medType,
+            iiv.aka130_name as medTypeName,
+            iiv.insure_org_code as orgCode,
+            iiv.insure_reg_code as insureRegCode,
+            iib.aac001 as psnNo
             FROM mris_base_info mbi
             left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code

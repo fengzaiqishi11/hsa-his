@@ -245,7 +245,8 @@
         crt_name <!--创建姓名--> ,
 
 
-        crt_time <!--创建时间-->
+        crt_time <!--创建时间-->,
+        score_price
 
         )
         values (
@@ -310,7 +311,8 @@
         #{visitNo},
         #{crtId},
         #{crtName},
-        #{crtTime}
+        #{crtTime},
+        #{scorePrice}
         )
     </insert>
 
@@ -382,6 +384,9 @@
             </if>
             <if test="groupResult != null and groupResult != '' ">
                and A.group_result = #{groupResult}
+            </if>
+            <if test="sv != null and sv != '' ">
+               and (A.violation_states = '1' or A.suspicious_states = '1')
             </if>
             <if test="keyword != null and keyword != ''">
                 and ( A.psn_name like concat('%',#{keyword},'%')
@@ -475,6 +480,9 @@
             </if>
             <if test="groupResult != null and groupResult != '' ">
                 and A.group_result = #{groupResult}
+            </if>
+            <if test="sv != null and sv != '' ">
+                and (A.violation_states = '1' or A.suspicious_states = '1')
             </if>
             <if test="keyword != null and keyword != ''">
                 and ( A.psn_name like concat('%',#{keyword},'%')

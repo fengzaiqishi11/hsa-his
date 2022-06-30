@@ -64,7 +64,7 @@ public interface DrgDipResultService {
      * @Date 2021-04-11 22:54
      * @Return
      */
-    WrapperResponse<Boolean> insertDrgDipResult(Map<String, Object> map);
+    WrapperResponse<DrgDipResultDTO> insertDrgDipResult(Map<String, Object> map);
 
     /**
      * @return

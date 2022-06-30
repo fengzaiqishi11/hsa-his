@@ -364,6 +364,24 @@ public class StringUtils {
         }
         return new ConfigInfoDO();
     }
-
+    /**
+     * @Author gory
+     * @Description 从字符串中获取数字，如果不存在数字则返回""
+     * @Date 2022/6/23 21:03
+     * @Param [str]
+     **/
+    public static String getNumberFromString(String str) {
+        if (null != str) {
+            String regEx = "[^0-9]";
+            Pattern p = Pattern.compile(regEx);
+            Matcher m = p.matcher(str);
+            String number = m.replaceAll("").trim();
+            if (number.startsWith("0") || number.equals("") || number == null) {
+                return "";
+            }
+            return number;
+        }
+        return "";
+    }
 }
 

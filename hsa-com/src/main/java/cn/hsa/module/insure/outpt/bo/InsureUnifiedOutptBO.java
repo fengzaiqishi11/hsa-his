@@ -73,7 +73,7 @@ public interface InsureUnifiedOutptBO {
      * @date 2022/6/14 16:22
      * @description 通过区域医保服务平台推送消息（待结算、结算成功、检查报告、挂号通知）等信息给用户,待结算消息推送（必选）
      **/
-    boolean AMP_HOS_001(Map<String, Object> map);
+    Map<String, Object> AMP_HOS_001(Map<String, Object> map);
 
     /**
      * 线上医保移动支付完成的结算订单，可通过此接口进行退款

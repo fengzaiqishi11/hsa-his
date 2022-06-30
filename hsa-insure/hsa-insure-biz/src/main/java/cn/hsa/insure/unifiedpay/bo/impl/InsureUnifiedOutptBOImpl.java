@@ -770,7 +770,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
             // 机构获取对账文件秘钥
             put("orgSecret", orgSecret.getValue()); // 系统参数 TODO 关于机构秘钥的发放对接时会进行分配
             // 账单日期，格式yyyy-MM-dd
-            put("billDate", MapUtils.get(map,"reconciliationDate"));
+            put("billDate", MapUtils.get(map,"billDate"));
             // 账单类型
             put("billType", "ALL");
         }};
@@ -801,14 +801,14 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
      * @return com.yhtech.nmpay.common.client.YhGatewayClient
      */
     private YhGatewayClient CreateYHGatewayClient(Map paramMap){
-      paramMap.put("codeList", new String[]{"HN_URL", "HN_CLIENT_PRV_KEY", "HN_APP_ID", "HN_APP_SECRET", "HN_SERVER_PUB_KEY", "HN_YDZF_FLAG"});
+      paramMap.put("codeList", new String[]{"HAINAN_URL", "HAINAN_CLIENT_PRV_KEY", "HAINAN_APP_ID", "HAINAN_APP_SECRET", "HAINAN_SERVER_PUB_KEY", "HAINAN_YDZF_FLAG"});
       WrapperResponse<Map<String, SysParameterDTO>> wr = sysParameterService_consumer.getParameterByCodeList(paramMap);
       Map<String, SysParameterDTO> sysMap = getData(wr);
-      SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HN_URL");
-      SysParameterDTO prvKeyPrameter = MapUtils.get(sysMap, "HN_CLIENT_PRV_KEY");
-      SysParameterDTO appIdPrameter = MapUtils.get(sysMap, "HN_APP_ID");
-      SysParameterDTO secretPrameter = MapUtils.get(sysMap, "HN_APP_SECRET");
-      SysParameterDTO pubKeyPrameter = MapUtils.get(sysMap, "HN_SERVER_PUB_KEY");
+      SysParameterDTO urlPrameter = MapUtils.get(sysMap, "HAINAN_URL");
+      SysParameterDTO prvKeyPrameter = MapUtils.get(sysMap, "HAINAN_CLIENT_PRV_KEY");
+      SysParameterDTO appIdPrameter = MapUtils.get(sysMap, "HAINAN_APP_ID");
+      SysParameterDTO secretPrameter = MapUtils.get(sysMap, "HAINAN_APP_SECRET");
+      SysParameterDTO pubKeyPrameter = MapUtils.get(sysMap, "HAINAN_SERVER_PUB_KEY");
       if (ObjectUtil.isEmpty(urlPrameter)){
         throw new RuntimeException("未配置服务网关地址");
       }
@@ -836,7 +836,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
      * @description 通过区域医保服务平台推送消息（待结算、结算成功、检查报告、挂号通知）等信息给用户,待结算消息推送（必选）
      **/
 	@Override
-	public boolean AMP_HOS_001(Map<String, Object> map) {
+	public Map<String, Object> AMP_HOS_001(Map<String, Object> map) {
         Map<String, String> params = new HashMap<>();
         //医保信息
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisitDTO");
@@ -845,7 +845,11 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         // 从处方信息中总结获得待结算金额  金额
         BigDecimal amount = new BigDecimal(0);
         for (OutptCostDTO costDTO : outptCostDTOList) {
-            amount = amount.add(costDTO.getLastRealityPrice());
+            if(costDTO.getLastRealityPrice() != null) {
+                amount = amount.add(costDTO.getLastRealityPrice());
+            }else {
+                amount = amount.add(costDTO.getRealityPrice());
+            }
         }
         //就诊信息
         List outptDiagnoseDTO = MapUtils.get(map, "outptDiagnoseDTOList");
@@ -860,7 +864,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         InsureConfigurationDTO insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configDTO);
         if (insureConfigurationDTO == null)
             throw new RuntimeException("未发现【" + insureIndividualVisitDTO.getInsureRegCode() + "】相关医保配置信息");
-        Map paramMap = new HashMap();
+        Map<String, Object> paramMap = new HashMap();
         paramMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
         // 一、初始化Client
         YhGatewayClient yhGatewayClient = CreateYHGatewayClient(paramMap);
@@ -869,7 +873,8 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         BaseDeptDTO baseDeptDTO = new BaseDeptDTO();
         baseDeptDTO.setId(outptVisitDTO.getDeptId());
         baseDeptDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
-        Map baseDeptMap = new HashMap();
+        Map<String, Object> baseDeptMap = new HashMap();
+        baseDeptMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
         baseDeptMap.put("baseDeptDTO",baseDeptDTO);
         BaseDeptDTO deptRes = baseDeptService.getById(baseDeptMap).getData();
         String deptPlace = deptRes.getPlace();
@@ -878,8 +883,9 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         SysUserDTO sysUserDTO = new SysUserDTO();
         sysUserDTO.setId(outptVisitDTO.getDoctorId());
         sysUserDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
-        Map sysUserMap = new HashMap();
-        baseDeptMap.put("sysUserDTO", sysUserDTO);
+        Map<String, Object> sysUserMap = new HashMap();
+        sysUserMap.put("hospCode", insureIndividualVisitDTO.getHospCode());
+        sysUserMap.put("sysUserDTO", sysUserDTO);
         SysUserDTO sysUserRes = sysUserService.getById(sysUserMap).getData();
         String drLvName = sysUserRes.getDutiesCode();
 
@@ -965,6 +971,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         payOnlineInfoDTO.setAmpTraceId("");
         payOnlineInfoDTO.setTraceId("");
         payOnlineInfoDTO.setOrgTraceNo("");
+        payOnlineInfoDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
         // bean对象转化为json对象
         JSONObject param = new JSONObject(MapUtils.object2Map(payOnlineInfoDTO));
 
@@ -972,7 +979,7 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
         PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
         // 属性拷贝
         BeanUtils.copyProperties(payOnlineInfoDTO, payOnlineInfoDO);
-
+        Map<String, Object> resultMap = new HashMap();
 
         // ！！！请求方法说明：第一个形参填写接口定义的url，第二个形参填入请求的入参，第三个形参填入出参需要转换成什么类（建议自己定义一个DTO进行接收）
         com.yhtech.yhaf.core.dto.WrapperResponse<JSONObject> gatewayResponse = yhGatewayClient.common(
@@ -982,19 +989,21 @@ public class InsureUnifiedOutptBOImpl extends HsafBO implements InsureUnifiedOut
                 }
         );
         boolean requestSuccess = gatewayResponse.isSuccess();
+        resultMap.put("requestSuccess", requestSuccess);
         if (requestSuccess) {
             JSONObject outParam = gatewayResponse.getParam();
             // 出参接收与处理
             logger.info("响应出参：{}", JSON.toJSONString(outParam));
+            resultMap.put("payOnlineInfoDO", payOnlineInfoDO);
             // 接收成功后的处理 存入本地信息推送表
-            payOnlineInfoDAO.insertPayOnlineInfo(payOnlineInfoDO);
+//            payOnlineInfoDAO.insertPayOnlineInfo(payOnlineInfoDO);
 
         } else {
             logger.warn("请求失败,错误码:{},错误信息{}", gatewayResponse.getRespCode(), gatewayResponse.getRespMsg());
             throw new AppException("请求远程接口失败："+ gatewayResponse.getRespMsg());
         }
 
-        return requestSuccess;
+        return resultMap;
 	}
 
     /**

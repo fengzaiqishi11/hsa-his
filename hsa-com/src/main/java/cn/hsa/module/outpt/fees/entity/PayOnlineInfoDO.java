@@ -150,6 +150,8 @@ public class PayOnlineInfoDO implements Serializable {
 	 */
 	private String redSettleId;
 
+	private String docTraceNo;
+
 
 	public void setId(String id) {
 		this.id = id;

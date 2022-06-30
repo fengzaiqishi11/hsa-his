@@ -288,19 +288,16 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         //返回给前端  提示是否有这个权限
         Map<String,Object> map2 = new HashMap<>();
         map2.put("hospCode",map.get("hospCode").toString());
-        DrgDipAuthDTO drgDipAuthDTO = new DrgDipAuthDTO();
-        drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorizationSettle(map2).getData();
-        //都提示false  没权限
-        if ("false".equals(drgDipAuthDTO.getDip())&&"false".equals(drgDipAuthDTO.getDrg())){
-          resultMap.put("hasAuth", false);
-        }else{
-          resultMap.put("hasAuth", true);
-        }
+        DrgDipAuthDTO drgDipAuthDTO =  drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
         HashMap map1 = new HashMap();
         map1.put("drgDipResultDTO",dto);
         map1.put("hospCode",map.get("hospCode").toString());
         map1.put("drgDipAuthDTO",drgDipAuthDTO);
         DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        combo.setDip(drgDipAuthDTO.getDip());
+        combo.setDrg(drgDipAuthDTO.getDrg());
+        combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+        combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
         resultMap.put("drgInfo",combo);
         return resultMap;
     }
@@ -853,10 +850,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
-        if (ListUtils.isEmpty(allergylist)) {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.F);
+        if (ListUtils.isEmpty(allergylist)) { // 药物是否过敏 国家卫健委标准：RC037 有无药物过敏表 1: 无 2: 有
+            mrisBaseInfoDTO.setIsAllergy("1");
         } else {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.S);
+            mrisBaseInfoDTO.setIsAllergy("2");
             String alleryList = "";
             for (InptPastAllergyDTO inptPastAllergyDTO : allergylist) {
                 alleryList += inptPastAllergyDTO.getDrugName() + ",";
@@ -883,13 +880,13 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
             mrisBaseInfoDTO.setDirectorName2(doctorInfo.getDirectorName2());
         }
 
-        // 住院次数获取(未获取，默认1次)
-        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
-        if (inCnt == 0) {
-            inCnt = 1;
-        }
-
-        mrisBaseInfoDTO.setInCnt(inCnt);
+//        // 住院次数获取(未获取，默认1次)
+//        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
+//        if (inCnt == 0) {
+//            inCnt = 1;
+//        }
+//
+//        mrisBaseInfoDTO.setInCnt(inCnt);
         mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getHealthCard());
 
         // 获取医疗机构名称与医疗机构编码

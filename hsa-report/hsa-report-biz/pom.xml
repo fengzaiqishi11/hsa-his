@@ -36,18 +36,19 @@
                 </exclusion>
             </exclusions>
         </dependency>
-
-        <!--ID唯一生成-->
-        <!--        <dependency>-->
-        <!--            <groupId>cn.hsa.hsaf.core</groupId>-->
-        <!--            <artifactId>hsaf-idgenerator</artifactId>-->
-        <!--        </dependency>-->
-
-        <!-- 认证安全组件 -->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.auth.security</groupId>-->
-<!--            <artifactId>hsaf-auth-security</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+        </dependency>
+        <!--动态数据源-->
+        <dependency>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.bstek.ureport</groupId>
+            <artifactId>ureport2-console</artifactId>
+        </dependency>
 
         <!--MVC框架-->
         <dependency>
@@ -106,19 +107,14 @@
             <version>3.10.2</version>
         </dependency>
 
-        <!--工具类-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>commons-io</groupId>-->
-<!--            <artifactId>commons-io</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>org.apache.commons</groupId>-->
 <!--            <artifactId>commons-collections4</artifactId>-->

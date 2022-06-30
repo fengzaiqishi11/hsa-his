@@ -1643,6 +1643,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         logger.info("统一支付平台下载入参" + itemType + ":" + json);
         String url = insureConfigurationDTO.getUrl();
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
+        logger.info("统一支付平台下载返参" + itemType + ":" + resultJson);
         if (StringUtils.isEmpty(resultJson)) {
             throw new AppException("无法访问医保统一支付平台");
         }
@@ -1650,7 +1651,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");

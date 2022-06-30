@@ -248,6 +248,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             inptMatchDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(reqMap).getData();
 
             mapList = handlerInptCostFee(insureSettleInfoDTO);
+            //修改状态
+            inptVisitDTO.setIsUplodDise("1");
 
         } else if (insureSettleInfoDTO.getLx().equals("0")) {
             Map<String, String> visitMap = new HashMap();
@@ -278,6 +280,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             outptMatchDiagnoseDTOList = outptDoctorPrescribeService.queryOutptDiagnose(map).getData();
 
             mapList = handlerOutptCostFee(insureSettleInfoDTO);
+            //修改状态
+            outptVisitDTO.setIsUploadDise("1");
         }
 
 
@@ -315,6 +319,18 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_UPLOD, interfaceParamDTO);
 
         insertHandlerInsureCost(mapList, insureSettleInfoDTO);
+        //修改状态
+        if(insureSettleInfoDTO.getLx().equals("1")){
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            updateMap.put("inptVisitDTO", inptVisitDTO);
+            inptVisitService_consumer.updateUplod(updateMap);
+        }else if (insureSettleInfoDTO.getLx().equals("0")){
+            Map paramMap1 = new HashMap();
+            paramMap1.put("hospCode",insureSettleInfoDTO.getHospCode());
+            paramMap1.put("outptVisitDTO",outptVisitDTO);
+            outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
+        }
         return true;
     }
 

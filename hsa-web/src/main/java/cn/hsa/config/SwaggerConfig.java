@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @Email: 406224709@qq.com
  * @Date: 2020/7/1 20:50
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
- **/
+// **/
 @Configuration
 @EnableSwagger2
 @ConditionalOnProperty(name = "swagger.enabled", havingValue = "true")

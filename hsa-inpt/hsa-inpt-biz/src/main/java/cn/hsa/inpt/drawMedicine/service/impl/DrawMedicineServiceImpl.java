@@ -159,8 +159,8 @@ public class DrawMedicineServiceImpl implements DrawMedicineService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     @Override
-    public WrapperResponse<Boolean> saveAdvanceTakeMedicine(Map<String, Object> map,String type) {
-        drawMedicineBO.saveAdvanceTakeMedicine(map,type);
+    public WrapperResponse<Boolean> saveAdvanceTakeMedicine(Map<String, Object> map) {
+        drawMedicineBO.saveAdvanceTakeMedicine(map);
         return WrapperResponse.success(true);
     }
 

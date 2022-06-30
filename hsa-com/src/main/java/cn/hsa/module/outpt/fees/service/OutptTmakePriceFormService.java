@@ -470,7 +470,7 @@ public interface OutptTmakePriceFormService {
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
       *
      **/
-    WrapperResponse AMP_HOS_001(Map map);
+    WrapperResponse savePayOnlineInfoDO(Map map);
 
     /**
      * @param param
@@ -501,5 +501,27 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      *
      **/
-    WrapperResponse<Map<String, Object>> queryUnsettleList(Map param);
+    WrapperResponse<Map<String, Object>> updateUnsettleList(Map param);
+
+    /**
+      * @method queryAccount
+      * @author wang'qiao
+      * @date 2022/6/22 15:10
+      *	@description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
+      * @param  param
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+      *
+     **/
+    WrapperResponse<Map<String, Object>> queryAccount(Map param);
+
+    /**
+      * @method rechargeSettle
+      * @author wang'qiao
+      * @date 2022/6/23 15:27
+      *	@description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+      * @param  param
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+      *
+     **/
+    WrapperResponse<Map<String, Object>> updateRechargeSettle(Map param);
 }

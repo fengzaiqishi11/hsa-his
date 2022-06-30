@@ -586,8 +586,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       *
      **/
     @Override
-    public WrapperResponse AMP_HOS_001(Map map){
-        return outptTmakePriceFormBO.AMP_HOS_001(map);
+    public WrapperResponse savePayOnlineInfoDO(Map map){
+        return outptTmakePriceFormBO.savePayOnlineInfoDO(map);
     }
 
     /**
@@ -625,8 +625,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @description
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> queryUnsettleList(Map param) {
-        return WrapperResponse.success(outptTmakePriceFormBO.queryUnsettleList(param));
+    public WrapperResponse<Map<String, Object>> updateUnsettleList(Map param) {
+        return WrapperResponse.success(outptTmakePriceFormBO.updateUnsettleList(param));
     }
 
     /**
@@ -652,7 +652,7 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       *
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> rechargeSettle(Map param) {
-        return WrapperResponse.success(outptTmakePriceFormBO.rechargeSettle(param));
+    public WrapperResponse<Map<String, Object>> updateRechargeSettle(Map param) {
+        return WrapperResponse.success(outptTmakePriceFormBO.updateRechargeSettle(param));
     }
 }

@@ -196,7 +196,7 @@ public interface InsureUnifiedPayOutptService {
 	 * @date 2022/6/14 16:20
 	 * @description
 	 **/
-	WrapperResponse<Boolean> AMP_HOS_001(Map<String, Object> map);
+	WrapperResponse<Map<String,Object>> AMP_HOS_001(Map<String, Object> map);
 
     /**
      * 线上医保移动支付完成的结算订单，可通过此接口进行退款

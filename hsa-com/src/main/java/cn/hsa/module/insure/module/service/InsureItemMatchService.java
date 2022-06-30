@@ -247,9 +247,9 @@ public interface InsureItemMatchService {
       * @author wang'qiao
       * @date 2022/6/21 21:28
       *	@description 	根据hospItemId查询项目信息
-      * @param  itemMatchDTO
+      * @param  selectItemMap
       * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
       *
      **/
-    List<InsureItemMatchDTO> queryByHospItemId(InsureItemMatchDTO itemMatchDTO);
+    List<InsureItemMatchDTO> queryByHospItemId(Map<String, Object> selectItemMap);
 }

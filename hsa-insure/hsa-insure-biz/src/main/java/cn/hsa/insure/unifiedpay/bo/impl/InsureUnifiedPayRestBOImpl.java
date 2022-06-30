@@ -1651,7 +1651,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
@@ -1659,7 +1659,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         List<Map<String, Object>> dataResultMap;
         // 医保可能返回了string字符串这里需要做一下判断才能继续往下走
         if(obj instanceof String){
-            //logger.info("统一支付平台下载回参" + itemType + ":" + obj);
+            logger.info("统一支付平台下载回参" + itemType + ":" + obj);
         }else if(obj instanceof List){
             dataResultMap = (List<Map<String, Object>>) obj;
             if (ListUtils.isEmpty(dataResultMap)) {

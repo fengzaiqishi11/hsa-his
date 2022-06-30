@@ -753,7 +753,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("diagFeeSco", groupInfoMap.get("feePay"));// 分值
             responseDataMap.put("profitAndLossAmount", groupInfoMap.get("profit"));// 盈亏额
             responseDataMap.put("totalFee", baseInfoMap.get("totalFee"));// 总费用
-            responseDataMap.put("feeStand", baseInfoMap.get("feeStand"));// 总费用标杆
+            responseDataMap.put("feeStand", groupInfoMap.get("feeStand"));// 总费用标杆
             responseDataMap.put("proMedicMater", baseInfoMap.get("pro_medic_mater"));// 药占比
             responseDataMap.put("proMedicMaterStand", groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum", baseInfoMap.get("pro_consum"));// 耗材占比

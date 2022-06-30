@@ -1542,8 +1542,12 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 //            pharOutReceiveService_consumer.batchInsert(pharOutReceiveParam);
 //            pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
 //            pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
-            outptCostDAO.batchPharOutReceiveInsert(pharOutReceiveDOList);
-            outptCostDAO.batchPharOutReceiveDetailInsert(pharOutReceiveDetailDOList);
+            if (ObjectUtil.isNotEmpty(pharOutReceiveDOList)) {
+                outptCostDAO.batchPharOutReceiveInsert(pharOutReceiveDOList);
+            }
+            if (ObjectUtil.isNotEmpty(pharOutReceiveDetailDOList)) {
+                outptCostDAO.batchPharOutReceiveDetailInsert(pharOutReceiveDetailDOList);
+            }
         }
     }
 

@@ -3103,19 +3103,39 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("下载的码表数据为空");
         }
         List<InsureDictDO> insureDictDTOList = new ArrayList<>();
-        for (Map<String, Object> item : resultDataMap) {
-            insureDictDTO = new InsureDictDTO();
-            insureDictDTO.setId(SnowflakeUtils.getId());
-            insureDictDTO.setHospCode(hospCode);
-            insureDictDTO.setInsureRegCode(insureRegCode);
-            insureDictDTO.setCode(MapUtils.get(item, "type"));
-            insureDictDTO.setValue(MapUtils.get(item, "value"));
-            insureDictDTO.setName(MapUtils.get(item, "label"));
-            insureDictDTO.setRemark(remark);
-            insureDictDTO.setCrteId(crteId);
-            insureDictDTO.setCrteTime(DateUtils.getNow());
-            insureDictDTO.setCrteName(crteName);
-            insureDictDTOList.add(insureDictDTO);
+        //广州码表下载接口与湖南的返回字段不一样且返回的是全量的码表值，做一下特殊处理
+        if (insureRegCode.startsWith(Constant.UnifiedPay.YBBMQZ.GD)) {
+            for (Map<String, Object> item : resultDataMap) {
+                if (type.equalsIgnoreCase(MapUtils.get(item, "dic_type_code"))) {
+                    insureDictDTO = new InsureDictDTO();
+                    insureDictDTO.setId(SnowflakeUtils.getId());
+                    insureDictDTO.setHospCode(hospCode);
+                    insureDictDTO.setInsureRegCode(insureRegCode);
+                    insureDictDTO.setCode(MapUtils.get(item, "dic_type_code"));
+                    insureDictDTO.setValue(MapUtils.get(item, "place_dic_val_code"));
+                    insureDictDTO.setName(MapUtils.get(item, "place_dic_val_name"));
+                    insureDictDTO.setRemark(remark);
+                    insureDictDTO.setCrteId(crteId);
+                    insureDictDTO.setCrteTime(DateUtils.getNow());
+                    insureDictDTO.setCrteName(crteName);
+                    insureDictDTOList.add(insureDictDTO);
+                }
+            }
+        }else {
+            for (Map<String, Object> item : resultDataMap) {
+                insureDictDTO = new InsureDictDTO();
+                insureDictDTO.setId(SnowflakeUtils.getId());
+                insureDictDTO.setHospCode(hospCode);
+                insureDictDTO.setInsureRegCode(insureRegCode);
+                insureDictDTO.setCode(MapUtils.get(item, "type"));
+                insureDictDTO.setValue(MapUtils.get(item, "value"));
+                insureDictDTO.setName(MapUtils.get(item, "label"));
+                insureDictDTO.setRemark(remark);
+                insureDictDTO.setCrteId(crteId);
+                insureDictDTO.setCrteTime(DateUtils.getNow());
+                insureDictDTO.setCrteName(crteName);
+                insureDictDTOList.add(insureDictDTO);
+            }
         }
         if (!ListUtils.isEmpty(insureDictDTOList)) {
             map.put("insureDictDTOList", insureDictDTOList);

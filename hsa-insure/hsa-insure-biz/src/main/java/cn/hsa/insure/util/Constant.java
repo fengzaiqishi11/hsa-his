@@ -916,6 +916,7 @@ public interface Constant {
         public static class YBBMQZ {
             public static final String HN = "46"; // 海南医保前缀
             public static final String GS = "62"; // 甘肃医保前缀
+            public static final String GD = "44"; // 广东医保前缀
         }
     }
 

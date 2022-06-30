@@ -328,6 +328,10 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
    * 既有可疑又有违规
    */
   private String sv;
+  /**
+   * 分值单价
+   */
+  private BigDecimal scorePrice;
     /**
      * 科室id集合
      */

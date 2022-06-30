@@ -1227,8 +1227,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             responseDataMap.put("inNO",baseInfoMap.get("visitId"));//住院号
             responseDataMap.put("diagCode",groupInfoMap.get("code"));// DIP组编码
             responseDataMap.put("diagName",groupInfoMap.get("name"));// DIP组名称
-            responseDataMap.put("diagFeeSco",resultMap.get("feePay"));// 分值
-            responseDataMap.put("profitAndLossAmount",resultMap.get("profit"));// 盈亏额
+            responseDataMap.put("diagFeeSco",groupInfoMap.get("feePay"));// 分值
+            responseDataMap.put("profitAndLossAmount",groupInfoMap.get("profit"));// 盈亏额
             responseDataMap.put("totalFee",baseInfoMap.get("totalFee"));// 总费用
             responseDataMap.put("feeStand",groupInfoMap.get("feeStand"));// 总费用标杆
             responseDataMap.put("proMedicMater",baseInfoMap.get("pro_medic_mater"));// 药占比
@@ -1258,7 +1258,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 responseDataMap.put("feeStand", "-");// 总费用标杆
             }
             if(groupInfoMap.get("score_price") == null){
-                responseDataMap.put("scorePrice", "-");// 总费用标杆
+                responseDataMap.put("scorePrice", "-");// 分值单价
             }
             /**==========返回参数封装 End ===========**/
         }catch (Exception e){

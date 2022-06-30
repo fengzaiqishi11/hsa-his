@@ -1,5 +1,6 @@
 package cn.hsa.module.interf.report.dao;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -203,4 +204,8 @@ public interface StatisticalReportDAO {
      * @Date: 2021/9/16
      */
     List<Map<String, Object>> queryOutSumAntibiosisDrugDetail(Map<String, Object> paramMap);
+
+
+    LinkedHashMap<String, Object> getLisorPassStatisticsSum(Map<String, Object> paramMap);
+
 }

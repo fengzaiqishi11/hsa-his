@@ -209,8 +209,9 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
         List<Map<String, Object>> resultData = statisticalReportDAO.lisStatistics(paramMap);
+        LinkedHashMap<String, Object> sumMap = statisticalReportDAO.getLisorPassStatisticsSum(paramMap);
         //return getPageDTO(paramMap, resultData);
-        return PageDTO.of(resultData);
+        return PageDTO.of(resultData,sumMap);
     }
 
     @Override
@@ -219,7 +220,8 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         int pageSize = Integer.parseInt((String)paramMap.get("pageSize"));
         PageHelper.startPage(pageNo,pageSize);
         List<Map<String, Object>> resultData = statisticalReportDAO.passStatistics(paramMap);
-        return PageDTO.of(resultData);
+        LinkedHashMap<String, Object> sumMap = statisticalReportDAO.getLisorPassStatisticsSum(paramMap);
+        return PageDTO.of(resultData,sumMap);
 //        return getPageDTO(paramMap, resultData);
     }
 

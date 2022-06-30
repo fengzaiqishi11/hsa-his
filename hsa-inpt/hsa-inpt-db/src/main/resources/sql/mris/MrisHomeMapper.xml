@@ -1044,6 +1044,27 @@
             AND md.visit_id = #{id}
     </select>
 
+    <!--查询中医病案诊断信息-->
+    <select id="queryTcmMrisDiagnosePage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO">
+            SELECT
+                md.id,
+                md.hosp_code,
+                mbi_id,
+                md.visit_id,
+                disease_code,
+                disease_name,
+                md.icd_version,
+                md.disease_icd10,
+                md.disease_icd10_name,
+                md.in_situation_code,
+                columns_num,
+                mbi.in_blh
+            FROM tcm_mris_diagnose md join tcm_mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
+            WHERE md.hosp_code = #{hospCode}
+            AND md.visit_id = #{id}
+    </select>
+
     <!--病案诊断数据批量插入-->
     <insert id="insertMrisDiagnoseBatch" parameterType="list">
         INSERT INTO mris_diagnose (
@@ -1113,6 +1134,15 @@
             resultType="cn.hsa.module.mris.mrisHome.dto.MrisOperDTO">
             SELECT *, oper_disease_name as 'name'
             FROM mris_oper_info
+            WHERE hosp_code = #{hospCode}
+            AND visit_id = #{id}
+    </select>
+
+    <!--查询中医病案手术信息-->
+    <select id="queryTcmMrisOperInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
+            resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO">
+            SELECT *, oper_disease_name as 'name'
+            FROM tcm_mris_oper_info
             WHERE hosp_code = #{hospCode}
             AND visit_id = #{id}
     </select>
@@ -1817,6 +1847,15 @@
                 where hosp_code = #{hospCode} and visit_id = #{visitId}
     </select>
 
+    <select id="queryTcmMriCost" resultType="cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO">
+        select id, hosp_code, mbi_id, visit_id, fy01, fy02, fy03, fy04, fy05, fy06,
+               fy07, zhylfwl01, zhylfwl02, zhylfwl03, zhylfwl04, zhylfwl05, zhylfwl06, zdl01,
+               zdl02, zdl03, zdl04, zll01, zll02, zll03, zll04, zll05, kfl01,
+               xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03, xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01,
+               zyl02, zyl03, zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06 from tcm_mris_cost
+                where hosp_code = #{hospCode} and visit_id = #{visitId}
+    </select>
+
     <!-- 查询病案婴儿信息-->
     <select id="queryMrisBabyInfoPage" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO"
             resultType="cn.hsa.module.mris.mrisHome.entity.MrisBabyInfoDO">
@@ -1988,212 +2027,222 @@
     <select id="getMrisPatientBaseInfo" parameterType="java.util.Map"
             resultType="java.util.Map">
         SELECT
-        IFNULL(yljg_code,'') as hospital_code,
-        IFNULL(mbi.visit_id,'') as visit_id,
-        IFNULL(hosp_name,'') as hospital_name,
-        IFNULL(iiv.medical_reg_no,'') as serial_no,
-        '' as hosp_id,
-        '' as branch_hosp_id,
-        '' as social_curity_card,
-        IFNULL(cert_code,'') as card_type,
-        IFNULL(cert_no,'') as card_number,
-        IFNULL(in_profile,'') as patient_no,
-        IFNULL(in_cnt,1) as hsptzd_count,
+        IFNULL(yljg_code,'') as hospital_code,/**医疗机构编码**/
+        IFNULL(mbi.visit_id,'') as visit_id,/**就诊id**/
+        IFNULL(hosp_name,'') as hospital_name,/**医疗服务机构名称**/
+        IFNULL(iiv.medical_reg_no,'') as serial_no,/**就诊登记号**/
+        '' as hosp_id,/**行政区划代码（参保地）**/
+        '' as branch_hosp_id,/**参保地社保分支机构代码**/
+        '' as social_curity_card,/**社会保障号码**/
+        IFNULL(cert_code,'') as card_type,/**证件类型**/
+        IFNULL(cert_no,'') as card_number,/**证件号码**/
+        IFNULL(in_profile,'') as patient_no,/**病案号**/
+        IFNULL(in_cnt,1) as hsptzd_count,/**住院次数**/
         IFNULL(icd_version,'') as icd_version,
-        IFNULL(in_no,'') as adm_no,
-        IFNULL(age,'') as age,
-        IFNULL(name,'') as name,
-        IFNULL(gender_code,'') as sex_id,
-        IFNULL(gender_name,'') as sex,
-        IFNULL(birthday,'') as birthday,
-        IFNULL(id_card,'') as id_card,
-        IFNULL(nationality_cation,'') as country_id,
-        IFNULL(nationality_name,'') as country,
-        IFNULL(nation_code,'') as nation_id,
-        IFNULL(nation_name,'') as nation,
-        IFNULL(occupation_name,'') as job,
-        IFNULL(marry_code,'') as marriage_status_id,
-        IFNULL(marry_name,'') as marriage_status,
-        IFNULL(work,'') as company_name,
-        IFNULL(work_address,'') as company_address,
-        IFNULL(work_phone,'') as work_phone,
-        IFNULL(work_post_code,'') as company_post,
-        IFNULL(native_adress,'') as resident_address,
-        IFNULL(native_post_code,'') as resident_post,
-        IFNULL(contact_name,'') as cont,
-        IFNULL(contact_rela_code,'') as cont_rel_patient,
-        IFNULL(contact_address,'') as cont_address,
-        IFNULL(contact_phone,'') as cont_tel,
-        IFNULL(health_card,'') as as_card,
-        IFNULL(in_time,'') as hsptzd_date,
-        IFNULL(in_dept_id,'') as hsptzd_unified_dept,
-        IFNULL(in_dept_name,'') as hsptzd_dept,
-        IFNULL(in_ward,'') as hsptzd_ward,
-        IFNULL(out_time,'') as hosp_disch_date,
-        IFNULL(out_dept_id,'') as disch_unified_dept,
-        IFNULL(out_dept_name,'') as disch_dept,
-        IFNULL(in_ward,'') as disch_ward,
-        IFNULL(in_days,0) as  actual_adm_days,
-        IFNULL(disease_icd10,'') as outemgc_dagns_id,
-        IFNULL(disease_icd10_name,'') as outemgc_dagns,
-        '无' as outemgc_doc_id,
-        '无' as outemgc_doc,
-        IFNULL(bl_icd10_name,'') as  pthlgy_dagns,
-        IFNULL(allergy_list,'') as allergic_drugs,
-        IFNULL(rescue_count,'') as rescue_num,
-        IFNULL(rescue_success_count,'') as rescue_succ_num,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1),'') as dept_direct_id,
-        IFNULL(director_name1,'') as dept_direct,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id2),'') as arch_id,
-        IFNULL(director_name2,'') as arch,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id),'') as att_doctor_id,
-        IFNULL(zz_doctor_name,'') as att_doctor,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id),'') as resident_id,
-        IFNULL(zg_doctor_name,'') as resident,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.jx_doctor_id),'') as refre_doctor_id,
-        IFNULL(jx_doctor_name,'') as refre_doctor,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as intern_id,
-        IFNULL(sx_doctor_name,'') as intern,
-        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as doctor_coder_id,
-        IFNULL(sx_doctor_name,'') as doctor_coder_name,
-        IFNULL(emr_quality_code,'') as patient_quality_id,
-        IFNULL(emr_quality_name,'') as patient_quality,
-        IFNULL( (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_doctor_id),'') as quality_doctor_id,
-        IFNULL(zk_doctor_name,'') as quality_doctor,
-       IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_nurse_id),'') as quality_nurs_id,
-        IFNULL(zk_nurse_name,'') as quality_nurs,
-        IFNULL(zk_time,'') as quality_date,
-        IFNULL(c.fy01,0) as total_fee,
-        IFNULL(c.fy02,0) as west_drug_fee,
-        IFNULL(c.fy03,0) as ch_drug_fee,
-        IFNULL(c.fy04,0) as ch_patent_fee,
-        IFNULL(c.fy05,0) as ch_herbal_fee,
-        IFNULL(c.fy06,0) as other_fee,
-        IFNULL(is_autopsy,'') as is_autopsy_id,
-        IFNULL(is_autopsy_name,'') as is_autopsy,
-        IFNULL(blood_code,'') as blood_type_id,
-        IFNULL(blood_name,'') as blood_type,
-        IFNULL(rh_code,'') as rh_id,
-        IFNULL(rh_name,'') as rh,
-        '无' as first_transf_unidept,
-        '' as first_transf_dept,
-        '' as first_transf_date,
-        '' as first_transf_time,
-        IFNULL(case_classification,'') as disease_class_id,
-        '' as disease_class,
-        IFNULL(native_place,'') as native_place,
-        IFNULL(now_adress,'') as curr_address,
-        IFNULL(phone,'') as curr_tel,
-        IFNULL(now_post_code,'') as curr_post,
-        IFNULL(occupation_code,'') as job_id,
+        IFNULL(in_no,'') as adm_no,/**住院流水号**/
+        IFNULL(age,'') as age,/**年龄**/
+        IFNULL(name,'') as name,/**姓名**/
+        IFNULL(gender_code,'') as sex_id,/**性别编码**/
+        IFNULL(gender_name,'') as sex,/**性别**/
+        IFNULL(birthday,'') as birthday,/**出生日期**/
+        IFNULL(id_card,'') as id_card,/**身份证号**/
+        IFNULL(nationality_cation,'') as country_id,/**国籍编码**/
+        IFNULL(nationality_name,'') as country,/**国籍**/
+        IFNULL(nation_code,'') as nation_id,/**民族编码**/
+        IFNULL(nation_name,'') as nation,/**民族**/
+        IFNULL(occupation_name,'') as job,/**职业**/
+        IFNULL(marry_code,'') as marriage_status_id,/**婚姻状况编码**/
+        IFNULL(marry_name,'') as marriage_status,/**婚姻状况**/
+        IFNULL(work,'') as company_name,/**单位名称**/
+        IFNULL(work_address,'') as company_address,/**单位地址**/
+        IFNULL(work_phone,'') as company_tel,/**单位电话**/
+        IFNULL(work_post_code,'') as company_post,/**单位邮编**/
+        IFNULL(native_adress,'') as resident_address,/**户口地址**/
+        IFNULL(native_post_code,'') as resident_post,/**户口邮编**/
+        IFNULL(contact_name,'') as cont,/**联系人**/
+        IFNULL(contact_rela_code,'') as cont_rel_patient,/**联系人与病人关系**/
+        IFNULL(contact_address,'') as cont_address,/**联系人地址**/
+        IFNULL(contact_phone,'') as cont_tel,/**联系人电话**/
+        IFNULL(health_card,'') as as_card,/**健康卡号**/
+        IFNULL(in_time,'') as hsptzd_date,/**入院时间**/
+        IFNULL(in_dept_id,'') as hsptzd_unified_dept,/**入院同一科号**/
+        IFNULL(in_dept_name,'') as hsptzd_dept,/**入院科别**/
+        IFNULL(in_ward,'') as hsptzd_ward,/**入院病室**/
+        IFNULL(out_time,'') as hosp_disch_date,/**出院时间**/
+        IFNULL(out_dept_id,'') as disch_unified_dept,/**出院同一科别号**/
+        IFNULL(out_dept_name,'') as disch_dept,/**出院科别**/
+        IFNULL(in_ward,'') as disch_ward,/**出院病室**/
+        IFNULL(in_days,0) as  actual_adm_days,/**实际住院天数**/
+        IFNULL(disease_icd10,'') as outemgc_dagns_id,/**门急诊断编码**/
+        IFNULL(disease_icd10_name,'') as outemgc_dagns,/**门诊、急诊诊断**/
+        outpt_doctor_id as outemgc_doc_id,/**门诊、急诊医生编码**/
+        outpt_doctor_name as outemgc_doc,/**门诊、急诊医生**/
+        IFNULL(bl_icd10_name,'') as  pthlgy_dagns,/**病理诊断**/
+        IFNULL(allergy_list,'') as allergic_drugs,/**过敏药物**/
+        IFNULL(rescue_count,'') as rescue_num,/**抢救次数**/
+        IFNULL(rescue_success_count,'') as rescue_succ_num,/**抢救成功次数**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1),'') as dept_direct_id,/**科主任编号**/
+        IFNULL(director_name1,'') as dept_direct,/**科主任**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id2),'') as arch_id,/**主（副）任医生编号**/
+        IFNULL(director_name2,'') as arch,/**主（副）任医生**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id),'') as att_doctor_id,/**主治医生编号**/
+        IFNULL(zz_doctor_name,'') as att_doctor,/**主治医生**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id),'') as resident_id,/**住院医生编号**/
+        IFNULL(zg_doctor_name,'') as resident,/**住院医生**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.jx_doctor_id),'') as refre_doctor_id,/**进修医师编号**/
+        IFNULL(jx_doctor_name,'') as refre_doctor,/**进修医师**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as intern_id,/**实习医师编号**/
+        IFNULL(sx_doctor_name,'') as intern,/**实习医师**/
+        IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.sx_doctor_id),'') as encoder_id,/**编码员编号**/
+        IFNULL(sx_doctor_name,'') as encoder,/**编码员**/
+        IFNULL(emr_quality_code,'') as patient_quality_id,/**病案质量编号**/
+        IFNULL(emr_quality_name,'') as patient_quality,/**病案质量**/
+        IFNULL( (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_doctor_id),'') as quality_doctor_id,/**质控医师编号**/
+        IFNULL(zk_doctor_name,'') as quality_doctor,/**质控医师**/
+       IFNULL((select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zk_nurse_id),'') as quality_nurs_id,/**质控护士编号**/
+        IFNULL(zk_nurse_name,'') as quality_nurs,/**质控护士**/
+        IFNULL(zk_time,'') as quality_date,/**质控日期**/
+        IFNULL(c.fy01,0) as total_fee,/**总费用**/
+        sum(IFNULL(c.fy02,0) + IFNULL(c.fy04,0)) as west_drug_fee,/**西药费**/
+        sum(IFNULL(c.fy03,0) + IFNULL(c.fy05,0)) as ch_drug_fee,/**中药费**/
+        IFNULL(c.fy04,0) as ch_patent_fee,/**中成药费**/
+        IFNULL(c.fy05,0) as ch_herbal_fee,/**中草药费**/
+        IFNULL(c.fy06,0) as other_fee,/**其他费用**/
+        IFNULL(is_autopsy,'') as is_autopsy_id,/**是否尸检编号**/
+        IFNULL(is_autopsy_name,'') as is_autopsy,/**是否尸检**/
+        IFNULL(blood_code,'') as blood_type_id,/**血型编号**/
+        IFNULL(blood_name,'') as blood_type,/**血型**/
+        IFNULL(rh_code,'') as rh_id,/**RH编号**/
+        IFNULL(rh_name,'') as rh,/**RH**/
+        '无' as first_transf_unidept,/**首次转科统一科号**/
+        '' as first_transf_dept,/**首次转科科别**/
+        '' as first_transf_date,/**首次转科日期**/
+        '' as first_transf_time,/**首次转科时间**/
+        IFNULL(case_classification,'') as disease_class_id,/**疾病分型编号**/
+        '' as disease_class,/**疾病分型**/
+        IFNULL(native_place,'') as native_place,/**籍贯**/
+        IFNULL(now_adress,'') as curr_address,/**现住址**/
+        IFNULL(phone,'') as curr_tel,/**现电话**/
+        IFNULL(now_post_code,'') as curr_post,/**现邮编**/
+        IFNULL(occupation_code,'') as job_id,/**职业编号**/
         IFNULL(baby_age_month,'') as newborn_age,
-        IFNULL(baby_birth_weight,'') as newborn_weight,
-        IFNULL(baby_in_weight,'') as newborn_hsptzd_weight,
-        IFNULL(in_way,'') as hsptzd_ways_id,
-        '' as hsptzd_ways,
-         '' as clinical_pathway_id,
-        IFNULL(clinical_path_case,'') as clinical_pathway,
-        IFNULL(bl_icd10,'') as pthlgy_id,
-        IFNULL(in_blh,'') as pthlgy,
-        IFNULL(is_allergy,'') as is_allergic_id,
+        IFNULL(baby_birth_weight,'') as newborn_weight,/**新生儿出生体重**/
+        IFNULL(baby_in_weight,'') as newborn_hsptzd_weight,/**新生儿入院体重**/
+        IFNULL(in_way,'') as hsptzd_ways_id,/**入院途径编号**/
+        '' as hsptzd_ways,/**入院途径**/
+         '' as clinical_pathway_id,/**临床路径病例编号**/
+        IFNULL(clinical_path_case,'') as clinical_pathway,/**临床路径病例**/
+        IFNULL(bl_icd10,'') as pthlgy_id,/**病理疾病编码**/
+        IFNULL(in_blh,'') as pthlgy,/**病理号**/
+        IFNULL(is_allergy,'') as is_allergic_id,/**是否药物过敏编号**/
         case when is_allergy = '1' then '是'
-         else '否' end as is_allergic,
-         IFNULL(zr_nurse_id,'') as respon_nurs_id,
-         IFNULL(zr_nurse_name,'') as respon_nurs,
-         IFNULL(out_mode_code,'') as out_hosp_id,
-         IFNULL(out_mode_name,'') as out_hosp,
+         else '否' end as is_allergic,/**是否药物过敏**/
+         IFNULL(zr_nurse_id,'') as respon_nurs_id,/**责任护士编号**/
+         IFNULL(zr_nurse_name,'') as respon_nurs,/**责任护士**/
+         IFNULL(out_mode_code,'') as out_hosp_id,/**离院方式编号**/
+         IFNULL(out_mode_name,'') as out_hosp,/**离园方式**/
          case when out_mode_code = '2' then IFNULL(turn_org_name,'-')
-         else '-' end as mdcl_advice_out,
+         else '-' end as mdcl_advice_out,/**离园方式为医嘱转院**/
          case when out_mode_code = '3' then IFNULL(turn_org_name,'-')
-          else '-' end as commu_out,
-         IFNULL(is_inpt,'') as isagain_hsptzd_id,
+          else '-' end as commu_out,/**离院方式为转社区卫生服务器机构/乡镇卫生院，拟接收医疗机构名称**/
+         IFNULL(is_inpt,'') as isagain_hsptzd_id,/**是否有出院31天内再住院计划编号**/
          case when is_inpt = '1' then '是'
-         else '否' end as isagain_hsptzd,
-         IFNULL(aim,'') as again_aim,
-         case when inpt_before_day = '-' then 0 else ifnull(inpt_before_day, 0) end as bef_coma_days,
-         case when inpt_before_hour = '-' then 0 else ifnull(inpt_before_hour, 0) end as bef_coma_hours,
-         case when inpt_before_minute = '-' then 0 else ifnull(inpt_before_minute, 0) end as bef_coma_mins,
-         '' as bef_coma_total,
-         case when inpt_last_day = '-' then 0 else ifnull(inpt_last_day, 0) end as aft_coma_days,
-         case when inpt_last_hour = '-' then 0 else ifnull(inpt_last_hour, 0) end as aft_coma_hours,
-         case when inpt_last_minute = '-' then 0 else ifnull(inpt_last_minute, 0) end as aft_coma_mins,
-         '' as aft_coma_total,
-         IFNULL(pay_way_code,'') as fee_mode_id,
-         IFNULL(pay_way_name,'') as fee_mode,
-         IFNULL(c.fy07,0) as self_fee,
-         IFNULL(c.zhylfwl01,0) as inte_serv_fee,
-         IFNULL(c.zhylfwl02,0) as inte_opera_fee,
-         IFNULL(c.zhylfwl03,0) as inte_nurs_fee,
-         IFNULL(c.zhylfwl04,0) as inte_other_fee,
-         IFNULL(c.zdl01,0) as dagns_patholo_fee,
-         IFNULL(c.zdl02,0) as dagns_lab_fee,
-         IFNULL(c.zdl03,0) as dagns_ima_fee,
-         IFNULL(c.zdl04,0) as dagns_cli_fee,
-         IFNULL(c.zll01,0) as trea_nooprt_fee,
-         IFNULL(c.zll02,0) as trea_cli_fee,
-         IFNULL(c.zll03,0) as trea_oprtreat_fee,
-         IFNULL(c.zll04,0) as trea_anthsa_fee,
-         IFNULL(c.zll05,0) as trea_oprt_fee,
-         IFNULL(c.kfl01,0) as rec_fee,
-         IFNULL(c.zyl01,0) as tradi_meditrea_fee,
-         IFNULL(c.xyl01,0) as western_antibac_fee,
-         IFNULL(c.xyzpl01,0) as bloo_blood_fee,
-         IFNULL(c.xyzpl02,0) as bloo_albumin_fee,
-         IFNULL(c.xyzpl03,0) as bloo_globulin_fee,
-         IFNULL(c.xyzpl04,0) as bloo_coagula_fee,
-         IFNULL(c.xyzpl05,0) as bloo_cell_fee,
-         IFNULL(c.hcl01,0) as comsu_chkdisp_fee,
-         IFNULL(c.hcl02,0) as comsu_treadisp_fee,
-         IFNULL(c.hcl03,0) as comsu_oprtdisp_fee,
-         IFNULL(c.zhylfwl05,0)  as inte_dialect_fee,
-         IFNULL(c.zhylfwl06,0) as inte_consul_fee,
-         IFNULL(c.zyl02,0) as tradi_dagns_fee,
-         IFNULL(c.zyl01,0) as tradi_trea_fee,
-         IFNULL(c.zyl03,0) as tradi_treaout_fee,
-         IFNULL(c.zyl04,0) as tradi_treabone_fee,
-         IFNULL(c.zyl05,0) as tradi_treaacup_fee,
-         IFNULL(c.zyl06,0) as tradi_treamani_fee,
-         IFNULL(c.zyl07,0) as tradi_treaanor_fee,
-         IFNULL(c.zyl08,0) as tradi_treaspec_fee,
-         IFNULL(c.zyl09,0) as tradi_othe_fee,
-         IFNULL(c.zyl10,0) as tradi_othemake_fee,
-         IFNULL(c.zyl11,0) as tradi_othefood_fee,
-         IFNULL(c.zyf01,0) as tradi_patemake_fee,
-         '' as treatype_tradi_id,
-         '' as treatype_tradi,
-         '' as outemgc_tradi_id,
-         '' as outemgc_tradi,
-         '' as implcli_tradi_id,
-         '' as implcli_tradi_path,
-         '' as useprep_tradi_id,
-         '' as useprep_tradi,
-         '' as usedev_tradi_id,
-         '' as usedev_tradi,
-         '' as usetech_tradi_id,
-         '' as usetech_tradi,
-         '' as tradi_dlctnurs_id,
-         '' as tradi_dlctnurs,
-         IFNULL(damage_reason,'') as inju_pois_exter_rsn,
-         IFNULL(disease_icd10_other,'') as inju_pois_exter_rsn_code,
-         '' as is_code,
+         else '否' end as isagain_hsptzd,/**是否有出院31天内再住院计划**/
+         mbi.hosp_code as org_id,/**所属机构（医院）id**/
+         IFNULL(aim,'') as again_aim,/**再住院目的**/
+         case when inpt_before_day = '-' then 0 else ifnull(inpt_before_day, 0) end as bef_coma_days,/**颅脑损伤患者昏迷时间：入院前 天**/
+         case when inpt_before_hour = '-' then 0 else ifnull(inpt_before_hour, 0) end as bef_coma_hours,/**颅脑损伤患者昏迷时间：入院前 小时**/
+         case when inpt_before_minute = '-' then 0 else ifnull(inpt_before_minute, 0) end as bef_coma_mins,/**颅脑损伤患者昏迷时间：入院前 分**/
+         '' as bef_coma_total,/**入院前昏迷总分钟**/
+         case when inpt_last_day = '-' then 0 else ifnull(inpt_last_day, 0) end as aft_coma_days,/**颅脑损伤患者昏迷时间：入院后 天**/
+         case when inpt_last_hour = '-' then 0 else ifnull(inpt_last_hour, 0) end as aft_coma_hours,/**颅脑损伤患者昏迷时间：入院后 小时**/
+         case when inpt_last_minute = '-' then 0 else ifnull(inpt_last_minute, 0) end as aft_coma_mins,/**颅脑损伤患者昏迷时间：入院后 分**/
+         '' as aft_coma_total,/**入院后昏迷总分钟**/
+         IFNULL(pay_way_code,'') as fee_mode_id,/**付款方式编号**/
+         IFNULL(pay_way_name,'') as fee_mode,/**付款方式**/
+         IFNULL(c.fy07,0) as self_fee,/**自费金额**/
+         IFNULL(c.zhylfwl01,0) as inte_serv_fee,/**综合医疗服务类：（1）一般医疗服务费**/
+         IFNULL(c.zhylfwl02,0) as inte_opera_fee,/**综合医疗服务类：（2）一般治疗操作费**/
+         IFNULL(c.zhylfwl03,0) as inte_nurs_fee,/**综合医疗服务类：（3）护理费**/
+         IFNULL(c.zhylfwl04,0) as inte_other_fee,/**综合医疗服务类：（4）其他费用**/
+         IFNULL(c.zdl01,0) as dagns_patholo_fee,/**诊断类：(5) 病理诊断费**/
+         IFNULL(c.zdl02,0) as dagns_lab_fee,/**诊断类：(6) 实验室诊断费**/
+         IFNULL(c.zdl03,0) as dagns_ima_fee,/**诊断类：(7) 影像学诊断费**/
+         IFNULL(c.zdl04,0) as dagns_cli_fee,/**诊断类：(8) 临床诊断项目费**/
+         IFNULL(c.zll01,0) as trea_nooprt_fee,/**治疗类：(9) 非手术治疗项目费**/
+         IFNULL(c.zll02,0) as trea_cli_fee,/**治疗类：非手术治疗项目费 其中临床物理治疗费**/
+         IFNULL(c.zll03,0) as trea_oprtreat_fee,/**治疗类：(10) 手术治疗费**/
+         IFNULL(c.zll04,0) as trea_anthsa_fee,/**治疗类：手术治疗费 其中麻醉费**/
+         IFNULL(c.zll05,0) as trea_oprt_fee,/**治疗类：手术治疗费 其中手术费**/
+         IFNULL(c.kfl01,0) as rec_fee,/**康复类：(11) 康复费**/
+         IFNULL(c.zyl01,0) as tradi_meditrea_fee,/**中医类：中医治疗类**/
+         IFNULL(c.xyl01,0) as western_antibac_fee,/**西药类： 西药费 其中抗菌药物费用**/
+         IFNULL(c.xyzpl01,0) as bloo_blood_fee,/**血液和血液制品类： 血费**/
+         IFNULL(c.xyzpl02,0) as bloo_albumin_fee,/**血液和血液制品类： 白蛋白类制品费**/
+         IFNULL(c.xyzpl03,0) as bloo_globulin_fee,/**血液和血液制品类： 球蛋白制品费**/
+         IFNULL(c.xyzpl04,0) as bloo_coagula_fee,/**血液和血液制品类：凝血因子类制品费**/
+         IFNULL(c.xyzpl05,0) as bloo_cell_fee,/**血液和血液制品类： 细胞因子类费**/
+         IFNULL(c.hcl01,0) as comsu_chkdisp_fee,/**耗材类：检查用一次性医用材料费**/
+         IFNULL(c.hcl02,0) as comsu_treadisp_fee,/**耗材类：治疗用一次性医用材料费**/
+         IFNULL(c.hcl03,0) as comsu_oprtdisp_fee,/**耗材类：手术用一次性医用材料费**/
+         IFNULL(c.zhylfwl05,0)  as inte_dialect_fee,/**综合医疗服务类：一般医疗服务费 其中中医辨证论治费（中医）**/
+         IFNULL(c.zhylfwl06,0) as inte_consul_fee,/**综合医疗服务类：一般医疗服务费 其中中医辨证论治会诊费（中医）**/
+         IFNULL(c.zyl02,0) as tradi_dagns_fee,/**中医类：诊断（中医）**/
+         IFNULL(c.zyl01,0) as tradi_trea_fee,/**中医类：治疗（中医）**/
+         IFNULL(c.zyl03,0) as tradi_treaout_fee,/**中医类：治疗 其中外治（中医）**/
+         IFNULL(c.zyl04,0) as tradi_treabone_fee,/**中医类：治疗 其中骨伤（中医）**/
+         IFNULL(c.zyl05,0) as tradi_treaacup_fee,/**中医类：治疗 其中针刺与灸法（中医）**/
+         IFNULL(c.zyl06,0) as tradi_treamani_fee,/**中医类：治疗推拿治疗（中医）**/
+         IFNULL(c.zyl07,0) as tradi_treaanor_fee,/**中医类：治疗 其中肛肠治疗（中医）**/
+         IFNULL(c.zyl08,0) as tradi_treaspec_fee,/**中医类：治疗 其中特殊治疗（中医）**/
+         IFNULL(c.zyl09,0) as tradi_othe_fee,/**中医类：其他（中医）**/
+         IFNULL(c.zyl10,0) as tradi_othemake_fee,/**中医类：其他 其中中药特殊调配加工（中医）**/
+         IFNULL(c.zyl11,0) as tradi_othefood_fee,/**中医类：其他 其中辨证施膳（中医）**/
+         IFNULL(c.zyf01,0) as tradi_patemake_fee,/**中药类：中成药费 其中医疗机构中药制剂费（中医）**/
+         '' as treatype_tradi_id,/**治疗类别编号（中医类）**/
+         '' as treatype_tradi,/**治疗类别（中医类）**/
+         '' as outemgc_tradi_id,/**门（急）诊中医诊断编码（中医类）**/
+         '' as outemgc_tradi,/**门（急）诊中医诊断（中医类）**/
+         '' as implcli_tradi_id,/**实施临床路径编号（中医类）**/
+         '' as implcli_tradi_path,/**实施临床路径（中医类）**/
+         '' as useprep_tradi_id,/**使用医疗机构中药制剂编号（中医类）**/
+         '' as useprep_tradi,/**使用医疗机构中药制剂（中医类）**/
+         '' as usedev_tradi_id,/**使用中医诊疗设备编号（中医类）**/
+         '' as usedev_tradi,/**使用中医诊疗设备（中医类）**/
+         '' as usetech_tradi_id,/**使用中医诊疗技术编号（中医类）**/
+         '' as usetech_tradi,/**使用中医诊疗技术（中医类）**/
+         '' as tradi_dlctnurs_id,/**辨证施护编号（中医类）**/
+         '' as tradi_dlctnurs,/**辨证施护（中医类）**/
+         IFNULL(damage_reason,'') as inju_pois_exter_rsn,/**损伤中毒的外部因素，填写造成损伤的外部原因及引起中毒的物质**/
+         IFNULL(disease_icd10_other,'') as inju_pois_exter_rsn_code,/**损伤中毒的外部原因的疾病编码，ICD-10**/
+         '' as is_code,/**病案状态 2：已提交、3：编码中、6:归档**/
           IFNULL(iiv.aka130_name,'') as insur_business_type,
           '' as insur_nonlocal_flag,
-          '' as in_state,
+          '' as in_state,/**在院状态**/
           IFNULL(iiv.aka130,'') as insur_business_type_id,
-          '' as cont_addr_prov,
-          '' as cont_addr_city,
-           '' as cont_addr_county,
-           '' as cont_addr_street,
-           '' as addr_province,
-           '' as addr_city,
-           '' as addr_county,
-           '' as addr_street,
-           '' as disch_dept_id,
-           '' as hsptzd_dept_id,
-           IFNULL(iiv.bka006_name,'') as insur_type
+          '' as cont_addr_prov,/**联系人地址省**/
+          '' as cont_addr_city,/**联系人地址市**/
+           '' as cont_addr_county,/**联系人地址县**/
+           contact_address as cont_addr_street,/**联系人详细地址**/
+           now_prov_name as addr_province,/**现住址省**/
+           now_city_name as addr_city,/**现住址市**/
+           now_area_name as addr_county,/**现住址县**/
+           now_adress as addr_street,/**现住址详细地址**/
+           '' as disch_dept_id,/**出院科别代码**/
+           '' as hsptzd_dept_id,/**入院科别代码**/
+           IFNULL(iiv.bka006_name,'') as insur_type,/**险种类别**/
+           iiv.medicine_org_code as medicine_org_code,
+            ifnull((select name from insure_dict where code = 'XZLX' and value = iib.aae140 limit 1),'自费病人') as health_care_type,
+            mbi.id as id,
+            iiv.aka130 as medType,
+            iiv.aka130_name as medTypeName,
+            iiv.insure_org_code as orgCode,
+            iiv.insure_reg_code as insureRegCode,
+            iib.aac001 as psnNo
             FROM mris_base_info mbi
-           left join insure_individual_visit iiv
+            left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code
+            left join insure_individual_basic iib on iiv.mib_id = iib.id and iib.hosp_code = iiv.hosp_code
            LEFT JOIN mris_cost c on mbi.visit_id = c.visit_id and mbi.hosp_code = c.hosp_code
            WHERE  mbi.hosp_code = #{hospCode}
             AND  mbi.visit_id = #{visitId}

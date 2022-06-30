@@ -4,6 +4,9 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.module.bo.InsureGetInfoBO;
 import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.insure.module.service.InsureGetInfoService;
@@ -12,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
@@ -234,6 +238,23 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     @Override
     public WrapperResponse<PageDTO> querySetlePage(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.querySetlePage(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRG(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.insertInsureSettleInfoForDRG(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.insertInsureSettleInfoForDIP(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRGorDIP(Map<String, Object> map) {
+
+        Map resultMap =insureGetInfoBO.insertInsureSettleInfoForDRGorDIP(map);
+        return WrapperResponse.success(resultMap);
     }
 
 }

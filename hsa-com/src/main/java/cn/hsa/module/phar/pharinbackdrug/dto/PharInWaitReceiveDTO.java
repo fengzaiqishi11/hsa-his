@@ -94,4 +94,12 @@ public class PharInWaitReceiveDTO extends PharInWaitReceiveDO implements Seriali
     private String productName;
 
     private String color;// 设置颜色 1. 是红色
+    /**
+     * 是否为查询提前领药
+     */
+    private String isAdvance;
+    /**
+     * 提前领药记录id
+     */
+    private String advanceId;
 }

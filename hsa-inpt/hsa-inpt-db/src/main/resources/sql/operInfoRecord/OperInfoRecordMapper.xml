@@ -606,7 +606,8 @@
         inpt.total_balance,
         (inpt.total_advance - (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id)) as totalMergeBalance,
         (select sum(reality_price) from inpt_cost ic where ic.hosp_code=#{hospCode} and ic.visit_id = inpt.id) as totalMergeCost,
-        (select ba.oper_nation_code  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationCode
+        (select ba.oper_nation_code  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationCode,
+        (select ba.oper_nation_name  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationName
         FROM
         inpt_visit inpt,
         oper_info_record oper
@@ -669,7 +670,8 @@
         0 as total_balance,
         0 as totalMergeBalance,
         0 as totalMergeCost,
-        (select ba.oper_nation_code  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationCode
+        (select ba.oper_nation_code  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationCode,
+        (select ba.oper_nation_name  from base_advice ba  where ba.hosp_code=#{hospCode} and ba.id = oper.oper_disease_id) as operNationName
         FROM
         outpt_visit outpt,
         oper_info_record oper

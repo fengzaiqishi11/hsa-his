@@ -2,6 +2,7 @@ package cn.hsa.insure.module.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
@@ -211,8 +212,14 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
         baseDiseaseDTO.setId(insureDiseaseDTO.getHospIllnessId());
         baseDiseaseDTO.setHospCode(insureDiseaseDTO.getHospCode());
         baseDiseaseDTO.setIsMatch(insureDiseaseDTO.getIsMatch());
-        insureDiseaseMatchDAO.updateBaseDisease(baseDiseaseDTO);
-        return insureDiseaseMatchDAO.updateDisease(insureDiseaseDTO);
+        Boolean update = insureDiseaseMatchDAO.updateDisease(insureDiseaseDTO);
+        if(update == true){
+            List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOList = insureDiseaseMatchDAO.selectByCode(insureDiseaseDTO);
+            if(insureDiseaseMatchDTOList.size() > 1){
+                throw new AppException(insureDiseaseDTO.getHospIllnessCode()+"疾病编码已存在，不允许修改");
+            }
+        }
+        return true;
     }
 
     /**

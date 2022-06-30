@@ -9709,7 +9709,9 @@ ALTER TABLE base_material ADD outpt_use_code varchar(32) CHARACTER SET utf8 COLL
 -- 修改报表模板表中报表模板文件名称字段长度
 ALTER TABLE report_configuration MODIFY COLUMN temp_name varchar(50) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '报表模板文件名称';
 -- 修改医嘱联合国家编码（医嘱明细中所有项目的国家编码拼接）长度
-ALTER TABLE base_advice MODIFY COLUMN union_nation_code varchar(128);
+ALTER TABLE base_advice MODIFY COLUMN union_nation_code varchar(512);
+-- 表结构调整
+ALTER TABLE base_advice ADD union_nation_name varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '医嘱联合国家名称（医嘱明细中所有项目的国家名称拼接）';
 
 
 

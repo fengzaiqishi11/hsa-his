@@ -11,6 +11,8 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.base.dept.service.BaseDeptService;
 import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
+import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.role.dao.SysRoleDao;
 import cn.hsa.module.sys.role.dto.SysRoleDto;
 import cn.hsa.module.sys.role.entity.SysRoleDo;
@@ -21,6 +23,7 @@ import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.dto.SysUserRoleDto;
 import cn.hsa.module.sys.user.dto.SysUserSystemDTO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +57,11 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     private SysUserDAO sysUserDAO;
     @Resource
     private SysRoleDao sysRoleDao;
-
+    /**
+     *  系统参数数据库访问层
+     */
+    @Resource
+    private SysParameterDAO sysParameterDao;
     @Resource
     private ApplicationEventPublisher publisher;
 
@@ -70,6 +77,17 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Resource
     private SysCodeService sysCodeService;
 
+    /**
+     *  是否开启外网登录提醒框系统参数名
+     */
+    private static final String whetherEnableReminderBoxParamName = "WHETHER_ENABLE_REMINDER_BOX";
+    /**
+     *  医保专网访问地址参数名
+     */
+    private static final String insurePrivateInternetAddressParamName = "INSURE_PRIVATE_ADDRESS";
+
+
+
 
     /**
      * @Method getById
@@ -82,6 +100,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public SysUserDTO getById(SysUserDTO sysUserDTO) {
         SysUserDTO byId = this.sysUserDAO.getById(sysUserDTO);
+        byId.setWhetherPrivateInnerAddress(sysUserDTO.getWhetherPrivateInnerAddress());
         List<SysUserSystemDTO> sysUserSystemDTOS = sysUserDAO.querySysUserSystemAll(byId);
         if (!ListUtils.isEmpty(sysUserSystemDTOS)) {
             try {
@@ -98,10 +117,40 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
                     byId.setSysUserSystemDTOS(newSysSystem);
                 }
             } catch (Exception e) {
+                log.error("账号存在系统编码为空的数据!子系统具体数据如下：{}", JSONArray.toJSONString(sysUserSystemDTOS));
                 throw new AppException("账号存在系统编码为空的数据");
             }
         }
+        fillPrivateInternetAccessInfo(byId);
         return byId;
+    }
+
+    /**
+     *  填充医保专网访问配置信息
+     * @param byId
+     */
+    private void fillPrivateInternetAccessInfo(SysUserDTO byId) {
+        // 1.属于内网访问则无需填充多余信息
+        if(Constants.SF.S.equals(byId.getWhetherPrivateInnerAddress())){
+            byId.setWhetherEnableReminderBox(Constants.SF.F);
+            return;
+        }
+       String hospCode = byId.getHospCode();
+        // 2.查询是否显示提示框参数
+        SysParameterDTO reminderParameterDTO = sysParameterDao.getParameterByCode(hospCode,whetherEnableReminderBoxParamName);
+        // 未配置则默认不开启提示框
+        if(null == reminderParameterDTO){
+            byId.setWhetherEnableReminderBox(Constants.SF.F);
+            return;
+        }
+        byId.setWhetherEnableReminderBox(reminderParameterDTO.getValue());
+        // 3.查询配置的系统参数医保专网地址
+        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,insurePrivateInternetAddressParamName);
+        if(null == insureAddressParameterDTO){
+            byId.setInsurePrivateInternetAddress("请配置医保专网访问ip地址系统参数：【INSURE_PRIVATE_ADDRESS】的值");
+            return;
+        }
+        byId.setInsurePrivateInternetAddress(insureAddressParameterDTO.getValue());
     }
 
     /**

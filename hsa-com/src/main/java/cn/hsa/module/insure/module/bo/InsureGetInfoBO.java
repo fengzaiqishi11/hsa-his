@@ -185,4 +185,20 @@ public interface InsureGetInfoBO {
      **/
 
     PageDTO querySetlePage(Map<String, Object> map);
+    /**
+     * @Author gory
+     * @Description 结算清单质控DRG
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    Map<String,Object> insertInsureSettleInfoForDRG(Map<String, Object> map);
+    /**
+     * @Author gory
+     * @Description 结算清单质控DIP
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    Map<String,Object> insertInsureSettleInfoForDIP(Map<String, Object> map);
+
+    Map<String,Object>  insertInsureSettleInfoForDRGorDIP(Map<String, Object> map);
 }

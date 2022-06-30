@@ -2,6 +2,7 @@ package cn.hsa.module.insure.module.dao;
 
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
+import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -78,4 +79,16 @@ public interface InsureUnifiedEmrUploadDAO {
      * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      */
     List<Map<String, Object>> selectTcmOperInfo(Map<String, Object> map);
+    /**
+     * @Method updateEmrBaseInfo
+     * @Desrciption  中医病案首页信息上传以后,更新上传标识
+     * @Param
+     *
+     * @Author guolai
+     * @Date   2022/6/8 9:11
+     * @Return
+     **/
+    void updateTcmEmrBaseInfo(TcmMrisBaseInfoDTO tcmmrisBaseInfoDTO);
+
+    Map<String, Object> selectInsureDiseaseMatch(Map<String, Object> map);
 }

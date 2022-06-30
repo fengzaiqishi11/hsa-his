@@ -20,12 +20,11 @@
 
     <dependencies>
 
+        <!--动态数据源-->
         <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
         </dependency>
-
         <dependency>
             <groupId>cn.hsa.interf</groupId>
             <artifactId>hsa-interf-biz</artifactId>
@@ -69,8 +68,9 @@
         </dependency>
         <!-- 应用监控相关 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>2.2.4</version>
         </dependency>
         <dependency>
             <groupId>cn.hsa.hsaf.adapt</groupId>

@@ -5,6 +5,8 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisDiagnoseDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisOperDTO;
@@ -46,6 +48,9 @@ public class TcmMrisHomeController extends BaseController {
 
     @Resource
     TcmMrisHomeService tcmMrisHomeService_consumer;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
 
     /**
      * @Method: loadMrisInfo
@@ -273,6 +278,22 @@ public class TcmMrisHomeController extends BaseController {
         selectMap.put("hospCode",sysUserDTO.getHospCode());
         selectMap.put("inptVisitDTO", inptVisitDTO);
         return WrapperResponse.success(tcmMrisHomeService_consumer.queryOutHospPatientPageZY(selectMap));
+    }
+
+    /**
+     * 前端调用DRG DIP接口授权校验
+     * @param req
+     * @param res
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-08 10:57
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @GetMapping(value = "/checkDrgDipBizAuthorization")
+    public WrapperResponse<DrgDipAuthDTO> checkDrgDipBizAuthorization(HttpServletRequest req, HttpServletResponse res) {
+      SysUserDTO sysUserDTO = getSession(req, res);
+      Map<String,Object> map = new HashMap<>();
+      map.put("hospCode",sysUserDTO.getHospCode());
+      return drgDipResultService.checkDrgDipBizAuthorization(map);
     }
 
 }

@@ -890,7 +890,8 @@
             a.contact_name as contactName,
             a.contact_rela_code as contactRelaCode,
             a.contact_address as contactAddress,
-            a.contact_phone as contactPhone
+            a.contact_phone as contactPhone,
+            a.total_in_count as inCnt
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id
@@ -1060,7 +1061,7 @@
             zhylfwl06, zdl01, zdl02, zdl03, zdl04, zll01, zll02, zll03,
             zll04, zll05, kfl01, xyl01, zyf01, xyzpl01, xyzpl02, xyzpl03,
             xyzpl04, xyzpl05, hcl01, hcl02, hcl03, zyl01, zyl02, zyl03,
-            zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06
+            zyl04, zyl05, zyl06, zyl07, zyl08, zyl09, zyl10, zyl11,xyzpl06,zyl12
         ) VALUES (
             #{id},
             #{hospCode},
@@ -1110,7 +1111,8 @@
             #{zyl09},
             #{zyl10},
             #{zyl11},
-            #{xyzpl06}
+            #{xyzpl06},
+            #{zyl12}
         )
     </insert>
 
@@ -1254,10 +1256,13 @@
                 zyl10 = #{zyl10},
             </if>
             <if test="zyl11 != null">
-                zyl11 = #{zyl11}
+                zyl11 = #{zyl11},
             </if>
             <if test="xyzpl06 != null">
-                xyzpl06 = #{xyzpl06}
+                xyzpl06 = #{xyzpl06},
+            </if>
+            <if test="zyl12 != null">
+                zyl12 = #{zyl12},
             </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}

@@ -59,6 +59,11 @@ public class SysUserController extends BaseController {
     @GetMapping("/getById")
     public WrapperResponse<SysUserDTO> getById(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTOSession = getSession(req, res);
+        String whetherPrivateInnerAddress = req.getHeader("Internet-Flag");
+        logger.error("==-==request.getHeader('Internet-Flag')= {}(String)",whetherPrivateInnerAddress);
+        logger.error("==-==request.getIp= {}",ServletUtils.getRequestIp());
+        logger.error("==-==request.getHeader('Host')= {}",req.getHeader("Host"));
+        sysUserDTO.setWhetherPrivateInnerAddress(whetherPrivateInnerAddress);
         sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
         //封装参数
         Map map = new HashMap();

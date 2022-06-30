@@ -1338,6 +1338,19 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
     }
 
     /**
+     * @param itemMatchDTO
+     * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
+     * @method queryByHospItemId
+     * @author wang'qiao
+     * @date 2022/6/21 21:28
+     * @description 根据hospItemId查询项目信息
+     **/
+    @Override
+    public List<InsureItemMatchDTO> queryByHospItemId(InsureItemMatchDTO itemMatchDTO) {
+        return insureItemMatchDAO.queryByHospItemIdIsItemId(itemMatchDTO);
+    }
+
+    /**
      * 封装导入的数据
      *
      * @param num

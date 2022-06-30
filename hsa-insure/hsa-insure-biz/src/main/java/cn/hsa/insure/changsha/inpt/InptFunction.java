@@ -1,7 +1,6 @@
 package cn.hsa.insure.changsha.inpt;
 
 
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.NeusoftStrUtil;

@@ -39,7 +39,7 @@
 		group by ss.daily_settle_id
 	) dd on	a.id = dd.daily_settle_id
     where a.type_code = '2' and a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime})
 	group by a.id) 
 	union 
 	(select
@@ -78,7 +78,7 @@
 		group by ss.daily_settle_id
 	) dd on	a.id = dd.daily_settle_id
     where a.type_code = '1' and a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime})
 	group by a.id)
 	union 
 	(select
@@ -117,7 +117,7 @@
 		group by ss.daily_settle_id
 	) dd on	a.id = dd.daily_settle_id
     where a.type_code = '0' and a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime})
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime})
 	group by a.id)
     ) cc
     order by cc.appetime asc
@@ -159,7 +159,7 @@
     left join inpt_settle_invoice c on b.id = c.settle_id and b.hosp_code = c.hosp_code
     join inpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '2' and a.hosp_code =#{hospCode}
-    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt; date(#{endTime}))
     union
     (select
 	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
@@ -196,7 +196,7 @@
     join outpt_settle b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
     join outpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '1' and a.hosp_code =#{hospCode}
-    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt; date(#{endTime}))
     union
     (select
 	(select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
@@ -234,7 +234,7 @@
     left join outpt_settle_invoice  c on b.id = c.settle_id and b.hosp_code = c.hosp_code
     join outpt_register d on b.register_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '0' and a.hosp_code =#{hospCode}
-    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}))
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt; date(#{endTime}))
     union
     (select
     (select value from sys_parameter sp where sp.code ='HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
@@ -271,7 +271,7 @@
     join inpt_advance_pay b on a.id = b.daily_settle_id and a.hosp_code = b.hosp_code
     join inpt_visit d on b.visit_id = d.id and b.hosp_code = d.hosp_code
     where a.type_code = '2' and a.hosp_code =#{hospCode}
-    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt;= date(#{endTime}) )
+    and b.crte_time &gt;= date(#{startTime}) and b.crte_time &lt; date(#{endTime}) )
     ) dd order by dd.appetime asc
 	</select>
     <select id="queryCwPayInfo" parameterType="java.util.Map" resultType="cn.hsa.module.interf.healthInfo.entity.TbCwsffs">
@@ -293,7 +293,7 @@
 	outin_daily a
 	join outin_daily_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
 	where a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}))
 	union
 	(select
 	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
@@ -312,7 +312,7 @@
 	outin_daily a
 	join outin_daily_advance_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
 	where a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}))
 	union
 	(select
 	(select value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO'	and sp.hosp_code = a.hosp_code	limit 1) as yljgdm,
@@ -331,7 +331,7 @@
 	outin_daily a
 	join outin_daily_card_pay b on  b.hosp_code=a.hosp_code  and b.daily_no =a.daily_no and b.daily_id  = a.id
 	where a.hosp_code =#{hospCode}
-    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}))
+    and a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}))
     ) dd order by dd.appetime asc
     </select>
 </mapper>

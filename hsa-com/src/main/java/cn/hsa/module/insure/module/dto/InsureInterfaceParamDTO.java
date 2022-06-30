@@ -34,6 +34,11 @@ public class InsureInterfaceParamDTO implements Serializable {
      * 定点医药机构编号
      */
     private String medins_code;
+    private String fixmedins_code;
+    /**
+     * 定点医药机构名称
+     */
+    private String fixmedins_name;
 
     /**
      * 医保中心编码

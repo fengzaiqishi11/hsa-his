@@ -49,11 +49,6 @@
             <groupId>cn.hsa.dynamic</groupId>
             <artifactId>hsa-dynamic</artifactId>
         </dependency>
-        <!-- 认证安全组件 -->
-        <dependency>
-            <groupId>cn.hsa.hsaf.auth.security</groupId>
-            <artifactId>hsaf-auth-security</artifactId>
-        </dependency>
 
         <!--MVC框架-->
         <dependency>
@@ -114,34 +109,6 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-collections4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-fileupload</groupId>
-            <artifactId>commons-fileupload</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>

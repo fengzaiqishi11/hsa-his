@@ -50,9 +50,7 @@ import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
-import cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassesDoctorDTO;
 import cn.hsa.module.outpt.prescribe.service.OutptDoctorPrescribeService;
-import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
@@ -61,13 +59,9 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import kafka.utils.Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
@@ -921,6 +915,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 
             medicalApplyDTO.setIsMerge(Constants.SF.S);
         }
+        //防止合管id为空，导致合管打印数据有误
+        if(StringUtils.isEmpty(mergeId)){
+            medicalApplyDTO.setMergeId(medicalApplyDTO.getId());
+        }
         medicalApplyDTO.setDocumentSta("01");
         medicalApplyDTO.setCrteId(medicalAdviceDTO.getCheckId());
         medicalApplyDTO.setCrteName(medicalAdviceDTO.getCheckName());
@@ -1522,6 +1520,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 inptCostDTO.setNum(baseAssistCalcDetailDO.getNum());
                 //inptCostDTO.setNumUnitCode(itemDTO.getUnitCode());
                 inptCostDTO.setId(SnowflakeUtils.getId());
+                inptCostDTO.setAdvanceId(medicalAdviceDTO.getSfTqly());
                 //用法
                 inptCostDTO.setUsageCode(usageCode);
                 inptCostDTO.setHospCode(medicalAdviceDTO.getHospCode());
@@ -1963,6 +1962,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             return null;
         }
         InptCostDTO inptCostDTO = new InptCostDTO();
+        inptCostDTO.setAdvanceId(medicalAdviceDTO.getSfTqly());
         //用量单位和数量不变
         inptCostDTO.setNum(inptAdviceDetailDTO.getNum());
         inptCostDTO.setNumUnitCode(inptAdviceDetailDTO.getUnitCode());
@@ -2398,6 +2398,7 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         }
 
         waitReceiveDTO.setId(SnowflakeUtils.getId());
+        waitReceiveDTO.setAdvanceId(inptCostDTO.getAdvanceId());
         waitReceiveDTO.setHospCode(inptCostDTO.getHospCode());
         waitReceiveDTO.setAdviceId(adviceDTO.getId());
         waitReceiveDTO.setGroupNo(adviceDTO.getGroupNo()==null?"":adviceDTO.getGroupNo().toString());
@@ -2882,13 +2883,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
         if (hour <= 0) {
             hour = 1;
         }
-
+        String advanceId = medicalAdviceDTO.getSfTqly();
         for (int i=0;i<dailyTimes;i++) {
             if (i < execDTOListNum) {
                 continue;
             }
             InptAdviceExecDTO InptAdviceExecDTO = new InptAdviceExecDTO();
             InptAdviceExecDTO.setId(SnowflakeUtils.getId());
+            InptAdviceExecDTO.setAdvanceId(advanceId);
             InptAdviceExecDTO.setHospCode(inptAdviceDTO.getHospCode());
             InptAdviceExecDTO.setAdviceId(inptAdviceDTO.getId());
             //医嘱明细ID
@@ -3283,6 +3285,10 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                    }
 //                }
 
+                // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
+                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
+                    continue;
+                }
 
                 BigDecimal tzNum = BigDecimal.valueOf(0);
                 BigDecimal tzCost = BigDecimal.valueOf(0);
@@ -3340,10 +3346,14 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if(baseRateDTO != null){
                         dailyTimes = baseRateDTO.getDailyTimes();
                     }
-
                     //总数量 - （总数量*停止次数/每日次数）
-                    costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes)));
+                    BigDecimal  backNum =BigDecimalUtils.subtract(costDTO.getTotalNum(),BigDecimalUtils.divide(BigDecimalUtils.multiply(costDTO.getTotalNum(),tzNum),dailyTimes));
+                    backNum = BigDecimal.valueOf(Math.ceil(backNum.doubleValue()));
+                    costDTO.setBackNum(backNum);
                     costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
+
+                    // costDTO.setBackNum(BigDecimalUtils.subtract(costDTO.getTotalNum(),tzNum));
+                    // costDTO.setBackAmount(BigDecimalUtils.subtract(costDTO.getTotalPrice(),tzCost));
                 }
 
                 //过滤掉退费数量为0的费用

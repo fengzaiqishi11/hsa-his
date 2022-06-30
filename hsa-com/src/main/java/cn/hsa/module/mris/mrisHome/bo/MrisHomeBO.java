@@ -178,7 +178,7 @@ public interface MrisHomeBO {
      **/
     Map<String, Object> queryAllMrisInfo(Map<String, Object> map);
 
-    Map<String, Object> upMrisForDRG(Map<String, Object> map);
+    Map<String, Object> insertMrisForDRG(Map<String, Object> map);
 
     /**
      * @Method: updateMrisTurnDept
@@ -265,5 +265,7 @@ public interface MrisHomeBO {
      */
     List<MrisDiagnoseDO> queryAllDiagnose(InptVisitDTO inptVisitDTO);
 
-    Map<String, Object> upMrisForDIP(Map<String, Object> map);
+    Map<String, Object> insertMrisForDIP(Map<String, Object> map);
+
+    Map<String,Object> insertMrisForDIPorDRG(Map<String, Object> map);
 }

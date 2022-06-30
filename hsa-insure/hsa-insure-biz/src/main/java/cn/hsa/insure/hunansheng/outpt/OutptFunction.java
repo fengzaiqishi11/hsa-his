@@ -530,4 +530,52 @@ public class OutptFunction {
         return resultMap;
     }
 
+    /**
+     * @param param 请求参数
+     * @Menthod bizc20010201
+     * @Desrciption 3.3.1.3    提取门诊业务结算信息：通过医院编码(hospital_id)和业务序列号(serial_no)提取门诊业务结算信息。
+     * @Author pengbo
+     * @Date 2021/01/30 9:19
+     * @Return java.util.Map<java.lang.String, java.lang.Object>
+     */
+    public Map<String, Object> bizc20010201(LinkedHashMap<String, Object>  param) {
+        String regCode = MapUtils.getVS(param, "regCode"); //医保编码
+        String hospCode = MapUtils.getVS(param, "hospCode"); //医院编码
+        InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,regCode);
+        //入参Map
+        // 人员信息Map
+        Map<String, Object> paramMap = new HashMap<>();
+        //功能号
+        paramMap.put("function_id", Constant.HuNanSheng.OUTPT.BIZC200102);
+        //医疗机构编码
+        paramMap.put("hospital_id", insureConfigurationDO.getOrgCode());//医疗机构编码
+        //业务序列号
+        paramMap.put("serial_no", MapUtils.getVS(param, "medicalRegNo"));
+        //调用医保接口
+        Map<String, Object> httpResult = requestInsure.callHNS((String) param.get("hospCode"), regCode, paramMap);
+        //返回参数
+        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> outptMap = MapUtils.get(httpResult, "info");
+
+        //TODO  设置返回参数
+        resultMap.put("psn_no",MapUtils.get(outptMap,"indi_id"));//人员编号
+        resultMap.put("psn_cert_type","01");//人员证件类型
+        resultMap.put("certno",MapUtils.get(outptMap,"idcard"));//证件号码
+        resultMap.put("psn_name",MapUtils.get(outptMap,"name"));//姓名
+        resultMap.put("gend",MapUtils.get(outptMap,"sex"));//性别
+        resultMap.put("insutype","");//险种类型
+        resultMap.put("psn_type",MapUtils.get(outptMap,"pers_name"));//人员类别
+        resultMap.put("cvlserv_flag","");//公务员标志
+        resultMap.put("begntime",MapUtils.get(outptMap,"begin_date"));//开始时间
+        resultMap.put("endtime",MapUtils.get(outptMap,"end_date"));//结束时间
+        resultMap.put("med_type","41");//医疗类别
+        resultMap.put("ipt_otp_no",MapUtils.get(outptMap,"patient_id"));//住院/门诊号
+        resultMap.put("adm_dept_name",MapUtils.get(outptMap,"in_dept_name"));//入院科室名称
+        resultMap.put("dscg_maindiag_code","");//住院主诊断代码
+        resultMap.put("dscg_maindiag_name",MapUtils.get(outptMap,"in_disease"));//住院主诊断名称
+
+
+        return resultMap;
+    }
+
 }

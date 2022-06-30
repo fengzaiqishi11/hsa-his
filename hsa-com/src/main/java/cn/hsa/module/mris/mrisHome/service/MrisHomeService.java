@@ -312,4 +312,6 @@ public interface MrisHomeService {
 
     @PutMapping("/service/mris/mrisHome/upMrisForDIP")
     Map<String, Object> upMrisForDIP(Map<String, Object> map);
+    @PutMapping("/service/mris/mrisHome/upMrisForDIPorDRG")
+    WrapperResponse<Map<String, Object>> upMrisForDIPorDRG(Map<String, Object> map);
 }

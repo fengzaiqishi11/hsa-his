@@ -144,6 +144,8 @@ public class MrisHomeController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String,Object> map = new HashMap<>();
         map.put("visitId",visitId);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.upMrisForDRG(map));
     }
@@ -155,8 +157,30 @@ public class MrisHomeController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         Map<String,Object> map = new HashMap<>();
         map.put("visitId",visitId);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
         map.put("hospCode",sysUserDTO.getHospCode());
         return WrapperResponse.success(mrisHomeService_consumer.upMrisForDIP(map));
+    }
+    /**
+     * @Author gory
+     * @Description 病案首页质控
+     * @Date 2022/6/9 15:00
+     * @Param [visitId, req, res]
+     **/
+    @PutMapping(value = "/upMrisForDIPorDRG")
+    public WrapperResponse<Map<String, Object>> upMrisForDIPorDRG(@RequestBody String visitId, HttpServletRequest req,
+                                                                  HttpServletResponse res){
+        if (StringUtils.isEmpty(visitId)) {
+            throw new AppException("参数错误：未获取到患者就诊ID，请刷新重试");
+        }
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("visitId",visitId);
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return mrisHomeService_consumer.upMrisForDIPorDRG(map);
     }
     /**
      * @Method: updateMrisBaseInfo
@@ -330,6 +354,9 @@ public class MrisHomeController extends BaseController {
         mrisBaseInfoDTO.setCrteTime(DateUtils.getNow());
         mrisBaseInfoDTO.setCrteName(sysUserDTO.getName());
         mrisBaseInfoDTO.setCrteId(sysUserDTO.getId());
+        mrisBaseInfoDTO.setHospCode(sysUserDTO.getHospCode());
+        mrisBaseInfoDTO.setCrteId(sysUserDTO.getCrteId());
+        mrisBaseInfoDTO.setCrteName(sysUserDTO.getCrteName());
         selectMap.put("hospCode",sysUserDTO.getHospCode());
         selectMap.put("mrisBaseInfoDTO",mrisBaseInfoDTO);
         return WrapperResponse.success(mrisHomeService_consumer.saveMrisInfo(selectMap));

@@ -99,6 +99,16 @@ public class InsureAdviceEntryServiceImpl extends HsafService implements InsureA
     }
 
     @Override
+    public WrapperResponse<Boolean> BIZC300001(Map map) {
+        return insureAdviceEntryBO.BIZC300001(MapUtils.get(map, "insureIndividualVisitDTO"));
+    }
+
+    @Override
+    public WrapperResponse<Boolean> deleteInjuryAdvice(Map map) {
+        return insureAdviceEntryBO.deleteInjuryAdvice(MapUtils.get(map, "insureIndividualVisitDTO"));
+    }
+
+    @Override
     public WrapperResponse<Boolean> deleteAdvice(Map map) {
         return WrapperResponse.success(insureAdviceEntryBO.deleteAdvice(MapUtils.get(map,"insureIndividualVisitDTO")));
     }

@@ -265,7 +265,7 @@ public class HealthInfoUniversalController {
         String method = MapUtils.get(map, "method");
         // 查询的开始日期
         String startTime = MapUtils.get(map, "startTime");
-        // 查询的借宿日期
+        // 查询的结束日期
         String endTime = MapUtils.get(map, "endTime");
         /* 这个入参根据自身接口的需要传入，由于我写的sql查询关联的医疗机构编码参数没有写死，
          * 所以需要传入一个参数编码查询医保机构编码
@@ -292,7 +292,7 @@ public class HealthInfoUniversalController {
             }
             return WrapperResponse.error(-1, clazz.getName()+"不存在【" + method + "】方法", null);
         }catch(Exception e){
-            return WrapperResponse.error(-1, e.getMessage(), null);
+            return WrapperResponse.error(-1, e.toString(), null);
         }
     }
 }

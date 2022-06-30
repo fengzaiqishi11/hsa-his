@@ -683,4 +683,16 @@ public interface OutptCostDAO {
      * @return java.util.List<cn.hsa.module.inpt.doctor.dto.OutptCostDTO>
      */
     List<cn.hsa.module.inpt.doctor.dto.OutptCostDTO> queryOutptCostByvisitIds(List<String> ids);
+
+    /**
+     * 更新费用表结算ID
+     * @param settleId
+     * @param costList
+     * @Author 医保开发二部-湛康
+     * @Date 2022-05-24 10:05
+     * @return void
+     */
+    void updateCostSettleId(String settleId,@Param("list") List<OutptCostDTO> costList);
+
+    void updateCostSettleIdByids(String settleId,@Param("list") List<OutptCostDTO> costList);
 }

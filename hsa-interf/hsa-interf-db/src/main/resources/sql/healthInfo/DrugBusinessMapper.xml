@@ -33,7 +33,7 @@
             and date(a.sfsj) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.sfsj) &lt;= date(#{endTime})
+            and date(a.sfsj) &lt; date(#{endTime})
         </if>
 
 
@@ -127,7 +127,7 @@
             and date(a.CRKSJ) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.CRKSJ) &lt;= date(#{endTime})
+            and date(a.CRKSJ) &lt; date(#{endTime})
         </if>
     </select>
     <!--药品库存信息-->
@@ -144,14 +144,14 @@
             bd.good_name as YPSPMC,
             (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code) as SCQY,
             bd.spec as GG,
-            sum(ss.num) as BZSL,
+            TRUNCATE(sum(ss.num),3) as BZSL,
             ss.unit_code as DW,
-            sum(ss.num) as KCSL,
-            max(ss.stock_max) as ZDCL,
+            TRUNCATE(sum(ss.num),3) as KCSL,
+            TRUNCATE(max(ss.stock_max),3) as ZDCL,
             null as BJCL,
-            max(ss.stock_min) as ZXCL,
-            max(ssd.buy_price) as PFJ,
-            max(ssd.sell_price) as LSJ,
+            TRUNCATE(max(ss.stock_min),3) as ZXCL,
+            TRUNCATE(max(ssd.buy_price),3) as PFJ,
+            TRUNCATE(max(ssd.sell_price),3) as LSJ,
             null as SXRQ
             from
             stro_stock ss,
@@ -175,7 +175,7 @@
 <!--            and date(a.SXRQ) &gt;= date(#{startTime})-->
 <!--        </if>-->
 <!--        <if test="endTime != null and endTime != ''">-->
-<!--            and date(a.SXRQ) &lt;= date(#{endTime})-->
+<!--            and date(a.SXRQ) &lt; date(#{endTime})-->
 <!--        </if>-->
     </select>
 
@@ -366,7 +366,7 @@
             and date(a.xssj) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.xssj) &lt;= date(#{endTime})
+            and date(a.xssj) &lt; date(#{endTime})
         </if>
     </select>
     <!--抗菌药物基本情况统计-->
@@ -551,7 +551,7 @@
             and date(a.JSRQ) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.JSRQ) &lt;= date(#{endTime})
+            and date(a.JSRQ) &lt; date(#{endTime})
         </if>
     </select>
     <!--抗菌药物各品种统计-->
@@ -689,7 +689,7 @@
             and date(a.ZXRQ) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.ZXRQ) &lt;= date(#{endTime})
+            and date(a.ZXRQ) &lt; date(#{endTime})
         </if>
     </select>
 
@@ -723,7 +723,7 @@
             and date(a.JSSJ) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.JSSJ) &lt;= date(#{endTime})
+            and date(a.JSSJ) &lt; date(#{endTime})
         </if>
     </select>
 
@@ -773,7 +773,7 @@
             and date(a.lqsj) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.lqsj) &lt;= date(#{endTime})
+            and date(a.lqsj) &lt; date(#{endTime})
         </if>
     </select>
 
@@ -1099,7 +1099,7 @@
             and date(a.YWSJ) &gt;= date(#{startTime})
         </if>
         <if test="endTime != null and endTime != ''">
-            and date(a.YWSJ) &lt;= date(#{endTime})
+            and date(a.YWSJ) &lt; date(#{endTime})
         </if>
     </select>
 

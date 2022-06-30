@@ -103,7 +103,7 @@ public interface DrawMedicineBO {
      * @Date 2021-05-12 15:20
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
-    void saveAdvanceTakeMedicine(Map<String, Object> map,String type);
+    void saveAdvanceTakeMedicine(Map<String, Object> map);
 
     List<Map<String, Object>> getTableTqlyData(Map<String, Object> map);
 

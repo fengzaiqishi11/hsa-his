@@ -6,9 +6,18 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.mris.service.MrisService;
@@ -16,6 +25,7 @@ import cn.hsa.module.mris.mrisHome.dao.MrisHomeDAO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.InptBedChangeDO;
 import cn.hsa.module.mris.mrisHome.entity.MrisTurnDeptDO;
+import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
 import cn.hsa.module.mris.tcmMrisHome.bo.TcmMrisHomeBO;
 import cn.hsa.module.mris.tcmMrisHome.dao.TcmMrisHomeDAO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmDiagnoseDTO;
@@ -27,6 +37,9 @@ import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -72,6 +85,18 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private DrgDipResultDAO drgDipResultDAO;
+
+    @Resource
+    private DrgDipResultDetailDAO drgDipResultDetailDAO;
+
+    @Resource
+    private DrgDipResultService drgDipResultService;
+
+    @Resource
+    private MrisHomeService mrisHomeService_consumer;
 
 
     /**
@@ -245,6 +270,35 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         resultMap.put("mrisTcmDiagnose", tcmMrisHomeDAO.queryTcmDiagnosePage(inptVisitDTO));
         resultMap.put("mrisOperInfo", tcmMrisHomeDAO.queryTcmMrisOperInfoPage(inptVisitDTO));
         resultMap.put("mrisTurnDeptList", tcmMrisHomeDAO.queryTcmMrisTurnDeptPage(inptVisitDTO));
+        //1.新增质控信息
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+
+        //2.获取DIP_DRG_MODE值
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "DIP_DRG_MODEL");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (ObjectUtil.isEmpty(sysParameterDTO)){
+          resultMap.put("DIP_DRG_MODEL",null);
+        }else{
+          resultMap.put("DIP_DRG_MODEL",sysParameterDTO.getValue());
+        }
+        //返回给前端  提示是否有这个权限
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("hospCode",map.get("hospCode").toString());
+        DrgDipAuthDTO drgDipAuthDTO =  drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        map1.put("drgDipAuthDTO",drgDipAuthDTO);
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        combo.setDip(drgDipAuthDTO.getDip());
+        combo.setDrg(drgDipAuthDTO.getDrg());
+        combo.setDipMsg(drgDipAuthDTO.getDipMsg());
+        combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
+        resultMap.put("drgInfo",combo);
         return resultMap;
     }
 
@@ -437,7 +491,7 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                 if (StringUtils.isEmpty(tcmDiagnoseDTO.getDiseaseIcd10())&&StringUtils.isEmpty(tcmDiagnoseDTO.getTcmSyndromesId())) {
                     continue;
                 }
-                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())||StringUtils.isNotEmpty(tcmDiagnoseDTO.getDiseaseIcd10())) {
+                if ("1".equals(tcmDiagnoseDTO.getDiseaseCode())) {
                     tcmDiagnoseDTO.setDiseaseName("主要诊断");
                     tcmDiagnoseDTO.setDiseaseCode("1");
                 } else {
@@ -630,10 +684,11 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         List<InptDiagnoseDTO> inptDiagnoseList = tcmMrisHomeDAO.queryHisDiagnoseInfo(map);
         List<TcmMrisDiagnoseDTO> mrisDiagnoseDOList = new ArrayList<>();
         List<TcmDiagnoseDTO> tcmDiagnoseDTOS = new ArrayList<>();
+        int i =2;
         if (!ListUtils.isEmpty(inptDiagnoseList)) {
             for (InptDiagnoseDTO inptDiagnoseDTO : inptDiagnoseList) {
-                if ("301".equals(inptDiagnoseDTO.getTypeCode()) || "302".equals(inptDiagnoseDTO.getTypeCode())
-                        || "303".equals(inptDiagnoseDTO.getTypeCode())) {
+                // 只取中医出院诊断
+                if ("303".equals(inptDiagnoseDTO.getTypeCode())) {
                     if ("1".equals(inptDiagnoseDTO.getIsMain())) {
                         TcmDiagnoseDTO tcmDiagnoseDTO = new TcmDiagnoseDTO();
                         tcmDiagnoseDTO.setId(SnowflakeUtils.getId());
@@ -663,23 +718,29 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
                         tcmDiagnoseDTOS.add(tcmDiagnoseDTO1);
                     }
                 } else {
-                    TcmMrisDiagnoseDTO mrisDiagnoseDO = new TcmMrisDiagnoseDTO();
-                    mrisDiagnoseDO.setId(SnowflakeUtils.getId());
-                    mrisDiagnoseDO.setMbiId(String.valueOf(map.get("mrisId")));
-                    mrisDiagnoseDO.setVisitId(String.valueOf(map.get("visitId")));
-                    mrisDiagnoseDO.setHospCode(String.valueOf(map.get("hospCode")));
-                    mrisDiagnoseDO.setDiseaseCode(inptDiagnoseDTO.getIsMain());
-                    if ("1".equals(inptDiagnoseDTO.getIsMain())) {
-                        mrisDiagnoseDO.setDiseaseName("主要诊断");
-                        mrisDiagnoseDO.setDiseaseCode("1");
-                    } else {
-                        mrisDiagnoseDO.setDiseaseName("其他诊断");
-                        mrisDiagnoseDO.setDiseaseCode("0");
+                    // 只取西医出院诊断
+                    if ("204".equals(inptDiagnoseDTO.getTypeCode())) {
+                        TcmMrisDiagnoseDTO mrisDiagnoseDO = new TcmMrisDiagnoseDTO();
+                        mrisDiagnoseDO.setId(SnowflakeUtils.getId());
+                        mrisDiagnoseDO.setMbiId(String.valueOf(map.get("mrisId")));
+                        mrisDiagnoseDO.setVisitId(String.valueOf(map.get("visitId")));
+                        mrisDiagnoseDO.setHospCode(String.valueOf(map.get("hospCode")));
+                        mrisDiagnoseDO.setDiseaseCode(inptDiagnoseDTO.getIsMain());
+                        if ("1".equals(inptDiagnoseDTO.getIsMain())) {
+                            mrisDiagnoseDO.setDiseaseName("主要诊断");
+                            mrisDiagnoseDO.setDiseaseCode("1");
+                            mrisDiagnoseDO.setColumnsNum("1");
+                        } else {
+                            mrisDiagnoseDO.setDiseaseName("其他诊断");
+                            mrisDiagnoseDO.setDiseaseCode("0");
+                            mrisDiagnoseDO.setColumnsNum(i + "");
+                            i++;
+                        }
+                        mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
+                        mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
+                        mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
+                        mrisDiagnoseDOList.add(mrisDiagnoseDO);
                     }
-                    mrisDiagnoseDO.setDiseaseIcd10(inptDiagnoseDTO.getDiseaseCode());
-                    mrisDiagnoseDO.setDiseaseIcd10Name(inptDiagnoseDTO.getDiseaseName());
-                    mrisDiagnoseDO.setIcdVersion(inptDiagnoseDTO.getIcdVersion());
-                    mrisDiagnoseDOList.add(mrisDiagnoseDO);
                 }
             }
             // 西医诊断
@@ -789,10 +850,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
 
         // 药物过敏信息集合
         List<InptPastAllergyDTO> allergylist = mrisHomeDAO.queryAllergyInfo(map);
-        if (ListUtils.isEmpty(allergylist)) {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.F);
+        if (ListUtils.isEmpty(allergylist)) { // 药物是否过敏 国家卫健委标准：RC037 有无药物过敏表 1: 无 2: 有
+            mrisBaseInfoDTO.setIsAllergy("1");
         } else {
-            mrisBaseInfoDTO.setIsAllergy(Constants.SF.S);
+            mrisBaseInfoDTO.setIsAllergy("2");
             String alleryList = "";
             for (InptPastAllergyDTO inptPastAllergyDTO : allergylist) {
                 alleryList += inptPastAllergyDTO.getDrugName() + ",";
@@ -819,14 +880,14 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
             mrisBaseInfoDTO.setDirectorName2(doctorInfo.getDirectorName2());
         }
 
-        // 住院次数获取(未获取，默认1次)
-        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
-        if (inCnt == 0) {
-            inCnt = 1;
-        }
-
-        mrisBaseInfoDTO.setInCnt(inCnt);
-        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getInNo());
+//        // 住院次数获取(未获取，默认1次)
+//        int inCnt = tcmMrisHomeDAO.getInCnt(mrisBaseInfoDTO);
+//        if (inCnt == 0) {
+//            inCnt = 1;
+//        }
+//
+//        mrisBaseInfoDTO.setInCnt(inCnt);
+        mrisBaseInfoDTO.setHealthCard(mrisBaseInfoDTO.getHealthCard());
 
         // 获取医疗机构名称与医疗机构编码
         Map<String, String> sysParamterMap = new HashMap<>();

@@ -61,6 +61,48 @@ public class InsureAdviceEntryController extends BaseController {
         return insureAdviceEntryService_consumer.saveAdviceEntry(map);
     }
 
+    /**
+     * @param insureIndividualVisitDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @method BIZC300001
+     * @author wangqiao
+     * @date 2022/5/31 11:05
+     * @description 工伤医嘱录入
+     **/
+    @PostMapping("/uploadInjuryAdvice")
+    public WrapperResponse<Boolean> BIZC300001(@RequestBody InsureIndividualVisitDTO insureIndividualVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureIndividualVisitDTO.setCrteId(sysUserDTO.getId());
+        insureIndividualVisitDTO.setCrteName(sysUserDTO.getName());
+        insureIndividualVisitDTO.setHospCode(sysUserDTO.getHospCode());
+
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        return insureAdviceEntryService_consumer.BIZC300001(map);
+    }
+
+    /**
+     * @param insureIndividualVisitDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @method BIZC300001
+     * @author wangqiao
+     * @date 2022/5/31 11:05
+     * @description 工伤医嘱删除
+     **/
+    @PostMapping("/deleteInjuryAdvice")
+    public WrapperResponse<Boolean> deleteInjuryAdvice(@RequestBody InsureIndividualVisitDTO insureIndividualVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        insureIndividualVisitDTO.setCrteId(sysUserDTO.getId());
+        insureIndividualVisitDTO.setCrteName(sysUserDTO.getName());
+        insureIndividualVisitDTO.setHospCode(sysUserDTO.getHospCode());
+
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        return insureAdviceEntryService_consumer.deleteInjuryAdvice(map);
+    }
+
 
     /**
      * @Method: queryPage()

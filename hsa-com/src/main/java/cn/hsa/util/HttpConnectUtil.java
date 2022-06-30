@@ -2,6 +2,7 @@ package cn.hsa.util;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 
+import cn.hutool.core.exceptions.ExceptionUtil;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -101,10 +102,11 @@ public class HttpConnectUtil {
                 HttpEntity entity = res.getEntity();
                 result = EntityUtils.toString(entity);
                 resultMap = JSONObject.parseObject(result,Map.class);
-                System.out.println(resultMap.get("code"));
+                logger.info("调用成功，返回参数为： " + resultMap.get("code"));
             }
         } catch (Exception e) {
-            logger.error("http 调用发生了异常: "+ e);
+            logger.error("http 调用发生了异常: 请求路径：{}，请求数据：{},详细堆栈日志：{}",urlS,param, ExceptionUtil.stacktraceToString(e));
+
             throw new RuntimeException(e);
         }
         return resultMap;
@@ -206,7 +208,8 @@ public class HttpConnectUtil {
             }
 //            }
         } catch (Exception e) {
-            logger.error("http 调用发生了异常: "+ e);
+            logger.error("http 调用发生了异常: 请求路径：{}，请求数据：{},详细堆栈日志：{}",url,param, ExceptionUtil.stacktraceToString(e));
+
             throw new AppException("请求失败:"+e.getMessage());
         }finally {
             // 关闭所有通道
@@ -256,7 +259,8 @@ public class HttpConnectUtil {
                 result += line;
             }
         } catch (Exception e) {
-            logger.error("http 调用发生了异常: "+ e);
+            logger.error("http 调用发生了异常: 请求路径：{}，请求数据：{},详细堆栈日志：{}",url,param, ExceptionUtil.stacktraceToString(e));
+
             throw new AppException("请求失败:"+e.getMessage());
         }
         // 使用finally块来关闭输入流
@@ -319,7 +323,7 @@ public class HttpConnectUtil {
             //固定多线程的话，如果不disconnect，链接会增多，直到收发不出信息。写上disconnect后正常一些。
             conn.disconnect();
         } catch (Exception e) {
-            logger.error("http 调用发生了异常: "+ e);
+            logger.error("http 调用发生了异常: 请求路径：{}，请求数据：{},详细堆栈日志：{}",path,data, ExceptionUtil.stacktraceToString(e));
             throw new AppException("doPost异常：" + e.getMessage());
         }
 
@@ -405,7 +409,7 @@ public class HttpConnectUtil {
                 connection.disconnect();
             }
         } catch (Exception e) {
-            logger.error("调用接口失败,原因：" + e.getMessage());
+            logger.error("调用接口失败,请求路径：{}, 请求数据：{},请求方法：{}, 详细堆栈：{}", path,data,sendType,ExceptionUtil.stacktraceToString(e));
             return getErrorResult("调用接口失败,原因：" + e.getMessage());
         }
 
@@ -421,6 +425,76 @@ public class HttpConnectUtil {
     //错误封装返回
     private static String getErrorResult(String message) {
         return "{\"infcode\":\"-1\", \"err_msg\":\"" + message + "\"}";
+    }
+
+    public static String doPostByXXX(String URL,Map<String,Object> params){
+        OutputStreamWriter out = null;
+        BufferedReader in = null;
+        StringBuilder result = new StringBuilder();
+        HttpURLConnection conn = null;
+        Exception exception = null;
+        // 构建请求参数
+        StringBuffer sbParams = new StringBuffer();
+        if (params != null && params.size() > 0) {
+            for (Map.Entry<String, Object> e : params.entrySet()) {
+                sbParams.append(e.getKey());
+                sbParams.append("=");
+                sbParams.append(e.getValue());
+                sbParams.append("&");
+            }
+        }
+            try{
+            URL url = new URL(URL);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            //发送POST请求必须设置为true
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
+            //设置连接超时时间和读取超时时间
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(600000);
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+            //获取输出流
+            out = new OutputStreamWriter(conn.getOutputStream(),"utf-8");
+            if (sbParams != null && sbParams.length() > 0) {
+                // 发送请求参数
+                out.write(sbParams.substring(0, sbParams.length() - 1));
+                // flush输出流的缓冲
+                out.flush();
+            }
+            out.close();
+            //取得输入流，并使用Reader读取
+            if (200 == conn.getResponseCode()){
+                in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+                String line;
+                while ((line = in.readLine()) != null){
+                    result.append(line);
+                }
+            }else{
+                throw new RuntimeException("接口地址："+URL+", http返回码为："+conn.getResponseCode());
+            }
+        }catch (Exception e){
+            exception = e;
+            throw new RuntimeException(e.getMessage());
+        }finally {
+            try{
+                if(out != null){
+                    out.close();
+                }
+                if(in != null){
+                    in.close();
+                }
+            }catch (IOException ioe){
+                ioe.printStackTrace();
+            }finally {
+                if (exception != null) {
+                    JSONObject errorMsg = new JSONObject();
+                    errorMsg.put("exception",exception.getMessage());
+                    result.append(errorMsg.toJSONString());
+                }
+                return result.toString();
+            }
+        }
     }
 
 

@@ -20,12 +20,6 @@
 
     <dependencies>
 
-<!--        <dependency>
-            <groupId>cn.bestwu</groupId>
-            <artifactId>fastdfs-client-java</artifactId>
-            <version>1.27</version>
-        </dependency>-->
-
         <dependency>
             <groupId>cn.hsa.report</groupId>
             <artifactId>hsa-report-biz</artifactId>
@@ -50,12 +44,7 @@
             <artifactId>hsaf-cache-redis</artifactId>
         </dependency>
 
-        <!--4.对象存储组件-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
-<!--        </dependency>-->
-        <!-- 应用监控相关 -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -84,15 +73,6 @@
             <version>5.1.48</version>
         </dependency>
 
-        <!--Rest接口文档-->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
     </dependencies>
 
     <build>

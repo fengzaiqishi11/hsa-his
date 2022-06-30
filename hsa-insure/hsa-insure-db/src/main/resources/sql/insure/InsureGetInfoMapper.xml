@@ -420,7 +420,7 @@
         select id,'1'as lx,in_no as visitNo, name, gender_code, age, age_unit_code,hosp_code,
         is_uplod_cost,is_uplod_dise,cplt_flag,DATE_FORMAT(in_time, "%Y-%m-%d") as visitDate,
         nation_code, cert_no,cert_code, birthday, patient_code, crte_time from inpt_visit where
-        patient_code = '0' and status_code in ('7') and hosp_code =#{hospCode}
+        CONVERT(patient_code,SIGNED) &lt;= 0 and status_code in ('7') and hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( name like concat('%',#{name},'%')
             or in_no like concat('%',#{name},'%'))
@@ -445,7 +445,7 @@
         ov.nation_code, ov.cert_no,cert_code, ov.birthday, ov.patient_code, ov.crte_time from outpt_visit ov
         left join outpt_settle os on os.visit_id = ov.id and os.hosp_code = ov.hosp_code and os.status_code ='0'
         where
-        ov.patient_code = '0' and os.id is not null and ov.hosp_code =#{hospCode}
+        CONVERT(ov.patient_code,SIGNED) &lt;= 0 and os.id is not null and ov.hosp_code =#{hospCode}
         <if test="name != null and name != ''">
             and ( ov.name like concat('%',#{name},'%')
             or ov.register_no like concat('%',#{name},'%'))
@@ -662,7 +662,7 @@
                 #{dscgTime}, #{dscgCaty}, #{actIptDays}, #{otpWmDise}, #{wmDiseCode}, #{otpTcmDise}, #{tcmDiseCode},
                 #{diagCodeCnt}, #{oprnOprtCodeCnt}, #{ventUsedDura}, #{pwcryBfadmComaDura}, #{pwcryAfadmComaDura},
                 #{bldCat}, #{bldAmt}, #{bldUnt}, #{spgaNurscareDays}, #{lv1NurscareDays}, #{scdNurscareDays},
-                #{lv3NursecareDays},
+                #{lv3NurscareDays},
                 #{dscgWay}, #{acpMedinsName}, #{acpOptinsCode}, #{billCode}, #{billNo}, #{bizSn}, #{daysRinpFlag31},
                 #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEndDate}, #{psnSelfpay},
                 #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept},
@@ -1097,6 +1097,33 @@
           order by moi.columns_num asc
     </select>
 
+    <select id="selectTcmMriOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select '2'                            as oprn_oprt_type,
+               moi.oper_disease_name          as oprnOprtName,
+               moi.oper_disease_icd9,
+               moi.oper_time                  as oprnOprtDate,
+               ''                             as anst_way,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and oper_doctor_id = su.id) as oper_dr_code,
+               moi.oper_doctor_name           as operDrName,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and ana_id1 = su.id)        as anst_dr_code,
+               moi.ana_name1                  as anst_dr_name,
+               moi.oper_time                  as oprnOprtDate,
+               idm.insure_illness_code        as oprnOprtCode
+        from tcm_mris_oper_info moi
+                 left join insure_disease_match idm on moi.oper_disease_id = idm.hosp_illness_id
+            and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+          and moi.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode}
+          and idm.audit_code = '1'
+          order by moi.columns_num asc
+    </select>
     <select id="selectOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
         select '2'                           as oprn_oprt_type,
                oir.oper_disease_name,
@@ -1436,6 +1463,26 @@
           and insure_settle_id = #{insureSettleId}
         order by maindiag_flag desc
     </select>
+<!--    查询西医诊断信息-->
+    <select id="selectXyDisease" resultType="java.util.Map">
+        select id,
+               hosp_code,
+               visit_id,
+               medical_reg_no,
+               insure_settle_id,
+               diag_type,
+               diag_code,
+               diag_name,
+               maindiag_flag,
+               adm_cond_type
+        from insure_diseinfo
+        where visit_id = #{visitId}
+          and hosp_code = #{hospCode}
+          and insure_settle_id = #{insureSettleId}
+          and diag_type != '2'
+          and diag_type != '3'
+        order by maindiag_flag desc
+    </select>
     <select id="selectBaseSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select id, visit_id, insure_settle_id, settle_no, fixmedins_name, fixmedins_code,
                (select name from insure_dict where code = 'HI_SETL_LV' and  value= hi_setl_lv limit 1) hi_setl_lv ,
@@ -1488,12 +1535,32 @@
     </select>
     <select id="selectMriBaseInfo" resultType="java.util.Map">
         select mbi.*,
+               (select prac_certi_no from sys_user su where mbi.zz_doctor_id = su.id) zz_doctor_code,
+               (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
+               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
+               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
                (select bd.nation_code
-                from base_dept bd
-                where bd.hosp_code =
-                      mbi.hosp_code
-                  and bd.id = mbi.turn_dept_ids) as nation_code
+                    from base_dept bd
+                    where bd.hosp_code =
+                    mbi.hosp_code
+                    and bd.id = mbi.turn_dept_ids) as nation_code
         from mris_base_info mbi
+        where mbi.hosp_code = #{hospCode}
+          and mbi.visit_id = #{visitId}
+    </select>
+
+    <select id="selectTcmMriBaseInfo" resultType="java.util.Map">
+        select mbi.*,
+               (select prac_certi_no from sys_user su where mbi.zz_doctor_id = su.id) zz_doctor_code,
+               (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
+               (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
+               (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
+               (select bd.nation_code
+                    from base_dept bd
+                    where bd.hosp_code =
+                    mbi.hosp_code
+                    and bd.id = mbi.turn_dept_ids) as nation_code
+        from tcm_mris_base_info mbi
         where mbi.hosp_code = #{hospCode}
           and mbi.visit_id = #{visitId}
     </select>
@@ -1655,7 +1722,7 @@
         from insure_bldinfo
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
-          and insure_settle_id = #{insureSettleId}
+          and insure_settle_id = #{insureSettleId} and bld_cat is not null
     </select>
     <select id="selectBldInfoForMap" resultType="java.util.Map">
         select id,
@@ -1687,14 +1754,57 @@
                idm.insure_illness_code diseaseCode,
                idm.insure_illness_name diseaseName,
                in_situation_code as    admCondType,
-               mid.disease_code  as    isMain
+               mid.disease_code  as    isMain,
+                bd.type_code
         from mris_inpt_diagnose mid
+                 join insure_disease_match idm on mid.hosp_code = idm.hosp_code
+            and idm.hosp_illness_code = mid.disease_icd10
+            left join base_disease bd on idm.hosp_illness_id=bd.id
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
+        order by  mid.disease_code desc
+    </select>
+
+    <select id="selectTcmMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+        select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id,
+               idm.insure_illness_code diseaseCode,
+               idm.insure_illness_name diseaseName,
+               in_situation_code as    admCondType,
+               mid.disease_code  as    isMain
+        from tcm_mris_diagnose mid
                  join insure_disease_match idm on mid.hosp_code = idm.hosp_code
             and idm.hosp_illness_code = mid.disease_icd10
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
         order by  mid.disease_code desc
+    </select>
+
+    <select id="selectTcmSyndromesMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">
+       select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id,
+               mid.disease_icd10 diseaseCode,
+               mid.disease_icd10_name diseaseName,
+               mid.in_situation_code as    admCondType,
+               mid.tcm_syndromes_id tcmSyndromesId,
+               mid.tcm_syndromes_name tcmSyndromesName,
+               mid.disease_code  as    isMain
+        from tcm_mris_syndromes_diagnose mid
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+    </select>
+
+    <select id="getParameterByCode" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select
+        id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from sys_parameter
+        where is_valid='1' and hosp_code=#{hospCode} and code=#{code}
     </select>
 
     <!-- 根据主键删除表信息 -->
@@ -1842,6 +1952,89 @@
     <select id="queryVisitById" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         select * from insure_individual_visit where
             hosp_code = #{hospCode}  and medical_reg_no=#{medicalRegNo} and aac001 = #{aac001}
+    </select>
+    <select id="selectMriOperInfoForDRGorDIP" resultType="java.util.Map">
+
+        select
+            moi.visit_id as visit_id,
+            '2'                               as oprn_oprt_type,
+               moi.oper_disease_name          as oprn_oprt_name,
+               moi.oper_disease_icd9          as oprn_oprt_code,
+               moi.oper_time                  as oprnOprtDate,
+               ''                             as anst_way,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and oper_doctor_id = su.id) as oper_dr_code,
+               moi.oper_doctor_name           as oper_dr_name,
+               (select prac_certi_no
+                from sys_user su
+                where su.hosp_code = #{hospCode}
+                  and ana_id1 = su.id)        as anst_dr_code,
+               moi.ana_name1                  as anst_dr_name,
+               ''                             as oprn_oprt_begntime,
+               ''                             as oprn_oprt_endtime,
+               ''                             as anst_begintime,
+               ''                             as anst_endtime,
+            moi.oper_time                  as oprnOprtDate,
+            moi.columns_num                  as sort_no,
+            moi.oper_time                  as oprt_date
+        from mris_oper_info moi
+                 left join insure_disease_match idm on moi.oper_disease_id = idm.hosp_illness_id
+            and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+          and moi.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode}
+          and idm.audit_code = '1'
+        order by moi.columns_num asc
+    </select>
+    <select id="selectMriInptDiagNoseForDRGorDIP" resultType="java.util.Map">
+        select mid.id,
+               mid.hosp_code,
+               mid.mbi_id,
+               mid.visit_id as visit_id,
+               idm.insure_illness_code as diag_code,
+               idm.insure_illness_name as diag_name,
+               ifnull(mid.in_situation_code,4) as    adm_cond_type,
+               mid.disease_code  as    maindiag_flag,
+               ifnull(mid.disease_code,'2') as sort_no
+        from mris_inpt_diagnose mid
+                 join insure_disease_match idm on mid.hosp_code = idm.hosp_code
+            and idm.hosp_illness_code = mid.disease_icd10
+        WHERE mid.visit_id = #{visitId}
+          and mid.hosp_code = #{hospCode}
+          and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
+        order by  mid.disease_code desc
+    </select>
+    <select id="queryTotalFee" resultType="java.math.BigDecimal">
+        select total_price from insure_individual_settle where settle_id = #{settleId} and hosp_code = #{hospCode}
+    </select>
+    <!--获取到匹配表信息-->
+    <select id="querySettleClockMatchByMap" resultType="java.util.Map">
+        select
+            id,
+            hosp_code as hospCode,
+            platform_type as platformType,
+            platform_dictionary_name as platformDictionaryName,
+            platform_dictionary_code as platformDictionaryCode,
+            platform_code_name as platformCodeName,
+            platform_code_value as platformCodeValue,
+            his_dictionary_name as hisDictionaryName,
+            his_dictionary_code as hisDictionaryCode,
+            his_code_name as hisCodeName,
+            his_code_value as hisCodeValue
+        from settle_clock_match
+        where hosp_code = #{hospCode}
+        <if test="platformType !=null and platformType != ''">
+            and platform_type = #{platformType}
+        </if>
+        <if test="platformDictionaryCode !=null and platformDictionaryCode != ''">
+            and platform_dictionary_code = #{platformDictionaryCode}
+        </if>
+        <if test="hisCodeValue !=null and hisCodeValue != ''">
+            and his_code_value = #{hisCodeValue}
+        </if>
+        LIMIT 1
     </select>
 
     <update id="updateSpecialAttribute">

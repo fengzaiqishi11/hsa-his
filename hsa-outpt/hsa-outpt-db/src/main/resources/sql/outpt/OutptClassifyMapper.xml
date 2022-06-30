@@ -218,12 +218,12 @@
     <!--查询单个-->
     <select id="queryClassifyCostList" resultMap="OutptClassifyCostMap">
         select a.id, a.hosp_code, a.cy_id, a.item_code, a.item_id, a.num, a.use_code,
-            case when a.item_code = '3' then b.unit_code when a.item_code = '2' then b.unit_code end itemUnitCode,
-            case when a.item_code = '3' then b.name when a.item_code = '2' then b.name end name,
-            case when a.item_code = '3' then b.price when a.item_code = '2' then b.price end itemPrice,
-            case when a.item_code = '3' then b.price*a.num when a.item_code = '2' then b.price*a.num end itemPriceAll,
-            case when a.item_code = '3' then b.price when a.item_code = '2' then b.price end itemPreferentialPrice,
-            case when a.item_code = '3' then b.price*a.num when a.item_code = '2' then b.price*a.num end itemPreferentialAllPrice,
+            case when a.item_code = '3' then b.unit_code when a.item_code = '2' then c.unit_code end itemUnitCode,
+            case when a.item_code = '3' then b.name when a.item_code = '2' then c.name end name,
+            case when a.item_code = '3' then b.price when a.item_code = '2' then c.price end itemPrice,
+            case when a.item_code = '3' then b.price * a.num when a.item_code = '2' then c.price * a.num end itemPriceAll,
+            case when a.item_code = '3' then b.price when a.item_code = '2' then c.price end itemPreferentialPrice,
+            case when a.item_code = '3' then b.price * a.num when a.item_code = '2' then c.price * a.num end itemPreferentialAllPrice,
             case when a.item_code='2' then e.id when a.item_code='3' then d.id end bfcId
         from outpt_classify_cost a
         left join base_item b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '3'

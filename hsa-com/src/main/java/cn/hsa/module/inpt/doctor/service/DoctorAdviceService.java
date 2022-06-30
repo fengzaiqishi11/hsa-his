@@ -252,4 +252,12 @@ public interface DoctorAdviceService {
      **/
     @GetMapping("/service/inpt/doctorAdviceController/queryUnsubmitAdviceList")
     WrapperResponse<Boolean> queryUnsubmitAdviceList(Map map);
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询某人的LIS或者PACS医嘱信息
+     * @Author: pengbo
+     * @Date: 2022-06-13 10:29
+     * @Return:
+     **/
+    WrapperResponse<List<InptAdviceDTO>> queryLisOrPacsAdvice(Map map);
 }

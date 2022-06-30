@@ -1686,6 +1686,19 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         return new ArrayList<>();
     }
 
+    /**
+     * @param inptAdviceDTO
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询某人的LIS或者PACS医嘱信息
+     * @Author: pengbo
+     * @Date: 2022-06-13 10:29
+     * @Return:
+     */
+    @Override
+    public List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO) {
+            return inptAdviceDAO.queryLisOrPacsAdvice(inptAdviceDTO);
+    }
+
     // 提交消息消费  lly 2021-12-03
     public void consumeSubmitAdviceMessage(String visitId,String hospCode){
         // 消息置为已读

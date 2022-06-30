@@ -170,5 +170,7 @@ public class TcmMrisCostDO implements java.io.Serializable {
 
     /** 中医类：辩证施膳 */
     private BigDecimal zyl11;
+    /** 中医类：中医和民族医医疗服务费 */
+    private BigDecimal zyl12;
 
 }

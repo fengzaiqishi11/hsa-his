@@ -4,9 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
-import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -113,4 +111,15 @@ public interface OutptVisitService {
 
 
     WrapperResponse<Boolean>  updateOutptVisitUploadFlag(Map<String, Object> map);
+
+    /**
+      * @method selectOutptVisitByCertNo
+      * @author wang'qiao
+      * @date 2022/6/21 21:29
+      *	@description  根据证件类型和证件号码 查询信息
+      * @param  map
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.outpt.visit.dto.OutptVisitDTO>
+      *
+     **/
+    WrapperResponse<OutptVisitDTO> selectOutptVisitByCertNo(Map<String, Object> map);
 }

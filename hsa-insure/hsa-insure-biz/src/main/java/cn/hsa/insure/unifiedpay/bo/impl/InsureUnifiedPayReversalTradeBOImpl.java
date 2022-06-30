@@ -757,7 +757,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
          * 1.调用政策查询接口  且是一站式结算单
          */
         BigDecimal sumBxFeeNumber = new BigDecimal(0.00);
-        if (Constants.SF.S.equals(isHospital) && (oneSettle || specialOneSettle) && !jxSettle) {
+        if (Constants.SF.S.equals(isHospital) && (oneSettle || specialOneSettle) && !jxSettle && !gsSettle) {
             Map<String, Object> policyMap = insureUnifiedBaseService.queryPolicyInfo(map).getData();
             List<Map<String, Object>> policyMapList = MapUtils.get(policyMap, "outptMap");
             if (!MapUtils.isEmpty(setlProcInfoMap)) {

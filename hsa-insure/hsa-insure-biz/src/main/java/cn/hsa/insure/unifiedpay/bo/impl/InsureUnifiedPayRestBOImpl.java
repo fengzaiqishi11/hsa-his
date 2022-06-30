@@ -1556,10 +1556,15 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         }
         Map<String, Object> dataMap = new HashMap<>();
         Map httpParam = new HashMap();
+        if (ObjectUtil.isEmpty(insureRegCode)) {
+            throw new AppException("医保中心编码不能为空!");
+        }
+        map.put("subRegCode",insureRegCode.substring(0,2));
         if (Constant.UnifiedPay.JBLIST.containsKey(itemType)) {
             InsureDiseaseDTO insureDiseaseDTO = insureDiseaseDAO.selectLatestVer(map);
-            if (insureDiseaseDTO != null && (insureDiseaseDTO.getRecordCounts() < insureDiseaseDTO.getNum() * insureDiseaseDTO.getSize())) {
-                throw new AppException("已经是最新数据了");
+            if (ObjectUtil.isNotEmpty(insureDiseaseDTO)) {
+                //调云助手查询是否为最新数据
+                checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureDiseaseDTO.getRecordCounts(),insureDiseaseDTO.getNum(),insureDiseaseDTO.getSize());
             }
             if (insureDiseaseDTO != null) {
                 num = insureDiseaseDTO.getNum();
@@ -1570,8 +1575,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             dataMap.put("page_size", size);
         } else {
             InsureItemDTO insureItemDTO = insureItemDAO.selectLatestVer(map);
-            if (insureItemDTO != null && (insureItemDTO.getRecordCounts() < insureItemDTO.getNum() * insureItemDTO.getSize())) {
-                throw new AppException("已经是最新数据了");
+            if (ObjectUtil.isNotEmpty(insureItemDTO)) {
+                //调云助手查询是否为最新数据
+                checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureItemDTO.getRecordCounts(),insureItemDTO.getNum(),insureItemDTO.getSize());
             }
             if (insureItemDTO != null) {
                 num = insureItemDTO.getNum();
@@ -1713,6 +1719,36 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             }
         }
         return resultMap;
+    }
+
+    /**
+     * @Description 调用云助手接口查义目录总数量
+     * @Author 产品三部-郭来
+     * @Date 2022-06-13 10:15
+     * @param insureRegCode
+     * @param itemType
+     * @param url_in
+     * @param recordCounts
+     * @return void
+     */
+    private void checkIsNewItem(String insureRegCode, String itemType, String url_in, int recordCounts,int pageNum, int pageSize) {
+
+            HashMap<String, Object> inMap = new HashMap<>();
+            inMap.put("infno",itemType);
+            inMap.put("insurCode",insureRegCode.substring(0,2));
+            String url = url_in.substring(0, url_in.lastIndexOf("/"))+"/getMiDirectoryCount";
+            String centerCount = "0";
+            try{
+                centerCount = HttpConnectUtil.unifiedPayPostUtil(url, JSON.toJSONString(inMap));
+            }catch (Exception ex){
+                throw new AppException("调云助手查询目录总数量失败!"+ex.getMessage());
+            }
+            if (Integer.valueOf(centerCount) <= recordCounts && recordCounts < pageNum * pageSize ) {
+                throw new AppException("当前目录已经是最新数据了！");
+            }
+
+
+
     }
 
     private void insert_1312(List<Map<String, Object>> dataResultMap, Map<String, Object> map) {

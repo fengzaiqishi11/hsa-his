@@ -62,8 +62,8 @@
                     <artifactId>guava</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>commons-codec</groupId>
-                    <artifactId>commons-codec</artifactId>
+                    <groupId>com.alibaba.csb.sdk</groupId>
+                    <artifactId>http-client</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -136,6 +136,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>

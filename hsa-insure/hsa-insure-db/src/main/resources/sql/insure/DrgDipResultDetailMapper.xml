@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO" id="drgDipResultDetailMap">
+        <result property="id" column="id"/>
+        <result property="resultId" column="result_id"/>
+        <result property="ruleLevel" column="rule_level"/>
+        <result property="ruleScore" column="rule_score"/>
+        <result property="fieldId" column="field_id"/>
+        <result property="checkFiled" column="check_filed"/>
+        <result property="resultMsg" column="result_msg"/>
+        <result property="originalValue" column="original_value"/>
+        <result property="isMain" column="is_main"/>
+        <result property="sort" column="sort"/>
+        <result property="ruletType" column="rulet_type"/>
+        <result property="validFlag" column="valid_flag"/>
+        <result property="crtId" column="crt_id"/>
+        <result property="crtName" column="crt_name"/>
+        <result property="crtTime" column="crt_time"/>
+    </resultMap>
+
+    <select id="selectListByVisitId" resultMap="drgDipResultDetailMap" >
+        select *
+        from drg_dip_result_detail where
+        result_id = #{id} and valid_flag = 1
+    </select>
+
+    <insert id="insertDrgDipResultDetail" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO" >
+        insert into drg_dip_result_detail (
+        id <!--id--> ,
+        result_id <!--质控结果主表id--> ,
+        rule_level <!--规则等级--> ,
+        rule_score <!--规则分数--> ,
+        field_id <!--错误字段字段名--> ,
+        check_filed <!--错误字段字段中文名--> ,
+        result_msg <!--质控结果信息--> ,
+        original_value <!--字段原始值--> ,
+        is_main <!--主次标识--> ,
+        sort <!--排序号--> ,
+        rulet_type <!--规则类型--> ,
+        valid_flag <!--有效标志--> ,
+        crt_id <!--创建人编号--> ,
+        crt_name <!--创建人姓名--> ,
+        crt_time <!--创建时间-->
+        )
+        values (
+        #{id},
+        #{resultId},
+        #{ruleLevel},
+        #{ruleScore},
+        #{fieldId},
+        #{checkFiled},
+        #{resultMsg},
+        #{originalValue},
+        #{isMain},
+        #{sort},
+        #{ruletType},
+        #{validFlag},
+        #{crtId},
+        #{crtName},
+        #{crtTime}
+        )
+    </insert>
+
+    <insert id="insertDrgDipResultDetailList" keyProperty="" useGeneratedKeys="true">
+        <foreach collection="list" item="entity" separator=";">
+        insert into drg_dip_result_detail (
+        id <!--id--> ,
+        result_id <!--质控结果主表id--> ,
+        rule_level <!--规则等级--> ,
+        rule_score <!--规则分数--> ,
+        field_id <!--错误字段字段名--> ,
+        check_filed <!--错误字段字段中文名--> ,
+        result_msg <!--质控结果信息--> ,
+        original_value <!--字段原始值--> ,
+        is_main <!--主次标识--> ,
+        sort <!--排序号--> ,
+        rulet_type <!--规则类型--> ,
+        valid_flag <!--有效标志--> ,
+        crt_id <!--创建人编号--> ,
+        crt_name <!--创建人姓名--> ,
+        crt_time <!--创建时间-->
+        )
+        values (
+        #{entity.id},
+        #{entity.resultId},
+        #{entity.ruleLevel},
+        #{entity.ruleScore},
+        #{entity.fieldId},
+        #{entity.checkFiled},
+        #{entity.resultMsg},
+        #{entity.originalValue},
+        #{entity.isMain},
+        #{entity.sort},
+        #{entity.ruletType},
+        #{entity.validFlag},
+        #{entity.crtId},
+        #{entity.crtName},
+        #{entity.crtTime}
+        )
+        </foreach>
+    </insert>
+
+    <select id="selectById" resultMap="drgDipResultDetailMap" >
+        select *
+                from drg_dip_result_detail where
+            id = #{id}
+                                                    </select>
+
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO" >
+        update drg_dip_result_detail set
+            if(#{id} != null and #{id} != ''){
+                id = #{id} <!--id-->,
+            }
+            if(#{resultId} != null and #{resultId} != ''){
+                result_id = #{resultId} <!--质控结果主表id-->,
+            }
+            if(#{ruleLevel} != null and #{ruleLevel} != ''){
+                rule_level = #{ruleLevel} <!--规则等级-->,
+            }
+            if(#{ruleScore} != null and #{ruleScore} != ''){
+                rule_score = #{ruleScore} <!--规则分数-->,
+            }
+            if(#{fieldId} != null and #{fieldId} != ''){
+                field_id = #{fieldId} <!--错误字段字段名-->,
+            }
+            if(#{checkFiled} != null and #{checkFiled} != ''){
+                check_filed = #{checkFiled} <!--错误字段字段中文名-->,
+            }
+            if(#{resultMsg} != null and #{resultMsg} != ''){
+                result_msg = #{resultMsg} <!--质控结果信息-->,
+            }
+            if(#{originalValue} != null and #{originalValue} != ''){
+                original_value = #{originalValue} <!--字段原始值-->,
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                valid_flag = #{validFlag} <!--有效标志-->,
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                crt_id = #{crtId} <!--创建人编号-->,
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                crt_name = #{crtName} <!--创建人姓名-->,
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                crt_time = #{crtTime} <!--创建时间-->
+            }
+        where
+            id = #{id}
+                                                    </update>
+
+    <delete id="deleteById"  >
+        delete drg_dip_result_detail where
+                id = #{id}
+                                                    </delete>
+</mapper>

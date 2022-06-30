@@ -420,4 +420,83 @@ public interface OutptTmakePriceFormBO {
      * @return java.lang.Boolean
      */
     Boolean insureRefund(Map map);
+
+    /**
+     * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 9:10
+     * @return java.lang.Boolean
+     */
+    Map<String, Object>  ampRefund(Map map);
+
+    /**
+     * 查询结算结果
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-16 14:43
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String, Object> querySettleResult(Map map);
+
+    /**
+     * @param map
+     * @return java.lang.Boolean
+     * @method AMP_HOS_001
+     * @author wang'qiao
+     * @date 2022/6/15 13:54
+     * @description 医疗消息推送
+     **/
+    WrapperResponse AMP_HOS_001(Map map);
+
+    /**
+      * @method refundInquiry
+      * @author wang'qiao
+      * @date 2022/6/20 14:45
+      *	@description 查询退款结果（AMP_HOS_003）
+      * @param  param
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+      *
+     **/
+    WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> param);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method reconciliationDocument
+     * @author wang'qiao
+     * @date 2022/6/20 19:48
+     * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+     **/
+    WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryUnsettleList
+     * @author wang'qiao
+     * @date 2022/6/21 10:37
+     * @description
+     **/
+    Map<String, Object> queryUnsettleList(Map map);
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method queryAccount
+     * @author wang'qiao
+     * @date 2022/6/22 15:10
+     * @description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
+     **/
+    Map<String,Object> queryAccount(Map param);
+
+    /**
+     * @param param
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+     * @method rechargeSettle
+     * @author wang'qiao
+     * @date 2022/6/23 15:27
+     * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
+     **/
+    Map<String, Object> rechargeSettle(Map param);
 }

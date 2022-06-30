@@ -230,4 +230,12 @@ public interface DoctorAdviceBO {
      * @Return:
      **/
     List<MessageInfoDTO> insertUnsubmitAdviceList(Map map,String type);
+    /**
+     * @Menthod: queryUnsubmitAdviceList
+     * @Desrciption: 查询某人的LIS或者PACS医嘱信息
+     * @Author: pengbo
+     * @Date: 2022-06-13 10:29
+     * @Return:
+     **/
+    List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
 }

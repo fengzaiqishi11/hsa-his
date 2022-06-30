@@ -32,7 +32,7 @@
 	join inpt_diagnose b on a.id =b.visit_id and a.hosp_code =b.hosp_code
 	left join base_disease c on b.disease_id =c.id and b.hosp_code =c.hosp_code
 	where b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
 	union all
@@ -65,7 +65,7 @@
 	join outpt_diagnose b on a.id =b.visit_id and a.hosp_code =b.hosp_code
 	left join base_disease c on b.disease_id =c.id and b.hosp_code =c.hosp_code
 	where b.crte_time &gt;= date(#{startTime})
-    and b.crte_time &lt;= date(#{endTime})
+    and b.crte_time &lt; date(#{endTime})
     and a.hosp_code =#{hospCode}
     and b.hosp_code =#{hospCode}
     ) dd

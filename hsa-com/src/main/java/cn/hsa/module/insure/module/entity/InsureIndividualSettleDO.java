@@ -174,4 +174,6 @@ public class InsureIndividualSettleDO extends PageDO implements Serializable {
         private BigDecimal behalfPay;// 代缴基金（破产改制）
         private BigDecimal psnPartAmt; // 个人负担总金额
         private String isCancel;
+        //是否是移动支付结算
+        //private String isMobilePayment;
 }

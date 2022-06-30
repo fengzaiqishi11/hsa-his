@@ -308,4 +308,17 @@ public class InsureItemMatchServiceImpl extends HsafService implements InsureIte
     public WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> selectItemMap) {
         return WrapperResponse.success(insureItemMatchBO.queryUnMacthAllPage(MapUtils.get(selectItemMap, "insureItemMatchDTO")));
     }
+
+    /**
+     * @param itemMatchDTO
+     * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
+     * @method queryByHospItemId
+     * @author wang'qiao
+     * @date 2022/6/21 21:28
+     * @description 根据hospItemId查询项目信息
+     **/
+    @Override
+	public List<InsureItemMatchDTO> queryByHospItemId(InsureItemMatchDTO itemMatchDTO) {
+		return insureItemMatchBO.queryByHospItemId(itemMatchDTO);
+	}
 }

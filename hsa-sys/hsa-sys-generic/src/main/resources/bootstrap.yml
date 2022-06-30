@@ -22,6 +22,10 @@ spring:
         enabled: false
         encode: UTF-8
         server-addr: 127.0.0.1:8848
+  boot:
+    admin:
+      client:
+        url: http://127.0.0.1:9020
 dubbo:
   registry:
     address: nacos://127.0.0.1:8848

@@ -236,6 +236,7 @@ public interface Constant {
         public static final String BIZC320007 = "320007";  // DRG 分组调用
         public static final String BIZC320003 = "320003";  // DRG 分组调用
         public static final String BIZC320001 = "320001";  // 医嘱录入上传
+        public static final String BIZC300001 = "300001";  // 工伤医嘱录入上传
 
         /*电子凭证*/
         public static final String FC_EMD_11001 = "EMD11001";//门诊电子凭证获取个人信息
@@ -620,6 +621,7 @@ public interface Constant {
             public static final String SYZY = "52"; // 生育住院
             public static final String JBYLSYZY = "54"; // 基本医疗生育门诊
             public static final String QTSYMZ = "9932"; // 其他生育门诊
+            public static final String GSMZ = "41"; // 工伤门诊
         }
 
 
@@ -893,6 +895,27 @@ public interface Constant {
             public static final String CZZG = "310"; // 城镇职工
             public static final String CXJM = "390"; // 城乡居民
             public static final String LX = "340"; // 离休
+        }
+
+        public static class ISMAN {
+            public static final String S = "1"; // 是
+            public static final String F = "0"; // 否
+        }
+
+        public static class ZKZT {
+            public static final String WZK = "0"; // 未质控
+            public static final String ZKWWC = "1"; // 质控未完成
+            public static final String ZKWC = "2"; // 质控完成
+        }
+
+        public static class ZKLX {
+            public static final String DRG = "1"; // DRG
+            public static final String DIP = "2"; // DIP
+        }
+        /*医保编码为 甘肃：620102 海南的：460100*/
+        public static class YBBMQZ {
+            public static final String HN = "46"; // 海南医保前缀
+            public static final String GS = "62"; // 甘肃医保前缀
         }
     }
 

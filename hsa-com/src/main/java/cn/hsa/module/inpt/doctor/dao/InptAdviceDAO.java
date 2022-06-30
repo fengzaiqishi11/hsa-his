@@ -712,7 +712,7 @@ public interface InptAdviceDAO {
      * @Date   2021/05/12 14:44
      * @Return list
      */
-    void updateAdvanceDays(@Param("list") List<String>  inptAdviceDTOList,@Param("advance_days") String days);
+    void updateAdvanceDays(@Param("list") List<InptAdviceDTO>  inptAdviceDTOList,@Param("advance_days") String days);
 
     /**
      * @Desrciption 根据项目ID查询最合适的库位
@@ -758,7 +758,7 @@ public interface InptAdviceDAO {
      * @Date   2021/05/12 14:44
      * @Return list
      */
-    Map<String, Object> getMedicineAdvance(Map<String, Object> map);
+    List<Map<String, Object>> getMedicineAdvance(Map<String, Object> map);
 
     List<BaseAdviceDTO> getIllnessAdviceByVisitId(@Param("list") List<InptVisitDTO> inptVisitDTOList);
     /**
@@ -821,7 +821,7 @@ public interface InptAdviceDAO {
      * @Date   2021/08/02 14:44
      * @Return list
      */
-    List<String> selectAdviceByDeptAndType (Map map);
+    List<InptAdviceDTO> selectAdviceByDeptAndType (Map map);
 
     InptAdviceDTO getLisInptAdvice(InptAdviceDTO inptAdviceDTO);
 
@@ -907,4 +907,12 @@ public interface InptAdviceDAO {
     List<InptVisitDTO> querySubmitAdviceList(Map param);
 
     List<BaseAdviceDetailDTO> getAdviceDataDetail(BaseDrugDTO baseDrugDTO);
+
+    /**
+     * 根据就诊ID查询对应的LIS医嘱，PACS医嘱
+     * @param inptAdviceDTO
+     * @return
+     */
+    List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
+
 }

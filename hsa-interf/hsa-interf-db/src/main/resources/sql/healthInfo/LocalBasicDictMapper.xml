@@ -26,7 +26,7 @@
             and bd.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and bd.crte_time &lt;= #{endTime}
+            and bd.crte_time &lt; #{endTime}
         </if>
     </select>
 
@@ -68,7 +68,7 @@
             and su.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and su.crte_time &lt;= #{endTime}
+            and su.crte_time &lt; #{endTime}
         </if>
     </select>
 
@@ -141,7 +141,7 @@
             and bd.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and bd.crte_time &lt;= #{endTime}
+            and bd.crte_time &lt; #{endTime}
         </if>
     </select>
 
@@ -175,7 +175,7 @@
             and bi.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and bi.crte_time &lt;= #{endTime}
+            and bi.crte_time &lt; #{endTime}
         </if>
     </select>
 
@@ -207,7 +207,7 @@
             and bd.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and bd.crte_time &lt;= #{endTime}
+            and bd.crte_time &lt; #{endTime}
         </if>
     </select>
 
@@ -240,7 +240,7 @@
             and bm.crte_time &gt;= #{startTime}
         </if>
         <if test="endTime != null">
-            and bm.crte_time &lt;= #{endTime}
+            and bm.crte_time &lt; #{endTime}
         </if>
     </select>
 </mapper>

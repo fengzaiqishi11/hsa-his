@@ -18,6 +18,7 @@ import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
+import cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -110,6 +111,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     private OutptRegisterDAO outptRegisterDAO;
     @Resource
     private OutptDoctorPrescribeDAO outptDoctorPrescribeDAO;
+
+    @Resource
+    private PayOnlineInfoDAO payOnlineInfoDAO;
 
     @Resource
     private OutptElectronicBillService outptElectronicBillService;
@@ -533,8 +537,34 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             return WrapperResponse.success(true);
         }
 
+        //判断是否是移动支付，是移动支付退款则推送退款申请 todo 并且这一笔结算是移动支付
+        /*Map<String, String> ydzfMap = new HashMap<>();
+        ydzfMap.put("code", "HN_YDZF_FLAG");
+        ydzfMap.put("hospCode", hospCode);
+        SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if(ydzfParameterDTO !=null && "1".equals(ydzfParameterDTO.getValue())) {
+          Map<String, Object> map1 = new HashMap<>();
+          map1.put("hospCode", hospCode);
+          map1.put("id",visitId);
+          InsureIndividualVisitDTO insureIndividualVisitDTO =
+              insureIndividualVisitService_consumer.getInsureIndividualVisitById(map1);
+          SetlRefundQueryDTO dto = new SetlRefundQueryDTO();
+          dto.setVisitId(visitId);
+          dto.setSettleId(settleId);
+          dto.setRedSettleId(redSettleId);
+          Map<String, Object> map = new HashMap<>();
+          map.put("hospCode", hospCode);
+          map.put("setlRefundQueryDTO", dto);
+          map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+          Map<String, Object> response = outptTmakePriceFormService_consumer.ampRefund(map).getData();
+          PayOnlineInfoDO pay = new PayOnlineInfoDO();
+          pay.setVisitId(insureIndividualVisitDTO.getVisitId());
+          pay.setRedSettleId(redSettleId);
+          pay.setAmpTraceId(insureIndividualVisitDTO.getVisitId());
+          pay.setTraceId(settleId);
+          payOnlineInfoDAO.updateByVisitId(pay);
+        }*/
         /**END*****************医保病人处理********************************************************************/
-
        // TODO 非医保病人自动退费
         // 如果有再收的费用且是普通病人，自动收费
 
@@ -1329,7 +1359,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
 
         // 门诊合同单位支付表冲红
-        this.outptInsurePayChangeRed(selectDTO);
+        this.outptInsurePayChangeRed1(selectDTO,redSettleId);
 
         return redSettleId;
     }
@@ -1364,7 +1394,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
      * @Author liaojiguang
      * @Date 2020/9/07 09:15
      */
-    private void outptInsurePayChangeRed(OutptSettleDTO outptSettleDTO) {
+    private void outptInsurePayChangeRed(OutptSettleDTO outptSettleDTO ) {
         List<OutptInsurePayDTO> outptInsurePayDTOList = outptInsurePayDAO.getOutptInsurePayByParams(outptSettleDTO);
         if (!ListUtils.isEmpty(outptInsurePayDTOList)) {
             for (OutptInsurePayDTO outptInsurePayDTO : outptInsurePayDTOList) {
@@ -1375,6 +1405,27 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         }
     }
 
+    /**
+     * @param outptSettleDTO
+     * @Menthod outptInsurePayChangeRed
+     * @Desrciption 门诊合同单位支付表冲红
+     * @Author liaojiguang
+     * @Date 2020/9/07 09:15
+     */
+    private void outptInsurePayChangeRed1(OutptSettleDTO outptSettleDTO,String redSettleId) {
+        List<OutptInsurePayDTO> outptInsurePayDTOList = outptInsurePayDAO.getOutptInsurePayByParams(outptSettleDTO);
+        if (!ListUtils.isEmpty(outptInsurePayDTOList)) {
+            for (OutptInsurePayDTO outptInsurePayDTO : outptInsurePayDTOList) {
+                //设置冲红结算id zjp 2022-06-09 【ID1003392】
+                //报表查询>财务报表>收费员收入明细 中，把收费和退费都统计到了 黄萍 的收入中 reason:医保支付冲红和被冲红结算id一致导致
+                outptInsurePayDTO.setSettleId(redSettleId);
+                ////
+                outptInsurePayDTO.setId(SnowflakeUtils.getId());
+                outptInsurePayDTO.setTotalPrice(BigDecimalUtils.negate(outptInsurePayDTO.getTotalPrice()));
+            }
+            outptInsurePayDAO.insertOutptInsurePays(outptInsurePayDTOList);
+        }
+    }
 
     /**
      * @param outptSettleDTO

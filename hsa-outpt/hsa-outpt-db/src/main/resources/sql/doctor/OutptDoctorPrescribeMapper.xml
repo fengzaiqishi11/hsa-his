@@ -724,6 +724,7 @@
                a.item_code itemCode, a.item_id itemId, a.item_name itemName,
                a.price , a.total_price totalPrice, a.spec, a.prep_code prepCode, a.dosage dosage,
                a.dosage_unit_code dosageUnitCode, a.usage_code usageCode, a.rate_id rateId,
+               br.remark as rateRemark, -- 频率描述
                a.speed_code speedCode, a.use_days useDays, a.num num, a.num_unit_code numUnitCode, a.total_num totalNum,
                a.herb_note_code herbNoteCode, a.is_skin isSkin, a.is_positive isPositive, a.content content, a.phar_id pharId, a.bfc_id bfcId,
                a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,
@@ -844,10 +845,11 @@
         0 preferentialPrice,
         case when a.item_code='2' then c.name when a.item_code='3' then b.name end itemName,
         case when a.item_code='2' then c.bfc_code when a.item_code='3' then b.bfc_code end bfcCode,
-        case when a.item_code='2' then e.id when a.item_code='3' then d.id end bfcId
+        case when a.item_code='2' then e.id when a.item_code='3' then d.id end bfcId,
+        case when a.item_code='2' then c.unit_code when a.item_code='3' then b.unit_code end unitCode
         from outpt_classify_cost a
         left join base_item b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '3'
-        left join base_material c on a.item_id = c.id and a.hosp_code = b.hosp_code and a.item_code = '2'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
         left join base_finance_classify d on b.bfc_code = d.code and b.hosp_code = d.hosp_code
         left join base_finance_classify e on c.bfc_code = e.code and c.hosp_code = e.hosp_code
         where a.hosp_code = #{hospCode}
@@ -1024,7 +1026,8 @@
 
     <!--  检查处方是否结算 -->
     <select id="checkIsSettle" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select count(id) num from outpt_prescribe a where id = #{id} and a.hosp_code = #{hospCode} and a.is_settle = '1' and ifnull(a.settle_id, '') != ''
+        select count(id) num from outpt_cost oc where oc.op_id =#{id} and oc.visit_id =#{visitId} and oc.hosp_code =#{hospCode}
+        and oc.settle_code='2' and oc.settle_id is not null
     </select>
 
     <!--  检查处方是否提交 -->

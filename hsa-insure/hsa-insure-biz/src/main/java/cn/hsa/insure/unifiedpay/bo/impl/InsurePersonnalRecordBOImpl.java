@@ -2,7 +2,7 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
@@ -11,14 +11,14 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureDiseaseRecordDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.*;
-import cn.hsa.module.insure.module.entity.InsureInptRecordDO;
+
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.ObjectUtil;
-import com.alibaba.fastjson.JSONObject;
+
 import com.github.pagehelper.PageHelper;
-import kafka.api.ApiUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -439,14 +439,21 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
         if(ObjectUtil.isEmpty(inptRecordDTO)){
             throw new AppException("未查询到转院备案数据");
         }
+        Map<String,Object> visitMap  = new HashMap<>();
         String hospCode = inptRecordDTO.getHospCode();
-        String orgCode = inptRecordDTO.getInsureRegCode();
-        String regCode = inptRecordDTO.getMdtrtareaAdmdvs();
+        visitMap.put("visitId",inptRecordDTO.getVisitId());
+        visitMap.put("hospCode",hospCode);
+        InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(visitMap);
+        String orgCode = insureIndividualVisitDTO.getMedicineOrgCode();
+        String regCode = insureIndividualVisitDTO.getInsureRegCode();
         InsureConfigurationDTO configurationDTO = new InsureConfigurationDTO();
         configurationDTO.setHospCode(inptRecordDTO.getHospCode());
         configurationDTO.setOrgCode(orgCode);
         configurationDTO.setRegCode(regCode);
         configurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(configurationDTO);
+        if (configurationDTO == null) {
+            throw new AppException("根据" + orgCode + "医保机构编码获取医保机构配置信息为空");
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
         map.put("regsiterTime",inptRecordDTO.getRegsiterTime());

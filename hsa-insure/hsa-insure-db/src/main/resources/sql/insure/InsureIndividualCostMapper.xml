@@ -822,11 +822,7 @@
                ic.hosp_code                                                                                   hospCode,
                ic.visit_id                                                                                    visitId,
                ic.op_id                                                                                       opId,
-               (select op.order_no
-                from outpt_prescribe op
-                where op.hosp_code = ic.hosp_code
-                  and op.id = ic.op_id
-                  and ic.visit_id = op.visit_id)                                                              rxNo,
+                op.order_no                                                                                     rxNo,
                (select su.work_type_code
                 from sys_user su
                 where su.hosp_code = ic.hosp_code
@@ -896,6 +892,10 @@
                iim.chrg_type chrgType,
                (select su.prac_certi_no from sys_user su where su.hosp_code = ic.hosp_code and su.id = ic.doctor_id ) as pracCertiNo
         FROM outpt_cost ic
+                left join outpt_prescribe op
+                on op.id = ic.op_id
+                and op.hosp_code = ic.hosp_code
+                and ic.visit_id = op.visit_id
                  JOIN insure_item_match iim
                       ON ic.`item_id` = iim.`hosp_item_id`
                           AND ic.`item_id` = iim.`hosp_item_id`
@@ -906,6 +906,7 @@
                                AND ic.`hosp_code` = iic.`hosp_code`
 
         WHERE ic.`hosp_code` = #{hospCode}
+        and op.is_submit='1'
         <if test='settle_code == "2" '>
             AND ic.`settle_code` IN ('0', '1','2')
         </if>
@@ -927,6 +928,7 @@
                 )
         </if>
         order by ic.crte_time desc
+
     </select>
     <delete id="deleteOutptInsureCost">
         delete from insure_individual_cost where visit_id =#{id} and hosp_code = #{hospCode}

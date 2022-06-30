@@ -8,9 +8,9 @@ import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
-import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+
 import cn.hsa.insure.util.*;
-import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
+
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -20,7 +20,7 @@ import cn.hsa.module.inpt.inregister.service.InptVisitService;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnDiseListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnFeeListDDTO;
 import cn.hsa.module.insure.fmiownpaypatn.dto.FmiOwnpayPatnMdtrtDDTO;
-import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
+
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
@@ -45,13 +45,9 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hsa.util.*;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.jetty.server.handler.gzip.GzipHttpOutputInterceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -252,6 +248,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             inptMatchDiagnoseDTOList = doctorAdviceService_consumer.queryInptDiagnose(reqMap).getData();
 
             mapList = handlerInptCostFee(insureSettleInfoDTO);
+            //修改状态
+            inptVisitDTO.setIsUplodDise("1");
 
         } else if (insureSettleInfoDTO.getLx().equals("0")) {
             Map<String, String> visitMap = new HashMap();
@@ -282,6 +280,8 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
             outptMatchDiagnoseDTOList = outptDoctorPrescribeService.queryOutptDiagnose(map).getData();
 
             mapList = handlerOutptCostFee(insureSettleInfoDTO);
+            //修改状态
+            outptVisitDTO.setIsUploadDise("1");
         }
 
 
@@ -311,12 +311,26 @@ public class InsureFmiOwnpayPatnBOImpl extends HsafBO implements InsureFmiOwnpay
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.FMI_OWNPAY_PATN_UPLOD.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
         interfaceParamDTO.setHospCode(insureSettleInfoDTO.getHospCode());
+        interfaceParamDTO.setFixmedins_code(insureSettleInfoDTO.getOrgCode());
+        interfaceParamDTO.setFixmedins_name(insureConfigurationDTO.getHospName());
         interfaceParamDTO.setIsHospital(insureSettleInfoDTO.getLx());
         interfaceParamDTO.setVisitId(insureSettleInfoDTO.getId());
         // 调用统一支付平台接口
         insureItfBO.executeInsur(FunctionEnum.FMI_OWNPAY_PATN_UPLOD, interfaceParamDTO);
 
         insertHandlerInsureCost(mapList, insureSettleInfoDTO);
+        //修改状态
+        if(insureSettleInfoDTO.getLx().equals("1")){
+            Map<String, Object> updateMap = new HashMap<>();
+            updateMap.put("hospCode", insureSettleInfoDTO.getHospCode());
+            updateMap.put("inptVisitDTO", inptVisitDTO);
+            inptVisitService_consumer.updateUplod(updateMap);
+        }else if (insureSettleInfoDTO.getLx().equals("0")){
+            Map paramMap1 = new HashMap();
+            paramMap1.put("hospCode",insureSettleInfoDTO.getHospCode());
+            paramMap1.put("outptVisitDTO",outptVisitDTO);
+            outptVisitService_consumer.updateOutptVisitUploadFlag(paramMap1);
+        }
         return true;
     }
 

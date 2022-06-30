@@ -1218,8 +1218,21 @@ public class BedListBOImpl implements BedListBO {
         if (ListUtils.isEmpty(bedList)) {
             throw new AppException("换科失败：病人无在床信息");
         }
-		inptVisitDTO.setInDeptId(MapUtils.get(map, "inDeptId"));
-        inptVisitDTO.setInWardId(MapUtils.get(map, "inWardId"));
+
+        // 转入病区ID
+        String inWardId = MapUtils.getEmptyErr(map, "inWardId", "转入病区ID为空");
+        // 转入科室ID
+        String inDeptId = MapUtils.getEmptyErr(map, "inDeptId", "转入科室ID为空");
+
+        if(StringUtils.isEmpty(inDeptId)){
+            throw new AppException("换科失败：转入科室ID为空,请刷新页面重新操作！");
+        }
+        if(StringUtils.isEmpty(inWardId)){
+            throw new AppException("换科失败：转入病区ID为空,请刷新页面重新操作！");
+        }
+
+		inptVisitDTO.setInDeptId(inDeptId);
+        inptVisitDTO.setInWardId(inWardId);
 
         // 查询科室名字
         String inDeptName = bedListDAO.getDeptName(map);
@@ -1262,8 +1275,15 @@ public class BedListBOImpl implements BedListBO {
             throw new AppException("病人换科失败：病人【" + inptVisitDTO.getName() + "】状态发生变化");
         }
 
-        // 修改医嘱 的就诊科室、开医嘱科室id， 医嘱执行表的开医嘱科室id、执行科室id， 费用表来源科室id、就诊科室id、开医嘱科室id、执行科室id
-        bedListDAO.updateVisitKS(inptVisitDTO);
+        // 修改医嘱 的就诊科室、开医嘱科室id，
+        bedListDAO.updateAdviceHK(inptVisitDTO);
+
+        // 医嘱执行表的开医嘱科室id、执行科室id，
+        bedListDAO.updateAdviceExecHK(inptVisitDTO);
+
+        // 费用表来源科室id、就诊科室id、开医嘱科室id、执行科室id
+//        bedListDAO.updateInptCostHK(inptVisitDTO);
+
     }
 
     private void checkIsAllowHk(int type, String hospCode, String visitId) {

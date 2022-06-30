@@ -1,0 +1,692 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" id="drgDipResultMap">
+        <result property="id" column="id"/>
+        <result property="visitId" column="visit_id"/>
+        <result property="psnNo" column="psn_no"/>
+        <result property="psnName" column="psn_name"/>
+        <result property="certno" column="certno"/>
+        <result property="gend" column="gend"/>
+        <result property="age" column="age"/>
+        <result property="insutype" column="insutype"/>
+        <result property="medType" column="med_type"/>
+        <result property="medTypeName" column="med_type_name"/>
+        <result property="inTime" column="in_time"/>
+        <result property="outTime" column="out_time"/>
+        <result property="inptDiagnose" column="inpt_diagnose"/>
+        <result property="outptDiagnose" column="outpt_diagnose"/>
+        <result property="deptId" column="dept_id"/>
+        <result property="deptName" column="dept_name"/>
+        <result property="doctorId" column="doctor_id"/>
+        <result property="doctorName" column="doctor_name"/>
+        <result property="medicalRegNo" column="medical_reg_no"/>
+        <result property="settleId" column="settle_id"/>
+        <result property="insureSettleId" column="insure_settle_id"/>
+        <result property="drgDipCode" column="drg_dip_code"/>
+        <result property="drgDipName" column="drg_dip_name"/>
+        <result property="icd10" column="icd10"/>
+        <result property="icd9" column="icd9"/>
+        <result property="totalFee" column="total_fee"/>
+        <result property="standFee" column="stand_fee"/>
+        <result property="override" column="override"/>
+        <result property="cdntnPay" column="cdntn_pay"/>
+        <result property="diffFee" column="diff_fee"/>
+        <result property="ypFee" column="yp_fee"/>
+        <result property="clFee" column="cl_fee"/>
+        <result property="states" column="states"/>
+        <result property="type" column="type"/>
+        <result property="businessType" column="business_type"/>
+        <result property="businessId" column="business_id"/>
+        <result property="hospCode" column="hosp_code"/>
+        <result property="insureRegCode" column="insure_reg_code"/>
+        <result property="hospName" column="hosp_name"/>
+        <result property="orgCode" column="org_code"/>
+        <result property="proMedicMater" column="pro_medic_mater"/>
+        <result property="weightValue" column="weight_value"/>
+        <result property="proConsum" column="pro_consum"/>
+        <result property="diagFeeSco" column="diag_fee_sco"/>
+        <result property="withCcormcc" column="with_ccormcc"/>
+        <result property="ccmccName" column="ccmcc_name"/>
+        <result property="bl" column="bl"/>
+        <result property="rate" column="rate"/>
+        <result property="feePay" column="fee_Pay"/>
+        <result property="standProMedicMater" column="stand_pro_medic_mater"/>
+        <result property="standProConsum" column="stand_pro_consum"/>
+        <result property="profit" column="profit"/>
+        <result property="validFlag" column="valid_flag"/>
+        <result property="crtId" column="crt_id"/>
+        <result property="crtName" column="crt_name"/>
+        <result property="crtTime" column="crt_time"/>
+    </resultMap>
+
+    <select id="queryListByVisitIdDesc" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO">
+        select   *
+        from drg_dip_result
+        where visit_id = #{visitId} and valid_flag = 1
+        <if test="type != null">
+            AND type = #{type}
+        </if>
+    </select>
+
+    <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
+        insert into drg_dip_result (
+
+        id <!--主键--> ,
+
+
+        visit_id <!--就诊id--> ,
+
+
+        psn_no <!--人员编号--> ,
+
+
+        psn_name <!--患者姓名--> ,
+
+
+        certno <!--患者身份证号码--> ,
+
+
+        gend <!--性别--> ,
+
+
+        age <!--年龄--> ,
+
+
+        insutype <!--险种--> ,
+
+
+        med_type <!--业务类型--> ,
+
+
+        med_type_name <!--业务类型名称--> ,
+
+
+        in_time <!--入院时间--> ,
+
+
+        out_time <!--出院时间--> ,
+
+
+        inpt_diagnose <!--入院诊断--> ,
+
+
+        outpt_diagnose <!--出院诊断--> ,
+
+
+        dept_id <!--科室id--> ,
+
+
+        dept_name <!--科室名称--> ,
+
+
+        doctor_id <!--医生id--> ,
+
+
+        doctor_name <!--医生姓名--> ,
+
+
+        medical_reg_no <!--就医登记号--> ,
+
+
+        settle_id <!--his结算id--> ,
+
+
+        insure_settle_id <!--医保结算id--> ,
+
+
+        drg_dip_code <!--drg\dip组编码--> ,
+
+
+        drg_dip_name <!--drg\dip组名称--> ,
+
+
+        icd10 <!--主要诊断--> ,
+
+
+        icd9 <!--主要手术--> ,
+
+
+        total_fee <!--总费用--> ,
+
+
+        stand_fee <!--标杆费用--> ,
+
+
+        override <!--倍率--> ,
+
+
+        cdntn_pay <!--统筹金额--> ,
+
+
+        diff_fee <!--预计偏差--> ,
+
+
+        yp_fee <!--药品费--> ,
+
+
+        cl_fee <!--耗材费--> ,
+
+
+        states <!--质控完成状态--> ,
+
+
+        type <!--质控类型--> ,
+
+
+        business_type <!--业务类型--> ,
+
+
+        business_id <!--业务id--> ,
+
+
+        hosp_code <!--医院编码--> ,
+
+
+        insure_reg_code <!--医保注册编码--> ,
+
+
+        hosp_name <!--医院名称--> ,
+
+
+        org_code <!--机构编码--> ,
+
+
+        pro_medic_mater <!--药占比--> ,
+
+
+        weight_value <!--权重--> ,
+
+
+        pro_consum <!--耗材占比--> ,
+
+
+        diag_fee_sco <!--费用分值--> ,
+
+
+        with_ccormcc <!--cc/mcc信息--> ,
+
+
+        ccmcc_name <!--cc/mcc信息--> ,
+
+
+        bl <!--倍率--> ,
+
+
+        rate <!--费率--> ,
+
+
+        fee_Pay <!--支付费用--> ,
+
+
+        stand_pro_medic_mater <!--标杆药占比--> ,
+
+
+        stand_pro_consum <!--标杆耗材占比--> ,
+
+
+        profit <!--盈亏额--> ,
+        suspicious_num,
+        violation_num,
+        group_result,
+        group_messages,
+        valid_flag <!--有效标志--> ,
+        medcasno,
+        visit_no,
+
+
+        crt_id <!--创建人--> ,
+
+
+        crt_name <!--创建姓名--> ,
+
+
+        crt_time <!--创建时间-->,
+        score_price
+
+        )
+        values (
+        #{id},
+        #{visitId},
+        #{psnNo},
+        #{psnName},
+        #{certno},
+        #{gend},
+        #{age},
+        #{insutype},
+        #{medType},
+        #{medTypeName},
+        #{inTime},
+        #{outTime},
+        #{inptDiagnose},
+        #{outptDiagnose},
+        #{deptId},
+        #{deptName},
+        #{doctorId},
+        #{doctorName},
+        #{medicalRegNo},
+        #{settleId},
+        #{insureSettleId},
+        #{drgDipCode},
+        #{drgDipName},
+        #{icd10},
+        #{icd9},
+        #{totalFee},
+        #{standFee},
+        #{override},
+        #{cdntnPay},
+        #{diffFee},
+        #{ypFee},
+        #{clFee},
+        #{states},
+        #{type},
+        #{businessType},
+        #{businessId},
+        #{hospCode},
+        #{insureRegCode},
+        #{hospName},
+        #{orgCode},
+        #{proMedicMater},
+        #{weightValue},
+        #{proConsum},
+        #{diagFeeSco},
+        #{withCcormcc},
+        #{ccmccName},
+        #{bl},
+        #{rate},
+        #{feePay},
+        #{standProMedicMater},
+        #{standProConsum},
+        #{profit},
+        #{suspiciousNum},
+        #{violationNum},
+        #{groupResult},
+        #{groupMessages},
+        #{validFlag},
+        #{medcasno},
+        #{visitNo},
+        #{crtId},
+        #{crtName},
+        #{crtTime},
+        #{scorePrice}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="drgDipResultMap" >
+        select    *
+        from drg_dip_result
+        where
+        id = #{id}
+    </select>
+
+    <update id="updateByVisitId" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
+      update drg_dip_result
+      set valid_flag = '0'
+      where visit_id = #{visitId} and type = #{type} and business_type = #{businessType}
+    </update>
+
+    <select id="queryDrgDipResultByVisitId" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select   *
+        from drg_dip_result
+        where visit_id = #{visitId} and valid_flag = 1
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        <if test="businessType != null and businessType != ''">
+            AND business_type = #{businessType}
+        </if>
+    </select>
+
+    <select id="queryDrgDipResultById" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO">
+        select   *
+        from drg_dip_result_detail
+        where result_id = #{id}
+    </select>
+
+    <select id="queryDrgDipResultSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select * from (select
+        isi.psn_name, isi.gend, isi.age, isi.medcasno, isi.chfpdr_code as doctor_id, isi.chfpdr_name as doctor_name,if(isi.settle_no is null,'0','1') as is_uplod ,
+        isi.visit_id, isi.insure_settle_id, iis.settle_id, iis.is_hospital, iis.insure_reg_code, iis.medicalRegNo,
+        iiv.visit_icd_code , iiv.visit_icd_name , iiv.visit_drpt_id as dept_id, iiv.visit_drpt_name as dept_name,iiv.visit_no,
+        iis.crte_time, DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time, iis.total_price as total_fee, ddr.id, ddr.stand_fee, ddr.profit,ddr.type,
+        if(ddr.states is null,'0',ddr.states) as states,
+        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
+        if(ddr.violation_num > 0,'1','0') as violation_states,
+        if(ddr.group_result is null,'0',ddr.group_result) as group_result
+	    from insure_setl_info isi left join insure_individual_visit iiv on isi.visit_id =iiv.visit_id and isi.mdtrt_id =iiv.medical_reg_no
+        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId and iis.state = '0' and iis.settle_state = '1'
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type})A
+        <where>
+            <if test="doctorId != null and doctorId != '' ">
+               and A.doctor_id = #{doctorId}
+            </if>
+            <if test="deptId != null and deptId != '' ">
+               and A.dept_Id = #{deptId}
+            </if>
+            <if test="isUplod != null and isUplod != '' ">
+               and A.is_uplod = #{isUplod}
+            </if>
+            <if test="states != null and states != '' ">
+               and A.states = #{states}
+            </if>
+            <if test="suspiciousStates != null and suspiciousStates != '' ">
+               and A.suspicious_states = #{suspiciousStates}
+            </if>
+            <if test="violationStates != null and violationStates != '' ">
+               and A.violation_states = #{violationStates}
+            </if>
+            <if test="groupResult != null and groupResult != '' ">
+               and A.group_result = #{groupResult}
+            </if>
+            <if test="sv != null and sv != '' ">
+               and (A.violation_states = '1' or A.suspicious_states = '1')
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( A.psn_name like concat('%',#{keyword},'%')
+                or A.visit_no like concat('%',#{keyword},'%')
+                or A.medcasno like concat('%',#{keyword},'%')
+                )
+            </if>
+            <if test="year != null and year != '' ">
+                and DATE_FORMAT(A.crte_time, '%Y') = #{year}
+            </if>
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            <if test="startYearMonth != '' and startYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &gt;= #{startYearMonth}
+            </if>
+            <if test="endYearMonth != '' and endYearMonth != null">
+                and DATE_FORMAT(A.crte_time, "%Y-%m") &lt;= #{endYearMonth}
+            </if>
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_Id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            <if test="isUplods != null and isUplods.size()>0">
+                and A.is_uplod in
+                <foreach collection="isUplods" item="isUplod" separator="," open="(" close=")">
+                    #{isUplod}
+                </foreach>
+            </if>
+            <if test="statess != null and statess.size()>0">
+                and A.states in
+                <foreach collection="statess" item="states" separator="," open="(" close=")">
+                    #{states}
+                </foreach>
+            </if>
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDrgDipResultMris" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select * from (select
+        mbi.name as psn_name, mbi.gender_code as gend, iv.age, mbi.in_profile as medcasno, mbi.zz_doctor_id as doctor_id, mbi.zz_doctor_name as doctor_name,
+        mbi.is_upload_insure as is_uplod ,mbi.visit_id, mbi.disease_icd10 as visit_icd_code , mbi.disease_icd10_name as visit_icd_name ,
+        iv.in_dept_id as dept_id, iv.in_dept_name as dept_name,iv.in_no as visit_no,iv.status_code,
+        ie.settle_time, DATE_FORMAT(ie.settle_time, '%Y-%m-%d %H:%i:%S') as setl_time, ie.total_price as total_fee, ddr.id, ddr.stand_fee, ddr.profit,ddr.type,
+        if(ddr.states is null,'0',ddr.states) as states,
+        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
+        if(ddr.violation_num > 0,'1','0') as violation_states,
+        if(ddr.group_result is null,'0',ddr.group_result) as group_result
+        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id
+        left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1' and ie.status_code = '0'
+        left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='2'  and ddr.type=#{type})A
+        <where>
+            <if test="doctorId != null and doctorId != '' ">
+                and A.doctor_id = #{doctorId}
+            </if>
+            <if test="deptId != null and deptId != '' ">
+                and A.dept_Id = #{deptId}
+            </if>
+            <if test="isUplod != null and isUplod != '' ">
+                and A.is_uplod = #{isUplod}
+            </if>
+            <if test="states != null and states != '' ">
+                and A.states = #{states}
+            </if>
+            <if test="suspiciousStates != null and suspiciousStates != '' ">
+                and A.suspicious_states = #{suspiciousStates}
+            </if>
+            <if test="violationStates != null and violationStates != '' ">
+                and A.violation_states = #{violationStates}
+            </if>
+            <if test="statusCode != null and statusCode != '' ">
+                and A.status_code = #{statusCode}
+            </if>
+            <if test="groupResult != null and groupResult != '' ">
+                and A.group_result = #{groupResult}
+            </if>
+            <if test="sv != null and sv != '' ">
+                and (A.violation_states = '1' or A.suspicious_states = '1')
+            </if>
+            <if test="keyword != null and keyword != ''">
+                and ( A.psn_name like concat('%',#{keyword},'%')
+                or A.visit_no like concat('%',#{keyword},'%')
+                or A.medcasno like concat('%',#{keyword},'%')
+                )
+            </if>
+            <if test="year != null and year != '' ">
+                and DATE_FORMAT(A.settle_time, '%Y') = #{year}
+            </if>
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.settle_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.settle_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            <if test="startYearMonth != '' and startYearMonth != null">
+                and DATE_FORMAT(A.settle_time, "%Y-%m") &gt;= #{startYearMonth}
+            </if>
+            <if test="endYearMonth != '' and endYearMonth != null">
+                and DATE_FORMAT(A.settle_time, "%Y-%m") &lt;= #{endYearMonth}
+            </if>
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_Id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            <if test="isUplods != null and isUplods.size()>0">
+                and A.is_uplod in
+                <foreach collection="isUplods" item="isUplod" separator="," open="(" close=")">
+                    #{isUplod}
+                </foreach>
+            </if>
+            <if test="statess != null and statess.size()>0">
+                and A.states in
+                <foreach collection="statess" item="states" separator="," open="(" close=")">
+                    #{states}
+                </foreach>
+            </if>
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+            <if test="statusCodes != null and statusCodes.size()>0">
+                and A.status_code in
+                <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                    #{statusCode}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <update id="updateById" parameterType="cn.hsa.module.insure.drgdip.entity.DrgDipResultDO" >
+        update drg_dip_result set
+            if(#{id} != null and #{id} != ''){
+                id = #{id} <!--主键-->,
+            }
+            if(#{visitId} != null and #{visitId} != ''){
+                visit_id = #{visitId} <!--就诊id-->,
+            }
+            if(#{psnNo} != null and #{psnNo} != ''){
+                psn_no = #{psnNo} <!--人员编号-->,
+            }
+            if(#{psnName} != null and #{psnName} != ''){
+                psn_name = #{psnName} <!--患者姓名-->,
+            }
+            if(#{certno} != null and #{certno} != ''){
+                certno = #{certno} <!--患者身份证号码-->,
+            }
+            if(#{gend} != null and #{gend} != ''){
+                gend = #{gend} <!--性别-->,
+            }
+            if(#{age} != null and #{age} != ''){
+                age = #{age} <!--年龄-->,
+            }
+            if(#{insutype} != null and #{insutype} != ''){
+                insutype = #{insutype} <!--险种-->,
+            }
+            if(#{medType} != null and #{medType} != ''){
+                med_type = #{medType} <!--业务类型-->,
+            }
+            if(#{medTypeName} != null and #{medTypeName} != ''){
+                med_type_name = #{medTypeName} <!--业务类型名称-->,
+            }
+            if(#{inTime} != null and #{inTime} != ''){
+                in_time = #{inTime} <!--入院时间-->,
+            }
+            if(#{outTime} != null and #{outTime} != ''){
+                out_time = #{outTime} <!--出院时间-->,
+            }
+            if(#{inptDiagnose} != null and #{inptDiagnose} != ''){
+                inpt_diagnose = #{inptDiagnose} <!--入院诊断-->,
+            }
+            if(#{outptDiagnose} != null and #{outptDiagnose} != ''){
+                outpt_diagnose = #{outptDiagnose} <!--出院诊断-->,
+            }
+            if(#{deptId} != null and #{deptId} != ''){
+                dept_id = #{deptId} <!--科室id-->,
+            }
+            if(#{deptName} != null and #{deptName} != ''){
+                dept_name = #{deptName} <!--科室名称-->,
+            }
+            if(#{doctorId} != null and #{doctorId} != ''){
+                doctor_id = #{doctorId} <!--医生id-->,
+            }
+            if(#{doctorName} != null and #{doctorName} != ''){
+                doctor_name = #{doctorName} <!--医生姓名-->,
+            }
+            if(#{medicalRegNo} != null and #{medicalRegNo} != ''){
+                medical_reg_no = #{medicalRegNo} <!--就医登记号-->,
+            }
+            if(#{settleId} != null and #{settleId} != ''){
+                settle_id = #{settleId} <!--his结算id-->,
+            }
+            if(#{insureSettleId} != null and #{insureSettleId} != ''){
+                insure_settle_id = #{insureSettleId} <!--医保结算id-->,
+            }
+            if(#{drgDipCode} != null and #{drgDipCode} != ''){
+                drg_dip_code = #{drgDipCode} <!--drg\dip组编码-->,
+            }
+            if(#{drgDipName} != null and #{drgDipName} != ''){
+                drg_dip_name = #{drgDipName} <!--drg\dip组名称-->,
+            }
+            if(#{icd10} != null and #{icd10} != ''){
+                icd10 = #{icd10} <!--主要诊断-->,
+            }
+            if(#{icd9} != null and #{icd9} != ''){
+                icd9 = #{icd9} <!--主要手术-->,
+            }
+            if(#{weight} != null and #{weight} != ''){
+                weight = #{weight} <!--权重-->,
+            }
+            if(#{totalFee} != null and #{totalFee} != ''){
+                total_fee = #{totalFee} <!--总费用-->,
+            }
+            if(#{standFee} != null and #{standFee} != ''){
+                stand_fee = #{standFee} <!--标杆费用-->,
+            }
+            if(#{override} != null and #{override} != ''){
+                override = #{override} <!--倍率-->,
+            }
+            if(#{cdntnPay} != null and #{cdntnPay} != ''){
+                cdntn_pay = #{cdntnPay} <!--统筹金额-->,
+            }
+            if(#{diffFee} != null and #{diffFee} != ''){
+                diff_fee = #{diffFee} <!--预计偏差-->,
+            }
+            if(#{ypFee} != null and #{ypFee} != ''){
+                yp_fee = #{ypFee} <!--药品费-->,
+            }
+            if(#{clFee} != null and #{clFee} != ''){
+                cl_fee = #{clFee} <!--耗材费-->,
+            }
+            if(#{states} != null and #{states} != ''){
+                states = #{states} <!--质控完成状态-->,
+            }
+            if(#{type} != null and #{type} != ''){
+                type = #{type} <!--质控类型-->,
+            }
+            if(#{businessType} != null and #{businessType} != ''){
+                business_type = #{businessType} <!--业务类型-->,
+            }
+            if(#{businessId} != null and #{businessId} != ''){
+                business_id = #{businessId} <!--业务id-->,
+            }
+            if(#{hospCode} != null and #{hospCode} != ''){
+                hosp_code = #{hospCode} <!--医院编码-->,
+            }
+            if(#{insureRegCode} != null and #{insureRegCode} != ''){
+                insure_reg_code = #{insureRegCode} <!--医保注册编码-->,
+            }
+            if(#{hospName} != null and #{hospName} != ''){
+                hosp_name = #{hospName} <!--医院名称-->,
+            }
+            if(#{orgCode} != null and #{orgCode} != ''){
+                org_code = #{orgCode} <!--机构编码-->,
+            }
+            if(#{validFlag} != null and #{validFlag} != ''){
+                valid_flag = #{validFlag} <!--有效标志-->,
+            }
+            if(#{crtId} != null and #{crtId} != ''){
+                crt_id = #{crtId} <!--创建人-->,
+            }
+            if(#{crtName} != null and #{crtName} != ''){
+                crt_name = #{crtName} <!--创建姓名-->,
+            }
+            if(#{crtTime} != null and #{crtTime} != ''){
+                crt_time = #{crtTime} <!--创建时间-->
+            }
+        where
+            id = #{id}
+    </update>
+
+    <delete id="deleteById"  >
+        delete drg_dip_result where
+                id = #{id}
+    </delete>
+</mapper>

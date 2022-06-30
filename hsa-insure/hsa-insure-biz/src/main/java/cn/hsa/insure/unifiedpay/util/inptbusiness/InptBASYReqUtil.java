@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.MrisCostDO;
 import cn.hsa.module.mris.tcmMrisHome.dto.TcmMrisBaseInfoDTO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.Constants;
@@ -18,6 +19,7 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -355,8 +357,17 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
      */
     private Map<String, Object> queryTcmEmcBaseInfo(Map<String, Object> map,String mdtrtSn) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
-        MrisCostDO mrisCostDO =  MapUtils.get(map,"mrisCostDO");
+        if (ObjectUtil.isEmpty(insureIndividualVisitDTO)) {
+            throw new AppException("未获取到医保登记信息！");
+        }
+        TcmMrisCostDO mrisCostDO =  MapUtils.get(map,"tcmmrisCostDO");
+        if (ObjectUtil.isEmpty(mrisCostDO)) {
+            throw new AppException("未获取到病案首页费用信息！");
+        }
         TcmMrisBaseInfoDTO mrisBaseInfoDTO = MapUtils.get(map,"tcmMrisBaseInfo");
+        if (ObjectUtil.isEmpty(mrisBaseInfoDTO)) {
+            throw new AppException("未获取到病案首页基础信息！");
+        }
         Map<String,Object> baseInfoMap = new HashMap<>();
 
         baseInfoMap.put("mdtrt_sn",mdtrtSn); // 就医流水号 定点医药机构编号+院内唯一流水号
@@ -605,8 +616,9 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
                 }
                 item.put("diag_code",MapUtils.get(item,"diag_code"));//	诊断代码
                 item.put("diag_name",MapUtils.get(item,"diag_name"));//	诊断名称
-                item.put("adm_dise_cond_name",null);//	入院疾病病情名称
-                item.put("adm_dise_cond_code",null);//	入院疾病病情代码
+                item.put("adm_dise_cond_name","");//	入院疾病病情名称
+                //广东病案首页上传此字段为必传，但可以传空值  000001：普通病种床日分值结算；000002：精神病种床日分值结算；000003：新生儿母婴同室；空值：其他病案 ；
+                item.put("adm_dise_cond_code","");//	入院疾病病情代码
                 String admCondValue = MapUtils.get(item,"adm_cond");
                 item.put("adm_cond_code",admCondValue);//	入院时病情代码
                 if("1".equals(admCondValue)){
@@ -664,8 +676,9 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
                 }
                 item.put("diag_code",MapUtils.get(item,"diag_code"));//	诊断代码
                 item.put("diag_name",MapUtils.get(item,"diag_name"));//	诊断名称
-                item.put("adm_dise_cond_name",null);//	入院疾病病情名称
-                item.put("adm_dise_cond_code",null);//	入院疾病病情代码
+                item.put("adm_dise_cond_name","");//	入院疾病病情名称
+                //广东病案首页上传此字段为必传，但可以传空值  000001：普通病种床日分值结算；000002：精神病种床日分值结算；000003：新生儿母婴同室；空值：其他病案 ；
+                item.put("adm_dise_cond_code","");//	入院疾病病情代码
                 String admCondValue = MapUtils.get(item,"adm_cond");
                 item.put("adm_cond_code",admCondValue);//	入院时病情代码
                 if("1".equals(admCondValue)){
@@ -734,15 +747,32 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
                 item.put("vali_flag",Constants.SF.S); // 有效标志
                 item.put("mdtrt_sn",mdtrtSn);  //  就医流水号
                 item.put("ipt_medcas_hmpg_sn",MapUtils.get(item,"id")); // 住院病案首页流水号
+
+                //广东医保病案上传接口oprn_oprt_date、oprn_oprt_code、oprn_oprt_name为必填项，这里做特殊处理
+                if ("44".startsWith(insureIndividualVisitDTO.getInsureRegCode())) {
+                    if (ObjectUtil.isEmpty(item.get("oprn_oprt_date"))) {
+                        throw new AppException("病案首页上传-手术操作日期不能为空，请检查！");
+                    }
+                    if (ObjectUtil.isEmpty(item.get("oprn_oprt_name")) || ObjectUtil.isEmpty(item.get("oprn_oprt_code"))) {
+                        if (ObjectUtil.isEmpty(item.get("oper_disease_id"))) {
+                            throw new AppException("病案首页上传-手术/操作名称或手术/操作代码不能为空，请检查！");
+                        }
+                        map.put("operDiseaseId",item.get("oper_disease_id"));
+                        Map<String, Object> matchMap = insureUnifiedEmrUploadDAO.selectInsureDiseaseMatch(map);
+                        if (ObjectUtil.isEmpty(matchMap)) {
+                            throw new AppException("病案首页上传-手术/操作名称或手术/操作代码不能为空，请检查！");
+                        }
+                        item.put("oprn_oprt_code",matchMap.get("insure_illness_code"));
+                        item.put("oprn_oprt_name",matchMap.get("insure_illness_name"));
+                    }
+                }
             });
         }else{
             map.put("code","SHOW_GDSBASY");
             SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
 
             if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
-                //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
-//                Map<String,Object> operInfoMap = new HashMap<>();
-//                operInfoDOList.add(operInfoMap);
+                //广东医保传空集合
             }else{
                 // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();
@@ -800,15 +830,32 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
                 item.put("vali_flag",Constants.SF.S); // 有效标志
                 item.put("mdtrt_sn",mdtrtSn);  //  就医流水号
                 item.put("ipt_medcas_hmpg_sn",MapUtils.get(item,"id")); // 住院病案首页流水号
+
+                //广东医保病案上传接口oprn_oprt_date、oprn_oprt_code、oprn_oprt_name为必填项，这里做特殊处理
+                if ("44".startsWith(insureIndividualVisitDTO.getInsureRegCode())) {
+                    if (ObjectUtil.isEmpty(item.get("oprn_oprt_date"))) {
+                        throw new AppException("病案首页上传-手术操作日期不能为空，请检查！");
+                    }
+                    if (ObjectUtil.isEmpty(item.get("oprn_oprt_name")) || ObjectUtil.isEmpty(item.get("oprn_oprt_code"))) {
+                        if (ObjectUtil.isEmpty(item.get("oper_disease_id"))) {
+                            throw new AppException("病案首页上传-手术/操作名称或手术/操作代码不能为空，请检查！");
+                        }
+                        map.put("operDiseaseId",item.get("oper_disease_id"));
+                        Map<String, Object> matchMap = insureUnifiedEmrUploadDAO.selectInsureDiseaseMatch(map);
+                        if (ObjectUtil.isEmpty(matchMap)) {
+                            throw new AppException("病案首页上传-手术/操作名称或手术/操作代码不能为空，请检查！");
+                        }
+                        item.put("oprn_oprt_code",matchMap.get("insure_illness_code"));
+                        item.put("oprn_oprt_name",matchMap.get("insure_illness_name"));
+                    }
+                }
             });
         }else{
             map.put("code","SHOW_GDSBASY");
             SysParameterDTO sysParameterDTO = sysParameterService.getParameterByCode(map).getData();
 
             if(sysParameterDTO !=null && Constants.SF.S.equals(sysParameterDTO.getValue())){
-                //修复调医保入参oprninfo节点“[{}]”问题（集合里有个空对象）导致报“住院病案首页诊断信息-住院病案首页流水号为空”
-//                Map<String,Object> operInfoMap = new HashMap<>();
-//                operInfoDOList.add(operInfoMap);
+                //广东医保传空集合
             }else{
                 // 用测试环境测试时，医保必须传手术节点
                 Map<String,Object> operInfoMap = new HashMap<>();

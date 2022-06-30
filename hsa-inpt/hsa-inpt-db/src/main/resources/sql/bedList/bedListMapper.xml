@@ -463,18 +463,21 @@
         where ic.hosp_code = #{hospCode} and ic.visit_id = #{visitId} and ifnull(is_ok, '0') = '0' and status_code = '1'
     </select>
 
-    <update id="updateVisitKS">
+    <update id="updateAdviceHK">
         <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
-        update inpt_advice set in_dept_id = #{inDeptId}, dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
-        where hosp_code = #{hospCode} and visit_id = #{id};
+        update inpt_advice set in_dept_id = #{inDeptId}, dept_id = #{inDeptId} where hosp_code = #{hospCode} and visit_id = #{id}
+    </update>
 
+    <update id="updateAdviceExecHK">
         <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
-        update inpt_advice_exec set dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
-        where hosp_code = #{hospCode} and visit_id = #{id};
+        update inpt_advice_exec set dept_id = #{inDeptId} where hosp_code = #{hospCode} and visit_id = #{id}
+    </update>
 
+
+    <update id="updateInptCostHK">
         <!--更新医嘱表 入院科室id，开方科室id，执行科室id -->
-        update inpt_cost set source_dept_id = #{inDeptId}, in_dept_id = #{inDeptId}, dept_id = #{inDeptId}, exec_dept_id = #{inDeptId}
-        where hosp_code = #{hospCode} and visit_id = #{id};
+        update inpt_cost set source_dept_id = #{inDeptId}, in_dept_id = #{inDeptId}, dept_id = #{inDeptId}
+        where hosp_code = #{hospCode} and visit_id = #{id}
     </update>
 
     <select id="getDeptName" parameterType="java.util.Map" resultType="java.lang.String">

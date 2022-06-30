@@ -5,7 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.report.business.dto.ReportReturnDataDTO;
 import cn.hsa.module.report.business.service.ReportDataDownLoadService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
-import io.swagger.annotations.ApiOperation;
+
 import org.apache.commons.io.IOUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,7 +36,7 @@ public class ReportDataDownLoadController extends BaseController {
     @Resource
     private ReportDataDownLoadService reportDataDownLoadService_consumer;
 
-    @ApiOperation("报表生成")
+
     @PostMapping("/saveBuild")
     public WrapperResponse<ReportReturnDataDTO> saveBuild(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
@@ -47,7 +47,7 @@ public class ReportDataDownLoadController extends BaseController {
         return reportDataDownLoadService_consumer.saveBuild(map);
     }
 
-    @ApiOperation("报表删除")
+
     @PostMapping("/deleteReport")
     public WrapperResponse<Boolean> deleteReport(@RequestBody Map map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);

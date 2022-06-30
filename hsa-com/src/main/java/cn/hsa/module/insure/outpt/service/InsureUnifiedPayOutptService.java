@@ -1,17 +1,10 @@
 package cn.hsa.module.insure.outpt.service;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
-import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
-import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
-import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
-import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.sys.redis.bo.RedisBO;
 import org.springframework.cloud.openfeign.FeignClient;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -194,4 +187,44 @@ public interface InsureUnifiedPayOutptService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     WrapperResponse<Map<String, Object>> UP6203(Map<String, Object> map);
+
+	/**
+	 * @param map
+	 * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+	 * @method AMP_HOS_001
+	 * @author wang'qiao
+	 * @date 2022/6/14 16:20
+	 * @description
+	 **/
+	WrapperResponse<Boolean> AMP_HOS_001(Map<String, Object> map);
+
+    /**
+     * 线上医保移动支付完成的结算订单，可通过此接口进行退款
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-06-15 9:33
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> AmpRefund(Map<String, Object> map);
+
+	/**
+	  * @method refundInquiry
+	  * @author wang'qiao
+	  * @date 2022/6/20 14:55
+	  *	@description 查询退款结果（AMP_HOS_003） 调用AMP_HOS_002平台退款申请接口后，根据此状态来查询对应的退款具体结果
+	  * @param  map
+	  * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+	  *
+	 **/
+	WrapperResponse<Map<String, Object>> refundInquiry(Map<String, Object> map);
+
+	/**
+	 * @param map
+	 * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map < java.lang.String, java.lang.Object>>
+	 * @method reconciliationDocument
+	 * @author wang'qiao
+	 * @date 2022/6/20 19:48
+	 * @description 对账文件获取  下载后定点医疗机构可自行解析此对账文件并与定点机构的对账文件和医保核心的对账文件进行三方账目的对账
+	 **/
+	WrapperResponse<Map<String, Object>> reconciliationDocument(Map<String, Object> map);
 }

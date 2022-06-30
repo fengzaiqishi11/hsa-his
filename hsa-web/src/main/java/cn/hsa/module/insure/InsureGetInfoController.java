@@ -85,7 +85,57 @@ public class InsureGetInfoController extends BaseController {
         map.put("crteTime",sysUserDTO.getCrteTime());
         return insureGetInfoService_consumer.saveInsureSettleInfo(map);
     }
-
+    /**
+     * @Author gory
+     * @Description 结算清单质控DRG
+     * @Date 2022/6/6 15:56
+     * @Param [map, req, res]
+     **/
+    @PostMapping("/uploadInsureSettleInfoForDRG")
+    public WrapperResponse<Map<String,Object>> uploadInsureSettleInfoForDRG(@RequestBody Map<String,Object> map,
+                                                                            HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("hospName",sysUserDTO.getHospName());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime",sysUserDTO.getCrteTime());
+        return insureGetInfoService_consumer.uploadInsureSettleInfoForDRG(map);
+    }
+    /**
+     * @Author gory
+     * @Description 结算清单质控DRG 或者 DIP
+     * @Date 2022/6/6 15:56
+     * @Param [map, req, res]
+     **/
+    @PostMapping("/uploadInsureSettleInfoForDRGorDIP")
+    public WrapperResponse<Map<String,Object>> uploadInsureSettleInfoForDRGorDIP(@RequestBody Map<String,Object> map,
+                                                                            HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("hospName",sysUserDTO.getHospName());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime",sysUserDTO.getCrteTime());
+        return insureGetInfoService_consumer.uploadInsureSettleInfoForDRGorDIP(map);
+    }
+    /**
+     * @Author gory
+     * @Description 结算清单质控DIP
+     * @Date 2022/6/6 15:56
+     * @Param [map, req, res]
+     **/
+    @PostMapping("/uploadInsureSettleInfoForDIP")
+    public WrapperResponse<Map<String,Object>> uploadInsureSettleInfoForDIP(@RequestBody Map<String,Object> map,
+                                                                            HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("hospName",sysUserDTO.getHospName());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteTime",sysUserDTO.getCrteTime());
+        return insureGetInfoService_consumer.uploadInsureSettleInfoForDIP(map);
+    }
     /**
      * @Method queryPage
      * @Desrciption  查询结算清单左侧人员类别信息

@@ -188,7 +188,7 @@
             c.insure_item_code as insureItemCode,
             c.insure_item_name as insureItemName,
             c.insure_reg_code as insureRegCode,
-        si.id AS fixmedinsBchno,
+            si.id AS fixmedinsBchno,
             a.doctor_name AS prscDrName,
             si.crte_name AS pharName,
             IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
@@ -222,10 +222,12 @@
             AND a.item_id = c.hosp_item_id
             LEFT JOIN outpt_visit d ON a.hosp_code = d.hosp_code
             AND a.visit_id = d.id
-            LEFT JOIN outpt_settle e ON a.hosp_code = e.hosp_code
-            AND a.settle_id = e.id
-            LEFT JOIN insure_individual_visit iiv ON a.hosp_code = iiv.hosp_code
-            AND a.visit_id = iiv.id
+            LEFT JOIN outpt_settle os ON os.id = a.settle_id
+            AND os.hosp_code = a.hosp_code
+--             LEFT JOIN outpt_settle e ON a.hosp_code = e.hosp_code
+--             AND a.settle_id = e.id
+--             LEFT JOIN insure_individual_visit iiv ON a.hosp_code = iiv.hosp_code
+--             AND a.visit_id = iiv.id
         WHERE
             a.hosp_code = #{hospCode}
             and a.status_code = '0' /*正常状态*/
@@ -247,7 +249,13 @@
         <if test="insureRegCode != null and insureRegCode != ''">
             and c.insure_reg_code = #{insureRegCode}
         </if>
-   UNION ALL
+        <if test="startTime != null and startTime != ''">
+            and os.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and os.settle_time &lt;= #{endTime}
+        </if>
+        UNION ALL
         /*住院*/
         SELECT
         c.insure_item_code AS medListCodg,
@@ -288,12 +296,14 @@
         AND a.item_id = bd.id
         LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
         AND a.item_id = c.hosp_item_id
-        LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
-        AND a.visit_id = d.id
-        LEFT JOIN inpt_settle e ON a.hosp_code = e.hosp_code
-        AND a.settle_id = e.id
-        LEFT JOIN insure_individual_visit iiv ON a.hosp_code = iiv.hosp_code
-        AND a.visit_id = iiv.id
+        LEFT JOIN inpt_settle is2 ON is2.id = a.settle_id
+        AND is2.hosp_code = a.hosp_code
+--         LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
+--         AND a.visit_id = d.id
+--         LEFT JOIN inpt_settle e ON a.hosp_code = e.hosp_code
+--         AND a.settle_id = e.id
+--         LEFT JOIN insure_individual_visit iiv ON a.hosp_code = iiv.hosp_code
+--         AND a.visit_id = iiv.id
         WHERE
         a.hosp_code = #{hospCode}
         and a.status_code = '0' /*正常状态*/
@@ -313,6 +323,12 @@
         </if>
         <if test="insureRegCode != null and insureRegCode != ''">
             and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and is2.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and is2.settle_time &lt;= #{endTime}
         </if>
     </select>
 

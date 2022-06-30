@@ -12,6 +12,9 @@ import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.*;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisDiagnoseDO;
+import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisOperInfoDO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -686,4 +689,19 @@ public interface MrisHomeDAO {
 
 
     Map<String, Object> getMrisPatientBaseInfo(Map<String, Object> map);
+
+    /**
+     * @Method queryMriCost
+     * @Desrciption  查询住院中医病案首页的的---费用数据
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/4/29 16:04
+     * @Return
+     **/
+    TcmMrisCostDO queryTcmMriCost(Map<String, Object> map);
+
+    List<TcmMrisOperInfoDO> queryTcmMrisOperInfoPage(InptVisitDTO inptVisitDTO);
+
+    List<TcmMrisDiagnoseDO> queryTcmMrisDiagnosePage(InptVisitDTO inptVisitDTO);
 }

@@ -1,6 +1,7 @@
 package cn.hsa.insure.unifiedpay.util.psninfo;
 
 import cn.hsa.exception.BizRtException;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.unifiedpay.util.InsureCommonUtil;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.Constant;
@@ -49,6 +50,9 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             tempMap.put("hospCode", map.get("hospCode"));
             tempMap.put("code", "QrCodePolicy");
             SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(tempMap).getData();
+            if(sys==null){
+                throw  new AppException("未找到医保电子凭证扫码读卡政策参数配置信息！");
+            }
             String QrCodePolicy = sys.getValue();
             if (Constant.UnifiedPay.QrCodePolicy.HN.equals(QrCodePolicy)) {
                 // 证件类型

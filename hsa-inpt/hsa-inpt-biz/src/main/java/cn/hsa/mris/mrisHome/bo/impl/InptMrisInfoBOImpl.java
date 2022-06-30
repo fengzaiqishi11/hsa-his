@@ -148,11 +148,14 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
     }
 
     public String changeData(Object object){
-        String data ="";
+        String data ="-";
         if (object==null){
             return data;
         }
         data = (String) object;
+        if (StringUtils.isEmpty(data)){
+            data="-";
+        }
         data = data.replace("\n","").replace("null","").replace("\t","");
         return data;
     }

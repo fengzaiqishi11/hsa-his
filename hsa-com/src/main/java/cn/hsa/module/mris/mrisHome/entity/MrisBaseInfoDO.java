@@ -64,7 +64,6 @@ public class MrisBaseInfoDO implements Serializable {
     private String ageUnitName;
 
     /** 出生日期 */
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     /** 证件类型代码（ZJLX） */
@@ -275,7 +274,6 @@ public class MrisBaseInfoDO implements Serializable {
     private String zkNurseName;
 
     /** 质控时间 */
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date zkTime;
 
     /** 是否尸检（SF）编码 */

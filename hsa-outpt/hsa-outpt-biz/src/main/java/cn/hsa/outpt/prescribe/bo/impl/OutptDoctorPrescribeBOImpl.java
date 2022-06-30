@@ -659,6 +659,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             outptCostDTO.setCrteName(outptVisitDTO.getCrteName());
             //创建时间
             outptCostDTO.setCrteTime(DateUtils.getNow());
+            // 处方id置空（处方id为null 医保结算不了） lly 2022-06-01
+            outptCostDTO.setOpId("");
             //费用数据
             outptCostDTOList.add(outptCostDTO);
         }
@@ -1406,7 +1408,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public boolean deleteOutptPrescribe(OutptPrescribeDTO outptPrescribeDTO){
         if(outptDoctorPrescribeDAO.checkIsSettle(outptPrescribeDTO) > 0){
-            throw new AppException("处方已结算，不能操作");
+            throw new AppException("处方有已结算数据，不能操作删除");
         }
         //删除诊断
 //        outptDoctorPrescribeDAO.deleteDiagnose(outptPrescribeDTO);
@@ -2392,6 +2394,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     public List<OutptCostDTO> buildOutptCost(OutptPrescribeDTO outptPrescribeDTO, List<OutptPrescribeDetailsDTO> outptPrescribeDetailsDTOList, Map<String, String> mapParameter){
         List<OutptCostDTO> outptCostDTOList = new ArrayList<>();
         String sfjf = MapUtils.getVS(mapParameter, "MZYS_SSJFFS", "0");
+        SysParameterDTO sysParameterDTO = getSysParameterDTO(outptPrescribeDTO.getHospCode(),"MZYJ_AUTO_QF");
         for(OutptPrescribeDetailsDTO  outptPrescribeDetails : outptPrescribeDetailsDTOList){
             for(OutptPrescribeDetailsExtDTO outptPrescribeDetailsExtDTO : outptPrescribeDetails.getOutptPrescribeDetailsExtDTOList()){
 
@@ -2442,6 +2445,17 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 }else{
                     //数量(上取整)
                     outptCostDTO.setNum(BigDecimal.valueOf(Math.ceil(outptPrescribeDetailsExtDTO.getNum().doubleValue())));
+                }
+                if (Constants.YZLB.YZLB3.equals(outptPrescribeDetails.getTypeCode())
+                        || Constants.YZLB.YZLB12.equals(outptPrescribeDetails.getTypeCode()) ) {// 如果是医技
+                    if (sysParameterDTO!=null&&"1".equals(sysParameterDTO.getValue())){
+                        outptCostDTO.setIsTechnologyOk(Constants.TechnologyStatus.CONFIRMCOST);
+                        outptCostDTO.setTechnologyOkId("-1");
+                        outptCostDTO.setTechnologyOkName("自动执行");
+                        outptCostDTO.setTechnologyOkTime(DateUtils.getNow());
+                    }else {
+                        outptCostDTO.setIsTechnologyOk(Constants.TechnologyStatus.NOTCONFIRMCOST);
+                    }
                 }
                 //规格
                 outptCostDTO.setSpec(outptPrescribeDetailsExtDTO.getSpec());

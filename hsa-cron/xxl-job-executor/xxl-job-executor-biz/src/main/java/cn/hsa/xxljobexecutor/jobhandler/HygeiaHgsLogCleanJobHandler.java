@@ -46,7 +46,7 @@ public class HygeiaHgsLogCleanJobHandler extends IJobHandler {
     /**
      *  统一支付平台调用日志清理语句
      */
-    private final String LOG_CLEAN_SQL = "delete from hygeia_hgs.bas_business_log where create_time < date_sub(now(),interval 10 day);";
+    private final String LOG_CLEAN_SQL = "delete from hygeia_hgs.bas_business_log where create_time < date_sub(now(),interval 20 day);";
 
     private final String SPACE_RELEASE_SQL = "alter table hygeia_hgs.bas_business_log engine = innodb;";
     @Override

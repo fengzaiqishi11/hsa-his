@@ -416,7 +416,9 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             //规格
             outptCostDTO.setSpec(outptRegisterDetailDto.getSpec());
             //数量单位
-            outptCostDTO.setNumUnitCode(outptRegisterDetailDto.getUnitCode());
+            String unitCode = outptRegisterDetailDto.getUnitCode();
+            String itemUnitCode = outptRegisterDetailDto.getItemUnitCode();
+            outptCostDTO.setNumUnitCode(unitCode == null ? itemUnitCode : unitCode);
             //总数量
             outptCostDTO.setTotalNum(outptRegisterDetailDto.getNum());
             //项目总金额
@@ -445,6 +447,8 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
             outptCostDTO.setCrteName(outptVisitDTO.getCrteName());
             //创建时间
             outptCostDTO.setCrteTime(DateUtils.getNow());
+            // 处方id置空（处方id为null 医保结算不了） lly 2022-06-01
+            outptCostDTO.setOpId("");
             //费用数据
             outptCostDTOList.add(outptCostDTO);
         }

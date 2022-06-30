@@ -3571,7 +3571,7 @@
             <if test="statement == '2'.toString() or statement == '3'.toString()">
                 inpt_settle A
                 inner join inpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code
-                inner join inpt_cost_settle ics on B.id=ics.cost_id
+                inner join inpt_cost_settle ics on B.id=ics.cost_id and A.id = ics.settle_id
                 inner join inpt_visit t on t.hosp_code = b.hosp_code and t.id = B.visit_id
                 where
                 A.hosp_code = #{hospCode}
@@ -5352,10 +5352,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.settle_code = '2' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
+                and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
+                and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
         <if test="type == null or type == '' ">
@@ -5370,10 +5370,10 @@
             join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
             where settle.is_settle = '1' and a.hosp_code = #{hospCode}
             <if test="startDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
+                and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%s') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d %H:%i:%s')
             </if>
             <if test="endDate != null ">
-                and DATE_FORMAT(settle.crte_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
+                and DATE_FORMAT(settle.settle_time,'%Y-%m-%d %H:%i:%s') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d %H:%i:%s')
             </if>
         </if>
         )a left join base_dept b on a.dept_id = b.id and a.hosp_code = b.hosp_code

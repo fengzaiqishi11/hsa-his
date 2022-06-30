@@ -147,4 +147,5 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String iptPsnSpFlagType;// 单位ID
         private String iptPsnSpFlag;// 单位ID
         private String iptPsnSpFlagDetlId;// 单位ID
+        private String inNo;//住院号
 }

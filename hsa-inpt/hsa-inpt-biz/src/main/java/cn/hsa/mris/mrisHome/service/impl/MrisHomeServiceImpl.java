@@ -5,6 +5,8 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.mris.mrisHome.bo.InptMrisInfoBO;
 import cn.hsa.module.mris.mrisHome.bo.MrisHomeBO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
@@ -46,6 +48,10 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     //系统参数
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    @Resource
+    private DrgDipResultService drgDipResultService_consumer;
+
 
     /**
      * @Method: queryOutHospPatientPage
@@ -246,12 +252,24 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
 
     @Override
     public Map<String, Object> upMrisForDRG(Map<String, Object> map) {
-        return mrisHomeBO.upMrisForDRG(map);
+        return mrisHomeBO.insertMrisForDRG(map);
     }
     @Override
     public Map<String, Object> upMrisForDIP(Map<String, Object> map) {
-        return mrisHomeBO.upMrisForDIP(map);
+        return mrisHomeBO.insertMrisForDIP(map);
     }
+    /**
+     * @Author gory
+     * @Description 调drg 或者dip
+     * @Date 2022/6/9 15:05
+     * @Param [map]
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> upMrisForDIPorDRG(Map<String, Object> map) {
+
+        return WrapperResponse.success(mrisHomeBO.insertMrisForDIPorDRG(map));
+    }
+
     /**
      * @Method: updateMrisTurnDept
      * @Description: 修改病案转科信息

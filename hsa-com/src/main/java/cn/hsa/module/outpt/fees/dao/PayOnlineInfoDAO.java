@@ -55,4 +55,10 @@ public interface PayOnlineInfoDAO {
       * @return int
       */
      int updateByVisitId(PayOnlineInfoDO payOnlineInfoDO);
+
+
+     int updateCallSnByVisitId(PayOnlineInfoDO payOnlineInfoDO);
+
+
+    PayOnlineInfoDO selectByVisitId(PayOnlineInfoDO payOnlineInfoDO);
 }

@@ -176,7 +176,7 @@ public class OnlinePayController  extends BaseController {
    * @Date 2022-06-16 14:11
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
    */
-  @PostMapping("/querySettleResult")
+    @PostMapping("/querySettleResult")
   public Map<String, Object> querySettleResult(@RequestBody Map<String,Object> param,
                                                         HttpServletRequest req,
                                                         HttpServletResponse res) {

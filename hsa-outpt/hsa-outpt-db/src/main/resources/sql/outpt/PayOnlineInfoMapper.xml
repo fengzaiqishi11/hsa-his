@@ -258,6 +258,9 @@
         from pay_online_info where
             id = #{id}
                                                                                                                                             </select>
+    <select id="selectByVisitId" resultType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO">
+        select * from pay_online_info where visit_id = #{visitId}
+    </select>
 
     <update id="updateByVisitId" parameterType="cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO" >
         update pay_online_info set
@@ -375,6 +378,11 @@
         where
             id = #{id}
                                                                                                                                             </update>
+    <update id="updateCallSnByVisitId">
+        update pay_online_info
+        set call_sn  = #{callSn}
+        where visit_id = #{visitId}
+    </update>
 
     <delete id="deleteById"  >
         delete pay_online_info where

@@ -5055,7 +5055,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         responseMap.put("result","fail");
         return responseMap;
       }
-      //根据就诊ID获取最新一条结算信息
+      PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
+      payOnlineInfoDO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      PayOnlineInfoDO resultDO = payOnlineInfoDAO.selectByVisitId(payOnlineInfoDO);
+        //根据就诊ID获取最新一条结算信息
       param.put("visitId",insureIndividualVisitDTO.getVisitId());
       InsureIndividualSettleDTO insureIndividualSettleDTO =
           insureIndividualSettleService.getInsureSettleByVisitId(param);
@@ -5067,6 +5070,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }else{
         responseMap.put("ret_code",RET_CODE00);
         responseMap.put("ret_msg","查询成功!");
+        responseMap.put("call_sn", resultDO.getCallSn());
+        responseMap.put("balance", null);
+        responseMap.put("common_tip_list", null);
+        responseMap.put("druginfo", null);
         responseMap.put("result","succ");
         return responseMap;
       }
@@ -5273,7 +5280,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 put("med_list_codg", outptCostDTO.getInsureItemCode()); //“医疗目录编码”
                 put("medins_list_codg", outptCostDTO.getHospItemCode()); //“医药机构目录编码”
                 put("pric", outptCostDTO.getPrice()); //“项目单价”
-                put("cnt", outptCostDTO.getNum()); //“项目数量”
+                put("cnt", outptCostDTO.getTotalNum()); //“项目数量”
                 put("det_item_fee_sumamt", outptCostDTO.getRealityPrice()); //“明细项目费用总额”
                 put("used_frqu_dscr", outptCostDTO.getRateId()); //“使用频次描述”
                 put("sin_dos_dscr", outptCostDTO.getDosage()); //“单次剂量描述”
@@ -5544,6 +5551,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             return responseMap;
         }
         String hospCode = MapUtils.get(param, "hospCode");
+        String callSn = SnowflakeUtils.getId();
         //根据org_trace_no（充当结算ID）获取费用列表信息
         Map costMap = new HashMap();
         //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
@@ -5648,10 +5656,16 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         MapUtils.get(tempMap,"pharOutReceiveDetailDOList");
         //领药申请数据
         MapUtils.get(tempMap,"pharOutReceiveMap");*/
+        // 保存callSn进 payOnlineInfo表
+        PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
+        payOnlineInfoDO.setVisitId(visitId);
+        payOnlineInfoDO.setCallSn(callSn);
+        payOnlineInfoDAO.updateByVisitId(payOnlineInfoDO);
 
         responseMap.put("ret_code", RET_CODE00);
         responseMap.put("ret_msg", "已确认结算");
         responseMap.put("result", "succ");
+        responseMap.put("call_sn", callSn);
         responseMap.put("balance", bacu18); //余额（元）
         responseMap.put("druginfo", null); //取药提示
         responseMap.put("common_tip_list", null); //通用提醒

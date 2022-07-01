@@ -2402,8 +2402,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
             xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
                     xiCollect.stream().sorted((a, b) ->
-                            (b.getIsMain() == null ? "" : b.getIsMain())
-                                    .compareTo(a.getIsMain()))
+                            (b.getId() == null ? "" : b.getId())
+                                    .compareTo(a.getId()))
                             .collect(Collectors.toList());// 质控信息集合
         }
         if(ObjectUtil.isNotEmpty(zxCollect)){
@@ -2414,8 +2414,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
             zxCollect1 = ListUtils.isEmpty(zxCollect) ? null :
                     zxCollect.stream().sorted((a, b) ->
-                            (b.getIsMain() == null ? "" : b.getIsMain())
-                                    .compareTo(a.getIsMain()))
+                            (b.getId() == null ? "" : b.getId())
+                                    .compareTo(a.getId()))
                             .collect(Collectors.toList());// 质控信息集合
         }
         diseaseMap.put("xiCollect",xiCollect1);

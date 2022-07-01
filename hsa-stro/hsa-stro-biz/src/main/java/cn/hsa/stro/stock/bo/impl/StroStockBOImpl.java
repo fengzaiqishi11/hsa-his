@@ -1089,6 +1089,7 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
             invoicingOut.setId(stroStockDetailOut.getId());
             //批号
             invoicingOut.setBatchNo(stroStockDetailOut.getBatchNo());
+            stroStockDetailDTO.setBatchNo(stroStockDetailOut.getBatchNo());
             //判断出库数量是否大于库存明细批次的数量
             if(BigDecimalUtils.compareTo(splitNum, stroStockDetailOut.getSplitNum()) > 0) {
                 //台账记账数量

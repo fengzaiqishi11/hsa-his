@@ -13,9 +13,11 @@ import lombok.Data;
  * @date： 2022-06-07 08:41:51
  */
 @Data
-public class DrgDipResultDTO extends PageDO implements Serializable {
+public class DrgDipResultDTO  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+  private int pageNo = 1;
+  private int pageSize = 10;
   /**
    * 主键
    */
@@ -356,6 +358,10 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
      * 在院状态集合
      */
     private List<String> statusCodes;
+    /**
+     * 是否住院集合
+     */
+    private List<String> isHospitals;
 
 
   public void setId(String id) {

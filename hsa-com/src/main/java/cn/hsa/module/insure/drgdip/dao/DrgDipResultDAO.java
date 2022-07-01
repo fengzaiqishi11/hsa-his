@@ -102,4 +102,13 @@ public interface DrgDipResultDAO {
       * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
       */
      List<DrgDipResultDetailDTO> queryDrgDipResultById(DrgDipResultDTO result);
+
+     /**
+      * 质控结果查询-出院病人
+      * @param result
+      * @Author lhm
+      * @Date 2022-06-07 9:38
+      * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
+      */
+     int querySettle(DrgDipResultDTO result);
 }

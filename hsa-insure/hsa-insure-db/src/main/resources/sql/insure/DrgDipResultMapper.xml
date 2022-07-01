@@ -349,22 +349,149 @@
         where result_id = #{id}
     </select>
 
+    <select id="querySettle" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="java.lang.Integer">
+        select count(*) from inpt_settle is2
+        where is2.is_settle ='1' and is2.status_code ='0' and CONVERT(patient_code,SIGNED) &lt;= 0
+        <if test="startDate != '' and startDate != null">
+            and DATE_FORMAT(is2.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+        </if>
+        <if test="endDate != '' and endDate != null">
+            and DATE_FORMAT(is2.crte_time, "%Y-%m-%d") &lt;= #{endDate}
+        </if>
+
+    </select>
+
     <select id="queryDrgDipResultSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
             resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
-        select * from (select
-        isi.psn_name, isi.gend, isi.age, isi.medcasno, isi.chfpdr_code as doctor_id, isi.chfpdr_name as doctor_name,if(isi.settle_no is null,'0','1') as is_uplod ,
-        isi.visit_id, isi.insure_settle_id, iis.settle_id, iis.is_hospital, iis.insure_reg_code, iis.medicalRegNo,
-        iiv.visit_icd_code , iiv.visit_icd_name , iiv.visit_drpt_id as dept_id, iiv.visit_drpt_name as dept_name,iiv.visit_no,
-        iis.crte_time, DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time, iis.total_price as total_fee, ddr.id, ddr.stand_fee, ddr.profit,ddr.type,
-        if(ddr.states is null,'0',ddr.states) as states,
-        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
-        if(ddr.violation_num > 0,'1','0') as violation_states,
-        if(ddr.group_result is null,'0',ddr.group_result) as group_result
-	    from insure_setl_info isi left join insure_individual_visit iiv on isi.visit_id =iiv.visit_id and isi.mdtrt_id =iiv.medical_reg_no
-        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId and iis.state = '0' and iis.settle_state = '1'
-        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type})A
+        select * from (select m.* from (select
+        iib.aac003 as psn_name,
+        iib.aac004 as gend,
+        iv.age,
+        iv.in_profile as medcasno,
+        iv.zg_doctor_id  as doctor_id,
+        iv.zg_doctor_name  as doctor_name,
+        if(isi.settle_no is null,
+        '0',
+        '1') as is_uplod ,
+        iis.crte_time,
+        iis.visit_id,
+        iis.insureSettleId ,
+        iis.settle_id,
+        iis.is_hospital,
+        iis.insure_reg_code,
+        iis.medicalRegNo,
+        iiv.visit_icd_code ,
+        iiv.visit_icd_name ,
+        iiv.visit_drpt_id as dept_id,
+        iiv.visit_drpt_name as dept_name,
+        iiv.visit_no,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time,
+        iis.total_price as total_fee,
+        ddr.id,
+        ddr.stand_fee,
+        ddr.profit,
+        ddr.type,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        if(ddr.suspicious_num > 0,
+        '1',
+        '0') as suspicious_states,
+        if(ddr.violation_num > 0,
+        '1',
+        '0') as violation_states,
+        if(ddr.group_result is null,
+        '0',
+        ddr.group_result) as group_result
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left  join inpt_visit iv on iis.visit_id = iv.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '1') m
+        union all
+        select n.* from (select
+        iib.aac003 as psn_name,
+        iib.aac004 as gend,
+        ov.age,
+        ov.out_profile as medcasno ,
+        ov.doctor_id  as doctor_id,
+        ov.doctor_name  as doctor_name,
+        if(isi.settle_no is null,
+        '0',
+        '1') as is_uplod ,
+        iis.crte_time,
+        iis.visit_id,
+        iis.insureSettleId ,
+        iis.settle_id,
+        iis.is_hospital,
+        iis.insure_reg_code,
+        iis.medicalRegNo,
+        iiv.visit_icd_code ,
+        iiv.visit_icd_name ,
+        iiv.visit_drpt_id as dept_id,
+        iiv.visit_drpt_name as dept_name,
+        iiv.visit_no,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time,
+        iis.total_price as total_fee,
+        ddr.id,
+        ddr.stand_fee,
+        ddr.profit,
+        ddr.type,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        if(ddr.suspicious_num > 0,
+        '1',
+        '0') as suspicious_states,
+        if(ddr.violation_num > 0,
+        '1',
+        '0') as violation_states,
+        if(ddr.group_result is null,
+        '0',
+        ddr.group_result) as group_result
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left  join outpt_visit   ov on iis.visit_id = ov.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '0'
+        and iiv.aka130 = '14') n) A
         <where>
-            <if test="doctorId != null and doctorId != '' ">
+            <if test="isHospital != null and isHospital != '' ">
+               and A.is_hospital = #{isHospital}
+            </if>            <if test="doctorId != null and doctorId != '' ">
                and A.doctor_id = #{doctorId}
             </if>
             <if test="deptId != null and deptId != '' ">
@@ -439,6 +566,12 @@
                     #{groupResult}
                 </foreach>
             </if>
+            <if test="isHospitals != null and isHospitals.size()>0">
+                and A.is_hospital in
+                <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                    #{isHospital}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -453,7 +586,7 @@
         if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
         if(ddr.violation_num > 0,'1','0') as violation_states,
         if(ddr.group_result is null,'0',ddr.group_result) as group_result
-        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id
+        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id and iv.status_code = '7'
         left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1' and ie.status_code = '0'
         left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='2'  and ddr.type=#{type})A
         <where>
@@ -475,9 +608,9 @@
             <if test="violationStates != null and violationStates != '' ">
                 and A.violation_states = #{violationStates}
             </if>
-            <if test="statusCode != null and statusCode != '' ">
-                and A.status_code = #{statusCode}
-            </if>
+            <!--<if test="statusCode != null and statusCode != '' ">-->
+                <!--and A.status_code = #{statusCode}-->
+            <!--</if>-->
             <if test="groupResult != null and groupResult != '' ">
                 and A.group_result = #{groupResult}
             </if>

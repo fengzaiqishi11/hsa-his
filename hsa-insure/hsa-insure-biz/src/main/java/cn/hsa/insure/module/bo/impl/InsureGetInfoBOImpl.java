@@ -2397,7 +2397,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     xiCollect.stream().sorted((a, b) ->
                             (b.getIsMain() == null ? "" : b.getIsMain())
                                     .compareTo(a.getIsMain()))
-                            .collect(Collectors.toList());// 质控信息集合
+                            .collect(Collectors.toList());
         }
         if(ObjectUtil.isNotEmpty(zxCollect)){
             for(InptDiagnoseDTO inptDiagnoseDTO:zxCollect){
@@ -2409,7 +2409,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     zxCollect.stream().sorted((a, b) ->
                             (b.getIsMain() == null ? "" : b.getIsMain())
                                     .compareTo(a.getIsMain()))
-                            .collect(Collectors.toList());// 质控信息集合
+                            .collect(Collectors.toList());
         }
         diseaseMap.put("xiCollect",xiCollect1);
         diseaseMap.put("zxCollect",zxCollect1);

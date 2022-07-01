@@ -2127,8 +2127,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (setlEndDate == null) {
             throw new AppException("结算结束时间为空");
         } else {
-
-            setlinfo.put("setlEndDate", DateUtils.parse((String) setlEndDate, DateUtils.Y_M_D)); // 结算结束日期 *******
+            if (ObjectUtil.isNotEmpty(setlEndDate)){
+              setlinfo.put("setlEndDate", DateUtils.parse((String) setlEndDate, DateUtils.Y_M_D)); // 结算结束日期 *******
+            }else{
+              setlinfo.put("setlEndDate", null);
+            }
         }
         // 全自费金额
         String fulamtOwnpayAmt = DataTypeUtils.dataToNumString(MapUtils.get(setlinfoMap, "fulamt_ownpay_amt"));

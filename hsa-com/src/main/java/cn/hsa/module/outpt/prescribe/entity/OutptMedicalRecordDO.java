@@ -165,4 +165,9 @@ public class OutptMedicalRecordDO extends PageDO implements Serializable {
      */
     private String tcmDiseaseId;
 
+    /**
+     * 月经史
+     */
+    private String menstrualHistory;
+
 }

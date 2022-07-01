@@ -1,7 +1,9 @@
 package cn.hsa.module.center.authorization.service;
 
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import org.springframework.cloud.openfeign.FeignClient;
 
@@ -28,5 +30,32 @@ public interface CenterFunctionAuthorizationService {
    * @return
    */
   WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO);
+
+
+
+  /**
+   * @Menthod queryHospZzywPage()
+   * @Desrciption   根据条件分页查询医院增值业务
+   * @Param
+   * 1. [CenterHospitalDTO] 参数数据传输DTO对象
+   * @Author pengbo
+   * @Date   2022/06/28 16:30
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+   **/
+  WrapperResponse<Map<String,Object>> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+  /**
+   * @Menthod queryPage()
+   * @Desrciption   根据条件分页查询参数信息
+   * @Param
+   * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+   * @Author pengbo
+   * @Date   2022/06/28 16:30
+   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+   **/
+    WrapperResponse<PageDTO> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    WrapperResponse<Boolean> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
 }

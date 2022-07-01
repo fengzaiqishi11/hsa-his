@@ -926,7 +926,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             /**======4.获取返回的参数 begin=========**/
             Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
             Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-            List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String,Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
+                    qualityInfo.stream().sorted((a, b) ->
+                            (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                    .toString()
+                                    .compareTo(a.get("rule_level").toString()))
+                            .collect(Collectors.toList());// 质控信息集合
             /**======获取返回的参数 end=========**/
             //保存质控结果
             DrgDipResultDTO drgDipResultDTO = insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
@@ -2382,8 +2388,35 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
             diseaseCount = zxCollect.size()+xiCollect.size();
         }
-        diseaseMap.put("xiCollect",xiCollect);
-        diseaseMap.put("zxCollect",zxCollect);
+        //排序
+        List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
+        List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
+        if(ObjectUtil.isNotEmpty(xiCollect)){
+            for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
+                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
+                    inptDiagnoseDTO.setIsMain("0");
+                }
+            }
+            xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
+                    xiCollect.stream().sorted((a, b) ->
+                            (b.getIsMain() == null ? "" : b.getIsMain())
+                                    .compareTo(a.getIsMain()))
+                            .collect(Collectors.toList());// 质控信息集合
+        }
+        if(ObjectUtil.isNotEmpty(zxCollect)){
+            for(InptDiagnoseDTO inptDiagnoseDTO:zxCollect){
+                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
+                    inptDiagnoseDTO.setIsMain("0");
+                }
+            }
+            zxCollect1 = ListUtils.isEmpty(zxCollect) ? null :
+                    zxCollect.stream().sorted((a, b) ->
+                            (b.getIsMain() == null ? "" : b.getIsMain())
+                                    .compareTo(a.getIsMain()))
+                            .collect(Collectors.toList());// 质控信息集合
+        }
+        diseaseMap.put("xiCollect",xiCollect1);
+        diseaseMap.put("zxCollect",zxCollect1);
         diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;
     }

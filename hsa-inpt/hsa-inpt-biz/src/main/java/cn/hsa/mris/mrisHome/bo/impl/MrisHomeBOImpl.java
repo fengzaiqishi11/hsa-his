@@ -555,7 +555,13 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (MapUtils.isEmpty(groupInfoMap)) {
                 throw new AppException("DRG调用获取的分组信息对象为null,请联系管理员");
             }
-            List<Map<String, Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
+                    qualityInfo.stream().sorted((a, b) ->
+                            (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                    .toString()
+                                    .compareTo(a.get("rule_level").toString()))
+                            .collect(Collectors.toList());// 质控信息集合
             /**======获取返回的参数 end=========**/
 
             /**======6.保存质控结果 begin=========**/
@@ -753,7 +759,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("diagFeeSco", groupInfoMap.get("feePay"));// 分值
             responseDataMap.put("profitAndLossAmount", groupInfoMap.get("profit"));// 盈亏额
             responseDataMap.put("totalFee", baseInfoMap.get("totalFee"));// 总费用
-            responseDataMap.put("feeStand", baseInfoMap.get("feeStand"));// 总费用标杆
+            responseDataMap.put("feeStand", groupInfoMap.get("feeStand"));// 总费用标杆
             responseDataMap.put("proMedicMater", baseInfoMap.get("pro_medic_mater"));// 药占比
             responseDataMap.put("proMedicMaterStand", groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum", baseInfoMap.get("pro_consum"));// 耗材占比

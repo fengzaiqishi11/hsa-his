@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptBabyDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.inptprint.bo.InptPrintBO;
 import cn.hsa.module.inpt.inptprint.dao.InptPrintDAO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
@@ -72,28 +73,36 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
       throw new AppException("未查询到数据，请更改查询条件后再试");
       // return null;
     }
-    if("1".equals(inptCostDTO.getPrintFlag())){
+    if(Constants.JSQD_PRINT.MXGSZR.equals(inptCostDTO.getPrintFlag())){
       collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate,TreeMap::new,Collectors.toList()));
       return queryDetailCostByDay(collect);
-    } else if("2".equals(inptCostDTO.getPrintFlag())){
+    } else if(Constants.JSQD_PRINT.MXGSHZ.equals(inptCostDTO.getPrintFlag())){
       collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
       return queryDetailCostByDay(collect);
-    } else if("3".equals(inptCostDTO.getPrintFlag())){
+    } else if(Constants.JSQD_PRINT.JGGSZR.equals(inptCostDTO.getPrintFlag())){
       collect = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate,TreeMap::new,Collectors.toList()));
       return queryStructureByDate(inptCostDTOS,collect);
-    } else if("4".equals(inptCostDTO.getPrintFlag())){
+    } else if(Constants.JSQD_PRINT.JGGSHZ.equals(inptCostDTO.getPrintFlag())){
       Map<String, BigDecimal> collect1 = inptCostDTOS.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName,
         Collectors.mapping(InptCostDTO::getAmountMoney, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))));
       return queryStructureByAll(inptCostDTOS,collect1);
-    } else if("5".equals(inptCostDTO.getPrintFlag())){
+    } else if(Constants.JSQD_PRINT.XMGSHZ.equals(inptCostDTO.getPrintFlag())){
       List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptItemCostListPrint(inptCostDTO);
       collect = inptCostDTOS1.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
       return queryDetailCostByDay(collect);
-    }else if("6".equals(inptCostDTO.getPrintFlag())){
+    }else if(Constants.JSQD_PRINT.XMGSZR.equals(inptCostDTO.getPrintFlag())){
       List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptItemCostListPrint(inptCostDTO);
       collect = inptCostDTOS1.stream().collect(Collectors.groupingBy(s->s.getCostDate()+'-'+s.getBfcName(),TreeMap::new,Collectors.toList()));
       return queryDetailCostByDay(collect);
-    } else {
+    }else if(Constants.JSQD_PRINT.XMHZMX.equals(inptCostDTO.getPrintFlag())){
+      List<InptCostDTO> inptCostDTOS1 = inptPrintDAO.queryInptCostListXmhzmx(inptCostDTO);
+      collect = inptCostDTOS1.stream().collect(Collectors.groupingBy(InptCostDTO::getBfcName));
+      List<InptSettleDTO> inptSettleDTOList = inptPrintDAO.queryInptSettleListPrint(inptCostDTO);
+      Map map = queryDetailCostByDay(collect);
+      map.put("settleList",inptSettleDTOList);
+      return map;
+    }
+    else {
       return null;
     }
   }
@@ -142,6 +151,7 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
    **/
   public Map queryDetailCostByDay(Map<String, List<InptCostDTO>> collect){
     List<Map> list= new ArrayList<>();
+    List listSum= new ArrayList();
     Map mapdata = new HashMap();
     BigDecimal total = BigDecimal.valueOf(0);
     if(collect.size() > 0){
@@ -155,16 +165,23 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
             collect.get(key).remove(mid.get(i));
           }
         }
+        sum = BigDecimalUtils.scale(sum,2);
         Map map = new HashMap();
+        Map mapSum = new HashMap();
         map.put("data",collect.get(key));
         map.put("key",key);
         total = BigDecimalUtils.add(total,sum);
         map.put("sum",sum);
+        mapSum.put("key",key);
+        mapSum.put("sum",sum);
+        listSum.add(mapSum);
         list.add(map);
         mapdata.put("startCostDate",mid.get(0).getStartCostDate());
         mapdata.put("endCostDate",mid.get(0).getEndCostDate());
       }
+      total = BigDecimalUtils.scale(total,2);
     }
+    mapdata.put("listSum",listSum);
     mapdata.put("listData",list);
     mapdata.put("total",total);
     return mapdata;

@@ -189,4 +189,6 @@ public class OutptMedicalTemplateDO extends PageDO implements Serializable {
   private Date crteTime;
 
   private String remarke;
+
+  private String menstrualHistory;
 }

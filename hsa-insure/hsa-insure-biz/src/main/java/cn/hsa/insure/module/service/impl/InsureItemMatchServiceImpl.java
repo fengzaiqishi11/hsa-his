@@ -310,7 +310,7 @@ public class InsureItemMatchServiceImpl extends HsafService implements InsureIte
     }
 
     /**
-     * @param itemMatchDTO
+     * @param selectItemMap
      * @return java.util.List<cn.hsa.module.insure.module.dto.InsureItemMatchDTO>
      * @method queryByHospItemId
      * @author wang'qiao
@@ -318,7 +318,7 @@ public class InsureItemMatchServiceImpl extends HsafService implements InsureIte
      * @description 根据hospItemId查询项目信息
      **/
     @Override
-	public List<InsureItemMatchDTO> queryByHospItemId(InsureItemMatchDTO itemMatchDTO) {
-		return insureItemMatchBO.queryByHospItemId(itemMatchDTO);
+	public List<InsureItemMatchDTO> queryByHospItemId(Map<String, Object> selectItemMap) {
+		return insureItemMatchBO.queryByHospItemId(MapUtils.get(selectItemMap, "insureItemMatchDTO"));
 	}
 }

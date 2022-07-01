@@ -470,7 +470,7 @@ public interface OutptTmakePriceFormService {
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
       *
      **/
-    WrapperResponse AMP_HOS_001(Map map);
+    WrapperResponse savePayOnlineInfoDO(Map map);
 
     /**
      * @param param
@@ -501,7 +501,7 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      *
      **/
-    WrapperResponse<Map<String, Object>> queryUnsettleList(Map param);
+    WrapperResponse<Map<String, Object>> updateUnsettleList(Map param);
 
     /**
       * @method queryAccount
@@ -523,5 +523,5 @@ public interface OutptTmakePriceFormService {
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
       *
      **/
-    WrapperResponse<Map<String, Object>> rechargeSettle(Map param);
+    WrapperResponse<Map<String, Object>> updateRechargeSettle(Map param);
 }

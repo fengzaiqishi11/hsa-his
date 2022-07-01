@@ -459,7 +459,7 @@ public interface OutptTmakePriceFormService {
      * @Date 2022-06-16 14:36
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
-    WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map);
+    Map<String, Object> querySettleResult(Map<String, Object> map);
 
     /**
       * @method AMP_HOS_001
@@ -501,7 +501,7 @@ public interface OutptTmakePriceFormService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      *
      **/
-    WrapperResponse<Map<String, Object>> updateUnsettleList(Map param);
+    Map<String, Object> updateUnsettleList(Map param);
 
     /**
       * @method queryAccount
@@ -512,7 +512,7 @@ public interface OutptTmakePriceFormService {
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
       *
      **/
-    WrapperResponse<Map<String, Object>> queryAccount(Map param);
+    Map<String, Object> queryAccount(Map param);
 
     /**
       * @method rechargeSettle
@@ -523,5 +523,5 @@ public interface OutptTmakePriceFormService {
       * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
       *
      **/
-    WrapperResponse<Map<String, Object>> updateRechargeSettle(Map param);
+    Map<String, Object> updateRechargeSettle(Map param);
 }

@@ -1864,7 +1864,7 @@
     <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
         a.is_main isMain, b.name diseaseName,b.code as diseaseCode, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName, ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
-        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName,b.is_valid isValid
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName,b.is_valid isValid,a.crte_time crteTime
         from outpt_diagnose a
         join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
         join outpt_visit ov on ov.id = a.visit_id and ov.hosp_code = a.hosp_code

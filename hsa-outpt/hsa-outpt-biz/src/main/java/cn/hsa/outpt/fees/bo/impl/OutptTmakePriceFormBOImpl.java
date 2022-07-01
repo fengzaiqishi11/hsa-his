@@ -5355,7 +5355,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             put("dise_name", null);  //特殊病种名称
             put("dept_name", finalOutptVisitDTO.getDeptName());  //科室名称
             put("dept_code", finalOutptVisitDTO.getDeptId());  //科室编码
-            put("caty", finalOutptVisitDTO.getDeptName());  //科室编码
+            put("caty", finalOutptVisitDTO.getDeptName());  //科别
             put("atddr_no", finalOutptVisitDTO.getDoctorId());  //医生编码
             put("dr_name", finalOutptVisitDTO.getDoctorName());  //医生姓名
             put("chfpdr_no", finalOutptVisitDTO.getDoctorId());  //主治医生编码
@@ -5377,7 +5377,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             put("preselfpay_amt",null); //先行自付金额
             put("inscp_scp_amt",null); //符合政策范围金额
             put("mid_setl_flag",null); //中途结算标志
-            put("med_type",insureIndividualVisitDTO.getAka130Name()); //医疗类别
+            put("med_type",insureIndividualVisitDTO.getAka130()); //医疗类别
             put("fpsc_no",null); //计划生育服务证号
             put("birctrl_type",null); //计划生育手术类别
             put("matn_type",null); //生育类别
@@ -5503,9 +5503,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 如果这个病人的BRLX是 0 也就是自费类型则：
         responseMap.put("patient_type", "01"); //“患者费别” 自费 00  医保 01
 
-        responseMap.put("his_cust_id", "查询成功"); //持卡人院内默认ID
+        responseMap.put("his_cust_id", insureIndividualVisitDTO.getVisitId() ); //持卡人院内默认ID
         responseMap.put("balance",MapUtils.get(personInfo.get(0), "balc").toString()); //余额(元)
-        responseMap.put("psn_cert_type", MapUtils.getVS(personInfo.get(0), "psn_cert_type)")); //证件类型
+        responseMap.put("psn_cert_type", MapUtils.get(personInfo.get(0), "psn_cert_type").toString()); //证件类型
         responseMap.put("cert_no", MapUtils.getVS(personInfo.get(0), "aac002")); //证件号
         responseMap.put("psn_name", MapUtils.getVS(personInfo.get(0), "aac003")); //人员姓名
         responseMap.put("gend", MapUtils.getVS(personInfo.get(0), "aac004")); //性别

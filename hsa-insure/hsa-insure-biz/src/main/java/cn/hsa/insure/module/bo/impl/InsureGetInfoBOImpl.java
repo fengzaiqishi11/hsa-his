@@ -1790,7 +1790,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 // 3.查询门诊诊断信息   得到门诊慢特病诊断信息节点
                 mapList = insertOutDiagnose(map);
                 resultDataMap.put("opspdiseinfo", mapList);
-                //4.封装住院诊断信息
+                //4.封装住院诊断信息 没有信息，封装空信息
                 diseaMap.put("diseaseCount",0);
                 diseaMap.put("xiCollect",new ArrayList<>());
                 diseaMap.put("zxCollect",new ArrayList<>());

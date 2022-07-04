@@ -216,11 +216,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
 
         //根据DIP_DRG_MODE值判断质控模式
+        DrgDipResultDTO dto = new DrgDipResultDTO();
+        dto.setVisitId(map.get("visitId").toString());
+        dto.setHospCode(map.get("hospCode").toString());
+        //查询权限
+        Map<String, Object> map2 = new HashMap<>();
+        map2.put("hospCode", map.get("hospCode").toString());
+        DrgDipAuthDTO drgDipAuthDTO = drgDipResultService.checkDrgDipBizAuthorization(map2).getData();
+        HashMap map1 = new HashMap();
+        map1.put("drgDipResultDTO",dto);
+        map1.put("hospCode",map.get("hospCode").toString());
+        map1.put("drgDipAuthDTO",drgDipAuthDTO);
+        DrgDipComboDTO combo = drgDipResultService.getDrgDipInfoByParam(map1).getData();
+        //查询质控模式
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", hospCode);
         sysMap.put("code", "DIP_DRG_MODEL");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
-        if (ObjectUtil.isNotEmpty(sysParameterDTO) && "1".equals(sysParameterDTO.getValue())){
+        if (ObjectUtil.isNotEmpty(sysParameterDTO) && Constant.UnifiedPay.ISMAN.S.equals(sysParameterDTO.getValue()) && !Constant.UnifiedPay.ZKZT.ZKWC.equals(combo.getQuaStaus())){
             throw new AppException("违规质控结果处理完成后，才能医保上传");
         }
         map.put("msgName", "医疗保障结算清单上传");
@@ -310,17 +323,46 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("opsp_mdtrt_date", settleInfoDTO.getOpspMdtrtDate()); // 就诊日期 *******
 
         setlinfo.put("adm_way", settleInfoDTO.getAdmWay()); // 入院途径 *******
-        // 治疗类别 *******
-        if (StringUtils.isNotEmpty(settleInfoDTO.getTrtType())) {
-            String trtType = settleInfoDTO.getTrtType();
-            if ("10".equals(trtType)) {
-                setlinfo.put("trt_type", "1"); // 西医
-            } else if ("21".equals(trtType)) {
-                setlinfo.put("trt_type", "2.1"); // 中医
-            } else if ("22".equals(trtType)) {
-                setlinfo.put("trt_type", "2.2"); // 民族医
-            } else {
-                setlinfo.put("trt_type", "3"); // 中西医
+        //根据参数判断治疗类别上传方式
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        sysMap.put("code", "TRT_TYPE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sysParameterDTO == null) {
+            throw new AppException("请先维护系统参数TRT_TYPE" + "值为结算清单治疗类别上传方式");
+        }
+        //参数值为0的时候按界面展示上传
+        if( Constant.UnifiedPay.ISMAN.F.equals(sysParameterDTO.getValue())){
+            // 治疗类别 *******
+            if (StringUtils.isNotEmpty(settleInfoDTO.getTrtType())) {
+                String trtType = settleInfoDTO.getTrtType();
+                if ("10".equals(trtType)) {
+                    setlinfo.put("trt_type", "1"); // 西医
+                } else if ("21".equals(trtType)) {
+                    setlinfo.put("trt_type", "2.1"); // 中医
+                } else if ("22".equals(trtType)) {
+                    setlinfo.put("trt_type", "2.2"); // 民族医
+                } else if ("30".equals(trtType)) {
+                    setlinfo.put("trt_type", "3"); // 中西医
+                } else {
+                    setlinfo.put("trt_type", trtType);
+                }
+            }
+        }else if(Constant.UnifiedPay.ISMAN.S.equals(sysParameterDTO.getValue())){
+            // 治疗类别 *******
+            if (StringUtils.isNotEmpty(settleInfoDTO.getTrtType())) {
+                String trtType = settleInfoDTO.getTrtType();
+                if ("1".equals(trtType)) {
+                    setlinfo.put("trt_type", "10"); // 西医
+                } else if ("2.1".equals(trtType)) {
+                    setlinfo.put("trt_type", "21"); // 中医
+                } else if ("2.2".equals(trtType)) {
+                    setlinfo.put("trt_type", "22"); // 民族医
+                } else if ("3".equals(trtType)) {
+                    setlinfo.put("trt_type", "30"); // 中西医
+                } else {
+                    setlinfo.put("trt_type", trtType);
+                }
             }
         }
         if (ObjectUtil.isNotEmpty(settleInfoDTO.getAdmTime())) { //对时间对象做判空处理才能 用date工具类做处理

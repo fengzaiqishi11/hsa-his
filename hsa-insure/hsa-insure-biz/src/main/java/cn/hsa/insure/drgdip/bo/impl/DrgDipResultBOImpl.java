@@ -433,8 +433,16 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("total",drgDipResultDTOList.size());//总数
+        int zfNum = 0; //住院自费人数
         int drgDipFinshSum = 0;//质控通过人数
         int drgDipNoFinshSum = 0;//质控未通过完成人数
+        if(drgDipResultDTO.getIsHospitals()!=null && drgDipResultDTO.getIsHospitals().size()> 0){
+            for(String isHospital:drgDipResultDTO.getIsHospitals()){
+                if(Constant.UnifiedPay.ISMAN.S.equals(isHospital)){
+                    zfNum = drgDipResultDAO.querySettle(drgDipResultDTO);
+                }
+            }
+        }
         for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
             if(Constant.UnifiedPay.ZKZT.ZKWWC.equals(drgDipResultDTO1.getStates())){
                 drgDipNoFinshSum++;
@@ -464,6 +472,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         resultMap.put("drgDipNotSum",drgDipNotSum);
         resultMap.put("drgDipFinsh",drgDipFinsh);
         resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        resultMap.put("zfNum",zfNum);
         return resultMap;
     }
 
@@ -522,6 +531,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         responseDataMap.put("proMedicMaterStand",drgDipResultDTO1.getStandProMedicMater());// 药占比标杆
         responseDataMap.put("proConsum",drgDipResultDTO1.getProConsum());// 耗材比
         responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
+        responseDataMap.put("scorePrice",drgDipResultDTO1.getScorePrice());// 分值单价
         responseDataMap.put("quality",HumpUnderlineUtils.humpToUnderlineArray(qualityInfoList));// 质控信息
         return responseDataMap;
     }

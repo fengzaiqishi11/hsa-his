@@ -1,6 +1,7 @@
 package cn.hsa.oper.operrecord.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operrecord.bo.OperAnesthesiaRecordBO;
 import cn.hsa.module.oper.operrecord.dao.OperAnesthesiaRecordDAO;
@@ -104,6 +105,10 @@ public class OperAnesthesiaRecordBOImpl implements OperAnesthesiaRecordBO {
   **/
   @Override
   public Boolean insertOperAnesthesiaRecord(OperAnesthesiaRecordDTO operAnesthesiaRecord) {
+    OperAnesthesiaRecordDTO recordById = operAnesthesiaRecordDAO.getOperAnesthesiaRecordById(operAnesthesiaRecord);
+    if (recordById != null){
+      throw new AppException("该手术记录已存在手术麻醉记录单了，请勿重复操作！");
+    }
     List<OperAnesthesiaDurgDTO> operAnesthesiaDurgDTOS = operAnesthesiaRecord.getOperAnesthesiaDurgDTOS();
     List<OperAnesthesiaMonitorDTO> operAnesthesiaMonitorDTOS = operAnesthesiaRecord.getOperAnesthesiaMonitorDTOS();
     operAnesthesiaRecord.setId(SnowflakeUtils.getId());

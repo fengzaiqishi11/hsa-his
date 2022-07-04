@@ -262,7 +262,7 @@
             and a.receive_id=#{receiveId}
         </if>
             group by a.item_code,a.item_id,a.item_name,a.spec,a.price,a.unit_code,b.phar_id,a.hosp_code,a.split_unit_code,a.split_ratio,a.dosage_unit_code
-        ) c order by c.itemName
+        ) c order by totalPrice
     </select>
 
     <!--根据领药申请ID获取明细数据-->

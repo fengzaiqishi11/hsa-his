@@ -18,6 +18,7 @@ import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -1161,12 +1162,21 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         Integer pageSize = incomeDTO.getPageSize();
         PageHelper.startPage(pageNo, pageSize);
         List<IncomeDTO> upCodeList  = new ArrayList<>();
+        //设置本月，上月，同年本月时间,避免在数据库中使用函数
+        Date startDate = incomeDTO.getStartDate();
+        Date endDate = incomeDTO.getEndDate();
+        //获取上个月第一天与最后一天
+        incomeDTO.setLastMonthStartDate(DateUtil.beginOfMonth(DateUtils.calculateMonth(startDate, -1)));
+        incomeDTO.setLastMonthEndDate(DateUtil.endOfMonth(DateUtils.calculateMonth(endDate, -1)));
+        //获取上一年时间
+        incomeDTO.setLastYearStartDate(DateUtils.calculateYear(startDate, -1));
+        incomeDTO.setLastYearEndDate(DateUtils.calculateYear(endDate, -1));
         if ("1".equals(incomeDTO.getSumCode())) {
             // 先查出大类，挂号大类、门诊大类、住院大类，及其名称
             upCodeList = patientCostLedgerDAO.queryIncomeUpCode(incomeDTO);
-            // 获得所有的code
-            List<String> codeList = upCodeList.stream().map(IncomeDTO::getUpCode).collect(Collectors.toList());
-            incomeDTO.setList(codeList);
+////             获得所有的code
+//            List<String> codeList = upCodeList.stream().map(IncomeDTO::getUpCode).collect(Collectors.toList());
+//            incomeDTO.setList(codeList);
             /*
              * 门诊费用：
              * 1.本月收入 outCurrentRealityPrice
@@ -1192,8 +1202,8 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             // 先查出所有的计费类别
             upCodeList = patientCostLedgerDAO.queryIncomeBfcId(incomeDTO);
             // 获得所有bfcId
-            List<String> bfcLists = upCodeList.stream().map(IncomeDTO::getBfcId).collect(Collectors.toList());
-            incomeDTO.setList(bfcLists);
+//            List<String> bfcLists = upCodeList.stream().map(IncomeDTO::getBfcId).collect(Collectors.toList());
+//            incomeDTO.setList(bfcLists);
             // 查询门诊费用
             List<IncomeDTO> outptPriceList = patientCostLedgerDAO.queryIncomeOutptPriceByBfcId(incomeDTO);
             // 查询住院费用
@@ -1214,14 +1224,15 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         Map<String, IncomeDTO> outptPriceMap = new HashMap<>();
         Map<String, IncomeDTO> inptPriceMap = new HashMap<>();
         if ("1".equals(sumCode)) { // key 是upCode 对应收费大类
-             outptPriceMap = outptPriceMapList.stream()
+            //组装map
+            outptPriceMap = outptPriceMapList.stream().filter(x -> x != null)
                     .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
-             inptPriceMap= inptPriceMapList.stream()
+            inptPriceMap= inptPriceMapList.stream().filter(x -> x != null)
                     .collect(Collectors.toMap(IncomeDTO::getUpCode, Function.identity(), (key1, key2) -> key2));
         } else { // key 是bfcId 对应计费类别
-             outptPriceMap = outptPriceMapList.stream()
+             outptPriceMap = outptPriceMapList.stream().filter(x -> x != null)
                     .collect(Collectors.toMap(IncomeDTO::getBfcId, Function.identity(), (key1, key2) -> key2));
-             inptPriceMap = inptPriceMapList.stream()
+             inptPriceMap = inptPriceMapList.stream().filter(x -> x != null)
                     .collect(Collectors.toMap(IncomeDTO::getBfcId, Function.identity(), (key1, key2) -> key2));
         }
         /*==== 返回参数封装begin====*/

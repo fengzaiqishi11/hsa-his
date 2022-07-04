@@ -5090,7 +5090,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         responseMap.put("result","fail");
         return responseMap;
       }
-      //根据就诊ID获取最新一条结算信息
+      PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
+      payOnlineInfoDO.setVisitId(insureIndividualVisitDTO.getVisitId());
+      PayOnlineInfoDO resultDO = payOnlineInfoDAO.selectByVisitId(payOnlineInfoDO);
+        //根据就诊ID获取最新一条结算信息
       param.put("visitId",insureIndividualVisitDTO.getVisitId());
       InsureIndividualSettleDTO insureIndividualSettleDTO =
           insureIndividualSettleService.getInsureSettleByVisitId(param);
@@ -5102,6 +5105,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       }else{
         responseMap.put("ret_code",RET_CODE00);
         responseMap.put("ret_msg","查询成功!");
+        responseMap.put("call_sn", resultDO.getCallSn());
+        responseMap.put("balance", null);
+        responseMap.put("common_tip_list", null);
+        responseMap.put("druginfo", null);
         responseMap.put("result","succ");
         return responseMap;
       }
@@ -5308,7 +5315,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 put("med_list_codg", outptCostDTO.getInsureItemCode()); //“医疗目录编码”
                 put("medins_list_codg", outptCostDTO.getHospItemCode()); //“医药机构目录编码”
                 put("pric", outptCostDTO.getPrice()); //“项目单价”
-                put("cnt", outptCostDTO.getNum()); //“项目数量”
+                put("cnt", outptCostDTO.getTotalNum()); //“项目数量”
                 put("det_item_fee_sumamt", outptCostDTO.getRealityPrice()); //“明细项目费用总额”
                 put("used_frqu_dscr", outptCostDTO.getRateId()); //“使用频次描述”
                 put("sin_dos_dscr", outptCostDTO.getDosage()); //“单次剂量描述”
@@ -5390,7 +5397,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             put("dise_name", null);  //特殊病种名称
             put("dept_name", finalOutptVisitDTO.getDeptName());  //科室名称
             put("dept_code", finalOutptVisitDTO.getDeptId());  //科室编码
-            put("caty", finalOutptVisitDTO.getDeptName());  //科室编码
+            put("caty", finalOutptVisitDTO.getDeptName());  //科别
             put("atddr_no", finalOutptVisitDTO.getDoctorId());  //医生编码
             put("dr_name", finalOutptVisitDTO.getDoctorName());  //医生姓名
             put("chfpdr_no", finalOutptVisitDTO.getDoctorId());  //主治医生编码
@@ -5412,7 +5419,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             put("preselfpay_amt",null); //先行自付金额
             put("inscp_scp_amt",null); //符合政策范围金额
             put("mid_setl_flag",null); //中途结算标志
-            put("med_type",insureIndividualVisitDTO.getAka130Name()); //医疗类别
+            put("med_type",insureIndividualVisitDTO.getAka130()); //医疗类别
             put("fpsc_no",null); //计划生育服务证号
             put("birctrl_type",null); //计划生育手术类别
             put("matn_type",null); //生育类别
@@ -5538,9 +5545,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         // 如果这个病人的BRLX是 0 也就是自费类型则：
         responseMap.put("patient_type", "01"); //“患者费别” 自费 00  医保 01
 
-        responseMap.put("his_cust_id", "查询成功"); //持卡人院内默认ID
+        responseMap.put("his_cust_id", insureIndividualVisitDTO.getVisitId() ); //持卡人院内默认ID
         responseMap.put("balance",MapUtils.get(personInfo.get(0), "balc").toString()); //余额(元)
-        responseMap.put("psn_cert_type", MapUtils.getVS(personInfo.get(0), "psn_cert_type)")); //证件类型
+        responseMap.put("psn_cert_type", MapUtils.get(personInfo.get(0), "psn_cert_type").toString()); //证件类型
         responseMap.put("cert_no", MapUtils.getVS(personInfo.get(0), "aac002")); //证件号
         responseMap.put("psn_name", MapUtils.getVS(personInfo.get(0), "aac003")); //人员姓名
         responseMap.put("gend", MapUtils.getVS(personInfo.get(0), "aac004")); //性别
@@ -5579,6 +5586,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             return responseMap;
         }
         String hospCode = MapUtils.get(param, "hospCode");
+        String callSn = SnowflakeUtils.getId();
         //根据org_trace_no（充当结算ID）获取费用列表信息
         Map costMap = new HashMap();
         //hospCode（医院编码）、statusCode（状态标志）、settleCode（结算状态）、settleId（结算id）
@@ -5683,10 +5691,16 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         MapUtils.get(tempMap,"pharOutReceiveDetailDOList");
         //领药申请数据
         MapUtils.get(tempMap,"pharOutReceiveMap");*/
+        // 保存callSn进 payOnlineInfo表
+        PayOnlineInfoDO payOnlineInfoDO = new PayOnlineInfoDO();
+        payOnlineInfoDO.setVisitId(visitId);
+        payOnlineInfoDO.setCallSn(callSn);
+        payOnlineInfoDAO.updateByVisitId(payOnlineInfoDO);
 
         responseMap.put("ret_code", RET_CODE00);
         responseMap.put("ret_msg", "已确认结算");
         responseMap.put("result", "succ");
+        responseMap.put("call_sn", callSn);
         responseMap.put("balance", bacu18); //余额（元）
         responseMap.put("druginfo", null); //取药提示
         responseMap.put("common_tip_list", null); //通用提醒

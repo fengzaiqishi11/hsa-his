@@ -51,7 +51,7 @@ public class OnlinePayController extends BaseController {
 	 * @Date 2022-06-16 14:11
 	 */
 	@PostMapping("/querySettleResult")
-	public WrapperResponse<Map<String, Object>> querySettleResult(@RequestBody Map<String, Object> param,
+	public Map<String, Object> querySettleResult(@RequestBody Map<String, Object> param,
 																  HttpServletRequest req,
 																  HttpServletResponse res) {
 		String hospCode = req.getHeader("hospCode");
@@ -68,7 +68,7 @@ public class OnlinePayController extends BaseController {
 	 * @description 查询用户院内现在的待缴费费用列表，用于展示给用户进行确认和选择
 	 **/
 	@PostMapping("/queryUnsettleList")
-	public WrapperResponse<Map<String, Object>> queryUnsettleList(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
+	public Map<String, Object> queryUnsettleList(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
 		String hospCode = req.getHeader("hospCode");
 
 		param.put("hospCode", hospCode);
@@ -84,7 +84,7 @@ public class OnlinePayController extends BaseController {
 	 * @description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
 	 **/
 	@PostMapping("/queryAccount")
-	public WrapperResponse<Map<String, Object>> queryAccount(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
+	public Map<String, Object> queryAccount(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
 		String hospCode = req.getHeader("hospCode");
 
 		param.put("hospCode", hospCode);
@@ -100,7 +100,7 @@ public class OnlinePayController extends BaseController {
 	 * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
 	 **/
 	@PostMapping("/rechargeSettle")
-	public WrapperResponse<Map<String, Object>> rechargeSettle(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
+	public Map<String, Object> rechargeSettle(@RequestBody Map param, HttpServletRequest req, HttpServletResponse res) {
 		String hospCode = req.getHeader("hospCode");
 
 

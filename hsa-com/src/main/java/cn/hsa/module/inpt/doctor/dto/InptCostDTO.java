@@ -214,5 +214,7 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     // 经治医生名称
     private String jzDoctorName;
     private String typeCode;
+    //自付金额
+    private BigDecimal guestRatioPriceend;
 
 }

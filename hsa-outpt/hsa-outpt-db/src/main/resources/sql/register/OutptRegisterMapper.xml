@@ -1234,6 +1234,7 @@
             d.aac001,
             d.medical_reg_no,
             c.patient_code,
+            a.cert_no,
             SUM(b.reality_price) as reality_price
         FROM
             outpt_register a
@@ -1247,5 +1248,24 @@
 
     <select id="getMaxInvoiceNo" resultType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
         select * from outin_invoice where id = #{billId} and hosp_code = #{hospCode}
+    </select>
+
+     <!-- 根据身份证查询门诊挂号信息，用于查询该身份证是否在本医院进行了挂号-->
+    <select id="queryRegisterInfoByCertno" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" parameterType="cn.hsa.module.outpt.register.entity.OutptRegisterDO">
+        select ov.name,ov.visit_id,ov.dept_name,ov.register_no,ov.cert_no, ir.id, ir.hosp_code, ir.visit_id, ir.psn_no,
+        ( case ir.insutype when '310' then '职工基本医疗保险' when '320' then '公务员医疗补助' when '330' then '大额医疗费用补助'
+        when '340' then '离休人员医疗保障' when '390' then '城乡居民基本医疗保险' when '392' then '城乡居民大病医疗保险'
+        when '510' then '生育保险' end) as insutype,
+        ir.opsp_dise_code, ir.opsp_dise_name, ir.tel, ir.addr, ir.insu_optins,
+        ir.ide_fixmedins_no, ir.ide_fixmedins_name,
+        ir.hosp_ide_date, ir.diag_dr_codg, ir.diag_dr_name,ir. begndate,
+        ir.enddate, ir.trt_dcla_detl_sn, ir.memo
+        from outpt_register ov
+        left join insure_record ir on ov.visit_id = ir.visit_id and ov.hosp_code = ir.hosp_code
+        where ov.hosp_code =#{hospCode}
+        <if test="keyword !=null and keyword != ''">
+            and ov.cert_no=#{keyword}
+        </if>
+        order by ir.crte_time desc
     </select>
 </mapper>

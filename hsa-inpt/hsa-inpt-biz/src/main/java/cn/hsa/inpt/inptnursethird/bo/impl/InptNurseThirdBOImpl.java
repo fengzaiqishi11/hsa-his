@@ -457,6 +457,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
         if (ListUtils.isEmpty(visitIds)) {
             throw new RuntimeException("批量录入三测单失败：录入患者为空");
         }
+        //todo 组装每个就诊人当日的三测单2:00 - 22:00的记录
 
         //新增
         if (!ListUtils.isEmpty(addList)){
@@ -499,6 +500,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
         //编辑
         if (!ListUtils.isEmpty(editList)){
             inptNurseThirdDao.updateList(editList);
+            //todo 修改该就诊id下所有的复用值（如上午血压和下午血压）
         }
 
         return true;

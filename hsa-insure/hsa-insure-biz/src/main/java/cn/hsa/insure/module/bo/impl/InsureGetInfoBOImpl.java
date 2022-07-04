@@ -1079,6 +1079,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultMap.put("fixmedins_name", setlinfo.get("fixmedinsName"));// 定点医药机构名称
         resultMap.put("fixmedins_code", setlinfo.get("fixmedinsCode"));// 定点医药机构编号
         resultMap.put("hi_setl_lv", setlinfo.get("hiSetlLv"));
+        //结算等级处理
+        Map dictMap = new HashMap(2);
+        dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        dictMap.put("insureRegCode", MapUtils.get(setlinfo, "insuplc"));
+        dictMap.put("code", "HI_SETL_LV");
+        Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
+        for(String key:dictMap1.keySet()){
+            if(dictMap1.get(key).equals(MapUtils.get(setlinfo, "hiSetlLv"))){
+                resultMap.put("hi_setl_lv", key);
+            }
+        }
         resultMap.put("hi_no", setlinfo.get("hiNo"));// 医保编号
         resultMap.put("medcasno", setlinfo.get("medcasno"));// 病案号
         resultMap.put("dcla_time", setlinfo.get("dclaTime"));// 申报时间

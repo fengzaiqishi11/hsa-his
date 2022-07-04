@@ -12,7 +12,6 @@ import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.drawMedicine.bo.DrawMedicineBO;
-import cn.hsa.module.inpt.medical.bo.MedicalAdviceBO;
 import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.phar.pharapply.service.PharApplyService;
@@ -26,9 +25,6 @@ import cn.hsa.util.*;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.util.CollectionUtils;
 
@@ -795,6 +791,7 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       if (!StringUtils.isEmpty(pharInWaitReceiveDTO1.getIsEmergency())){
         // 查询非紧急数据
         pharInWaitReceiveDTO.setIsEmergency(pharInWaitReceiveDTO1.getIsEmergency());
+        pharInWaitReceiveDTO.setIsLong(pharInWaitReceiveDTO1.getIsLong());
       }
       pharInWaitReceiveDTO.setIsAdvance(pharInWaitReceiveDTO1.getIsAdvance());
     }

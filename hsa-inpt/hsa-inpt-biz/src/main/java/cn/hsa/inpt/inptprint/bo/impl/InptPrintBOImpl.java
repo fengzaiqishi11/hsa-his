@@ -407,6 +407,8 @@ public class InptPrintBOImpl extends HsafBO implements InptPrintBO {
         }
       }
     }
+    // 根据预配药每个药品的汇总金额做排序，解决打印的预配药单据和配药单据数据顺序不一致的问题
+    sumList.sort(Comparator.comparing(PharInWaitReceiveDTO::getAllTotalPrice));
     Map map1 = new HashMap();
     map1.put("data",sumList);
     return map1;

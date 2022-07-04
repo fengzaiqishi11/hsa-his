@@ -2118,13 +2118,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zrNurse_name",null)); // 责任护士名 *******
         setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code",null)); // 责任护士代码 *******
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
-        if (setlBegnDate == null) {
+        if (ObjectUtil.isEmpty(setlBegnDate)) {
             throw new AppException("结算开始时间为空");
         } else {
             setlinfo.put("setlBegnDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap, "setlBegnDate")), DateUtils.Y_M_D)); //结算开始日期 *******
         }
         Object setlEndDate = MapUtils.get(setlinfoMap, "setl_time");
-        if (setlEndDate == null) {
+        if (ObjectUtil.isEmpty(setlEndDate)) {
             throw new AppException("结算结束时间为空");
         } else {
 

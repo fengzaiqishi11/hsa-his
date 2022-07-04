@@ -14,6 +14,7 @@ import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO;
@@ -54,6 +55,8 @@ import java.util.*;
 @Slf4j
 public class OutptDoctorPrescribeController extends BaseController {
 
+  private static String IS_HAI_NAN = "1";
+
   /**
    * 处方管理dubbo消费者接口
    */
@@ -80,6 +83,9 @@ public class OutptDoctorPrescribeController extends BaseController {
    */
   @Resource
   private SysParameterService sysParameterService_consumer;
+
+  @Resource
+  private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
 
   /**
    * @Menthod queryPatientByOperType
@@ -965,6 +971,19 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     outptPrescribeDTO.setSubmitName(sysUserDTO.getName());
     outptPrescribeDTO.setSubmitId(sysUserDTO.getId());
+
+    //如果是海南的则会推送移动支付的消息推送接口，推送出待结算的数据信息
+    Map<String, String> ydzfMap = new HashMap<>();
+    ydzfMap.put("code", "HAINAN_YDZF_FLAG");
+    ydzfMap.put("hospCode", sysUserDTO.getHospCode());
+    SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(ydzfMap).getData();
+    map.put("visitId", outptPrescribeDTO.getVisitId());
+    map.put("pushType", "HOSPITAL_PAYMENT"); // 推送类型 ： 支付单
+    map.put("orderStatus", "MERCHANT_WAIT_PAY"); // 支付状态 ： 待支付
+    if (ydzfParameterDTO != null && IS_HAI_NAN.equals(ydzfParameterDTO.getValue())) {
+      outptTmakePriceFormService_consumer.savePayOnlineInfoDO(map);
+    }
+
     map.put("hospCode",sysUserDTO.getHospCode());
     map.put("outptPrescribeDTO",outptPrescribeDTO);
     return outptDoctorPrescribeService_consumer.updatePrescribeSubmit(map);

@@ -176,8 +176,8 @@ public class OnlinePayController  extends BaseController {
    * @Date 2022-06-16 14:11
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
    */
-  @PostMapping("/querySettleResult")
-  public WrapperResponse<Map<String, Object>> querySettleResult(@RequestBody Map<String,Object> param,
+    @PostMapping("/querySettleResult")
+  public Map<String, Object> querySettleResult(@RequestBody Map<String,Object> param,
                                                         HttpServletRequest req,
                                                         HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
@@ -254,7 +254,7 @@ public class OnlinePayController  extends BaseController {
     *
    **/
   @PostMapping("/queryUnsettleList")
-  public WrapperResponse<Map<String, Object>> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());
@@ -270,7 +270,7 @@ public class OnlinePayController  extends BaseController {
     * 
    **/ 
   @PostMapping("/queryAccount")
-  public WrapperResponse<Map<String, Object>> queryAccount( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> queryAccount( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());
@@ -286,7 +286,7 @@ public class OnlinePayController  extends BaseController {
     *
    **/
   @PostMapping("/rechargeSettle")
-  public WrapperResponse<Map<String, Object>> rechargeSettle( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> rechargeSettle( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());

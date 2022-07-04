@@ -442,6 +442,8 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                     zfNum = drgDipResultDAO.querySettle(drgDipResultDTO);
                 }
             }
+        }else {
+            zfNum = drgDipResultDAO.querySettle(drgDipResultDTO);
         }
         for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
             if(Constant.UnifiedPay.ZKZT.ZKWWC.equals(drgDipResultDTO1.getStates())){

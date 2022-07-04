@@ -1898,4 +1898,103 @@
         )tab where tab.num != 0 order by tab.crte_time desc,tab.code asc
     </select>
 
+    <select id="getLisorPassStatisticsSum" resultType="java.util.LinkedHashMap">
+    select
+        sum(s.price) as 'priceSum',
+        sum(s.total_price) as 'totalPriceSum',
+        sum(s.total_num) as 'numSum'
+        from (
+        SELECT
+        ia.price,
+        ia.total_price,
+        ia.total_num
+        FROM
+        medic_apply ma
+        LEFT JOIN inpt_advice ia ON ia.hosp_code = ma.hosp_code AND ma.order_no = ia.order_no AND ma.visit_id = ia.visit_id
+        LEFT JOIN inpt_visit iv ON ma.visit_id = iv.id AND iv.hosp_code = ma.hosp_code
+        LEFT JOIN inpt_baby ib ON ia.baby_id = ib.id
+        WHERE
+        ma.is_inpt = '1'
+        and ma.hosp_code = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and  ma.crte_time &gt; #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt; #{endTime}
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '1'.toString()">
+            and 1=2
+        </if>
+        union all
+        SELECT
+        pd.price as price,
+        pd.total_price as total_price,
+        pd.total_num as total_num
+        FROM
+        medic_apply ma,
+        outpt_prescribe_detail pd,
+        outpt_visit ov,
+        outpt_prescribe op,
+        outpt_settle os
+        WHERE
+        ma.visit_id = ov.id
+        and ma.hosp_code = #{hospCode}
+        and ma.hosp_code = ov.hosp_code
+        and ma.opd_id = pd.id
+        and ma.hosp_code = pd.hosp_code
+        and ma.is_inpt = '0'
+        and ma.document_sta &lt;&gt; '01'
+        and op.hosp_code = pd.hosp_code and op.id = pd.op_id
+        and os.hosp_code = op.hosp_code and os.id = op.settle_id
+        <if test="typeCode != null and typeCode != ''">
+            and ma.type_code = #{typeCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and  os.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and os.settle_time &lt;= #{endTime}
+        </if>
+        <if test="impDeptId != null and impDeptId != ''">
+            and ma.imp_dept_id = #{impDeptId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (ov.name like concat('%',#{keyword},'%') or ov.cert_no like concat('%',#{keyword},'%') or ma.in_no like
+            concat('%',#{keyword},'%'))
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and ma.content like concat('%',#{itemName},'%')
+        </if>
+        <if test="documentSta != null and documentSta != ''">
+            and ma.document_sta = #{documentSta}
+        </if>
+        <if test="clinicTypeValue != null and clinicTypeValue == '2'.toString()">
+            and 1=2
+        </if>
+        <if test="technologyCode != null and technologyCode != ''">
+            and ma.medic_type = #{technologyCode}
+        </if>
+        ) s
+    </select>
+
+
 </mapper>

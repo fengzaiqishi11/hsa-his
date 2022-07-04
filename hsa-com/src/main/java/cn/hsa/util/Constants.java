@@ -1289,4 +1289,18 @@ public interface Constants {
         public static final String RYZW_NURSE_04 = "204";//护士
         public static final String RYZW_NURSE_05 = "205";//实习护士
     }
+    /**
+     * @Desrciption 结算清单打印格式
+     * @Author yuelong.chen
+     * @Date 2022/06/30 10:02
+     */
+    class JSQD_PRINT{
+        public static final String MXGSZR = "1"; //明细格式逐日打印
+        public static final String MXGSHZ = "2";//明细格式汇总打印
+        public static final String XMGSZR = "6";//项目格式逐日打印
+        public static final String XMGSHZ = "5";//项目格式汇总打印
+        public static final String JGGSZR = "3";//结构格式逐日打印
+        public static final String JGGSHZ = "4";//结构格式汇总打印
+        public static final String XMHZMX = "7";//项目汇总-明细打印
+    }
 }

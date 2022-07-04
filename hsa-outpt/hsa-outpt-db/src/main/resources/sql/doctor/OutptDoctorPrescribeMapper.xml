@@ -425,7 +425,7 @@
                a.allergy_history allergyHistory, a.vaccination_history vaccinationHistory, a.auxiliary_inspect auxiliaryInspect, a.disease_analysis diseaseAnalysis, a.handle_suggestion handleSuggestion, a.specialty_check specialtyCheck,
                a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
                a.breath, height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, b.doctor_id doctorId, b.doctor_name doctorName,remarke,
-               a.tcm_disease_id,a.tcm_syndromes_id
+               a.tcm_disease_id,a.tcm_syndromes_id,a.menstrual_history as menstrualHistory
         from  outpt_medical_record a
                   join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
                   left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
@@ -440,7 +440,7 @@
                a.specialty_check specialtyCheck, a.temperature, a.min_blood_pressure minBloodPressure, a.max_blood_pressure maxBloodPressure,
                a.breath, a.height, a.blood_sugar bloodSugar, a.pulse, a.weight, a.bmi, a.entrust, c.name diagnoseName,
                (select o.is_food_borne from outpt_visit o where o.hosp_code = #{hospCode} and o.id = #{visitId}) as isFoodBorne,a.remarke,
-               a.tcm_disease_id as tcmDiseaseId, a.tcm_syndromes_id as tcmSyndromesId
+               a.tcm_disease_id as tcmDiseaseId, a.tcm_syndromes_id as tcmSyndromesId,a.menstrual_history as menstrualHistory
         from  outpt_medical_record a
                   left join base_disease c on a.disease_id = c.id and a.hosp_code = c.hosp_code
         where a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
@@ -451,12 +451,12 @@
         insert into outpt_medical_record (
             id, hosp_code, visit_id, profile_id, disease_id, start_date, chief_complaint, present_illness, past_history, oneself_history, family_history,
             allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure,
-            breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time,tcm_disease_id,tcm_syndromes_id
+            breath, height, blood_sugar, pulse, weight, bmi, entrust,remarke, crte_id, crte_name, crte_time,tcm_disease_id,tcm_syndromes_id,menstrual_history
         )
         values (
                    #{id}, #{hospCode}, #{visitId}, #{profileId}, #{diseaseId}, #{startDate}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory},
                    #{allergyHistory}, #{vaccinationHistory},  #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure},
-                   #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now(),#{tcmDiseaseId},#{tcmSyndromesId}
+                   #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust},#{remarke}, #{crteId}, #{crteName}, now(),#{tcmDiseaseId},#{tcmSyndromesId},#{menstrualHistory}
                )
     </insert>
 
@@ -488,7 +488,8 @@
                                         entrust = #{entrust},
                                         remarke = #{remarke},
                                         tcm_disease_id = #{tcmDiseaseId},
-                                        tcm_syndromes_id = #{tcmSyndromesId}
+                                        tcm_syndromes_id = #{tcmSyndromesId},
+                                        menstrual_history = #{menstrualHistory}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 
@@ -1026,7 +1027,8 @@
 
     <!--  检查处方是否结算 -->
     <select id="checkIsSettle" resultType="java.lang.Integer" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
-        select count(id) num from outpt_prescribe a where id = #{id} and a.hosp_code = #{hospCode} and a.is_settle = '1' and ifnull(a.settle_id, '') != ''
+        select count(id) num from outpt_cost oc where oc.op_id =#{id} and oc.visit_id =#{visitId} and oc.hosp_code =#{hospCode}
+        and oc.settle_code='2' and oc.settle_id is not null
     </select>
 
     <!--  检查处方是否提交 -->

@@ -1,7 +1,6 @@
 package cn.hsa.base.clinic.bo.impl;
 
 import cn.hsa.base.PageDTO;
-import cn.hsa.example.id.Snowflake;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.clinic.bo.BaseClinicBO;
 import cn.hsa.module.base.clinic.dao.BaseClinicDAO;

@@ -907,10 +907,16 @@ public interface Constant {
             public static final String ZKWWC = "1"; // 质控未完成
             public static final String ZKWC = "2"; // 质控完成
         }
+
+        public static class ZKLX {
+            public static final String DRG = "1"; // DRG
+            public static final String DIP = "2"; // DIP
+        }
         /*医保编码为 甘肃：620102 海南的：460100*/
         public static class YBBMQZ {
             public static final String HN = "46"; // 海南医保前缀
             public static final String GS = "62"; // 甘肃医保前缀
+            public static final String GD = "44"; // 广东医保前缀
         }
     }
 

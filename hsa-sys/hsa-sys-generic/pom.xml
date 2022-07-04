@@ -64,8 +64,9 @@
 
         <!-- 应用监控相关 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <groupId>de.codecentric</groupId>
+            <artifactId>spring-boot-admin-starter-client</artifactId>
+            <version>2.2.4</version>
         </dependency>
         <dependency>
             <groupId>cn.hsa.hsaf.adapt</groupId>
@@ -85,37 +86,17 @@
         </dependency>
 
         <!--数据库连接驱动-->
-        <!--本地模拟用-->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${com-h2database-version}</version>
-        </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-driver-version}</version>
         </dependency>
 
-        <!--Rest接口文档-->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <version>${spring-boot.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-            <version>2.3.9.RELEASE</version>
         </dependency>
 
     </dependencies>
@@ -158,55 +139,55 @@
                     </excludes>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.spotify</groupId>-->
-<!--                <artifactId>docker-maven-plugin</artifactId>-->
-<!--                <version>1.2.2</version>-->
-<!--                &lt;!&ndash;将插件绑定在某个phase执行&ndash;&gt;-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>build-image</id>-->
-<!--                        &lt;!&ndash;用户只需执行mvn package ，就会自动执行mvn docker:build&ndash;&gt;-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>build</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
+            <!--            <plugin>-->
+            <!--                <groupId>com.spotify</groupId>-->
+            <!--                <artifactId>docker-maven-plugin</artifactId>-->
+            <!--                <version>1.2.2</version>-->
+            <!--                &lt;!&ndash;将插件绑定在某个phase执行&ndash;&gt;-->
+            <!--                <executions>-->
+            <!--                    <execution>-->
+            <!--                        <id>build-image</id>-->
+            <!--                        &lt;!&ndash;用户只需执行mvn package ，就会自动执行mvn docker:build&ndash;&gt;-->
+            <!--                        <phase>package</phase>-->
+            <!--                        <goals>-->
+            <!--                            <goal>build</goal>-->
+            <!--                        </goals>-->
+            <!--                    </execution>-->
+            <!--                </executions>-->
 
-<!--                <configuration>-->
-<!--                    &lt;!&ndash;指定生成的镜像名,这里是我们的作者名+项目名&ndash;&gt;-->
-<!--                    <imageName>yuanzibo/${project.build.finalName}</imageName>-->
+            <!--                <configuration>-->
+            <!--                    &lt;!&ndash;指定生成的镜像名,这里是我们的作者名+项目名&ndash;&gt;-->
+            <!--                    <imageName>yuanzibo/${project.build.finalName}</imageName>-->
 
-<!--                    &lt;!&ndash;指定标签 这里指定的是镜像的版本，我们默认版本是latest&ndash;&gt;-->
-<!--                    <imageTags>-->
-<!--                        <imageTag>latest</imageTag>-->
-<!--                    </imageTags>-->
+            <!--                    &lt;!&ndash;指定标签 这里指定的是镜像的版本，我们默认版本是latest&ndash;&gt;-->
+            <!--                    <imageTags>-->
+            <!--                        <imageTag>latest</imageTag>-->
+            <!--                    </imageTags>-->
 
-<!--                    &lt;!&ndash;指定基础镜像jdk1.8&ndash;&gt;-->
-<!--                    <baseImage>java:8</baseImage>-->
+            <!--                    &lt;!&ndash;指定基础镜像jdk1.8&ndash;&gt;-->
+            <!--                    <baseImage>java:8</baseImage>-->
 
-<!--                    &lt;!&ndash;切换到ROOT目录&ndash;&gt;-->
-<!--                    <workdir>/</workdir>-->
-<!--                    <entryPoint>["java","-Xms256m","-Xmx1024m","-jar","/${project.build.finalName}.jar"]</entryPoint>-->
+            <!--                    &lt;!&ndash;切换到ROOT目录&ndash;&gt;-->
+            <!--                    <workdir>/</workdir>-->
+            <!--                    <entryPoint>["java","-Xms256m","-Xmx1024m","-jar","/${project.build.finalName}.jar"]</entryPoint>-->
 
-<!--                    <exposes>19003</exposes>-->
+            <!--                    <exposes>19003</exposes>-->
 
-<!--                    &lt;!&ndash;指定远程 docker api地址&ndash;&gt;-->
-<!--&lt;!&ndash;                    <dockerHost>${dockerUrl}</dockerHost>&ndash;&gt;-->
-<!--&lt;!&ndash;                    <dockerCertPath>${dockerUrlZs}</dockerCertPath>&ndash;&gt;-->
-<!--&lt;!&ndash;                    &lt;!&ndash; 这里是复制 jar 包到 docker 容器指定目录配置 &ndash;&gt;&ndash;&gt;-->
-<!--                    <resources>-->
-<!--                        <resource>-->
-<!--                            <targetPath>/</targetPath>-->
-<!--                            &lt;!&ndash;jar 包所在的路径  此处配置的 即对应 target 目录&ndash;&gt;-->
-<!--                            <directory>${project.build.directory}</directory>-->
-<!--                            &lt;!&ndash;用于指定需要复制的文件 需要包含的 jar包 ，这里对应的是 Dockerfile中添加的文件名　&ndash;&gt;-->
-<!--                            <include>${project.build.finalName}.jar</include>-->
-<!--                        </resource>-->
-<!--                    </resources>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <!--                    &lt;!&ndash;指定远程 docker api地址&ndash;&gt;-->
+            <!--&lt;!&ndash;                    <dockerHost>${dockerUrl}</dockerHost>&ndash;&gt;-->
+            <!--&lt;!&ndash;                    <dockerCertPath>${dockerUrlZs}</dockerCertPath>&ndash;&gt;-->
+            <!--&lt;!&ndash;                    &lt;!&ndash; 这里是复制 jar 包到 docker 容器指定目录配置 &ndash;&gt;&ndash;&gt;-->
+            <!--                    <resources>-->
+            <!--                        <resource>-->
+            <!--                            <targetPath>/</targetPath>-->
+            <!--                            &lt;!&ndash;jar 包所在的路径  此处配置的 即对应 target 目录&ndash;&gt;-->
+            <!--                            <directory>${project.build.directory}</directory>-->
+            <!--                            &lt;!&ndash;用于指定需要复制的文件 需要包含的 jar包 ，这里对应的是 Dockerfile中添加的文件名　&ndash;&gt;-->
+            <!--                            <include>${project.build.finalName}.jar</include>-->
+            <!--                        </resource>-->
+            <!--                    </resources>-->
+            <!--                </configuration>-->
+            <!--            </plugin>-->
         </plugins>
     </build>
 

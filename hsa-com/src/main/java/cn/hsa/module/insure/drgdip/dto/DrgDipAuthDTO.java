@@ -21,4 +21,12 @@ public class DrgDipAuthDTO implements Serializable {
      * dip
      */
     private String dip;
+    /**
+     * drg
+     */
+    private String drgMsg;
+    /**
+     * dip
+     */
+    private String dipMsg;
 }

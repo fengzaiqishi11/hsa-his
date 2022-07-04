@@ -3,6 +3,7 @@ package cn.hsa.insure.drgdip.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
@@ -144,7 +145,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
      * @Return
      */
     @Override
-    public Boolean insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
+    public DrgDipResultDTO insertDrgDipResult(DrgDipResultDTO drgDipResultDTO,List<DrgDipResultDetailDTO> drgDipResultDetailDTOList) {
 
         //保存质控结果表
         if(drgDipResultDTO != null){
@@ -198,7 +199,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             }
             drgDipResultDetailDAO.insertDrgDipResultDetailList(drgDipResultDetailDTOList);
         }
-        return true;
+        return drgDipResultDTO;
 
     }
 
@@ -216,29 +217,37 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
       HashMap param = new HashMap();
       param.put("hospCode",MapUtils.get(map, "hospCode"));
       //循环查询DRG和DIP质控权限1：DIP 2:DRG
-      Boolean dip = false;
-      Boolean drg = false;
       param.put("orderTypeCode","1");
-      CenterFunctionAuthorizationDO dipAuth =
-          (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+      WrapperResponse<CenterFunctionAuthorizationDO> dipWrapper=
+          centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param);
       param.put("orderTypeCode","2");
-      CenterFunctionAuthorizationDO drgAuth =
-          (CenterFunctionAuthorizationDO)centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param).getData();
+      WrapperResponse<CenterFunctionAuthorizationDO> drgWrapper=
+          centerFunctionAuthorizationService.queryBizAuthorizationByOrderTypeCode(param);
       //都没有权限 报错
-      if (ObjectUtil.isEmpty(dipAuth)&&ObjectUtil.isEmpty(drgAuth)){
-        throw new AppException("未查询到本机构的DIP、DRG质控服务的授权信息，请通过400电话400-987-5000或通过企业微信联系我们");
+      if (ObjectUtil.isEmpty(dipWrapper.getData())&&ObjectUtil.isEmpty(drgWrapper.getData())){
+        dto.setDip(String.valueOf(dipWrapper.getCode()));
+        dto.setDrg(String.valueOf(drgWrapper.getCode()));
+        dto.setDipMsg(dipWrapper.getMessage());
+        dto.setDrgMsg(dipWrapper.getMessage());
+        return dto;
       }
+      CenterFunctionAuthorizationDO dipAuth = dipWrapper.getData();
+      CenterFunctionAuthorizationDO drgAuth = drgWrapper.getData();
       //dip
       if (ObjectUtil.isNotEmpty(dipAuth)){
         dto.setDip("true");
+        dto.setDipMsg(dipWrapper.getMessage());
       }else{
-        dto.setDip("false");
+        dto.setDip(String.valueOf(dipWrapper.getCode()));
+        dto.setDipMsg(dipWrapper.getMessage());
       }
       //drg
       if (ObjectUtil.isNotEmpty(drgAuth)){
         dto.setDrg("true");
+        dto.setDrgMsg(drgWrapper.getMessage());
       }else{
-        dto.setDrg("false");
+        dto.setDrg(String.valueOf(drgWrapper.getCode()));
+        dto.setDrgMsg(drgWrapper.getMessage());
       }
       return dto;
     }
@@ -366,15 +375,20 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
             throw new AppException("请选择质控类型");
         }
         //可疑违规查询条件处理
-        if("1".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "1".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setViolationStates(null);
         }
-        if("0".equals(drgDipResultDTO.getViolationStates()) && "0".equals(drgDipResultDTO.getSuspiciousStates())){
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
             drgDipResultDTO.setSuspiciousStates(null);
             drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
@@ -399,6 +413,22 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public Map<String, Object> queryDrgDipResultSetlinfoSum(DrgDipResultDTO drgDipResultDTO){
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
+        }
+        //可疑违规查询条件处理
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();
@@ -474,10 +504,17 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         }else {
             responseDataMap.put("hiType","自费病人");// 医保类型
         }
+        if(Constant.UnifiedPay.ZKLX.DRG.equals(drgDipResultDTO.getType())){
+            responseDataMap.put("drgCode",drgDipResultDTO1.getDrgDipCode());// DRG组编码
+            responseDataMap.put("drgName",drgDipResultDTO1.getDrgDipName());// DRG组名称
+            responseDataMap.put("weightValue",drgDipResultDTO1.getWeightValue());// DRG权重
+            responseDataMap.put("ratio",drgDipResultDTO1.getBl());// 倍率
+        } else if(Constant.UnifiedPay.ZKLX.DIP.equals(drgDipResultDTO.getType())){
+            responseDataMap.put("diagCode",drgDipResultDTO1.getDrgDipCode());// DIP组编码
+            responseDataMap.put("diagName",drgDipResultDTO1.getDrgDipName());// DIP组名称
+            responseDataMap.put("diagFeeSco",drgDipResultDTO1.getFeePay());// 分值
+        }
         responseDataMap.put("inNO",drgDipResultDTO1.getVisitId());//住院号
-        responseDataMap.put("diagCode",drgDipResultDTO1.getDrgDipCode());// DIP组编码
-        responseDataMap.put("diagName",drgDipResultDTO1.getDrgDipName());// DIP组名称
-        responseDataMap.put("diagFeeSco",drgDipResultDTO1.getFeePay());// 分值
         responseDataMap.put("profitAndLossAmount",drgDipResultDTO1.getProfit());// 盈亏额
         responseDataMap.put("totalFee",drgDipResultDTO1.getTotalFee());// 总费用
         responseDataMap.put("feeStand",drgDipResultDTO1.getStandFee());// 总费用标杆
@@ -485,7 +522,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         responseDataMap.put("proMedicMaterStand",drgDipResultDTO1.getStandProMedicMater());// 药占比标杆
         responseDataMap.put("proConsum",drgDipResultDTO1.getProConsum());// 耗材比
         responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
-        responseDataMap.put("quality",qualityInfoList);// 质控信息
+        responseDataMap.put("quality",HumpUnderlineUtils.humpToUnderlineArray(qualityInfoList));// 质控信息
         return responseDataMap;
     }
 
@@ -500,6 +537,22 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public PageDTO queryDrgDipResultMris(DrgDipResultDTO drgDipResultDTO){
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
+        }
+        //可疑违规查询条件处理
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
@@ -524,6 +577,22 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
     public Map<String, Object> queryDrgDipResultMrisSum(DrgDipResultDTO drgDipResultDTO){
         if(StringUtils.isEmpty(drgDipResultDTO.getType())){
             throw new AppException("请选择质控类型");
+        }
+        //可疑违规查询条件处理
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.F.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+        }
+        if(Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getViolationStates()) && Constant.UnifiedPay.ISMAN.S.equals(drgDipResultDTO.getSuspiciousStates())){
+            drgDipResultDTO.setSuspiciousStates(null);
+            drgDipResultDTO.setViolationStates(null);
+            drgDipResultDTO.setSv(Constant.UnifiedPay.ISMAN.S);
         }
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultMris(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();

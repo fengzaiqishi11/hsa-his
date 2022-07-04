@@ -693,4 +693,6 @@ public interface OutptCostDAO {
      * @return void
      */
     void updateCostSettleId(String settleId,@Param("list") List<OutptCostDTO> costList);
+
+    void updateCostSettleIdByids(String settleId,@Param("list") List<OutptCostDTO> costList);
 }

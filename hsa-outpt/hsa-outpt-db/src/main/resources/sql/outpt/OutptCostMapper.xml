@@ -3677,4 +3677,12 @@
             #{item.id}
         </foreach>
     </update>
+
+    <update id="updateCostSettleIdByids" parameterType="list">
+        update outpt_cost set settle_id = #{settleId} where
+        id in
+        <foreach collection="list" separator="," item="item" open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
 </mapper>

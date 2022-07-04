@@ -472,4 +472,8 @@
         and is_match = '1'
     </select>
 
+    <select id="selectByCode" resultType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO">
+        select * from insure_disease_match where hosp_code =#{hospCode} and insure_reg_code =#{insureRegCode} and hosp_illness_code =#{hospIllnessCode}
+    </select>
+
 </mapper>

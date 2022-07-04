@@ -1,17 +1,32 @@
 package cn.hsa.center.authorization.bo.impl;
 
+import cn.hsa.base.PageDO;
+import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.bo.CenterFunctionAuthorizationBO;
 import cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO;
+import cn.hsa.module.center.authorization.dao.CenterInterceptUrlRecordDAO;
+import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
+import cn.hsa.module.center.code.bo.CenterCodeBO;
+import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
+import cn.hsa.util.ListUtils;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author luonianxin
@@ -30,9 +45,18 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
     private CenterFunctionAuthorizationDAO centerFunctionAuthorizationDAO;
 
+    private CenterInterceptUrlRecordDAO centerInterceptUrlRecordDAO;
+
+    @Resource
+    private CenterCodeBO centerCodeBO;
+
     @Autowired
     public void setCenterFunctionAuthorizationDAO(CenterFunctionAuthorizationDAO centerFunctionAuthorizationDAO) {
         this.centerFunctionAuthorizationDAO = centerFunctionAuthorizationDAO;
+    }
+    @Autowired
+    public void setCenterInterceptUrlRecordDAO(CenterInterceptUrlRecordDAO centerInterceptUrlRecordDAO) {
+        this.centerInterceptUrlRecordDAO = centerInterceptUrlRecordDAO;
     }
 
     @Override
@@ -74,7 +98,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         if(!(nowTimeStamp.compareTo(startDateTimeStamp) > 0 && nowTimeStamp.compareTo(endDateTimeStamp) < 0)){
             StringBuilder builder = new StringBuilder();
             builder.append("医院编码为【 ").append(functionAuthorizationDO.getHospCode()).append('】')
-                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用").append("权限类型代码：").append(orderTypeCode);
+                    .append("功能授权已过期或未到授权开始时间,请在授权使用时间范围内调用，授权时间范围：").append(functionAuthorizationDO.getStartDate() +" ")
+                    .append('-').append(" " +functionAuthorizationDO.getEndDate())
+                    .append(", 权限类型代码：").append(orderTypeCode);
             log.info("==-=="+builder);
             return WrapperResponse.error(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value(),builder.toString(),null);
         }
@@ -91,5 +117,110 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     public WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO) {
         int affectRows = centerFunctionAuthorizationDAO.insertAuthorization(functionAuthorizationDO);
         return WrapperResponse.success(functionAuthorizationDO);
+    }
+
+    /**
+     * 查询中心端需要拦截的uri列表
+     *
+     * @param params 参数
+     * @return 需要拦截的uri列表
+     */
+    @Override
+    public WrapperResponse<List<CenterInterceptUrlRecordDO>> queryAllCenterInterceptUrlRecords(Map<String, Object> params) {
+        List<CenterInterceptUrlRecordDO> centerInterceptUrlRecordDOList = centerInterceptUrlRecordDAO.queryAllCenterInterceptUrlRecords();
+        return WrapperResponse.success(centerInterceptUrlRecordDOList);
+    }
+
+
+
+    @Override
+    public Map<String,Object> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+
+        CenterCodeDetailDTO centerCodeDetailDTO = new CenterCodeDetailDTO();
+        centerCodeDetailDTO.setCode("QXDJ");
+        centerCodeDetailDTO.setPageNo(0);
+        centerCodeDetailDTO.setPageSize(10000);
+        List<CenterCodeDetailDTO> centerCodeDetailDos = (List<CenterCodeDetailDTO>) centerCodeBO.queryCodeDetailPage(centerCodeDetailDTO).getResult();
+
+        if (ListUtils.isEmpty(centerCodeDetailDos)){
+            return null;
+        }
+
+        List<Map<String,Object>> childList = null;
+        List<Map<String,Object>> tableHead = new ArrayList<>();
+        StringBuffer sql1 = new StringBuffer(" , find_in_set('0',concat_ws(',',");
+        StringBuffer sql2 = new StringBuffer();
+
+        Map<String,Object> parentMap = null;
+        Map<String,Object> childMap = null;
+        for(CenterCodeDetailDTO centerCodeDetail :centerCodeDetailDos){
+            sql1.append(centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
+
+            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then '"+ centerCodeDetail.getValue() +"' end) as "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +",");
+            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then cf.audit_status end) as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
+            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then concat(cf.start_date,' ~ ',cf.end_date)  end )as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"YXQ,");
+
+            parentMap = new HashMap();
+            parentMap.put("label",centerCodeDetail.getName() );
+
+
+            childList = new ArrayList<>();
+            childMap = new HashMap();
+            childMap.put("label","开通状态");
+            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue());
+            childMap.put("type","text");
+            childMap.put("minWidth","100");
+            childList.add(childMap);
+
+            childMap = new HashMap();
+            childMap.put("label","审核状态");
+            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"SH");
+            childMap.put("type","text");
+            childMap.put("minWidth","100");
+            childList.add(childMap);
+
+            childMap = new HashMap();
+            childMap.put("label","服务时间");
+            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"YXQ");
+            childMap.put("type","text");
+            childMap.put("minWidth","100");
+            childList.add(childMap);
+
+
+            parentMap.put("children",childList);
+            tableHead.add(parentMap);
+        }
+        sql1 = new StringBuffer(sql1.substring(0,sql1.length()-1));
+        sql1.append(" )) sfysh") ;
+        centerFunctionAuthorizationDto.setSql1(sql1.toString());
+        centerFunctionAuthorizationDto.setSql2(sql2.toString());
+        PageHelper.startPage(centerFunctionAuthorizationDto.getPageNo(), centerFunctionAuthorizationDto.getPageSize());
+        List<Map<String,Object>> list = centerFunctionAuthorizationDAO.queryHospZzywPage(centerFunctionAuthorizationDto);
+
+        Map<String,Object> resultMap = new HashMap();
+        resultMap.put("tableHead",tableHead);
+        resultMap.put("tableData",list);
+
+
+
+
+        return resultMap;
+    }
+
+    @Override
+    public PageDTO queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        PageHelper.startPage(centerFunctionAuthorizationDto.getPageNo(), centerFunctionAuthorizationDto.getPageSize());
+        List<Map<String,Object>> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        return PageDTO.of(list);
+    }
+
+    @Override
+    public Boolean updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return centerFunctionAuthorizationDAO.updateAuthorization(centerFunctionAuthorizationDto)>0;
+    }
+
+    @Override
+    public Boolean updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return centerFunctionAuthorizationDAO.updateAuthorizationAudit(centerFunctionAuthorizationDto)>0;
     }
 }

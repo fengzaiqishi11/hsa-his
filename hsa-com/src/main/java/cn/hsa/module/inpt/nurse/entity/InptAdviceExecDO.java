@@ -119,6 +119,9 @@ public class InptAdviceExecDO extends PageDO implements Serializable {
     /**
      * 医嘱明细ID
      */
-    private String adviceDetailId;
+    private String adviceDetailId;/**
+     * 提前领药ID
+     */
+    private String advanceId;
 
 }

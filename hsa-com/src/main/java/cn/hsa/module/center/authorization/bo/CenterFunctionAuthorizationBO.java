@@ -1,7 +1,14 @@
 package cn.hsa.module.center.authorization.bo;
 
+import cn.hsa.base.PageDO;
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author luonianxin
@@ -24,4 +31,22 @@ public interface CenterFunctionAuthorizationBO {
      * @return
      */
     WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO);
-}
+
+    /**
+     *  查询中心端需要拦截的uri列表
+     * @param params 参数
+     * @return 需要拦截的uri列表
+     */
+    WrapperResponse<List<CenterInterceptUrlRecordDO>> queryAllCenterInterceptUrlRecords(Map<String,Object> params);
+
+
+
+    Map<String,Object> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    PageDTO queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    Boolean updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    Boolean updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+};

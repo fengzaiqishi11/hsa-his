@@ -57,4 +57,5 @@
     <!-- 门诊挂号登记-->
     <dubbo:reference interface="cn.hsa.module.outpt.register.service.OutptRegisterService" id="outptRegisterService_consumer" check="false"/>
 
+    <dubbo:reference interface="cn.hsa.module.center.syshospital.service.SysHospitalService" id="sysHospitalService_consummer" check="false"/>
 </beans>

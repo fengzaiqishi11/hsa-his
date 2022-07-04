@@ -592,6 +592,16 @@ public class OutptRegisterBOImpl extends HsafBO implements OutptRegisterBO {
         return disposeYhcl(costList, pfCode, hospCode);
     }
 
+    @Override
+    public List<OutptRegisterDTO> queryRegisterInfoByCertno(Map<String, Object> map) {
+        return outptRegisterDAO.queryRegisterInfoByCertno(map);
+    }
+
+    @Override
+    public  OutptRegisterDTO getOutptRegisterByVisitId(Map<String, Object> map) {
+        return outptRegisterDAO.getOutptRegisterByVisitId(map);
+    }
+
     private void disposeMzbr(OutptVisitDTO outptVisitDTO, OutptRegisterDTO outptRegisterDTO, String registerId, String registerNo, String visitId, String hospCode,
                              String docId, String docName, Date sysdate, String profileId) {
         // 组装就诊数据 HIS_MZBR

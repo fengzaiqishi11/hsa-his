@@ -82,4 +82,8 @@ public interface OutptRegisterBO {
      * @Return java.lang.Boolean
     **/
     List<OutptClassifyCostDTO> updateCostPreferential(Map map);
+
+    List<OutptRegisterDTO> queryRegisterInfoByCertno(Map<String, Object> map);
+
+   OutptRegisterDTO  getOutptRegisterByVisitId(Map<String, Object> map);
 }

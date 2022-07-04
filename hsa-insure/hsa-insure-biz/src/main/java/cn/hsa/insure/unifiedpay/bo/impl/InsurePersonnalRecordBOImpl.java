@@ -3,6 +3,7 @@ package cn.hsa.insure.unifiedpay.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
@@ -14,6 +15,8 @@ import cn.hsa.module.insure.module.dto.*;
 
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
+import cn.hsa.module.outpt.register.service.OutptRegisterService;
 import cn.hsa.util.*;
 import cn.hutool.core.util.ObjectUtil;
 
@@ -60,6 +63,9 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
     @Resource
     private InsureUnifiedLogService insureUnifiedLogService_consumer;
 
+    @Resource
+    private OutptRegisterService outptRegisterService_consumer;
+
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
@@ -72,8 +78,30 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
      */
     @Override
     public Boolean insertInsureDiseaseRecord(InsureDiseaseRecordDTO insureDiseaseRecordDTO) {
+
+
         String hospCode = insureDiseaseRecordDTO.getHospCode();
         String insureRegCode = insureDiseaseRecordDTO.getRegCode();
+        String visitId = insureDiseaseRecordDTO.getVisitId();
+
+        //1、门特病人未在本医院进行门诊挂号就诊时,提示门特备案登记提示失败
+        Map<String,Object> map = new HashMap();
+        String certno = insureDiseaseRecordDTO.getCertNo();
+        map.put("keyword",certno);
+        map.put("hospCode",hospCode);
+        map.put("visitId",insureDiseaseRecordDTO.getVisitId());
+        List<OutptRegisterDTO> registerDTOList = outptRegisterService_consumer.queryRegisterInfoByCertno(map);
+        if(ListUtils.isEmpty(registerDTOList)){
+            throw new AppException("证件号码"+"【"+certno+"】"+"未在本医院进行门诊挂号!");
+        }
+        //2、门特病人进行慢特备案的身份证号与点击页面病人的身份证号不一致时提示门特备案失败。
+        OutptRegisterDTO outptRegisterDTO = outptRegisterService_consumer.getOutptRegisterByVisitId(map);
+        if(outptRegisterDTO==null){
+            throw new AppException("未找到被选择的患者的门诊挂号信息！");
+        }
+        if(!outptRegisterDTO.getCertNo().equals(certno)){
+            throw new AppException("填写的身份证号与被选择的病人的身份证号不一致！");
+        }
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
         insureConfigurationDTO.setRegCode(insureRegCode);

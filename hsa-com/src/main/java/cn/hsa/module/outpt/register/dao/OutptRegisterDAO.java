@@ -198,7 +198,7 @@ public interface OutptRegisterDAO {
     int insertRegisterDetail(List<OutptRegisterDetailDto> list);
 
     // 根据就诊id查询挂号记录(outpt_register)
-    OutptRegisterDTO getOutptRegisterByVisitId(Map<String, Object> map);
+    OutptRegisterDTO  getOutptRegisterByVisitId(Map<String, Object> map);
 
     /**
      * @Description: 查询当前发票号段已经使用的最大发票号码
@@ -211,4 +211,6 @@ public interface OutptRegisterDAO {
     OutinInvoiceDTO getMaxInvoiceNo(OutptRegisterSettleDto outptRegisterSettleDto);
 
     int updateDetailById(@Param("list") List<OutptRegisterDetailDO> list);
+
+    List<OutptRegisterDTO> queryRegisterInfoByCertno(Map<String, Object> map);
 }

@@ -54,5 +54,5 @@
 
     <!--SysUserService-->
     <dubbo:reference interface="cn.hsa.module.sys.user.service.SysUserService" id="SysUserService_consumer" check="false"/>
-
+    <dubbo:reference interface="cn.hsa.module.center.syshospital.service.SysHospitalService" id="sysHospitalService_consummer" check="false"/>
 </beans>

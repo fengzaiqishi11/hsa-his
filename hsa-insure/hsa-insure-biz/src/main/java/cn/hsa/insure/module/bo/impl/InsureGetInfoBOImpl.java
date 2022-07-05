@@ -804,11 +804,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> icuinfoList = insureGetInfoDAO.selectIcuInfoForMap(map);
         // 手术操作信息
         List<Map<String, Object>> oprnfoList = insureGetInfoDAO.selectOprninfoForMap(map);
-        // 住院诊断信息
+        List<Map<String, Object>> opspdiseinfoList = new ArrayList<>();
+        Map<String, Object> diseaseMap = new HashMap<>();
+        String isHospital = MapUtils.get(map, "isHospital");
+        if (Constants.SF.F.equals(isHospital)) {
+            //  门诊慢特病诊断信息
+            opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
+        }else {
+            // 住院诊断信息
 //        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
-        Map<String, Object> diseaseMap = handerInptDiagnose(map);
-        //  门诊慢特病诊断信息
-        List<Map<String, Object>> opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
+            diseaseMap = handerInptDiagnose(map);
+        }
         // 基金支付信息
         List<Map<String, Object>> payinfoList = insureGetInfoDAO.selectPayinfoForMap(map);
 

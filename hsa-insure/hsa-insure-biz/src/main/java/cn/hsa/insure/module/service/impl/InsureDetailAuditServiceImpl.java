@@ -62,7 +62,7 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
         }
 
         Map param = new HashMap();
-        param.put("infno", "3102");  //交易编号
+        param.put("infno", "3101");  //交易编号
         param.put("msgid",StringUtils.createMsgId(insureVisitDTO.getMedicineOrgCode()));
         param.put("insuplc_admdvs", insureVisitDTO.getInsuplcAdmdvs()); //参保地医保区划分
         param.put("medins_code", insureVisitDTO.getMedicineOrgCode()); //定点医药机构编号

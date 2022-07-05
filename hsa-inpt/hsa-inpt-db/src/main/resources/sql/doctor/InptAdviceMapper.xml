@@ -1393,8 +1393,8 @@
         and a.is_long='0'
         --         已核收
         and a.is_check='1'
-        --         排除停嘱并核收
-        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         排除停嘱并核收(只要是停嘱的 都不再产生费用)
+        and a.is_stop !='1'
         --         非据收医嘱
         and (a.is_reject is null or a.is_reject='0')
         --         在院

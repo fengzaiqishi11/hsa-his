@@ -45,6 +45,7 @@
 		<result property="jzDoctorName" column="jz_doctor_name" jdbcType="VARCHAR"/>
 		<result property="zgDoctorId" column="zg_doctor_id" jdbcType="VARCHAR"/>
 		<result property="zgDoctorName" column="zg_doctor_name" jdbcType="VARCHAR"/>
+		<result property="respNurseName" column="resp_nurse_name" jdbcType="VARCHAR"/>
 		<result property="inRemark" column="in_remark" jdbcType="VARCHAR"/>
 		<result property="inModeCode" column="in_mode_code" jdbcType="VARCHAR"/>
 		<result property="inDiseaseId" column="in_disease_id" jdbcType="VARCHAR"/>
@@ -272,7 +273,7 @@
 		IFNULL((case v.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '-'),'/',
 		IFNULL(v.age,'-'),
 		IFNULL((case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
-		) AS keyword
+		) AS keyword,v.resp_nurse_name
 		from inpt_visit v
 		left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		and (s.baby_id is null or s.baby_id ='')
@@ -338,7 +339,7 @@
 		IFNULL((case pt.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(pt.age,'-'),
 		IFNULL((case pt.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
-		) AS keyword
+		) AS keyword,pt.resp_nurse_name
 		from inpt_visit pt
 		join inpt_baby pb on pt.id = pb.visit_id and pb.is_cancel ='0'
 		left join inpt_settle s on s.hosp_code = pb.hosp_code and pb.visit_id = s.visit_id
@@ -2188,7 +2189,7 @@
 		v.archive_id, v.archive_name, v.insure_code, v.insure_org_code, v.insure_no, v.insure_biz_code, v.insure_treat_code,
 		v.insure_patient_id, v.insure_remark, v.total_advance, s.settle_time,
 		(select sum(reality_price) from inpt_cost b where b.visit_id = v.id and v.hosp_code = b.hosp_code ) as total_cost,
-		v.total_balance, v.crte_id, v.crte_name, v.crte_time,
+		v.total_balance, v.crte_id, v.crte_name, v.crte_time,v.resp_nurse_name,
 		(select name from base_dept where in_ward_id = base_dept.id) as wardName,null as babyId,1 as px, null as babyName,b.seq_no,
 		CONCAT(
 		v.name,

@@ -57,7 +57,6 @@ import java.util.*;
 @Slf4j
 public class OutptDoctorPrescribeController extends BaseController {
 
-  private static String IS_HAI_NAN = "1";
 
   /**
    * 处方管理dubbo消费者接口
@@ -86,11 +85,6 @@ public class OutptDoctorPrescribeController extends BaseController {
   @Resource
   private SysParameterService sysParameterService_consumer;
 
-  @Resource
-  private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
-
-  @Resource
-  private OutptVisitService outptVisitService;
 
   /**
    * @Menthod queryPatientByOperType
@@ -976,40 +970,6 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     outptPrescribeDTO.setSubmitName(sysUserDTO.getName());
     outptPrescribeDTO.setSubmitId(sysUserDTO.getId());
-
-    //如果是海南的则会推送移动支付的消息推送接口，推送出待结算的数据信息
-    Map<String, Object> ydzfMap = new HashMap<>();
-    String[] codeList =  new String[4];
-    codeList[0] = "HAINAN_YDZF_FLAG";
-    codeList[1] = "HAINAN_CERTNO_VERIFY";
-    ydzfMap.put("codeList", codeList);
-    ydzfMap.put("hospCode", sysUserDTO.getHospCode());
-    Map<String, SysParameterDTO> data = sysParameterService_consumer.getParameterByCodeList(ydzfMap).getData();
-    SysParameterDTO sysParameterDTO = MapUtils.get(data, "HAINAN_YDZF_FLAG");
-    SysParameterDTO sysParameterDTO2 = MapUtils.get(data, "HAINAN_CERTNO_VERIFY");
-    String values = sysParameterDTO2.getValue();
-    // 获得能够推送消息的身份证号
-    String[] certnos = values.replace("{","").replace("}","").split(",");
-    if (sysParameterDTO != null && IS_HAI_NAN.equals(sysParameterDTO.getValue())) {
-      // 获得需要推送消息的身份证号
-      Map param = new HashMap();
-      param.put("visitID",map.get("visitId"));
-      param.put("hospCode",map.get("hospCode"));
-      OutptVisitDTO outptVisitDTO = outptVisitService.queryByVisitID(param);
-      boolean flag = false;
-      for (int i = 0; i < certnos.length; i++) {
-       if(outptVisitDTO.getCardNo().equals(certnos[i])){
-         flag = true;
-       }
-      }
-      // 如果这个病人的身份证符合要求就推送消息
-      if(flag){
-        map.put("visitId", outptPrescribeDTO.getVisitId());
-        map.put("pushType", "HOSPITAL_PAYMENT"); // 推送类型 ： 支付单
-        map.put("orderStatus", "MERCHANT_WAIT_PAY"); // 支付状态 ： 待支付
-        outptTmakePriceFormService_consumer.savePayOnlineInfoDO(map);
-      }
-    }
 
     map.put("hospCode",sysUserDTO.getHospCode());
     map.put("outptPrescribeDTO",outptPrescribeDTO);

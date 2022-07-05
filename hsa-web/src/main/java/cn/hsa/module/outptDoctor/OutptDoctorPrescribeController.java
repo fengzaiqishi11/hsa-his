@@ -26,12 +26,14 @@ import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
 import cn.hsa.module.outpt.triage.service.OutptTriageVisitService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -55,7 +57,6 @@ import java.util.*;
 @Slf4j
 public class OutptDoctorPrescribeController extends BaseController {
 
-  private static String IS_HAI_NAN = "1";
 
   /**
    * 处方管理dubbo消费者接口
@@ -84,8 +85,6 @@ public class OutptDoctorPrescribeController extends BaseController {
   @Resource
   private SysParameterService sysParameterService_consumer;
 
-  @Resource
-  private OutptTmakePriceFormService outptTmakePriceFormService_consumer;
 
   /**
    * @Menthod queryPatientByOperType
@@ -971,18 +970,6 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     outptPrescribeDTO.setSubmitName(sysUserDTO.getName());
     outptPrescribeDTO.setSubmitId(sysUserDTO.getId());
-
-    //如果是海南的则会推送移动支付的消息推送接口，推送出待结算的数据信息
-    Map<String, String> ydzfMap = new HashMap<>();
-    ydzfMap.put("code", "HAINAN_YDZF_FLAG");
-    ydzfMap.put("hospCode", sysUserDTO.getHospCode());
-    SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(ydzfMap).getData();
-    map.put("visitId", outptPrescribeDTO.getVisitId());
-    map.put("pushType", "HOSPITAL_PAYMENT"); // 推送类型 ： 支付单
-    map.put("orderStatus", "MERCHANT_WAIT_PAY"); // 支付状态 ： 待支付
-    if (ydzfParameterDTO != null && IS_HAI_NAN.equals(ydzfParameterDTO.getValue())) {
-      outptTmakePriceFormService_consumer.savePayOnlineInfoDO(map);
-    }
 
     map.put("hospCode",sysUserDTO.getHospCode());
     map.put("outptPrescribeDTO",outptPrescribeDTO);

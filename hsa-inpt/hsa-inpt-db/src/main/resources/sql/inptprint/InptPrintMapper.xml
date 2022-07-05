@@ -731,9 +731,15 @@
              (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
              (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
             (case iv.patient_code  when '0' then '100.00'
-            else round(iic.guest_ratio * 100,2) end )as guestRatio,
-            (case iv.patient_code  when '0' then  sum(ic.total_price)
-             else  round(iic.guest_ratio * iic.primary_price,2) end ) as guestRatioPriceend
+            else
+                case iv.status_code when '7'  then round(iic.guest_ratio * 100,2)
+                else '404' end
+            end )as guestRatio,
+            (case iv.patient_code  when '0' then  round(sum(ic.total_price),2)
+            else
+                case iv.status_code when '7' then  round(iic.guest_ratio * iic.primary_price,2)
+                else round(sum(ic.total_price),2) end
+            end ) as guestRatioPriceend
         from
             inpt_cost ic
                 left join base_finance_classify bfc on

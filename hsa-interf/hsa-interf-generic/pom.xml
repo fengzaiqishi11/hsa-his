@@ -61,11 +61,6 @@
             <artifactId>hsaf-generic-fsstore</artifactId>
         </dependency>
 
-        <!-- 5.网关（应用可以同时访问腾讯云和阿里云网关）-->
-        <dependency>
-            <groupId>cn.hsa.hsaf.adapt</groupId>
-            <artifactId>hsaf-ali-gateway</artifactId>
-        </dependency>
         <!-- 应用监控相关 -->
         <dependency>
             <groupId>de.codecentric</groupId>

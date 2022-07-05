@@ -71,7 +71,7 @@
         <if test="type != null">
             AND type = #{type}
         </if>
-        <if test="type != null">
+        <if test="businessType != null">
             AND business_type = #{businessType}
         </if>
     </select>

@@ -217,8 +217,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         //根据DIP_DRG_MODE值判断质控模式
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //结算清单 business_type 1
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("1");
         //查询权限
         Map<String, Object> map2 = new HashMap<>();
         map2.put("hospCode", map.get("hospCode").toString());
@@ -848,8 +850,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultDataMap.put("setldetail", setldetail);
         //新增质控信息
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //清单 business_type 1
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("1");
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -1882,8 +1886,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             System.out.println("----======" + json);
             //新增质控信息
             DrgDipResultDTO dto = new DrgDipResultDTO();
+            //清单 business_type 1
             dto.setVisitId(map.get("visitId").toString());
             dto.setHospCode(map.get("hospCode").toString());
+            dto.setBusinessType("1");
             //DIP_DRG_MODE值
             Map<String, Object> sysMap = new HashMap<>();
             sysMap.put("hospCode", MapUtils.get(map, "hospCode"));

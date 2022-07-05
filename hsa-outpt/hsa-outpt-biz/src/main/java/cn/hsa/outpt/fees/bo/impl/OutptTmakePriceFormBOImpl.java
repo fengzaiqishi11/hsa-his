@@ -5909,9 +5909,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         for (Map<String, Object> map : insureCostList) {
             AnaOrderDTO anaOrderDTO = new AnaOrderDTO();
             //*处方(医嘱)标识
-            anaOrderDTO.setRxId(MapUtil.getStr(map,"opId"));
+            anaOrderDTO.setRxId(ObjectUtil.isNotEmpty(MapUtil.getStr(map,"opId"))?MapUtil.getStr(map,"opId"):MapUtil.getStr(map,"id"));
             //*处方号
-            anaOrderDTO.setRxno(ObjectUtil.isEmpty(MapUtil.getStr(map,"rxNo"))?MapUtil.getStr(map,"opId"):MapUtil.getStr(map,"rxNo"));
+            anaOrderDTO.setRxno(ObjectUtil.isNotEmpty(MapUtil.getStr(map,"rxNo"))?MapUtil.getStr(map,"rxNo"):MapUtil.getStr(map,"id"));
             //组编号
             anaOrderDTO.setGrpno(MapUtil.getStr(map,"iatdGroupNo"));
             //*是否为长期医嘱  1:是   0：否

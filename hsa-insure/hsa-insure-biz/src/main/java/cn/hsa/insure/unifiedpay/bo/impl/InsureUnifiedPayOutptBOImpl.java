@@ -724,7 +724,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             inMap.put("hospCode",hospCode);
             inMap.put("analysisDTO",analysisDTO);
             inMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-            AnaResJudgeDTO anaResJudgeDTO = insureDetailAuditService.upldBeforeAnalysisDTO(inMap);
+            AnaResJudgeDTO anaResJudgeDTO = insureDetailAuditService.upldMidAnalysisDTO(inMap);
         }
         //========================================================================
         return payInfo;
@@ -1584,7 +1584,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         for (Map<String, Object> map : insureCostList) {
             AnaOrderDTO anaOrderDTO = new AnaOrderDTO();
             //*处方(医嘱)标识
-            anaOrderDTO.setRxId(MapUtil.getStr(map,"opId"));
+            anaOrderDTO.setRxId(ObjectUtil.isNotEmpty(MapUtil.getStr(map,"opId"))?MapUtil.getStr(map,"opId"):MapUtil.getStr(map,"id"));
             //*处方号
             anaOrderDTO.setRxno(ObjectUtil.isEmpty(MapUtil.getStr(map,"rxNo"))?MapUtil.getStr(map,"opId"):MapUtil.getStr(map,"rxNo"));
             //组编号

@@ -71,6 +71,9 @@
         <if test="type != null">
             AND type = #{type}
         </if>
+        <if test="type != null">
+            AND business_type = #{businessType}
+        </if>
     </select>
 
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >

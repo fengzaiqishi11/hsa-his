@@ -812,6 +812,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (Constants.SF.F.equals(isHospital)) {
             //  门诊慢特病诊断信息
             opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
+            //4.封装住院诊断信息 没有信息，封装空信息
+            diseaseMap.put("diseaseCount",0);
+            diseaseMap.put("xiCollect",new ArrayList<>());
+            diseaseMap.put("zxCollect",new ArrayList<>());
         }else {
             // 住院诊断信息
 //        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);

@@ -291,9 +291,9 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
 
             String breath = dto.getBreath()==null?"":dto.getBreath().toString();
             String isVentilator =   StringUtils.isEmpty( dto.getIsVentilator())?"": dto.getIsVentilator();
-
+            String huxi ="";
             if("1".equals(isVentilator)){
-                breath = "®";
+                huxi = "®";
             }
             m.put("riqi",String.valueOf(timeSlot.getTime()));
             //m.put("ruyuantianshu",String.valueOf(i)); //入院天数
@@ -301,8 +301,10 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             m.put("shijian",String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
             if(StringUtils.isNotEmpty(breath) && "0".equals(breath)){
                 m.put("huxi","");
+                m.put("breath","");
             }else{
-                m.put("huxi",breath);
+                m.put("huxi",huxi);
+                m.put("breath",breath);
             }
 
             m.put("peeNO", StringUtils.isEmpty( dto.getPeeCode())?"": dto.getPeeCode());

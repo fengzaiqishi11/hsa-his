@@ -51,7 +51,6 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.analysis.Analysis;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

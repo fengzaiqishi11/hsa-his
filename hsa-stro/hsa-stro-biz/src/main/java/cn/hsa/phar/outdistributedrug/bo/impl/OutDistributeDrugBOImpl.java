@@ -387,6 +387,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
                 stockDetailDTO.setBizId(receiveDTO.getPharId());
                 stockDetailDTO.setItemCode(detailDO.getItemCode());
                 stockDetailDTO.setItemId(detailDO.getItemId());
+                stockDetailDTO.setItemName(detailDO.getItemName());
                 stockDetailDTO.setOpId(detailDO.getOpId());
                 stockDetailDTO.setOpdId(detailDO.getOpdId());
                 stockDetailDTO.setCostId(detailDO.getCostId());

@@ -217,8 +217,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
         //根据DIP_DRG_MODE值判断质控模式
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //结算清单 business_type 1
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("1");
         //查询权限
         Map<String, Object> map2 = new HashMap<>();
         map2.put("hospCode", map.get("hospCode").toString());
@@ -804,11 +806,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> icuinfoList = insureGetInfoDAO.selectIcuInfoForMap(map);
         // 手术操作信息
         List<Map<String, Object>> oprnfoList = insureGetInfoDAO.selectOprninfoForMap(map);
-        // 住院诊断信息
+        List<Map<String, Object>> opspdiseinfoList = new ArrayList<>();
+        Map<String, Object> diseaseMap = new HashMap<>();
+        String isHospital = MapUtils.get(map, "isHospital");
+        if (Constants.SF.F.equals(isHospital)) {
+            //  门诊慢特病诊断信息
+            opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
+        }else {
+            // 住院诊断信息
 //        Map<String, Object> diseaseMap = handerSetleDiseaInfo(map);
-        Map<String, Object> diseaseMap = handerInptDiagnose(map);
-        //  门诊慢特病诊断信息
-        List<Map<String, Object>> opspdiseinfoList = insureGetInfoDAO.selectOpspdiseinfoForMap(map);
+            diseaseMap = handerInptDiagnose(map);
+        }
         // 基金支付信息
         List<Map<String, Object>> payinfoList = insureGetInfoDAO.selectPayinfoForMap(map);
 
@@ -842,8 +850,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultDataMap.put("setldetail", setldetail);
         //新增质控信息
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //清单 business_type 1
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("1");
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -1073,6 +1083,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultMap.put("fixmedins_name", setlinfo.get("fixmedinsName"));// 定点医药机构名称
         resultMap.put("fixmedins_code", setlinfo.get("fixmedinsCode"));// 定点医药机构编号
         resultMap.put("hi_setl_lv", setlinfo.get("hiSetlLv"));
+        //结算等级处理
+        Map dictMap = new HashMap(2);
+        dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        dictMap.put("insureRegCode", MapUtils.get(setlinfo, "insuplc"));
+        dictMap.put("code", "HI_SETL_LV");
+        Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
+        for(String key:dictMap1.keySet()){
+            if(dictMap1.get(key).equals(MapUtils.get(setlinfo, "hiSetlLv"))){
+                resultMap.put("hi_setl_lv", key);
+            }
+        }
         resultMap.put("hi_no", setlinfo.get("hiNo"));// 医保编号
         resultMap.put("medcasno", setlinfo.get("medcasno"));// 病案号
         resultMap.put("dcla_time", setlinfo.get("dclaTime"));// 申报时间
@@ -1865,8 +1886,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             System.out.println("----======" + json);
             //新增质控信息
             DrgDipResultDTO dto = new DrgDipResultDTO();
+            //清单 business_type 1
             dto.setVisitId(map.get("visitId").toString());
             dto.setHospCode(map.get("hospCode").toString());
+            dto.setBusinessType("1");
             //DIP_DRG_MODE值
             Map<String, Object> sysMap = new HashMap<>();
             sysMap.put("hospCode", MapUtils.get(map, "hospCode"));

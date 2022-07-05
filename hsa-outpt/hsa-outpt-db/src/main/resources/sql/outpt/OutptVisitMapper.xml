@@ -961,4 +961,11 @@
         where
         id = #{id} and hosp_code =#{hospCode}
     </update>
+
+    <select id="getByVisitId" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
+        select aae140,bka006,bka008,bka035,aac002,aac004,aac006,aae140,aac001,aac003 from insure_individual_basic
+        where id = (
+        select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode} and medical_reg_no = #{medicalRegNo})
+        and hosp_code = #{hospCode}
+    </select>
 </mapper>

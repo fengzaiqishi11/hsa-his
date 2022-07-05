@@ -73,5 +73,8 @@
     <dubbo:reference id="insureIndividualBasicService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualBasicService" check="false" />
     <!--库存校验-->
     <dubbo:reference id="checkStockService_consumer" interface="cn.hsa.module.stro.stock.service.CheckStockService" check="false" />
+    <!--明细审核分析服务-->
+    <dubbo:reference interface="cn.hsa.module.insure.module.service.InsureDetailAuditService" id="insureDetailAuditService" check="false"/>
+    <dubbo:reference interface="cn.hsa.module.center.syshospital.service.SysHospitalService" id="sysHospitalService_consummer" check="false"/>
 </beans>
 

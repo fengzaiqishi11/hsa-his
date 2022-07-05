@@ -1,29 +1,23 @@
 package cn.hsa.insure.module.bo.impl;
 import java.util.Date;
 
+import cn.hsa.enums.TrigScen;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.insure.enums.TrigScen;
 import cn.hsa.module.inpt.compositequery.service.CompositeQueryService;
-import cn.hsa.module.inpt.doctor.dto.InptAdviceDetailDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
-import cn.hsa.module.inpt.fees.dao.InptSettleDAO;
 import cn.hsa.module.inpt.fees.service.InptSettlementService;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dto.AnaDiagnoseDTO;
 import cn.hsa.module.insure.module.dto.AnaInsuDTO;
 import cn.hsa.module.insure.module.dto.AnaMdtrtDTO;
-import cn.hsa.module.insure.module.dto.AnaOperationDTO;
 import cn.hsa.module.insure.module.dto.AnaOrderDTO;
 import cn.hsa.module.insure.module.dto.AnaResJudgeDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.service.InsureDetailAuditService;
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.annotation.JSONField;
-import com.google.common.collect.Lists;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -51,7 +45,6 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.analysis.Analysis;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

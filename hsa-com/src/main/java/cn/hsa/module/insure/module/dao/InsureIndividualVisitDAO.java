@@ -5,10 +5,12 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -499,5 +501,9 @@ public interface InsureIndividualVisitDAO {
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
     InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map param);
+
+    List<OutptDiagnoseDTO> getOutptDiagnose(OutptPrescribeDTO inPut);
+
+    OutptVisitDTO selectOutptVisitById(HashMap<String, Object> map);
 }
 

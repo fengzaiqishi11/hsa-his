@@ -86,7 +86,7 @@ public class InsurePersonnalRecordBOImpl extends HsafBO implements InsurePersonn
 
         //1、门特病人未在本医院进行门诊挂号就诊时,提示门特备案登记提示失败
         Map<String,Object> map = new HashMap();
-        String certno = insureDiseaseRecordDTO.getCertNo();
+        String certno = insureDiseaseRecordDTO.getBka896();
         map.put("keyword",certno);
         map.put("hospCode",hospCode);
         map.put("visitId",insureDiseaseRecordDTO.getVisitId());

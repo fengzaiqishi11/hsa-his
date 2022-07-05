@@ -1,4 +1,4 @@
-package cn.hsa.insure.enums;
+package cn.hsa.enums;
 
 import lombok.Getter;
 

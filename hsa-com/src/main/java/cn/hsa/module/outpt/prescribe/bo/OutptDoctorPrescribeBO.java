@@ -375,6 +375,8 @@ public interface OutptDoctorPrescribeBO {
      **/
     boolean updatePrescribeSubmit(OutptPrescribeDTO outptPrescribeDTO);
 
+    boolean updatePrescribeSubmit2(Map map,OutptPrescribeDTO outptPrescribeDTO);
+
     /**
      * @Menthod updateIsCanPrescribeSubmit
      * @Desrciption  批量取消提交处方

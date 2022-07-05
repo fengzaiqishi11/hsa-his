@@ -23,6 +23,7 @@
 		<result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
 		<result property="certCode" column="cert_code" jdbcType="VARCHAR"/>
 		<result property="certNo" column="cert_no" jdbcType="VARCHAR"/>
+		<result property="bka035Name" column="bka035Name" jdbcType="VARCHAR"/>
 		<result property="marryCode" column="marry_code" jdbcType="VARCHAR"/>
 		<result property="phone" column="phone" jdbcType="VARCHAR"/>
 		<result property="address" column="address" jdbcType="VARCHAR"/>
@@ -273,11 +274,13 @@
 		IFNULL((case v.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '-'),'/',
 		IFNULL(v.age,'-'),
 		IFNULL((case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
-		) AS keyword,v.resp_nurse_name
+		) AS keyword,v.resp_nurse_name,ifnull(iib.bka035_name,'-') as bka035Name
 		from inpt_visit v
 		left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		and (s.baby_id is null or s.baby_id ='')
 		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
+		left join insure_individual_visit iiv on iiv.hosp_code = v.hosp_code and iiv.visit_id = v.id
+		left join insure_individual_basic iib on iiv.hosp_code = iib.hosp_code and iib.id = iiv.mib_id
 		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and v.id = #{id}
@@ -339,12 +342,14 @@
 		IFNULL((case pt.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
 		IFNULL(pt.age,'-'),
 		IFNULL((case pt.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
-		) AS keyword,pt.resp_nurse_name
+		) AS keyword,pt.resp_nurse_name,ifnull(iib.bka035_name,'-') as bka035Name
 		from inpt_visit pt
 		join inpt_baby pb on pt.id = pb.visit_id and pb.is_cancel ='0'
 		left join inpt_settle s on s.hosp_code = pb.hosp_code and pb.visit_id = s.visit_id
 		and pb.id = s.baby_id and s.status_code = '0' and s.is_settle = '1'
 		left join base_bed b on b.hosp_code = pt.hosp_code and b.id = pt.bed_id
+		left join insure_individual_visit iiv on iiv.hosp_code = pt.hosp_code and iiv.visit_id = pt.id
+		left join insure_individual_basic iib on iiv.hosp_code = iib.hosp_code and iib.id = iiv.mib_id
 		where pt.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and pt.id = #{id}
@@ -2198,9 +2203,12 @@
 		'/',
 		IFNULL(v.age,'-'),
 		(case v.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' else '天' end)
-		) AS keyword
+		) AS keyword,
+		ifnull(iib.bka035_name,'-') as bka035Name
 		from inpt_visit v left join inpt_settle s on v.hosp_code = s.hosp_code and v.id = s.visit_id and s.status_code = '0' and s.is_settle = '1'
 		left join base_bed b on b.hosp_code = v.hosp_code and b.id = v.bed_id
+		left join insure_individual_visit iiv on iiv.hosp_code = v.hosp_code and iiv.visit_id = v.id
+		left join insure_individual_basic iib on iiv.hosp_code = iib.hosp_code and iib.id = iiv.mib_id
 		where v.hosp_code = #{hospCode}
 		<if test="id != null and id != ''">
 			and v.id = #{id}

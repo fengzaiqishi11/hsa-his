@@ -3902,9 +3902,16 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         ydzfMap.put("codeList", codeList);
         ydzfMap.put("hospCode", map.get("hospCode"));
         Map<String, SysParameterDTO> data = sysParameterService_consumer.getParameterByCodeList(ydzfMap).getData();
-        SysParameterDTO sysParameterDTO = MapUtils.get(data, "HAINAN_YDZF_FLAG");
-        SysParameterDTO sysParameterDTO2 = MapUtils.get(data, "HAINAN_CERTNO_VERIFY");
-        String values = sysParameterDTO2.getValue();
+        SysParameterDTO sysParameterDTO = new SysParameterDTO();
+        SysParameterDTO sysParameterDTO2 = new SysParameterDTO();
+        if(ObjectUtil.isNotEmpty(data)){
+            sysParameterDTO = MapUtils.get(data, "HAINAN_YDZF_FLAG");
+            sysParameterDTO2 = MapUtils.get(data, "HAINAN_CERTNO_VERIFY");
+        }
+        String values = "";
+        if(ObjectUtil.isNotEmpty(sysParameterDTO2)){
+            values = sysParameterDTO2.getValue();
+        }
         // 获得能够推送消息的身份证号
         String[] certnos = values.replace("{","").replace("}","").split(",");
         if (sysParameterDTO != null && IS_HAI_NAN.equals(sysParameterDTO.getValue())) {

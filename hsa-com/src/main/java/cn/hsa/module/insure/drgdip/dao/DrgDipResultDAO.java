@@ -111,4 +111,21 @@ public interface DrgDipResultDAO {
       * @return cn.hsa.module.drgdip.entity.DrgDipResultDO
       */
      int querySettle(DrgDipResultDTO result);
+
+     /**
+      * @Author 医保二部-张金平
+      * @Date 2022-07-04 15:34
+      * @Description 质控违规信息查询-病案首页
+      * @param drgDipResultDTO
+      * @return java.util.List<cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO>
+      */
+    List<DrgDipResultDTO> queryDrgDipNoRegulationsMris(DrgDipResultDTO drgDipResultDTO);
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-06 10:03
+     * @Description 质控违规信息查询-结算清单
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    List<DrgDipResultDTO> queryDrgDipNoRegulationSetlinfo(DrgDipResultDTO drgDipResultDTO);
 }

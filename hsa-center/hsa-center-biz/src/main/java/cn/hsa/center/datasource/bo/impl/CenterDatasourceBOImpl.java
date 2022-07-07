@@ -19,6 +19,8 @@ import cn.hsa.util.ListUtils;
 import cn.hsa.util.SnowflakeUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -48,6 +50,8 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
     private CenterHospitalDatasourceDAO centerHospitalDatasourceDAO;
 
     private final Pattern PATTERN = Pattern.compile(".+?(\\{.+?\\})");
+
+    private static final Logger log = LoggerFactory.getLogger(CenterDatasourceBOImpl.class);
 
     /**
      * @Menthod queryCenterHospitalDatasourceAll
@@ -352,7 +356,7 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
                     }
                 }
             }
-
+            log.error("this is not an error msg, just for debug, sql parsed is：{}",sql);
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.execute();
@@ -364,6 +368,7 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+            log.error("table struct or data synchronize occurred error,the detail is",e);
             throw new  AppException(centerDatasourceDTO.getName());
         }
         finally {

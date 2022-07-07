@@ -593,12 +593,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       throw new RuntimeException("请选择领药单据类型!");
     }
 
-    List<Map<String,Object>> advanceMapList = inptAdviceDAO.getMedicineAdvance(map);
-    // 校验是否可提前领药
-    if(!CollectionUtils.isEmpty(advanceMapList)){
-      throw new RuntimeException("该单据类型或全部药品类型已申请提前领取了"+days+"天内的药品了，不可重复操作！");
-    }
-
     Map parmMap = new HashMap();
     parmMap.put("hospCode", hospCode);
     parmMap.put("id", advanceType);

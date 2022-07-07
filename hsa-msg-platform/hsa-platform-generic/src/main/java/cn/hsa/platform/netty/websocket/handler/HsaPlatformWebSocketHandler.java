@@ -228,7 +228,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             });
             //关闭长连接
             ctx.close();
-            log.info("异常发生 " + cause.getMessage());
+            log.error("异常发生 " + cause.getMessage(),cause);
     }
 
     public static Map<String, Channel> getChannelMap() {

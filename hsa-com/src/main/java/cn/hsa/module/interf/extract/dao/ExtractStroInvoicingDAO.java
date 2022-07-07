@@ -2,6 +2,7 @@ package cn.hsa.module.interf.extract.dao;
 
 import cn.hsa.module.interf.extract.dto.ExtractDataDTO;
 import cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -50,5 +51,5 @@ public interface ExtractStroInvoicingDAO {
      * @Date 2022/7/7 9:06
      * @Param [extractConsumptionDetails]
      **/
-    void insertBatchToConsumption(List<ExtractConsumptionDetailDO> extractConsumptionDetails);
+    void insertBatchToConsumption(@Param("extractConsumptionDetails") List<ExtractConsumptionDetailDO> extractConsumptionDetails);
 }

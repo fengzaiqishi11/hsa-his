@@ -1,14 +1,15 @@
 package cn.hsa.module.stro;
 
+
 import cn.hsa.base.BaseController;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.extract.entity.ExtractDataDO;
 import cn.hsa.module.interf.extract.service.ExtractStroInvoicingService;
+
+import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/web/stro/extract")
 @Slf4j
-public class ExtractStroInvoicingController extends BaseController {
+public class ExtractStroInvoicingController {
     @Resource
     ExtractStroInvoicingService extractStroInvoicingService_consumer;
     /**
@@ -32,12 +33,10 @@ public class ExtractStroInvoicingController extends BaseController {
      * @Date 2022/7/7 9:19
      * @Param [request, response]
      **/
-    @PostMapping("/insertDataToExtractReport")
-    private WrapperResponse<Boolean> insertDataToExtractReport(@RequestBody ExtractDataDO extractDataDO,
-                                                               HttpServletRequest req,
-                                                               HttpServletResponse res){
+    @GetMapping("/insertDataToExtractReport/{hospCode}")
+    private WrapperResponse<Boolean> insertDataToExtractReport(@PathVariable String hospCode, HttpServletRequest req, HttpServletResponse res){
         Map map = new HashMap<>();
-        map.put("hospCode",extractDataDO.getHospCode());
+        map.put("hospCode","1000001");
         return extractStroInvoicingService_consumer.insertDataToExtractReport(map);
     }
 }

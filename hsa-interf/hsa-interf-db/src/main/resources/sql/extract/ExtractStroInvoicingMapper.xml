@@ -9,6 +9,7 @@
         <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
         <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
         <result property="consumeTime" column="consume_time" jdbcType="INTEGER"/>
+        <result property="extractDate" column="extract_date" jdbcType="TIMESTAMP"/>
         <result property="extractStatus" column="extract_status" jdbcType="VARCHAR"/>
     </resultMap>
     <!--消耗量表Map映射-->
@@ -41,7 +42,7 @@
     </resultMap>
 
     <select id="queryRecentlyExtractTime" resultType="java.util.Date">
-        select date(extract_time) from extract_data
+        select DATE_FORMAT(ifnull(extract_time,now()),'%Y-%m-%d') as extract_time from extract_data
         where hosp_code = #{hospCode} and extract_type = #{extractType} and extract_status = #{extractStatus}
         ORDER BY extract_time DESC LIMIT 1
     </select>
@@ -49,21 +50,21 @@
     <select id="queryStroInvoicingByComsume"
             resultMap="extractConsumptionDetailMap">
         select
-        id, hosp_code, summary_type, item_id, item_code, item_name,
+        hosp_code, summary_type, item_id, item_code, item_name,
         code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,
         consum_num,ifnull((sell_price_all/consum_num),0)  avg_sell_price , sell_price_all,
         ifnull((buy_price_all/consum_num),0)  as avg_buy_price, buy_price_all,
         ifnull((A.buy_price_all - A.sell_price_all),0)  as profit_price,
-        extract_type, extract_date,renewal_time, extract_id
+        extract_type, extract_time,renewal_time, extract_id
         from
         (
         select
         siv.hosp_code,/*医院编码*/
         /*汇总类型：1含盘点，2不含盘点*/
-        <if test="includeInc == '1'">
+        <if test='includeInc == "1".toString()'>
         '1' as summary_type,
         </if>
-        <if test="includeInc == '2'">
+        <if test='includeInc == "0".toString()'>
         '2' as summary_type,
         </if>
         siv.item_id as item_id,/*项目id*/
@@ -98,10 +99,10 @@
         where
         1 = 1
         and siv.hosp_code = #{hospCode}
-        <if test="includeInc == '1'">/*含盘点*/
+        <if test="includeInc == '1'.toString()">/*含盘点*/
             and siv.outin_code in ('7','8','23','25','27','28')
         </if>
-        <if test="includeInc == '2'">/*不含盘点*/
+        <if test="includeInc == '0'.toString()">/*不含盘点*/
             and siv.outin_code in ('8','23','25','27','28')
         </if>
         and date(siv.crte_time) = #{recentlyTime}
@@ -116,8 +117,8 @@
 
     <!--插入同步主表-->
     <insert id="insertExtractData">
-        insert into extract_data(id,hosp_code, extract_num, extract_time, extract_type, consume_time, extract_status)
-        values (#{id},#{hospCode}, #{extractNum}, #{extractTime}, #{extractType}, #{consumeTime}, #{extractStatus})
+        insert into extract_data(id,hosp_code, extract_num, extract_time, extract_type, consume_time, extract_status,extract_date)
+        values (#{id},#{hospCode}, #{extractNum}, #{extractTime}, #{extractType}, #{consumeTime}, #{extractStatus},#{extractDate})
     </insert>
 
     <!--插入extract_consumption_detail消耗表-->

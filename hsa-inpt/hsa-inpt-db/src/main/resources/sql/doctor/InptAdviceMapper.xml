@@ -1820,20 +1820,6 @@
         order by crte_time desc limit 5
     </select>
 
-    <!--获取科室当天该单据类型或全部药品单据类型，未取消的并且领药天数大于该提前领药天数的提前领药记录-->
-    <select id="getMedicineAdvance" resultType="map" parameterType="map">
-        select ima.* from
-        inpt_medicine_advance ima
-        left join base_order_receive bor on bor.hosp_code = ima.hosp_code
-        where
-            ima.hosp_code = #{hospCode}
-            and ima.dept_id = #{deptId}
-            and (ima.type_code = #{advanceType} or bor.is_all = '1')
-            and ima.sfpy != '2'
-            and ima.advance_days >= #{advanceDays}
-            and date_format(ima.crte_time,'%Y-%m-%d') = curdate()
-    </select>
-
     <!--修改提前领药记录-->
     <update id="updateMedicineAdvance" parameterType="map">
         update inpt_medicine_advance set sfpy =#{sfpy}

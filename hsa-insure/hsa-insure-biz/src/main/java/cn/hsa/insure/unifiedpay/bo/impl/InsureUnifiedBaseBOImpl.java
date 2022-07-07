@@ -966,7 +966,11 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         Map<String, Object> paramMap = new HashMap<>();
         dataMap.put("setl_id", insureSettleId);
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("mdtrt_id", dto.getMedicalRegNo());
+        if(ObjectUtil.isNotEmpty(dto)){
+            dataMap.put("mdtrt_id", dto.getMedicalRegNo());
+        }else{
+            dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        }
         paramMap.put("data", dataMap);
         paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
         map.put("msgName","结算信息查询");

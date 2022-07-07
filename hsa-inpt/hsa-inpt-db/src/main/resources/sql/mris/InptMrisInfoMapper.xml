@@ -871,9 +871,9 @@
      ROUND(IFNULL( c.hcl02,0),2) as D32,
      ROUND(IFNULL(c.hcl03,0),2) as D33,
      ROUND(IFNULL(c.fy06,0),2) as D34
-       from mris_base_info b LEFT JOIN mris_cost c on c.hosp_code= #{hospCode} and  b.visit_id = c.visit_id
+       from mris_base_info b JOIN mris_cost c on c.hosp_code= #{hospCode} and  b.visit_id = c.visit_id
        left join inpt_visit v on v.hosp_code=#{hospCode} and  b.visit_id = v.id
-       where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL
+       where b.hosp_code= #{hospCode} and b.in_profile IS NOT NULL and c.fy01 >0
        <if test="keyword != null and keyword !=''">
         and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
         or v.in_no LIKE CONCAT('%',#{keyword},'%') )

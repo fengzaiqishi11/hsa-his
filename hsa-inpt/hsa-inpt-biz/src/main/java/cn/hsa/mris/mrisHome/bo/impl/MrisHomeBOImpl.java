@@ -2195,6 +2195,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             mrisBaseInfoDTO.setNationalityName("中国");
         }
 
+        // 设置默认值 证件类型无值取身份证 01
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getCertCode())){
+            mrisBaseInfoDTO.setCertCode("01");
+        }
         // 身份证号码
         if ("01".equals(mrisBaseInfoDTO.getCertCode())) {
             mrisBaseInfoDTO.setIdCard(mrisBaseInfoDTO.getCertNo());

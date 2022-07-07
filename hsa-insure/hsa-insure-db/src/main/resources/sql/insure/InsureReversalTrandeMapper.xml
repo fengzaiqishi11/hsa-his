@@ -103,7 +103,8 @@
         e.insure_reg_code AS insureRegCode,
         e.visit_id as visitId,
         t.medicine_org_code as medicineOrgCode,
-        t.medical_reg_no as  medicalRegNo,
+        <!--t.medical_reg_no as  medicalRegNo,-->
+        e.medicalRegNo as  medicalRegNo,
         t.is_hospital as isHospital,
         t.medical_reg_no AS mdtrtId,
         e.insureSettleId AS setlId,

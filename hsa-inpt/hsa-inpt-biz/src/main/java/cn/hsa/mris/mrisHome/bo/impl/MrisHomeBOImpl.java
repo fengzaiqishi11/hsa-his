@@ -592,6 +592,14 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("sort"))){
+                        x.put("sort",Integer.valueOf((String)x.get("sort"))-1);
+                    }
+                });
+            }
             responseDataMap.put("quality", qualityInfoList);// 质控信息list
             /**==========返回参数封装 End ===========**/
         } catch (Exception e) {
@@ -770,6 +778,14 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             //自行计算盈亏额
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("sort"))){
+                        x.put("sort",Integer.valueOf((String)x.get("sort"))-1);
+                    }
+                });
             }
             responseDataMap.put("quality", qualityInfoList);// 质控信息
             //如果为空返回-
@@ -2675,6 +2691,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     private DrgDipResultDTO insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> baseInfoMap, Map<String, Object> groupInfo, List<Map<String, Object>> qualityInfo) {
         //冗余基本信息
         DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
+        drgDipResultDTO.setHospCode(MapUtils.get(dataMap, "hospCode"));
         drgDipResultDTO.setVisitId(MapUtils.get(dataMap, "visit_id"));
         drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "patient_no"));
         drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "att_doctor_id"));

@@ -1006,6 +1006,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("order"))){
+                        x.put("sort",Integer.valueOf((String)x.get("order"))-1);
+                    }
+                });
+            }
             responseDataMap.put("quality",qualityInfoList);// 质控信息
             /**==========返回参数封装 End ===========**/
         }catch (Exception e){
@@ -1029,6 +1037,45 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private List<Map<String, Object>> getInsureSettleOprtInfo(Map<String, Object> map) {
         List<Map<String, Object>> resultList = insureGetInfoDAO.selectMriOperInfoForDRGorDIP(map);
+        //病案首页没查到手术则查询结算清单手术
+        if(ListUtils.isEmpty(resultList)){
+            List<Map<String, Object>> resultList1 = new ArrayList<>();
+            // 手术操作信息
+            List<Map<String, Object>> oprnfoList = insureGetInfoDAO.selectOprninfoForMap(map);
+            if (!ListUtils.isEmpty(oprnfoList)){
+                oprnfoList.stream().forEach(x ->{
+                    Map<String,Object> resultMap = new HashMap<>();
+                    resultMap.put("visit_id",x.get("visitId"));// 就诊id
+                    resultMap.put("oprn_oprt_type",x.get("OprnOprtType"));// 手术操作类别
+                    resultMap.put("oprn_oprt_name",x.get("oprnOprtName"));// 手术操作名称
+                    resultMap.put("oprn_oprt_code",x.get("oprnOprtCode"));// 手术操作代码
+                    resultMap.put("anst_way",x.get("anstWay"));// 麻醉方式
+                    resultMap.put("oper_dr_code",x.get("operDrCode"));// 术者医师代码
+                    resultMap.put("oper_dr_name",x.get("operDrName"));// 术者医师姓名
+                    resultMap.put("anst_dr_code",x.get("anstDrCode"));// 麻醉医师代码
+                    resultMap.put("anst_dr_name",x.get("anstDrName"));// 麻醉医师姓名
+                    if(ObjectUtil.isNotEmpty(x.get("oprnOprtStartTime"))){
+                        resultMap.put("oprn_oprt_begntime",DateUtils.format((Date)x.get("oprnOprtStartTime"), DateUtils.Y_M_D));// 手术操作开始时间
+                    }
+                    if(ObjectUtil.isNotEmpty(x.get("oprnOprtEndTime"))){
+                        resultMap.put("oprn_oprt_endtime",DateUtils.format((Date) x.get("oprnOprtEndTime"), DateUtils.Y_M_D));// 手术操作结束时间
+                    }
+                    if(ObjectUtil.isNotEmpty(x.get("anstDrStartTime"))){
+                        resultMap.put("anst_begntime",DateUtils.format((Date) x.get("anstDrStartTime"), DateUtils.Y_M_D));// 麻醉开始时间
+                    }
+                    if(ObjectUtil.isNotEmpty(x.get("anstDrEndTime"))){
+                        resultMap.put("anst_endtime",DateUtils.format((Date) x.get("anstDrEndTime"), DateUtils.Y_M_D));// 麻醉结束时间
+                    }
+                    resultMap.put("oprt_date",x.get("oprtDate"));// 手术操作日期
+                    resultList1.add(resultMap);
+                });
+            }
+            resultList = resultList1;
+        }
+        //增加排序号
+        for(int i = 0 ;i < resultList.size(); i++){
+            resultList.get(i).put("sort_no",String.valueOf(i+1));
+        }
         return resultList;
     }
 
@@ -1066,6 +1113,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 resultMap.put("maindiag_flag",x.getIsMain());
                 resultList.add(resultMap);
             });
+        }
+        //增加排序号
+        for(int i = 0 ;i < resultList.size(); i++){
+            resultList.get(i).put("sort_no",String.valueOf(i+1));
         }
         return resultList;
     }
@@ -1306,6 +1357,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             //自行计算盈亏额
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("order"))){
+                        x.put("sort",Integer.valueOf((String)x.get("order"))-1);
+                    }
+                });
             }
             responseDataMap.put("quality",qualityInfoList);// 质控信息
             //如果为空返回-
@@ -2457,17 +2516,30 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
+        List<InptDiagnoseDTO> xiCollect2 = new ArrayList<>();
+        List<InptDiagnoseDTO> zxCollect2 = new ArrayList<>();
         if(ObjectUtil.isNotEmpty(xiCollect)){
             for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
                 if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
                     inptDiagnoseDTO.setIsMain("0");
                 }
             }
+            //主诊断排第一位
+            for(int i = 0;i < xiCollect.size(); i++){
+                if(Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())){
+                    xiCollect2.add(xiCollect.get(i));
+                    xiCollect.remove(i);
+                }
+            }
+            //根据id排序
             xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
                     xiCollect.stream().sorted((a, b) ->
                             (b.getId() == null ? "" : b.getId())
                                     .compareTo(a.getId()))
-                            .collect(Collectors.toList());// 质控信息集合
+                            .collect(Collectors.toList());
+            if(ObjectUtil.isNotEmpty(xiCollect1)){
+                xiCollect2.addAll(xiCollect1);
+            }
         }
         if(ObjectUtil.isNotEmpty(zxCollect)){
             for(InptDiagnoseDTO inptDiagnoseDTO:zxCollect){
@@ -2475,14 +2547,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     inptDiagnoseDTO.setIsMain("0");
                 }
             }
+            //主诊断排第一位
+            for(int i = 0;i < zxCollect.size(); i++){
+                if(Constant.UnifiedPay.ISMAN.S.equals(zxCollect.get(i).getIsMain())){
+                    zxCollect2.add(zxCollect.get(i));
+                    zxCollect.remove(i);
+                }
+            }
+            //根据id排序
             zxCollect1 = ListUtils.isEmpty(zxCollect) ? null :
                     zxCollect.stream().sorted((a, b) ->
                             (b.getId() == null ? "" : b.getId())
                                     .compareTo(a.getId()))
-                            .collect(Collectors.toList());// 质控信息集合
+                            .collect(Collectors.toList());
+            if(ObjectUtil.isNotEmpty(zxCollect1)){
+                zxCollect2.addAll(zxCollect1);
+            }
         }
-        diseaseMap.put("xiCollect",xiCollect1);
-        diseaseMap.put("zxCollect",zxCollect1);
+        diseaseMap.put("xiCollect",xiCollect2);
+        diseaseMap.put("zxCollect",zxCollect2);
         diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;
     }
@@ -3442,6 +3525,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         drgDipResultDTO.setCrtName(MapUtils.get(dataMap, "crteName"));
         drgDipResultDTO.setBusinessType(MapUtils.get(dataMap, "businessType"));
         drgDipResultDTO.setType(MapUtils.get(dataMap, "type"));
+        drgDipResultDTO.setHospCode(MapUtils.get(dataMap, "hospCode"));
         drgDipResultDTO.setMedType(insureIndividualVisitDTO.getAka130());
         drgDipResultDTO.setMedTypeName(insureIndividualVisitDTO.getAka130Name());
         drgDipResultDTO.setInptDiagnose(insureIndividualVisitDTO.getInDiseaseName());

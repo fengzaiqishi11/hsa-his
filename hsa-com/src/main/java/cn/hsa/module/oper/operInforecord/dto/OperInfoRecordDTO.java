@@ -124,7 +124,7 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     // 麻醉医师代码
     private String anstDrCode;
     // 手术操作类别
-    private String oprnOprtType;
+    private String OprnOprtType;
     private String anstWay; // 手术麻醉方式
     private String anstDrName; // 麻醉医师姓名
     private String operDrName; // 术者医师姓名
@@ -140,5 +140,11 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     //手术国家码
     private String operNationCode;
     private String operNationName;
+    private Long ansDrEndTime;
+    private Long ansDrStartTime;
+    private Long oprnOprtEndTime;
+    private Long oprnOprtStartTime;
+
+
 
 }

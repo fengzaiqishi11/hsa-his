@@ -1070,7 +1070,7 @@
 
     <select id="selectMriOperInfo" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
 
-        select '2'                            as oprn_oprt_type,
+        select '2'                            as OprnOprtType,
                moi.oper_disease_name          as oprnOprtName,
                moi.oper_disease_icd9,
                moi.oper_time                  as oprnOprtDate,
@@ -1079,6 +1079,15 @@
                 from sys_user su
                 where su.hosp_code = #{hospCode}
                   and oper_doctor_id = su.id) as oper_dr_code,
+                0 as ansDrEndTime,
+                0 as ansDrStartTime,
+               0 as oprnOprtEndTime,
+               0 as oprnOprtStartTime,
+               '' as id,
+               '' as insureSetllId,
+               '' as medicalRegNo,
+               '' as visitId,
+               '' as hospCode,
                moi.oper_doctor_name           as operDrName,
                (select prac_certi_no
                 from sys_user su

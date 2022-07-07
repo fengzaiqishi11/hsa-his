@@ -14,7 +14,13 @@ import java.util.List;
  */
 public interface Constants {
 
+    /**
+     * 抽取类型（CQLX）
+     */
+    class CQLX {
+        public static final String YFYKXH = "1"; // 药房药库消耗
 
+    }
 
     /**
      * 病人来源途径（LYTJ）

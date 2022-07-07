@@ -37,5 +37,8 @@
 
     <!--本地医养服务-->
     <dubbo:reference id="medicToCareService_consumer" interface="cn.hsa.module.outpt.medictocare.service.MedicToCareService" check="false" />
+    <!--同步进销存数据-->
+    <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false" retries="0"/>
+
 </beans>
 

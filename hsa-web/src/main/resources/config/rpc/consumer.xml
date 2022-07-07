@@ -536,5 +536,8 @@
        <!-- drg/dip质控业务日志-->
     <dubbo:reference interface="cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService" id="drgDipBusinessOptInfoLogService_consumer" check="false" retries="0"/>
     <dubbo:reference interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" id="drgDipResultService" check="false"/>
+    <!--数据抽取-->
+    <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false"/>
+
 </beans>
 

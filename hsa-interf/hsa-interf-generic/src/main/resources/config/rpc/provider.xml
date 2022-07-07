@@ -15,5 +15,7 @@
     <dubbo:service interface="cn.hsa.module.interf.report.service.StatisticalReportService" ref="statisticalReportService_provider"/>
     <!-- 中心端国家基础药品搜索服务 -->
     <dubbo:service interface="cn.hsa.module.interf.search.service.SearchableNationStandardDrugService" ref="searchableNationStandardDrugService_provider"/>
+    <!-- 数据抽取service -->
+    <dubbo:service interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" ref="extractStroInvoicingService_provider"/>
 
 </beans>

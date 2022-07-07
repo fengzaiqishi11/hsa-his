@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.extract.dao.ExtractStroInvoicingDAO">
+    <!--ExtractData：同步数据主表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractDataDO" id="extractDataMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="extractNum" column="extract_num" jdbcType="INTEGER"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="consumeTime" column="consume_time" jdbcType="INTEGER"/>
+        <result property="extractStatus" column="extract_status" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--消耗量表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO" id="extractConsumptionDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="summaryType" column="summary_type" jdbcType="VARCHAR"/>
+        <result property="statisticsOptions" column="statistics_options" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="consumNum" column="consum_num" jdbcType="VARCHAR"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="profitPrice" column="profit_price" jdbcType="VARCHAR"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="renewalTime" column="renewal_time" jdbcType="TIMESTAMP"/>
+        <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="queryRecentlyExtractTime" resultType="java.util.Date">
+        select date(extract_time) from extract_data
+        where hosp_code = #{hospCode} and extract_type = #{extractType} and extract_status = #{extractStatus}
+        ORDER BY extract_time DESC LIMIT 1
+    </select>
+
+    <select id="queryStroInvoicingByComsume"
+            resultMap="extractConsumptionDetailMap">
+        select
+        id, hosp_code, summary_type, item_id, item_code, item_name,
+        code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,
+        consum_num,ifnull((sell_price_all/consum_num),0)  avg_sell_price , sell_price_all,
+        ifnull((buy_price_all/consum_num),0)  as avg_buy_price, buy_price_all,
+        ifnull((A.buy_price_all - A.sell_price_all),0)  as profit_price,
+        extract_type, extract_date,renewal_time, extract_id
+        from
+        (
+        select
+        siv.hosp_code,/*医院编码*/
+        /*汇总类型：1含盘点，2不含盘点*/
+        <if test="includeInc == '1'">
+        '1' as summary_type,
+        </if>
+        <if test="includeInc == '2'">
+        '2' as summary_type,
+        </if>
+        siv.item_id as item_id,/*项目id*/
+        siv.item_code as item_code,/*项目类别*/
+        siv.item_name as item_name,/*项目名称*/
+        case siv.item_code when '1' then b.code when '2' then c.code end code,/*编码*/
+        case siv.item_code when '1' then b.big_type_code	when '2' then '3' end type_code,/*品种*/
+        case siv.item_code when '1' then b.spec when '2' then c.spec end spec,/*规格*/
+        max(siv.unit_code) as unit_code,/*项目单位*/
+        case siv.item_code when '1' then b.price when '2' then c.price end price,/*零售单价*/
+        siv.split_num as split_num,/*拆零数量*/
+        max(siv.split_unit_code) as split_unit_code,/*拆零单位*/
+        siv.biz_id,/*科室id*/
+        (select name from base_dept where id = siv.biz_id and hosp_code = siv.hosp_code) as biz_name,
+        sum(siv.num) as consum_num,/*消耗数量*/
+        sum(siv.num * siv.sell_price) as sell_price_all,/*零售总金额*/
+        sum(siv.num * siv.buy_price) buy_price_all,/*成本价*/
+        '1' as extract_type,/*1表示定时器自动同步*/
+        date(siv.crte_time) as extract_time,
+        now() as renewal_time,
+        #{extractId} as extract_id
+        from
+        stro_invoicing siv
+        left join base_drug b on
+        siv.item_id = b.id
+        and siv.hosp_code = b.hosp_code
+        and siv.item_code = '1'
+        left join base_material c on
+        siv.item_id = c.id
+        and siv.hosp_code = c.hosp_code
+        and siv.item_code = '2'
+        where
+        1 = 1
+        and siv.hosp_code = #{hospCode}
+        <if test="includeInc == '1'">/*含盘点*/
+            and siv.outin_code in ('7','8','23','25','27','28')
+        </if>
+        <if test="includeInc == '2'">/*不含盘点*/
+            and siv.outin_code in ('8','23','25','27','28')
+        </if>
+        and date(siv.crte_time) = #{recentlyTime}
+        group by
+        siv.item_id,
+        siv.item_name,
+        siv.biz_id,
+        siv.item_code,
+        date(siv.crte_time)
+        ) A where consum_num != 0
+    </select>
+
+    <!--插入同步主表-->
+    <insert id="insertExtractData">
+        insert into extract_data(id,hosp_code, extract_num, extract_time, extract_type, consume_time, extract_status)
+        values (#{id},#{hospCode}, #{extractNum}, #{extractTime}, #{extractType}, #{consumeTime}, #{extractStatus})
+    </insert>
+
+    <!--插入extract_consumption_detail消耗表-->
+    <insert id="insertBatchToConsumption">
+        insert into extract_consumption_detail(id,hosp_code, summary_type, statistics_options, item_id, item_code, item_name, code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id, consum_num, avg_sell_price, sell_price_all, avg_buy_price, buy_price_all, profit_price, extract_type, extract_time, renewal_time, extract_id)
+        values
+        <foreach collection="extractConsumptionDetails" item="entity" separator=",">
+            (#{entity.id},#{entity.hospCode}, #{entity.summaryType}, #{entity.statisticsOptions}, #{entity.itemId}, #{entity.itemCode}, #{entity.itemName}, #{entity.code}, #{entity.typeCode}, #{entity.spec}, #{entity.unitCode}, #{entity.price}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.bizId}, #{entity.consumNum}, #{entity.avgSellPrice}, #{entity.sellPriceAll}, #{entity.avgBuyPrice}, #{entity.buyPriceAll}, #{entity.profitPrice}, #{entity.extractType}, #{entity.extractTime}, #{entity.renewalTime}, #{entity.extractId})
+        </foreach>
+    </insert>
+
+</mapper>

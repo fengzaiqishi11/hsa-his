@@ -83,7 +83,7 @@ public class inptPrintController extends BaseController {
   * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
   **/
   @GetMapping(value = "/getApplyDetailsListPrint")
-  public WrapperResponse<Map> getApplyDetailsListPrint(String code,String flag,String id, HttpServletRequest req, HttpServletResponse res){
+  public WrapperResponse<Map> getApplyDetailsListPrint(String code,String flag,String id,String ids, HttpServletRequest req, HttpServletResponse res){
     SysUserDTO sysUserDTO = getSession(req, res);
     List<String> codeList = new ArrayList<>();
     codeList.add(code);
@@ -92,6 +92,7 @@ public class inptPrintController extends BaseController {
     map.put("hospCode", sysUserDTO.getHospCode());
     map.put("codeList", codeList);
     map.put("id", id);
+    map.put("ids", ids);
     map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
     WrapperResponse<Map> wrapperResponse = inptPrintService_consumer.getApplyDetailsListPrint(map);
     return wrapperResponse;

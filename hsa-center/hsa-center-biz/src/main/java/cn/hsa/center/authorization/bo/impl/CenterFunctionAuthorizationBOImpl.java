@@ -215,7 +215,7 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
         Map<String,Object> resultMap = new HashMap();
         resultMap.put("tableHead",tableHead);
-        resultMap.put("tableData",list);
+        resultMap.put("tableData",PageDTO.of(list));
 
 
 

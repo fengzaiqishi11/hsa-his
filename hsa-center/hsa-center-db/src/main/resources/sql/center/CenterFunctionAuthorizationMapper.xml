@@ -120,7 +120,7 @@
         ch.name,
         concat(ch.start_date,' ~ ',ch.end_date),
         ch.admin_name ,
-        ch.admin_phone ) aa
+        ch.admin_phone ) aa   order by ch.code desc
     </select>
 
 

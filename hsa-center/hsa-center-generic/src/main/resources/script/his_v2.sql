@@ -9713,6 +9713,38 @@ ALTER TABLE base_advice MODIFY COLUMN union_nation_code varchar(512);
 -- 表结构调整
 ALTER TABLE base_advice ADD union_nation_name varchar(512) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT '医嘱联合国家名称（医嘱明细中所有项目的国家名称拼接）';
 
+CREATE TABLE `settle_clock_match` (
+  `id` varchar(32) NOT NULL COMMENT '主键',
+  `hosp_code` varchar(32) DEFAULT NULL COMMENT '医院编码',
+  `platform_type` varchar(4) DEFAULT NULL COMMENT '平台类型（1：质控平台，后续会维护到码表）',
+  `platform_dictionary_name` varchar(32) DEFAULT NULL COMMENT '平台字典名称',
+  `platform_dictionary_code` varchar(32) DEFAULT NULL COMMENT '平台字典编码',
+  `platform_code_name` varchar(32) DEFAULT NULL COMMENT '平台代码名称',
+  `platform_code_value` varchar(32) DEFAULT NULL COMMENT '平台代码值',
+  `his_dictionary_name` varchar(32) DEFAULT NULL COMMENT 'his字典名称',
+  `his_dictionary_code` varchar(32) DEFAULT NULL COMMENT 'his字典编码',
+  `his_code_name` varchar(32) DEFAULT NULL COMMENT 'his代码名称',
+  `his_code_value` varchar(32) DEFAULT NULL COMMENT 'his代码值',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE base_advice  ADD COLUMN `oper_nation_name` varchar(32) NULL COMMENT '手术国家名称' ;
+ALTER TABLE tcm_mris_base_info add zyhljs_code VARCHAR(32) COMMENT '使用中医护理技术' DEFAULT null;
+ALTER TABLE inpt_medicine_advance_advice ADD this_exec_time date NULL COMMENT '本次领药的结束时间';
+ALTER TABLE inpt_medicine_advance_advice ADD last_exec_time date NULL COMMENT '上次医嘱的最后执行时间';
+ALTER TABLE inpt_advice_exec  ADD advance_id varchar(100) NULL COMMENT '提前领药ID（inpt_medicine_advance主键ID）';
+ALTER TABLE inpt_cost  ADD advance_id varchar(100) NULL COMMENT '提前领药ID（inpt_medicine_advance主键ID）';
+ALTER TABLE phar_in_wait_receive  ADD advance_id varchar(100) NULL COMMENT '提前领药ID（inpt_medicine_advance主键ID）';
+alter table insure_setl_info modify column spga_nurscare_days int(3) DEFAULT null COMMENT '特级护理天数';
+alter table insure_setl_info modify column lv1_nurscare_days int(3) DEFAULT null COMMENT '一级护理天数';
+alter table insure_setl_info modify column scd_nurscare_days int(3) DEFAULT null COMMENT '二级护理天数';
+alter table insure_setl_info modify column lv3_nursecare_days int(3) DEFAULT null COMMENT '三级护理天数';
+ALTER TABLE drg_dip_result ADD COLUMN `score_price` decimal(10,2) DEFAULT NULL COMMENT '分值单价';
+ALTER TABLE outpt_medical_record ADD menstrual_history varchar(500) DEFAULT null COMMENT '月经生育史';
+ALTER TABLE .outpt_medical_template ADD menstrual_history varchar(500) NULL COMMENT '月经生育史';
+alter table  base_finance_classify add index `idx_base_finance_classify_02` (`up_code`) USING BTREE;
+
+
 
 
 

@@ -271,6 +271,14 @@ public class ExtractStroInvoicingDetailDO extends PageDO implements Serializable
      */
     private Date extractTime;
 
+    /**
+     * 项目分类代码
+     */
+    private String itemType;
+    /**
+     * 项目分类代码名称
+     */
+    private String itemTypeName;
 
 }
 

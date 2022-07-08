@@ -19,6 +19,7 @@ public interface Constants {
      */
     class CQLX {
         public static final String YFYKXH = "1"; // 药房药库消耗
+        public static final String YFYKSSJXC = "2"; // 药房药库实时进销存
 
     }
 

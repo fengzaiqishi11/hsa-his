@@ -2,6 +2,7 @@ package cn.hsa.module.interf.extract.dao;
 
 import cn.hsa.module.interf.extract.dto.ExtractDataDTO;
 import cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO;
+import cn.hsa.module.interf.extract.entity.ExtractStroInvoicingDetailDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -52,4 +53,18 @@ public interface ExtractStroInvoicingDAO {
      * @Param [extractConsumptionDetails]
      **/
     void insertBatchToConsumption(@Param("extractConsumptionDetails") List<ExtractConsumptionDetailDO> extractConsumptionDetails);
+    /**
+     * @Author gory
+     * @Description 查询实时进销存数据
+     * @Date 2022/7/8 9:53
+     * @Param [requestMapIncludeIncMap]
+     **/
+    List<ExtractStroInvoicingDetailDO> queryStroInvoicingByInvoic(Map<String, Object> requestMapIncludeIncMap);
+    /**
+     * @Author gory
+     * @Description 批量插入药房药库实时进销存
+     * @Date 2022/7/8 11:48
+     * @Param [stroInvoicingDetails]
+     **/
+    void insertBatchStroInvoic(@Param("list") List<ExtractStroInvoicingDetailDO> stroInvoicingDetails);
 }

@@ -45,5 +45,5 @@ public interface CenterFunctionAuthorizationDAO {
 
   List<Map<String, Object>> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-  List<Map<String, Object>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+  List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 }

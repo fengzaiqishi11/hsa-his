@@ -655,12 +655,12 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationsMris(drgDipResultDTO);
-        /*for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
             //性别转义
             String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
             //拼接信息
             drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
-        }*/
+        }
         return PageDTO.of(drgDipResultDTOList);
     }
     /**
@@ -741,6 +741,12 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         //分页参数
         PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationSetlinfo(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
         return PageDTO.of(drgDipResultDTOList);
     }
     /**

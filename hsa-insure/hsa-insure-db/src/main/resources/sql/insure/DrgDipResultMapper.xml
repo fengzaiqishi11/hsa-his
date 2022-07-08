@@ -833,6 +833,8 @@
         ddr.id,
         ddr.visit_id,
         ddr.dept_name ,
+        ddr.gend,
+        ddr.age,
         ddr.dept_id,
         ddr.doctor_id,
         ddr.doctor_name ,
@@ -840,15 +842,15 @@
         ddrd.check_filed,
         ddrd.result_msg ,
         ddr.psn_name ,
-        ddr.visit_no ,
+        iv.in_no as visitNo ,
         mbi.in_profile as medcasno ,
-        ddr.icd10 as inptDiagnose ,
+        iv.in_disease_name as icd10 ,
         ddr.total_fee ,
         ddr.in_time ,
         ddr.out_time,
         ddr.states,
         ddr.group_result,
-        mbi.is_upload_insure
+        mbi.is_upload_insure as isUplod
         from drg_dip_result_detail ddrd
         left join drg_dip_result ddr on
         ddrd.result_id = ddr.id
@@ -923,6 +925,8 @@
         ddr.id,
         ddr.visit_id,
         ddr.dept_name ,
+        ddr.gend,
+        ddr.age,
         ddr.dept_id,
         ddr.doctor_id,
         ddr.doctor_name ,
@@ -930,14 +934,18 @@
         ddrd.check_filed,
         ddrd.result_msg ,
         ddr.psn_name ,
-        ddr.visit_no ,
-        ddr.icd10 as inptDiagnose ,
+        iv.in_no as visitNo ,
+        iv.in_disease_name as icd10 ,
         ddr.total_fee ,
         ddr.in_time ,
         ddr.out_time,
         ddr.states,
         ddr.group_result,
+        iiv.is_hospital,
         isi.medcasno,
+        if(isi.settle_no is null,
+        '0',
+        '1') as isUplod,
         DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
         from drg_dip_result_detail ddrd
         left join drg_dip_result ddr on
@@ -947,6 +955,7 @@
         left join insure_individual_settle iis on
         iis.insureSettleId = isi.insure_settle_id
         left join inpt_visit iv on isi.visit_id =iv.id
+        left join insure_individual_visit iiv on iiv.visit_id=iv.id
         where ddr.business_type='1'
         <if test="type != null and type != '' ">
             and ddr.`type` =#{type}
@@ -991,6 +1000,12 @@
             and ddrd.rule_level in
             <foreach collection="level" item="level1" separator="," open="(" close=")">
                 #{level1}
+            </foreach>
+        </if>
+        <if test="isHospitals != null and isHospitals.size()>0 ">
+            and iiv.is_hospital in
+            <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                #{isHospital}
             </foreach>
         </if>
 

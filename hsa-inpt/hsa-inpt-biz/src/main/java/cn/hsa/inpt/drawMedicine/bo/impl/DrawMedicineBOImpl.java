@@ -735,6 +735,11 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     return true;
   }
 
+  @Override
+  public List<Map<String, Object>> queryAllVisit(Map<String, Object> map) {
+    return  pharInWaitReceiveService_consumer.queryAllVisit(map).getData();
+  }
+
   //领药申请详情汇总
   public List<PharInWaitReceiveDTO> getSummary(List<PharInWaitReceiveDTO> inWaitReceiveList) {
     if (ListUtils.isEmpty(inWaitReceiveList)) {
@@ -763,6 +768,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
 
   public List<PharInWaitReceiveDTO> getPharInWaitReceiveDTOS(Map map, String hospCode, List<String> codeList) {
     String id = MapUtils.get(map, "id");
+    String ids = MapUtils.get(map, "ids");
+
     Map baseOrderReceiveMap = new HashMap();
     BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
     baseOrderReceiveDTO.setHospCode(hospCode);
@@ -788,7 +795,13 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
         pharInWaitReceiveDTO.setIsLong(pharInWaitReceiveDTO1.getIsLong());
       }
       pharInWaitReceiveDTO.setIsAdvance(pharInWaitReceiveDTO1.getIsAdvance());
+      pharInWaitReceiveDTO.setIds(pharInWaitReceiveDTO1.getIds());
     }
+
+    if(!StringUtils.isEmpty(ids)){
+      pharInWaitReceiveDTO.setIds(Arrays.asList(ids.split(",")));
+    }
+
     queryWaitReceiveMap.put("hospCode", hospCode);
     queryWaitReceiveMap.put("pharInWaitReceiveDTO", pharInWaitReceiveDTO);
     //查询所有待领药品
@@ -804,6 +817,12 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     pharInWaitReceiveDTOisBack.setHospCode(hospCode);
     pharInWaitReceiveDTOisBack.setDeptId(MapUtils.get(map, "deptId"));
     pharInWaitReceiveDTOisBack.setIsBack("1");
+    if (pharInWaitReceiveDTO1 != null){
+      pharInWaitReceiveDTOisBack.setIds(pharInWaitReceiveDTO1.getIds());
+    }
+    if(!StringUtils.isEmpty(ids)){
+      pharInWaitReceiveDTOisBack.setIds(Arrays.asList(ids.split(",")));
+    }
     queryWaitReceiveMapIsBack.put("hospCode", hospCode);
     queryWaitReceiveMapIsBack.put("pharInWaitReceiveDTO", pharInWaitReceiveDTOisBack);
     //查询所有待领药品

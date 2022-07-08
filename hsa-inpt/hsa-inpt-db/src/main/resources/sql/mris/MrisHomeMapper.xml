@@ -127,7 +127,7 @@
                    contact_post_code, contact_address, now_prov, now_prov_name, now_city, now_city_name,
                    now_area, now_area_name, now_post_code, native_prov, native_prov_name, native_city,
                    native_city_name, native_area, native_area_name, native_post_code, in_cnt, in_time,
-                   in_dept_id, in_bed_id, in_bed_name, out_time,
+                   in_dept_id, in_bed_id, in_bed_name, out_time,out_dept_id,
                    out_bed_id, out_bed_name, in_days, icd_version, disease_icd10, disease_icd10_name,
                    bl_icd10, bl_icd10_name, director_id1, director_name1, director_id2, director_name2,
                    zz_doctor_id, zz_doctor_name, zg_doctor_id, zg_doctor_name, zr_nurse_id, zr_nurse_name,

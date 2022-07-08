@@ -663,6 +663,12 @@
         <if test="isAdvance != null and isAdvance != ''" >
           and a.advance_id is not null and a.advance_id != ''
         </if>
+        <if test="ids != null and ids.size()>0" >
+            and  a.visit_id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <!--批量修改发药状态-->
@@ -725,6 +731,22 @@
             AND e.dist_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
         </if>
         order by e.crte_time desc
+    </select>
+    
+    
+    <select id="queryAllVisit"  resultType="java.util.Map">
+        select
+            distinct
+            a.id as value ,
+	        a.name as label
+        from
+            inpt_visit a,
+            phar_in_wait_receive b
+        where
+            a.status_code = '2'
+          and a.id = b.visit_id
+          and a.hosp_code  = b.hosp_code
+          and b.dept_id  = #{deptId}
     </select>
 
 </mapper>

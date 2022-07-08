@@ -30,19 +30,3 @@ spring:
       auto:
         offset:
           reset: earliest
-dubbo:
-  registry:
-    address: nacos://127.0.0.1:8848
-  consumer:
-    timeout: 60000
-  application:
-    name: hsa-inpt
-  protocol:
-    name: dubbo
-    port: 29005
-  provider:
-    threads: 1000
-security:
-  oauth2:
-    client:
-      permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**

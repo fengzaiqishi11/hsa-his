@@ -372,22 +372,22 @@
             <if test="name != null">
                 name = #{name},
             </if>
-            <if test="inptBeforeDay != null">
+            <if test="inptBeforeDay != null and inptBeforeDay!=''">
                 inpt_before_day = #{inptBeforeDay},
             </if>
-            <if test="inptBeforehour != null">
+            <if test="inptBeforehour != null and inptBeforehour!=''">
                 inpt_before_hour = #{inptBeforehour},
             </if>
-            <if test="inptBeforeMinute != null">
+            <if test="inptBeforeMinute != null and inptBeforeMinute!=''">
                 inpt_before_minute = #{inptBeforeMinute},
             </if>
-            <if test="inptLastDay != null">
+            <if test="inptLastDay != null and inptLastDay!=''">
                 inpt_last_day = #{inptLastDay},
             </if>
-            <if test="inptLastHour != null">
+            <if test="inptLastHour != null and inptLastHour!=''">
                 inpt_last_hour = #{inptLastHour},
             </if>
-            <if test="inptLastMinute != null">
+            <if test="inptLastMinute != null and inptLastMinute!=''">
                 inpt_last_minute = #{inptLastMinute},
             </if>
             <if test="genderCode != null">
@@ -645,13 +645,13 @@
             <if test="allergyList != null">
                 allergy_list = #{allergyList},
             </if>
-            <if test="outModeCode != null">
+            <if test="outModeCode != null and outModeCode!=''">
                 out_mode_code = #{outModeCode},
             </if>
-            <if test="outModeName != null">
+            <if test="outModeName != null and outModeName!=''">
                 out_mode_name = #{outModeName},
             </if>
-            <if test="turnOrgName != null">
+            <if test="turnOrgName != null and turnOrgName!=''">
                 turn_org_name = #{turnOrgName},
             </if>
             <if test="inSituationCode != null">

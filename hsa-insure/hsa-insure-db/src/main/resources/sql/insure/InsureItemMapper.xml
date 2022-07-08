@@ -135,4 +135,20 @@
           and insure_reg_code = #{insureRegCode}
           and down_load_type = #{downLoadType}
     </delete>
+
+    <select id="selectLastPageList" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO" parameterType="map">
+        select id, hosp_code, insure_reg_code, item_mark, item_code, item_name, item_type, item_dosage, item_spec, item_price, item_unit_code, prod, deductible, check_price, directory, take_date, lose_date, pym, wbm, is_valid, crte_id, crte_name, crte_time, ver, ver_name,
+               down_load_type, sp_drug_flag, sp_lmtpric_drug_flag, lmt_user_flag,hosp_item_name,hosp_item_code,num,size,record_counts
+        from insure_item where hosp_code =#{hospCode} and down_load_type =#{downLoadType} and insure_reg_code like concat (#{subRegCode},'%') and num=#{lastPage}
+                           and ver_name is not null
+        order by crte_time desc
+    </select>
+    <delete id="deleteLastPage">
+        delete from insure_item where
+        hosp_code =#{hospCode} and  down_load_type =#{downLoadType} and insure_reg_code like concat (#{subRegCode},'%')
+        and id in
+        <foreach collection="ids" open="(" close=")" separator="," item="item">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

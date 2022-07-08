@@ -80,6 +80,9 @@
             <if test="code!=null and code!=''">
                 and a.c_code=#{code}
             </if>
+            <if test="value!=null and value!=''">
+                and a.value=#{value}
+            </if>
             <if test="isEnd!=null and isEnd!=''">
                 and ((a.is_end is null) or (a.is_end is not null and a.is_end != '1'))
             </if>

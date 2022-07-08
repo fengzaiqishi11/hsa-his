@@ -14,10 +14,7 @@ import cn.hsa.util.ServletUtils;
 import cn.hsa.util.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -138,7 +135,7 @@ public class CenterInsureAuthorizationController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
      **/
     @GetMapping("/queryPage")
-    public WrapperResponse<PageDTO> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+    public WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
         return centerFunctionAuthorizationService.queryPage(centerFunctionAuthorizationDto);
     }
 
@@ -166,8 +163,23 @@ public class CenterInsureAuthorizationController {
      * @Date   2022/06/28 16:30
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
      **/
-    @GetMapping("/updateAuthorizationAudit")
-    public WrapperResponse<Boolean> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+    @PostMapping("/updateAuthorizationAudit")
+    public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
         return centerFunctionAuthorizationService.updateAuthorizationAudit(centerFunctionAuthorizationDto);
+    }
+
+
+    /**
+     * @Menthod save()
+     * @Desrciption   保存
+     * @Param
+     * 1. [centerFunctionAuthorizationDO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<CenterFunctionAuthorizationDO>
+     **/
+    @PostMapping("/save")
+    public WrapperResponse<CenterFunctionAuthorizationDto> save(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.saveBizAuthorization(centerFunctionAuthorizationDto);
     }
 }

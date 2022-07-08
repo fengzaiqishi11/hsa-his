@@ -43,10 +43,11 @@ public interface CenterFunctionAuthorizationBO {
 
     Map<String,Object> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    PageDTO queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     Boolean updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    Boolean updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    CenterFunctionAuthorizationDto updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
+    CenterFunctionAuthorizationDto saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 };

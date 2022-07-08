@@ -312,6 +312,9 @@ public interface InsureUnifiedBaseBO {
 
     Map<String,Object> querySettleDeInfo(Map<String, Object> map);
 
+
+    Map<String,Object> querySettleDeInfoBySettleId(Map<String, Object> map);
+
     /**
      * @Method queryPolicyInfo
      * @Desrciption  政策项查询

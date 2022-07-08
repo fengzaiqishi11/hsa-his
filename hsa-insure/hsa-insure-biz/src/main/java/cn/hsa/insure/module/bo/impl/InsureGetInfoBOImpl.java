@@ -654,6 +654,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> bldInfoMapList = MapUtils.get(map, "bldinfo");
         bldInfoMapList = insertCommonSettleInfo(map, bldInfoMapList);
         if (!ListUtils.isEmpty(bldInfoMapList)) {
+            bldInfoMapList.stream().forEach(x ->{
+                deleteConstantBar(x);
+            });
             insureGetInfoDAO.deleteBldInfo(map);
             insureGetInfoDAO.insertBldInfo(bldInfoMapList);
         }
@@ -1619,6 +1622,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         String isHospital = MapUtils.get(map, "isHospital");
         if (MapUtils.isEmpty(setlInfoMap)) {
             throw new AppException("清单结算信息节点数据为空");
+        }
+        //去除空字符串
+        deleteConstantBar(setlInfoMap);
+        //医保机构处理
+        if(MapUtils.get(setlInfoMap, "hsorg") == null){
+            setlInfoMap.put("hsorg","");
         }
         setlInfoMap.put("id", SnowflakeUtils.getId());
         setlInfoMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -3576,5 +3585,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultMap.put("drgDipResultDetailDTOList",drgDipResultDetailDTOList);
         DrgDipResultDTO drgDipResultDTO1 = drgDipResultService.insertDrgDipResult(resultMap).getData();
         return drgDipResultDTO1;
+    }
+
+    //保存去除空字符串
+    private Map<String, Object> deleteConstantBar(Map<String, Object> dataMap){
+        for (String key : dataMap.keySet()) {
+            if ("".equals(MapUtils.get(dataMap, key))) {
+                dataMap.put(key, null);
+            }
+        }
+        return dataMap;
     }
 }

@@ -597,7 +597,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         medisnInfMap.put("hospName", hospName);
         medisnInfMap.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
         // 获取医保结算信息  调用医保接口
-        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfoBySettleId(map).getData();
         Map<String, Object> setlInfoMap = MapUtils.get(data, "setlinfo"); // 结算信息明细
         List<Map<String, Object>> setldetail = MapUtils.get(data, "setldetail"); // 基金分项信息
 

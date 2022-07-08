@@ -16,6 +16,7 @@ import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dao.*;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureIndividualBasicService;
+import cn.hsa.module.insure.module.service.InsureIndividualSettleService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayRestService;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -96,7 +97,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
     @Resource
     private RedisUtils redisUtils;
-
+    @Resource
+    private InsureIndividualSettleService insureIndividualSettleService;
     @Resource
     private Transpond transpond;
 
@@ -939,6 +941,49 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         return resultDataMap;
     }
 
+    /**
+     * @Method querySettleDeInfo
+     * @Desrciption 结算信息查询
+     * @Param
+     * @Author caoliang
+     * @Date 2021/7/19 19:00
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> querySettleDeInfoBySettleId(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        String insureSettleId = MapUtils.get(map, "insureSettleId");
+        if(StringUtils.isEmpty(insureSettleId)){
+            throw new AppException("医保结算id参数为空");
+        }
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        InsureIndividualSettleDTO insureSettleInfoDTO = new InsureIndividualSettleDTO();
+        insureSettleInfoDTO.setHospCode(hospCode);
+        insureSettleInfoDTO.setInsureSettleId(insureSettleId);
+        map.put("insureSettleInfoDTO",insureSettleInfoDTO);
+        InsureIndividualSettleDTO dto = insureIndividualSettleDAO.selectInsureSettInfo(insureSettleInfoDTO);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("setl_id", insureSettleId);
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        if(ObjectUtil.isNotEmpty(dto)){
+            dataMap.put("mdtrt_id", dto.getMedicalRegNo());
+        }else{
+            dataMap.put("mdtrt_id", insureIndividualVisitDTO.getMedicalRegNo());
+        }
+        paramMap.put("data", dataMap);
+        paramMap.put("insuplcAdmdvs",insureIndividualVisitDTO.getInsuplcAdmdvs());
+        map.put("msgName","结算信息查询");
+        map.put("visitId",insureIndividualVisitDTO.getVisitId());
+        map.put("isHospital",insureIndividualVisitDTO.getIsHospital());
+        Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureIndividualVisitDTO.getInsureOrgCode(), Constant.UnifiedPay.REGISTER.UP_5203, paramMap,map);
+        List<Map<String, Object>> setldetail = MapUtils.get(MapUtils.get(resultMap, "output"), "setldetail");
+        Map<String, Object> setlinfo = MapUtils.get(MapUtils.get(resultMap, "output"), "setlinfo");
+        Map<String, Object> resultDataMap = new HashMap<>();
+        resultDataMap.put("setldetail", setldetail);
+        resultDataMap.put("setlinfo", setlinfo);
+        return resultDataMap;
+    }
 
     /**
      * @Method querySpecialUserDrug

@@ -127,7 +127,7 @@
                    contact_post_code, contact_address, now_prov, now_prov_name, now_city, now_city_name,
                    now_area, now_area_name, now_post_code, native_prov, native_prov_name, native_city,
                    native_city_name, native_area, native_area_name, native_post_code, in_cnt, in_time,
-                   in_dept_id, in_dept_name, in_bed_id, in_bed_name, out_time, out_dept_id, out_dept_name,
+                   in_dept_id, in_bed_id, in_bed_name, out_time,
                    out_bed_id, out_bed_name, in_days, icd_version, disease_icd10, disease_icd10_name,
                    bl_icd10, bl_icd10_name, director_id1, director_name1, director_id2, director_name2,
                    zz_doctor_id, zz_doctor_name, zg_doctor_id, zg_doctor_name, zr_nurse_id, zr_nurse_name,
@@ -150,6 +150,8 @@
                    (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.director_id1) as  deptdrtCode,
                    (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zz_doctor_id) as  atddrCode,
                   (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zr_nurse_id) as  respNursCode,
+                  (SELECT name FROM base_dept t WHERE id = mbi.out_dept_id) as  out_dept_name,
+                  (SELECT name FROM base_dept t WHERE id = mbi.in_dept_id) as  in_dept_name,
      (select prac_certi_no from sys_user su where su.hosp_code = mbi.hosp_code and su.id = mbi.zg_doctor_id) as  iptDrCode
             FROM mris_base_info mbi left join insure_individual_visit iiv
                 on mbi.visit_id = iiv.visit_id and mbi.hosp_code = iiv.hosp_code

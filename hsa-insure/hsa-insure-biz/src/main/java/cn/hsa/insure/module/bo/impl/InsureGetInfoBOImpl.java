@@ -653,6 +653,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private void insertBldInfo(Map<String, Object> map) {
         List<Map<String, Object>> bldInfoMapList = MapUtils.get(map, "bldinfo");
         bldInfoMapList = insertCommonSettleInfo(map, bldInfoMapList);
+        insureGetInfoDAO.deleteBldInfo(map);
         if (!ListUtils.isEmpty(bldInfoMapList)) {
             bldInfoMapList.stream().forEach(x ->{
                 deleteConstantBar(x);
@@ -1009,6 +1010,30 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
+            //自行计算标杆费用
+            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
+            }
+            //计算预计基金支付
+            Map<String,Object> priceMap = new HashMap<>();
+            priceMap.put("hospCode",MapUtils.get(map, "hospCode"));
+            priceMap.put("visitId",MapUtils.get(map, "visitId"));
+            priceMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
+            PayInfoDTO payInfoDTO = insureGetInfoDAO.queryInsureSettlePrice(priceMap);
+            if(payInfoDTO == null){
+                responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+            }else{
+                BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                //如果小于0当做0处理
+                if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                    estimateFund = BigDecimal.ZERO;
+                }
+                responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+            }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){
                 qualityInfoList.stream().forEach(x ->{
@@ -1361,6 +1386,30 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
+            //自行计算标杆费用
+            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
+            }
+            //计算预计基金支付
+            Map<String,Object> priceMap = new HashMap<>();
+            priceMap.put("hospCode",MapUtils.get(map, "hospCode"));
+            priceMap.put("visitId",MapUtils.get(map, "visitId"));
+            priceMap.put("insureSettleId",MapUtils.get(map, "insureSettleId"));
+            PayInfoDTO payInfoDTO = insureGetInfoDAO.queryInsureSettlePrice(priceMap);
+            if(payInfoDTO == null){
+                responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+            }else{
+                BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                //如果小于0当做0处理
+                if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                    estimateFund = BigDecimal.ZERO;
+                }
+                responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+            }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){
                 qualityInfoList.stream().forEach(x ->{
@@ -1484,6 +1533,32 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("fixmedinsName", infoDTO.getFixmedinsName()); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", infoDTO.getFixmedinsCode()); // 定点医药机构编号
         setlinfo.put("hiSetlLv", infoDTO.getHiSetlLv());//医保结算等级
+        //如果之前没保存从参数获取医保结算等级
+        if(StringUtils.isNotEmpty(infoDTO.getHiSetlLv())){
+            SysParameterDTO data = insureGetInfoDAO.getParameterByCode(MapUtils.get(map, "hospCode"),"SETTLELEVEL");
+            if (data == null) {
+                throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
+            }
+            String value = data.getValue();
+            String settleLv = "";
+            Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
+            for (String key : stringObjectMap.keySet()) {
+                if ("settleLv".equals(key)) { //
+                    settleLv = MapUtils.get(stringObjectMap, key);
+                }
+            }
+            Map dictMap = new HashMap(2);
+            dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
+            dictMap.put("insureRegCode", infoDTO.getInsuplc());
+            dictMap.put("code", "HI_SETL_LV");
+            Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
+            for(String key:dictMap1.keySet()){
+                if(dictMap1.get(key).equals(settleLv)){
+                    settleLv = key;
+                }
+            }
+            setlinfo.put("hiSetlLv", settleLv);//医保结算等级
+        }
         setlinfo.put("psnNo", infoDTO.getHiNo()); // 医保编号
         setlinfo.put("hiNo", infoDTO.getHiNo()); //医保编号
         setlinfo.put("iptMedType", infoDTO.getIptMedType());  // 住院业务类型
@@ -1879,6 +1954,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     private void insertOpspdiseinfo(Map<String, Object> map) {
         List<Map<String, Object>> opspdiseinfoList = MapUtils.get(map, "opspdiseinfo");
         opspdiseinfoList = opspdiseinfoList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "diagCode"))).collect(Collectors.toList());
+        insureGetInfoDAO.deleteOpspdiseinfo(map);
         List<Map<String, Object>> mapList = insertCommonSettleInfo(map, opspdiseinfoList);
         if (!ListUtils.isEmpty(mapList)) {
             insureGetInfoDAO.deleteOpspdiseinfo(map);
@@ -2652,6 +2728,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> icuinfoList = MapUtils.get(map, "icuinfo");
         if (!ListUtils.isEmpty(icuinfoList)) {
             icuinfoList = icuinfoList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "scsCutdWardType"))).collect(Collectors.toList());
+            insureGetInfoDAO.deleteIcuInfo(map);
             icuinfoList.stream().forEach(item -> {
                 Object scsCutdInpoolTime = MapUtils.get(item, "scsCutdInpoolTime");
                 if (scsCutdInpoolTime != null) {
@@ -2708,6 +2785,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> opernInfoList = MapUtils.get(map, "oprninfo");
         if (!ListUtils.isEmpty(opernInfoList)) {
             opernInfoList = opernInfoList.stream().filter(item -> StringUtils.isNotEmpty(MapUtils.get(item, "oprnOprtCode"))).collect(Collectors.toList());
+            insureGetInfoDAO.deleteOperInfo(map);
             if (!ListUtils.isEmpty(opernInfoList)) {
                 opernInfoList.get(0).put("oprnOprtType", "1");
                 opernInfoList.stream().forEach(item -> {

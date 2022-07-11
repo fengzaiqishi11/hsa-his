@@ -836,5 +836,14 @@ public interface InsureGetInfoDAO {
 
     List<Map<String, Object>> selectXyDisease(Map<String, Object> map);
 
-    SysParameterDTO getParameterByCode(@PathVariable("hospCode") String hospCode, @PathVariable("code") String code);
+    SysParameterDTO getParameterByCode(@Param("hospCode") String hospCode, @Param("code") String code);
+
+    /**
+     * @Author gory
+     * @Description 查询医保结算信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    PayInfoDTO queryInsureSettlePrice(Map<String, Object> map);
+
 }

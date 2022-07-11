@@ -34,6 +34,10 @@ public class PayInfoDTO implements Serializable {
 
     private BigDecimal personalPrice; // 个人账户支付
 
+    private BigDecimal personPrice; // 个人支付
+
+    private BigDecimal restsPrice; // 其他支付
+
     private String settleId;
 
     private String insureSettleId;

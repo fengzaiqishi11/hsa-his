@@ -1007,11 +1007,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
             //自行计算标杆费用
-            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
                 responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
             }
             //计算预计基金支付
@@ -1383,11 +1383,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             responseDataMap.put("proConsumStand",groupInfoMap.get("pro_consum"));// 耗材比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
             //自行计算标杆费用
-            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
                 responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
             }
             //计算预计基金支付
@@ -2517,7 +2517,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      **/
     private List<OperInfoRecordDTO> handerOperInfo(Map<String, Object> map) {
         List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
-        infoRecordDTOList = insureGetInfoDAO.selectMriOperInfo(map);
+        //先查询是否有从医嘱开的手术
+        infoRecordDTOList = insureGetInfoDAO.selectMriOperInfoAdvice(map);
+        //再查询病案手术
+        infoRecordDTOList.addAll(insureGetInfoDAO.selectMriOperInfo(map));
         //西医病案首页手术信息没取到则取中医病案首页
         if (ObjectUtil.isEmpty(infoRecordDTOList)) {
             infoRecordDTOList = insureGetInfoDAO.selectTcmMriOperInfo(map);

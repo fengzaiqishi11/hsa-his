@@ -53,6 +53,8 @@ public class DoctorAdviceExecuteController extends BaseController {
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("inptAdviceExecDTO", inptAdviceExecDTO);
 
+        System.out.println(inptAdviceExecDTO.getColumnName());
+
         WrapperResponse<PageDTO> pageDTOWrapperResponse = doctorAdviceExecuteService_consumer.queryDoctorAdviceExecuteInfo(map);
         return pageDTOWrapperResponse;
     }

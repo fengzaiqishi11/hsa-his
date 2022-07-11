@@ -12,9 +12,7 @@ import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
 import cn.hsa.module.center.code.bo.CenterCodeBO;
 import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
-import cn.hsa.util.Constants;
-import cn.hsa.util.DateUtils;
-import cn.hsa.util.ListUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author luonianxin
@@ -154,6 +149,7 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
         CenterCodeDetailDTO centerCodeDetailDTO = new CenterCodeDetailDTO();
         centerCodeDetailDTO.setCode("QXDJ");
+        centerCodeDetailDTO.setValue(centerFunctionAuthorizationDto.getOrderTypeCode());
         centerCodeDetailDTO.setPageNo(0);
         centerCodeDetailDTO.setPageSize(10000);
         List<CenterCodeDetailDTO> centerCodeDetailDos = (List<CenterCodeDetailDTO>) centerCodeBO.queryCodeDetailPage(centerCodeDetailDTO).getResult();
@@ -172,7 +168,7 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         for(CenterCodeDetailDTO centerCodeDetail :centerCodeDetailDos){
             sql1.append(centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
 
-            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then '"+ centerCodeDetail.getValue() +"' end) as "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +",");
+            sql2.append("if( MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then cf.id end) is null,'0','1')  as "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +",");
             sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then cf.audit_status end) as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
             sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then concat(cf.start_date,' ~ ',cf.end_date)  end )as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"YXQ,");
 
@@ -184,22 +180,21 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
             childMap = new HashMap();
             childMap.put("label","开通状态");
             childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue());
-            childMap.put("type","text");
-            childMap.put("minWidth","100");
+            childMap.put("minWidth","150");
+            childMap.put("code","KTZT");
             childList.add(childMap);
 
             childMap = new HashMap();
             childMap.put("label","审核状态");
             childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"SH");
-            childMap.put("type","text");
-            childMap.put("minWidth","100");
+            childMap.put("minWidth","150");
+            childMap.put("code","YYSHZT");
             childList.add(childMap);
 
             childMap = new HashMap();
             childMap.put("label","服务时间");
             childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"YXQ");
-            childMap.put("type","text");
-            childMap.put("minWidth","100");
+            childMap.put("minWidth","150");
             childList.add(childMap);
 
 
@@ -224,10 +219,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     }
 
     @Override
-    public PageDTO queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
-        PageHelper.startPage(centerFunctionAuthorizationDto.getPageNo(), centerFunctionAuthorizationDto.getPageSize());
-        List<Map<String,Object>> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
-        return PageDTO.of(list);
+    public List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        return list;
     }
 
     @Override
@@ -236,7 +230,65 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     }
 
     @Override
-    public Boolean updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
-        return centerFunctionAuthorizationDAO.updateAuthorizationAudit(centerFunctionAuthorizationDto)>0;
+    public CenterFunctionAuthorizationDto updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        centerFunctionAuthorizationDAO.updateAuthorizationAudit(centerFunctionAuthorizationDto);
+        List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        if (!ListUtils.isEmpty(list)) {
+            centerFunctionAuthorizationDto = list.get(0);
+        }
+        return centerFunctionAuthorizationDto;
+    }
+
+    @Override
+    public CenterFunctionAuthorizationDto saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+
+        if(centerFunctionAuthorizationDto.getStartDate() == null){
+            throw new RuntimeException("开始时间不能为空!");
+        }
+
+        if(centerFunctionAuthorizationDto.getEndDate() == null){
+            throw new RuntimeException("开始时间不能为空!");
+        }
+
+        if(centerFunctionAuthorizationDto.getHospCode() == null){
+            throw new RuntimeException("医院编码不能为空!");
+        }
+
+        if(centerFunctionAuthorizationDto.getOrderTypeCode() == null){
+            throw new RuntimeException("开始时间不能为空!");
+        }
+        centerFunctionAuthorizationDto.setAuditId("1");
+        centerFunctionAuthorizationDto.setAuditName("admin");
+        centerFunctionAuthorizationDto.setAuditStatus("0");
+        centerFunctionAuthorizationDto.setIsValid("1");
+        centerFunctionAuthorizationDto.setRemark(centerFunctionAuthorizationDto.getName()+"授权信息");
+        centerFunctionAuthorizationDto.setAuditTime(new Date());
+        centerFunctionAuthorizationDto.setCrteTime(new Date());
+        // 加密开始时间
+        String str2EncryptStartDate = centerFunctionAuthorizationDto.getHospCode()+':'+centerFunctionAuthorizationDto.getOrderTypeCode()+':'+centerFunctionAuthorizationDto.getStartDate().getTime();
+        // 加密结束时间
+        String str2EncryptEndDate = centerFunctionAuthorizationDto.getHospCode()+':'+centerFunctionAuthorizationDto.getOrderTypeCode()+':'+centerFunctionAuthorizationDto.getEndDate().getTime();
+        try {
+            String encryptStartTime = RSAUtil.encryptByPublicKey(str2EncryptStartDate.getBytes(), rsaPublicKey);
+            centerFunctionAuthorizationDto.setEncryptStartDate(encryptStartTime);
+            String encryptEndTime = RSAUtil.encryptByPublicKey(str2EncryptEndDate.getBytes(), rsaPublicKey);
+            centerFunctionAuthorizationDto.setEncryptEndDate(encryptEndTime);
+        }catch (Exception e){
+            log.error("加密时间出现问题",e);
+        }
+
+        if(StringUtils.isEmpty(centerFunctionAuthorizationDto.getId())){
+            centerFunctionAuthorizationDto.setId(SnowflakeUtils.getId());
+            centerFunctionAuthorizationDAO.insertAuthorization(centerFunctionAuthorizationDto);
+        }else{
+            centerFunctionAuthorizationDAO.updateAuthorization(centerFunctionAuthorizationDto);
+            centerFunctionAuthorizationDto.setUpdateTime(new Date());
+        }
+
+        List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        if (!ListUtils.isEmpty(list)) {
+            centerFunctionAuthorizationDto = list.get(0);
+        }
+        return centerFunctionAuthorizationDto;
     }
 }

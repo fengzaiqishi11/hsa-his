@@ -7,6 +7,7 @@ import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import org.springframework.cloud.openfeign.FeignClient;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -52,10 +53,11 @@ public interface CenterFunctionAuthorizationService {
    * @Date   2022/06/28 16:30
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
    **/
-    WrapperResponse<PageDTO> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    WrapperResponse<Boolean> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
+  WrapperResponse<CenterFunctionAuthorizationDto> saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 }

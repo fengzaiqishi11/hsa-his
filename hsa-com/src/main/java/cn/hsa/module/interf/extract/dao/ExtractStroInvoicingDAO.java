@@ -1,6 +1,7 @@
 package cn.hsa.module.interf.extract.dao;
 
 import cn.hsa.module.interf.extract.dto.ExtractDataDTO;
+import cn.hsa.module.interf.extract.entity.ExtractBusinessDO;
 import cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO;
 import cn.hsa.module.interf.extract.entity.ExtractStroInvoicingDetailDO;
 import org.apache.ibatis.annotations.Param;
@@ -60,6 +61,7 @@ public interface ExtractStroInvoicingDAO {
      * @Param [requestMapIncludeIncMap]
      **/
     List<ExtractStroInvoicingDetailDO> queryStroInvoicingByInvoic(Map<String, Object> requestMapIncludeIncMap);
+
     /**
      * @Author gory
      * @Description 批量插入药房药库实时进销存
@@ -67,4 +69,22 @@ public interface ExtractStroInvoicingDAO {
      * @Param [stroInvoicingDetails]
      **/
     void insertBatchStroInvoic(@Param("list") List<ExtractStroInvoicingDetailDO> stroInvoicingDetails);
+    /**
+     * @Author 西瓜先生
+     * @Description 按供应商分组查询
+     * 参数：
+     *  1.hospCode:医院编码
+     *  2.recentlyTime: 同步时间
+     *  3.extractId: 同步主表id
+     * @Date 2022/7/11 9:28
+     * @Param [requestMapIncludeIncMap]
+     **/
+    List<ExtractBusinessDO> queryBusinessBySup(Map<String, Object> queryMap);
+    /**
+     * @Author 西瓜先生
+     * @Description 批量插入extractBusiness
+     * @Date 2022/7/11 9:41
+     * @Param [extractBusinessList]
+     **/
+    void insertBatchBusiness(@Param("list") List<ExtractBusinessDO> extractBusinessList);
 }

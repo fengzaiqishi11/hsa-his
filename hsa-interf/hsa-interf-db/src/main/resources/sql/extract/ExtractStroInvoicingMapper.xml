@@ -105,6 +105,26 @@
         <result property="code" column="code" jdbcType="VARCHAR"/>
         <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+    <!--按xxx表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractBusinessDO" id="extractBusinessMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="reportType" column="report_type" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="targetBizId" column="target_biz_id" jdbcType="VARCHAR"/>
+        <result property="targetBizName" column="target_biz_name" jdbcType="VARCHAR"/>
+        <result property="mainNum" column="main_num" jdbcType="INTEGER"/>
+        <result property="detailNum" column="detail_num" jdbcType="INTEGER"/>
+        <result property="itemNum" column="item_num" jdbcType="INTEGER"/>
+        <result property="batchNoNum" column="batch_no_num" jdbcType="INTEGER"/>
+        <result property="lastTime" column="last_time" jdbcType="TIMESTAMP"/>
+        <result property="avgMainBuyPrice" column="avg_main_buy_price" jdbcType="VARCHAR"/>
+        <result property="avgItemBuyPrice" column="avg_item_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="priceSpread" column="price_spread" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
     <!--查询最近的执行时间-->
     <select id="queryRecentlyExtractTime" resultType="java.util.Date">
         select DATE_FORMAT(ifnull(extract_date,now()),'%Y-%m-%d') as extract_time from extract_data
@@ -258,6 +278,22 @@
         a.biz_id,
         date(a.crte_time)
     </select>
+    <!--按供应商查询需要同步的数据-->
+    <select id="queryBusinessBySup" resultMap="extractBusinessMap">
+        SELECT bs.name AS target_biz_name ,bs.id as target_biz_id,'3' as report_type,
+               count(DISTINCT sid.order_no) AS mainNum, count(0) AS detailNum,
+               count(DISTINCT sid.item_id) AS itemNum, count(DISTINCT sid.batch_no) AS batchNoNum,
+               max(sid.crte_time) AS lastTime, (sum(sid.num * sid.buy_price)) / count(DISTINCT sid.order_no) AS avgMainBuyPrice,
+               (sum(sid.buy_price * sid.num)) / count(DISTINCT sid.item_id) AS avgItemBuyPrice,
+               (sum(sid.buy_price * sid.num)) AS buyPriceAll, (sum(sid.sell_price * sid.num)) AS sellPriceAll,
+               (sum(sid.sell_price * sid.num) - sum(sid.buy_price * sid.num)) AS priceSpread,#{extractId} as extract_id
+        FROM stro_invoicing sid
+               LEFT JOIN stro_in si ON sid.order_no = si.order_no AND sid.hosp_code = si.hosp_code
+               LEFT JOIN base_supplier bs ON si.supplier_id = bs.id AND sid.hosp_code = bs.hosp_code
+        WHERE sid.hosp_code = #{hospCode}
+          AND sid.outin_code IN ('1', '2', '3') AND date(sid.crte_time) = #{recentlyTime}
+        GROUP BY target_biz_id,date(sid.crte_time),sid.biz_id
+    </select>
 
     <!--插入同步主表-->
     <insert id="insertExtractData">
@@ -280,6 +316,14 @@
         values
         <foreach collection="list" item="entity" separator=",">
             (#{entity.id},#{entity.hospCode}, #{entity.bizId}, #{entity.itemCode}, #{entity.itemId}, #{entity.itemName}, #{entity.num}, #{entity.unitCode}, #{entity.currUnitCode}, #{entity.sellPrice}, #{entity.buyPrice}, #{entity.splitRatio}, #{entity.splitPrice}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.upSurplusNum}, #{entity.surplusNum}, #{entity.upBuyPriceAll}, #{entity.buyPriceAll}, #{entity.upSellPriceAll}, #{entity.sellPriceAll}, #{entity.crteTime}, #{entity.newPrice}, #{entity.newSplitPrice}, #{entity.stroInNum}, #{entity.stroInNumPriceAll}, #{entity.returnSuplNum}, #{entity.returnSuplPriceAll}, #{entity.stroToDeptNum}, #{entity.stroToDeptPriceAll}, #{entity.stroToPharNum}, #{entity.stroToPharPriceAll}, #{entity.reportLossesNum}, #{entity.reportLossesPriceAll}, #{entity.pharReturnStroNum}, #{entity.pharReturnStroPriceAll}, #{entity.adjustProfitPriceAll}, #{entity.adjustLossPriceAll}, #{entity.takeStrockSubtractNum}, #{entity.takeStrockSubtractPriceAll}, #{entity.takeStrockAddNum}, #{entity.takeStrockAddPriceAll}, #{entity.stroInNumBuyPriceAll}, #{entity.returnSuplBuyPriceAll}, #{entity.stroToDeptBuyPriceAll}, #{entity.stroToPharBuyPriceAll}, #{entity.reportLossesBuyPriceAll}, #{entity.pharReturnStroBuyPriceAll}, #{entity.adjustProfitBuyPriceAll}, #{entity.adjustLossBuyPriceAll}, #{entity.takeStrockSubtractBuyPriceAll}, #{entity.takeStrockAddBuyPriceAll}, #{entity.outSalesNum}, #{entity.outSalesPriceAll}, #{entity.outSalesBuyPriceAll}, #{entity.inSalesBuyPriceAll}, #{entity.inSalesPriceAll}, #{entity.inSalesNum}, #{entity.extractId}, #{entity.spec}, #{entity.code}, #{entity.extractTime})
+        </foreach>
+    </insert>
+    <!--批量插入stro_out-->
+    <insert id="insertBatchBusiness">
+        insert into extract_business(id,hosp_code, report_type, biz_id, target_biz_id, target_biz_name, main_num, detail_num, item_num, batch_no_num, last_time, avg_main_buy_price, avg_item_buy_price, buy_price_all, price_spread, sell_price_all, extract_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id},#{entity.hospCode}, #{entity.reportType}, #{entity.bizId}, #{entity.targetBizId}, #{entity.targetBizName}, #{entity.mainNum}, #{entity.detailNum}, #{entity.itemNum}, #{entity.batchNoNum}, #{entity.lastTime}, #{entity.avgMainBuyPrice}, #{entity.avgItemBuyPrice}, #{entity.buyPriceAll}, #{entity.priceSpread}, #{entity.sellPriceAll}, #{entity.extractTime})
         </foreach>
     </insert>
 </mapper>

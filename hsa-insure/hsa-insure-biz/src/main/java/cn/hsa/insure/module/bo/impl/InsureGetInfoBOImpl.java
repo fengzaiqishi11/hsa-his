@@ -1763,14 +1763,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlInfoMap.put("scdNurscareDays",null);
         }
         Object objNwbBirWt = MapUtils.get(setlInfoMap, "nwbBirWt"); // 新生儿出生体重
-        if (objNwbBirWt instanceof String || objNwbBirWt == null) {
+        if (ObjectUtil.isEmpty(objNwbBirWt)){
+          setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
+        }
+        /*if (objNwbBirWt instanceof String || objNwbBirWt == null) {
             setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
-        }
-
+        }*/
         Object objNwbAdmWt = MapUtils.get(setlInfoMap, "nwbAdmWt"); //新生儿入院体重
-        if (objNwbAdmWt instanceof String || objNwbAdmWt == null) {
-            setlInfoMap.put("nwbAdmWt", null); // 新生儿入院体重
+        if (ObjectUtil.isEmpty(objNwbAdmWt)){
+          setlInfoMap.put("nwbAdmWt", null); // 新生儿入院体重
         }
+        /*if (objNwbAdmWt instanceof String || objNwbAdmWt == null) {
+            setlInfoMap.put("nwbAdmWt", null); // 新生儿入院体重
+        }*/
         if (Constants.SF.S.equals(isHospital)) {
             getEmptyErr(setlInfoMap, "daysRinpFlag31", "出院31天内再住院计划标志不能为空");
             getEmptyErr(setlInfoMap, "chfpdrName", "主诊医师姓名不能为空");

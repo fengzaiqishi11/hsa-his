@@ -110,7 +110,8 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         }
         List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
-        lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
+        // 删除已经有结果的结果,
+        lisResultDAO.deleteResult(collect);
         // 新增结果
         int num = lisResultDAO.insertResult(medicalResultDTOList);
         // 更新申请单状态
@@ -136,7 +137,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
             }
             List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
 
-            lisResultDAO.deleteResult(collect); // 删除已经有结果的结果
+            lisResultDAO.deleteResultDX(collect); // 删除已经有结果的结果
             // 新增结果
             int num = lisResultDAO.insertDXResult(medicalResultDTOList);
             // 更新申请单状态

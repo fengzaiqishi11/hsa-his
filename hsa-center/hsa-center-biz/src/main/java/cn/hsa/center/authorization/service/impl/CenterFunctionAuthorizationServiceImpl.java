@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,7 +79,7 @@ public class CenterFunctionAuthorizationServiceImpl implements CenterFunctionAut
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
      */
     @Override
-    public WrapperResponse<PageDTO> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+    public WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         return WrapperResponse.success(centerFunctionAuthorizationBO.queryPage(centerFunctionAuthorizationDto));
     }
 
@@ -88,7 +89,12 @@ public class CenterFunctionAuthorizationServiceImpl implements CenterFunctionAut
     }
 
     @Override
-    public WrapperResponse<Boolean> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+    public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         return WrapperResponse.success(centerFunctionAuthorizationBO.updateAuthorizationAudit(centerFunctionAuthorizationDto));
+    }
+
+    @Override
+    public WrapperResponse<CenterFunctionAuthorizationDto> saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.saveBizAuthorization(centerFunctionAuthorizationDto));
     }
 }

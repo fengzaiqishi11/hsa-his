@@ -2061,4 +2061,71 @@
             #{item}
         </foreach>
     </delete>
+
+    <select id="queryInsureSettlePrice" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
+        select
+               ifnull(insure_price, 0)   as insurePrice,
+               ifnull(personal_price, 0)   as personalPrice,
+               ifnull(person_price, 0)   as personPrice,
+               ifnull(rests_price, 0)   as restsPrice
+        from insure_individual_settle
+       where hosp_code = #{hospCode} and state ='0' and settle_state ='1'
+        <if test="visitId !=null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        <if test="insureSettleId !=null and insureSettleId != ''">
+            and insureSettleId = #{insureSettleId}
+        </if>
+    </select>
+
+    <select id="selectMriOperInfoAdvice" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+         select
+	    '2' as OprnOprtType,
+	    idm.oper_nation_name as oprnOprtName,
+	    moi.oper_disease_icd9,
+	    moi.oper_time as oprnOprtDate,
+	    '' as anst_way,
+	    (
+	    select
+		prac_certi_no
+	    from
+		sys_user su
+	    where
+		su.hosp_code = #{hospCode}
+		and oper_doctor_id = su.id) as oper_dr_code,
+	    0 as ansDrEndTime,
+	    0 as ansDrStartTime,
+	    0 as oprnOprtEndTime,
+	    0 as oprnOprtStartTime,
+	    moi.id,
+	    iis.insureSettleId  as insureSetllId,
+	    iis.medicalRegNo  as medicalRegNo,
+	    moi.visit_id  as visitId,
+	    moi.hosp_code  as hospCode,
+	    moi.oper_doctor_name as operDrName,
+	    (
+	    select
+		prac_certi_no
+	    from
+		sys_user su
+	    where
+		su.hosp_code = #{hospCode}
+		and ana_id1 = su.id) as anst_dr_code,
+	    moi.ana_name1 as anst_dr_name,
+	    moi.oper_time as oprnOprtDate,
+	    idm.oper_nation_code as oprnOprtCode
+        from
+	    mris_oper_info moi
+        left join base_advice idm on
+	    moi.oper_disease_id = idm.id
+	    and idm.hosp_code = moi.hosp_code
+	    left join insure_individual_settle iis on iis.visit_id = moi.visit_id
+        where
+	    moi.visit_id = #{visitId}
+	    and moi.hosp_code = #{hospCode}
+	    and idm.oper_nation_code is not null
+        order by
+	    moi.columns_num asc
+    </select>
+
 </mapper>

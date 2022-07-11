@@ -785,4 +785,30 @@
             where id = #{dto.id} and hosp_code = #{dto.hospCode}
         </foreach>
     </update>
+
+    <!--批量修改三测单的共用参数-->
+    <update id="updatePublicParameterList" parameterType="java.util.List">
+        <foreach collection="editList" item="dto" separator=";">
+            update inpt_nurse_third
+            <set>
+                intake = #{dto.intake},
+                output = #{dto.output},
+                remark = #{dto.remark},
+                skin_code = #{dto.skinCode},
+                excrement_code = #{dto.excrementCode},
+                pee_code = #{dto.peeCode},
+                height = #{dto.height},
+                weight = #{dto.weight},
+                girth = #{dto.girth},
+                am_bp = #{dto.amBp},
+                pm_bp = #{dto.pmBp},
+                is_operation = #{dto.isOperation},
+                operation_days = #{dto.operationDays},
+                operation_cnt = #{dto.operationCnt},
+                drug_allergy = #{dto.drugAllergy},
+            </set>
+            where visit_id = #{dto.visitId} and hosp_code = #{dto.hospCode}
+            and date_format(record_time,'%Y-%m-%d')  = date_format(#{dto.recordTime},'%Y-%m-%d')
+        </foreach>
+    </update>
 </mapper>

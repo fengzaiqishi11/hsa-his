@@ -2,10 +2,12 @@ package cn.hsa.module.center.authorization.entity;
 
 import cn.hsa.base.PageDO;
 import cn.hsa.util.Constants;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -27,7 +29,11 @@ public class CenterFunctionAuthorizationDO extends PageDO implements Serializabl
     private String	id;
     private String	hospCode;
     private String	orderTypeCode;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date	endDate;
     private String	encryptStartDate;
     private String	encryptEndDate;
@@ -38,12 +44,18 @@ public class CenterFunctionAuthorizationDO extends PageDO implements Serializabl
     private String	auditStatus;
     private String	auditId;
     private String	auditName;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date	auditTime;
     private String	isValid;
     private String	crteId;
     private String	crteName;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date	crteTime;
     private String	updateId;
     private String	updateName;
+    @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date	updateTime;
 }

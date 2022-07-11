@@ -1,5 +1,6 @@
 package cn.hsa.center.authorization.controller;
 
+import cn.hsa.base.CenterBaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
@@ -8,16 +9,15 @@ import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
+import cn.hsa.module.center.user.dto.CenterUserDTO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.ServletUtils;
 import cn.hsa.util.SnowflakeUtils;
+import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
@@ -30,7 +30,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/center/centerFunctionAuthorization")
 @Slf4j
-public class CenterInsureAuthorizationController {
+public class CenterInsureAuthorizationController extends CenterBaseController {
 
     @Value("${rsa.public.key}")
     private String rsaPublicKey;
@@ -138,7 +138,7 @@ public class CenterInsureAuthorizationController {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
      **/
     @GetMapping("/queryPage")
-    public WrapperResponse<PageDTO> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+    public WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
         return centerFunctionAuthorizationService.queryPage(centerFunctionAuthorizationDto);
     }
 
@@ -153,6 +153,7 @@ public class CenterInsureAuthorizationController {
      **/
     @GetMapping("/updateAuthorization")
     public WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+
         return centerFunctionAuthorizationService.updateAuthorization(centerFunctionAuthorizationDto);
     }
 
@@ -166,8 +167,38 @@ public class CenterInsureAuthorizationController {
      * @Date   2022/06/28 16:30
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
      **/
-    @GetMapping("/updateAuthorizationAudit")
-    public WrapperResponse<Boolean> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+    @PostMapping("/updateAuthorizationAudit")
+    public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        if(centerFunctionAuthorizationDto != null){
+            centerFunctionAuthorizationDto.setAuditId(userId);
+            centerFunctionAuthorizationDto.setAuditName(userName);
+        }
         return centerFunctionAuthorizationService.updateAuthorizationAudit(centerFunctionAuthorizationDto);
+    }
+
+
+    /**
+     * @Menthod save()
+     * @Desrciption   保存
+     * @Param
+     * 1. [centerFunctionAuthorizationDO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<CenterFunctionAuthorizationDO>
+     **/
+    @PostMapping("/save")
+    public WrapperResponse<CenterFunctionAuthorizationDto> save(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+
+        if(centerFunctionAuthorizationDto != null  && StringUtils.isEmpty(centerFunctionAuthorizationDto.getId())){
+            centerFunctionAuthorizationDto.setCrteId(userId);
+            centerFunctionAuthorizationDto.setCrteName(userName);
+            centerFunctionAuthorizationDto.setCrteTime(new Date());
+        }else{
+            centerFunctionAuthorizationDto.setUpdateId(userId);
+            centerFunctionAuthorizationDto.setUpdateName(userName);
+            centerFunctionAuthorizationDto.setUpdateTime(new Date());
+        }
+
+        return centerFunctionAuthorizationService.saveBizAuthorization(centerFunctionAuthorizationDto);
     }
 }

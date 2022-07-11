@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.module.dao;
 
+import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureItemDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import org.apache.ibatis.annotations.Param;
@@ -108,4 +109,8 @@ public interface InsureItemDAO {
      * @Return
      */
     InsureItemDTO getInsureItemById(InsureItemMatchDTO insureItemMatchDTO);
+
+    List<InsureItemDTO> selectLastPageList(Map<String, Object> map);
+
+    void deleteLastPage(Map<String, Object> map);
 }

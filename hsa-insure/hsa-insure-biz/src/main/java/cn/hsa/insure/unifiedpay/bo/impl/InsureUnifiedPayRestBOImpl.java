@@ -1566,9 +1566,25 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 //调云助手查询是否为最新数据
                 checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureDiseaseDTO.getRecordCounts(),insureDiseaseDTO.getNum(),insureDiseaseDTO.getSize());
             }
+
             if (insureDiseaseDTO != null) {
-                num = insureDiseaseDTO.getNum();
-                dataMap.put("page_num", ++num);
+                //查询该项目在表中最后一页的数据
+                int pageNum = insureDiseaseDTO.getNum();
+                map.put("lastPage",pageNum);
+                List<InsureDiseaseDTO> lastPageList = insureDiseaseDAO.selectLastPageList(map);
+                List<String> ids = lastPageList.stream().map(InsureDiseaseDTO::getId).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(lastPageList)&&lastPageList.size()<insureDiseaseDTO.getSize()){
+                    //删除最后一页的数据重新下载，避免少下载和重复下载的情况
+                    map.put("ids",ids);
+                    insureDiseaseDAO.deleteLastPage(map);
+                    dataMap.put("page_num", pageNum);
+                    num = pageNum;
+                }else{
+                    num = ++pageNum;
+                    dataMap.put("page_num", num);
+
+                }
+
             } else {
                 dataMap.put("page_num", num);
             }
@@ -1579,9 +1595,24 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 //调云助手查询是否为最新数据
                 checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureItemDTO.getRecordCounts(),insureItemDTO.getNum(),insureItemDTO.getSize());
             }
-            if (insureItemDTO != null) {
-                num = insureItemDTO.getNum();
-                dataMap.put("page_num", ++num);
+              if (insureItemDTO != null) {
+                  //查询该项目在表中最后一页的数据
+                  int pageNum = insureItemDTO.getNum();
+                  map.put("lastPage",pageNum);
+                  List<InsureItemDTO> lastPageList = insureItemDAO.selectLastPageList(map);
+                  List<String> ids = lastPageList.stream().map(InsureItemDTO::getId).collect(Collectors.toList());
+
+                 if(!ListUtils.isEmpty(lastPageList)&&lastPageList.size()<insureItemDTO.getSize()){
+                     //删除最后一页的数据重新下载，避免少下载和重复下载的情况
+                     map.put("ids",ids);
+                     insureItemDAO.deleteLastPage(map);
+                     dataMap.put("page_num", pageNum);
+                     num = pageNum;
+                 }else{
+                     num = ++pageNum;
+                     dataMap.put("page_num", num);
+
+                 }
             } else {
                 dataMap.put("page_num", num);
             }

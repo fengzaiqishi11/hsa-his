@@ -318,6 +318,11 @@ public class DrgDipResultDTO  implements Serializable {
    * 在院状态
    */
   private String statusCode;
+
+  /**
+   * 上传状态
+   */
+  private String isUploadInsure;
   /**
    * 姓名年龄性别
    */
@@ -362,7 +367,35 @@ public class DrgDipResultDTO  implements Serializable {
      * 是否住院集合
      */
     private List<String> isHospitals;
+  /**
+   * 年月份选择类型
+   */
+    private String yearFlag;
+  /**
+   * 违规等级
+   */
+    private String ruletType;
+  /**
+   * 错误字段
+   */
+    private String checkFiled;
+  /**
+   * 违规错误信息
+   */
+    private String resultMsg;
+  /**
+   * 违规等级
+   */
+  private List<String> level;
 
+
+  public void setYearFlag(String yearFlag) {
+    this.id = yearFlag;
+  }
+
+  public String getYearFlag() {
+    return yearFlag;
+  }
 
   public void setId(String id) {
     this.id = id;

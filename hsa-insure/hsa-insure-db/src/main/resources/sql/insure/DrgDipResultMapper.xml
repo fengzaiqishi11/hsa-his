@@ -825,4 +825,206 @@
         delete drg_dip_result where
                 id = #{id}
     </delete>
+
+
+    <select id="queryDrgDipNoRegulationsMris" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select
+        ddr.id,
+        ddr.visit_id,
+        ddr.dept_name ,
+        ddr.gend,
+        ddr.age,
+        ddr.dept_id,
+        ddr.doctor_id,
+        ddr.doctor_name ,
+        ddrd .rulet_type ,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        ddr.psn_name ,
+        iv.in_no as visitNo ,
+        mbi.in_profile as medcasno ,
+        iv.in_disease_name as icd10 ,
+        ddr.total_fee ,
+        ddr.in_time ,
+        ddr.out_time,
+        ddr.states,
+        ddr.group_result,
+        mbi.is_upload_insure as isUplod
+        from drg_dip_result_detail ddrd
+        left join drg_dip_result ddr on
+        ddrd.result_id = ddr.id
+        left join mris_base_info mbi on
+        ddr.visit_id = mbi.visit_id
+        left join inpt_visit iv on mbi.visit_id =iv.id
+        where ddr.business_type='2'
+            <if test="type != null and type != '' ">
+                and ddr.`type` =#{type}
+            </if>
+
+            <if test="keyword != null and keyword != '' ">
+                and ddrd.result_msg like concat('%',#{keyword},'%')
+            </if>
+            <if test="yearFlag != null and yearFlag=='1'">
+                and year(ddrd.crt_time )=date_format(#{year},'yyyy')
+            </if>
+            <if test="yearFlag != null and yearFlag=='2'">
+                and year(ddrd.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
+            </if>
+        <if test="deptIds != null and deptIds.size()>0">
+            and ddr.dept_id in
+            <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="doctorIds != null and doctorIds.size()>0">
+            and ddr.doctor_id in
+            <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                #{doctorId}
+            </foreach>
+        </if>
+            <if test="isUplods != null and isUplods.size()>0 ">
+                and mbi.is_upload_insure in
+                <foreach collection="isUplods" item="isUploadInsure" separator="," open="(" close=")">
+                    #{isUploadInsure}
+                </foreach>
+            </if>
+            <if test="states != null and states != '' ">
+                and ddr.states=#{states}
+            </if>
+
+            <if test="level != null and level.size()>0 ">
+                and ddrd.rule_level in
+                <foreach collection="level" item="level1" separator="," open="(" close=")">
+                    #{level1}
+                </foreach>
+            </if>
+
+            <if test="ruletType != null and ruletType != '' ">
+                and ddrd.rulet_type =#{ruletType}
+            </if>
+
+            <if test="groupResults != null and groupResults.size()>0">
+               and ddr.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+        <if test="statusCodes != null and statusCodes.size()>0">
+            and iv.status_code in
+            <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                #{statusCode}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="queryDrgDipNoRegulationSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select
+        ddr.id,
+        ddr.visit_id,
+        ddr.dept_name ,
+        ddr.gend,
+        ddr.age,
+        ddr.dept_id,
+        ddr.doctor_id,
+        ddr.doctor_name ,
+        ddrd .rulet_type ,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        ddr.psn_name ,
+        iv.in_no as visitNo ,
+        iv.in_disease_name as icd10 ,
+        ddr.total_fee ,
+        ddr.in_time ,
+        ddr.out_time,
+        ddr.states,
+        ddr.group_result,
+        iiv.is_hospital,
+        isi.medcasno,
+        if(isi.settle_no is null,
+        '0',
+        '1') as isUplod,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
+        from drg_dip_result_detail ddrd
+        left join drg_dip_result ddr on
+        ddrd.result_id = ddr.id
+        left join insure_setl_info isi on
+        ddr.visit_id = isi.visit_id
+        left join insure_individual_settle iis on
+        iis.insureSettleId = isi.insure_settle_id
+        left join inpt_visit iv on isi.visit_id =iv.id
+        left join insure_individual_visit iiv on iiv.visit_id=iv.id
+        where ddr.business_type='1'
+        <if test="type != null and type != '' ">
+            and ddr.`type` =#{type}
+        </if>
+
+        <if test="keyword != null and keyword != '' ">
+            and ddrd.result_msg like concat('%',#{keyword},'%')
+        </if>
+        <if test="yearFlag != null and yearFlag=='1'">
+            and year(ddrd.crt_time )=date_format(#{year},'yyyy')
+        </if>
+        <if test="yearFlag != null and yearFlag=='2'">
+            and year(ddrd.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
+        </if>
+        <if test="deptIds != null and deptIds.size()>0">
+            and ddr.dept_id in
+            <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="doctorIds != null and doctorIds.size()>0">
+            and ddr.doctor_id in
+            <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                #{doctorId}
+            </foreach>
+        </if>
+        <if test="isUplods != null and isUplods.size()>0 ">
+            <foreach collection="isUplods" item="isUploadInsure" separator="," >
+                <if test="isUploadInsure=='1' ">
+                    and isi.settle_no is not null
+                </if>
+                <if test="isUploadInsure=='2' ">
+                    and isi.settle_no is null
+                </if>
+            </foreach>
+        </if>
+        <if test="states != null and states != '' ">
+            and ddr.states=#{states}
+        </if>
+
+        <if test="level != null and level.size()>0 ">
+            and ddrd.rule_level in
+            <foreach collection="level" item="level1" separator="," open="(" close=")">
+                #{level1}
+            </foreach>
+        </if>
+        <if test="isHospitals != null and isHospitals.size()>0 ">
+            and iiv.is_hospital in
+            <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                #{isHospital}
+            </foreach>
+        </if>
+
+        <if test="ruletType != null and ruletType != '' ">
+            and ddrd.rulet_type =#{ruletType}
+        </if>
+
+        <if test="groupResults != null and groupResults.size()>0">
+            and ddr.group_result in
+            <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                #{groupResult}
+            </foreach>
+        </if>
+        <if test="statusCodes != null and statusCodes.size()>0">
+            and iv.status_code in
+            <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                #{statusCode}
+            </foreach>
+        </if>
+
+    </select>
 </mapper>

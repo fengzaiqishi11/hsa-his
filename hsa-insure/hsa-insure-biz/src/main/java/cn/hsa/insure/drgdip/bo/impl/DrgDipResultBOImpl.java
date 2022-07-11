@@ -29,6 +29,7 @@ import cn.hsa.util.MapUtils;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.StringValue;
+import org.elasticsearch.common.Strings;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -37,13 +38,12 @@ import org.springframework.transaction.support.ResourceTransactionManager;
 
 import javax.annotation.Resource;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 
 import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -640,6 +640,176 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         resultMap.put("drgDipNotSum",drgDipNotSum);
         resultMap.put("drgDipFinsh",drgDipFinsh);
         resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        return resultMap;
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-07-04 14:51
+     * @Description 质控违规信息查询-病案首页
+     * @param drgDipResultDTO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryDrgDipNoRegulationsMris(DrgDipResultDTO drgDipResultDTO) {
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationsMris(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:20
+     * @Description 质控违规信息汇总-病案首页
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public Map<String, Object> queryDrgDipNoRegulationMrisSum(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationsMris(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//违规总数
+        int errorFieldSum = 0;//错误字段数
+        List<DrgDipResultDTO> errorFieldList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getCheckFiled))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorFieldList)){
+            errorFieldSum = errorFieldList.size();
+        }
+        int errorMsgSum = 0;//错误信息数
+        List<DrgDipResultDTO> errorMsgList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getResultMsg))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorMsgList)){
+            errorMsgSum = errorMsgList.size();
+        }
+        int errorPatientSum = 0;//违规病例数
+        List<DrgDipResultDTO> errorPatientList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getVisitId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorPatientList)){
+            errorPatientSum = errorPatientList.size();
+        }
+        //过滤从科室id和医生id 为空的数据，避免报空指针
+        List<DrgDipResultDTO> deptRemoveList = drgDipResultDTOList;
+        deptRemoveList.removeIf(dto->"".equals(dto.getDeptId())||dto.getDeptId()==null);
+        int errorDeptSum = 0;//违规科室数
+        List<DrgDipResultDTO> errorDeptList = deptRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDeptId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDeptList)){
+            errorDeptSum = errorDeptList.size();
+        }
+        List<DrgDipResultDTO> doctorRemoveList = drgDipResultDTOList;
+        doctorRemoveList.removeIf(dto->"".equals(dto.getDoctorId())||dto.getDoctorId()==null);
+        int errorDoctorSum = 0;//违规医生数
+        List<DrgDipResultDTO> errorDoctortList = doctorRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDoctorId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDoctortList)){
+            errorDoctorSum = errorDoctortList.size();
+        }
+
+        resultMap.put("errorFieldSum",errorFieldSum);
+        resultMap.put("errorMsgSum",errorMsgSum);
+        resultMap.put("errorDeptSum",errorDeptSum);
+        resultMap.put("errorDoctorSum",errorDoctorSum);
+        resultMap.put("errorPatientSum",errorPatientSum);
+        return resultMap;
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-06 10:03
+     * @Description 质控违规信息查询-结算清单
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public PageDTO queryDrgDipNoRegulationSetlinfo(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationSetlinfo(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:16
+     * @Description 质控违规信息汇总-结算清单
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public Map<String, Object> queryDrgDipNoRegulationSettleSum(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationSetlinfo(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//违规总数
+        int errorFieldSum = 0;//错误字段数
+        List<DrgDipResultDTO> errorFieldList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getCheckFiled))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorFieldList)){
+            errorFieldSum = errorFieldList.size();
+        }
+        int errorMsgSum = 0;//错误信息数
+        List<DrgDipResultDTO> errorMsgList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getResultMsg))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorMsgList)){
+            errorMsgSum = errorMsgList.size();
+        }
+        int errorPatientSum = 0;//违规病例数
+        List<DrgDipResultDTO> errorPatientList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getVisitId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorPatientList)){
+            errorPatientSum = errorPatientList.size();
+        }
+        //过滤从科室id和医生id 为空的数据，避免报空指针
+        List<DrgDipResultDTO> deptRemoveList = drgDipResultDTOList;
+        deptRemoveList.removeIf(dto->"".equals(dto.getDeptId())||dto.getDeptId()==null);
+        int errorDeptSum = 0;//违规科室数
+        List<DrgDipResultDTO> errorDeptList = deptRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDeptId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDeptList)){
+            errorDeptSum = errorDeptList.size();
+        }
+        List<DrgDipResultDTO> doctorRemoveList = drgDipResultDTOList;
+        doctorRemoveList.removeIf(dto->"".equals(dto.getDoctorId())||dto.getDoctorId()==null);
+        int errorDoctorSum = 0;//违规医生数
+        List<DrgDipResultDTO> errorDoctortList = doctorRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDoctorId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDoctortList)){
+            errorDoctorSum = errorDoctortList.size();
+        }
+
+        resultMap.put("errorFieldSum",errorFieldSum);
+        resultMap.put("errorMsgSum",errorMsgSum);
+        resultMap.put("errorDeptSum",errorDeptSum);
+        resultMap.put("errorDoctorSum",errorDoctorSum);
+        resultMap.put("errorPatientSum",errorPatientSum);
         return resultMap;
     }
 

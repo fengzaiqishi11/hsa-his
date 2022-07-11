@@ -137,7 +137,23 @@
     <if test="babyId != null and babyId != ''">
       AND c.baby_id = #{babyId}
     </if>
+
     order by c.sign_code asc,c.plan_exec_time asc,e.group_no asc,e.group_seq_no asc
+      <if test="columnName != null and sortName != ''">
+
+        <if test='columnName =="isLong"'>
+          ,e.is_long ${sortName}
+        </if>
+
+        <if test='columnName =="startTime"'>
+          ,e.long_start_time  ${sortName}
+        </if>
+
+        <if test='columnName =="content"'>
+          ,e.content   ${sortName}
+        </if>
+
+      </if>
   </select>
 
 

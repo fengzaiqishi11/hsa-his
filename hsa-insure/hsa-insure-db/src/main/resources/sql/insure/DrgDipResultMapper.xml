@@ -832,10 +832,10 @@
         select
         ddr.id,
         ddr.visit_id,
-        ddr.dept_name ,
+        iv.in_dept_name as dept_name ,
         ddr.gend,
         ddr.age,
-        ddr.dept_id,
+        iv.in_dept_id as dept_id,
         ddr.doctor_id,
         ddr.doctor_name ,
         ddrd .rulet_type ,
@@ -924,10 +924,10 @@
         select
         ddr.id,
         ddr.visit_id,
-        ddr.dept_name ,
+        iv.in_dept_name as dept_name ,
         ddr.gend,
         ddr.age,
-        ddr.dept_id,
+        iv.in_dept_id as dept_id,
         ddr.doctor_id,
         ddr.doctor_name ,
         ddrd .rulet_type ,
@@ -969,6 +969,12 @@
         </if>
         <if test="yearFlag != null and yearFlag=='2'">
             and year(ddrd.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
+        </if>
+        <if test="startDate != '' and startDate != null">
+            and DATE_FORMAT(iis.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+        </if>
+        <if test="endDate != '' and endDate != null">
+            and DATE_FORMAT(iis.crte_time, "%Y-%m-%d") &lt;= #{endDate}
         </if>
         <if test="deptIds != null and deptIds.size()>0">
             and ddr.dept_id in

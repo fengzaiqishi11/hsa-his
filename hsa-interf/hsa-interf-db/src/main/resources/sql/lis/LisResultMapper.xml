@@ -229,14 +229,23 @@ FROM
 		</foreach>
     </insert>
 
+	<!--根据barcode 删除旧的医技结果（线上版通用）-->
     <delete id="deleteResult">
-        delete from medic_result where advice_id in
+        delete from medic_result where bar_code in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
           #{entity}
         </foreach>
     </delete>
 
-    <update id="updateApplyStatus">
+	<!--根据adviceId 删除旧的医技结果（适用落地版德星）-->
+	<delete id="deleteResultDX">
+		delete from medic_result where advice_id in
+		<foreach collection="list" item="entity" separator="," open="(" close=")">
+			#{entity}
+		</foreach>
+	</delete>
+
+	<update id="updateApplyStatus">
         update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
         where opd_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">

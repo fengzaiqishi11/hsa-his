@@ -586,11 +586,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
             //自行计算标杆费用
-            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
                 responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
             }
             //计算预计基金支付
@@ -796,11 +796,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum"));// 耗材占比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
             }
             //自行计算标杆费用
-            if(groupInfoMap.get("feePay") != null && groupInfoMap.get("score_price")!= null){
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
                 responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
             }
             //计算预计基金支付

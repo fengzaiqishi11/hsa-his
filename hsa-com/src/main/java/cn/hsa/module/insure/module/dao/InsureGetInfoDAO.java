@@ -846,4 +846,14 @@ public interface InsureGetInfoDAO {
      **/
     PayInfoDTO queryInsureSettlePrice(Map<String, Object> map);
 
+    /**
+     * @Method selectMriOperInfo
+     * @Desrciption  查询病案首页手术信息关联医嘱表
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/5 11:00
+     * @Return
+     **/
+    List<OperInfoRecordDTO> selectMriOperInfoAdvice(Map<String, Object> map);
 }

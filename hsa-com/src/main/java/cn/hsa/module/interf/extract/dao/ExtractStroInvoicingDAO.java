@@ -70,7 +70,7 @@ public interface ExtractStroInvoicingDAO {
      **/
     void insertBatchStroInvoic(@Param("list") List<ExtractStroInvoicingDetailDO> stroInvoicingDetails);
     /**
-     * @Author 西瓜先生
+     * @Author gory
      * @Description 按供应商分组查询
      * 参数：
      *  1.hospCode:医院编码
@@ -81,7 +81,7 @@ public interface ExtractStroInvoicingDAO {
      **/
     List<ExtractBusinessDO> queryBusinessBySup(Map<String, Object> queryMap);
     /**
-     * @Author 西瓜先生
+     * @Author gory
      * @Description 批量插入extractBusiness
      * @Date 2022/7/11 9:41
      * @Param [extractBusinessList]

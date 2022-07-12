@@ -63,13 +63,13 @@ public class ExtractStroInvoicingBOImpl implements ExtractStroInvoicingBO {
         insertExtractStroInvoicingDetail(hospCode);
         logger.info("同步药房药库实时进销存数据，结束时间：" + DateUtils.getNow());
         // todo 3.同步药房药库业务报表数据
-        logger.info("同步药房药库业务报表数据，开始时间：" + DateUtils.getNow());
-        insertExtractBusiness(hospCode);
-        logger.info("同步药房药库业务报表数据，结束时间：" + DateUtils.getNow());
+//        logger.info("同步药房药库业务报表数据，开始时间：" + DateUtils.getNow());
+//        insertExtractBusiness(hospCode);
+//        logger.info("同步药房药库业务报表数据，结束时间：" + DateUtils.getNow());
         return true;
     }
     /**
-     * @Author 西瓜先生
+     * @Author gory
      * @Description同步药房药库业务报表
      * 1.同步库房入库业务统计
      * 2.同步出库到药房汇总统计
@@ -84,7 +84,7 @@ public class ExtractStroInvoicingBOImpl implements ExtractStroInvoicingBO {
         insertExtractBusinessByIn(hospCode);
     }
     /**
-     * @Author 西瓜先生
+     * @Author gory
      * @Description
      * 1.按供应商
      * 2.按供应商/品种
@@ -102,7 +102,7 @@ public class ExtractStroInvoicingBOImpl implements ExtractStroInvoicingBO {
 
     }
     /**
-     * @Author 西瓜先生
+     * @Author gory
      * @Description
      * 1.查询药房药库实时进销存数据最近同步时间
      * 2.查询需要同步的数据

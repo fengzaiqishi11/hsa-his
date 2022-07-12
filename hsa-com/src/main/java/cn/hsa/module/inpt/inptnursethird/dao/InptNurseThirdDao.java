@@ -124,4 +124,12 @@ public interface InptNurseThirdDao {
      * @Return:
      **/
     List<InptNurseThirdDTO> queryAllByVisitId(Map<String, Object> map);
+
+    /**
+     * 批量录入三测单，修改每个就诊者当天全部时间点共有的参数值
+     * 比如 上午血压和下午血压这些共有的值，修改一个时间则全部时间都修改
+     * @param editList
+     * @return
+     */
+    int updatePublicParameterList(@Param("editList") List<InptNurseThirdDTO> editList);
 }

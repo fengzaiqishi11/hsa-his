@@ -195,6 +195,49 @@ public class DateUtils {
             throw new AppException(e.getMessage());
         }
     }
+    /**
+     * @Method 在当前时间字符串上增加/减少天数
+     * @Description
+     * @Param 1、pattern 时间格式
+     * 2、date 时间字符串
+     * 3、month 加减月数
+     * @Author zhongming
+     * @Date 2020/7/10 14:43
+     * @Return
+     **/
+    public static Date calculateMonth(Date date, int month) {
+        try {
+            Calendar c = Calendar.getInstance();
+            c.setTime(date);
+            c.add(Calendar.MONTH, month);
+            return c.getTime();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(e.getMessage());
+        }
+    }
+
+    /**
+     * @Method 在当前时间字符串上增加/减少天数
+     * @Description
+     * @Param 1、pattern 时间格式
+     * 2、date 时间字符串
+     * 3、year 加减年数
+     * @Author zhongming
+     * @Date 2020/7/10 14:43
+     * @Return
+     **/
+    public static Date calculateYear(Date date, int year) {
+        try {
+            Calendar c = Calendar.getInstance();
+            c.setTime(date);
+            c.add(Calendar.YEAR, year);
+            return c.getTime();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new AppException(e.getMessage());
+        }
+    }
 
     /**
      * @Method 在时间字符串上增加/减少月数
@@ -604,7 +647,7 @@ public class DateUtils {
     }
 
     /**
-     *  获取指定日期的当天的开始时间
+     *  获取指定日期的当天的开始时间@
      *  <p>例如:给定：2021-11-24 15:43:32 返回的则是2021-11-24 00:00:00 </p>
      * @param startDate 开始时间
      * @return

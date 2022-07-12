@@ -152,6 +152,9 @@ public class PayOnlineInfoDO implements Serializable {
 
 	private String docTraceNo;
 
+	private String callSn;
+
+
 
 	public void setId(String id) {
 		this.id = id;

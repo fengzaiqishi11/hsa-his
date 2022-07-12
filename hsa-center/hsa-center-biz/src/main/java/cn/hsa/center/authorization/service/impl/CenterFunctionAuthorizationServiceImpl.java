@@ -1,8 +1,10 @@
 package cn.hsa.center.authorization.service.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.bo.CenterFunctionAuthorizationBO;
 import cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO;
+import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.util.MapUtils;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -48,5 +51,50 @@ public class CenterFunctionAuthorizationServiceImpl implements CenterFunctionAut
 
     public WrapperResponse<CenterFunctionAuthorizationDO> insertBizAuthorization(CenterFunctionAuthorizationDO functionAuthorizationDO) {
         return centerFunctionAuthorizationBO.insertBizAuthorization(functionAuthorizationDO);
+    }
+
+
+
+    /**
+     * @param centerFunctionAuthorizationDto
+     * @Menthod queryHospZzywPage()
+     * @Desrciption 根据条件分页查询医院增值业务
+     * @Param 1. [CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date 2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     */
+    @Override
+    public WrapperResponse<Map<String,Object>> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.queryHospZzywPage(centerFunctionAuthorizationDto));
+    }
+
+    /**
+     * @param centerFunctionAuthorizationDto
+     * @Menthod queryPage()
+     * @Desrciption 根据条件分页查询参数信息
+     * @Param 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date 2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     */
+    @Override
+    public WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.queryPage(centerFunctionAuthorizationDto));
+    }
+
+    @Override
+    public WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.updateAuthorization(centerFunctionAuthorizationDto));
+    }
+
+    @Override
+    public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.updateAuthorizationAudit(centerFunctionAuthorizationDto));
+    }
+
+    @Override
+    public WrapperResponse<CenterFunctionAuthorizationDto> saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.saveBizAuthorization(centerFunctionAuthorizationDto));
     }
 }

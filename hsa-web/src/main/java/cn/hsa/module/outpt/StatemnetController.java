@@ -476,8 +476,9 @@ public class StatemnetController extends BaseController {
   @GetMapping("/queryIncomeClassifyInfo")
   public WrapperResponse<PageDTO> queryIncomeClassifyInfo(IncomeDTO incomeDTO, HttpServletRequest req, HttpServletResponse res) {
     Date startDate = incomeDTO.getStartDate();
-    if (startDate == null) {
-      throw new AppException("开始时间不能为空");
+    Date endDate = incomeDTO.getEndDate();
+    if (startDate == null || endDate == null) {
+      return WrapperResponse.warning(200,"开始时间与结束时间不能为空",null);
     }
     SysUserDTO userDTO = getSession(req, res) ;
     Map paraMap = new HashMap();

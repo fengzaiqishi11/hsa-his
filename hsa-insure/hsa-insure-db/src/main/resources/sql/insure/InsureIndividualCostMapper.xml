@@ -906,7 +906,7 @@
                                AND ic.`hosp_code` = iic.`hosp_code`
 
         WHERE ic.`hosp_code` = #{hospCode}
-        and op.is_submit='1'
+            and (op.is_submit='1' or (ic.op_id is null or ic.op_id = ''))
         <if test='settle_code == "2" '>
             AND ic.`settle_code` IN ('0', '1','2')
         </if>

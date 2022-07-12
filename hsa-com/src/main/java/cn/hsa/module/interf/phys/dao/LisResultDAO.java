@@ -114,12 +114,19 @@ public interface LisResultDAO {
     List<Map> queryUser(Map map);
 
     /**
-     * @Description:
+     * @Description: 根据barcode 删除旧的医技结果（线上版通用）
      * @Param: [stringList]
      * @return: java.lang.Boolean
      * @Author: zhangxuan
      * @Date: 2021-07-09
      */
-    Boolean deleteResult(@Param("list") List<String> stringList);
+    int deleteResult(@Param("list") List<String> stringList);
+
+    /**
+     * 根据adviceId 删除旧的医技结果（适用落地版德星）
+     * @param stringList
+     * @return
+     */
+    int deleteResultDX(@Param("list") List<String> stringList);
 
 }

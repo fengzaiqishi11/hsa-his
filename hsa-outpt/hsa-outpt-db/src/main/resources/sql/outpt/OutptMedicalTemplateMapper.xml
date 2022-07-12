@@ -43,12 +43,15 @@
         <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="menstrualHistory" column="menstrual_history" jdbcType="VARCHAR"/>
+
+
     </resultMap>
 
     <!--查询单个-->
     <select id="getById" resultMap="OutptMedicalTemplateMap">
         select
-          id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke
+          id, hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke,menstrual_history
         from outpt_medical_template
         where id = #{id} and hosp_code = #{hospCode}
     </select>
@@ -62,7 +65,7 @@
           a.handle_suggestion, a.specialty_check ,a.temperature, a.min_blood_pressure, a.max_blood_pressure, a.breath, a.height, a.blood_sugar, a.pulse,
           a.weight, a.bmi, a.entrust, a.crte_id, a.crte_name, a.crte_time,a.disease_id,
           c.name diseaseName,
-          remarke
+          remarke,menstrual_history
         from outpt_medical_template a
         left join base_disease c on a.disease_id = c.id and c.hosp_code = a.hosp_code
         where a.hosp_code = #{hospCode}
@@ -185,8 +188,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into outpt_medical_template(id,hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke)
-        values (#{id},#{hospCode}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isValid}, #{pym}, #{wbm}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory}, #{allergyHistory}, #{vaccinationHistory}, #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure}, #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust}, #{crteId}, #{crteName}, #{crteTime},#{diseaseId},#{remarke})
+        insert into outpt_medical_template(id,hosp_code, name, type_code, dept_id, dept_name, doctor_id, doctor_name, is_valid, pym, wbm, audit_code, audit_id, audit_name, audit_time, chief_complaint, present_illness, past_history, oneself_history, family_history, allergy_history, vaccination_history, auxiliary_inspect, disease_analysis, handle_suggestion, specialty_check, temperature, min_blood_pressure, max_blood_pressure, breath, height, blood_sugar, pulse, weight, bmi, entrust, crte_id, crte_name, crte_time,disease_id,remarke,menstrual_history)
+        values (#{id},#{hospCode}, #{name}, #{typeCode}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isValid}, #{pym}, #{wbm}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{chiefComplaint}, #{presentIllness}, #{pastHistory}, #{oneselfHistory}, #{familyHistory}, #{allergyHistory}, #{vaccinationHistory}, #{auxiliaryInspect}, #{diseaseAnalysis}, #{handleSuggestion}, #{specialtyCheck}, #{temperature}, #{minBloodPressure}, #{maxBloodPressure}, #{breath}, #{height}, #{bloodSugar}, #{pulse}, #{weight}, #{bmi}, #{entrust}, #{crteId}, #{crteName}, #{crteTime},#{diseaseId},#{remarke},#{menstrualHistory})
     </insert>
 
     <!--通过主键修改数据-->
@@ -223,7 +226,8 @@
             bmi = #{bmi},
             entrust = #{entrust},
             disease_id = #{diseaseId},
-            remarke = #{remarke}
+            remarke = #{remarke},
+            menstrual_history = #{menstrualHistory}
         where id = #{id} and hosp_code = #{hospCode}
     </update>
 

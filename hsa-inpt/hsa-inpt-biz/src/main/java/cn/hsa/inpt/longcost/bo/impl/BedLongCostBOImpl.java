@@ -266,7 +266,7 @@ public class BedLongCostBOImpl implements BedLongCostBO {
             // 总数量单位
             costDTO.setTotalNumUnitCode(costDTO.getNumUnitCode());
             // 项目总金额
-            costDTO.setTotalPrice(BigDecimalUtils.multiply(costDTO.getNum(), costDTO.getPrice()));
+            costDTO.setTotalPrice(BigDecimalUtils.multiply(costDTO.getNum(), costDTO.getPrice()).setScale(2, BigDecimal.ROUND_HALF_DOWN));
             // 优惠总金额
             costDTO.setPreferentialPrice(BigDecimal.ZERO);
             // 优惠后总金额

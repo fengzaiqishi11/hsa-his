@@ -2926,6 +2926,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
             itemDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag")); // 限制使用标志
             itemDTO.setDownLoadType(listType);
+            itemDTO.setLimUserExplain(MapUtils.get(item, "lim_use_scope"));// 限制使用说明
             insureItemDTOList.add(itemDTO);
         }
         if (!ListUtils.isEmpty(insureItemDTOList)) {

@@ -10,6 +10,7 @@ import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.user.dto.CenterUserDTO;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.ServletUtils;
@@ -107,6 +108,83 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
             log.error("加密时间出现问题",e);
         }
             return  centerFunctionAuthorizationService.insertBizAuthorization(authorizationDO);
+    }
+
+
+
+
+    /**
+     * @Menthod queryHospZzywPage()
+     * @Desrciption   根据条件分页查询医院增值业务
+     * @Param
+     * 1. [CenterHospitalDTO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @GetMapping("/queryHospZzywPage")
+    public WrapperResponse<Map<String,Object>> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.queryHospZzywPage(centerFunctionAuthorizationDto);
+    }
+
+
+
+    /**
+     * @Menthod queryPage()
+     * @Desrciption   根据条件分页查询参数信息
+     * @Param
+     * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @GetMapping("/queryPage")
+    public WrapperResponse<List<CenterFunctionAuthorizationDto>> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.queryPage(centerFunctionAuthorizationDto);
+    }
+
+    /**
+     * @Menthod updateAuthorization()
+     * @Desrciption   根据条件分页查询参数信息
+     * @Param
+     * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @GetMapping("/updateAuthorization")
+    public WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.updateAuthorization(centerFunctionAuthorizationDto);
+    }
+
+
+    /**
+     * @Menthod updateAuthorizationAudit()
+     * @Desrciption   根据条件分页查询参数信息
+     * @Param
+     * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @PostMapping("/updateAuthorizationAudit")
+    public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.updateAuthorizationAudit(centerFunctionAuthorizationDto);
+    }
+
+
+    /**
+     * @Menthod save()
+     * @Desrciption   保存
+     * @Param
+     * 1. [centerFunctionAuthorizationDO] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<CenterFunctionAuthorizationDO>
+     **/
+    @PostMapping("/save")
+    public WrapperResponse<CenterFunctionAuthorizationDto> save(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.saveBizAuthorization(centerFunctionAuthorizationDto);
     }
 
 

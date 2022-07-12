@@ -954,6 +954,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             String substring = age.substring(1);
             baseInfoStr.put("age",substring);
         }
+        // 防止drg那边报错，数据库已经进行了一次非空转换，所以这里放心使用toString
+        baseInfoStr.put("newborn_age",StringUtils.getNumberFromString(baseInfoStr.get("newborn_age").toString()));
+        baseInfoStr.put("newborn_weight",StringUtils.getNumberFromString(baseInfoStr.get("newborn_weight").toString()));
+        baseInfoStr.put("newborn_hsptzd_weight",StringUtils.getNumberFromString(baseInfoStr.get("newborn_hsptzd_weight").toString()));
+
         dataMap.put("baseInfoStr", JSONObject.toJSONString(baseInfoStr));
         List<Map<String, Object>> strArr = getMrisDiagnosePage(map);// 病案诊断信息
         if (MapUtils.isEmpty(strArr)){

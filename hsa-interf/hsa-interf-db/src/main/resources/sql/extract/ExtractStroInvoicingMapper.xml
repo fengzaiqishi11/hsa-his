@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.extract.dao.ExtractStroInvoicingDAO">
+    <!--ExtractData：同步数据主表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractDataDO" id="extractDataMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="extractNum" column="extract_num" jdbcType="INTEGER"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="consumeTime" column="consume_time" jdbcType="INTEGER"/>
+        <result property="extractDate" column="extract_date" jdbcType="TIMESTAMP"/>
+        <result property="extractStatus" column="extract_status" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--消耗量表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO" id="extractConsumptionDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="summaryType" column="summary_type" jdbcType="VARCHAR"/>
+        <result property="statisticsOptions" column="statistics_options" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="consumNum" column="consum_num" jdbcType="VARCHAR"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="profitPrice" column="profit_price" jdbcType="VARCHAR"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="renewalTime" column="renewal_time" jdbcType="TIMESTAMP"/>
+        <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--药房药库实时进销存Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractStroInvoicingDetailDO" id="extractStroInvoicingDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
+        <result property="sellPrice" column="sell_price" jdbcType="VARCHAR"/>
+        <result property="buyPrice" column="buy_price" jdbcType="VARCHAR"/>
+        <result property="splitRatio" column="split_ratio" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="upSurplusNum" column="up_surplus_num" jdbcType="VARCHAR"/>
+        <result property="surplusNum" column="surplus_num" jdbcType="VARCHAR"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="newPrice" column="new_price" jdbcType="VARCHAR"/>
+        <result property="newSplitPrice" column="new_split_price" jdbcType="VARCHAR"/>
+        <result property="stroInNum" column="stro_in_num" jdbcType="VARCHAR"/>
+        <result property="stroInNumPriceAll" column="stro_in_num_price_all" jdbcType="VARCHAR"/>
+        <result property="returnSuplNum" column="return_supl_num" jdbcType="VARCHAR"/>
+        <result property="returnSuplPriceAll" column="return_supl_price_all" jdbcType="VARCHAR"/>
+        <result property="stroToDeptNum" column="stro_to_dept_num" jdbcType="VARCHAR"/>
+        <result property="stroToDeptPriceAll" column="stro_to_dept_price_all" jdbcType="VARCHAR"/>
+        <result property="stroToPharNum" column="stro_to_phar_num" jdbcType="VARCHAR"/>
+        <result property="stroToPharPriceAll" column="stro_to_phar_price_all" jdbcType="VARCHAR"/>
+        <result property="reportLossesNum" column="report_losses_num" jdbcType="VARCHAR"/>
+        <result property="reportLossesPriceAll" column="report_losses_price_all" jdbcType="VARCHAR"/>
+        <result property="pharReturnStroNum" column="phar_return_stro_num" jdbcType="VARCHAR"/>
+        <result property="pharReturnStroPriceAll" column="phar_return_stro_price_all" jdbcType="VARCHAR"/>
+        <result property="adjustProfitPriceAll" column="adjust_profit_price_all" jdbcType="VARCHAR"/>
+        <result property="adjustLossPriceAll" column="adjust_loss_price_all" jdbcType="VARCHAR"/>
+        <result property="takeStrockSubtractNum" column="take_strock_subtract_num" jdbcType="VARCHAR"/>
+        <result property="takeStrockSubtractPriceAll" column="take_strock_subtract_price_all" jdbcType="VARCHAR"/>
+        <result property="takeStrockAddNum" column="take_strock_add_num" jdbcType="VARCHAR"/>
+        <result property="takeStrockAddPriceAll" column="take_strock_add_price_all" jdbcType="VARCHAR"/>
+        <result property="stroInNumBuyPriceAll" column="stro_in_num_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="returnSuplBuyPriceAll" column="return_supl_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="stroToDeptBuyPriceAll" column="stro_to_dept_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="stroToPharBuyPriceAll" column="stro_to_phar_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="reportLossesBuyPriceAll" column="report_losses_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="pharReturnStroBuyPriceAll" column="phar_return_stro_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="adjustProfitBuyPriceAll" column="adjust_profit_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="adjustLossBuyPriceAll" column="adjust_loss_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="takeStrockSubtractBuyPriceAll" column="take_strock_subtract_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="takeStrockAddBuyPriceAll" column="take_strock_add_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="outSalesNum" column="out_sales_num" jdbcType="VARCHAR"/>
+        <result property="outSalesPriceAll" column="out_sales_price_all" jdbcType="VARCHAR"/>
+        <result property="outSalesBuyPriceAll" column="out_sales_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="inSalesBuyPriceAll" column="in_sales_buy_price_all" jdbcType="VARCHAR"/>
+        <result property="inSalesPriceAll" column="in_sales_price_all" jdbcType="VARCHAR"/>
+        <result property="inSalesNum" column="in_sales_num" jdbcType="VARCHAR"/>
+        <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--按xxx表Map映射-->
+    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractBusinessDO" id="extractBusinessMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="reportType" column="report_type" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="targetBizId" column="target_biz_id" jdbcType="VARCHAR"/>
+        <result property="targetBizName" column="target_biz_name" jdbcType="VARCHAR"/>
+        <result property="mainNum" column="main_num" jdbcType="INTEGER"/>
+        <result property="detailNum" column="detail_num" jdbcType="INTEGER"/>
+        <result property="itemNum" column="item_num" jdbcType="INTEGER"/>
+        <result property="batchNoNum" column="batch_no_num" jdbcType="INTEGER"/>
+        <result property="lastTime" column="last_time" jdbcType="TIMESTAMP"/>
+        <result property="avgMainBuyPrice" column="avg_main_buy_price" jdbcType="VARCHAR"/>
+        <result property="avgItemBuyPrice" column="avg_item_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="priceSpread" column="price_spread" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <!--查询最近的执行时间-->
+    <select id="queryRecentlyExtractTime" resultType="java.util.Date">
+        select DATE_FORMAT(ifnull(extract_date,now()),'%Y-%m-%d') as extract_time from extract_data
+        where hosp_code = #{hospCode} and extract_type = #{extractType} and extract_status = #{extractStatus}
+        ORDER BY extract_date DESC LIMIT 1
+    </select>
+    <!--查询药房药库消耗数据-->
+    <select id="queryStroInvoicingByComsume"
+            resultMap="extractConsumptionDetailMap">
+        select
+        hosp_code, summary_type, item_id, item_code, item_name,
+        code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,
+        consum_num,ifnull((sell_price_all/consum_num),0)  avg_sell_price , sell_price_all,
+        ifnull((buy_price_all/consum_num),0)  as avg_buy_price, buy_price_all,
+        ifnull((A.buy_price_all - A.sell_price_all),0)  as profit_price,
+        extract_type, extract_time,renewal_time, extract_id
+        from
+        (
+        select
+        siv.hosp_code,/*医院编码*/
+        /*汇总类型：1含盘点，2不含盘点*/
+        <if test='includeInc == "1".toString()'>
+        '1' as summary_type,
+        </if>
+        <if test='includeInc == "0".toString()'>
+        '2' as summary_type,
+        </if>
+        siv.item_id as item_id,/*项目id*/
+        siv.item_code as item_code,/*项目类别*/
+        siv.item_name as item_name,/*项目名称*/
+        case siv.item_code when '1' then b.code when '2' then c.code end code,/*编码*/
+        case siv.item_code when '1' then b.big_type_code	when '2' then '3' end type_code,/*品种*/
+        case siv.item_code when '1' then b.spec when '2' then c.spec end spec,/*规格*/
+        max(siv.unit_code) as unit_code,/*项目单位*/
+        case siv.item_code when '1' then b.price when '2' then c.price end price,/*零售单价*/
+        siv.split_num as split_num,/*拆零数量*/
+        max(siv.split_unit_code) as split_unit_code,/*拆零单位*/
+        siv.biz_id,/*科室id*/
+        (select name from base_dept where id = siv.biz_id and hosp_code = siv.hosp_code) as biz_name,
+        sum(siv.num) as consum_num,/*消耗数量*/
+        sum(siv.num * siv.sell_price) as sell_price_all,/*零售总金额*/
+        sum(siv.num * siv.buy_price) buy_price_all,/*成本价*/
+        '1' as extract_type,/*1表示定时器自动同步*/
+        date(siv.crte_time) as extract_time,
+        now() as renewal_time,
+        #{extractId} as extract_id
+        from
+        stro_invoicing siv
+        left join base_drug b on
+        siv.item_id = b.id
+        and siv.hosp_code = b.hosp_code
+        and siv.item_code = '1'
+        left join base_material c on
+        siv.item_id = c.id
+        and siv.hosp_code = c.hosp_code
+        and siv.item_code = '2'
+        where
+        1 = 1
+        and siv.hosp_code = #{hospCode}
+        <if test="includeInc == '1'.toString()">/*含盘点*/
+            and siv.outin_code in ('7','8','23','25','27','28')
+        </if>
+        <if test="includeInc == '0'.toString()">/*不含盘点*/
+            and siv.outin_code in ('8','23','25','27','28')
+        </if>
+        and date(siv.crte_time) = #{recentlyTime}
+        group by
+        siv.item_id,
+        siv.item_name,
+        siv.biz_id,
+        siv.item_code,
+        date(siv.crte_time)
+        ) A where consum_num != 0
+    </select>
+    <!--查询实时进销存数据-->
+    <select id="queryStroInvoicingByInvoic"
+            resultMap="extractStroInvoicingDetailMap">
+        select
+        a.hosp_code,/*医院编码*/
+        a.biz_id,/*科室id*/
+        a.item_code,/*项目编码*/
+        a.item_id,/*项目id*/
+        a.item_name,/*项目名称*/
+        a.num,/*数量*/
+        max(a.unit_code) unit_code,/*单位*/
+        a.curr_unit_code,/*当前单位*/
+        case when a.item_code = '1' then b.type_code
+        when a.item_code = '2' then c.type_code else '' end item_type,/*项目分类*/
+        (select	d.sell_price from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = max(a.id)) sell_price,/*零售单价*/
+        (select d.buy_price from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = max(a.id)) buy_price,/*购进单价*/
+        a.split_ratio,/*拆分比*/
+        a.split_price,/*拆零单价*/
+        a.split_num,/*拆零数量*/
+        a.split_unit_code,/*拆零单位*/
+        (select d.up_surplus_num from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = min(a.id)) up_surplus_num,/*期初数量*/
+        (select d.surplus_num from stro_invoicing d where  d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = max(a.id)) surplus_num,/*期末数量*/
+        ifnull((select d.up_buy_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = min(a.id)), 0) up_Buy_Price_All,/*期初购进总金额*/
+        (select  d.buy_price_all from stro_invoicing d  where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = max(a.id)) buy_Price_All,/*期末购进总金额*/
+        ifnull((select d.up_sell_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = min(a.id)), 0) up_Sell_Price_All, /*期初零售总金额*/
+        (select d.sell_price_all from stro_invoicing d where d.item_id = a.item_id and d.hosp_code = a.hosp_code and d.id = max(a.id)) sell_Price_All,/*期末零售总金额*/
+        date(a.crte_time) as extract_time,/*抽取时间段*/
+        now() as crte_time,
+        a.new_price,/*新价格*/
+        a.new_split_price,/*新拆零单价*/
+        sum(if( a.outin_code = '2', a.num, 0)) stro_in_num,/*药库入库数量*/
+        sum(if( a.outin_code = '2', a.sell_price * a.num, 0)) stro_in_num_price_all,/*药库入库数量*/
+        sum(if( a.outin_code = '3', a.num, 0)) return_supl_num,/*药库入库数量*/
+        sum(if( a.outin_code = '3', a.sell_price * a.num, 0)) return_supl_price_all,/*药库退供应商零售总金额*/
+        sum(if( a.outin_code = '4', a.num, 0)) stro_to_dept_num,/*药库出库到科室数量*/
+        sum(if( a.outin_code = '4', a.sell_price * a.num, 0)) stro_to_dept_price_all,/*药库出库到科室零售总金额*/
+        sum(if( a.outin_code = '5', a.num, 0)) stro_to_phar_num,/*药库出库到药房数量*/
+        sum(if( a.outin_code = '5', a.sell_price * a.num, 0)) stro_to_phar_price_all,/*药库出库到药房零售总金额*/
+        sum(if( a.outin_code = '8', a.num, 0)) report_losses_num,/*报损消耗数量*/
+        sum(if( a.outin_code = '8', a.sell_price * a.num, 0)) report_losses_price_all,/*报损消耗零售总金额*/
+        sum(if( a.outin_code = '21', a.num, 0)) phar_return_stro_num,/*药房退库数量*/
+        sum(if( a.outin_code = '21', a.sell_price * a.num, 0)) phar_return_stro_price_all,/*药房退库零售总金额*/
+        sum(if( a.outin_code = '24' and a.sell_price_all > a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all, 0)) adjust_profit_price_all,/*调价调盈零售总金额*/
+        sum(if( a.outin_code = '24' and a.sell_price_all > a.up_sell_price_all,a.sell_price_all - a.up_sell_price_all, 0)) adjust_loss_price_all,/*调价亏损零售总金额*/
+        sum(if( a.outin_code = '7' and a.num &lt; 0, a.num, 0)) take_strock_subtract_num,/*盘亏数量*/
+        sum(if( a.outin_code = '7' and a.num &lt; 0, a.sell_price * a.num, 0)) take_strock_subtract_price_all,/*盘亏零售总金额*/
+        sum(if( a.outin_code = '7' and a.num > 0, a.num, 0)) take_strock_add_num,/*盘盈总数量*/
+        sum(if( a.outin_code = '7' and a.num > 0, a.sell_price * a.num, 0)) take_strock_add_price_all,/*盘盈购进总金额*/
+        sum(if( a.outin_code = '2', a.buy_price * a.num, 0)) stro_in_num_buy_price_all,/*药库入库购进总金额*/
+        sum(if( a.outin_code = '3', a.buy_price * a.num, 0)) return_supl_buy_price_all,/*药库退供应商购进总金额*/
+        sum(if( a.outin_code = '4', a.buy_price * a.num, 0)) stro_to_dept_buy_price_all,/*药库出库到科室购进总金额*/
+        sum(if( a.outin_code = '5', a.buy_price * a.num, 0)) stro_to_phar_buy_price_all,/*药库出库到药房购进总金额*/
+        sum(if( a.outin_code = '8', a.buy_price * a.num, 0)) report_losses_buy_price_all,/*报损消耗数量购进总金额*/
+        sum(if( a.outin_code = '21', a.buy_price * a.num, 0)) phar_return_stro_buy_price_all,/*药房退库购进总金额*/
+        sum(if( a.outin_code = '24' and a.buy_price_all > a.up_buy_price_all,a.buy_price_all - a.up_buy_price_all, 0)) adjust_profit_buy_price_all,/*调价调盈购进总金额*/
+        sum(if( a.outin_code = '24' and a.buy_price_all &lt; a.up_buy_price_all,a.buy_price_all - a.up_buy_price_all, 0)) adjust_loss_buy_price_all,/*调价亏损购进总金额*/
+        sum(if( a.outin_code = '7' and a.num &lt; 0, a.buy_price * a.num, 0)) take_strock_subtract_buyPrice_all,/*盘亏购进总金额*/
+        sum(if( a.outin_code = '7' and a.num > 0, a.buy_price * a.num, 0)) take_strock_add_buy_price_all,/*盘盈购进总金额*/
+        sum(if((a.outin_code='23' or a.outin_code='25'),a.num,0)) out_sales_num,                  /**门诊销售总数量**/
+        sum(if((a.outin_code='23' or a.outin_code='25'),a.sell_price * a.num,0)) out_sales_price_all,    /**门诊销售零售总金额**/
+        sum(if((a.outin_code='23' or a.outin_code='25'),a.buy_price * a.num,0)) out_sales_buy_price_all,    /**门诊销售购进总金额**/
+        sum(if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0)) in_sales_buy_price_all,     /**住院销售购进总金额**/
+        sum(if((a.outin_code='27' or a.outin_code='28'),a.sell_price * a.num,0)) in_sales_price_all,     /**住院销售零售总金额**/
+        sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) in_sales_num,                  /**住院销售总数量**/
+        case max(a.item_code) when '1' then max(b.spec) when '2' then max(c.spec) end spec, /**规格**/
+        case max(a.item_code) when '1' then max(b.code) when '2' then max(c.code) end code, /**编码**/
+        #{extractId} as extract_id /*同步主表id*/
+        from
+        stro_invoicing a
+        left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
+        left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
+        where
+        a.hosp_code = #{hospCode}
+        and date(a.crte_time) = #{recentlyTime}
+        group by
+        a.item_id,
+        a.biz_id,
+        date(a.crte_time)
+    </select>
+    <!--按供应商查询需要同步的数据-->
+    <select id="queryBusinessBySup" resultMap="extractBusinessMap">
+        SELECT bs.name AS target_biz_name ,bs.id as target_biz_id,'3' as report_type,
+               count(DISTINCT sid.order_no) AS mainNum, count(0) AS detailNum,
+               count(DISTINCT sid.item_id) AS itemNum, count(DISTINCT sid.batch_no) AS batchNoNum,
+               max(sid.crte_time) AS lastTime, (sum(sid.num * sid.buy_price)) / count(DISTINCT sid.order_no) AS avgMainBuyPrice,
+               (sum(sid.buy_price * sid.num)) / count(DISTINCT sid.item_id) AS avgItemBuyPrice,
+               (sum(sid.buy_price * sid.num)) AS buyPriceAll, (sum(sid.sell_price * sid.num)) AS sellPriceAll,
+               (sum(sid.sell_price * sid.num) - sum(sid.buy_price * sid.num)) AS priceSpread,#{extractId} as extract_id
+        FROM stro_invoicing sid
+               LEFT JOIN stro_in si ON sid.order_no = si.order_no AND sid.hosp_code = si.hosp_code
+               LEFT JOIN base_supplier bs ON si.supplier_id = bs.id AND sid.hosp_code = bs.hosp_code
+        WHERE sid.hosp_code = #{hospCode}
+          AND sid.outin_code IN ('1', '2', '3') AND date(sid.crte_time) = #{recentlyTime}
+        GROUP BY target_biz_id,date(sid.crte_time),sid.biz_id
+    </select>
+
+    <!--插入同步主表-->
+    <insert id="insertExtractData">
+        insert into extract_data(id,hosp_code, extract_num, extract_time, extract_type, consume_time, extract_status,extract_date)
+        values (#{id},#{hospCode}, #{extractNum}, #{extractTime}, #{extractType}, #{consumeTime}, #{extractStatus},#{extractDate})
+    </insert>
+
+    <!--插入extract_consumption_detail消耗表-->
+    <insert id="insertBatchToConsumption">
+        insert into extract_consumption_detail(id,hosp_code, summary_type, statistics_options, item_id, item_code, item_name, code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id, consum_num, avg_sell_price, sell_price_all, avg_buy_price, buy_price_all, profit_price, extract_type, extract_time, renewal_time, extract_id)
+        values
+        <foreach collection="extractConsumptionDetails" item="entity" separator=",">
+            (#{entity.id},#{entity.hospCode}, #{entity.summaryType}, #{entity.statisticsOptions}, #{entity.itemId}, #{entity.itemCode}, #{entity.itemName}, #{entity.code}, #{entity.typeCode}, #{entity.spec}, #{entity.unitCode}, #{entity.price}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.bizId}, #{entity.consumNum}, #{entity.avgSellPrice}, #{entity.sellPriceAll}, #{entity.avgBuyPrice}, #{entity.buyPriceAll}, #{entity.profitPrice}, #{entity.extractType}, #{entity.extractTime}, #{entity.renewalTime}, #{entity.extractId})
+        </foreach>
+    </insert>
+
+    <!--插入实时进销存表-->
+    <insert id="insertBatchStroInvoic">
+        insert into extract_stro_invoicing_detail(id,hosp_code, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code, sell_price, buy_price, split_ratio, split_price, split_num, split_unit_code, up_surplus_num, surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all, crte_time, new_price, new_split_price, stro_in_num, stro_in_num_price_all, return_supl_num, return_supl_price_all, stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num, stro_to_phar_price_all, report_losses_num, report_losses_price_all, phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all, adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all, take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all, return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all, report_losses_buy_price_all, phar_return_stro_buy_price_all, adjust_profit_buy_price_all, adjust_loss_buy_price_all, take_strock_subtract_buy_price_all, take_strock_add_buy_price_all, out_sales_num, out_sales_price_all, out_sales_buy_price_all, in_sales_buy_price_all, in_sales_price_all, in_sales_num, extract_id, spec, code, extract_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id},#{entity.hospCode}, #{entity.bizId}, #{entity.itemCode}, #{entity.itemId}, #{entity.itemName}, #{entity.num}, #{entity.unitCode}, #{entity.currUnitCode}, #{entity.sellPrice}, #{entity.buyPrice}, #{entity.splitRatio}, #{entity.splitPrice}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.upSurplusNum}, #{entity.surplusNum}, #{entity.upBuyPriceAll}, #{entity.buyPriceAll}, #{entity.upSellPriceAll}, #{entity.sellPriceAll}, #{entity.crteTime}, #{entity.newPrice}, #{entity.newSplitPrice}, #{entity.stroInNum}, #{entity.stroInNumPriceAll}, #{entity.returnSuplNum}, #{entity.returnSuplPriceAll}, #{entity.stroToDeptNum}, #{entity.stroToDeptPriceAll}, #{entity.stroToPharNum}, #{entity.stroToPharPriceAll}, #{entity.reportLossesNum}, #{entity.reportLossesPriceAll}, #{entity.pharReturnStroNum}, #{entity.pharReturnStroPriceAll}, #{entity.adjustProfitPriceAll}, #{entity.adjustLossPriceAll}, #{entity.takeStrockSubtractNum}, #{entity.takeStrockSubtractPriceAll}, #{entity.takeStrockAddNum}, #{entity.takeStrockAddPriceAll}, #{entity.stroInNumBuyPriceAll}, #{entity.returnSuplBuyPriceAll}, #{entity.stroToDeptBuyPriceAll}, #{entity.stroToPharBuyPriceAll}, #{entity.reportLossesBuyPriceAll}, #{entity.pharReturnStroBuyPriceAll}, #{entity.adjustProfitBuyPriceAll}, #{entity.adjustLossBuyPriceAll}, #{entity.takeStrockSubtractBuyPriceAll}, #{entity.takeStrockAddBuyPriceAll}, #{entity.outSalesNum}, #{entity.outSalesPriceAll}, #{entity.outSalesBuyPriceAll}, #{entity.inSalesBuyPriceAll}, #{entity.inSalesPriceAll}, #{entity.inSalesNum}, #{entity.extractId}, #{entity.spec}, #{entity.code}, #{entity.extractTime})
+        </foreach>
+    </insert>
+    <!--批量插入stro_out-->
+    <insert id="insertBatchBusiness">
+        insert into extract_business(id,hosp_code, report_type, biz_id, target_biz_id, target_biz_name, main_num, detail_num, item_num, batch_no_num, last_time, avg_main_buy_price, avg_item_buy_price, buy_price_all, price_spread, sell_price_all, extract_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id},#{entity.hospCode}, #{entity.reportType}, #{entity.bizId}, #{entity.targetBizId}, #{entity.targetBizName}, #{entity.mainNum}, #{entity.detailNum}, #{entity.itemNum}, #{entity.batchNoNum}, #{entity.lastTime}, #{entity.avgMainBuyPrice}, #{entity.avgItemBuyPrice}, #{entity.buyPriceAll}, #{entity.priceSpread}, #{entity.sellPriceAll}, #{entity.extractTime})
+        </foreach>
+    </insert>
+</mapper>

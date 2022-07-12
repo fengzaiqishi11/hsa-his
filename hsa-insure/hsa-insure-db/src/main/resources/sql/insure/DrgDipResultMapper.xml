@@ -850,7 +850,7 @@
         mbi.out_time,
         if(ddr.states is null,
         '0',
-        ddr.states),
+        ddr.states) as states,
         ddr.group_result,
         mbi.is_upload_insure as isUplod
         from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id and iv.status_code = '7'
@@ -861,11 +861,11 @@
          left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id
          where 1=1
 
-            <if test="keyword != null and keyword != '' ">
-                and (ddrd.result_msg like concat('%',#{keyword},'%')
-                    or  mbi.name like concat('%',#{keyword},'%')
-                or mbi.in_profile like concat('%',#{keyword},'%')
-                or  iv.in_no like concat('%',#{keyword},'%')
+            <if test="keywords != null and keywords != '' ">
+                and (ddrd.result_msg like concat('%',#{keywords},'%')
+                    or  mbi.name like concat('%',#{keywords},'%')
+                or mbi.in_profile like concat('%',#{keywords},'%')
+                or  iv.in_no like concat('%',#{keywords},'%')
                 )
             </if>
         <if test="deptIds != null and deptIds.size()>0">
@@ -1031,11 +1031,11 @@
         and iiv.aka130 = '14') n
         ) A
         <where>
-            <if test="keyword != null and keyword != '' ">
-                and (A.result_msg like concat('%',#{keyword},'%')
-                or  A.psn_name like concat('%',#{keyword},'%')
-                or A.medcasno like concat('%',#{keyword},'%')
-                or  A.visitNo like concat('%',#{keyword},'%')
+            <if test="keywords != null and keywords != '' ">
+                and (A.result_msg like concat('%',#{keywords},'%')
+                or  A.psn_name like concat('%',#{keywords},'%')
+                or A.medcasno like concat('%',#{keywords},'%')
+                or  A.visitNo like concat('%',#{keywords},'%')
                 )
             </if>
             <if test="yearFlag != null and yearFlag=='1'">

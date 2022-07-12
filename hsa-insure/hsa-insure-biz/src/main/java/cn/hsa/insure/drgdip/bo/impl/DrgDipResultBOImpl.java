@@ -13,6 +13,8 @@ import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
 import cn.hsa.module.insure.drgdip.dto.*;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
+import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
+import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.util.*;
@@ -37,6 +39,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -69,6 +72,9 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
 
     @Resource
     private InsureDictService insureDictService_consumer;
+
+    @Resource
+    private InsureGetInfoDAO insureGetInfoDAO;
 
     /**
      * @return
@@ -513,7 +519,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                 responseDataMap.put("hiType","自费病人");// 医保类型
             }
         }else {
-            responseDataMap.put("hiType","自费病人");// 医保类型
+            responseDataMap.put("hiType","");// 医保类型
         }
         if(Constant.UnifiedPay.ZKLX.DRG.equals(drgDipResultDTO.getType())){
             responseDataMap.put("drgCode",drgDipResultDTO1.getDrgDipCode());// DRG组编码
@@ -535,6 +541,42 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
         responseDataMap.put("scorePrice",drgDipResultDTO1.getScorePrice());// 分值单价
         responseDataMap.put("quality",HumpUnderlineUtils.humpToUnderlineArray(qualityInfoList));// 质控信息
+        //自行计算标杆费用
+        if(drgDipResultDTO1.getFeePay() != null && !"".equals(drgDipResultDTO1.getFeePay()) && drgDipResultDTO1.getScorePrice()!= null && !"".equals(drgDipResultDTO1.getScorePrice())){
+            responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(drgDipResultDTO1.getFeePay().toString()),BigDecimalUtils.convert(drgDipResultDTO1.getScorePrice().toString())).setScale(2));// 标杆费用
+        }
+        //先查询是否出院
+        Map<String,Object> priceMap = new HashMap<>();
+        priceMap.put("hospCode",drgDipResultDTO.getHospCode());
+        priceMap.put("visitId",drgDipResultDTO.getVisitId());
+        String statusCode = insureGetInfoDAO.queryInptVist(priceMap);
+        if(!Constants.BRZT.CY.equals(statusCode)){
+            responseDataMap.put("estimateFund","-");//预计基金支付
+            responseDataMap.put("profitAndLossAmount","-");//盈亏额
+        }else {
+            //计算预计基金支付
+            PayInfoDTO payInfoDTO = insureGetInfoDAO.queryInsureSettlePrice(priceMap);
+            if(payInfoDTO == null){
+                responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+            }else{
+                //如果没报销算全自费
+                if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else {
+                    BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                    BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                    estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    //如果小于0当做0处理
+                    if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                        estimateFund = BigDecimal.ZERO;
+                    }
+                    responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                    responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+                }
+            }
+        }
         return responseDataMap;
     }
 

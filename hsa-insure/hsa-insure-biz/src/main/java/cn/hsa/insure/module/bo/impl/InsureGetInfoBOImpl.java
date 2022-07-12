@@ -1024,15 +1024,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 responseDataMap.put("estimateFund","-全自费");//预计基金支付
                 responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
             }else{
-                BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
-                BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
-                //如果小于0当做0处理
-                if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
-                    estimateFund = BigDecimal.ZERO;
+                //如果没有报销也算全自费
+                if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else {
+                    BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                    BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                    estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    //如果小于0当做0处理
+                    if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                        estimateFund = BigDecimal.ZERO;
+                    }
+                    responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                    responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                 }
-                responseDataMap.put("estimateFund",estimateFund);//预计基金支付
-                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
             }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){
@@ -1400,15 +1406,21 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 responseDataMap.put("estimateFund","-全自费");//预计基金支付
                 responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
             }else{
-                BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
-                BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
-                //如果小于0当做0处理
-                if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
-                    estimateFund = BigDecimal.ZERO;
+                //如果没有报销也算全自费
+                if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else {
+                    BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                    BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                    estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    //如果小于0当做0处理
+                    if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                        estimateFund = BigDecimal.ZERO;
+                    }
+                    responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                    responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                 }
-                responseDataMap.put("estimateFund",estimateFund);//预计基金支付
-                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
             }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){

@@ -2128,4 +2128,8 @@
 	    moi.columns_num asc
     </select>
 
+    <select id="queryInptVist" resultType="java.lang.String">
+        select status_code from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
+    </select>
+
 </mapper>

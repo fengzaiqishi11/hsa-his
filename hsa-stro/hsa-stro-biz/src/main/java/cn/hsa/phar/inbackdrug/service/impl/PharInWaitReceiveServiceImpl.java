@@ -187,4 +187,10 @@ public class PharInWaitReceiveServiceImpl extends HsafService implements PharInW
         return WrapperResponse.success(isSussess);
     }
 
+    @Override
+    public WrapperResponse<List<Map<String, Object>>> queryAllVisit(Map<String, Object> map) {
+        PharInWaitReceiveDTO pharInWaitReceiveDTO = (PharInWaitReceiveDTO) map.get("pharInWaitReceiveDTO");
+        return  WrapperResponse.success(pharInWaitReceiveBO.queryAllVisit(pharInWaitReceiveDTO));
+    }
+
 }

@@ -480,6 +480,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     inMap.put("analysisDTO",analysisDTO);
                     inMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
                     AnaResJudgeDTO anaResJudgeDTO = insureDetailAuditService.upldMidAnalysisDTO(inMap);
+
                 }
 
                 //TODO 保存医保试算接口返回的报销信息

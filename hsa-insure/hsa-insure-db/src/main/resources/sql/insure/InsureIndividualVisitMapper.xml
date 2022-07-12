@@ -1563,5 +1563,30 @@
         AND hosp_code =#{hospCode}
         ORDER BY crte_time DESC LIMIT 1
     </select>
+    <select id="getOutptDiagnose" resultType="cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        select a.id, a.hosp_code hospCode, a.disease_id diseaseId, a.visit_id visitId, a.type_code typeCode,a.custom_disease as customDisease,
+        a.is_main isMain, b.name diseaseName,b.code as diseaseCode, b.nation_code as nationCode, ifnull(b.nation_name, b.name) as nationName, ov.doctor_id doctorId,ov.dept_name deptName,ov.doctor_name doctorName,
+        a.tcm_syndromes_id as tcmSyndromesId, a.tcm_syndromes_name as tcmSyndromesName,b.is_valid isValid
+        from outpt_diagnose a
+        join base_disease b on a.disease_id = b.id and a.hosp_code = b.hosp_code
+        join outpt_visit ov on ov.id = a.visit_id and ov.hosp_code = a.hosp_code
+        where  a.visit_id = #{visitId} and a.hosp_code = #{hospCode}
+        <if test="isMain != null and isMain != ''">
+            and a.is_main = #{isMain}
+        </if>
+    </select>
 
+    <select id="selectOutptVisitById" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code,
+               age, age_unit_code, birthday, marry_code, nation_code, cert_code, cert_no, phone,
+               now_address, visit_no, visit_code, patient_code,
+               source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+               insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time,
+               is_visit, is_first_visit, tran_in_code, in_cert_time, in_dept_id,
+               in_disease_id, in_remark, advance_payment,
+               crte_id, crte_name, crte_time,
+               (select su.prac_certi_no from sys_user su where su.hosp_code = outpt_visit.hosp_code and su.id =outpt_visit.doctor_id ) pracCertiNo,
+               (select bd.nation_code from base_dept  bd where bd.hosp_code = outpt_visit.hosp_code and outpt_visit.dept_id = bd.id ) as caty
+        from outpt_visit where hosp_code =#{hospCode} and id =#{visitId}
+    </select>
 </mapper>

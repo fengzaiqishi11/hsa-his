@@ -14,6 +14,7 @@ import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptMedicalRecordDTO;
 import cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDTO;
@@ -25,12 +26,14 @@ import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto;
 import cn.hsa.module.outpt.triage.service.OutptTriageVisitService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -53,6 +56,7 @@ import java.util.*;
 @RequestMapping("/web/outpt/outptDoctorPrescribe")
 @Slf4j
 public class OutptDoctorPrescribeController extends BaseController {
+
 
   /**
    * 处方管理dubbo消费者接口
@@ -80,6 +84,7 @@ public class OutptDoctorPrescribeController extends BaseController {
    */
   @Resource
   private SysParameterService sysParameterService_consumer;
+
 
   /**
    * @Menthod queryPatientByOperType
@@ -965,6 +970,7 @@ public class OutptDoctorPrescribeController extends BaseController {
     outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
     outptPrescribeDTO.setSubmitName(sysUserDTO.getName());
     outptPrescribeDTO.setSubmitId(sysUserDTO.getId());
+
     map.put("hospCode",sysUserDTO.getHospCode());
     map.put("outptPrescribeDTO",outptPrescribeDTO);
     return outptDoctorPrescribeService_consumer.updatePrescribeSubmit(map);

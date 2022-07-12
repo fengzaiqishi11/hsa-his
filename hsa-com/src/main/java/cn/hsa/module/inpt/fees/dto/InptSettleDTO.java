@@ -135,4 +135,8 @@ public class InptSettleDTO extends InptSettleDO implements Serializable {
          * 身份证号码
          */
         private String certNo;
+        //补退
+        private BigDecimal backTake;
+        //个账余额
+        private BigDecimal lastSettle;
 }

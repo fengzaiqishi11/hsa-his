@@ -6,6 +6,7 @@
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
         <result property="adviceId" column="advice_id" jdbcType="VARCHAR"/>
+        <result property="advanceId" column="advance_id" jdbcType="VARCHAR"/>
         <result property="groupNo" column="group_no" jdbcType="VARCHAR"/>
         <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
         <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
@@ -633,7 +634,8 @@
         e.dosage as adviceDosage,
         bp.name as productName,
         b.spec,
-        (select f.name from base_rate f where f.id = e.rate_id) as rateName
+        (select f.name from base_rate f where f.id = e.rate_id) as rateName,
+        if(e.is_long = '1','临时','长期') as adviceType -- 医嘱类型
         from phar_in_wait_receive a
         left join base_drug b on a.item_id = b.id
         left join base_product bp on b.prod_code = bp.code
@@ -651,11 +653,21 @@
             and a.is_back = #{isBack}
         </if>
         <if test="isEmergency != null and isEmergency !=''">
-          and a.is_emergency = #{isEmergency}
+            and a.is_emergency = #{isEmergency}
+        </if>
+        /*用于紧急领药中查询长期或临时的医嘱类型*/
+        <if test="isLong != null  and isLong !=''">
+            and find_in_set(e.is_long,#{isLong})
         </if>
         /*仅查询出提前领药的待领数据*/
         <if test="isAdvance != null and isAdvance != ''" >
           and a.advance_id is not null and a.advance_id != ''
+        </if>
+        <if test="ids != null and ids.size()>0" >
+            and  a.visit_id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
         </if>
     </select>
 
@@ -719,6 +731,22 @@
             AND e.dist_time &lt; date_add(STR_TO_DATE(#{endDate},'%Y-%m-%d'),interval 1 day)
         </if>
         order by e.crte_time desc
+    </select>
+    
+    
+    <select id="queryAllVisit"  resultType="java.util.Map">
+        select
+            distinct
+            a.id as value ,
+	        a.name as label
+        from
+            inpt_visit a,
+            phar_in_wait_receive b
+        where
+            a.status_code = '2'
+          and a.id = b.visit_id
+          and a.hosp_code  = b.hosp_code
+          and b.dept_id  = #{deptId}
     </select>
 
 </mapper>

@@ -12,7 +12,6 @@ import cn.hsa.module.inpt.doctor.dao.InptCostDAO;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.drawMedicine.bo.DrawMedicineBO;
-import cn.hsa.module.inpt.medical.bo.MedicalAdviceBO;
 import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.inpt.medical.service.MedicalAdviceService;
 import cn.hsa.module.phar.pharapply.service.PharApplyService;
@@ -26,9 +25,6 @@ import cn.hsa.util.*;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 import org.springframework.util.CollectionUtils;
 
@@ -597,12 +593,6 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       throw new RuntimeException("请选择领药单据类型!");
     }
 
-    List<Map<String,Object>> advanceMapList = inptAdviceDAO.getMedicineAdvance(map);
-    // 校验是否可提前领药
-    if(!CollectionUtils.isEmpty(advanceMapList)){
-      throw new RuntimeException("该单据类型或全部药品类型已申请提前领取了"+days+"天内的药品了，不可重复操作！");
-    }
-
     Map parmMap = new HashMap();
     parmMap.put("hospCode", hospCode);
     parmMap.put("id", advanceType);
@@ -745,6 +735,11 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     return true;
   }
 
+  @Override
+  public List<Map<String, Object>> queryAllVisit(Map<String, Object> map) {
+    return  pharInWaitReceiveService_consumer.queryAllVisit(map).getData();
+  }
+
   //领药申请详情汇总
   public List<PharInWaitReceiveDTO> getSummary(List<PharInWaitReceiveDTO> inWaitReceiveList) {
     if (ListUtils.isEmpty(inWaitReceiveList)) {
@@ -773,6 +768,8 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
 
   public List<PharInWaitReceiveDTO> getPharInWaitReceiveDTOS(Map map, String hospCode, List<String> codeList) {
     String id = MapUtils.get(map, "id");
+    String ids = MapUtils.get(map, "ids");
+
     Map baseOrderReceiveMap = new HashMap();
     BaseOrderReceiveDTO baseOrderReceiveDTO = new BaseOrderReceiveDTO();
     baseOrderReceiveDTO.setHospCode(hospCode);
@@ -795,9 +792,16 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
       if (!StringUtils.isEmpty(pharInWaitReceiveDTO1.getIsEmergency())){
         // 查询非紧急数据
         pharInWaitReceiveDTO.setIsEmergency(pharInWaitReceiveDTO1.getIsEmergency());
+        pharInWaitReceiveDTO.setIsLong(pharInWaitReceiveDTO1.getIsLong());
       }
       pharInWaitReceiveDTO.setIsAdvance(pharInWaitReceiveDTO1.getIsAdvance());
+      pharInWaitReceiveDTO.setIds(pharInWaitReceiveDTO1.getIds());
     }
+
+    if(!StringUtils.isEmpty(ids)){
+      pharInWaitReceiveDTO.setIds(Arrays.asList(ids.split(",")));
+    }
+
     queryWaitReceiveMap.put("hospCode", hospCode);
     queryWaitReceiveMap.put("pharInWaitReceiveDTO", pharInWaitReceiveDTO);
     //查询所有待领药品
@@ -813,6 +817,12 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     pharInWaitReceiveDTOisBack.setHospCode(hospCode);
     pharInWaitReceiveDTOisBack.setDeptId(MapUtils.get(map, "deptId"));
     pharInWaitReceiveDTOisBack.setIsBack("1");
+    if (pharInWaitReceiveDTO1 != null){
+      pharInWaitReceiveDTOisBack.setIds(pharInWaitReceiveDTO1.getIds());
+    }
+    if(!StringUtils.isEmpty(ids)){
+      pharInWaitReceiveDTOisBack.setIds(Arrays.asList(ids.split(",")));
+    }
     queryWaitReceiveMapIsBack.put("hospCode", hospCode);
     queryWaitReceiveMapIsBack.put("pharInWaitReceiveDTO", pharInWaitReceiveDTOisBack);
     //查询所有待领药品

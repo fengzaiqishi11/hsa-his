@@ -1566,9 +1566,25 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 //调云助手查询是否为最新数据
                 checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureDiseaseDTO.getRecordCounts(),insureDiseaseDTO.getNum(),insureDiseaseDTO.getSize());
             }
+
             if (insureDiseaseDTO != null) {
-                num = insureDiseaseDTO.getNum();
-                dataMap.put("page_num", ++num);
+                //查询该项目在表中最后一页的数据
+                int pageNum = insureDiseaseDTO.getNum();
+                map.put("lastPage",pageNum);
+                List<InsureDiseaseDTO> lastPageList = insureDiseaseDAO.selectLastPageList(map);
+                List<String> ids = lastPageList.stream().map(InsureDiseaseDTO::getId).collect(Collectors.toList());
+                if(!ListUtils.isEmpty(lastPageList)&&lastPageList.size()<insureDiseaseDTO.getSize()){
+                    //删除最后一页的数据重新下载，避免少下载和重复下载的情况
+                    map.put("ids",ids);
+                    insureDiseaseDAO.deleteLastPage(map);
+                    dataMap.put("page_num", pageNum);
+                    num = pageNum;
+                }else{
+                    num = ++pageNum;
+                    dataMap.put("page_num", num);
+
+                }
+
             } else {
                 dataMap.put("page_num", num);
             }
@@ -1579,9 +1595,24 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 //调云助手查询是否为最新数据
                 checkIsNewItem(insureRegCode, itemType, insureConfigurationDTO.getUrl(), insureItemDTO.getRecordCounts(),insureItemDTO.getNum(),insureItemDTO.getSize());
             }
-            if (insureItemDTO != null) {
-                num = insureItemDTO.getNum();
-                dataMap.put("page_num", ++num);
+              if (insureItemDTO != null) {
+                  //查询该项目在表中最后一页的数据
+                  int pageNum = insureItemDTO.getNum();
+                  map.put("lastPage",pageNum);
+                  List<InsureItemDTO> lastPageList = insureItemDAO.selectLastPageList(map);
+                  List<String> ids = lastPageList.stream().map(InsureItemDTO::getId).collect(Collectors.toList());
+
+                 if(!ListUtils.isEmpty(lastPageList)&&lastPageList.size()<insureItemDTO.getSize()){
+                     //删除最后一页的数据重新下载，避免少下载和重复下载的情况
+                     map.put("ids",ids);
+                     insureItemDAO.deleteLastPage(map);
+                     dataMap.put("page_num", pageNum);
+                     num = pageNum;
+                 }else{
+                     num = ++pageNum;
+                     dataMap.put("page_num", num);
+
+                 }
             } else {
                 dataMap.put("page_num", num);
             }
@@ -1643,6 +1674,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         logger.info("统一支付平台下载入参" + itemType + ":" + json);
         String url = insureConfigurationDTO.getUrl();
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
+        logger.info("统一支付平台下载返参" + itemType + ":" + resultJson);
         if (StringUtils.isEmpty(resultJson)) {
             throw new AppException("无法访问医保统一支付平台");
         }
@@ -1650,7 +1682,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
             throw new AppException((String) resultMap.get("msg"));
         }
-        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
             throw new AppException((String) resultMap.get("err_msg"));
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
@@ -3102,19 +3134,39 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("下载的码表数据为空");
         }
         List<InsureDictDO> insureDictDTOList = new ArrayList<>();
-        for (Map<String, Object> item : resultDataMap) {
-            insureDictDTO = new InsureDictDTO();
-            insureDictDTO.setId(SnowflakeUtils.getId());
-            insureDictDTO.setHospCode(hospCode);
-            insureDictDTO.setInsureRegCode(insureRegCode);
-            insureDictDTO.setCode(MapUtils.get(item, "type"));
-            insureDictDTO.setValue(MapUtils.get(item, "value"));
-            insureDictDTO.setName(MapUtils.get(item, "label"));
-            insureDictDTO.setRemark(remark);
-            insureDictDTO.setCrteId(crteId);
-            insureDictDTO.setCrteTime(DateUtils.getNow());
-            insureDictDTO.setCrteName(crteName);
-            insureDictDTOList.add(insureDictDTO);
+        //广州码表下载接口与湖南的返回字段不一样且返回的是全量的码表值，做一下特殊处理
+        if (insureRegCode.startsWith(Constant.UnifiedPay.YBBMQZ.GD)) {
+            for (Map<String, Object> item : resultDataMap) {
+                if (type.equalsIgnoreCase(MapUtils.get(item, "dic_type_code"))) {
+                    insureDictDTO = new InsureDictDTO();
+                    insureDictDTO.setId(SnowflakeUtils.getId());
+                    insureDictDTO.setHospCode(hospCode);
+                    insureDictDTO.setInsureRegCode(insureRegCode);
+                    insureDictDTO.setCode(MapUtils.get(item, "dic_type_code"));
+                    insureDictDTO.setValue(MapUtils.get(item, "place_dic_val_code"));
+                    insureDictDTO.setName(MapUtils.get(item, "place_dic_val_name"));
+                    insureDictDTO.setRemark(remark);
+                    insureDictDTO.setCrteId(crteId);
+                    insureDictDTO.setCrteTime(DateUtils.getNow());
+                    insureDictDTO.setCrteName(crteName);
+                    insureDictDTOList.add(insureDictDTO);
+                }
+            }
+        }else {
+            for (Map<String, Object> item : resultDataMap) {
+                insureDictDTO = new InsureDictDTO();
+                insureDictDTO.setId(SnowflakeUtils.getId());
+                insureDictDTO.setHospCode(hospCode);
+                insureDictDTO.setInsureRegCode(insureRegCode);
+                insureDictDTO.setCode(MapUtils.get(item, "type"));
+                insureDictDTO.setValue(MapUtils.get(item, "value"));
+                insureDictDTO.setName(MapUtils.get(item, "label"));
+                insureDictDTO.setRemark(remark);
+                insureDictDTO.setCrteId(crteId);
+                insureDictDTO.setCrteTime(DateUtils.getNow());
+                insureDictDTO.setCrteName(crteName);
+                insureDictDTOList.add(insureDictDTO);
+            }
         }
         if (!ListUtils.isEmpty(insureDictDTOList)) {
             map.put("insureDictDTOList", insureDictDTOList);

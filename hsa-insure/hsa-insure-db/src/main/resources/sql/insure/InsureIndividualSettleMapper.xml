@@ -1734,6 +1734,7 @@
             AND iis.visit_id = #{visitId}
         </if>
             AND iis.state = '0'
+            order by crte_time desc limit 1
     </select>
 
 </mapper>

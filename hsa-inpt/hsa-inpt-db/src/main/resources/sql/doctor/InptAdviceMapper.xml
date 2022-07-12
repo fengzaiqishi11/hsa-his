@@ -1393,8 +1393,8 @@
         and a.is_long='0'
         --         已核收
         and a.is_check='1'
-        --         排除停嘱并核收
-        and !(a.is_stop='1' and a.is_stop_check='1')
+        --         排除停嘱并核收(只要是停嘱的 都不再产生费用)
+        and a.is_stop !='1'
         --         非据收医嘱
         and (a.is_reject is null or a.is_reject='0')
         --         在院
@@ -1818,20 +1818,6 @@
         hosp_code = #{hospCode}
         and dept_id = #{deptId}
         order by crte_time desc limit 5
-    </select>
-
-    <!--获取科室当天该单据类型或全部药品单据类型，未取消的并且领药天数大于该提前领药天数的提前领药记录-->
-    <select id="getMedicineAdvance" resultType="map" parameterType="map">
-        select ima.* from
-        inpt_medicine_advance ima
-        left join base_order_receive bor on bor.hosp_code = ima.hosp_code
-        where
-            ima.hosp_code = #{hospCode}
-            and ima.dept_id = #{deptId}
-            and (ima.type_code = #{advanceType} or bor.is_all = '1')
-            and ima.sfpy != '2'
-            and ima.advance_days >= #{advanceDays}
-            and date_format(ima.crte_time,'%Y-%m-%d') = curdate()
     </select>
 
     <!--修改提前领药记录-->

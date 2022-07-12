@@ -572,8 +572,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
      */
     @Override
-    public WrapperResponse<Map<String, Object>> querySettleResult(Map<String, Object> map) {
-      return WrapperResponse.success(outptTmakePriceFormBO.querySettleResult(map));
+    public Map<String, Object> querySettleResult(Map<String, Object> map) {
+      return outptTmakePriceFormBO.querySettleResult(map);
     }
 
     /**
@@ -586,8 +586,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       *
      **/
     @Override
-    public WrapperResponse AMP_HOS_001(Map map){
-        return outptTmakePriceFormBO.AMP_HOS_001(map);
+    public WrapperResponse savePayOnlineInfoDO(Map map){
+        return outptTmakePriceFormBO.savePayOnlineInfoDO(map);
     }
 
     /**
@@ -625,8 +625,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @description
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> queryUnsettleList(Map param) {
-        return WrapperResponse.success(outptTmakePriceFormBO.queryUnsettleList(param));
+    public Map<String, Object> updateUnsettleList(Map param) {
+        return outptTmakePriceFormBO.updateUnsettleList(param);
     }
 
     /**
@@ -638,8 +638,8 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
      * @description 查询用户在院内的账户信息，如果用户是住院患者需要返回住院所需要的住院病人信息字段
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> queryAccount(Map param) {
-        return WrapperResponse.success(outptTmakePriceFormBO.queryAccount(param));
+    public Map<String, Object> queryAccount(Map param) {
+        return outptTmakePriceFormBO.queryAccount(param);
     }
 
     /**
@@ -652,7 +652,7 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
       *
      **/
     @Override
-    public WrapperResponse<Map<String, Object>> rechargeSettle(Map param) {
-        return WrapperResponse.success(outptTmakePriceFormBO.rechargeSettle(param));
+    public Map<String, Object> updateRechargeSettle(Map param) {
+        return outptTmakePriceFormBO.updateRechargeSettle(param);
     }
 }

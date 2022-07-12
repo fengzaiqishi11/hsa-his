@@ -822,7 +822,7 @@
                is_visit, is_first_visit, tran_in_code, in_cert_time, in_dept_id,
                in_disease_id, in_remark, advance_payment,
                crte_id, crte_name, crte_time
-        from outpt_visit where cert_code =#{certCode} and cert_no =#{certNo}
+        from outpt_visit where cert_code =#{certCode} and cert_no =#{certNo} order by visit_time DESC LIMIT 1
     </select>
     <select id="selectOutptSettleById" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
         select id, hosp_code, visit_id, settle_no, patient_code, settle_time, total_price, reality_price,
@@ -961,4 +961,11 @@
         where
         id = #{id} and hosp_code =#{hospCode}
     </update>
+
+    <select id="getByVisitId" resultType="cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO">
+        select aae140,bka006,bka008,bka035,aac002,aac004,aac006,aae140,aac001,aac003 from insure_individual_basic
+        where id = (
+        select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode} and medical_reg_no = #{medicalRegNo})
+        and hosp_code = #{hospCode}
+    </select>
 </mapper>

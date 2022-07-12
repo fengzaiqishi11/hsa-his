@@ -30,4 +30,6 @@ public class CenterFunctionAuthorizationDto  extends CenterFunctionAuthorization
 
     //是否有审核数据  0没有 ，1有
     private String sfysh;
+
+    private String yyyxq;
 }

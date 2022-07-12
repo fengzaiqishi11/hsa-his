@@ -1,8 +1,11 @@
 package cn.hsa.insure.module.service.impl;
+import com.google.common.collect.Lists;
+import java.math.BigDecimal;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.AnaResJudgeDTO;
+import cn.hsa.module.insure.module.dto.AnaResJudgeDetlDTO;
 import cn.hsa.module.insure.module.dto.AnalysisDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
@@ -19,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -82,6 +87,7 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
         log.info("统一支付平台明细审核事前分析回参:" + resultStr);
         Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
         AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
+        checkResult(result);
         return result;
     }
 
@@ -131,7 +137,36 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
         log.info("统一支付平台明细审核事中分析回参:" + resultStr);
         Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
         AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
+        checkResult(result);
         return result;
+    }
+
+    private void checkResult(AnaResJudgeDTO result) {
+        if (ObjectUtil.isNotEmpty(result) && ObjectUtil.isNotEmpty(result.getJudgeResultDetailDtos())) {
+            StringBuilder builder = new StringBuilder();
+            if (ObjectUtil.isNotEmpty(result.getJrId())) {
+                builder.append("违规标识:").append(result.getJrId()).append(",");
+                builder.append("规则ID:").append(result.getRuleId()).append(",");
+                builder.append("规则名称:").append(result.getRuleName()).append(",");
+                builder.append("违规内容:").append(result.getVolaCont()).append(",");
+                builder.append("违规金额:").append(result.getVolaAmt()).append(",");
+                builder.append("违规明细：{");
+                for (AnaResJudgeDetlDTO judgeDetlDTO : result.getJudgeResultDetailDtos()) {
+                    if (ObjectUtil.isNotEmpty(judgeDetlDTO.getJrdId()) && ObjectUtil.isNotEmpty(judgeDetlDTO.getVolaItemType())) {
+                        builder.append("违规明细标识：").append(judgeDetlDTO.getJrdId()).append(",");
+                        builder.append("参保人标识：").append(judgeDetlDTO.getPatnId()).append(",");
+                        builder.append("就诊标识：").append(judgeDetlDTO.getMdtrtId()).append(",");
+                        builder.append("处方(医嘱)标识：").append(judgeDetlDTO.getRxId()).append(",");
+                        builder.append("违规明细类型：").append(judgeDetlDTO.getVolaItemType()).append(",");
+                        builder.append("违规金额：").append(judgeDetlDTO.getVolaAmt()).append(";");
+                    }
+                }
+                builder.append("}");
+            }
+            if (ObjectUtil.isNotEmpty(builder) && builder.length() > 0) {
+                throw new RuntimeException("明细审核存在违规情况："+builder.toString());
+            }
+        }
     }
 
 

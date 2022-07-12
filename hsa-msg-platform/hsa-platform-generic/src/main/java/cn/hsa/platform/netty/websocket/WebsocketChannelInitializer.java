@@ -1,5 +1,6 @@
 package cn.hsa.platform.netty.websocket;
 
+import cn.hsa.platform.netty.websocket.handler.ChannelAuthHandler;
 import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -13,15 +14,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
+
 @Component
 public class WebsocketChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-    @Autowired
-    private HsaPlatformWebSocketHandler webSocketHandler;
+
+    private HsaPlatformWebSocketHandler platformWebSocketHandler;
+
+    private ChannelAuthHandler channelAuthHandler;
 
     @Value("${websocket.url}")
     private String websocketUrl;
 
+    @Autowired
+    public void setPlatformWebSocketHandler(HsaPlatformWebSocketHandler platformHandler){
+        this.platformWebSocketHandler = platformHandler;
+    }
+    @Autowired
+    public void setChannelAuthHandler(ChannelAuthHandler authHandler){
+        this.channelAuthHandler = authHandler;
+    }
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
 
@@ -37,6 +49,8 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
           2. 这就就是为什么，当浏览器发送大量数据时，就会发出多次http请求
         */
         pipeline.addLast(new HttpObjectAggregator(8192));
+        // 鉴权handler必须加在WebSocket协议处理器之前否则当协议切换后该handler不会触发
+        pipeline.addLast(channelAuthHandler);
         /* 说明
           1. 对应websocket ，它的数据是以 帧(frame) 形式传递
           2. 可以看到WebSocketFrame 下面有六个子类
@@ -46,7 +60,8 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
         */
         pipeline.addLast(new WebSocketServerProtocolHandler(websocketUrl));
         //自定义的handler ，处理业务逻辑
-        pipeline.addLast(webSocketHandler);
+        pipeline.addLast(platformWebSocketHandler);
+
     }
 
     public String getWebSocketContextUrl(){

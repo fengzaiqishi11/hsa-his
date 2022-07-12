@@ -154,4 +154,51 @@ public class DrgDipResultServiceImpl extends HsafService implements DrgDipResult
      return WrapperResponse.success(drgDipResultBO.queryDrgDipResultMrisSum(MapUtils.get(map, "drgDipResultDTO")));
    }
 
+   /**
+    * @Author 医保二部-张金平
+    * @Date 2022-07-04 14:50
+    * @Description 质控违规信息查询-病案首页
+    * @param map
+    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+    */
+  @Override
+  public WrapperResponse<PageDTO> queryDrgDipNoRegulationsMris(Map<String, Object> map) {
+    return WrapperResponse.success(drgDipResultBO.queryDrgDipNoRegulationsMris(MapUtils.get(map, "drgDipResultDTO")));
+  }
+
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-05 15:20
+   * @Description 质控违规信息汇总-病案首页
+   * @param map
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+   */
+  @Override
+  public WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationMrisSum(Map<String, Object> map) {
+    return WrapperResponse.success(drgDipResultBO.queryDrgDipNoRegulationMrisSum(MapUtils.get(map, "drgDipResultDTO")));
+
+  }
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-06 10:03
+   * @Description 质控违规信息查询-结算清单
+   * @param map
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @Override
+  public WrapperResponse<PageDTO> queryDrgDipNoRegulationSetlinfo(Map<String, Object> map) {
+    return WrapperResponse.success(drgDipResultBO.queryDrgDipNoRegulationSetlinfo(MapUtils.get(map, "drgDipResultDTO")));
+  }
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-05 15:16
+   * @Description 质控违规信息汇总-结算清单
+   * @param map
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+   */
+  @Override
+  public WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationSettleSum(Map<String, Object> map) {
+    return WrapperResponse.success(drgDipResultBO.queryDrgDipNoRegulationSettleSum(MapUtils.get(map, "drgDipResultDTO")));
+  }
+
 }

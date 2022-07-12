@@ -713,4 +713,12 @@ public interface MrisHomeDAO {
      * @Param [deptMap]
      **/
     PayInfoDTO queryInsureSettlePrice(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询患者信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    String queryInptVist(Map<String, Object> map);
 }

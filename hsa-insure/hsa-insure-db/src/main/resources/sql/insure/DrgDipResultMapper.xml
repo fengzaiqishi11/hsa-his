@@ -1042,7 +1042,7 @@
         /*模糊查询质控信息，姓名，住院/门诊号，病案号*/
             <if test="keywords != null and keywords != '' ">
                 and (A.result_msg like concat('%',#{keywords},'%')
-                or  A.psn_name like concat('%',#{keywords},'%')
+                or  A.psnName like concat('%',#{keywords},'%')
                 or A.medcasno like concat('%',#{keywords},'%')
                 or  A.visitNo like concat('%',#{keywords},'%')
                 )

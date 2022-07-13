@@ -904,6 +904,15 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             if(!DateUtils.calculationDays(outptPrescribeDTO.getBirthday(), nl)){
                 prescribeTypeCode = Constants.CFLX.EK;
             }
+            // 出生日期为空时，取年龄作比较是否为儿科 lly 2022-07-12 start
+        }else if (StringUtils.isEmpty(outptPrescribeDTO.getBirthday())&&outptPrescribeDTO.getAge()!=null){
+            //获取系统参数
+            Map<String, String> mapParameter = this.getParameterValue(outptPrescribeDTO.getHospCode() , new String[]{"MZYS_EKCFNL"});
+            int nl = MapUtils.getVI(mapParameter, "MZYS_EKCFNL", 10);
+            if(StringUtils.isEmpty(outptPrescribeDTO.getBirthday())&&outptPrescribeDTO.getAge()!=null&&outptPrescribeDTO.getAge()<nl){
+                prescribeTypeCode = Constants.CFLX.EK;
+            }
+            // 出生日期为空时，取年龄作比较是否为儿科 lly 2022-07-12 end
         }
         Map<String, String> macfKFKParameter = this.getParameterValue(outptPrescribeDTO.getHospCode() , new String[]{"MZCF_KFK"});
         String mzcfKFK = null;
@@ -1418,6 +1427,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public boolean deleteOutptPrescribe(OutptPrescribeDTO outptPrescribeDTO){
         if(outptDoctorPrescribeDAO.checkIsSettle(outptPrescribeDTO) > 0){
+            throw new AppException("处方已结算，不能操作删除");
+        }
+        if(outptDoctorPrescribeDAO.checkCostIsSettle(outptPrescribeDTO) > 0){
             throw new AppException("处方有已结算数据，不能操作删除");
         }
         //删除诊断

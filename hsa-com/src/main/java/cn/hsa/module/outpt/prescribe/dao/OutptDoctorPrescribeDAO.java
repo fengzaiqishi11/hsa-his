@@ -905,4 +905,14 @@ public interface OutptDoctorPrescribeDAO {
     List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
 
     List<BaseDrugDTO> getCfData2(BaseDrugDTO baseDrugDTO);
+
+    /**
+     * @Method checkCostIsSettle
+     * @Desrciption 判断处方费用是否结算
+     * @param outptPrescribeDTO
+     * @Author liuliyun
+     * @Date   2022/7/13 08:40
+     * @Return int
+     **/
+    int checkCostIsSettle(OutptPrescribeDTO outptPrescribeDTO);
 }

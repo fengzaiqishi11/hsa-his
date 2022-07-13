@@ -61,5 +61,17 @@ public class MrisBaseInfoDTO extends MrisBaseInfoDO implements Serializable {
 
     private String insureRegCode;
 
+    private String inDiseaseIcd10; // 入院诊断编码
+    private String inDiseaseName; // 入院诊断名称
+    // 档案中的信息
+    private String bfContactName;
+    private String bfContactRelaCode;
+    private String bfContactPhone;
+    private String bfContactPostCode;
+    private String bfContactAddress;
+    private String bfNowAddress;
+    private String bfNowPostCode;
+    private String bfPhone;
+
 }
 

@@ -126,4 +126,13 @@ public interface InsureUnifiedPayInptService {
     Map<String,Object> UP_2305(Map<String,Object> insureUnifiedMap);
 
     WrapperResponse<Map<String, Object>> UP_4602(Map<String, Object> map);
+
+    /**
+     * 【2001】人员待遇享受检查
+     * @param insureUnifiedMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-07-13 8:57
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String,Object> UP_2001(Map<String,Object> insureUnifiedMap);
 }

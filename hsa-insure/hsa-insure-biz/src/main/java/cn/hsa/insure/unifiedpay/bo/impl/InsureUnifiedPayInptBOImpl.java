@@ -11,6 +11,7 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -90,6 +91,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
 
     @Resource
     private BaseReqUtilFactory baseReqUtilFactory;
+
+    @Resource
+    private InsureUnifiedCommonUtil insureUnifiedCommonUtil;
 
     /**
      * @param map
@@ -1717,7 +1721,55 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         return resultMap;
     }
 
-    // 封装护理生命特征记录
+    /**
+     * 【2001】人员待遇享受检查
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-07-13 9:05
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    @Override
+    public Map<String, Object> UP_2001(Map<String, Object> map) {
+      InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
+      InsureConfigurationDTO insureConfigurationDTO = MapUtils.get(map, "insureConfigurationDTO");
+      InsureInptRegisterDTO insureInptRegisterDTO = MapUtils.get(map, "insureInptRegisterDTO");
+      InsureIndividualBasicDTO insureIndividualBasicDTO = MapUtils.get(map, "insureIndividualBasicDTO");
+      String  hospCode = MapUtils.get(map, "hospCode");
+      //封装入参
+      Map<String, Object> dataMap = new HashMap<>();
+      //人员编号
+      dataMap.put("psn_no", insureInptRegisterDTO.getAac001());
+      //就诊发生日期 yyyyMMdd
+      dataMap.put("begntime", insureInptRegisterDTO.getAae030());
+      //险种类型
+      dataMap.put("insutype", insureIndividualBasicDTO.getAae140());
+      //医疗机构编码
+      dataMap.put("fixmedins_code", insureConfigurationDTO.getOrgCode());
+      //业务类型
+      dataMap.put("med_type", inptVisitDTO.getInsureBizCode());
+      dataMap.put("endtime", null);
+      dataMap.put("dise_codg", "");
+      dataMap.put("dise_name", "");
+      dataMap.put("oprn_oprt_code", null);
+      dataMap.put("oprn_oprt_name", null);
+      dataMap.put("matn_type", null);
+      dataMap.put("birctrl_type", null);
+      Map<String, Object> inputMap = new HashMap<>();
+      inputMap.put("data", dataMap);
+      map.put("msgName","人员待遇享受检查");
+      map.put("isHospital","");
+      map.put("visitId",inptVisitDTO.getId());
+      Map<String, Object> resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_2001, dataMap,map);
+      Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
+      List<Map<String, Object>> resultDataMap = MapUtils.get(outputMap, "trtinfo");
+      if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+        throw new AppException((String) resultMap.get("err_msg"));
+      }
+      map.put("resultDataMap", resultDataMap);
+      return null;
+    }
+
+  // 封装护理生命特征记录
     private List<Map<String, Object>> handeleSmtzData(List<InptNurseThirdDTO> smtzList) {
         List<Map<String, Object>> data = new ArrayList<>();
         if (!ListUtils.isEmpty(smtzList)) {

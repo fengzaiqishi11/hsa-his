@@ -6,13 +6,10 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
-import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
-import cn.hsa.module.center.user.dto.CenterUserDTO;
-import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
-import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 

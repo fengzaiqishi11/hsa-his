@@ -154,7 +154,20 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
     @Override
     public PageDTO queryInptVisitPage(InptVisitDTO inptVisitDTO) {
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
-        List<InptVisitDTO> inptVisitDTODTOList = inptAdviceDAO.queryInptVisitPage(inptVisitDTO);
+        // 获取系统参数 是否开启大人婴儿合并结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", inptVisitDTO.getHospCode());
+        isMergeParam.put("code", "BABY_INSURE_FEE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        List<InptVisitDTO> inptVisitDTODTOList = null;
+        //《========新生婴儿试算========》
+        if (mergeParameterDTO != null && Constants.SF.S.equals(mergeParameterDTO.getValue())) {
+            // 开启合并结算
+            inptVisitDTODTOList = inptAdviceDAO.queryInptVisitPage(inptVisitDTO);
+        } else {
+            inptVisitDTODTOList = inptAdviceDAO.queryInptVisitPageNoMerge(inptVisitDTO);
+        }
         return PageDTO.of(inptVisitDTODTOList);
     }
 

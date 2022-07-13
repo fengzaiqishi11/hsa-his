@@ -846,36 +846,39 @@
         mbi.in_profile as medcasno ,
         iv.in_disease_name as icd10 ,
         ddr.total_fee ,
-        ddr.in_time ,
-        ddr.out_time,
-        ddr.states,
+        mbi.in_time ,
+        mbi.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
         ddr.group_result,
         mbi.is_upload_insure as isUplod
-        from drg_dip_result_detail ddrd
-        left join drg_dip_result ddr on
-        ddrd.result_id = ddr.id
-        left join mris_base_info mbi on
-        ddr.visit_id = mbi.visit_id
-        left join inpt_visit iv on mbi.visit_id =iv.id
-        where ddr.business_type='2'
-            <if test="type != null and type != '' ">
-                and ddr.`type` =#{type}
-            </if>
+        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id and iv.status_code = '7'
+        left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1' and ie.status_code = '0'
+        left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id and ddr.valid_flag = '1'
+        and ddr.business_type = '2'
+        and ddr.`type` = #{type}
+         left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id
+         where 1=1
 
-            <if test="keyword != null and keyword != '' ">
-                and ddrd.result_msg like concat('%',#{keyword},'%')
-            </if>
-            <if test="yearFlag != null and yearFlag=='1'">
-                and year(ddrd.crt_time )=date_format(#{year},'yyyy')
-            </if>
-            <if test="yearFlag != null and yearFlag=='2'">
-                and year(ddrd.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
+            <if test="keywords != null and keywords != '' ">
+                and (ddrd.result_msg like concat('%',#{keywords},'%')
+                    or  mbi.name like concat('%',#{keywords},'%')
+                or mbi.in_profile like concat('%',#{keywords},'%')
+                or  iv.in_no like concat('%',#{keywords},'%')
+                )
             </if>
         <if test="deptIds != null and deptIds.size()>0">
             and ddr.dept_id in
             <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
                 #{deptId}
             </foreach>
+        </if>
+        <if test="startDate != '' and startDate != null">
+            and DATE_FORMAT(ie.settle_time, "%Y-%m-%d") &gt;= #{startDate}
+        </if>
+        <if test="endDate != '' and endDate != null">
+            and DATE_FORMAT(ie.settle_time, "%Y-%m-%d") &lt;= #{endDate}
         </if>
         <if test="doctorIds != null and doctorIds.size()>0">
             and ddr.doctor_id in
@@ -892,7 +895,9 @@
             <if test="states != null and states != '' ">
                 and ddr.states=#{states}
             </if>
-
+            <if test="level == null or level.size()==0 ">
+                and ddr.states is null
+            </if>
             <if test="level != null and level.size()>0 ">
                 and ddrd.rule_level in
                 <foreach collection="level" item="level1" separator="," open="(" close=")">
@@ -921,25 +926,28 @@
 
     <select id="queryDrgDipNoRegulationSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
             resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
-        select
+        select A.* from(select m.* from (select
         ddr.id,
         ddr.visit_id,
-        iv.in_dept_name as dept_name ,
+        iiv.visit_drpt_name as dept_name ,
         ddr.gend,
         ddr.age,
-        iv.in_dept_id as dept_id,
+        iiv.visit_drpt_id as dept_id,
         ddr.doctor_id,
         ddr.doctor_name ,
         ddrd .rulet_type ,
+        ddrd.rule_level,
         ddrd.check_filed,
         ddrd.result_msg ,
         ddr.psn_name ,
         iv.in_no as visitNo ,
-        iv.in_disease_name as icd10 ,
+        iiv.visit_icd_name as icd10 ,
         ddr.total_fee ,
-        ddr.in_time ,
-        ddr.out_time,
-        ddr.states,
+        iv.in_time ,
+        iv.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
         ddr.group_result,
         iiv.is_hospital,
         isi.medcasno,
@@ -947,90 +955,166 @@
         '0',
         '1') as isUplod,
         DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
-        from drg_dip_result_detail ddrd
-        left join drg_dip_result ddr on
-        ddrd.result_id = ddr.id
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
         left join insure_setl_info isi on
-        ddr.visit_id = isi.visit_id
-        left join insure_individual_settle iis on
         iis.insureSettleId = isi.insure_settle_id
-        left join inpt_visit iv on isi.visit_id =iv.id
-        left join insure_individual_visit iiv on iiv.visit_id=iv.id
-        where ddr.business_type='1'
-        <if test="type != null and type != '' ">
-            and ddr.`type` =#{type}
-        </if>
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id
+        left  join inpt_visit iv on iis.visit_id = iv.id
+        where ddr.business_type='1' and  iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '1') m
+        union all
+        select n.* from (select
+        ddr.id,
+        ddr.visit_id,
+        iiv.visit_drpt_name as dept_name ,
+        ddr.gend,
+        ddr.age,
+        iiv.visit_drpt_id as dept_id,
+        ddr.doctor_id,
+        ddr.doctor_name ,
+        ddrd .rulet_type ,
+        ddrd.rule_level,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        ddr.psn_name ,
+        ov.visit_no as visitNo ,
+        iiv.visit_icd_name as icd10 ,
+        ddr.total_fee ,
+        ddr.in_time ,
+        ddr.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        ddr.group_result,
+        iiv.is_hospital,
+        isi.medcasno,
+        if(isi.settle_no is null,
+        '0',
+        '1') as isUplod,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id
+        left  join outpt_visit ov on iis.visit_id = ov.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '0'
+        and iiv.aka130 = '14') n
+        ) A
+        <where>
+            <if test="keywords != null and keywords != '' ">
+                and (A.result_msg like concat('%',#{keywords},'%')
+                or  A.psn_name like concat('%',#{keywords},'%')
+                or A.medcasno like concat('%',#{keywords},'%')
+                or  A.visitNo like concat('%',#{keywords},'%')
+                )
+            </if>
+            <if test="yearFlag != null and yearFlag=='1'">
+                and year(A.crt_time )=date_format(#{year},'yyyy')
+            </if>
+            <if test="yearFlag != null and yearFlag=='2'">
+                and year(A.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
+            </if>
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.setl_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.setl_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            <if test="isUplods != null and isUplods.size()>0 ">
+                <foreach collection="isUplods" item="isUploadInsure" separator="," >
+                    <if test="isUploadInsure=='1' ">
+                        and A.settle_no is not null
+                    </if>
+                    <if test="isUploadInsure=='2' ">
+                        and A.settle_no is null
+                    </if>
+                </foreach>
+            </if>
+            <if test="states != null and states != '' ">
+                and A.states=#{states}
+            </if>
 
-        <if test="keyword != null and keyword != '' ">
-            and ddrd.result_msg like concat('%',#{keyword},'%')
-        </if>
-        <if test="yearFlag != null and yearFlag=='1'">
-            and year(ddrd.crt_time )=date_format(#{year},'yyyy')
-        </if>
-        <if test="yearFlag != null and yearFlag=='2'">
-            and year(ddrd.crt_time ) between date_format(#{startYearMonth},'yyyy-mm') and date_format(#{endYearMonth},'yyyy-mm')
-        </if>
-        <if test="startDate != '' and startDate != null">
-            and DATE_FORMAT(iis.crte_time, "%Y-%m-%d") &gt;= #{startDate}
-        </if>
-        <if test="endDate != '' and endDate != null">
-            and DATE_FORMAT(iis.crte_time, "%Y-%m-%d") &lt;= #{endDate}
-        </if>
-        <if test="deptIds != null and deptIds.size()>0">
-            and ddr.dept_id in
-            <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
-                #{deptId}
-            </foreach>
-        </if>
-        <if test="doctorIds != null and doctorIds.size()>0">
-            and ddr.doctor_id in
-            <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
-                #{doctorId}
-            </foreach>
-        </if>
-        <if test="isUplods != null and isUplods.size()>0 ">
-            <foreach collection="isUplods" item="isUploadInsure" separator="," >
-                <if test="isUploadInsure=='1' ">
-                    and isi.settle_no is not null
-                </if>
-                <if test="isUploadInsure=='2' ">
-                    and isi.settle_no is null
-                </if>
-            </foreach>
-        </if>
-        <if test="states != null and states != '' ">
-            and ddr.states=#{states}
-        </if>
+            <if test="level == null or level.size()==0 ">
+                and A.states='0'
+            </if>
 
-        <if test="level != null and level.size()>0 ">
-            and ddrd.rule_level in
-            <foreach collection="level" item="level1" separator="," open="(" close=")">
-                #{level1}
-            </foreach>
-        </if>
-        <if test="isHospitals != null and isHospitals.size()>0 ">
-            and iiv.is_hospital in
-            <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
-                #{isHospital}
-            </foreach>
-        </if>
+            <if test="level != null and level.size()>0 ">
+                and A.rule_level in
+                <foreach collection="level" item="level1" separator="," open="(" close=")">
+                    #{level1}
+                </foreach>
+            </if>
+            <if test="level == null and level.size()=0 ">
+                and A.rule_level=''
+            </if>
+            <if test="isHospitals != null and isHospitals.size()>0 ">
+                and A.is_hospital in
+                <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                    #{isHospital}
+                </foreach>
+            </if>
 
-        <if test="ruletType != null and ruletType != '' ">
-            and ddrd.rulet_type =#{ruletType}
-        </if>
+            <if test="ruletType != null and ruletType != '' ">
+                and A.rulet_type =#{ruletType}
+            </if>
 
-        <if test="groupResults != null and groupResults.size()>0">
-            and ddr.group_result in
-            <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
-                #{groupResult}
-            </foreach>
-        </if>
-        <if test="statusCodes != null and statusCodes.size()>0">
-            and iv.status_code in
-            <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
-                #{statusCode}
-            </foreach>
-        </if>
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+            <if test="statusCodes != null and statusCodes.size()>0">
+                and A.status_code in
+                <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                    #{statusCode}
+                </foreach>
+            </if>
+
+        </where>
+
 
     </select>
 </mapper>

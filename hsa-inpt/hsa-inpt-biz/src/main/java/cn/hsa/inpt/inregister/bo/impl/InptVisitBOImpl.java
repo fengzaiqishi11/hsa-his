@@ -1056,8 +1056,11 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             String isOneSettle = Constants.SF.F;
             List<Map<String, Object>> identMapList = inptVisitDTO.getIdetinList();
             if (!ListUtils.isEmpty(identMapList)) {
+                String psnIdetTypes = "";
+                String psnIdetTypesName = "";
                 for (Map<String, Object> identMap : identMapList) {
                     String psnIdetType = MapUtils.get(identMap, "psn_idet_type"); // 人员身份类别
+                    String psnIdetTypeName = MapUtils.get(identMap, "psn_idet_type_name"); // 人员身份类别码值
                     String begntime = MapUtils.get(identMap, "begntime"); // 开始时间
                     String endtime = MapUtils.get(identMap, "endtime"); // 结算时间
                     if (!StringUtils.isEmpty(endtime)) {
@@ -1076,10 +1079,16 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
                             insureIndividualVisitDTO.setPsnIdetType(psnIdetType);
                             insureIndividualVisitDTO.setIdetStartDate(begnDate);
                             insureIndividualVisitDTO.setIdetEndDate(endDate);
-                            break;
+                            psnIdetTypes = psnIdetTypes + psnIdetType + ",";
+                            psnIdetTypesName = psnIdetTypesName + psnIdetTypeName + ",";
+                            //break;
                         }
                     }
                 }
+              psnIdetTypes = psnIdetTypes.substring(0,psnIdetTypes.length()-1);
+              psnIdetTypesName = psnIdetTypesName.substring(0,psnIdetTypesName.length()-1);
+              insureIndividualVisitDTO.setPsnIdetType(psnIdetTypes);
+              insureIndividualVisitDTO.setPsnIdetTypeName(psnIdetTypesName);
             }
 
             insureIndividualVisitDTO.setIsOneSettle(isOneSettle);

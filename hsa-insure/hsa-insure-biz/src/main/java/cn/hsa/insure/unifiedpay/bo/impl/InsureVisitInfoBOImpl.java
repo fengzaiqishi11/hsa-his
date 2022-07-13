@@ -10,6 +10,8 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.entity.InsureDictDO;
+import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
@@ -62,6 +64,9 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 
 	@Resource
 	private BaseReqUtilFactory baseReqUtilFactory;
+
+  @Resource
+  private InsureDictService insureDictService;
 
 	/**
 	 * @Description: 获取人员信息
@@ -170,13 +175,28 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			ybxzList.add(xzMap);
 		}
 
-		List<Map<String,Object>> idetinList = new ArrayList<>();
-		if (!ListUtils.isEmpty(idetinfoArray)) {
-			for (int i = 0; i < idetinfoArray.size(); i++) {
-				Map<String, Object> idetinfoMap = idetinfoArray.getJSONObject(i);
-				idetinList.add(idetinfoMap);
-			}
-		}
+
+    //先查询出人员身份类别对应码值
+    Map<String,Object> dictMap = new HashMap<>();
+    InsureDictDO insureDictDO = new InsureDictDO();
+    insureDictDO.setCode("PSN_IDET_TYPE");
+    insureDictDO.setHospCode((String) params.get("hospCode"));
+    dictMap.put("insureDictDO",insureDictDO);
+    dictMap.put("hospCode",(String) params.get("hospCode"));
+    List<InsureDictDO> dictList = insureDictService.queryInsureDict(dictMap).getData();
+
+    List<Map<String,Object>> idetinList = new ArrayList<>();
+    if (!ListUtils.isEmpty(idetinfoArray)) {
+      for (int i = 0; i < idetinfoArray.size(); i++) {
+        Map<String, Object> idetinfoMap = idetinfoArray.getJSONObject(i);
+        for (InsureDictDO dict : dictList){
+          if (dict.getId().equals(MapUtils.get(idetinfoMap, "psn_idet_type"))){
+            idetinfoMap.put("psn_idet_type_name",dict.getName());
+          }
+        }
+        idetinList.add(idetinfoMap);
+      }
+    }
 
 		Map<String, Object> spinfoMap = new HashMap<>();
 		Map<String, Object> injuryorbirthinfoMap = new HashMap<>();

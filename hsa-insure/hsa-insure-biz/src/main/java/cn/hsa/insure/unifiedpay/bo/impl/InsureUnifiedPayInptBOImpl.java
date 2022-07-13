@@ -1765,8 +1765,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
       if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
         throw new AppException((String) resultMap.get("err_msg"));
       }
-      map.put("resultDataMap", resultDataMap);
-      return null;
+      Map<String, Object> resultMap1 = new HashMap<>();
+      resultMap1.put("resultDataMap", resultDataMap);
+      return resultMap1;
     }
 
   // 封装护理生命特征记录

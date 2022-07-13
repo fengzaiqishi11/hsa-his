@@ -34,6 +34,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -994,6 +995,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         if (sys != null && sys.getValue().equals("1")) {  // 调用统一支付平台*/
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {  // 调用统一支付平台
             //在调用入院登记接口前，先调用2001 人员待遇享受检查 接口，判断待遇是否正常，如果冻结，则提示“该参保人待遇冻结，不能办理医保入院登记。”,只针对江西 H36
+          if (ObjectUtil.isEmpty(insureConfigurationDTO.getOrgCode())){
+            throw new AppException("未获取到机构配置信息医疗机构编码，请联系管理员");
+          }
           if (JX_ORGCODE.equals(insureConfigurationDTO.getOrgCode().substring(0,3))){
               Map<String, Object> treatmentParam = new HashMap<>();
               treatmentParam.put("inptVisitDTO",inptVisitDTO);

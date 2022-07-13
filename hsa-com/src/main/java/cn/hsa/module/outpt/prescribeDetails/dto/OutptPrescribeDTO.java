@@ -102,5 +102,6 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
     private String nationName; //
     private String isValid;// 是否有效
     private String visitNo;//就诊号
+    private Integer age; // 年龄
 }
 

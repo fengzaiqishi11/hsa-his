@@ -22,7 +22,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureInptRecordDTO extends InsureInptRecordDO {
     private String keyword;
     private String hospName;
@@ -49,4 +49,8 @@ public class InsureInptRecordDTO extends InsureInptRecordDO {
     private Date regsiterTime;
     private String aac001;
     private String aae140; // 险种类型
+    private Date inTime;//入院时间
+    private Date outTime;//出院时间
+    private String outDiseaseName;//出院诊断名称
+    private String outDiseaseIcd10;//出院诊断编码
 }

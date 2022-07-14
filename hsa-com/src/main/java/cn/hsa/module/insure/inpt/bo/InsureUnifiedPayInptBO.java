@@ -113,4 +113,13 @@ public interface InsureUnifiedPayInptBO {
      * @Return:
      **/
     Map<String, Object> UP4602(Map<String, Object> map);
+
+    /**
+     * 【2001】人员待遇享受检查
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-07-13 9:04
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    Map<String, Object> UP_2001(Map<String, Object> map);
 }

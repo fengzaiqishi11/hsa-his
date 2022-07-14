@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO">
     <!--药房消耗报表的映射-->
-    <resultMap type="cn.hsa.module.interf.extract.entity.ExtractConsumptionDetailDO" id="extractConsumptionDetailMap">
+    <resultMap type="cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO" id="extractConsumptionDetailMap">
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
         <result property="summaryType" column="summary_type" jdbcType="VARCHAR"/>
@@ -44,10 +44,10 @@
         where
         hosp_code = #{hospCode}
         and summary_type = #{summaryType}
-        <if test="startTime != null and startTime != ''">
+        <if test="startTime != null">
             and extract_time &gt;= #{startTime}
         </if>
-        <if test="endTime != null and endTime != ''">
+        <if test="endTime != null">
             and extract_time &lt;= #{endTime}
         </if>
         <if test="itemCode != null and item_code !=''">
@@ -81,10 +81,10 @@
         where
         hosp_code = #{hospCode}
         and summary_type = #{summaryType}
-        <if test="startTime != null and startTime != ''">
+        <if test="startTime != null">
             and extract_time &gt;= #{startTime}
         </if>
-        <if test="endTime != null and endTime != ''">
+        <if test="endTime != null">
             and extract_time &lt;= #{endTime}
         </if>
         <if test="itemCode != null and item_code !=''">

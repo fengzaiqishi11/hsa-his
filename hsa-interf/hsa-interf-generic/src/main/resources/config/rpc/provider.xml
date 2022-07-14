@@ -18,5 +18,5 @@
     <!-- 数据抽取service -->
     <dubbo:service interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" ref="extractStroInvoicingService_provider"/>
     <!--查询消耗报表服务-->
-    <dubbo:reference id="extraConsumptionService_provider" interface="cn.hsa.module.interf.extract.service.ExtractConsumptionService"/>
+    <dubbo:service ref="extraConsumptionService_provider" interface="cn.hsa.module.interf.extract.service.ExtractConsumptionService"/>
 </beans>

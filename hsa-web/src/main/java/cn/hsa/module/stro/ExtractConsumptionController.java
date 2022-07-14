@@ -7,10 +7,7 @@ import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
 import cn.hsa.module.interf.extract.service.ExtractConsumptionService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +27,7 @@ import java.util.Map;
 public class ExtractConsumptionController extends BaseController {
 
     @Resource
-    private ExtractConsumptionService extractConsumptionService_consumer;
+    private ExtractConsumptionService extraConsumptionService_consumer;
     /**
      * @Author gory
      * @Description 药房药库消耗报表统计
@@ -44,8 +41,9 @@ public class ExtractConsumptionController extends BaseController {
         SysUserDTO userDTO = getSession(req, rep);
         Map map = new HashMap<>();
         map.put("hospCode",userDTO.getHospCode());
+        extractConsumptionDTO.setHospCode(userDTO.getHospCode());
         map.put("extractConsumptionDTO",extractConsumptionDTO);
-        return extractConsumptionService_consumer.queryExtractConsumptions(map);
+        return extraConsumptionService_consumer.queryExtractConsumptions(map);
     }
 
 

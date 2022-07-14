@@ -1,11 +1,13 @@
 package cn.hsa.interf.extract.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.interf.extract.bo.ExtractConsumptionBO;
 import cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
 import cn.hsa.util.MapUtils;
+import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +38,9 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
      **/
     @Override
     public PageDTO queryExtractConsumptions(ExtractConsumptionDTO extractConsumptionDTO) {
+        if (StringUtils.isEmpty(extractConsumptionDTO.getSummaryType())){
+            throw new AppException("汇总类型不能为空");
+        }
         PageHelper.startPage(extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());
         // todo 1.根据项目id进行分组汇总
         List<ExtractConsumptionDTO> extractConsumptions = extraConsumptionDAO.

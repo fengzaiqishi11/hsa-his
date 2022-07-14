@@ -8824,7 +8824,7 @@ CREATE TABLE `sys_user`  (
   `is_password_change` varchar(2) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0' COMMENT '近期是否修改过密码',
   `only_open_item` varchar(32) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT '0' COMMENT '是否只能开检查项目，（0：还可以开药品，1：只能开检查项目）',
   PRIMARY KEY (`id`, `code`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '\r\n\r\n1、用户状态代码：1正常    2停用   3密码错误冻结\'' ROW_FORMAT = Compact;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '1、用户状态代码：1正常2停用3密码错误冻结' ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for sys_user_role
@@ -9727,6 +9727,92 @@ CREATE TABLE `settle_clock_match` (
   `his_code_value` varchar(32) DEFAULT NULL COMMENT 'his代码值',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `drg_dip_result` (
+`id` varchar(32) NOT NULL COMMENT '主键',
+`visit_id` varchar(32) NOT NULL COMMENT '就诊id',
+`psn_no` varchar(32) DEFAULT NULL COMMENT '人员编号',
+`psn_name` varchar(32) DEFAULT NULL COMMENT '患者姓名',
+`certno` varchar(32) DEFAULT NULL COMMENT '患者身份证号码',
+`gend` varchar(32) DEFAULT NULL COMMENT '性别',
+`age` int(11) DEFAULT NULL COMMENT '年龄',
+`insutype` varchar(32) DEFAULT NULL COMMENT '险种',
+`med_type` varchar(32) DEFAULT NULL COMMENT '业务类型',
+`med_type_name` varchar(32) DEFAULT NULL COMMENT '业务类型名称',
+`in_time` datetime DEFAULT NULL COMMENT '入院时间',
+`out_time` datetime DEFAULT NULL COMMENT '出院时间',
+`inpt_diagnose` varchar(500) DEFAULT NULL COMMENT '入院诊断',
+`outpt_diagnose` varchar(500) DEFAULT NULL COMMENT '出院诊断',
+`dept_id` varchar(32) DEFAULT NULL COMMENT '科室id',
+`dept_name` varchar(32) DEFAULT NULL COMMENT '科室名称',
+`doctor_id` varchar(32) DEFAULT NULL COMMENT '医生id',
+`doctor_name` varchar(32) DEFAULT NULL COMMENT '医生姓名',
+`medical_reg_no` varchar(32) DEFAULT NULL COMMENT '就医登记号',
+`settle_id` varchar(32) DEFAULT NULL COMMENT 'his结算id',
+`insure_settle_id` varchar(32) DEFAULT NULL COMMENT '医保结算id',
+`drg_dip_code` varchar(32) DEFAULT NULL COMMENT 'drg\\dip组编码',
+`drg_dip_name` varchar(128) DEFAULT NULL COMMENT 'drg\\dip组名称',
+`icd10` varchar(32) DEFAULT NULL COMMENT '主要诊断',
+`icd9` varchar(32) DEFAULT NULL COMMENT '主要手术',
+`total_fee` decimal(10,2) DEFAULT NULL COMMENT '总费用',
+`stand_fee` decimal(10,2) DEFAULT NULL COMMENT '标杆费用',
+`override` decimal(10,2) DEFAULT NULL COMMENT '倍率',
+`cdntn_pay` decimal(10,2) DEFAULT NULL COMMENT '统筹金额',
+`diff_fee` decimal(10,2) DEFAULT NULL COMMENT '预计偏差',
+`yp_fee` decimal(10,2) DEFAULT NULL COMMENT '药品费',
+`cl_fee` decimal(10,2) DEFAULT NULL COMMENT '耗材费',
+`states` varchar(2) DEFAULT '2' COMMENT '质控完成状态',
+`type` varchar(2) DEFAULT NULL COMMENT '质控类型:(1:DRG,2:DIP)',
+`business_type` varchar(2) DEFAULT NULL COMMENT '业务类型:(1:结算清单,2:病案首页)',
+`business_id` varchar(32) DEFAULT NULL COMMENT '业务id',
+`hosp_code` varchar(32) DEFAULT NULL COMMENT '医院编码',
+`insure_reg_code` varchar(32) DEFAULT NULL COMMENT '医保注册编码',
+`hosp_name` varchar(64) DEFAULT NULL COMMENT '医院名称',
+`org_code` varchar(32) DEFAULT NULL COMMENT '机构编码',
+`pro_medic_mater` varchar(32) DEFAULT NULL COMMENT '药占比',
+`weight_value` varchar(32) DEFAULT NULL COMMENT '权重',
+`pro_consum` varchar(32) DEFAULT NULL COMMENT '耗材占比',
+`diag_fee_sco` varchar(32) DEFAULT NULL COMMENT '费用分值',
+`with_ccormcc` varchar(128) DEFAULT NULL COMMENT 'cc/mcc信息',
+`ccmcc_name` varchar(128) DEFAULT NULL COMMENT 'cc/mcc信息',
+`bl` varchar(32) DEFAULT NULL COMMENT '倍率',
+`rate` varchar(32) DEFAULT NULL COMMENT '费率',
+`fee_Pay` decimal(10,2) DEFAULT NULL COMMENT '支付费用',
+`stand_pro_medic_mater` varchar(32) DEFAULT NULL COMMENT '标杆药占比',
+`stand_pro_consum` varchar(32) DEFAULT NULL COMMENT '标杆耗材占比',
+`profit` decimal(10,2) DEFAULT NULL COMMENT '盈亏额',
+`suspicious_num` int(11) DEFAULT NULL COMMENT '可疑条数',
+`violation_num` int(11) DEFAULT NULL COMMENT '违规条数',
+`medcasno` varchar(32) DEFAULT NULL COMMENT '病案号',
+`visit_no` varchar(32) DEFAULT NULL COMMENT '住院号/就诊号',
+`group_messages` text COMMENT '分组提示',
+`group_result` varchar(32) DEFAULT NULL COMMENT '分组结果',
+`valid_flag` varchar(2) DEFAULT '1' COMMENT '有效标志',
+`crt_id` varchar(32) DEFAULT NULL COMMENT '创建人',
+`crt_name` varchar(32) DEFAULT NULL COMMENT '创建姓名',
+`crt_time` datetime DEFAULT NULL COMMENT '创建时间',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='DIP/DRG质控结果表';
+
+CREATE TABLE `drg_dip_result_detail` (
+`id` varchar(32) NOT NULL COMMENT 'id',
+`result_id` varchar(32) DEFAULT NULL COMMENT '质控结果主表id',
+`rule_level` varchar(32) DEFAULT NULL COMMENT '规则等级',
+`rule_score` varchar(32) DEFAULT NULL COMMENT '规则分数',
+`field_id` varchar(128) DEFAULT NULL COMMENT '错误字段字段名',
+`check_filed` varchar(128) DEFAULT NULL COMMENT '错误字段字段中文名',
+`result_msg` varchar(500) DEFAULT NULL COMMENT '质控结果信息',
+`original_value` varchar(200) DEFAULT NULL COMMENT '字段原始值',
+`is_main` varchar(32) DEFAULT NULL COMMENT '主次标识',
+`sort` varchar(16) DEFAULT NULL COMMENT '排序号',
+`rulet_type` varchar(32) DEFAULT NULL COMMENT '规则类型',
+`valid_flag` varchar(2) DEFAULT '1' COMMENT '有效标志',
+`crt_id` varchar(32) DEFAULT NULL COMMENT '创建人编号',
+`crt_name` varchar(32) DEFAULT NULL COMMENT '创建人姓名',
+`crt_time` datetime DEFAULT NULL COMMENT '创建时间',
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='DIP/DRG质控信息结果明细表';
+
 
 ALTER TABLE base_advice  ADD COLUMN `oper_nation_name` varchar(32) NULL COMMENT '手术国家名称' ;
 ALTER TABLE inpt_medicine_advance_advice ADD this_exec_time date NULL COMMENT '本次领药的结束时间';

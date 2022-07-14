@@ -80,4 +80,39 @@
         from center_menu a where a.is_valid='1'
     </select>
 
+
+    <!--查询用户角色-->
+    <select id="getRoleUsers" resultType="cn.hsa.module.center.user.dto.CenterUserRoleDTO">
+        select
+            cur.id,
+            cu.code as userCode,
+            cu.name as userName,
+            cr.code as roleCode ,
+            cr.name as roleName ,
+            cur.crte_id as crteId ,
+            cur.crte_name as crteName ,
+            cur.crte_time as crteTime
+        from
+            center_user cu
+                left join center_role cr on 1=1
+                left join center_user_role cur on
+                        cur.role_code = cr.code
+                    and cu.code = cur.user_code
+        where cu.code = #{userCode}  and cr.is_valid ='1'   order by cr.crte_time
+    </select>
+
+    <!--删除角色用户-->
+    <delete id="deleteRoleUsers">
+        delete from center_user_role where user_code=#{userCode}
+    </delete>
+
+    <!--保存角色用户-->
+    <insert id="saveRoleUsers" parameterType="cn.hsa.module.center.user.dto.CenterUserRoleDTO">
+        insert into center_user_role(id,role_code,user_code,crte_id,crte_name,crte_time)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            ( #{item.id}, #{item.roleCode}, #{item.userCode}, #{item.crteId}, #{item.crteName}, #{item.crteTime})
+        </foreach>
+    </insert>
+
 </mapper>

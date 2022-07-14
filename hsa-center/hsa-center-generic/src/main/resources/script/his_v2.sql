@@ -9729,7 +9729,6 @@ CREATE TABLE `settle_clock_match` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE base_advice  ADD COLUMN `oper_nation_name` varchar(32) NULL COMMENT '手术国家名称' ;
-ALTER TABLE tcm_mris_base_info add zyhljs_code VARCHAR(32) COMMENT '使用中医护理技术' DEFAULT null;
 ALTER TABLE inpt_medicine_advance_advice ADD this_exec_time date NULL COMMENT '本次领药的结束时间';
 ALTER TABLE inpt_medicine_advance_advice ADD last_exec_time date NULL COMMENT '上次医嘱的最后执行时间';
 ALTER TABLE inpt_advice_exec  ADD advance_id varchar(100) NULL COMMENT '提前领药ID（inpt_medicine_advance主键ID）';

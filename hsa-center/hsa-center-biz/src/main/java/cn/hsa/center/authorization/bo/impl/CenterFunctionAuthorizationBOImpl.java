@@ -1,6 +1,5 @@
 package cn.hsa.center.authorization.bo.impl;
 
-import cn.hsa.base.PageDO;
 import cn.hsa.base.PageDTO;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;

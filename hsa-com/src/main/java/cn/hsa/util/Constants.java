@@ -25,6 +25,14 @@ public interface Constants {
         public static final String ZZJGH = "3"; // 自助机挂号
     }
 
+    /**
+     * 医保区划开头（YBQHKT）
+     */
+    class YBQHKT {
+        public static final String GD = "44"; // 广州
+
+    }
+
     class TechnologyStatus {
         public static final String NOTCONFIRMCOST = "0"; // 未确费
         public static final String CONFIRMCOST = "1"; // 已确费

@@ -26,15 +26,15 @@
     </sql>
 
 
-    <!-- 根据主键查询表信息 -->
-    <select id="queryBizAuthorizationByOrderTypeCode" resultType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
-        select
-        <include refid="Base_Column_List" />
-        from
-        center_function_authorization
-        where
-        hosp_code =#{hospCode} and order_type_code = #{orderTypeCode} and is_valid = '1'
-    </select>
+  <!-- 根据主键查询表信息 -->
+  <select id="queryBizAuthorizationByOrderTypeCode" resultType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
+    select
+    <include refid="Base_Column_List" />
+    from
+      center_function_authorization
+    where
+     hosp_code =#{hospCode} and order_type_code = #{orderTypeCode} and is_valid = '1'
+  </select>
 
     <insert id="insertAuthorization"  parameterType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
         INSERT INTO `center_function_authorization`(`id`, `hosp_code`, `order_type_code`, `start_date`, `end_date`, `encrypt_start_date`,
@@ -148,7 +148,5 @@
         and ch.code = #{hospCode}
         order by ch.code,cd.value
     </select>
-
-
 
 </mapper>

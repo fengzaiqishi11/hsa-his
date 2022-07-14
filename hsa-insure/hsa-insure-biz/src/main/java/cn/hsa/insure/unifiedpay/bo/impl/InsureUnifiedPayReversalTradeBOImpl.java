@@ -276,6 +276,13 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         // 根据条件查询所
         List<Map<String, Object>> list = insureReversalTradeDAO.queryDataWith3201(map);
+        //查询是否是区分省内异地
+        selectParamterCodeMap.put("code","REFD_SETL_XIZANG");
+        SysParameterDTO xz = sysParameterService_consumer.getParameterByCode(selectParamterCodeMap).getData();
+        if(xz != null && "1".equals(xz.getValue())){
+            // 根据条件查询所
+             list = insureReversalTradeDAO.queryDataXiZangWith3201(map);
+        }
 
         //根据险种类型 和 清算类别 ，获得对应的 费用结算明细
         map.put("list", list);

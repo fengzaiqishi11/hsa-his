@@ -27,6 +27,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
 import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.SetlRefundQueryDTO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.bo.OutptDoctorPrescribeBO;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
@@ -3929,20 +3930,22 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         if (sysParameterDTO != null && IS_HAI_NAN.equals(sysParameterDTO.getValue())) {
             // 获得需要推送消息的身份证号
             Map param = new HashMap();
-            param.put("visitID",map.get("visitId"));
+            param.put("id",outptPrescribeDTO.getVisitId());
             param.put("hospCode",map.get("hospCode"));
             OutptVisitDTO outptVisitDTO = outptVisitService.queryByVisitID(param);
             boolean flag = false;
             if(ObjectUtil.isNotEmpty(outptVisitDTO)){
                 for (int i = 0; i < certnos.length; i++) {
-                    if(outptVisitDTO.getCardNo().equals(certnos[i])){
+                    if(outptVisitDTO.getCertNo().equals(certnos[i])){
                         flag = true;
                     }
                 }
             }
             // 如果这个病人的身份证符合要求就推送消息
             if(flag){
-                map.put("visitId", outptPrescribeDTO.getVisitId());
+                SetlRefundQueryDTO setlRefundQueryDTO = new SetlRefundQueryDTO();
+                setlRefundQueryDTO.setVisitId(outptVisitDTO.getId());
+                map.put("setlRefundQueryDTO", setlRefundQueryDTO);
                 map.put("pushType", "HOSPITAL_PAYMENT"); // 推送类型 ： 支付单
                 map.put("orderStatus", "MERCHANT_WAIT_PAY"); // 支付状态 ： 待支付
                 outptTmakePriceFormService_consumer.savePayOnlineInfoDO(map);

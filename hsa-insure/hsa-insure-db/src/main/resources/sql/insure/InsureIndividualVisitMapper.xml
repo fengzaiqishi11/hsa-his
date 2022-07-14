@@ -1178,6 +1178,10 @@
             )
         </if>
         <!--业务类型选择-->
+        <if test="aka130 != null and aka130 != ''">
+            and iiv.aka130 =#{aka130}
+        </if>
+        <!--业务类型选择-->
         <if test="isHospital != null and isHospital != ''">
             and iiv.is_hospital =#{isHospital}
         </if>

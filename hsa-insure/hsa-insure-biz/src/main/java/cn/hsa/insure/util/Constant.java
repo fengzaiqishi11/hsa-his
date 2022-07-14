@@ -901,6 +901,7 @@ public interface Constant {
         public static class ISMAN {
             public static final String S = "1"; // 是
             public static final String F = "0"; // 否
+            public static final String E = "2"; // 否
         }
 
         public static class ZKZT {

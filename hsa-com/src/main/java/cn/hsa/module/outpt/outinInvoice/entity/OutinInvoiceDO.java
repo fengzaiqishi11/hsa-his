@@ -86,6 +86,11 @@ public class OutinInvoiceDO extends PageDO implements java.io.Serializable {
     private Date crteTime;
 
     /**
+     * 发票的票据代码
+     */
+    private String invoiceCode;
+
+    /**
      * 获取主键
      * 
      * @return 主键
@@ -425,5 +430,13 @@ public class OutinInvoiceDO extends PageDO implements java.io.Serializable {
      */
     public void setCrteTime(Date crteTime) {
         this.crteTime = crteTime;
+    }
+
+    public String getInvoiceCode() {
+        return invoiceCode;
+    }
+
+    public void setInvoiceCode(String invoiceCode) {
+        this.invoiceCode = invoiceCode;
     }
 }

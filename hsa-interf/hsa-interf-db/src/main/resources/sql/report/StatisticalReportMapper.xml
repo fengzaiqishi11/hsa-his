@@ -1630,7 +1630,7 @@
         <if test="deptId != null and deptId != ''">
             and in_dept_id = #{deptId}
         </if>
-        GROUP BY in_dept_id, in_dept_name, hosp_code
+        GROUP BY in_dept_id, hosp_code
         ) t1
         LEFT JOIN (
         SELECT
@@ -1649,7 +1649,7 @@
         <if test="startDate != null and endDate != null">
             and DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')
         </if>
-        GROUP BY out_dept_id, out_dept_name, hosp_code
+        GROUP BY out_dept_id,  hosp_code
         ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_name = t2.dept_name
         left join (
         SELECT
@@ -1663,8 +1663,8 @@
         <if test="endDate != null">
             and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
-        GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
-        ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_name = t3.dept_name
+        GROUP BY a.in_dept_id, a.hosp_code
+        ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_id = t3.dept_id
     </select>
 
     <select id="queryWardNum" parameterType="java.util.Map" resultType="java.util.Map">

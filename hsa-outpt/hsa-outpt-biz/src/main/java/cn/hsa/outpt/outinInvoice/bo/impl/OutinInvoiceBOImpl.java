@@ -933,6 +933,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 		OutinInvoiceDTO dto = new OutinInvoiceDTO();
 		dto.setId(outinInvoiceDTO.getId());
 		dto.setHospCode(outinInvoiceDTO.getHospCode());
+		dto.setInvoiceCode(outinInvoiceDTO.getInvoiceCode());
 		dto.setUseId(outinInvoiceDTO.getUseId());
 		dto.setUseName(outinInvoiceDTO.getUseName());
 		dto.setStatusCode(outinInvoiceDTO.getStatusCode());

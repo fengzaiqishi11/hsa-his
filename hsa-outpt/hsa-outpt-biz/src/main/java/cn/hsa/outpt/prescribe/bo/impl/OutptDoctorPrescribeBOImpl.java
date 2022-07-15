@@ -27,6 +27,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.service.OperInfoRecordService;
 import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
+import cn.hsa.module.outpt.fees.dto.SetlRefundQueryDTO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.bo.OutptDoctorPrescribeBO;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
@@ -904,6 +905,15 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             if(!DateUtils.calculationDays(outptPrescribeDTO.getBirthday(), nl)){
                 prescribeTypeCode = Constants.CFLX.EK;
             }
+            // 出生日期为空时，取年龄作比较是否为儿科 lly 2022-07-12 start
+        }else if (StringUtils.isEmpty(outptPrescribeDTO.getBirthday())&&outptPrescribeDTO.getAge()!=null){
+            //获取系统参数
+            Map<String, String> mapParameter = this.getParameterValue(outptPrescribeDTO.getHospCode() , new String[]{"MZYS_EKCFNL"});
+            int nl = MapUtils.getVI(mapParameter, "MZYS_EKCFNL", 10);
+            if(StringUtils.isEmpty(outptPrescribeDTO.getBirthday())&&outptPrescribeDTO.getAge()!=null&&outptPrescribeDTO.getAge()<nl){
+                prescribeTypeCode = Constants.CFLX.EK;
+            }
+            // 出生日期为空时，取年龄作比较是否为儿科 lly 2022-07-12 end
         }
         Map<String, String> macfKFKParameter = this.getParameterValue(outptPrescribeDTO.getHospCode() , new String[]{"MZCF_KFK"});
         String mzcfKFK = null;
@@ -1418,6 +1428,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public boolean deleteOutptPrescribe(OutptPrescribeDTO outptPrescribeDTO){
         if(outptDoctorPrescribeDAO.checkIsSettle(outptPrescribeDTO) > 0){
+            throw new AppException("处方已结算，不能操作删除");
+        }
+        if(outptDoctorPrescribeDAO.checkCostIsSettle(outptPrescribeDTO) > 0){
             throw new AppException("处方有已结算数据，不能操作删除");
         }
         //删除诊断
@@ -3917,20 +3930,22 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         if (sysParameterDTO != null && IS_HAI_NAN.equals(sysParameterDTO.getValue())) {
             // 获得需要推送消息的身份证号
             Map param = new HashMap();
-            param.put("visitID",map.get("visitId"));
+            param.put("id",outptPrescribeDTO.getVisitId());
             param.put("hospCode",map.get("hospCode"));
             OutptVisitDTO outptVisitDTO = outptVisitService.queryByVisitID(param);
             boolean flag = false;
             if(ObjectUtil.isNotEmpty(outptVisitDTO)){
                 for (int i = 0; i < certnos.length; i++) {
-                    if(outptVisitDTO.getCardNo().equals(certnos[i])){
+                    if(outptVisitDTO.getCertNo().equals(certnos[i])){
                         flag = true;
                     }
                 }
             }
             // 如果这个病人的身份证符合要求就推送消息
             if(flag){
-                map.put("visitId", outptPrescribeDTO.getVisitId());
+                SetlRefundQueryDTO setlRefundQueryDTO = new SetlRefundQueryDTO();
+                setlRefundQueryDTO.setVisitId(outptVisitDTO.getId());
+                map.put("setlRefundQueryDTO", setlRefundQueryDTO);
                 map.put("pushType", "HOSPITAL_PAYMENT"); // 推送类型 ： 支付单
                 map.put("orderStatus", "MERCHANT_WAIT_PAY"); // 支付状态 ： 待支付
                 outptTmakePriceFormService_consumer.savePayOnlineInfoDO(map);

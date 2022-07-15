@@ -29,6 +29,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -2926,6 +2927,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
             itemDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag")); // 限制使用标志
             itemDTO.setDownLoadType(listType);
+            itemDTO.setLimUserExplain(MapUtils.get(item, "lim_use_scope"));// 限制使用说明
             insureItemDTOList.add(itemDTO);
         }
         if (!ListUtils.isEmpty(insureItemDTOList)) {
@@ -3659,6 +3661,103 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         PageHelper.startPage(insureUnifiedNationDrugDO.getPageNo(), insureUnifiedNationDrugDO.getPageSize());
         List<InsureUnifiedNationDrugDO> insureUnifiedNationDrugDOList = insureDirectoryDownLoadDAO.queryPageInsureUnifiedNationDrug(insureUnifiedNationDrugDO);
         return PageDTO.of(insureUnifiedNationDrugDOList);
+    }
+    /**
+     * @param map
+     * @Method getMedisnInfo
+     * @Desrciption 医保统一支付;医疗机构信息获取
+     * @Param map
+     * @Author fuhui
+     * @Date 2021/4/13 20:28
+     * @Return
+     */
+    @Override
+    public PageDTO getMedisnInfoByMedisnInName(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        Map<String,Object> paramMap = new HashMap<>();
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("code","HOSP_INSURE_CODE");
+        String orgCode = "";
+        SysParameterDTO data = sysParameterService_consumer.getParameterByCode(paramMap).getData();
+        if(data !=null){
+            orgCode = data.getValue();
+        }else{
+            throw  new AppException("请先配置医疗机构系统参数");
+        }
+        String insureServiceType = MapUtils.get(map, "insureServiceType");
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setOrgCode(orgCode);
+        insureConfigurationDTO.setRegCode(MapUtils.get(map,"regCode"));
+        insureConfigurationDTO.setIsValid(Constants.SF.S);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+
+        Map httpParam = new HashMap();
+        httpParam.put("infno", Constant.UnifiedPay.REGISTER.UP_1201);  //交易编号
+        httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
+        httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("fixmedins_type", insureServiceType);
+        dataMap.put("fixmedins_name", MapUtils.get(map, "medinsName"));
+        dataMap.put("fixmedins_code", MapUtils.get(map, "medinsCode"));
+        Map<String, Object> inputMap = new HashMap<>();
+        inputMap.put("medinsinfo", dataMap);
+        httpParam.put("input", inputMap);
+
+        String json = JSONObject.toJSONString(httpParam);
+        logger.info("获取定点医药机构信息入参:" + json);
+        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问医保统一支付平台");
+        }
+        logger.info("获取定点医药机构信息入参回参:" + resultJson);
+        Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
+        Map<String, Object> outputMap = (Map<String, Object>) resultMap.get("output");
+        List<Map<String, Object>> resultDataMap = MapUtils.get(outputMap, "medinsinfo");
+        if(ListUtils.isEmpty(resultDataMap)){
+            return PageDTO.of(new ArrayList<>());
+        }
+        for(Map map1:resultDataMap){
+            String fixmedinsCode = MapUtils.get(map1,"fixmedins_code");
+            String mdtrtAdvmsCode = fixmedinsCode.substring(1,7);
+            map1.put("mdtrtareaAdmdvs",mdtrtAdvmsCode);
+        }
+        int pageNo = MapUtils.get(map,"pageNo");
+        int pageSize = MapUtils.get(map,"pageSize");
+        int firstNum = 0;
+        int lastNum = 0;
+        if(ObjectUtil.isEmpty(pageSize)){
+            pageSize = 10;
+        }
+        if(ObjectUtil.isEmpty(pageNo)){
+            pageNo = 1;
+        }
+        if(pageNo==1){
+            lastNum = pageSize;
+        }
+        if (pageNo>0) {
+            firstNum = (pageNo-1) *pageSize+1;
+            lastNum = pageNo*pageSize;
+        }
+        if(lastNum>resultDataMap.size()){
+            lastNum = resultDataMap.size();
+        }
+
+        List<Map<String, Object>> returnList = resultDataMap.subList(firstNum,lastNum);
+        PageDTO pageDTO = new PageDTO();
+        PageInfo pageInfo = new PageInfo(resultDataMap);
+        pageDTO = PageDTO.of(returnList);
+        pageDTO.setTotal(pageInfo.getTotal());
+        return pageDTO;
     }
 
     /**

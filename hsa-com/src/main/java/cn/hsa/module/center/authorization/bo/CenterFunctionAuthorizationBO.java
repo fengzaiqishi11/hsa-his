@@ -1,7 +1,5 @@
 package cn.hsa.module.center.authorization.bo;
 
-import cn.hsa.base.PageDO;
-import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;

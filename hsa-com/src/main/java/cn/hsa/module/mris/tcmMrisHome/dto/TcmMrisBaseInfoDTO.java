@@ -56,6 +56,17 @@ public class TcmMrisBaseInfoDTO extends TcmMrisBaseInfoDO implements Serializabl
     private  String atddrCode; // 主治医生代码
     private  String respNursCode; // 责任护士代码
     private  String iptDrCode; // 住院医师代码
+    private String inDiseaseIcd10; // 入院诊断编码
+    private String inDiseaseName; // 入院诊断名称
+    // 档案中的信息
+    private String bfContactName;
+    private String bfContactRelaCode;
+    private String bfContactPhone;
+    private String bfContactPostCode;
+    private String bfContactAddress;
+    private String bfNowAddress;
+    private String bfNowPostCode;
+    private String bfPhone;
 
 
 }

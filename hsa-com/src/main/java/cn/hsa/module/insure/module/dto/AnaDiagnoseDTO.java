@@ -18,38 +18,42 @@ public class AnaDiagnoseDTO implements Serializable {
     /**
      * 诊断标识
      */
-    @JSONField(name = "dise_id")
+//    @JSONField(name = "dise_id")
     private String diseId;
     /**
      * 出入诊断类别
      */
-    @JSONField(name = "inout_dise_type")
+//    @JSONField(name = "inout_dise_type")
     private String inoutDiseType;
     /**
      * 主诊断标志
      */
-    @JSONField(name = "maindise_flag")
+//    @JSONField(name = "maindise_flag")
     private String maindiseFlag;
     /**
      * 诊断排序号
      */
-    @JSONField(name = "dias_srt_no")
+//    @JSONField(name = "dias_srt_no")
     private BigDecimal diasSrtNo;
     /**
      * 诊断(疾病)编码
      */
-    @JSONField(name = "dise_codg")
+//    @JSONField(name = "dise_codg")
     private String diseCodg;
     /**
      * 诊断(疾病)名称
      */
-    @JSONField(name = "dise_name")
+//    @JSONField(name = "dise_name")
     private String diseName;
     /**
      * 诊断日期
      */
-    @JSONField(name = "dise_date")
+//    @JSONField(name = "dise_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date diseDate;
+    /**
+     * 诊断类目   --海南必传
+     */
+    private String diseCgy;
 }

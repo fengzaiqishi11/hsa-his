@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -365,5 +366,18 @@ public class InsureUnifiedPayRestServiceImpl extends HsafService implements Insu
     public WrapperResponse<PageDTO> queryPageInsureUnifiedNationDrug(Map<String, Object> map) {
         InsureUnifiedNationDrugDO insureUnifiedNationDrugDO = MapUtils.get(map,"insureUnifiedNationDrugDO");
         return WrapperResponse.success(insureUnifiedPayRestBO.queryPageInsureUnifiedNationDrug(insureUnifiedNationDrugDO));
+    }
+    /**
+     * @param map
+     * @Method getMedisnInfo
+     * @Desrciption 医保统一支付;医疗机构信息获取
+     * @Param map
+     * @Author fuhui
+     * @Date 2021/4/13 20:28
+     * @Return
+     */
+    @Override
+    public WrapperResponse<PageDTO> getMedisnInfoByMedisnInName(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedPayRestBO.getMedisnInfoByMedisnInName(map));
     }
 }

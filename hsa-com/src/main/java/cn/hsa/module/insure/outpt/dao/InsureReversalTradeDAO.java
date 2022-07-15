@@ -59,6 +59,16 @@ public interface InsureReversalTradeDAO {
     **/
     List<Map<String,Object>> queryDataWith3201(Map<String,Object> map);
 
+    /**医药机构费用结算对总账查询
+    * @Method queryDataWith3201
+    * @Desrciption
+    * @param map
+    * @Author liuqi1
+    * @Date   2021/4/16 11:13
+    * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+    **/
+    List<Map<String,Object>> queryDataXiZangWith3201(Map<String,Object> map);
+
     /**医药机构费用结算对明细账查询
     * @Method queryDataWith3202
     * @Desrciption

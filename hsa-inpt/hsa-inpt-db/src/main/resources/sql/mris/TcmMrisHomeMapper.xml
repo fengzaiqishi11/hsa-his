@@ -891,7 +891,17 @@
             a.contact_rela_code as contactRelaCode,
             a.contact_address as contactAddress,
             a.contact_phone as contactPhone,
-            a.total_in_count as inCnt
+            a.total_in_count as inCnt,
+            ifnull((select code from base_disease where id = a.in_disease_id and hosp_code = #{hospCode} limit 1),'') as inDiseaseIcd10,
+            a.in_disease_name as inDiseaseName,
+            bf.contact_name as bfContactName,
+            bf.contact_rela_code as bfContactRelaCode,
+            bf.contact_phone as bfContactPhone,
+            bf.contact_post_code as bfContactPostCode,
+            bf.contact_address as bfContactAddress,
+            bf.now_address as bfNowAddress,
+            bf.now_post_code as bfNowPostCode,
+            bf.phone as bfPhone
         FROM inpt_visit a
              left join inpt_bed_change bed on a.id = bed.visit_id
              left join inpt_baby baby on a.id = baby.visit_id

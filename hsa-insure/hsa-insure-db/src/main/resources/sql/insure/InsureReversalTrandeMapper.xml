@@ -254,6 +254,104 @@
         A.type
     </select>
 
+    <!--西藏医药机构费用结算对总账查询-->
+    <select id="queryDataXiZangWith3201" resultType="java.util.Map">
+        SELECT
+        A.insureRegCode AS insureRegCode,
+        A.type,
+        A.insutype AS insutype,
+        A.is_hospital AS is_hospital,
+        A.clr_type AS clr_type,
+        A.clr_optins AS clr_optins,
+        sum( A.person_price ) AS person_price,
+        A.medicine_org_code fixmedins_code,
+        sum( A.medfee_sumamt ) AS medfee_sumamt,
+        sum( A.fund_pay_sumamt ) AS fund_pay_sumamt,
+        sum( A.acct_pay ) AS acct_pay,
+        count( 1 ) AS fixmedins_setl_cnt
+        FROM
+        (
+        SELECT DISTINCT
+        ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id,
+        IF
+        (
+        LEFT ( e.insure_reg_code, 4 ) = LEFT ( t.insuplc_admdvs, 4 )
+        or (LEFT ( e.insure_reg_code, 4 ) != LEFT ( t.insuplc_admdvs, 4 )
+        AND LEFT ( e.insure_reg_code, 2 ) = LEFT ( t.insuplc_admdvs, 2 )),
+        '本市参保',
+        '跨省异地'
+        ) type,
+        c.aac003 AS psnName,
+        e.insure_reg_code AS insureRegCode,
+        t.aac001 AS psn_no,
+        e.settle_id,
+        e.visit_id,
+        t.medical_reg_no AS mdtrt_id,
+        e.insureSettleId AS setl_id,
+        c.aae140 AS insutype,
+        t.is_hospital,
+        e.clr_type,
+        IF
+        ( e.state = '0', '0', '1' ) AS refd_setl_flag,
+        e.state,
+        e.clr_optins,
+        t.insure_reg_code AS setl_optins,
+        e.total_price AS medfee_sumamt,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price end as fund_pay_sumamt,
+        e.person_price,
+        e.personal_price AS acct_pay,
+        t.medicine_org_code
+        FROM
+        insure_individual_settle e,
+        insure_individual_visit t,
+        insure_individual_basic c
+        WHERE
+        e.hosp_code = t.hosp_code
+        AND e.visit_id = t.visit_id
+        AND c.hosp_code = t.hosp_code
+        AND c.id = t.mib_id
+        AND c.aae140 IS NOT NULL
+        AND e.settle_state = '1'
+        /*是否作废 0表示正常*/
+        AND e.is_cancel = '0'
+        AND e.insureSettleId IS NOT NULL
+        AND e.insure_reg_code = #{insureRegCode}
+        AND e.hosp_code = #{hospCode}
+        AND e.insure_price > 0
+        <if test="psnNo != null and psnNo != ''">
+            AND t.aac001 like concat('%',#{psnNo},'%')
+        </if>
+
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="state != null and state != ''">
+            and e.state = '0'
+        </if>
+        GROUP BY
+        se_vi_id
+        ) A
+        GROUP BY
+        A.insutype,
+        <if test="insureRegCode != 369900">
+            A.is_hospital,
+        </if>
+        A.clr_type,
+        A.type,
+        A.clr_optins,
+        A.medicine_org_code
+        ORDER BY
+        A.type
+    </select>
+
     <select id="getHisReckonInfo" resultType="java.util.Map">
         SELECT
         max(e.insure_reg_code) as insureRegCode,

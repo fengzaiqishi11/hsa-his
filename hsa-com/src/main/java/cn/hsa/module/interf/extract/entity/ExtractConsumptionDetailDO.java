@@ -83,6 +83,10 @@ public class ExtractConsumptionDetailDO extends PageDO implements Serializable {
      */
     private String bizId;
     /**
+     * 库房科室名称
+     */
+    private String bizName;
+    /**
      * 消耗数量
      */
     private BigDecimal consumNum;
@@ -122,7 +126,14 @@ public class ExtractConsumptionDetailDO extends PageDO implements Serializable {
      * 抽取主表id
      */
     private String extractId;
-
+    /**
+     * 拼音码
+     */
+    private String pym;
+    /**
+     * 五笔码
+     */
+    private String wbm;
 
 }
 

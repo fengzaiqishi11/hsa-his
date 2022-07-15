@@ -36,7 +36,7 @@ public class ExtractStroInvoicingController {
     @GetMapping("/insertDataToExtractReport/{hospCode}")
     private WrapperResponse<Boolean> insertDataToExtractReport(@PathVariable String hospCode, HttpServletRequest req, HttpServletResponse res){
         Map map = new HashMap<>();
-        map.put("hospCode","1000001");
+        map.put("hospCode",hospCode);
         return extractStroInvoicingService_consumer.insertDataToExtractReport(map);
     }
 }

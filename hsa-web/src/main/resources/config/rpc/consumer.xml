@@ -537,7 +537,9 @@
     <dubbo:reference interface="cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService" id="drgDipBusinessOptInfoLogService_consumer" check="false" retries="0"/>
     <dubbo:reference interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" id="drgDipResultService" check="false"/>
     <!--数据抽取-->
-    <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false"/>
+    <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false" retries="0"/>
+    <!--同步药房消耗报表-->
+    <dubbo:reference id="extraConsumptionService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractConsumptionService" check="false" retries="0"/>
 
 </beans>
 

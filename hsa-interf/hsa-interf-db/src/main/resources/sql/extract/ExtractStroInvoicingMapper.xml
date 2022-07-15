@@ -29,6 +29,7 @@
         <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
         <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
         <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="bizName" column="biz_name" jdbcType="VARCHAR"/>
         <result property="consumNum" column="consum_num" jdbcType="VARCHAR"/>
         <result property="avgSellPrice" column="avg_sell_price" jdbcType="VARCHAR"/>
         <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
@@ -39,6 +40,8 @@
         <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
         <result property="renewalTime" column="renewal_time" jdbcType="TIMESTAMP"/>
         <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
     </resultMap>
     <!--药房药库实时进销存Map映射-->
     <resultMap type="cn.hsa.module.interf.extract.entity.ExtractStroInvoicingDetailDO" id="extractStroInvoicingDetailMap">
@@ -136,7 +139,7 @@
             resultMap="extractConsumptionDetailMap">
         select
         hosp_code, summary_type, item_id, item_code, item_name,
-        code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,
+        code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,biz_name,
         consum_num,ifnull((sell_price_all/consum_num),0)  avg_sell_price , sell_price_all,
         ifnull((buy_price_all/consum_num),0)  as avg_buy_price, buy_price_all,
         ifnull((A.buy_price_all - A.sell_price_all),0)  as profit_price,
@@ -158,6 +161,8 @@
         case siv.item_code when '1' then b.code when '2' then c.code end code,/*编码*/
         case siv.item_code when '1' then b.big_type_code	when '2' then '3' end type_code,/*品种*/
         case siv.item_code when '1' then b.spec when '2' then c.spec end spec,/*规格*/
+        case siv.item_code when '1' then b.good_pym when '2' then c.good_pym end pym,/*拼音码*/
+        case siv.item_code when '1' then b.good_wbm when '2' then c.good_wbm end wbm,/*五笔码*/
         max(siv.unit_code) as unit_code,/*项目单位*/
         case siv.item_code when '1' then b.price when '2' then c.price end price,/*零售单价*/
         siv.split_num as split_num,/*拆零数量*/
@@ -303,10 +308,10 @@
 
     <!--插入extract_consumption_detail消耗表-->
     <insert id="insertBatchToConsumption">
-        insert into extract_consumption_detail(id,hosp_code, summary_type, statistics_options, item_id, item_code, item_name, code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id, consum_num, avg_sell_price, sell_price_all, avg_buy_price, buy_price_all, profit_price, extract_type, extract_time, renewal_time, extract_id)
+        insert into extract_consumption_detail(id,hosp_code, summary_type, statistics_options, item_id, item_code, item_name, code, type_code, spec, unit_code, price, split_num, split_unit_code, biz_id,biz_name, consum_num, avg_sell_price, sell_price_all, avg_buy_price, buy_price_all, profit_price, extract_type, extract_time, renewal_time, extract_id,wbm,pym)
         values
         <foreach collection="extractConsumptionDetails" item="entity" separator=",">
-            (#{entity.id},#{entity.hospCode}, #{entity.summaryType}, #{entity.statisticsOptions}, #{entity.itemId}, #{entity.itemCode}, #{entity.itemName}, #{entity.code}, #{entity.typeCode}, #{entity.spec}, #{entity.unitCode}, #{entity.price}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.bizId}, #{entity.consumNum}, #{entity.avgSellPrice}, #{entity.sellPriceAll}, #{entity.avgBuyPrice}, #{entity.buyPriceAll}, #{entity.profitPrice}, #{entity.extractType}, #{entity.extractTime}, #{entity.renewalTime}, #{entity.extractId})
+            (#{entity.id},#{entity.hospCode}, #{entity.summaryType}, #{entity.statisticsOptions}, #{entity.itemId}, #{entity.itemCode}, #{entity.itemName}, #{entity.code}, #{entity.typeCode}, #{entity.spec}, #{entity.unitCode}, #{entity.price}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.bizId},#{entity.bizName}, #{entity.consumNum}, #{entity.avgSellPrice}, #{entity.sellPriceAll}, #{entity.avgBuyPrice}, #{entity.buyPriceAll}, #{entity.profitPrice}, #{entity.extractType}, #{entity.extractTime}, #{entity.renewalTime}, #{entity.extractId},#{entity.wbm},#{entity.pym})
         </foreach>
     </insert>
 

@@ -286,6 +286,11 @@ public class DrgDipResultDTO  implements Serializable {
    * 模糊查询条件
    */
   private String keyword;
+
+  /**
+   * 模糊查询条件
+   */
+  private String keywords;
   /**
    * 主诊断代码
    */

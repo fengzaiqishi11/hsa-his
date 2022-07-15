@@ -1418,6 +1418,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     @Override
     public boolean deleteOutptPrescribe(OutptPrescribeDTO outptPrescribeDTO){
         if(outptDoctorPrescribeDAO.checkIsSettle(outptPrescribeDTO) > 0){
+            throw new AppException("处方已结算，不能操作删除");
+        }
+        if(outptDoctorPrescribeDAO.checkCostIsSettle(outptPrescribeDTO) > 0){
             throw new AppException("处方有已结算数据，不能操作删除");
         }
         //删除诊断

@@ -38,6 +38,7 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         Map map = (Map) param;
         InsureEmrDetailDTO insureEmrDetailDTO = MapUtils.get(map, "insureEmrDetailDTO");
         String insuplcAdmdvs = MapUtils.get(map, "insuplcAdmdvs");
+        String regCode = MapUtils.get(map, "configCode");
 
         Map<String, Object> dataMap = new HashMap<>(3);
         // 入院信息
@@ -72,9 +73,12 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
 
         //广州医保如果没有病程死亡记录信息则传null
         List<InsureEmrDieinfoDTO> dieinfoDTOList = insureEmrDetailDTO.getInsureEmrDieinfoDTOList();
-        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")
-                && ObjectUtil.isEmpty(dieinfoDTOList)) {
-            dataMap.put("dieinfo","null");
+        if (ObjectUtil.isNotEmpty(insuplcAdmdvs) && insuplcAdmdvs.startsWith("44")) {
+            if (ObjectUtil.isEmpty(dieinfoDTOList)) {
+                dataMap.put("dieinfo","null");
+            }else {
+                dataMap.put("dieinfo", HumpUnderlineUtils.humpToUnderline(dieinfoDTOList.get(0)));
+            }
         }else {
             // 死亡信息
             dataMap.put("dieinfo", HumpUnderlineUtils.humpToUnderlineArray(insureEmrDetailDTO.getInsureEmrDieinfoDTOList()));
@@ -105,6 +109,10 @@ public class DzblUploadReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         commParam.put("orgCode",MapUtils.get(map,"orgCode"));
         commParam.put("configCode",MapUtils.get(map,"configCode"));
         commParam.put("configRegCode",MapUtils.get(map,"configRegCode"));
+        //广州4701接口不需要传参保区划，传了反而会导致报“未配置两定接口[4701]接口服务地址”，不信你试试
+        if (ObjectUtil.isNotEmpty(regCode) && regCode.startsWith(Constant.UnifiedPay.YBBMQZ.GD)) {
+            commParam.put("insuplcAdmdvs","");
+        }
 
         return getInsurCommonParam(commParam);
     }

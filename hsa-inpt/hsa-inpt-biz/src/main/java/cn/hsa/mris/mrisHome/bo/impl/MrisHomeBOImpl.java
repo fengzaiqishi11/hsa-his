@@ -1660,6 +1660,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         // 存入分行表
         List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
         if (!ListUtils.isEmpty(diagnoseList)) {
+            int i=1;
             for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
                 if (sysParameterDTO != null && "1".equals(sysParameterDTO.getValue())) {
                     if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10()) && !"2".equals(mrisDiagnoseDO.getDiseaseCode())) {
@@ -1688,6 +1689,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
                     mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
                     mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                    mrisDiagnoseDO.setColumnIndex(i);
                 }
                 insertDiagnoseList.add(mrisDiagnoseDO);
                 if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())) {
@@ -1705,8 +1707,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    diagnoseDO.setColumnIndex(i+1);
                     insertDiagnoseList.add(diagnoseDO);
                 }
+                i=i+2;
             }
             if (!ListUtils.isEmpty(insertDiagnoseList)) {
                 mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);
@@ -1771,6 +1775,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         // 存入分行表
         List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
         if (!ListUtils.isEmpty(diagnoseList)) {
+            int i=1;
             for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
                 if (sysParameterDTO != null && "1".equals(sysParameterDTO.getValue())) {
                     if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10()) && !"2".equals(mrisDiagnoseDO.getDiseaseCode())) {
@@ -1799,6 +1804,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
                     mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
                     mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                    mrisDiagnoseDO.setColumnIndex(i);
                 }
                 insertDiagnoseList.add(mrisDiagnoseDO);
                 if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())) {
@@ -1816,8 +1822,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    diagnoseDO.setColumnIndex(i+1);
                     insertDiagnoseList.add(diagnoseDO);
                 }
+                i=i+2;
             }
             if (!ListUtils.isEmpty(insertDiagnoseList)) {
                 mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);

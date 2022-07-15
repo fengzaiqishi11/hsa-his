@@ -15,30 +15,30 @@ public class AnalysisDTO implements Serializable {
     /**
      * 系统编码
      */
-    @JSONField(name = "syscode")
+//    @JSONField(name = "syscode")
     private String syscode;
     /**
      * 任务ID
      */
-    @JSONField(name = "task_id")
+//    @JSONField(name = "task_id")
     private String taskId;
     /**
      * 触发场景
      */
-    @JSONField(name = "trig_scen")
+//    @JSONField(name = "trig_scen")
     private String trigScen;
     /**
      * 规则标识集合
      */
-    @JSONField(name = "rule_ids")
+//    @JSONField(name = "rule_ids")
     private String ruleIds;
     /**
      * 参保人信息
      */
-    @JSONField(name = "patient_dtos")
+//    @JSONField(name = "patient_dtos")
     private AnaInsuDTO patientDtos;
 
-    @JSONField(serialize = false)
+//    @JSONField(serialize = false)
     private String mdtrtAdmdvs;
 
 }

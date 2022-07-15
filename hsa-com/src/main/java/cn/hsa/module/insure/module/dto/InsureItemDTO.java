@@ -48,6 +48,7 @@ public class InsureItemDTO extends InsureItemDO implements Serializable {
         private String insureItemName;
         private String hospItemCode;
         private String limUserExplain;
+        private String lmtUserFlag;
 
 
 }

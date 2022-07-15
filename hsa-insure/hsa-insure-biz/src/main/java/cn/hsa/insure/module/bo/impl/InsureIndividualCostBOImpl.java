@@ -993,6 +993,8 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
             diagnoseDTO.setDiseName(inptDiagnoseDTO.getDiseaseName());
             //*诊断日期
             diagnoseDTO.setDiseDate(inptDiagnoseDTO.getCrteTime());
+            //*诊断类目  --海南必传
+            diagnoseDTO.setDiseCgy("1");
             anaDiagnoseDTOS.add(diagnoseDTO);
         }
         //就诊信息
@@ -1083,6 +1085,10 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         anaMdtrtDTO.setFsiOrderDtos(anaOrderDTOS);
         //诊断信息DTO
         anaMdtrtDTO.setFsiDiagnoseDtos(anaDiagnoseDTOS);
+        //公务员标志  --海南必传
+        anaMdtrtDTO.setCvlservFlag(ObjectUtil.isNotEmpty(basicDTO.getBac001())?basicDTO.getBac001():"0");
+        anaMdtrtDTO.setOrderDtos(anaOrderDTOS);
+        anaMdtrtDTO.setDiagnoseDtos(anaDiagnoseDTOS);
 
         //参保信息
         AnaInsuDTO anaInsuDTO = new AnaInsuDTO();
@@ -1100,7 +1106,8 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         anaInsuDTO.setCurrMdtrtId(mdtrtDTO.getId());
         //*就诊信息集合
         anaInsuDTO.setFsiEncounterDtos(anaMdtrtDTO);
-
+        //*就诊信息集合  --海南
+        anaInsuDTO.setEncounterDtos(anaMdtrtDTO);
         //入参DTO
         AnalysisDTO analysisDTO = new AnalysisDTO();
         //*系统编码

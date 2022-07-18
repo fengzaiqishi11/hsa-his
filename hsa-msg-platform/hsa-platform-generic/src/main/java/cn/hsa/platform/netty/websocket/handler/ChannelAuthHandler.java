@@ -69,6 +69,7 @@ public class ChannelAuthHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 return;
             }
         }catch (Exception e){
+            log.error("socket auth failed ：",e);
             InetSocketAddress inetSocketAddress = (InetSocketAddress) ctx.channel().remoteAddress();
             String redirectClientIp = inetSocketAddress.getAddress().getHostAddress();
             String clientIp = proxyRealIp == null ? redirectClientIp : proxyRealIp;
@@ -84,9 +85,9 @@ public class ChannelAuthHandler extends SimpleChannelInboundHandler<FullHttpRequ
      * @return
      */
     private boolean verifyAuth(String userId, String token) {
-        Map<Object, Object> sessionInfo = redisTemplate.opsForHash().entries(SESSION_PREFIX+token);
+        Long userInfoEntryKeyCounts = redisTemplate.opsForHash().size(SESSION_PREFIX+token);
 
-        return !sessionInfo.isEmpty();
+        return userInfoEntryKeyCounts.intValue() > 0;
     }
 
 

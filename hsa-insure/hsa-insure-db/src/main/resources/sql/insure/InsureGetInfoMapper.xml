@@ -1200,11 +1200,11 @@
                status_code,
                in_ward_id,
                in_dept_id,
-               (select bd.nation_code
+               (select bd.caty_code
                 from base_dept bd
                 where bd.id = a.in_dept_id
                   and bd.hosp_code = a.hosp_code)                  inDeptNatinCode,
-               (select bd.nation_code
+               (select bd.caty_code
                 from base_dept bd
                 where bd.id = a.out_dept_id
                   and bd.hosp_code = a.hosp_code)                  outDeptNatinCode,
@@ -1335,7 +1335,7 @@
                doctor_id,
                doctor_name,
                dept_id,
-               (select bd.nation_code
+               (select bd.caty_code
                 from base_dept bd
                 where bd.id = dept_id
                   and bd.hosp_code = hosp_code)      inDeptNatinCode,
@@ -1548,7 +1548,7 @@
                (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
                (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
                (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
-               (select bd.nation_code
+               (select bd.caty_code
                     from base_dept bd
                     where bd.hosp_code =
                     mbi.hosp_code
@@ -1772,7 +1772,7 @@
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
           and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
-        order by  mid.disease_code desc
+        order by  mid.columns_index
     </select>
 
     <select id="selectTcmMriInptDiagNose" resultType="cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO">

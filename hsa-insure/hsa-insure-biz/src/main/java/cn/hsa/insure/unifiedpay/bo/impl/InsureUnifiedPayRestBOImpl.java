@@ -2927,7 +2927,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
             itemDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag")); // 限制使用标志
             itemDTO.setDownLoadType(listType);
-            itemDTO.setLimUserExplain(MapUtils.get(item, "lim_use_scope"));// 限制使用说明
             insureItemDTOList.add(itemDTO);
         }
         if (!ListUtils.isEmpty(insureItemDTOList)) {
@@ -3731,15 +3730,21 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             String mdtrtAdvmsCode = fixmedinsCode.substring(1,7);
             map1.put("mdtrtareaAdmdvs",mdtrtAdvmsCode);
         }
-        int pageNo = MapUtils.get(map,"pageNo");
-        int pageSize = MapUtils.get(map,"pageSize");
+        String pageNoStr = MapUtils.get(map,"pageNo");
+        String pageSizeStr = MapUtils.get(map,"pageSize");
+        int pageNo = 0;
+        int pageSize=0;
         int firstNum = 0;
         int lastNum = 0;
-        if(ObjectUtil.isEmpty(pageSize)){
+        if(ObjectUtil.isEmpty(pageSizeStr)){
             pageSize = 10;
+        }else{
+            pageSize = Integer.valueOf(pageSizeStr).intValue();
         }
-        if(ObjectUtil.isEmpty(pageNo)){
+        if(ObjectUtil.isEmpty(pageNoStr)){
             pageNo = 1;
+        }else{
+            pageNo  = Integer.valueOf(pageSizeStr).intValue();
         }
         if(pageNo==1){
             lastNum = pageSize;

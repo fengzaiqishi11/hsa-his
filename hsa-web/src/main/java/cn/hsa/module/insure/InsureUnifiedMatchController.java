@@ -488,8 +488,8 @@ public class InsureUnifiedMatchController extends BaseController {
      * @Date   2021/4/13 20:28
      * @Return
      **/
-    @PostMapping("/getMedisnInfoByMedisnInName")
-    public WrapperResponse<PageDTO> getMedisnInfoByMedisnInName(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    @GetMapping("/getMedisnInfoByMedisnInName")
+    public WrapperResponse<PageDTO> getMedisnInfoByMedisnInName(@RequestParam  Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
         return this.insureUnifiedPayRestService_consumer.getMedisnInfoByMedisnInName(map);

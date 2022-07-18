@@ -3755,7 +3755,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if(ObjectUtil.isEmpty(pageNoStr)){
             pageNo = 1;
         }else{
-            pageNo  = Integer.valueOf(pageSizeStr).intValue();
+            pageNo  = Integer.valueOf(pageNoStr).intValue();
         }
         if(pageNo==1){
             lastNum = pageSize;

@@ -2686,32 +2686,32 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
-        List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
-        List<InptDiagnoseDTO> xiCollect2 = new ArrayList<>();
         List<InptDiagnoseDTO> zxCollect2 = new ArrayList<>();
-        if(ObjectUtil.isNotEmpty(xiCollect)){
-            for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
-                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
-                    inptDiagnoseDTO.setIsMain("0");
-                }
-            }
-            //主诊断排第一位
-            for(int i = 0;i < xiCollect.size(); i++){
-                if(Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())){
-                    xiCollect2.add(xiCollect.get(i));
-                    xiCollect.remove(i);
-                }
-            }
-            //根据id排序
-            xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
-                    xiCollect.stream().sorted((a, b) ->
-                            (b.getId() == null ? "" : b.getId())
-                                    .compareTo(a.getId()))
-                            .collect(Collectors.toList());
-            if(ObjectUtil.isNotEmpty(xiCollect1)){
-                xiCollect2.addAll(xiCollect1);
-            }
-        }
+//        List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
+//        List<InptDiagnoseDTO> xiCollect2 = new ArrayList<>();
+//        if(ObjectUtil.isNotEmpty(xiCollect)){
+//            for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
+//                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
+//                    inptDiagnoseDTO.setIsMain("0");
+//                }
+//            }
+//            //主诊断排第一位
+//            for(int i = 0;i < xiCollect.size(); i++){
+//                if(Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())){
+//                    xiCollect2.add(xiCollect.get(i));
+//                    xiCollect.remove(i);
+//                }
+//            }
+//            //根据id排序
+//            xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
+//                    xiCollect.stream().sorted((a, b) ->
+//                            (b.getId() == null ? "" : b.getId())
+//                                    .compareTo(a.getId()))
+//                            .collect(Collectors.toList());
+//            if(ObjectUtil.isNotEmpty(xiCollect1)){
+//                xiCollect2.addAll(xiCollect1);
+//            }
+//        }
         if(ObjectUtil.isNotEmpty(zxCollect)){
             for(InptDiagnoseDTO inptDiagnoseDTO:zxCollect){
                 if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
@@ -2735,7 +2735,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 zxCollect2.addAll(zxCollect1);
             }
         }
-        diseaseMap.put("xiCollect",xiCollect2);
+        diseaseMap.put("xiCollect",xiCollect);
         diseaseMap.put("zxCollect",zxCollect2);
         diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;

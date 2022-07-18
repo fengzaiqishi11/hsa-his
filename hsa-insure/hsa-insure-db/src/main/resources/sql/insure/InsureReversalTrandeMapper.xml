@@ -933,6 +933,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
         ) A GROUP BY insuplcAdmdvs,medTypeName
@@ -1311,6 +1314,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
     </select>
@@ -1439,6 +1445,9 @@
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
         </if>
         GROUP BY
         se_vi_id
@@ -1590,6 +1599,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
         ) A GROUP BY insuplcAdmdvs,medTypeName
@@ -1721,6 +1733,9 @@
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
         </if>
         GROUP BY
         se_vi_id

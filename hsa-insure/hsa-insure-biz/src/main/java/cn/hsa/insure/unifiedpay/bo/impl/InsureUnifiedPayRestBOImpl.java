@@ -1632,6 +1632,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 break;
             case "1304": // 民族药
                 httpParam.put("infno", Constant.UnifiedPay.DOWNLOAD.UP_1304);  //民族药品目录查询
+                dataMap.put("updt_time", new Date());
                 break;
             case "1305": // 服务项目
                 httpParam.put("infno", Constant.UnifiedPay.DOWNLOAD.UP_1305);  //医疗服务项目目录下载
@@ -3247,7 +3248,17 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         String url = insureConfigurationDTO.getUrl();
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
         logger.info("民族药品目录查询回参:" + resultJson);
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问医保统一支付平台");
+        }
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
+
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         map.put("mapList", mapList);
@@ -3744,7 +3755,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if(ObjectUtil.isEmpty(pageNoStr)){
             pageNo = 1;
         }else{
-            pageNo  = Integer.valueOf(pageSizeStr).intValue();
+            pageNo  = Integer.valueOf(pageNoStr).intValue();
         }
         if(pageNo==1){
             lastNum = pageSize;

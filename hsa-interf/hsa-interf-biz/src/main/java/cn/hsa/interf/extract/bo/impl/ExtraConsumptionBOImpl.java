@@ -6,6 +6,7 @@ import cn.hsa.module.interf.extract.bo.ExtractConsumptionBO;
 import cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
+import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.github.pagehelper.PageHelper;
@@ -41,6 +42,9 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         if (StringUtils.isEmpty(extractConsumptionDTO.getSummaryType())){
             throw new AppException("汇总类型不能为空");
         }
+        if (ListUtils.isEmpty(extractConsumptionDTO.getDeptList())){
+            throw new AppException("筛选科室不能为空");
+        }
         PageHelper.startPage(extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());
         // todo 1.根据项目id进行分组汇总
         List<ExtractConsumptionDTO> extractConsumptions = extraConsumptionDAO.
@@ -55,8 +59,14 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         for (ExtractConsumptionDTO extractConsumption: extractConsumptions) {
             List<ExtractConsumptionDTO> consumptions = MapUtils.get(comsumptionMap, extractConsumption.getItemId());
             for (ExtractConsumptionDTO e: consumptions) {
-                Map<String, ExtractConsumptionDTO> extractConsumptionMap = new HashMap<>();
-                extractConsumptionMap.put(e.getBizId(),e);
+                Map<String, Object> extractConsumptionMap = new HashMap<>();
+                // 封装属性，行转列
+                extractConsumptionMap.put( "consumNum" + e.getBizId(),e.getConsumNum());// 消耗数量
+                extractConsumptionMap.put( "sellPriceAll" + e.getBizId(),e.getSellPriceAll());// 零售金额
+                extractConsumptionMap.put( "avgSellPrice" + e.getBizId(),e.getAvgSellPrice());// 平均售价
+                extractConsumptionMap.put( "avgBuyPrice" + e.getBizId(),e.getAvgBuyPrice());// 成本价
+                extractConsumptionMap.put( "buyPriceAll" + e.getBizId(),e.getBuyPriceAll());// 成本金额
+                extractConsumptionMap.put( "profitPrice" + e.getBizId(),e.getProfitPrice());// 盈利
                 extractConsumption.setExtractConMap(extractConsumptionMap);
             }
         }

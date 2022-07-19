@@ -3936,8 +3936,10 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             boolean flag = false;
             if(ObjectUtil.isNotEmpty(outptVisitDTO)){
                 for (int i = 0; i < certnos.length; i++) {
-                    if(certnos[i].equals(outptVisitDTO.getCertNo())){
-                        flag = true;
+                    if(ObjectUtil.isNotEmpty(certnos[i])){
+                        if(certnos[i].equals(outptVisitDTO.getCertNo())){
+                            flag = true;
+                        }
                     }
                 }
             }

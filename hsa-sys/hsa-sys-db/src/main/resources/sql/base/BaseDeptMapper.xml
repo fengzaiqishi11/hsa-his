@@ -143,6 +143,8 @@
         bd.crte_id,
         bd.crte_name,
         bd.crte_time,
+        bd.caty_code,
+        bd.caty_name,
         bd.type_identity
         FROM
         base_dept bd

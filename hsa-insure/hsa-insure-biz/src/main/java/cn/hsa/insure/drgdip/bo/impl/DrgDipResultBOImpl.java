@@ -571,42 +571,42 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                     }
                     responseDataMap.put("estimateFund",estimateFund);//预计基金支付
                     responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
-                    //查询医保费用
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("hospCode",drgDipResultDTO.getHospCode());
-                    map.put("visitId",drgDipResultDTO.getVisitId());
-                    map.put("insureSettleId",payInfoDTO.getInsureSettleId());
-                    Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
-                    List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
-                    if (ListUtils.isEmpty(feeMapList)) {
-                        throw new AppException("没有获取到医保费用明细数据");
-                    }
-                    //计算药占比，耗材占比
-                    BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
-                    BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
-                    BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
-                    for(Map feeMap:feeMapList){
-                        //累加药占总费用
-                        if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
-                                || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
-                            sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
-                        }
-                        //累加耗材总费用
-                        if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
-                            sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
-                        }
-                        //累加总费用
-                        sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
-                    }
-                    BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
-                    BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
-                    if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
-                        proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
-                        proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
-                    }
-                    responseDataMap.put("proMedicMater",proMedicMater);// 药占比
-                    responseDataMap.put("proConsum",proConsum);// 耗材比
                 }
+                //查询医保费用
+                Map<String, Object> map = new HashMap<>();
+                map.put("hospCode",drgDipResultDTO.getHospCode());
+                map.put("visitId",drgDipResultDTO.getVisitId());
+                map.put("insureSettleId",payInfoDTO.getInsureSettleId());
+                Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
+                List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
+                if (ListUtils.isEmpty(feeMapList)) {
+                    throw new AppException("没有获取到医保费用明细数据");
+                }
+                //计算药占比，耗材占比
+                BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
+                BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
+                BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
+                for(Map feeMap:feeMapList){
+                    //累加药占总费用
+                    if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
+                            || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
+                        sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加耗材总费用
+                    if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
+                        sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加总费用
+                    sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                }
+                BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
+                BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
+                if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
+                    proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
+                    proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
+                }
+                responseDataMap.put("proMedicMater",proMedicMater);// 药占比
+                responseDataMap.put("proConsum",proConsum);// 耗材比
             }
         }
         return responseDataMap;

@@ -1561,6 +1561,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("医保中心编码不能为空!");
         }
         map.put("subRegCode",insureRegCode.substring(0,2));
+        int records = 0;
         if (Constant.UnifiedPay.JBLIST.containsKey(itemType)) {
             InsureDiseaseDTO insureDiseaseDTO = insureDiseaseDAO.selectLatestVer(map);
             if (ObjectUtil.isNotEmpty(insureDiseaseDTO)) {
@@ -1585,11 +1586,12 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                     dataMap.put("page_num", num);
 
                 }
-
+                records = insureDiseaseDTO.getRecordCounts();
             } else {
                 dataMap.put("page_num", num);
             }
             dataMap.put("page_size", size);
+            dataMap.put("recordCounts", records);
         } else {
             InsureItemDTO insureItemDTO = insureItemDAO.selectLatestVer(map);
             if (ObjectUtil.isNotEmpty(insureItemDTO)) {
@@ -1614,11 +1616,12 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                      dataMap.put("page_num", num);
 
                  }
+                  records = insureItemDTO.getRecordCounts();
             } else {
                 dataMap.put("page_num", num);
             }
             dataMap.put("page_size", size);
-
+            dataMap.put("recordCounts", records);
         }
         switch (itemType) {
             case "1301":  // 代表西药
@@ -1670,6 +1673,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
         Map<String, Object> paramMap = new HashMap<>();
+        //增加一个查询来源标识  his:表示来源于云his
+        dataMap.put("source","his");
         paramMap.put("data", dataMap);
         httpParam.put("input", paramMap);
         String json = JSONObject.toJSONString(httpParam);

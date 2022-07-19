@@ -905,7 +905,36 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         int pageSize = Integer.parseInt(MapUtils.get(map, "pageSize") == null ? "10" : MapUtils.get(map, "pageSize"));
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = insureGetInfoDAO.querySetlePage(map);
-        return PageDTO.of(list);
+        //queryFlag =0表示查询全部数据  直接返回结果集
+        if (Constant.UnifiedPay.ISMAN.F.equals(MapUtil.getStr(map,"queryFlag"))) {
+            return PageDTO.of(list);
+        }
+
+        if (ObjectUtil.isEmpty(MapUtil.getStr(map,"queryFlag"))) {
+            throw new AppException("查询标志【queryFlag】不能为空，请检查！");
+        }
+        //根据queryFlag标志按需过滤  queryFlag =1表示查询异地就医数据  queryFlag = 2表示查询本地就医数据
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (Constant.UnifiedPay.ISMAN.S.equals(MapUtil.getStr(map,"queryFlag"))) {
+            //取异地数据
+            list.forEach(o->{
+                if (ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insureRegCode"))
+                        && ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insuplcAdmdvs"))
+                        && !MapUtil.getStr(o,"insuplcAdmdvs").substring(0,4).equals(MapUtil.getStr(o,"insureRegCode").substring(0,4))) {
+                    result.add(o);
+                }
+            });
+        }else if (Constant.UnifiedPay.ISMAN.E.equals(MapUtil.getStr(map,"queryFlag"))) {
+            //取本地数据
+            list.forEach(o->{
+                if (ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insureRegCode"))
+                        && ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insuplcAdmdvs"))
+                        && MapUtil.getStr(o,"insuplcAdmdvs").substring(0,4).equals(MapUtil.getStr(o,"insureRegCode").substring(0,4))) {
+                    result.add(o);
+                }
+            });
+        }
+        return PageDTO.of(result);
     }
 
     /**

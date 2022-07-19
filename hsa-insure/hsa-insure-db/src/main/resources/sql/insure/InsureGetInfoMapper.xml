@@ -1673,6 +1673,7 @@
         iiv.medical_reg_no as medicalRegNo,
         iiv.is_hospital as isHospital,
         iiv.medical_reg_no AS mdtrtId,
+        iiv.insuplc_admdvs AS insuplcAdmdvs,
         iis.insureSettleId AS setlId,
         iis.settle_id settleId,
         iis.settle_id,

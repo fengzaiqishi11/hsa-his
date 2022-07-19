@@ -64,7 +64,35 @@
         <dependency>
             <groupId>cn.hsa.hsaf.adapt</groupId>
             <artifactId>hsaf-generic-rpc</artifactId>
-            <version>${hsaf-generic-rpc.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.dubbo</groupId>
+                    <artifactId>dubbo-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.dubbo</groupId>
+                    <artifactId>dubbo-dependencies-zookeeper</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba.cloud</groupId>
+                    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+            <version>2.7.6</version>
+        </dependency>
+        <!-- Dubbo Registry Nacos -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo-registry-nacos</artifactId>
+            <version>2.7.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
         <!--MVC框架-->
@@ -72,15 +100,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${spring-boot.version}</version>
-        </dependency>
-
-        <!-- Spring Cloud 依赖引入,兼容原Property热更新-->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-dependencies</artifactId>
-            <version>Hoxton.SR10</version>
-            <type>pom</type>
-            <scope>compile</scope>
         </dependency>
 
         <!--数据库访问 开始-->
@@ -201,16 +220,6 @@
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>cn.bestwu</groupId>-->
-<!--            <artifactId>fastdfs-client-java</artifactId>-->
-<!--            <version>1.27</version>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;4.对象存储组件&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>cn.hsa.hsaf.adapt</groupId>-->
-<!--            <artifactId>hsaf-generic-fsstore</artifactId>-->
-<!--        </dependency>-->
         <!-- hsaf-core参数校验 -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -234,8 +243,32 @@
             <artifactId>spring-boot-admin-starter-client</artifactId>
             <version>2.2.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba.nacos</groupId>
+            <artifactId>nacos-common</artifactId>
+            <version>1.4.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
-
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Cloud 依赖引入,兼容原Property热更新-->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>Hoxton.SR10</version>
+                <type>pom</type>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>2.2.8.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
        <build>
            <finalName>hsa-web</finalName>
            <plugins>
@@ -269,7 +302,7 @@
                    <configuration>
                        <!--所有properties文件均不会打进jar包，其中配置项需在配置中心进行配置-->
                        <excludes>
-                           <exclude>*.properties</exclude>
+                           <exclude>application.properties</exclude>
                            <exclude>config/**/*.properties</exclude>
                        </excludes>
                    </configuration>

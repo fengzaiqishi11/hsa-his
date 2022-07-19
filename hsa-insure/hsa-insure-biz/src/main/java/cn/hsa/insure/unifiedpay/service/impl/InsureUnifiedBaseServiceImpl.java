@@ -414,6 +414,12 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
         return  WrapperResponse.success(insureUnifiedBaseBO.querySettleDeInfo(map));
     }
 
+
+    @Override
+    public WrapperResponse<Map<String,Object>> querySettleDeInfoBySettleId(Map<String, Object> map) {
+        return  WrapperResponse.success(insureUnifiedBaseBO.querySettleDeInfoBySettleId(map));
+    }
+
     /**
      * @Method queryPolicyInfo
      * @Desrciption  政策项查询

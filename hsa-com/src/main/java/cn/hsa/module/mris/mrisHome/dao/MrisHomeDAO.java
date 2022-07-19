@@ -10,6 +10,7 @@ import cn.hsa.module.inpt.fees.dto.InptPayDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import cn.hsa.module.mris.mrisHome.dto.MrisBaseInfoDTO;
 import cn.hsa.module.mris.mrisHome.entity.*;
 import cn.hsa.module.mris.tcmMrisHome.entity.TcmMrisCostDO;
@@ -704,4 +705,20 @@ public interface MrisHomeDAO {
     List<TcmMrisOperInfoDO> queryTcmMrisOperInfoPage(InptVisitDTO inptVisitDTO);
 
     List<TcmMrisDiagnoseDO> queryTcmMrisDiagnosePage(InptVisitDTO inptVisitDTO);
+
+    /**
+     * @Author gory
+     * @Description 查询医保结算信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    PayInfoDTO queryInsureSettlePrice(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询患者信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    String queryInptVist(Map<String, Object> map);
 }

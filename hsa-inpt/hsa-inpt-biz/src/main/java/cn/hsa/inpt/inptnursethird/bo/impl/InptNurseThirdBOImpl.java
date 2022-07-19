@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.inptnursethird.entity.InptNurseThirdDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.util.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -291,9 +292,9 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
 
             String breath = dto.getBreath()==null?"":dto.getBreath().toString();
             String isVentilator =   StringUtils.isEmpty( dto.getIsVentilator())?"": dto.getIsVentilator();
-
+            String huxi ="";
             if("1".equals(isVentilator)){
-                breath = "®";
+                huxi = "®";
             }
             m.put("riqi",String.valueOf(timeSlot.getTime()));
             //m.put("ruyuantianshu",String.valueOf(i)); //入院天数
@@ -301,8 +302,10 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             m.put("shijian",String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)));
             if(StringUtils.isNotEmpty(breath) && "0".equals(breath)){
                 m.put("huxi","");
+                m.put("breath","");
             }else{
-                m.put("huxi",breath);
+                m.put("huxi",huxi);
+                m.put("breath",breath);
             }
 
             m.put("peeNO", StringUtils.isEmpty( dto.getPeeCode())?"": dto.getPeeCode());
@@ -488,17 +491,53 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                 }
             }
 
-            for (InptNurseThirdDTO inptNurseThirdDTO : addList) {
-                inptNurseThirdDTO.setId(SnowflakeUtils.getId());
-                inptNurseThirdDTO.setCrteTime(DateUtils.getNow());
+            List<InptNurseThirdDTO> iNThirdList = new ArrayList<>();
+            for (InptNurseThirdDTO addDTO : addList) {
+                addDTO.setStartDate(startDate);
+                addDTO.setEndDate(startDate);
+                List<InptNurseThirdDTO> thirdItem= inptNurseThirdDao.queryAllByTimeSlot(addDTO);
+                for (InptNurseThirdDTO thirdDTO : thirdItem) {
+                    if (thirdDTO.getTimeSlot().equals(addDTO.getTimeSlot())){
+                        BeanUtils.copyProperties(addDTO,thirdDTO);
+                    }else {
+                        thirdDTO.setTemperatureCode(addDTO.getTemperatureCode());
+                        thirdDTO.setIsVentilator(addDTO.getIsVentilator());
+                        thirdDTO.setBabyIds(addDTO.getBabyIds());
+                        thirdDTO.setHospCode(addDTO.getHospCode());
+                        thirdDTO.setIntake(addDTO.getIntake());
+                        thirdDTO.setOutput(addDTO.getOutput());
+                        thirdDTO.setOtherOutput(addDTO.getOtherOutput());
+                        thirdDTO.setSkinCode(addDTO.getSkinCode());
+                        thirdDTO.setExcrementCode(addDTO.getExcrementCode());
+                        thirdDTO.setPeeCode(addDTO.getPeeCode());
+                        thirdDTO.setHeight(addDTO.getHeight());
+                        thirdDTO.setWeight(addDTO.getWeight());
+                        thirdDTO.setGirth(addDTO.getGirth());
+                        thirdDTO.setAmBp(addDTO.getAmBp());
+                        thirdDTO.setPmBp(addDTO.getPmBp());
+                        thirdDTO.setIsOperation(addDTO.getIsOperation());
+                        thirdDTO.setOperationDays(addDTO.getOperationDays());
+                        thirdDTO.setOperationCnt(addDTO.getOperationCnt());
+                        thirdDTO.setDrugAllergy(addDTO.getDrugAllergy());
+                        thirdDTO.setVisitId(addDTO.getVisitId());
+                        thirdDTO.setCrteId(addDTO.getCrteId());
+                        thirdDTO.setCrteName(addDTO.getCrteName());
+                    }
+                    thirdDTO.setId(SnowflakeUtils.getId());
+                    thirdDTO.setCrteTime(DateUtils.getNow());
+                }
+                iNThirdList.addAll(thirdItem);
             }
 
-            inptNurseThirdDao.insertList(addList);
+            inptNurseThirdDao.insertList(iNThirdList);
         }
 
         //编辑
         if (!ListUtils.isEmpty(editList)){
+            // 修改当天某个时间点的一行护理三测单记录
             inptNurseThirdDao.updateList(editList);
+            // 修改当天所有时间点的护理三测单记录的共有值（如上午血压等）
+            inptNurseThirdDao.updatePublicParameterList(editList);
         }
 
         return true;

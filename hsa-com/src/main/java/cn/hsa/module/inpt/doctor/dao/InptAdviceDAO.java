@@ -751,15 +751,6 @@ public interface InptAdviceDAO {
      */
     void updateMedicineAdvance(Map<String, Object> map);
 
-    /**
-     * @Desrciption 获取某个科室未配药的提前领药记录
-     * @param map
-     * @Author pengbo
-     * @Date   2021/05/12 14:44
-     * @Return list
-     */
-    List<Map<String, Object>> getMedicineAdvance(Map<String, Object> map);
-
     List<BaseAdviceDTO> getIllnessAdviceByVisitId(@Param("list") List<InptVisitDTO> inptVisitDTOList);
     /**
      * @Desrciption 取消提前领药记录

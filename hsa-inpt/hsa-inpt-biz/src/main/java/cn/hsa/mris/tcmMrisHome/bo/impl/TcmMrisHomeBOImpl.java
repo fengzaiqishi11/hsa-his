@@ -272,8 +272,10 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         resultMap.put("mrisTurnDeptList", tcmMrisHomeDAO.queryTcmMrisTurnDeptPage(inptVisitDTO));
         //1.新增质控信息
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //病案 business_type 2
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("2");
 
         //2.获取DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();

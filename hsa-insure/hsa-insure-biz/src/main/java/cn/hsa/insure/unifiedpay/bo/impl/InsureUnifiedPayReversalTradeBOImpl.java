@@ -597,7 +597,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         medisnInfMap.put("hospName", hospName);
         medisnInfMap.put("printDate", DateUtils.format(new Date(), DateUtils.Y_M_D));
         // 获取医保结算信息  调用医保接口
-        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfo(map).getData();
+        Map<String, Object> data = insureUnifiedBaseService.querySettleDeInfoBySettleId(map).getData();
         Map<String, Object> setlInfoMap = MapUtils.get(data, "setlinfo"); // 结算信息明细
         List<Map<String, Object>> setldetail = MapUtils.get(data, "setldetail"); // 基金分项信息
 
@@ -1976,24 +1976,34 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         if (StringUtils.isEmpty(insuplcAdmdvs)) {
             throw new AppException("该医保患者的参参保地区划为空");
         }
-        // 就诊人的参保地区划和就医地区划不一致就是异地
-        //就诊人的参保地区划和就医地区划不一致就是异地(省内不算异地，省外才算)
-        if (mdtrtareaAdmvs.substring(0, 2).equals(insuplcAdmdvs.substring(0, 2))) {
+
+        if(Constants.YBQHKT.GD.equals(mdtrtareaAdmvs.substring(0, 2))){
+            //广东地区医保结算单下载
             dataMap.put("setl_id", setlId);//结算ID
             dataMap.put("psn_no", psnNo);//人员编号
             dataMap.put("mdtrt_id", mdtrtId);//就医登记号
-            resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
+            resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5260, dataMap);
+        }else{
+            // 就诊人的参保地区划和就医地区划不一致就是异地
+            //就诊人的参保地区划和就医地区划不一致就是异地(省内不算异地，省外才算)
+            if (mdtrtareaAdmvs.substring(0, 2).equals(insuplcAdmdvs.substring(0, 2))) {
+                dataMap.put("setl_id", setlId);//结算ID
+                dataMap.put("psn_no", psnNo);//人员编号
+                dataMap.put("mdtrt_id", mdtrtId);//就医登记号
+                resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5265, dataMap);
 
-        } else {
-            dataMap.put("mdtrtRegno", setlId);//结算ID
-            dataMap.put("mdtrtId", mdtrtId);//就医登记号
-            dataMap.put("medinsNo", insureConfigurationDTO.getOrgCode());//就医登记号
-            if ("1".equals(individualVisitDTO.getIsHospital())) {
-                resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5270, dataMap);
             } else {
-                resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5269, dataMap);
+                dataMap.put("mdtrtRegno", setlId);//结算ID
+                dataMap.put("mdtrtId", mdtrtId);//就医登记号
+                dataMap.put("medinsNo", insureConfigurationDTO.getOrgCode());//就医登记号
+                if ("1".equals(individualVisitDTO.getIsHospital())) {
+                    resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5270, dataMap);
+                } else {
+                    resultMap = invokingUpay(hospCode, insureRegCode, Constant.UnifiedPay.OUTPT.UP_5269, dataMap);
+                }
             }
         }
+
         return resultMap;
     }
 

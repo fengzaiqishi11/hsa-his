@@ -1,5 +1,6 @@
 package cn.hsa.center.admdvs.controller;
 
+import cn.hsa.base.CenterBaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.admdvs.service.CenterInsureAdmdvsService;
@@ -19,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/center/centerInsureAdmdvs")
-public class CenterInsureAdmdvsController {
+public class CenterInsureAdmdvsController extends CenterBaseController {
 
     @Resource
     private CenterInsureAdmdvsService centerInsureAdmdvsService;

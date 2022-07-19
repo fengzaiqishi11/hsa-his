@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO;
 import cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 
@@ -69,4 +70,14 @@ public interface OutptRegisterService {
     WrapperResponse<List<OutptClassifyCostDTO>> updateCostPreferential(Map map);
 
 
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-07-01 17:00
+     * @Description 根据身份证查询门诊挂号信息
+     * @param map
+     * @return cn.hsa.module.outpt.register.dto.OutptRegisterDTO
+     */
+    List<OutptRegisterDTO> queryRegisterInfoByCertno(Map<String, Object> map);
+
+    OutptRegisterDTO getOutptRegisterByVisitId(Map<String, Object> map);
 }

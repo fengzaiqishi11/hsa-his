@@ -5,6 +5,7 @@ import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -227,4 +228,6 @@ public interface PharInWaitReceiveDAO {
     * @Return java.util.List<cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO>
     **/
     List<PharInWaitReceiveDTO> queryBackDrugPage(PharInWaitReceiveDTO pharInWaitReceiveDTO);
+
+    List<Map<String,Object>> queryAllVisit(PharInWaitReceiveDTO pharInWaitReceiveDTO);
 }

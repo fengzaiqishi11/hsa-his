@@ -86,4 +86,10 @@ public class InptAdviceExecDTO extends InptAdviceExecDO implements Serializable 
 
   // 取消医嘱执行查询标志
   private String canceFlag;
+
+  // 排序字段名称
+  private String columnName;
+
+  // 排序名称 desc:降序  asc:升序
+  private String sortName;
 }

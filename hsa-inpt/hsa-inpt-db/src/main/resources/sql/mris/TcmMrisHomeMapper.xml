@@ -549,13 +549,13 @@
             <if test="allergyList != null">
                 allergy_list = #{allergyList},
             </if>
-            <if test="outModeCode != null">
+            <if test="outModeCode != null and outModeCode!=''">
                 out_mode_code = #{outModeCode},
             </if>
-            <if test="outModeName != null">
+            <if test="outModeName != null and outModeName!=''">
                 out_mode_name = #{outModeName},
             </if>
-            <if test="turnOrgName != null">
+            <if test="turnOrgName != null and turnOrgName!=''">
                 turn_org_name = #{turnOrgName},
             </if>
             <if test="inSituationCode != null">

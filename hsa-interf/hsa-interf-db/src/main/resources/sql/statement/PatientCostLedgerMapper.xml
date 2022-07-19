@@ -5384,7 +5384,7 @@
     <sql id="getOutRegisterCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from outpt_register_settle settle
-                 join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
+                 join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
@@ -5392,14 +5392,14 @@
     <sql id="getOutPtCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from outpt_settle settle
-                 join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code and a.settle_code = '2'
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
     <sql id="getInptCost">
         select a.bfc_id, b.name, sum(a.reality_price) reality_price
         from inpt_settle settle
-                 join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join inpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code and a.settle_code = '2'
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
@@ -5553,7 +5553,7 @@
     <sql id="getOutRegisterCostBig">
         select b.up_code,sum(a.reality_price) reality_price
         from outpt_register_settle settle
-                 join outpt_register_detail a on settle.register_id = ifnull(a.register_id, '') and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
+                 join outpt_register_detail a on settle.register_id = a.register_id and settle.hosp_code = a.hosp_code and settle.status_code = a.status_code
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
@@ -5561,7 +5561,7 @@
     <sql id="getOutPtCostBig">
         select b.up_code, sum(a.reality_price) reality_price
         from outpt_settle settle
-                 join outpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join outpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code and a.settle_code = '2'
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
@@ -5569,7 +5569,7 @@
     <sql id="getInptCostBig">
         select b.up_code, sum(a.reality_price) reality_price
         from inpt_settle settle
-                 join inpt_cost a on settle.id = ifnull(a.settle_id, '') and settle.hosp_code = a.hosp_code and a.settle_code = '2'
+                 join inpt_cost a on settle.id = a.settle_id and settle.hosp_code = a.hosp_code and a.settle_code = '2'
                  join base_finance_classify b on a.bfc_id = b.id and a.hosp_code = b.hosp_code
     </sql>
 
@@ -7100,12 +7100,11 @@
         WHERE
         settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*======挂号的大类======end*/
         union all
@@ -7121,12 +7120,11 @@
         settle.is_settle = '1'
         AND settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*=====门诊大类===end*/
         union all
@@ -7142,12 +7140,11 @@
         settle.is_settle = '1'
         AND settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull(#{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*=====住院大类===end*/
         )ab
@@ -7160,60 +7157,14 @@
     <!--门诊费用-->
     <select id="queryIncomeOutptPrice" resultType="cn.hsa.module.outpt.statement.dto.IncomeDTO">
         select
+        distinct
         allResult.up_code as upCode,
         outCurrentResult.reality_price as outCurrentRealityPrice,/*本月费用*/
         outYearResult.reality_price as outYearRealityPrice,/*上年同期*/
         concat(format((ifnull(outCurrentResult.reality_price,0) - outYearResult.reality_price)/outYearResult.reality_price*100,2),'%') as outSameCompare,/*同比增长率*/
         outMonthResult.reality_price as outMonthRealityPrice, /*上月费用*/
         concat(format((ifnull(outCurrentResult.reality_price,0) - outMonthResult.reality_price)/outMonthResult.reality_price*100,2),'%') as outLinkCompare /*环比*/
-        from
-        /*====门诊中 本月、上月、同期 所有的upCode=====*/
-        (
-            select b.up_code from(
-                /*======挂号的大类======begin*/
-                SELECT
-                a.bfc_id
-                FROM
-                outpt_register_settle settle
-                JOIN outpt_register_detail a ON settle.hosp_code = a.hosp_code and settle.register_id = a.register_id
-                AND settle.status_code = a.status_code
-                WHERE
-                settle.hosp_code = #{hospCode}
-                AND (
-                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-                OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-                OR (
-                settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-                AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-                )
-                )
-                /*======挂号的大类======end*/
-                union all
-                /*=====门诊大类===begin*/
-                SELECT
-                a.bfc_id
-                FROM
-                outpt_settle settle
-                JOIN outpt_cost a ON settle.id = ifnull( a.settle_id, '' )
-                AND settle.hosp_code = a.hosp_code
-                AND a.settle_code = '2'
-                WHERE
-                settle.is_settle = '1'
-                AND settle.hosp_code = #{hospCode}
-                AND (
-                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-                OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-                OR (
-                settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-                AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-                )
-                )
-                /*=====门诊大类===end*/
-        )a JOIN base_finance_classify b ON a.bfc_id = b.id AND  b.hosp_code = #{hospCode}
-        join base_finance_classify c on b.up_code = c.code AND  c.hosp_code = #{hospCode}
-        group by b.up_code, c.name
-        ) allResult
-        /*====门诊中 本月、上月、同期 所有的upCode=====*/
+        from base_finance_classify  allResult
         left join
         /*=======门诊本月费用begin========*/
         (
@@ -7221,12 +7172,12 @@
             from (
             <include refid="getOutRegisterCostBig"></include>
             where settle.hosp_code = #{hospCode} and settle.settle_time >= #{startDate}
-            and settle.settle_time &lt;= ifnull(#{endDate}, now())
+            and settle.settle_time &lt;= #{endDate}
             group by b.up_code
             union all
             <include refid="getOutPtCostBig"></include>
             where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >=  #{startDate}
-            and settle.settle_time &lt;= ifnull(#{endDate}, now())
+            and settle.settle_time &lt;= #{endDate}
             group by b.up_code
             )a group by a.up_code
         ) outCurrentResult on allResult.up_code = outCurrentResult.up_code
@@ -7237,11 +7188,14 @@
             select a.up_code, sum(a.reality_price) reality_price
             from (
             <include refid="getOutRegisterCostBig"></include>
-            where settle.hosp_code = #{hospCode} and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+            where settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
             group by b.up_code
             union all
             <include refid="getOutPtCostBig"></include>
-            where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+            where settle.is_settle = '1' and
+        settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
             group by b.up_code
             )a group by a.up_code
         ) outMonthResult on allResult.up_code = outMonthResult.up_code
@@ -7252,27 +7206,27 @@
             select a.up_code, sum(a.reality_price) reality_price
             from (
             <include refid="getOutRegisterCostBig"></include>
-            where settle.hosp_code = #{hospCode} and settle.settle_time >= date_sub(#{startDate}, interval 1 year)
-            and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+            where settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
             group by b.up_code
             union all
             <include refid="getOutPtCostBig"></include>
-            where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >= date_sub(#{startDate},
-            interval 1 year)
-            and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+            where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
             group by b.up_code
             )a group by a.up_code
         ) outYearResult on allResult.up_code = outYearResult.up_code
         /*=======门诊上年同期费用end========*/
-        where
-        allResult.up_code in
-        <foreach collection="list" open="(" close=")" separator="," item="item">
-            #{item}
-        </foreach>
+<!--        where-->
+<!--        allResult.up_code in-->
+<!--        <foreach collection="list" open="(" close=")" separator="," item="item">-->
+<!--            #{item}-->
+<!--        </foreach>-->
     </select>
     <!--住院费用-->
     <select id="queryIncomeIntPrice" resultType="cn.hsa.module.outpt.statement.dto.IncomeDTO">
         select
+        distinct
         allInResult.up_code as upCode,
         inCurrentResult.reality_price as inCurrentRealityPrice, /*当月住院收入*/
         inYearResult.reality_price as inYearRealityPrice, /*上年同期收入*/
@@ -7280,38 +7234,13 @@
         inMonthResult.reality_price as inMonthRealityPrice, /*上月收入*/
         concat(format((ifnull(inCurrentResult.reality_price,0) - inMonthResult.reality_price)/inMonthResult.reality_price*100,2),'%') as inLinkCompare
         from
-        /*====住院中 本月、上月、同期 所有的upCode=====*/
-        (
-        SELECT
-        b.up_code
-        FROM
-        inpt_settle settle
-        JOIN inpt_cost a ON settle.id = ifnull( a.settle_id, '' )
-        AND settle.hosp_code = a.hosp_code
-        AND a.settle_code = '2'
-        JOIN base_finance_classify b ON a.bfc_id = b.id
-        AND a.hosp_code = b.hosp_code
-        WHERE
-        settle.is_settle = '1'
-        AND settle.hosp_code = #{hospCode}
-        AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull(#{endDate}, now()), INTERVAL 1 YEAR )
-        )
-        )
-        GROUP BY
-        b.up_code
-        ) allInResult
-        /*====住院中 本月、上月、同期 所有的upCode=====*/
+         base_finance_classify   allInResult
         left join
         /*====本月住院收入begin====*/
         (
             <include refid="getInptCostBig"></include>
-            where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >= #{startDate}
-            and settle.settle_time &lt;= ifnull(#{endDate}, now())
+            where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate}
             group by b.up_code
         ) inCurrentResult on allInResult.up_code = inCurrentResult.up_code
         /*====本月住院收入end====*/
@@ -7320,8 +7249,7 @@
         (
             <include refid="getInptCostBig"></include>
             where settle.is_settle = '1' and settle.hosp_code = #{hospCode}
-            and settle.settle_time >= date_sub(#{startDate}, interval 1 year)
-            and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+            and settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
             group by b.up_code
         ) inYearResult on allInResult.up_code = inYearResult.up_code
         /*====上年同期收入end====*/
@@ -7330,14 +7258,14 @@
         (
             <include refid="getInptCostBig"></include>
             where settle.is_settle = '1' and settle.hosp_code = #{hospCode}
-            and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+            and settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
             group by b.up_code
         ) inMonthResult on allInResult.up_code = inMonthResult.up_code
         /*====上月收入end====*/
-        where  allInResult.up_code in
-        <foreach collection="list" open="(" separator="," close=")" item="item">
-            #{item}
-        </foreach>
+<!--        where  allInResult.up_code in-->
+<!--        <foreach collection="list" open="(" separator="," close=")" item="item">-->
+<!--            #{item}-->
+<!--        </foreach>-->
     </select>
     <!--查出财务分类编码-->
     <select id="queryBaseFinanceClassify" resultType="cn.hsa.module.outpt.statement.dto.IncomeDTO">
@@ -7360,12 +7288,11 @@
         WHERE
         settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*======挂号的大类======end*/
         union all
@@ -7381,12 +7308,11 @@
         settle.is_settle = '1'
         AND settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*=====门诊大类===end*/
         union all
@@ -7395,19 +7321,18 @@
         distinct a.bfc_id
         FROM
         inpt_settle settle
-        JOIN inpt_cost a ON settle.id = ifnull( a.settle_id, '' )
+        JOIN inpt_cost a ON settle.id = a.settle_id
         AND settle.hosp_code = a.hosp_code
         AND a.settle_code = '2'
         WHERE
         settle.is_settle = '1'
         AND settle.hosp_code = #{hospCode}
         AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull(#{endDate}, now()), INTERVAL 1 YEAR )
-        )
+                ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate})
+                OR  (settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate})
+                OR (
+                        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
+                    )
         )
         /*=====住院大类===end*/
         )ab
@@ -7419,7 +7344,7 @@
     <!--查询门诊费用-->
     <select id="queryIncomeOutptPriceByBfcId" resultType="cn.hsa.module.outpt.statement.dto.IncomeDTO">
         select
-        allResult.bfc_id as bfcId,
+        allResult.id as bfcId,
         outCurrentResult.reality_price as outCurrentRealityPrice,/*本月费用*/
         outYearResult.reality_price as outYearRealityPrice,/*上年同期*/
         concat(format((ifnull(outCurrentResult.reality_price,0) - outYearResult.reality_price)/outYearResult.reality_price*100,2),'%') as outSameCompare,/*同比增长率*/
@@ -7427,50 +7352,7 @@
         concat(format((ifnull(outCurrentResult.reality_price,0) - outMonthResult.reality_price)/outMonthResult.reality_price*100,2),'%') as outLinkCompare /*环比*/
         from
         /*====门诊中 本月、上月、同期 所有的upCode=====*/
-        (
-        select a.bfc_id from(
-        /*======挂号的大类======begin*/
-        SELECT
-        a.bfc_id
-        FROM
-        outpt_register_settle settle
-        JOIN outpt_register_detail a ON settle.hosp_code = a.hosp_code and settle.register_id = a.register_id
-        AND settle.status_code = a.status_code
-        WHERE
-        settle.hosp_code = #{hospCode}
-        AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
-        )
-        /*======挂号的大类======end*/
-        union all
-        /*=====门诊大类===begin*/
-        SELECT
-        a.bfc_id
-        FROM
-        outpt_settle settle
-        JOIN outpt_cost a ON settle.id = ifnull( a.settle_id, '' )
-        AND settle.hosp_code = a.hosp_code
-        AND a.settle_code = '2'
-        WHERE
-        settle.is_settle = '1'
-        AND settle.hosp_code = #{hospCode}
-        AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull( #{endDate}, now()), INTERVAL 1 YEAR )
-        )
-        )
-        /*=====门诊大类===end*/
-        )a JOIN base_finance_classify b ON a.bfc_id = b.id AND  b.hosp_code = #{hospCode}
-        group by b.id, b.name
-        ) allResult
+        base_finance_classify  allResult
         /*====门诊中 本月、上月、同期 所有的upCode=====*/
         left join
         /*=======门诊本月费用begin========*/
@@ -7479,15 +7361,15 @@
         from (
         <include refid="getOutRegisterCost"></include>
         where settle.hosp_code = #{hospCode} and settle.settle_time >= #{startDate}
-        and settle.settle_time &lt;= ifnull(#{endDate}, now())
+        and  settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate}
         group by b.id
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >=  #{startDate}
-        and settle.settle_time &lt;= ifnull(#{endDate}, now())
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{startDate} AND settle.settle_time &lt;=  #{endDate}
         group by b.id
         )a group by a.bfc_id
-        ) outCurrentResult on allResult.bfc_id = outCurrentResult.bfc_id
+        ) outCurrentResult on allResult.id = outCurrentResult.bfc_id
         left join
         /*=======门诊本月费用end=========*/
         /*=======门诊上月费用begin========*/
@@ -7495,14 +7377,15 @@
         select a.bfc_id, sum(a.reality_price) reality_price
         from (
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+        where settle.hosp_code = #{hospCode} and   settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
         group by b.id
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
         group by b.id
         )a group by a.bfc_id
-        ) outMonthResult on allResult.bfc_id = outMonthResult.bfc_id
+        ) outMonthResult on allResult.id = outMonthResult.bfc_id
         /*=======门诊上月费用end========*/
         left join
         /*=======门诊上年同期费用begin========*/
@@ -7510,28 +7393,26 @@
         select a.bfc_id, sum(a.reality_price) reality_price
         from (
         <include refid="getOutRegisterCost"></include>
-        where settle.hosp_code = #{hospCode} and settle.settle_time >= date_sub(#{startDate}, interval 1 year)
-        and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+        where settle.hosp_code = #{hospCode} and  settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
         group by b.id
         union all
         <include refid="getOutPtCost"></include>
-        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >= date_sub(#{startDate},
-        interval 1 year)
-        and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+        where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and
+        settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
         group by b.id
         )a group by a.bfc_id
-        ) outYearResult on allResult.bfc_id = outYearResult.bfc_id
+        ) outYearResult on allResult.id = outYearResult.bfc_id
         /*=======门诊上年同期费用end========*/
-        where
-        allResult.bfc_id in
-        <foreach collection="list" open="(" close=")" separator="," item="item">
-            #{item}
-        </foreach>
+<!--        where-->
+<!--        allResult.bfc_id in-->
+<!--        <foreach collection="list" open="(" close=")" separator="," item="item">-->
+<!--            #{item}-->
+<!--        </foreach>-->
     </select>
     <!--查询住院费用-->
     <select id="queryIncomeIntPriceByBfcId" resultType="cn.hsa.module.outpt.statement.dto.IncomeDTO">
         select
-        allInResult.bfc_id as bfcId,
+        distinct  allInResult.id as bfcId,
         inCurrentResult.reality_price as inCurrentRealityPrice, /*当月住院收入*/
         inYearResult.reality_price as inYearRealityPrice, /*上年同期收入*/
         concat(format((ifnull(inCurrentResult.reality_price,0) - inYearResult.reality_price)/inYearResult.reality_price*100,2),'%') as inSameCompare,/*上年同比*/
@@ -7539,63 +7420,39 @@
         concat(format((ifnull(inCurrentResult.reality_price,0) - inMonthResult.reality_price)/inMonthResult.reality_price*100,2),'%') as inLinkCompare
         from
         /*====住院中 本月、上月、同期 所有的upCode=====*/
-        (
-        SELECT
-        a.bfc_id
-        FROM
-        inpt_settle settle
-        JOIN inpt_cost a ON settle.id = ifnull( a.settle_id, '' )
-        AND settle.hosp_code = a.hosp_code
-        AND a.settle_code = '2'
-        JOIN base_finance_classify b ON a.bfc_id = b.id
-        AND a.hosp_code = b.hosp_code
-        WHERE
-        settle.is_settle = '1'
-        AND settle.hosp_code = #{hospCode}
-        AND (
-        ( settle.settle_time >= #{startDate} AND settle.settle_time &lt;= ifnull( #{endDate}, now()) )
-        OR date_format( settle.settle_time, '%Y-%m' ) = date_format( DATE_SUB( #{startDate}, INTERVAL 1 MONTH ), '%Y-%m' )
-        OR (
-        settle.settle_time >= date_sub( #{startDate}, INTERVAL 1 YEAR )
-        AND settle.settle_time &lt;= date_sub( ifnull(#{endDate}, now()), INTERVAL 1 YEAR )
-        )
-        )
-        GROUP BY
-        b.id
-        ) allInResult
+        base_finance_classify   allInResult
         /*====住院中 本月、上月、同期 所有的upCode=====*/
         left join
         /*====本月住院收入begin====*/
         (
         <include refid="getInptCost"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode} and settle.settle_time >= #{startDate}
-        and settle.settle_time &lt;= ifnull(#{endDate}, now())
+        and settle.settle_time &lt;= #{endDate}
         group by b.id
-        ) inCurrentResult on allInResult.bfc_id = inCurrentResult.bfc_id
+        ) inCurrentResult on allInResult.id = inCurrentResult.bfc_id
         /*====本月住院收入end====*/
         left join
         /*====上年同期收入begin====*/
         (
         <include refid="getInptCost"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode}
-        and settle.settle_time >= date_sub(#{startDate}, interval 1 year)
-        and settle.settle_time &lt;= date_sub(ifnull(#{endDate}, now()), interval 1 year)
+        and   settle.settle_time >= #{lastYearStartDate} AND settle.settle_time &lt;= #{lastYearEndDate}
         group by b.id
-        ) inYearResult on allInResult.bfc_id = inYearResult.bfc_id
+        ) inYearResult on allInResult.id = inYearResult.bfc_id
         /*====上年同期收入end====*/
         left join
         /*====上月收入begin====*/
         (
         <include refid="getInptCost"></include>
         where settle.is_settle = '1' and settle.hosp_code = #{hospCode}
-        and date_format(settle.settle_time,'%Y-%m') = date_format(DATE_SUB(#{startDate}, INTERVAL 1 MONTH),'%Y-%m')
+        and  settle.settle_time >= #{lastMonthStartDate} AND settle.settle_time &lt;= #{lastMonthEndDate}
         group by b.id
-        ) inMonthResult on allInResult.bfc_id = inMonthResult.bfc_id
+        ) inMonthResult on allInResult.id = inMonthResult.bfc_id
         /*====上月收入end====*/
-        where  allInResult.bfc_id in
-        <foreach collection="list" open="(" separator="," close=")" item="item">
-            #{item}
-        </foreach>
+<!--        where  allInResult.bfc_id in-->
+<!--        <foreach collection="list" open="(" separator="," close=")" item="item">-->
+<!--            #{item}-->
+<!--        </foreach>-->
     </select>
 
     <!--住院病人手术财务分类报表标题 20211213-->

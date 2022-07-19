@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  *@Package_name: cn.hsa.phar.inbackdrug.bo.impl
@@ -178,5 +179,10 @@ public class PharInWaitReceiveBOImpl extends HsafBO implements PharInWaitReceive
     public Boolean updateCostIdBatch(List<InptCostDTO> inptCostDTOs) {
         int i = pharInWaitReceiveDao.updateCostIdBatch(inptCostDTOs);
         return i>0;
+    }
+
+    @Override
+    public List<Map<String, Object>> queryAllVisit(PharInWaitReceiveDTO pharInWaitReceiveDTO) {
+        return pharInWaitReceiveDao.queryAllVisit(pharInWaitReceiveDTO);
     }
 }

@@ -102,4 +102,13 @@ public class PharInWaitReceiveDTO extends PharInWaitReceiveDO implements Seriali
      * 提前领药记录id
      */
     private String advanceId;
+    /**
+     * 医嘱类型 ：长期|临时
+     */
+    private String adviceType;
+    /**
+     * 紧急领药医嘱类型查询条件
+     * 入参例如："0,1"
+     */
+    private String isLong;
 }

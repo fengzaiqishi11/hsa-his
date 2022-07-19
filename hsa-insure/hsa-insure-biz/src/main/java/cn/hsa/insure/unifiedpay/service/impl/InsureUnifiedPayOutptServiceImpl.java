@@ -293,7 +293,7 @@ public class InsureUnifiedPayOutptServiceImpl implements InsureUnifiedPayOutptSe
    * @description 通过区域医保服务平台推送消息（待结算、结算成功、检查报告、挂号通知）等信息给用户,待结算消息推送（必选）
    **/
 	@Override
-	public WrapperResponse<Boolean> AMP_HOS_001(Map<String, Object> map) {
+	public WrapperResponse<Map<String, Object>> AMP_HOS_001(Map<String, Object> map) {
 		return  WrapperResponse.success(insureUnifiedOutptBO.AMP_HOS_001(map));
 	}
 }

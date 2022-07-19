@@ -1,7 +1,5 @@
 package cn.hsa.module.center.authorization.bo;
 
-import cn.hsa.base.PageDO;
-import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
@@ -43,10 +41,11 @@ public interface CenterFunctionAuthorizationBO {
 
     Map<String,Object> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    PageDTO queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     Boolean updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    Boolean updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+    CenterFunctionAuthorizationDto updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
+    CenterFunctionAuthorizationDto saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 };

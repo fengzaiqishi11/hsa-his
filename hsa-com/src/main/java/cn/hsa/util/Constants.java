@@ -14,7 +14,47 @@ import java.util.List;
  */
 public interface Constants {
 
+    /**
+     * 抽取类型（CQLX）
+     */
+    class CQLX {
+        public static final String YFYKXH = "1"; // 药房药库消耗
+        public static final String YFYKSSJXC = "2"; // 药房药库实时进销存
+        public static final String AGYS = "3"; // 按供应商
+        public static final String AGYSPZ = "4"; // 按供应商/品种
+        public static final String AGYSPZPC = "5"; // 按供应商/品种批次
+        public static final String AGYSRKDJ = "6"; // 按供应商/入库单据
+        public static final String AGYSRKDJMX = "7"; // 按供应商/入库单据明细
+        public static final String AGYSJFLB = "8"; // 按供应商/计费类别
+        public static final String AGYSCLFL = "9"; // 按供应商/材料分类
 
+        public static final String AYF = "10"; // 按药房
+        public static final String AYFPZ = "11"; // 按药房/品种
+        public static final String AYFPZPC = "12"; // 按药房/品种批次
+        public static final String AYFCKDJ = "13"; // 按药房/出库单据
+        public static final String AYFJFLB = "14"; // 按药房/计费类别
+        public static final String AYFCKDJMX = "15"; // 按药房/出库单据明细
+        public static final String AYFCLFL = "16"; // 按药房/材料分类
+
+        public static final String AKS = "17"; // 按科室
+        public static final String AKSPZ = "18"; // 按科室/品种
+        public static final String AKSPZPC = "19"; // 按科室/品种批次
+        public static final String AKSCKDJ = "20"; // 按科室/出库单据
+        public static final String AKSCKDJMX = "21"; // 按科室/出库单据明细
+        public static final String AKSJFLB = "22"; // 按科室/计费类别
+        public static final String AKSCLFL = "23"; // 按科室/材料分类
+
+        public static final String BSAPZ = "24"; // 报损/按品种
+        public static final String BSAPZPC = "25"; // 报损/按品种批次
+        public static final String BSAYWFL = "26"; // 报损/按业务单据
+        public static final String BSAJFLB = "27"; // 报损/按计费类别
+
+        public static final String KFPDHZ = "28"; // 库房盘点汇总
+        public static final String KFTJHZ = "29"; // 库房盘点汇总
+
+
+
+    }
 
     /**
      * 病人来源途径（LYTJ）
@@ -23,6 +63,14 @@ public interface Constants {
         public static final String ZCGH = "1"; // 正常挂号
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
+    }
+
+    /**
+     * 医保区划开头（YBQHKT）
+     */
+    class YBQHKT {
+        public static final String GD = "44"; // 广州
+
     }
 
     class TechnologyStatus {
@@ -1288,5 +1336,19 @@ public interface Constants {
         public static final String RYZW_NURSE_03 = "203";//主管护师
         public static final String RYZW_NURSE_04 = "204";//护士
         public static final String RYZW_NURSE_05 = "205";//实习护士
+    }
+    /**
+     * @Desrciption 结算清单打印格式
+     * @Author yuelong.chen
+     * @Date 2022/06/30 10:02
+     */
+    class JSQD_PRINT{
+        public static final String MXGSZR = "1"; //明细格式逐日打印
+        public static final String MXGSHZ = "2";//明细格式汇总打印
+        public static final String XMGSZR = "6";//项目格式逐日打印
+        public static final String XMGSHZ = "5";//项目格式汇总打印
+        public static final String JGGSZR = "3";//结构格式逐日打印
+        public static final String JGGSHZ = "4";//结构格式汇总打印
+        public static final String XMHZMX = "7";//项目汇总-明细打印
     }
 }

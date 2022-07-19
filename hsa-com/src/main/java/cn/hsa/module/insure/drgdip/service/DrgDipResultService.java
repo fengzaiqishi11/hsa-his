@@ -120,4 +120,38 @@ public interface DrgDipResultService {
      * @Return
      */
     WrapperResponse<Map<String, Object>> queryDrgDipResultMrisSum(Map<String, Object> map);
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-07-04 14:44
+     * @Description 质控违规信息查询-病案首页
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> queryDrgDipNoRegulationsMris(Map<String, Object> map);
+
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:20
+     * @Description 质控违规信息汇总-病案首页
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationMrisSum(Map<String, Object> map);
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-06 10:03
+     * @Description 质控违规信息查询-结算清单
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    WrapperResponse<PageDTO> queryDrgDipNoRegulationSetlinfo(Map<String, Object> map);
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:16
+     * @Description 质控违规信息汇总-结算清单
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationSettleSum(Map<String, Object> map);
 }

@@ -63,4 +63,8 @@ public interface InsureDiseaseDAO {
     InsureDiseaseDTO selectLatestVer(Map<String, Object> map);
 
     InsureDiseaseDTO getInsureDiseaseById(InsureItemMatchDTO insureItemMatchDTO);
+
+    List<InsureDiseaseDTO> selectLastPageList(Map<String, Object> map);
+
+    void deleteLastPage(Map<String, Object> map);
 }

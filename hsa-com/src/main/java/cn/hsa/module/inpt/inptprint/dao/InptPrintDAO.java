@@ -2,6 +2,7 @@ package cn.hsa.module.inpt.inptprint.dao;
 
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
+import cn.hsa.module.inpt.fees.dto.InptSettleDTO;
 import cn.hsa.module.inpt.inptprint.dto.InptAdvicePrintDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -191,4 +192,7 @@ public interface InptPrintDAO {
   **/
   int queryMaxSeqNoByVisit(InptAdvicePrintDTO inptAdvicePrintDTO);
 
+  List<InptCostDTO> queryInptCostListXmhzmx(InptCostDTO inptCostDTO);
+
+  List<InptSettleDTO> queryInptSettleListPrint(InptCostDTO inptCostDTO);
 }

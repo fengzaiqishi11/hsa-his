@@ -933,6 +933,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
         ) A GROUP BY insuplcAdmdvs,medTypeName
@@ -1311,6 +1314,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
     </select>
@@ -1439,6 +1445,9 @@
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
         </if>
         GROUP BY
         se_vi_id
@@ -1590,6 +1599,9 @@
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
         </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
+        </if>
         GROUP BY
         se_vi_id
         ) A GROUP BY insuplcAdmdvs,medTypeName
@@ -1610,7 +1622,7 @@
         Round(e.insure_price,2) AS insurePrice,
         Round(e.plan_account_price,2) AS planAccountPrice,
         Round(e.plan_price,2) AS planPrice,
-        Round(e.serious_price,2) AS seriousPrice,
+        Round(ifnull(e.serious_price,0),2) AS seriousPrice,
         Round(e.civil_price,2) AS civilPrice,
         Round(e.retire_price,2) AS retirePrice,
         Round(e.personal_price,2) AS personalPrice,
@@ -1648,11 +1660,11 @@
         )
         ) type,
         e.insure_reg_code AS insureRegCode,
-        Round(e.all_portion_price,2) as allPortionPrice,
-        Round(e.over_self_price,2) as overSelfPrice,
-        Round(e.preselfpay_amt,2) as preselfpayAmt,
-        Round(e.inscp_scp_amt,2) as inscpScpAmt,
-        Round(e.pool_prop_selfpay,2) as poolPropSelfpay,
+        Round(ifnull(e.all_portion_price,0),2) as allPortionPrice,
+        Round(ifnull(e.over_self_price,0),2) as overSelfPrice,
+        Round(ifnull(e.preselfpay_amt,0),2) as preselfpayAmt,
+        Round(ifnull(e.inscp_scp_amt,0),2) as inscpScpAmt,
+        Round(ifnull(e.pool_prop_selfpay,0),2) as poolPropSelfpay,
         t.insuplc_admdvs as insuplcAdmdvs,
 --         ia.admdvs_name as insuplcAdmdvsName,
         (select ia.admdvs_name from insure_admdvs ia where t.insuplc_admdvs = ia.admdvs_code) as insuplcAdmdvsName,
@@ -1670,7 +1682,9 @@
         c.aac004 AS sex,
         c.bka035 AS psnType,
         (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'GEND' and c.aac004 = value ) as sexName,
-        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'PSN_TYPE' and c.bka035 = value) as psnAttrName
+        (select name from insure_dict where insure_reg_code = e.insure_reg_code and code = 'PSN_TYPE' and c.bka035 = value) as psnAttrName,
+        (select name from insure_dict where value = t.psn_idet_type and code = 'PSN_IDET_TYPE' and insure_reg_code =
+        t.insure_reg_code and hosp_code = t.hosp_code limit 1) as psnIdetName
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1721,6 +1735,9 @@
         /*结束日期*/
         <if test="endDate != null and endDate != ''">
             and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+        <if test="insuplcAdmdvs != null and insuplcAdmdvs != ''">
+            and t.insuplc_admdvs = #{insuplcAdmdvs}
         </if>
         GROUP BY
         se_vi_id

@@ -1635,6 +1635,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 break;
             case "1304": // 民族药
                 httpParam.put("infno", Constant.UnifiedPay.DOWNLOAD.UP_1304);  //民族药品目录查询
+                dataMap.put("updt_time", new Date());
                 break;
             case "1305": // 服务项目
                 httpParam.put("infno", Constant.UnifiedPay.DOWNLOAD.UP_1305);  //医疗服务项目目录下载
@@ -2932,7 +2933,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             itemDTO.setVer(MapUtils.get(item, "ver")); // 版本号
             itemDTO.setLmtUsedFlag(MapUtils.get(item, "lmt_used_flag")); // 限制使用标志
             itemDTO.setDownLoadType(listType);
-            itemDTO.setLimUserExplain(MapUtils.get(item, "lim_use_scope"));// 限制使用说明
             insureItemDTOList.add(itemDTO);
         }
         if (!ListUtils.isEmpty(insureItemDTOList)) {
@@ -3253,7 +3253,17 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         String url = insureConfigurationDTO.getUrl();
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(url, json);
         logger.info("民族药品目录查询回参:" + resultJson);
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问医保统一支付平台");
+        }
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
+        if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            throw new AppException((String) resultMap.get("msg"));
+        }
+        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
+            throw new AppException((String) resultMap.get("err_msg"));
+        }
+
         Map<String, Object> outMap = MapUtils.get(resultMap, "output");
         List<Map<String, Object>> mapList = MapUtils.get(outMap, "data");
         map.put("mapList", mapList);
@@ -3736,15 +3746,21 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             String mdtrtAdvmsCode = fixmedinsCode.substring(1,7);
             map1.put("mdtrtareaAdmdvs",mdtrtAdvmsCode);
         }
-        int pageNo = MapUtils.get(map,"pageNo");
-        int pageSize = MapUtils.get(map,"pageSize");
+        String pageNoStr = MapUtils.get(map,"pageNo");
+        String pageSizeStr = MapUtils.get(map,"pageSize");
+        int pageNo = 0;
+        int pageSize=0;
         int firstNum = 0;
         int lastNum = 0;
-        if(ObjectUtil.isEmpty(pageSize)){
+        if(ObjectUtil.isEmpty(pageSizeStr)){
             pageSize = 10;
+        }else{
+            pageSize = Integer.valueOf(pageSizeStr).intValue();
         }
-        if(ObjectUtil.isEmpty(pageNo)){
+        if(ObjectUtil.isEmpty(pageNoStr)){
             pageNo = 1;
+        }else{
+            pageNo  = Integer.valueOf(pageNoStr).intValue();
         }
         if(pageNo==1){
             lastNum = pageSize;

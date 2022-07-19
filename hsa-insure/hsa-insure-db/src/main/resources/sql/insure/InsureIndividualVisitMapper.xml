@@ -198,6 +198,7 @@
          idet_start_date,
          idet_end_date,
          psn_idet_type,
+         psn_idet_type_name,
          is_one_settle,
          hcard_basinfo,
          hcard_chkinfo)
@@ -241,6 +242,7 @@
                 #{idetStartDate,jdbcType=VARCHAR},
                 #{idetEndDate,jdbcType=VARCHAR},
                 #{psnIdetType,jdbcType=VARCHAR},
+                #{psnIdetTypeName,jdbcType=VARCHAR},
                 #{isOneSettle,jdbcType=VARCHAR},
                 #{hcardBasinfo,jdbcType=VARCHAR},
                 #{hcardChkinfo,jdbcType=VARCHAR}

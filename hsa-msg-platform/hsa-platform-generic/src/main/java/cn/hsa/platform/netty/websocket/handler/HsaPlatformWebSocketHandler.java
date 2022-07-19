@@ -67,6 +67,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     @Resource
     private MessageInfoService messageInfoService;
 
+    private static final String PING_MSG = "ping";
     /**
      * 客户端发送给服务端的消息
      *
@@ -78,6 +79,8 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         try {
             String msa = msg.text();
+            log.info("received msg from client,chanel id is: {} msg text is: {}",ctx.channel().id().asShortText(),msa);
+            if(PING_MSG.equalsIgnoreCase(msa)) return;
             //接受客户端发送的消息
             ImContentModel messageRequest = JSON.parseObject(msg.text(), ImContentModel.class);
 
@@ -87,7 +90,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             clientMap.put(key, messageRequest.getUnionId());
             // 存储客户端请求参数
             paramMap.put(key,messageRequest);
-            log.info("接受客户端的消息......" + ctx.channel().remoteAddress() + "-参数[" + messageRequest.getUnionId() + "]");
+            log.info("accept msg from client......" + ctx.channel().remoteAddress() + "-params[" + messageRequest.getUnionId() + "]");
             if (!channelMap.containsKey(key)&&!sysChannelMap.containsKey(key)) {
                 Future future =null;
                 // 存储系统消息连接用户
@@ -114,7 +117,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 //                    messageInfoModel.addAll(sysMessageInfoList);
                     List<MessageInfoModel> messageInfoModels = messageInfoService.getUnReadMsgList(getParam(messageRequest));
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("首次连接业务处理业务逻辑参数为:{}" + JSON.toJSONString(messageInfoModels));
+                    log.info("first connected do business. the param is:{}" + JSON.toJSONString(messageInfoModels));
                 }
             } else {
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
@@ -141,7 +144,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 //                        }
 //                    }
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("主动业务处理业务逻辑参数为:{}"+JSON.toJSONString(messageInfoModels));
+                    log.info("active processing business :{}"+JSON.toJSONString(messageInfoModels));
                     messageInfoService.updateMessageInfoList(messageInfoModels);
                 }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
 //                       MessageInfoModel messageInfoModel =new MessageInfoModel();
@@ -153,7 +156,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             }
 
         } catch (Exception e) {
-            log.error("websocket服务器推送消息发生错误：", e);
+            log.error("an error occurs during websocket server push msg to client ：", e);
             WebSocketUtils.writeAndFlushToChannel(ctx,new TextWebSocketFrame("websocket服务器处理连接发生错误："+e.getMessage()+ "服务器时间" + LocalDateTime.now()));
         }
 
@@ -199,7 +202,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             future.cancel(true);
             futureMap.remove(key);
             });
-            log.info("一个客户端移除......" + ctx.channel().remoteAddress());
+            log.info("a client removed......, channel id: {}. socket address is {}" ,key,ctx.channel().remoteAddress());
             ctx.close();
     }
 
@@ -228,7 +231,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             });
             //关闭长连接
             ctx.close();
-            log.error("异常发生 " + cause.getMessage(),cause);
+            log.error("error: " + cause.getMessage(),cause);
     }
 
     public static Map<String, Channel> getChannelMap() {

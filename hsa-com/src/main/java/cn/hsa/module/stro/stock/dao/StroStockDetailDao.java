@@ -75,4 +75,18 @@ public interface StroStockDetailDao {
      * @return
      */
     List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+    /**
+     * @Author gory
+     * @Description 查询门诊发药利润
+     * @Date 2022/7/18 13:58
+     * @Param [itemProfitStatisticsDTO]
+     **/
+    List<ItemProfitStatisticsDTO> queryNewMZDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+    /**
+     * @Author gory
+     * @Description 按结算时间算利润
+     * @Date 2022/7/18 15:34
+     * @Param [itemProfitStatisticsDTO]
+     **/
+    List<ItemProfitStatisticsDTO> queryZYDrugAndMaterialProfitBySettleTime(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
 }

@@ -108,18 +108,21 @@
         d.total_num as totalNum,
         d.num as preNum,
         d.num_unit_code as numUnitCode,
-
+        d.remark,
         b.visit_no as visitNo,
         b.dept_name as deptName,
         b.name as name,
         b.age as age,
         b.age_unit_code as ageUnitCode,
-        b.gender_code as genderCode
-
+        b.gender_code as genderCode,
+        (select iiv.aka130 from insure_individual_visit iiv where iiv.visit_id = b.id and iiv.hosp_code = b.hosp_code ) as aka130,
+        bd.name as diseaseName
         from phar_out_receive_detail a
         join phar_out_receive c on a.or_id = c.id  and c.hosp_code = a.hosp_code
         left join outpt_prescribe_detail d on a.opd_id = d.id and d.hosp_code=a.hosp_code
         left join outpt_visit b on b.id = c.visit_id and b.hosp_code = a.hosp_code
+        left join outpt_diagnose od on od.is_main = '1' and  b.id = od.visit_id and b.hosp_code = od.hosp_code
+        left join base_disease bd on bd.is_valid = '1' and bd.id = od.disease_id and bd.hosp_code = od.hosp_code
         where 1=1 and a.hosp_code=#{hospCode}
         <if test="id != null and id !='' ">
             and a.or_id = #{id}

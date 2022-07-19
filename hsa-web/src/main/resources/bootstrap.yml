@@ -19,16 +19,18 @@ spring:
       config:
         file-extension: properties
         group: dev
-        enabled: false
+        enabled: true
         encode: UTF-8
-        server-addr: 127.0.0.1:8848
+        server-addr: ${mspring.cloud.nacos.config.server-addr}
+        username: ${mspring.cloud.nacos.config.username}
+        password: ${mspring.cloud.nacos.config.password}
   boot:
     admin:
       client:
         url: http://127.0.0.1:9020
 dubbo:
   registry:
-    address: nacos://127.0.0.1:8848
+    address: nacos://${mspring.cloud.nacos.config.server-addr}/?username=${mspring.cloud.nacos.config.username}&password=${mspring.cloud.nacos.config.password}
   consumer:
     timeout: 60000
   application:

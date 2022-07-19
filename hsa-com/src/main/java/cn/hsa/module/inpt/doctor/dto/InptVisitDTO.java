@@ -174,6 +174,8 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     // 电脑号
     private String computerNumber;
+    //人员类别
+    private String bka035Name;
 
     // 个人信息ID
     private String mibId;

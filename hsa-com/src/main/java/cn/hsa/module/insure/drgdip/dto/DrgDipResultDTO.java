@@ -13,9 +13,11 @@ import lombok.Data;
  * @date： 2022-06-07 08:41:51
  */
 @Data
-public class DrgDipResultDTO extends PageDO implements Serializable {
+public class DrgDipResultDTO  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+  private int pageNo = 1;
+  private int pageSize = 10;
   /**
    * 主键
    */
@@ -284,6 +286,11 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
    * 模糊查询条件
    */
   private String keyword;
+
+  /**
+   * 模糊查询条件
+   */
+  private String keywords;
   /**
    * 主诊断代码
    */
@@ -316,6 +323,11 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
    * 在院状态
    */
   private String statusCode;
+
+  /**
+   * 上传状态
+   */
+  private String isUploadInsure;
   /**
    * 姓名年龄性别
    */
@@ -356,7 +368,39 @@ public class DrgDipResultDTO extends PageDO implements Serializable {
      * 在院状态集合
      */
     private List<String> statusCodes;
+    /**
+     * 是否住院集合
+     */
+    private List<String> isHospitals;
+  /**
+   * 年月份选择类型
+   */
+    private String yearFlag;
+  /**
+   * 违规等级
+   */
+    private String ruletType;
+  /**
+   * 错误字段
+   */
+    private String checkFiled;
+  /**
+   * 违规错误信息
+   */
+    private String resultMsg;
+  /**
+   * 违规等级
+   */
+  private List<String> level;
 
+
+  public void setYearFlag(String yearFlag) {
+    this.id = yearFlag;
+  }
+
+  public String getYearFlag() {
+    return yearFlag;
+  }
 
   public void setId(String id) {
     this.id = id;

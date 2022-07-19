@@ -183,4 +183,9 @@ public class DrawMedicineServiceImpl implements DrawMedicineService {
         return WrapperResponse.success(drawMedicineBO.updateAdvance(map));
     }
 
+    @Override
+    public WrapperResponse<List<Map<String, Object>>> queryAllVisit(Map<String, Object> map) {
+        return WrapperResponse.success(drawMedicineBO.queryAllVisit(map));
+    }
+
 }

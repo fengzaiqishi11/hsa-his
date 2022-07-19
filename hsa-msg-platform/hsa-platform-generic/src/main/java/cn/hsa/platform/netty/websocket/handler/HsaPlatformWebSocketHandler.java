@@ -78,6 +78,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         try {
             String msa = msg.text();
+            log.info("received msg from client :{}",msa);
             //接受客户端发送的消息
             ImContentModel messageRequest = JSON.parseObject(msg.text(), ImContentModel.class);
 
@@ -87,7 +88,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             clientMap.put(key, messageRequest.getUnionId());
             // 存储客户端请求参数
             paramMap.put(key,messageRequest);
-            log.info("接受客户端的消息......" + ctx.channel().remoteAddress() + "-参数[" + messageRequest.getUnionId() + "]");
+            log.info("received msg ......" + ctx.channel().remoteAddress() + "-params[" + messageRequest.getUnionId() + "]");
             if (!channelMap.containsKey(key)&&!sysChannelMap.containsKey(key)) {
                 Future future =null;
                 // 存储系统消息连接用户
@@ -199,7 +200,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             future.cancel(true);
             futureMap.remove(key);
             });
-            log.info("一个客户端移除......" + ctx.channel().remoteAddress());
+            log.info("a client has disconnected...chanelId :{},channelIp:{}" ,key, ctx.channel().remoteAddress());
             ctx.close();
     }
 
@@ -228,7 +229,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             });
             //关闭长连接
             ctx.close();
-            log.info("异常发生 " + cause.getMessage());
+            log.error("异常发生 " + cause.getMessage(),cause);
     }
 
     public static Map<String, Channel> getChannelMap() {

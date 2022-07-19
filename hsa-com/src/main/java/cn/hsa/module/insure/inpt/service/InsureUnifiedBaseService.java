@@ -319,6 +319,13 @@ public interface InsureUnifiedBaseService {
     WrapperResponse<Map<String,Object>> querySettleDeInfo(Map<String, Object> map);
 
     /**
+     * 结算单下载使用
+     * @param map map
+     * @return
+     */
+    WrapperResponse<Map<String,Object>> querySettleDeInfoBySettleId(Map<String, Object> map);
+
+    /**
      * @Method queryPolicyInfo
      * @Desrciption  政策项查询
      * @Param

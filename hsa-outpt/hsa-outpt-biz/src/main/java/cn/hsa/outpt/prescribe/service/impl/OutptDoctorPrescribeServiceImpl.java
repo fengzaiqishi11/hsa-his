@@ -530,7 +530,7 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
     @Override
     public WrapperResponse<Boolean> updatePrescribeSubmit(Map map) {
         OutptPrescribeDTO outptPrescribeDTO = MapUtils.get(map,"outptPrescribeDTO");
-        return WrapperResponse.success(outptDoctorPrescribeBO.updatePrescribeSubmit(outptPrescribeDTO));
+        return WrapperResponse.success(outptDoctorPrescribeBO.updatePrescribeSubmit2(map,outptPrescribeDTO));
     }
 
     /**

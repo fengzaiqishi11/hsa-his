@@ -2,12 +2,14 @@ package cn.hsa.module.phar.pharinbackdrug.bo;
 
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  *@Package_name: cn.hsa.module.phar.pharinbackdrug.bo
@@ -132,4 +134,5 @@ public interface PharInWaitReceiveBO {
     Boolean updateCostIdBatch(List<InptCostDTO> inptCostDTOs);
 
 
+    List<Map<String, Object>> queryAllVisit(PharInWaitReceiveDTO pharInWaitReceiveDTO);
 }

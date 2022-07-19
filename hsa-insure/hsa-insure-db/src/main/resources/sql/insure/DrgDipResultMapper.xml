@@ -71,6 +71,9 @@
         <if test="type != null">
             AND type = #{type}
         </if>
+        <if test="businessType != null">
+            AND business_type = #{businessType}
+        </if>
     </select>
 
     <insert id="insertDrgDipResult" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO" >
@@ -349,22 +352,149 @@
         where result_id = #{id}
     </select>
 
+    <select id="querySettle" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="java.lang.Integer">
+        select count(*) from inpt_settle is2
+        where is2.is_settle ='1' and is2.status_code ='0' and CONVERT(patient_code,SIGNED) &lt;= 0
+        <if test="startDate != '' and startDate != null">
+            and DATE_FORMAT(is2.crte_time, "%Y-%m-%d") &gt;= #{startDate}
+        </if>
+        <if test="endDate != '' and endDate != null">
+            and DATE_FORMAT(is2.crte_time, "%Y-%m-%d") &lt;= #{endDate}
+        </if>
+
+    </select>
+
     <select id="queryDrgDipResultSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
             resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
-        select * from (select
-        isi.psn_name, isi.gend, isi.age, isi.medcasno, isi.chfpdr_code as doctor_id, isi.chfpdr_name as doctor_name,if(isi.settle_no is null,'0','1') as is_uplod ,
-        isi.visit_id, isi.insure_settle_id, iis.settle_id, iis.is_hospital, iis.insure_reg_code, iis.medicalRegNo,
-        iiv.visit_icd_code , iiv.visit_icd_name , iiv.visit_drpt_id as dept_id, iiv.visit_drpt_name as dept_name,iiv.visit_no,
-        iis.crte_time, DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time, iis.total_price as total_fee, ddr.id, ddr.stand_fee, ddr.profit,ddr.type,
-        if(ddr.states is null,'0',ddr.states) as states,
-        if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
-        if(ddr.violation_num > 0,'1','0') as violation_states,
-        if(ddr.group_result is null,'0',ddr.group_result) as group_result
-	    from insure_setl_info isi left join insure_individual_visit iiv on isi.visit_id =iiv.visit_id and isi.mdtrt_id =iiv.medical_reg_no
-        left join insure_individual_settle iis on isi.insure_settle_id =iis.insureSettleId and iis.state = '0' and iis.settle_state = '1'
-        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type})A
+        select * from (select m.* from (select
+        iib.aac003 as psn_name,
+        iib.aac004 as gend,
+        iv.age,
+        iv.in_profile as medcasno,
+        iv.zg_doctor_id  as doctor_id,
+        iv.zg_doctor_name  as doctor_name,
+        if(isi.settle_no is null,
+        '0',
+        '1') as is_uplod ,
+        iis.crte_time,
+        iis.visit_id,
+        iis.insureSettleId ,
+        iis.settle_id,
+        iis.is_hospital,
+        iis.insure_reg_code,
+        iis.medicalRegNo,
+        iiv.visit_icd_code ,
+        iiv.visit_icd_name ,
+        iiv.visit_drpt_id as dept_id,
+        iiv.visit_drpt_name as dept_name,
+        iiv.visit_no,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time,
+        iis.total_price as total_fee,
+        ddr.id,
+        ddr.stand_fee,
+        ddr.profit,
+        ddr.type,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        if(ddr.suspicious_num > 0,
+        '1',
+        '0') as suspicious_states,
+        if(ddr.violation_num > 0,
+        '1',
+        '0') as violation_states,
+        if(ddr.group_result is null,
+        '0',
+        ddr.group_result) as group_result
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left  join inpt_visit iv on iis.visit_id = iv.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '1') m
+        union all
+        select n.* from (select
+        iib.aac003 as psn_name,
+        iib.aac004 as gend,
+        ov.age,
+        ov.out_profile as medcasno ,
+        ov.doctor_id  as doctor_id,
+        ov.doctor_name  as doctor_name,
+        if(isi.settle_no is null,
+        '0',
+        '1') as is_uplod ,
+        iis.crte_time,
+        iis.visit_id,
+        iis.insureSettleId ,
+        iis.settle_id,
+        iis.is_hospital,
+        iis.insure_reg_code,
+        iis.medicalRegNo,
+        iiv.visit_icd_code ,
+        iiv.visit_icd_name ,
+        iiv.visit_drpt_id as dept_id,
+        iiv.visit_drpt_name as dept_name,
+        iiv.visit_no,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time,
+        iis.total_price as total_fee,
+        ddr.id,
+        ddr.stand_fee,
+        ddr.profit,
+        ddr.type,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        if(ddr.suspicious_num > 0,
+        '1',
+        '0') as suspicious_states,
+        if(ddr.violation_num > 0,
+        '1',
+        '0') as violation_states,
+        if(ddr.group_result is null,
+        '0',
+        ddr.group_result) as group_result
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left  join outpt_visit   ov on iis.visit_id = ov.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '0'
+        and iiv.aka130 = '14') n) A
         <where>
-            <if test="doctorId != null and doctorId != '' ">
+            <if test="isHospital != null and isHospital != '' ">
+               and A.is_hospital = #{isHospital}
+            </if>            <if test="doctorId != null and doctorId != '' ">
                and A.doctor_id = #{doctorId}
             </if>
             <if test="deptId != null and deptId != '' ">
@@ -439,6 +569,12 @@
                     #{groupResult}
                 </foreach>
             </if>
+            <if test="isHospitals != null and isHospitals.size()>0">
+                and A.is_hospital in
+                <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                    #{isHospital}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -453,7 +589,7 @@
         if(ddr.suspicious_num > 0,'1','0') as suspicious_states,
         if(ddr.violation_num > 0,'1','0') as violation_states,
         if(ddr.group_result is null,'0',ddr.group_result) as group_result
-        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id
+        from mris_base_info mbi left join inpt_visit iv on mbi.visit_id =iv.id and iv.status_code = '7'
         left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1' and ie.status_code = '0'
         left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='2'  and ddr.type=#{type})A
         <where>
@@ -475,9 +611,9 @@
             <if test="violationStates != null and violationStates != '' ">
                 and A.violation_states = #{violationStates}
             </if>
-            <if test="statusCode != null and statusCode != '' ">
-                and A.status_code = #{statusCode}
-            </if>
+            <!--<if test="statusCode != null and statusCode != '' ">-->
+                <!--and A.status_code = #{statusCode}-->
+            <!--</if>-->
             <if test="groupResult != null and groupResult != '' ">
                 and A.group_result = #{groupResult}
             </if>
@@ -689,4 +825,303 @@
         delete drg_dip_result where
                 id = #{id}
     </delete>
+
+
+    <select id="queryDrgDipNoRegulationsMris" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select
+        ddr.id,
+        ddr.visit_id,
+        iv.in_dept_name as dept_name ,
+        ddr.gend,
+        ddr.age,
+        iv.in_dept_id as dept_id,
+        mbi.zz_doctor_id as doctor_id,
+        mbi.zz_doctor_name as doctor_name ,
+        ddrd .rulet_type ,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        mbi.name as psnName,
+        iv.in_no as visitNo ,
+        mbi.in_profile as medcasno ,
+        iv.in_disease_name as icd10 ,/*主诊断*/
+        ddr.total_fee ,
+        mbi.in_time ,
+        mbi.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,/*质控状态*/
+        ddr.group_result,/*分组结果*/
+        mbi.is_upload_insure as isUplod
+        from mris_base_info mbi /*病案基础信息表*/
+        left join inpt_visit iv on mbi.visit_id =iv.id/*住院登记表*/
+        left join inpt_settle ie on ie.visit_id = mbi.visit_id and ie.is_settle = '1'/*住院结算表*/
+        left join drg_dip_result ddr on ddr.visit_id = mbi.visit_id and ddr.valid_flag = '1'/*质控结果表*/
+        and ddr.business_type = '2'
+        and ddr.`type` = #{type}
+        left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id/*质控结果详情表*/
+        where 1=1
+
+        /*模糊查询姓名，住院/就诊号，违规信息*/
+        <if test="keywords != null and keywords != '' ">
+            and (ddrd.result_msg like concat('%',#{keywords},'%')
+            or  mbi.name like concat('%',#{keywords},'%')
+            or mbi.in_profile like concat('%',#{keywords},'%')
+            or  iv.in_no like concat('%',#{keywords},'%')
+            )
+        </if>
+        /*科室*/
+        <if test="deptIds != null and deptIds.size()>0">
+            and ddr.dept_id in
+            <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="startDate != '' and startDate != null">
+            and DATE_FORMAT(ie.settle_time, "%Y-%m-%d") &gt;= #{startDate}
+        </if>
+        <if test="endDate != '' and endDate != null">
+            and DATE_FORMAT(ie.settle_time, "%Y-%m-%d") &lt;= #{endDate}
+        </if>
+        <if test="doctorIds != null and doctorIds.size()>0">
+            and mbi.zz_doctor_id in
+            <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                #{doctorId}
+            </foreach>
+        </if>
+        /*上传状态*/
+        <if test="isUplods != null and isUplods.size()>0 ">
+            and mbi.is_upload_insure in
+            <foreach collection="isUplods" item="isUploadInsure" separator="," open="(" close=")">
+                #{isUploadInsure}
+            </foreach>
+        </if>
+        /*质控状态*/
+        <if test="states != null and states != '' ">
+            and ddr.states=#{states}
+        </if>
+        /*质控等级*/
+        <if test="level == null or level.size()==0 ">
+            and ddr.states is null
+        </if>
+        /*违规等级*/
+        <if test="level != null and level.size()>0 ">
+            and ddrd.rule_level in
+            <foreach collection="level" item="level1" separator="," open="(" close=")">
+                #{level1}
+            </foreach>
+        </if>
+
+        /*违规类型*/
+        <if test="ruletType != null and ruletType != '' ">
+            and ddrd.rulet_type =#{ruletType}
+        </if>
+        /*分组结果*/
+        <if test="groupResults != null and groupResults.size()>0">
+            and ddr.group_result in
+            <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                #{groupResult}
+            </foreach>
+        </if>
+        /*在院状态*/
+        <if test="statusCodes != null and statusCodes.size()>0">
+            and iv.status_code in
+            <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                #{statusCode}
+            </foreach>
+        </if>
+
+    </select>
+
+    <select id="queryDrgDipNoRegulationSetlinfo" parameterType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO"
+            resultType="cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO">
+        select A.* from(select m.* from (select
+        ddr.id,
+        ddr.visit_id,
+        iiv.visit_drpt_name as dept_name ,
+        ddr.gend,
+        ddr.age,
+        iiv.visit_drpt_id as dept_id,
+        iv.zz_doctor_id as doctor_id,
+        iv.zz_doctor_name  as doctor_name ,
+        ddrd .rulet_type ,
+        ddrd.rule_level,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        iib.aac003 as psnName ,
+        iv.in_no as visitNo ,
+        iiv.visit_icd_name as icd10 ,
+        ddr.total_fee ,
+        iv.in_time ,
+        iv.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        ddr.group_result,
+        iiv.is_hospital,
+        isi.medcasno,
+        if(isi.settle_no is null,
+        '0',
+        '1') as isUplod,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on/*医保登记表*/
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on iiv.mib_id = iib.id/*医保个人信息表*/
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on/*结算清单信息表*/
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}/*质控结果表*/
+        left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id/*质控结果详情表*/
+        left  join inpt_visit iv on iis.visit_id = iv.id
+        where ddr.business_type='1' and  iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '1') m
+        union all
+        select n.* from (select
+        ddr.id,
+        ddr.visit_id,
+        iiv.visit_drpt_name as dept_name ,
+        ddr.gend,
+        ddr.age,
+        iiv.visit_drpt_id as dept_id,
+        ov.doctor_id as doctor_id,
+        ov.doctor_name as doctor_name,
+        ddrd .rulet_type ,
+        ddrd.rule_level,
+        ddrd.check_filed,
+        ddrd.result_msg ,
+        iib.aac003 as psnName ,
+        ov.visit_no as visitNo ,
+        iiv.visit_icd_name as icd10 ,
+        ddr.total_fee ,
+        ddr.in_time ,
+        ddr.out_time,
+        if(ddr.states is null,
+        '0',
+        ddr.states) as states,
+        ddr.group_result,
+        iiv.is_hospital,
+        isi.medcasno,
+        if(isi.settle_no is null,
+        '0',
+        '1') as isUplod,
+        DATE_FORMAT(iis.crte_time, '%Y-%m-%d %H:%i:%S') as setl_time
+        from
+        insure_individual_settle iis
+        left join insure_individual_visit iiv on
+        iis.visit_id = iiv.visit_id
+        and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        left join insure_individual_basic iib on
+        iiv.mib_id = iib.id
+        and iiv.hosp_code = iib.hosp_code
+        left join insure_setl_info isi on
+        iis.insureSettleId = isi.insure_settle_id
+        and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        left join drg_dip_result ddr on ddr.visit_id = isi.visit_id  and ddr.valid_flag ='1' and ddr.business_type ='1'  and ddr.type=#{type}
+        left join drg_dip_result_detail ddrd on ddrd.result_id=ddr.id
+        left  join outpt_visit ov on iis.visit_id = ov.id
+        where
+        iis.state = '0'
+        and iis.settle_state = '1'
+        and iis.hosp_code = #{hospCode}
+        and iis.insureSettleId is not null
+        and iis.is_hospital = '0'
+        and iiv.aka130 = '14') n
+        ) A
+        where 1=1
+        /*模糊查询质控信息，姓名，住院/门诊号，病案号*/
+            <if test="keywords != null and keywords != '' ">
+                and (A.result_msg like concat('%',#{keywords},'%')
+                or  A.psnName like concat('%',#{keywords},'%')
+                or A.medcasno like concat('%',#{keywords},'%')
+                or  A.visitNo like concat('%',#{keywords},'%')
+                )
+            </if>
+
+            /*结算时间*/
+            <if test="startDate != '' and startDate != null">
+                and DATE_FORMAT(A.setl_time, "%Y-%m-%d") &gt;= #{startDate}
+            </if>
+            <if test="endDate != '' and endDate != null">
+                and DATE_FORMAT(A.setl_time, "%Y-%m-%d") &lt;= #{endDate}
+            </if>
+            /*科室*/
+            <if test="deptIds != null and deptIds.size()>0">
+                and A.dept_id in
+                <foreach collection="deptIds" item="deptId" separator="," open="(" close=")">
+                    #{deptId}
+                </foreach>
+            </if>
+            /*医生*/
+            <if test="doctorIds != null and doctorIds.size()>0">
+                and A.doctor_id in
+                <foreach collection="doctorIds" item="doctorId" separator="," open="(" close=")">
+                    #{doctorId}
+                </foreach>
+            </if>
+            /*上传状态*/
+            <if test="isUplods != null and isUplods.size()>0 ">
+                <foreach collection="isUplods" item="isUploadInsure" separator="," >
+                    <if test="isUploadInsure=='1' ">
+                        and A.settle_no is not null
+                    </if>
+                    <if test="isUploadInsure=='2' ">
+                        and A.settle_no is null
+                    </if>
+                </foreach>
+            </if>
+            <if test="states != null and states != '' ">
+                and A.states=#{states}
+            </if>
+
+            <if test="level == null or level.size()==0 ">
+                and A.states='0'
+            </if>
+            /*质控等级*/
+            <if test="level != null and level.size()>0 ">
+                and A.rule_level in
+                <foreach collection="level" item="level1" separator="," open="(" close=")">
+                    #{level1}
+                </foreach>
+            </if>
+            <if test="level == null and level.size()=0 ">
+                and A.rule_level=''
+            </if>
+            /*业务类型*/
+            <if test="isHospitals != null and isHospitals.size()>0 ">
+                and A.is_hospital in
+                <foreach collection="isHospitals" item="isHospital" separator="," open="(" close=")">
+                    #{isHospital}
+                </foreach>
+            </if>
+            /*违规类型*/
+            <if test="ruletType != null and ruletType != '' ">
+                and A.rulet_type =#{ruletType}
+            </if>
+            /*分组结果*/
+            <if test="groupResults != null and groupResults.size()>0">
+                and A.group_result in
+                <foreach collection="groupResults" item="groupResult" separator="," open="(" close=")">
+                    #{groupResult}
+                </foreach>
+            </if>
+            /*在院状态*/
+            <if test="statusCodes != null and statusCodes.size()>0">
+                and A.status_code in
+                <foreach collection="statusCodes" item="statusCode" separator="," open="(" close=")">
+                    #{statusCode}
+                </foreach>
+            </if>
+
+    </select>
 </mapper>

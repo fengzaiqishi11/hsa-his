@@ -24,10 +24,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
-import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.dto.InsureMrisAdvicePatientInfoDTO;
+import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
 import cn.hsa.module.insure.module.service.InsureIndividualVisitService;
 import cn.hsa.module.insure.mris.service.MrisService;
@@ -442,8 +439,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         resultMap.put("mrisBabyInfo", mrisHomeDAO.queryMrisBabyInfoPage(inptVisitDTO));
         //新增质控信息
         DrgDipResultDTO dto = new DrgDipResultDTO();
+        //病案 business_type 2
         dto.setVisitId(map.get("visitId").toString());
         dto.setHospCode(map.get("hospCode").toString());
+        dto.setBusinessType("2");
         //DIP_DRG_MODE值
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode", MapUtils.get(map, "hospCode"));
@@ -555,12 +554,12 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if (MapUtils.isEmpty(groupInfoMap)) {
                 throw new AppException("DRG调用获取的分组信息对象为null,请联系管理员");
             }
-            List<Map<String, Object>>  qualityInfo = MapUtils.get(resultMap, "qualityInfo");
+            List<Map<String, Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
             List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
                     qualityInfo.stream().sorted((a, b) ->
-                                    (b.get("rule_level") == null ? "" : b.get("rule_level"))
-                                            .toString()
-                                            .compareTo(a.get("rule_level").toString()))
+                            (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                    .toString()
+                                    .compareTo(a.get("rule_level").toString()))
                             .collect(Collectors.toList());// 质控信息集合
             /**======获取返回的参数 end=========**/
 
@@ -587,8 +586,52 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum").toString());// 耗材占比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
+            //自行计算标杆费用
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
+                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
+            }
+            //先查询是否出院
+            String statusCode = mrisHomeDAO.queryInptVist(map);
+            //没出院不需要显示
+            if(!Constants.BRZT.CY.equals(statusCode)){
+                responseDataMap.put("estimateFund","-");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-");//盈亏额
+            }else {
+                //计算预计基金支付
+                Map<String,Object> priceMap = new HashMap<>();
+                priceMap.put("hospCode",MapUtils.get(map, "hospCode"));
+                priceMap.put("visitId",MapUtils.get(map, "visitId"));
+                PayInfoDTO payInfoDTO = mrisHomeDAO.queryInsureSettlePrice(priceMap);
+                if(payInfoDTO == null){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else{
+                    if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                        responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                        responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                    }else {
+                        BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                        BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        //如果小于0当做0处理
+                        if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                            estimateFund = BigDecimal.ZERO;
+                        }
+                        responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                        responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+                    }
+                }
+            }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("sort"))){
+                        x.put("sort",Integer.valueOf((String)x.get("sort"))-1);
+                    }
+                });
             }
             responseDataMap.put("quality", qualityInfoList);// 质控信息list
             /**==========返回参数封装 End ===========**/
@@ -759,15 +802,59 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("diagFeeSco", groupInfoMap.get("feePay"));// 分值
             responseDataMap.put("profitAndLossAmount", groupInfoMap.get("profit"));// 盈亏额
             responseDataMap.put("totalFee", baseInfoMap.get("totalFee"));// 总费用
-            responseDataMap.put("feeStand", baseInfoMap.get("feeStand"));// 总费用标杆
+            responseDataMap.put("feeStand", groupInfoMap.get("feeStand"));// 总费用标杆
             responseDataMap.put("proMedicMater", baseInfoMap.get("pro_medic_mater"));// 药占比
             responseDataMap.put("proMedicMaterStand", groupInfoMap.get("pro_medic_mater"));// 药占比标杆
             responseDataMap.put("proConsum", baseInfoMap.get("pro_consum"));// 耗材占比
             responseDataMap.put("proConsumStand", groupInfoMap.get("pro_consum"));// 耗材占比标杆
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
-            if(baseInfoMap.get("totalFee") != null && groupInfoMap.get("feeStand")!= null){
+            if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
                 responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+            }
+            //自行计算标杆费用
+            if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
+                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
+            }
+            //先查询是否出院
+            String statusCode = mrisHomeDAO.queryInptVist(map);
+            //没出院不需要显示
+            if(!Constants.BRZT.CY.equals(statusCode)){
+                responseDataMap.put("estimateFund","-");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-");//盈亏额
+            }else {
+                //计算预计基金支付
+                Map<String,Object> priceMap = new HashMap<>();
+                priceMap.put("hospCode",MapUtils.get(map, "hospCode"));
+                priceMap.put("visitId",MapUtils.get(map, "visitId"));
+                PayInfoDTO payInfoDTO = mrisHomeDAO.queryInsureSettlePrice(priceMap);
+                if(payInfoDTO == null){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else{
+                    if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                        responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                        responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                    }else {
+                        BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                        BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        //如果小于0当做0处理
+                        if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                            estimateFund = BigDecimal.ZERO;
+                        }
+                        responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                        responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+                    }
+                }
+            }
+            //处理排序号
+            if (!ListUtils.isEmpty(qualityInfoList)){
+                qualityInfoList.stream().forEach(x ->{
+                    if(ObjectUtil.isNotEmpty(x.get("sort"))){
+                        x.put("sort",Integer.valueOf((String)x.get("sort"))-1);
+                    }
+                });
             }
             responseDataMap.put("quality", qualityInfoList);// 质控信息
             //如果为空返回-
@@ -2198,6 +2285,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             mrisBaseInfoDTO.setNationalityName("中国");
         }
 
+        // 设置默认值 证件类型无值取身份证 01
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getCertCode())){
+            mrisBaseInfoDTO.setCertCode("01");
+        }
         // 身份证号码
         if ("01".equals(mrisBaseInfoDTO.getCertCode())) {
             mrisBaseInfoDTO.setIdCard(mrisBaseInfoDTO.getCertNo());
@@ -2678,6 +2769,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     private DrgDipResultDTO insertDrgDipResult(Map<String, Object> dataMap, Map<String, Object> baseInfoMap, Map<String, Object> groupInfo, List<Map<String, Object>> qualityInfo) {
         //冗余基本信息
         DrgDipResultDTO drgDipResultDTO = new DrgDipResultDTO();
+        drgDipResultDTO.setHospCode(MapUtils.get(dataMap, "hospCode"));
         drgDipResultDTO.setVisitId(MapUtils.get(dataMap, "visit_id"));
         drgDipResultDTO.setMedcasno(MapUtils.get(dataMap, "patient_no"));
         drgDipResultDTO.setDoctorId(MapUtils.get(dataMap, "att_doctor_id"));

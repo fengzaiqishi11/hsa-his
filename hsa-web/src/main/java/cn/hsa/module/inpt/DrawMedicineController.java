@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.drawMedicine.service.DrawMedicineService;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO;
+import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
@@ -261,4 +262,17 @@ public class DrawMedicineController extends BaseController {
         return wrapperResponse;
     }
 
+
+    @GetMapping(value = "/queryAllVisit")
+    WrapperResponse<List<Map<String, Object>>> queryAllVisit(PharInWaitReceiveDTO pharInWaitReceiveDTO,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String, Object> map = new HashMap<>();
+        pharInWaitReceiveDTO.setHospCode(sysUserDTO.getHospCode());
+        pharInWaitReceiveDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("deptId", sysUserDTO.getLoginBaseDeptDTO().getId());
+        map.put("pharInWaitReceiveDTO", pharInWaitReceiveDTO);
+        WrapperResponse<List<Map<String, Object>>> wrapperResponse = drawMedicineService.queryAllVisit(map);
+        return wrapperResponse;
+    }
 }

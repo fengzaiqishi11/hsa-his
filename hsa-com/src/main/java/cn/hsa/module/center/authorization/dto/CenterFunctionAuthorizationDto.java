@@ -14,7 +14,8 @@ public class CenterFunctionAuthorizationDto  extends CenterFunctionAuthorization
 
     //医院名称
     private String hospName;
-
+    //服务名称
+    private String name;
     //sql
     private String sql1;
 
@@ -29,4 +30,6 @@ public class CenterFunctionAuthorizationDto  extends CenterFunctionAuthorization
 
     //是否有审核数据  0没有 ，1有
     private String sfysh;
+
+    private String yyyxq;
 }

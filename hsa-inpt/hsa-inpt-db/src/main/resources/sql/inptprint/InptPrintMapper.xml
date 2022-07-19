@@ -709,4 +709,105 @@
     select ifnull(max(seq_no),0) from inpt_advice_print where hosp_code = #{hospCode} and visit_id = #{visitId}
   </select>
 
+    <select id="queryInptCostListXmhzmx" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        select
+            ic.visit_id as visitId,
+            ic.item_code  as itemCode,
+            ic.item_id ,
+            ic.item_name as itemName,
+            ic.bfc_id as bfcId,
+            bfc.code as bfcCode,
+            bfc.name as bfcName,
+            round(ic.price,4)  as price,
+            sum(ic.total_num) as num,
+            round(sum(ic.total_price),2) as amountMoney,
+            ic.spec as spec,
+            ic.dosage_unit_code as dosageUnitCode,
+            ic.usage_code as usageCode,
+            ic.total_num_unit_code as numUnitCode ,
+            max(ic.cost_time) as costTime,
+            ifnull(iic.item_code, ifnull(bd.nation_code, ifnull(bi.nation_code, ifnull(bm.nation_code, ifnull(ic.nation_code, ''))))) as nationCode,
+            ifnull(iic.item_name, ifnull(bd.nation_name, ifnull(bi.nation_name, ifnull(bm.nation_name, ifnull(ic.nation_name, ''))))) as nationName,
+             (select min(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as startCostDate,
+             (select max(DATE_FORMAT(cost_time,'%Y-%m-%d')) from inpt_cost where hosp_code = #{hospCode} and visit_id = #{visitId}) as endCostDate,
+            (case iv.patient_code  when '0' then '100.00'
+            else
+                case iv.status_code when '7'  then round(iic.guest_ratio * 100,2)
+                else '404' end
+            end )as guestRatio,
+            (case iv.patient_code  when '0' then  round(sum(ic.total_price),2)
+            else
+                case iv.status_code when '7' then  round(iic.guest_ratio * iic.primary_price,2)
+                else round(sum(ic.total_price),2) end
+            end ) as guestRatioPriceend
+        from
+            inpt_cost ic
+                left join base_finance_classify bfc on
+                    ic.bfc_id = bfc.id
+                    and ic.hosp_code = bfc.hosp_code
+                left join
+            base_drug bd
+            on
+                    bd.id = ic.item_id
+                    and bd.hosp_code = ic.hosp_code
+                left join
+            base_item bi
+            on
+                    bi.id = ic.item_id
+                    and bi.hosp_code = ic.hosp_code
+                left join
+            base_material bm
+            on
+                    bm.id = ic.item_id
+                    and bm.hosp_code = ic.hosp_code
+                left join insure_individual_cost iic on
+                    ic.hosp_code = iic.hosp_code
+                    and ic.id = iic.cost_id
+                left join inpt_visit iv on
+                    iv.hosp_code = ic.hosp_code
+                    and iv.id = ic.visit_id
+        where ic.hosp_code = #{hospCode} and ic.status_code ='0'
+        <if test="visitId != null and visitId != ''">
+            AND ic.visit_id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND iv.status_code = #{statusCode}
+        </if>
+        <if test='queryBaby =="N"'>
+            and (ic.baby_id is null or ic.baby_id = '')
+        </if>
+        <if test="babyId != null and babyId != ''">
+            AND ic.baby_id = #{babyId}
+        </if>
+        <if test="costStartTime != null and costStartTime != '' and costStopTime != '' and costStopTime != null">
+            and ic.cost_time &gt;= #{costStartTime} and ic.cost_time &lt;= #{costStopTime}
+        </if>
+        <if test="costStartTime == null and costStopTime != null and costStopTime != ''">
+            and ic.cost_time &lt;= #{costStopTime}
+        </if>
+        <if test="costStartTime != null and costStartTime != '' and costStopTime == null">
+            and ic.cost_time >= #{costStartTime}
+        </if>
+        group by ic.item_id,ic.price
+        order by bfc.code
+    </select>
+
+    <select id="queryInptSettleListPrint" resultType="cn.hsa.module.inpt.fees.dto.InptSettleDTO">
+        select
+            round(is2.total_price,2) as totalPrice,
+            round(is2.mi_price,2) as miPrice,
+            round(is2.acct_pay,2) as acctPay,
+            round(is2.self_price,2) as selfPrice,
+            round(ifnull(is2.ap_total_price,ifnull(iv.total_advance,0)),2)  as apTotalPrice,
+            round((is2.settle_back_price - is2.settle_take_price),2) as backTake,
+            round(iis.last_settle,2) as lastSettle
+        from
+            inpt_visit iv
+                left join inpt_settle is2 on is2.status_code ='0' and
+                iv.id = is2.visit_id and iv.hosp_code = is2.hosp_code
+                left join insure_individual_settle iis on iis.state  = '0' and
+                iv.id = iis.visit_id and iv.hosp_code = iis.hosp_code
+        where iv.hosp_code = #{hospCode}
+          and iv.id = #{visitId}
+    </select>
 </mapper>

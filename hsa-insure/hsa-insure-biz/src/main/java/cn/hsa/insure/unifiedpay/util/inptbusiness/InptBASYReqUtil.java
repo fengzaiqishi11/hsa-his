@@ -150,7 +150,7 @@ public class InptBASYReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<
         if(StringUtils.isEmpty(babyBirthWeight) || "-".equals(babyBirthWeight) ){
             baseInfoMap.put("nwb_bir_wt",""); // 新生儿出生体重
         }else{
-            baseInfoMap.put("nwb_bir_wt", Integer.parseInt(babyBirthWeight)); // 新生儿出生体重
+            baseInfoMap.put("nwb_bir_wt", Double.parseDouble(babyBirthWeight)); // 新生儿出生体重
         }
         if(StringUtils.isEmpty(babyInWeight) || "-".equals(babyInWeight) ){
             baseInfoMap.put("nwb_adm_wt",""); // 新生儿出生体重

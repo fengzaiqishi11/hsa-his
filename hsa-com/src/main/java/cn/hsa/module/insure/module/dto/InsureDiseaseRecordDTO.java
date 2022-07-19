@@ -53,5 +53,7 @@ public class InsureDiseaseRecordDTO extends InsureDiseaseRecordDO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date hospAppyTime;
 
+    private String bka896;
+
 
 }

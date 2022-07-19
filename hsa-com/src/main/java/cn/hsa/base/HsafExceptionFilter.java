@@ -89,6 +89,7 @@ public class HsafExceptionFilter   implements Filter {
             }else {
                 appResponse.setException(new RuntimeException(exception.getMessage()));
             }
+            appResponse.getException().setStackTrace(exception.getStackTrace());
         }
 
     }

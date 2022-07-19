@@ -8,6 +8,7 @@ import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -175,8 +176,8 @@ public class OnlinePayController  extends BaseController {
    * @Date 2022-06-16 14:11
    * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
    */
-  @PostMapping("/querySettleResult")
-  public WrapperResponse<Map<String, Object>> querySettleResult(@RequestBody Map<String,Object> param,
+    @PostMapping("/querySettleResult")
+  public Map<String, Object> querySettleResult(@RequestBody Map<String,Object> param,
                                                         HttpServletRequest req,
                                                         HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
@@ -198,8 +199,11 @@ public class OnlinePayController  extends BaseController {
                                                                 HttpServletRequest req,
                                                                 HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
+    SetlRefundQueryDTO setlRefundQueryDTO =  new SetlRefundQueryDTO();
+    setlRefundQueryDTO.setVisitId(MapUtils.get(param, "visitId"));
     param.put("hospCode", sysUserDTO.getHospCode());
-    return outptTmakePriceFormService_consumer.AMP_HOS_001(param);
+    param.put("setlRefundQueryDTO", setlRefundQueryDTO);
+    return outptTmakePriceFormService_consumer.savePayOnlineInfoDO(param);
   }
 
   /**
@@ -232,12 +236,10 @@ public class OnlinePayController  extends BaseController {
     *
    **/
   @PostMapping("/reconciliationDocument")
-  public WrapperResponse<Map<String, Object>> reconciliationDocument(String orgCode,String reconciliationDate,HttpServletRequest req, HttpServletResponse res) {
+  public WrapperResponse<Map<String, Object>> reconciliationDocument(@RequestBody Map map,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
-    Map<String, Object> map = new HashMap<>();
+
     map.put("hospCode", sysUserDTO.getHospCode());
-    map.put("orgCode", orgCode);
-    map.put("reconciliationDate", reconciliationDate);
     return outptTmakePriceFormService_consumer.reconciliationDocument(map);
   }
 
@@ -252,11 +254,11 @@ public class OnlinePayController  extends BaseController {
     *
    **/
   @PostMapping("/queryUnsettleList")
-  public WrapperResponse<Map<String, Object>> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> queryUnsettleList( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());
-    return outptTmakePriceFormService_consumer.queryUnsettleList(param);
+    return outptTmakePriceFormService_consumer.updateUnsettleList(param);
   }
   /**
     * @method queryAccount
@@ -268,7 +270,7 @@ public class OnlinePayController  extends BaseController {
     * 
    **/ 
   @PostMapping("/queryAccount")
-  public WrapperResponse<Map<String, Object>> queryAccount( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> queryAccount( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());
@@ -284,11 +286,11 @@ public class OnlinePayController  extends BaseController {
     *
    **/
   @PostMapping("/rechargeSettle")
-  public WrapperResponse<Map<String, Object>> rechargeSettle( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
+  public Map<String, Object> rechargeSettle( @RequestBody Map param,HttpServletRequest req, HttpServletResponse res) {
     SysUserDTO sysUserDTO = getSession(req, res);
 
     param.put("hospCode", sysUserDTO.getHospCode());
-    return outptTmakePriceFormService_consumer.rechargeSettle(param);
+    return outptTmakePriceFormService_consumer.updateRechargeSettle(param);
   }
 
 

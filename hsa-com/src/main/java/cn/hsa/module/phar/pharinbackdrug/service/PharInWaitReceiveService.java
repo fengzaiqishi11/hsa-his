@@ -141,4 +141,5 @@ public interface PharInWaitReceiveService {
     @RequestMapping("/service/phar/pharInWait/updateCostIdBatch")
     WrapperResponse<Boolean> updateCostIdBatch(Map map);
 
+    WrapperResponse<List<Map<String, Object>>> queryAllVisit(Map<String, Object> map);
 }

@@ -159,4 +159,79 @@ public class drgDipResultController extends BaseController {
     return drgDipResultService_consumer.queryDrgDipResultMrisSum(map);
   }
 
+  /**
+   * @Author 医保二部-张金平
+   * @Date 2022-07-04 14:44
+   * @Description 质控违规信息查询-病案首页
+   * @param drgDipResultDTO
+   * @param req
+   * @param res
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @PostMapping("/queryDrgDipNoRegulationsMris")
+  public WrapperResponse<PageDTO> queryDrgDipNoRegulationsMris(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String,Object> map = new HashMap<>();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("drgDipResultDTO",drgDipResultDTO);
+    return drgDipResultService_consumer.queryDrgDipNoRegulationsMris(map);
+  }
+
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-05 15:16
+   * @Description 质控违规信息汇总-病案首页
+   * @param drgDipResultDTO
+   * @param req
+   * @param res
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+   */
+  @PostMapping("/queryDrgDipNoRegulationMrisSum")
+  public WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationMrisSum(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String,Object> map = new HashMap<>();
+    drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("drgDipResultDTO",drgDipResultDTO);
+    return drgDipResultService_consumer.queryDrgDipNoRegulationMrisSum(map);
+  }
+
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-06 10:03
+   * @Description 质控违规信息查询-结算清单
+   * @param drgDipResultDTO
+   * @param req
+   * @param res
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+   */
+  @PostMapping("/queryDrgDipNoRegulationSetlinfo")
+  public WrapperResponse<PageDTO> queryDrgDipNoRegulationSetlinfo(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String,Object> map = new HashMap<>();
+    drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("drgDipResultDTO",drgDipResultDTO);
+    return drgDipResultService_consumer.queryDrgDipNoRegulationSetlinfo(map);
+  }
+
+  /**
+   * @Author zhangjinping
+   * @Date 2022-07-05 15:16
+   * @Description 质控违规信息汇总-结算清单
+   * @param drgDipResultDTO
+   * @param req
+   * @param res
+   * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+   */
+  @PostMapping("/queryDrgDipNoRegulationSettleSum")
+  public WrapperResponse<Map<String, Object>> queryDrgDipNoRegulationSettleSum(@RequestBody DrgDipResultDTO drgDipResultDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map<String,Object> map = new HashMap<>();
+    drgDipResultDTO.setHospCode(sysUserDTO.getHospCode());
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("drgDipResultDTO",drgDipResultDTO);
+    return drgDipResultService_consumer.queryDrgDipNoRegulationSettleSum(map);
+  }
 }

@@ -3286,7 +3286,8 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
 //                }
 
                 // 经确认动静态辅助计费不退费 （手动去退） 2022-06-09 pengbo
-                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode())){
+                Integer endExecNum= inptAdviceDTO.getEndExecNum() == null ? 0 : inptAdviceDTO.getEndExecNum();
+                if(Constants.FYLYFS.DJTJF.equals(costDTO.getSourceCode()) && endExecNum>0){
                     continue;
                 }
 

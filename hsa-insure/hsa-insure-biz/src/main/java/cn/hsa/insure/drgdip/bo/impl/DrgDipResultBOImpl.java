@@ -2,33 +2,29 @@ package cn.hsa.insure.drgdip.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
-
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.insure.util.Constant;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
-import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
-import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
-import cn.hsa.module.insure.drgdip.dto.*;
-import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
-import cn.hsa.module.insure.drgdip.entity.DrgDipResultDetailDO;
-import cn.hsa.module.insure.module.service.InsureDictService;
-import cn.hsa.insure.util.Constant;
-import cn.hsa.util.*;
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.convert.Convert;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hsa.module.insure.drgdip.bo.DrgDipResultBO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipQulityInfoLogDAO;
 import cn.hsa.module.insure.drgdip.dao.DrgDipResultDAO;
+import cn.hsa.module.insure.drgdip.dao.DrgDipResultDetailDAO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipAuthDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipComboDTO;
 import cn.hsa.module.insure.drgdip.dto.DrgDipResultDTO;
+import cn.hsa.module.insure.drgdip.dto.DrgDipResultDetailDTO;
 import cn.hsa.module.insure.drgdip.entity.DrgDipQulityInfoLogDO;
-import cn.hsa.util.MapUtils;
+import cn.hsa.module.insure.drgdip.entity.DrgDipResultDO;
+import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
+import cn.hsa.module.insure.module.dto.PayInfoDTO;
+import cn.hsa.module.insure.module.service.InsureDictService;
+import cn.hsa.util.*;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -36,14 +32,10 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.text.NumberFormat;
-import java.util.Date;
-import java.util.Map;
-
-
-import javax.annotation.Resource;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -69,6 +61,9 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
 
     @Resource
     private InsureDictService insureDictService_consumer;
+
+    @Resource
+    private InsureGetInfoDAO insureGetInfoDAO;
 
     /**
      * @return
@@ -433,8 +428,18 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipResultSetlinfo(drgDipResultDTO);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("total",drgDipResultDTOList.size());//总数
+        int zfNum = 0; //住院自费人数
         int drgDipFinshSum = 0;//质控通过人数
         int drgDipNoFinshSum = 0;//质控未通过完成人数
+        if(drgDipResultDTO.getIsHospitals()!=null && drgDipResultDTO.getIsHospitals().size()> 0){
+            for(String isHospital:drgDipResultDTO.getIsHospitals()){
+                if(Constant.UnifiedPay.ISMAN.S.equals(isHospital)){
+                    zfNum = drgDipResultDAO.querySettle(drgDipResultDTO);
+                }
+            }
+        }else {
+            zfNum = drgDipResultDAO.querySettle(drgDipResultDTO);
+        }
         for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
             if(Constant.UnifiedPay.ZKZT.ZKWWC.equals(drgDipResultDTO1.getStates())){
                 drgDipNoFinshSum++;
@@ -464,6 +469,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         resultMap.put("drgDipNotSum",drgDipNotSum);
         resultMap.put("drgDipFinsh",drgDipFinsh);
         resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        resultMap.put("zfNum",zfNum);
         return resultMap;
     }
 
@@ -502,7 +508,7 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
                 responseDataMap.put("hiType","自费病人");// 医保类型
             }
         }else {
-            responseDataMap.put("hiType","自费病人");// 医保类型
+            responseDataMap.put("hiType","");// 医保类型
         }
         if(Constant.UnifiedPay.ZKLX.DRG.equals(drgDipResultDTO.getType())){
             responseDataMap.put("drgCode",drgDipResultDTO1.getDrgDipCode());// DRG组编码
@@ -522,7 +528,44 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         responseDataMap.put("proMedicMaterStand",drgDipResultDTO1.getStandProMedicMater());// 药占比标杆
         responseDataMap.put("proConsum",drgDipResultDTO1.getProConsum());// 耗材比
         responseDataMap.put("proConsumStand",drgDipResultDTO1.getStandProConsum());// 耗材比标杆
+        responseDataMap.put("scorePrice",drgDipResultDTO1.getScorePrice());// 分值单价
         responseDataMap.put("quality",HumpUnderlineUtils.humpToUnderlineArray(qualityInfoList));// 质控信息
+        //自行计算标杆费用
+        if(drgDipResultDTO1.getFeePay() != null && !"".equals(drgDipResultDTO1.getFeePay()) && drgDipResultDTO1.getScorePrice()!= null && !"".equals(drgDipResultDTO1.getScorePrice())){
+            responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(drgDipResultDTO1.getFeePay().toString()),BigDecimalUtils.convert(drgDipResultDTO1.getScorePrice().toString())).setScale(2));// 标杆费用
+        }
+        //先查询是否出院
+        Map<String,Object> priceMap = new HashMap<>();
+        priceMap.put("hospCode",drgDipResultDTO.getHospCode());
+        priceMap.put("visitId",drgDipResultDTO.getVisitId());
+        String statusCode = insureGetInfoDAO.queryInptVist(priceMap);
+        if(!Constants.BRZT.CY.equals(statusCode)){
+            responseDataMap.put("estimateFund","-");//预计基金支付
+            responseDataMap.put("profitAndLossAmount","-");//盈亏额
+        }else {
+            //计算预计基金支付
+            PayInfoDTO payInfoDTO = insureGetInfoDAO.queryInsureSettlePrice(priceMap);
+            if(payInfoDTO == null){
+                responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+            }else{
+                //如果没报销算全自费
+                if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
+                    responseDataMap.put("estimateFund","-全自费");//预计基金支付
+                    responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                }else {
+                    BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
+                    BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
+                    estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    //如果小于0当做0处理
+                    if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
+                        estimateFund = BigDecimal.ZERO;
+                    }
+                    responseDataMap.put("estimateFund",estimateFund);//预计基金支付
+                    responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
+                }
+            }
+        }
         return responseDataMap;
     }
 
@@ -628,6 +671,176 @@ public class DrgDipResultBOImpl extends HsafBO implements DrgDipResultBO {
         resultMap.put("drgDipNotSum",drgDipNotSum);
         resultMap.put("drgDipFinsh",drgDipFinsh);
         resultMap.put("drgDipNoFinsh",drgDipNoFinsh);
+        return resultMap;
+    }
+
+    /**
+     * @Author 医保二部-张金平
+     * @Date 2022-07-04 14:51
+     * @Description 质控违规信息查询-病案首页
+     * @param drgDipResultDTO
+     * @return cn.hsa.base.PageDTO
+     */
+    @Override
+    public PageDTO queryDrgDipNoRegulationsMris(DrgDipResultDTO drgDipResultDTO) {
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationsMris(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:20
+     * @Description 质控违规信息汇总-病案首页
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public Map<String, Object> queryDrgDipNoRegulationMrisSum(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationsMris(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//违规总数
+        int errorFieldSum = 0;//错误字段数
+        List<DrgDipResultDTO> errorFieldList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getCheckFiled))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorFieldList)){
+            errorFieldSum = errorFieldList.size();
+        }
+        int errorMsgSum = 0;//错误信息数
+        List<DrgDipResultDTO> errorMsgList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getResultMsg))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorMsgList)){
+            errorMsgSum = errorMsgList.size();
+        }
+        int errorPatientSum = 0;//违规病例数
+        List<DrgDipResultDTO> errorPatientList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getVisitId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorPatientList)){
+            errorPatientSum = errorPatientList.size();
+        }
+        //过滤从科室id和医生id 为空的数据，避免报空指针
+        List<DrgDipResultDTO> deptRemoveList = drgDipResultDTOList;
+        deptRemoveList.removeIf(dto->"".equals(dto.getDeptId())||dto.getDeptId()==null);
+        int errorDeptSum = 0;//违规科室数
+        List<DrgDipResultDTO> errorDeptList = deptRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDeptId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDeptList)){
+            errorDeptSum = errorDeptList.size();
+        }
+        List<DrgDipResultDTO> doctorRemoveList = drgDipResultDTOList;
+        doctorRemoveList.removeIf(dto->"".equals(dto.getDoctorId())||dto.getDoctorId()==null);
+        int errorDoctorSum = 0;//违规医生数
+        List<DrgDipResultDTO> errorDoctortList = doctorRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDoctorId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDoctortList)){
+            errorDoctorSum = errorDoctortList.size();
+        }
+
+        resultMap.put("errorFieldSum",errorFieldSum);
+        resultMap.put("errorMsgSum",errorMsgSum);
+        resultMap.put("errorDeptSum",errorDeptSum);
+        resultMap.put("errorDoctorSum",errorDoctorSum);
+        resultMap.put("errorPatientSum",errorPatientSum);
+        return resultMap;
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-06 10:03
+     * @Description 质控违规信息查询-结算清单
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     */
+    @Override
+    public PageDTO queryDrgDipNoRegulationSetlinfo(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        //分页参数
+        PageHelper.startPage(drgDipResultDTO.getPageNo(), drgDipResultDTO.getPageSize());
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationSetlinfo(drgDipResultDTO);
+        for(DrgDipResultDTO drgDipResultDTO1:drgDipResultDTOList){
+            //性别转义
+            String gendName = getSysCodeName(drgDipResultDTO.getHospCode(),"XB",drgDipResultDTO1.getGend());
+            //拼接信息
+            drgDipResultDTO1.setNameGendAge(drgDipResultDTO1.getPsnName()+"/"+gendName+"/"+String.valueOf(drgDipResultDTO1.getAge()));
+        }
+        return PageDTO.of(drgDipResultDTOList);
+    }
+    /**
+     * @Author zhangjinping
+     * @Date 2022-07-05 15:16
+     * @Description 质控违规信息汇总-结算清单
+     * @param drgDipResultDTO
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map<java.lang.String,java.lang.Object>>
+     */
+    @Override
+    public Map<String, Object> queryDrgDipNoRegulationSettleSum(DrgDipResultDTO drgDipResultDTO) {
+        if(StringUtils.isEmpty(drgDipResultDTO.getType())){
+            throw new AppException("请选择质控类型");
+        }
+        List<DrgDipResultDTO>  drgDipResultDTOList = drgDipResultDAO.queryDrgDipNoRegulationSetlinfo(drgDipResultDTO);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("total",drgDipResultDTOList.size());//违规总数
+        int errorFieldSum = 0;//错误字段数
+        List<DrgDipResultDTO> errorFieldList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getCheckFiled))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorFieldList)){
+            errorFieldSum = errorFieldList.size();
+        }
+        int errorMsgSum = 0;//错误信息数
+        List<DrgDipResultDTO> errorMsgList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getResultMsg))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorMsgList)){
+            errorMsgSum = errorMsgList.size();
+        }
+        int errorPatientSum = 0;//违规病例数
+        List<DrgDipResultDTO> errorPatientList = drgDipResultDTOList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getVisitId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorPatientList)){
+            errorPatientSum = errorPatientList.size();
+        }
+        //过滤从科室id和医生id 为空的数据，避免报空指针
+        List<DrgDipResultDTO> deptRemoveList = drgDipResultDTOList;
+        deptRemoveList.removeIf(dto->"".equals(dto.getDeptId())||dto.getDeptId()==null);
+        int errorDeptSum = 0;//违规科室数
+        List<DrgDipResultDTO> errorDeptList = deptRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDeptId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDeptList)){
+            errorDeptSum = errorDeptList.size();
+        }
+        List<DrgDipResultDTO> doctorRemoveList = drgDipResultDTOList;
+        doctorRemoveList.removeIf(dto->"".equals(dto.getDoctorId())||dto.getDoctorId()==null);
+        int errorDoctorSum = 0;//违规医生数
+        List<DrgDipResultDTO> errorDoctortList = doctorRemoveList.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                        () -> new TreeSet<>(Comparator.comparing(DrgDipResultDTO::getDoctorId))), ArrayList::new));
+        if(!ListUtils.isEmpty(errorDoctortList)){
+            errorDoctorSum = errorDoctortList.size();
+        }
+
+        resultMap.put("errorFieldSum",errorFieldSum);
+        resultMap.put("errorMsgSum",errorMsgSum);
+        resultMap.put("errorDeptSum",errorDeptSum);
+        resultMap.put("errorDoctorSum",errorDoctorSum);
+        resultMap.put("errorPatientSum",errorPatientSum);
         return resultMap;
     }
 

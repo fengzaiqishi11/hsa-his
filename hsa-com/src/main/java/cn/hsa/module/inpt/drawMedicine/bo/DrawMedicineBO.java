@@ -117,4 +117,6 @@ public interface DrawMedicineBO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      */
     Boolean updateAdvance(Map<String, Object> map);
+
+  List<Map<String, Object>> queryAllVisit(Map<String, Object> map);
 }

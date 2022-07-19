@@ -8,6 +8,7 @@ import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO;
 import cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto;
 import cn.hsa.module.outpt.register.bo.OutptRegisterBO;
+import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.register.service.OutptRegisterService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -87,5 +88,15 @@ public class OutptRegisterServiceImpl extends HsafService implements OutptRegist
     @Override
     public WrapperResponse<List<OutptClassifyCostDTO>> updateCostPreferential(Map map) {
         return WrapperResponse.success(outptRegisterBO.updateCostPreferential(map));
+    }
+
+    @Override
+    public List<OutptRegisterDTO> queryRegisterInfoByCertno(Map<String, Object> map) {
+        return outptRegisterBO.queryRegisterInfoByCertno(map);
+    }
+
+    @Override
+    public  OutptRegisterDTO  getOutptRegisterByVisitId(Map<String, Object> map) {
+        return outptRegisterBO.getOutptRegisterByVisitId(map);
     }
 }

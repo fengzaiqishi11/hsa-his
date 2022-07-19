@@ -236,4 +236,6 @@ public interface OutptVisitDAO {
      * @description 根据证件类型和证件号码 查询信息
      **/
     OutptVisitDTO selectOutptVisitByCertNo(OutptVisitDTO outptVisitDTO);
+
+    InsureIndividualBasicDTO getByVisitId(InsureIndividualBasicDTO insureIndividualBasicDTO);
 }

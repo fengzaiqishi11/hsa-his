@@ -2064,17 +2064,20 @@
 
     <select id="queryInsureSettlePrice" resultType="cn.hsa.module.insure.module.dto.PayInfoDTO">
         select
-               ifnull(insure_price, 0)   as insurePrice,
-               ifnull(personal_price, 0)   as personalPrice,
-               ifnull(person_price, 0)   as personPrice,
-               ifnull(rests_price, 0)   as restsPrice
-        from insure_individual_settle
-       where hosp_code = #{hospCode} and state ='0' and settle_state ='1'
+        ifnull(insure_price, 0)   as insurePrice,
+        ifnull(personal_price, 0)   as personalPrice,
+        ifnull(person_price, 0)   as personPrice,
+        ifnull(rests_price, 0)   as restsPrice,
+        iis.insureSettleId, iis.medicalRegNo, iiv.aac001 as psnNo
+        from insure_individual_settle iis
+        left join insure_individual_visit iiv
+        on iis.visit_id = iiv.visit_id and iis.medicalRegNo = iiv.medical_reg_no
+       where iis.hosp_code = #{hospCode} and state ='0' and iis.settle_state ='1'
         <if test="visitId !=null and visitId != ''">
-            and visit_id = #{visitId}
+            and iis.visit_id = #{visitId}
         </if>
         <if test="insureSettleId !=null and insureSettleId != ''">
-            and insureSettleId = #{insureSettleId}
+            and iis.insureSettleId = #{insureSettleId}
         </if>
     </select>
 

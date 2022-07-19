@@ -194,9 +194,6 @@ VALUES( #{id}, #{hosp_code}, #{dcla_souc}, #{insutype}, #{psn_no}, #{psn_insurlt
         <if test="isHospital == '1'.toString()">
             iv.in_time,iv.out_time,iv.out_disease_name,iv.out_disease_icd10,
         </if>
-        <if test="isHospital == '0'.toString()">
-            ov.visit_time as begndate,
-        </if>
         iir.*
 
         from insure_individual_visit iiv

@@ -3760,7 +3760,7 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if(pageNo==1){
             lastNum = pageSize;
         }
-        if (pageNo>0) {
+        if (pageNo>1) {
             firstNum = (pageNo-1) *pageSize+1;
             lastNum = pageNo*pageSize;
         }

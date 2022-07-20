@@ -502,4 +502,13 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String mdtrtCertNo;  //入参值
     private String visitDate;  //入参值
 
+    // 人员身份类型
+    private String psnIdetType;
+    // 人员身份类型码值
+    private String psnIdetTypeName;
+    // 人员身份类型list
+    private String codes;
+    private List<String> codeList;
+    private String sqlStr1;
+
 }

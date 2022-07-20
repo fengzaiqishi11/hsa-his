@@ -143,6 +143,8 @@
         bd.crte_id,
         bd.crte_name,
         bd.crte_time,
+        bd.caty_code,
+        bd.caty_name,
         bd.type_identity
         FROM
         base_dept bd
@@ -309,10 +311,10 @@
     <!--新增所有列-->
     <insert id="insert">
         insert into base_dept(id, hosp_code, type_code, nation_code, code, name, ward_code, phone, person_name, up_dept_code,
-                              mg_dept_code, intro, place, remark, pym, wbm, is_valid, crte_id, crte_name, crte_time,
+                              mg_dept_code, intro, place, remark,caty_name,caty_code, pym, wbm, is_valid, crte_id, crte_name, crte_time,
                               type_identity)
         values (#{id}, #{hospCode}, #{typeCode}, #{nationCode}, #{code}, #{name}, #{wardCode}, #{phone}, #{personName}, #{upDeptCode},
-                #{mgDeptCode}, #{intro}, #{place}, #{remark}, #{pym}, #{wbm}, #{isValid}, #{crteId}, #{crteName},
+                #{mgDeptCode}, #{intro}, #{place}, #{remark}, #{catyName}, #{catyCode} ,#{pym}, #{wbm}, #{isValid}, #{crteId}, #{crteName},
                 #{crteTime}, #{typeIdentity})
     </insert>
 
@@ -337,8 +339,10 @@
             crte_id      = #{crteId},
             crte_name    = #{crteName},
             crte_time    = #{crteTime},
+            caty_name    = #{catyName},
+            caty_code    = #{catyCode},
             type_identity= #{typeIdentity}
-        where id = #{id}
+            where id = #{id}
           and hosp_code = #{hospCode}
     </update>
 
@@ -620,6 +624,8 @@
         a.name,
         a.type_code,
         a.nation_code,
+        a.caty_name,
+        a.caty_code,
         a.intro,
         a.phone,
         a.person_name,

@@ -15,4 +15,6 @@
     <!--病人费用台账-->
     <dubbo:reference id="patientCostLedgerService_consumer" interface="cn.hsa.module.interf.statement.service.PatientCostLedgerService" check="false"/>
 
+    <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
+
 </beans>

@@ -10,6 +10,8 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hsa.module.insure.module.entity.InsureDictDO;
+import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.module.service.InsureUnifiedLogService;
 import cn.hsa.module.insure.outpt.bo.InsureVisitInfoBO;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayOutptService;
@@ -20,6 +22,7 @@ import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +62,9 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 
 	@Resource
 	private BaseReqUtilFactory baseReqUtilFactory;
+
+  @Resource
+  private InsureDictService insureDictService;
 
 	/**
 	 * @Description: 获取人员信息
@@ -170,13 +173,44 @@ public class InsureVisitInfoBOImpl extends HsafBO implements InsureVisitInfoBO {
 			ybxzList.add(xzMap);
 		}
 
-		List<Map<String,Object>> idetinList = new ArrayList<>();
-		if (!ListUtils.isEmpty(idetinfoArray)) {
-			for (int i = 0; i < idetinfoArray.size(); i++) {
-				Map<String, Object> idetinfoMap = idetinfoArray.getJSONObject(i);
-				idetinList.add(idetinfoMap);
-			}
-		}
+
+    //先查询出人员身份类别对应码值
+    Map<String,Object> dictMap = new HashMap<>();
+    InsureDictDO insureDictDO = new InsureDictDO();
+    insureDictDO.setCode("PSN_IDET_TYPE");
+    insureDictDO.setHospCode((String) params.get("hospCode"));
+    dictMap.put("insureDictDO",insureDictDO);
+    dictMap.put("hospCode",(String) params.get("hospCode"));
+    List<InsureDictDO> dictList = insureDictService.queryInsureDict(dictMap).getData();
+
+    List<Map<String,Object>> idetinList = new ArrayList<>();
+    if (!ListUtils.isEmpty(idetinfoArray)) {
+      for (int i = 0; i < idetinfoArray.size(); i++) {
+        Integer flag = 0;
+        Map<String, Object> idetinfoMap = idetinfoArray.getJSONObject(i);
+        if(ObjectUtil.isNotEmpty(MapUtils.get(idetinfoMap, "begntime"))&&ObjectUtil.isNotEmpty(MapUtils.get(idetinfoMap, "endtime"))){
+          // 开始时间
+          String begntime = MapUtils.get(idetinfoMap, "begntime");
+          // 结束时间
+          String endtime = MapUtils.get(idetinfoMap, "endtime");
+          Date begnDate = DateUtils.parse(DateUtils.calculateDate(begntime, -1), DateUtils.Y_M_D);
+          Date endDate = DateUtils.parse(DateUtils.calculateDate(endtime, 1), DateUtils.Y_M_D);
+          for (InsureDictDO dict : dictList){
+            if (DateUtils.getNow().before(endDate) && DateUtils.getNow().after(begnDate)) {
+              if (dict.getId().equals(MapUtils.get(idetinfoMap, "psn_idet_type"))){
+                idetinfoMap.put("psn_idet_type_name",dict.getName());
+                flag = 1;
+                break;
+              }
+            }
+          }
+          //在有效期之内展示
+          if (1 == flag){
+            idetinList.add(idetinfoMap);
+          }
+        }
+      }
+    }
 
 		Map<String, Object> spinfoMap = new HashMap<>();
 		Map<String, Object> injuryorbirthinfoMap = new HashMap<>();

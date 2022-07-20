@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -282,4 +283,6 @@ public interface InsureUnifiedPayRestService {
      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
      */
     WrapperResponse<PageDTO> queryPageInsureUnifiedNationDrug(Map<String, Object> map);
+
+    WrapperResponse<PageDTO> getMedisnInfoByMedisnInName(Map<String, Object> map);
 }

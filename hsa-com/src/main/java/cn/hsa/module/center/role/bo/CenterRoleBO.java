@@ -3,6 +3,7 @@ package cn.hsa.module.center.role.bo;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.center.role.dto.CenterRoleDTO;
 import cn.hsa.module.center.role.entity.CenterRoleDO;
+import cn.hsa.module.center.user.dto.CenterUserRoleDTO;
 
 import java.util.List;
 
@@ -31,4 +32,8 @@ public interface CenterRoleBO {
 
 
     Boolean saveRoleMenus(CenterRoleDTO centerRoleDTO);
+
+    List<CenterUserRoleDTO> getRoleUsers(CenterUserRoleDTO centerUserRoleDTO);
+
+    Boolean saveRoleUsers(CenterUserRoleDTO centerUserRoleDTO);
 }

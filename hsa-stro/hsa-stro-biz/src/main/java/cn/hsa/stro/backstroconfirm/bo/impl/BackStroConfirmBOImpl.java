@@ -61,7 +61,16 @@ public class BackStroConfirmBOImpl extends HsafBO implements BackStroConfirmBO {
 
     //查询出所有的数据
     List<StroOutDTO> stroOutDTOS = backStroConfirmDAO.queryBackOutPage(stroOutDTO);
-
+    if(stroOutDTOS!=null&&stroOutDTOS.size()>0) {
+        for (int i = 0; i < stroOutDTOS.size(); i++) {
+            StroOutDTO stroOutDTO1 = new StroOutDTO();
+            stroOutDTO1.setHospCode(stroOutDTOS.get(i).getHospCode());
+            stroOutDTO1.setInOrderNo(stroOutDTOS.get(i).getOrderNo());
+            stroOutDTO1.setId(stroOutDTOS.get(i).getId());
+            List<StroOutDetailDTO> stroOutDetailDTOS = backStroConfirmDAO.queryOutDetailByOutId(stroOutDTO1);
+            stroOutDTOS.get(i).setStroOutDetailDTOS(stroOutDetailDTOS);
+        }
+    }
     //进行分页
     return PageDTO.of(stroOutDTOS);
   }

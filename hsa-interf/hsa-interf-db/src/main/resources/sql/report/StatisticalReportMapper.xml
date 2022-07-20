@@ -334,6 +334,7 @@
     <!--医保结算统计报表(按明细)-->
     <select id="queryYbSettleReportByMX" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
+        (planPrice+civilPrice+seriousPrice+retirePrice+restsPrice) fundPay,/*统筹基金+公务员补助支付+大病互助支付+离休基金支付+其他支付*/
         ywlx,
         visitNo,
         name,
@@ -433,7 +434,7 @@
         WHERE
         b.hosp_code = #{hospCode}
         AND a.is_settle = '1'
-        AND a.status_code = '0'
+      --  AND a.status_code = '0'
         <if test="medType != null and medType != ''">
             AND b.aka130 = #{medType}
         </if>
@@ -701,6 +702,7 @@
     <!--医保结算统计报表(按病人类型)-->
     <select id="queryYbSettleReportByBRLX" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
+        SUM(ss.planPrice+ss.civilPrice+ss.seriousPrice+ss.retirePrice+ss.restsPrice) fundPay,/*统筹基金+公务员补助支付+大病互助支付+离休基金支付+其他支付*/
         ywlx,
         patientCode,
         SUM( ss.totalPrice ) AS totalPrice,
@@ -714,7 +716,7 @@
         SUM( ss.ynyh ) AS ynyh,
         SUM( ss.mafPay) AS mafPay,
         SUM( ss.comPay ) AS comPay, /*企业补充医疗*/
-        SUM( ss.personalPrice) as personalPrice
+        SUM( ss.personalPrice) as personalPrice,
         psnIdetType,
         psnIdetTypeName
         FROM
@@ -730,11 +732,12 @@
         IFNULL( b.retire_price, 0 ) AS retirePrice,
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
+        IFNULL( b.rests_price, 0 ) as restsPrice,
         0 AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
         v.psn_idet_type as psnIdetType,
         ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM
@@ -763,10 +766,11 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
+        IFNULL( b.rests_price, 0 ) as restsPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
         v.psn_idet_type as psnIdetType,
         ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM
@@ -778,7 +782,7 @@
         AND a.hosp_code = b.hosp_code
         and a.visit_id = v.visit_id
         AND a.is_settle = '1'
-        AND a.status_code = '0'
+       -- AND a.status_code = '0'
         AND a.hosp_code = #{hospCode}
         <if test="medType != null and medType != ''">
             AND b.aka130 = #{medType}

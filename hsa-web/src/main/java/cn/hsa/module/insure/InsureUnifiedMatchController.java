@@ -478,4 +478,20 @@ public class InsureUnifiedMatchController extends BaseController {
         map.put("insureUnifiedMatchMedicinsDO",insureUnifiedMatchMedicinsDO);
         return insureUnifiedPayRestService_consumer.queryPageInsureMedicinesMatch(map);
     }
+
+    /**
+     * @Method getMedisnInfo
+     * @Desrciption   医保统一支付;医疗机构信息获取
+     * @Param map
+     *
+     * @Author fuhui
+     * @Date   2021/4/13 20:28
+     * @Return
+     **/
+    @GetMapping("/getMedisnInfoByMedisnInName")
+    public WrapperResponse<PageDTO> getMedisnInfoByMedisnInName(@RequestParam  Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return this.insureUnifiedPayRestService_consumer.getMedisnInfoByMedisnInName(map);
+    }
 }

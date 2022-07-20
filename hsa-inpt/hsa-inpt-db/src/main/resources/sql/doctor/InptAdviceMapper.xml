@@ -2393,5 +2393,55 @@
         </if>
     </select>
 
-
+    <select id="queryInptVisitPageNoMerge" resultMap="InptVisitMap">
+        select
+        a.id, a.hosp_code, a.profile_id, a.in_profile, a.in_no, a.name, a.gender_code, a.age, a.age_unit_code, a.birthday, a.nation_code, a.cert_code,
+        a.cert_no, a.marry_code, a.phone, a.address, a.preferential_type_id, a.patient_code, a.receive_hosp_name, a.bed_id, a.bed_name, a.nursing_code,
+        a.diet_type, a.Illness_code, a.status_code, a.in_ward_id, a.in_dept_id, a.in_dept_name, a.in_time, a.zz_doctor_id, a.zz_doctor_name,
+        a.jz_doctor_id, a.jz_doctor_name, a.zg_doctor_id, a.zg_doctor_name,
+        a.in_remark, a.in_mode_code, a.in_disease_id, a.in_disease_name, a.in_disease_icd10, a.in_situation_code, a.outpt_visit_no, a.outpt_doctor_id,
+        a.outpt_doctor_name, a.outpt_disease_id, a.outpt_disease_name, a.outpt_disease_icd10, a.out_ward_id, a.out_dept_id, a.out_dept_name, a.out_time,
+        a.out_disease_id, a.out_disease_name, a.out_disease_icd10, a.out_oper_id, a.out_oper_name, a.out_oper_time, a.out_situation_code, a.out_remark,
+        a.out_mode_code,
+        a.is_archive, a.archive_time, a.archive_id, a.archive_name, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
+        a.insure_patient_id, a.insure_remark, a.total_advance, a.total_cost, a.total_balance, a.crte_id, a.crte_name, a.crte_time,
+        (select name from base_dept where id = a.in_ward_id and hosp_code = a.hosp_code) as wardName,
+        (case when date(now()) = date(in_time) then 1 else to_days(date(now())) - to_Days(date(in_time)) end)as inNum,
+        a.total_balance as totalMergeBalance,
+        a.total_cost as totalMergeCost
+        <if test="zgbrQuery == '2'.toString()">
+            , t.is_consule, t.apply_deptid
+        </if>
+        from inpt_visit a left join base_bed b on a.hosp_code = b.hosp_code and a.bed_id = b.id
+        <!--会诊病人，关联会诊申请表-->
+        <if test="zgbrQuery == '2'.toString()">
+            join (
+            SELECT
+            '1' as is_consule, ss.apply_deptid, ss.visit_id, ss.hosp_code
+            FROM inpt_consultation_apply ss
+            join inpt_advice ia on ss.hosp_code = ia.hosp_code and ss.advice_id = ia.id
+            WHERE ss.hosp_code = #{hospCode}
+            and ss.consul_state = '1'
+            and ia.is_check = '1'
+            AND FIND_IN_SET(#{zgDoctorId}, ss.consul_userid_list)
+            GROUP BY ss.visit_id, ss.hosp_code
+            ) t on a.hosp_code = t.hosp_code and a.id = t.visit_id
+        </if>
+        where a.hosp_code = #{hospCode} and ifnull(a.bed_id,'') != '' and a.status_code = '2'
+        <!--非会诊病人，只差当前登录科室-->
+        <if test="zgbrQuery != '2'.toString()">
+            and a.in_dept_id = #{inDeptId}
+        </if>
+        <if test="id != null and id != ''">
+            and a.id = #{id}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (a.name like concat('%',#{keyword},'%') or a.cert_no like concat('%',#{keyword},'%')
+            or a.in_no like concat('%',#{keyword},'%') or a.bed_name like concat('%',#{keyword},'%'))
+        </if>
+        <if test='zgbrQuery =="1"'>
+            and a.zg_doctor_id = #{zgDoctorId}
+        </if>
+        order by b.seq_no asc
+    </select>
 </mapper>

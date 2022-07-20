@@ -23,7 +23,7 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsureInptRecordDO extends PageDO implements Serializable {
     private static final long serialVersionUID = -2339664304930982846L;
     private String id;

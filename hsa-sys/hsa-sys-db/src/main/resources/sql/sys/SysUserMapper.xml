@@ -691,6 +691,12 @@
 			<if test="isAnaesthesia != null and isAnaesthesia != ''">
 				and a.is_anaesthesia = #{isAnaesthesia}
 			</if>
+			<if test="psnType != null and psnType != '' and psnType == 1">
+				and a.work_type_code in (select value from sys_code_detail where c_code = 'RYZW' AND  name like '%医师%')
+			</if>
+			<if test="psnType != null and psnType != '' and psnType == 0">
+				and a.work_type_code in (select value from sys_code_detail where c_code = 'RYZW' AND  name like '%护士%')
+			</if>
 		</where>
 		order by a.code asc
 	</select>

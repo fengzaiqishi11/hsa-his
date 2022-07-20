@@ -919,6 +919,12 @@ public interface Constant {
             public static final String GS = "62"; // 甘肃医保前缀
             public static final String GD = "44"; // 广东医保前缀
         }
+
+        //病案首页类型
+        public static class MRISTYPE {
+            public static final String XY = "1"; // 西医病案首页
+            public static final String ZY = "2"; // 中医病案首页
+        }
     }
 
 

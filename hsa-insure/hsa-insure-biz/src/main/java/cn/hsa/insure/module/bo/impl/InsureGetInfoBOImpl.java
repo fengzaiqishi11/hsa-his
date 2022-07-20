@@ -29,6 +29,7 @@ import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
+import cn.hsa.module.insure.module.entity.TcmDiseScoreDO;
 import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
@@ -49,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 import javax.annotation.Resource;
@@ -594,6 +596,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insertOpspdiseinfo(map);
         // 保存 住院诊断信息
         insertDiseaseInfo(map);
+
+//        saveDiseaseInfo(map);
+//        //校验中医病种分值规则
+//        chkTcmDiseMatch(map);
         // 保存结清单信息
         Map<String, Object> setleInfoMap = insertSetleInfo(map);
         // 保存输血信息
@@ -1966,6 +1972,75 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
     }
 
+    private synchronized void saveDiseaseInfo(Map<String, Object> map) {
+        Map<String, Object> diseaseMap = MapUtils.get(map, "diseinfo");
+        if (MapUtils.isEmpty(diseaseMap)) {
+            return;
+        }
+        List<Map<String, Object>> zxCollect = MapUtils.get(diseaseMap, "zxCollect");
+        List<Map<String, Object>> xiCollect = MapUtils.get(diseaseMap, "xiCollect");
+        List<Map<String, Object>> inptDiagnoseDTOList = new ArrayList<>();
+        //病案首页类型   1：西医病案  2.中医病案
+        String mrisType = MapUtil.getStr(map, "mrisType");
+        /**
+         * 如果新增时，默认是西医诊断且是非主诊断
+         */
+        if (!ListUtils.isEmpty(zxCollect)) {
+            zxCollect = zxCollect.stream().filter
+                    (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
+                    collect(Collectors.toList());
+            if (!ListUtils.isEmpty(zxCollect)) {
+                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+                if (ListUtils.isEmpty(zyIsMain)) {
+                    zxCollect.get(0).put("isMain", "1");
+                }
+                zxCollect.stream().forEach(item -> {
+                    if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
+                        item.put("typeCode", "2");
+                    }
+                    if (!"1".equals(MapUtils.get(item, "isMain"))) {
+                        item.put("isMain", "0");
+                    }
+                });
+                inptDiagnoseDTOList.addAll(zxCollect);
+            }
+        }
+        /**
+         * 如果新增时，默认是中医诊断且是非主诊断
+         */
+        if (!ListUtils.isEmpty(xiCollect)) {
+            xiCollect = xiCollect.stream().filter
+                    (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
+                    collect(Collectors.toList());
+            if (!ListUtils.isEmpty(xiCollect)) {
+                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+                if (ListUtils.isEmpty(xiIsMain)) {
+                    xiCollect.get(0).put("isMain", "1");
+                }
+                System.out.println("--------------" + xiCollect);
+                xiCollect.stream().forEach(item -> {
+                    if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
+                        item.put("typeCode", "1");
+                    }
+                    if (!"1".equals(MapUtils.get(item, "isMain"))) {
+                        item.put("isMain", "0");
+                    }
+                });
+                inptDiagnoseDTOList.addAll(xiCollect);
+            }
+        }
+        if (!ListUtils.isEmpty(inptDiagnoseDTOList)) {
+            List<Map<String, Object>> mapList = insertCommonSettleInfo(map, inptDiagnoseDTOList);
+            insureGetInfoDAO.deleteDisease(map);
+            mapList.stream().forEach(item -> {
+                if (StringUtils.isEmpty(MapUtils.get(item, "admCondType"))) {
+                    throw new AppException("请完善住院诊断信息节点的入院病情");
+                }
+            });
+            insureGetInfoDAO.insertDisease(mapList);
+        }
+    }
+
     /**
      * @Method insertOpspdiseinfo
      * @Desrciption 处理医疗保障基金结算清单 -- 门诊慢特病诊断信息
@@ -2086,6 +2161,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
             resultDataMap.put("drgInfo",combo);
         }
+        resultDataMap.put("mrisType", map.get("mrisType"));
         return resultDataMap;
     }
 
@@ -2599,6 +2675,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
             diseaseCount = inptDiagnoseDTOList.size();
+            map.put("mrisType",Constant.UnifiedPay.MRISTYPE.XY);
         }else {
             if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
                 tcmZyDiagnoseDTOS.stream().forEach(diag ->{
@@ -2623,6 +2700,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
             diseaseCount = zxCollect.size()+xiCollect.size();
+            map.put("mrisType",Constant.UnifiedPay.MRISTYPE.ZY);
         }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
@@ -3699,5 +3777,90 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
         }
         return dataMap;
+    }
+
+    /**
+     * @Description  校验中医诊断与西医诊断的匹配
+     * 2、在住院医保结算清单保存的时候，对该医院进行校验，判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
+     *
+     * 2.1、如果在范围内(比如为：急性腰扭伤/闪腰A03.06.04.08)，根据1维护的对照关系，获取对应的西医诊断的编码（可能有多个，比如：腰部扭伤 S33.501、腰椎扭伤和劳损 S33.500、腰椎扭伤 S33.502、腰骶关节扭伤 S33.500x011），再校验结算清单中出院西医诊断的主诊断，是否在其中。
+     *
+     * 2.1.1、如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
+     *
+     * 2.1.2、如果不在其中，则提示“中医主要诊断急性腰扭伤/闪腰A03.06.04.08)符合《中医优势住院病种分值表》，西医主要诊断不符合。该中医诊断映射的西医诊断有“腰部扭伤 S33.501、腰椎扭伤和劳损 S33.500、腰椎扭伤 S33.502、腰骶关节扭伤 S33.500x011，请根据映射关系修改西医主诊断编码和名称””
+     *
+     * 2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
+     * @Author 产品三部-郭来
+     * @Date 2022-07-19 10:44
+     * @param map
+     * @return void
+     */
+    public void chkTcmDiseMatch(Map map){
+        //1.开关配置
+        if (true) {
+            return;
+        }
+        //非住院业务不校验
+        if (!Constants.SF.S.equals(MapUtil.getStr(map,"isHospital"))) {
+            return;
+        }
+        Map<String, Object> setlInfoMap = MapUtils.get(map, "setlinfo");
+        HashMap<String, Object> queryMap = new HashMap<>();
+        queryMap.put("visitId",MapUtil.getStr(map,"visitId"));
+        queryMap.put("hospCode",MapUtil.getStr(map,"hospCode"));
+        queryMap.put("insureRegCode",MapUtil.getStr(setlInfoMap,"insuplc"));
+        //获取西医诊断信息
+        List<InptDiagnoseDTO>  tcmXyDiagnoseDTOS = insureGetInfoDAO.selectTcmMriInptDiagNose(queryMap);//中医病案的西医诊断信息
+        if (ObjectUtil.isEmpty(tcmXyDiagnoseDTOS)) {
+            throw new AppException("未获取到西医诊断信息，请检查！");
+        }
+        List<InptDiagnoseDTO> xyMainList = tcmXyDiagnoseDTOS.stream().filter(o -> "1".equals(o.getIsMain())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(xyMainList) || xyMainList.size() < 1) {
+            throw new AppException("未获取到西医主诊断信息，请检查！");
+        }
+        if (xyMainList.size() > 1) {
+            throw new AppException("获取到多个西医主诊断信息，请检查！");
+        }
+        String xyMainCode = xyMainList.get(0).getDiseaseCode();
+        //获取中医诊断信息
+        List<InptDiagnoseDTO>  tcmZyDiagnoseDTOS = insureGetInfoDAO.selectTcmSyndromesMriInptDiagNose(queryMap);//中医病案的中医诊断信息
+        if (ObjectUtil.isEmpty(tcmZyDiagnoseDTOS)) {
+            throw new AppException("未获取到中医诊断信息，请检查！");
+        }
+        List<InptDiagnoseDTO> zyMainList = tcmZyDiagnoseDTOS.stream().filter(o -> "1".equals(o.getIsMain())).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(zyMainList) || zyMainList.size() < 1) {
+            throw new AppException("未获取到中医主诊断信息，请检查！");
+        }
+        if (zyMainList.size() > 1) {
+            throw new AppException("获取到多个中医主诊断信息，请检查！");
+        }
+        String zyMainCode = zyMainList.get(0).getDiseaseCode();
+        //2.判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
+        List<TcmDiseScoreDO> tcmDiseScoreDOS = insureGetInfoDAO.queryByTcmDiseCode(zyMainCode);
+        //2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
+        if (CollectionUtils.isEmpty(tcmDiseScoreDOS)) {
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        List<String> wmDiseList = new ArrayList<>();
+        for (TcmDiseScoreDO tcmDiseScoreDO : tcmDiseScoreDOS) {
+            wmDiseList.add(tcmDiseScoreDO.getWm_dise_code());
+            builder.append(tcmDiseScoreDO.getWm_dise_name())
+                    .append(tcmDiseScoreDO.getWm_dise_code())
+                    .append(";");
+        }
+        if (CollectionUtils.isEmpty(wmDiseList)) {
+            throw new AppException("中医病种分值西医诊断为空,请先维护！");
+        }
+        String tcmDiseName = tcmDiseScoreDOS.get(0).getTcm_dise_name();
+        if (!wmDiseList.contains(xyMainCode)) {
+            throw new AppException("中医主要诊断【"+tcmDiseName+zyMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "西医主要诊断不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，请根据映射关系修改西医主诊断编码和名称");
+        }
+        //如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
+        Map setlinfo = MapUtil.getAny(map, "setlinfo");
+        setlinfo.put("hi_paymtd","60");
+        map.put("setlinfo",setlinfo);
     }
 }

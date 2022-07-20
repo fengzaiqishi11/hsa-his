@@ -1676,6 +1676,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             diagnoseDTO.setDiseName(outptDiagnose.get(i).getDiseaseName());
             //*诊断日期
             diagnoseDTO.setDiseDate(outptDiagnose.get(i).getCrteTime());
+            //*诊断类目  --海南必传
+            diagnoseDTO.setDiseCgy("1");
             anaDiagnoseDTOS.add(diagnoseDTO);
         }
         //就诊信息
@@ -1771,6 +1773,10 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         anaMdtrtDTO.setFsiOrderDtos(anaOrderDTOS);
         //诊断信息DTO
         anaMdtrtDTO.setFsiDiagnoseDtos(anaDiagnoseDTOS);
+        //公务员标志  --海南必传
+        anaMdtrtDTO.setCvlservFlag(ObjectUtil.isNotEmpty(basicDTO.getBac001())?basicDTO.getBac001():"0");
+        anaMdtrtDTO.setOrderDtos(anaOrderDTOS);
+        anaMdtrtDTO.setDiagnoseDtos(anaDiagnoseDTOS);
 
         //参保信息
         AnaInsuDTO anaInsuDTO = new AnaInsuDTO();
@@ -1788,6 +1794,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         anaInsuDTO.setCurrMdtrtId(outptVisitDTO.getId());
         //*就诊信息集合
         anaInsuDTO.setFsiEncounterDtos(anaMdtrtDTO);
+        //*就诊信息集合  --海南
+        anaInsuDTO.setEncounterDtos(anaMdtrtDTO);
 
         //入参DTO
         AnalysisDTO analysisDTO = new AnalysisDTO();

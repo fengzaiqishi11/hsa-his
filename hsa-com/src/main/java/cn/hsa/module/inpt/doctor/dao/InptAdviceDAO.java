@@ -906,4 +906,5 @@ public interface InptAdviceDAO {
      */
     List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
 
+    List<InptVisitDTO> queryInptVisitPageNoMerge(InptVisitDTO inptVisitDTO);
 }

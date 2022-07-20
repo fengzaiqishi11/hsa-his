@@ -901,6 +901,7 @@ public interface Constant {
         public static class ISMAN {
             public static final String S = "1"; // 是
             public static final String F = "0"; // 否
+            public static final String E = "2"; // 否
         }
 
         public static class ZKZT {
@@ -918,6 +919,13 @@ public interface Constant {
             public static final String HN = "46"; // 海南医保前缀
             public static final String GS = "62"; // 甘肃医保前缀
             public static final String GD = "44"; // 广东医保前缀
+        }
+        /*明细审核接口编码*/
+        public static class MXSHBM {
+            public static final String SQSH = "3101"; // 事前审核
+            public static final String SZSH = "3102"; // 事中审核
+            public static final String SQSH_HAINAN = "3660"; // 海南事前审核
+            public static final String SZSH_HAINAN = "3661"; // 海南事中审核
         }
 
         //病案首页类型

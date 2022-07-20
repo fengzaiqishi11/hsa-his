@@ -1739,9 +1739,11 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         PageHelper.startPage(itemProfitStatisticsDTO.getPageNo(),itemProfitStatisticsDTO.getPageSize());
         switch (bizCode){
             // 查询门诊药品和材料利润统计信息
-            case "1" : list = stroStockDetailDao.queryMZDrugAndMaterialProfit(itemProfitStatisticsDTO); break;
-            // 查询住院药品和材料利润统计信息
+            case "1" : list = stroStockDetailDao.queryNewMZDrugAndMaterialProfit(itemProfitStatisticsDTO); break;
+            // 查询住院药品和材料利润统计信息(按费用发生时间)
             case "2" : list = stroStockDetailDao.queryZYDrugAndMaterialProfit(itemProfitStatisticsDTO); break;
+            // 查询住院药品和材料利润统计信息（按费用结算时间）
+            case "3" : list = stroStockDetailDao.queryZYDrugAndMaterialProfitBySettleTime(itemProfitStatisticsDTO); break;
         }
         PageDTO pageDTO = PageDTO.of(list);
         return pageDTO;

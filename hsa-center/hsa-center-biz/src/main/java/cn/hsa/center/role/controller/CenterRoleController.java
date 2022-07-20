@@ -6,6 +6,8 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.role.dto.CenterRoleDTO;
 import cn.hsa.module.center.role.entity.CenterRoleDO;
 import cn.hsa.module.center.role.service.CenterRoleService;
+import cn.hsa.module.center.user.dto.CenterUserRoleDTO;
+import cn.hsa.module.sys.user.dto.SysUserRoleDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -111,5 +113,41 @@ public class CenterRoleController extends CenterBaseController {
         Map map = new HashMap();
         map.put("centerRoleDTO", centerRoleDTO);
         return centerRoleService_consumer.saveRoleMenus(map);
+    }
+
+
+    /**
+     * @Method: getRoleUsers
+     * @Description: 获取所有的角色用户列表
+     * @Param: [sysSystemDo]
+     * @Author: pengbo
+     * @Email: 254580179@qq.com
+     * @Date: 2022/7/14 9:34
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.sys.system.entity.SysSystemDo>>
+     **/
+    @GetMapping("/getRoleUsers")
+    public WrapperResponse<List<CenterUserRoleDTO>> getRoleUsers(CenterUserRoleDTO centerUserRoleDTO) {
+        Map map = new HashMap();
+        map.put("centerUserRoleDTO", centerUserRoleDTO);
+        return centerRoleService_consumer.getRoleUsers(map);
+    }
+
+
+    /**
+     * @Method: saveRoleUsers
+     * @Description: 保存所有的角色列表
+     * @Param: [sysSystemDo]
+     * @Author: pengbo
+     * @Email: 254580179@qq.com
+     * @Date: 2020/7/14 9:34
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List<cn.hsa.module.sys.system.entity.SysSystemDo>>
+     **/
+    @PostMapping("/saveRoleUsers")
+    public WrapperResponse<Boolean> saveRoleUsers(@RequestBody CenterUserRoleDTO centerUserRoleDTO) {
+        Map map = new HashMap();
+        centerUserRoleDTO.setCrteId(userId);
+        centerUserRoleDTO.setCrteName(userName);
+        map.put("centerUserRoleDTO", centerUserRoleDTO);
+        return centerRoleService_consumer.saveRoleUsers(map);
     }
 }

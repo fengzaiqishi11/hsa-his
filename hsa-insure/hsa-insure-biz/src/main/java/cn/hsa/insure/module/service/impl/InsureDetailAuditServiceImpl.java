@@ -1,4 +1,6 @@
 package cn.hsa.insure.module.service.impl;
+import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.dto.AnaMdtrtDTO;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 
@@ -69,22 +71,28 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
         param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         param.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
         Map<String, Object> data = new HashMap<>();
-        data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
+        //海南的接口编号和入参节点名不一样
+        if (insureConfigurationDTO.getMdtrtareaAdmvs().startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
+            param.put("infno", Constant.UnifiedPay.MXSHBM.SQSH_HAINAN);
+            data.put("trigScen",analysisDTO);
+        }else {
+            data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
+        }
         param.put("input",data);
         String json = JSONObject.toJSONString(param);
         log.info("统一支付平台明细审核事前分析入参:" + json);
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        log.info("统一支付平台明细审核事前分析回参:" + resultStr);
         if(StringUtils.isEmpty(resultStr)){
             throw new AppException("无法访问统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
         if ("999".equals(MapUtils.get(resultMap,"code"))) {
-            throw new AppException((String) resultMap.get("msg"));
+            throw new AppException("明细审核事前分析返回："+(String) resultMap.get("msg"));
         }
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-            throw new AppException((String) resultMap.get("err_msg"));
+            throw new AppException("明细审核事前分析返回："+(String) resultMap.get("err_msg"));
         }
-        log.info("统一支付平台明细审核事前分析回参:" + resultStr);
         Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
         AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
         checkResult(result);
@@ -119,22 +127,28 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
         param.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
         param.put("mdtrtarea_admvs",insureConfigurationDTO.getMdtrtareaAdmvs());// 就医地医保区划
         Map<String, Object> data = new HashMap<>();
-        data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
+        //海南的接口编号和入参节点名不一样
+        if (insureConfigurationDTO.getMdtrtareaAdmvs().startsWith(Constant.UnifiedPay.YBBMQZ.HN)) {
+            param.put("infno", Constant.UnifiedPay.MXSHBM.SZSH_HAINAN);
+            data.put("trigScen",analysisDTO);
+        }else {
+            data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
+        }
         param.put("input",data);
         String json = JSONObject.toJSONString(param);
         log.info("统一支付平台明细审核事中分析入参:" + json);
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        log.info("统一支付平台明细审核事中分析回参:" + resultStr);
         if(StringUtils.isEmpty(resultStr)){
             throw new AppException("无法访问统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
         if ("999".equals(MapUtils.get(resultMap,"code"))) {
-            throw new AppException((String) resultMap.get("msg"));
+            throw new AppException("明细审核事中分析返回："+(String) resultMap.get("msg"));
         }
         if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-            throw new AppException((String) resultMap.get("err_msg"));
+            throw new AppException("明细审核事中分析返回："+(String) resultMap.get("err_msg"));
         }
-        log.info("统一支付平台明细审核事中分析回参:" + resultStr);
         Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
         AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
         checkResult(result);

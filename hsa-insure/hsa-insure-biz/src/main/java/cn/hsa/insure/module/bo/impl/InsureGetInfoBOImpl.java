@@ -911,7 +911,36 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         int pageSize = Integer.parseInt(MapUtils.get(map, "pageSize") == null ? "10" : MapUtils.get(map, "pageSize"));
         PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = insureGetInfoDAO.querySetlePage(map);
-        return PageDTO.of(list);
+        //queryFlag =0表示查询全部数据  直接返回结果集
+        if (Constant.UnifiedPay.ISMAN.F.equals(MapUtil.getStr(map,"queryFlag"))) {
+            return PageDTO.of(list);
+        }
+
+        if (ObjectUtil.isEmpty(MapUtil.getStr(map,"queryFlag"))) {
+            throw new AppException("查询标志【queryFlag】不能为空，请检查！");
+        }
+        //根据queryFlag标志按需过滤  queryFlag =1表示查询异地就医数据  queryFlag = 2表示查询本地就医数据
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (Constant.UnifiedPay.ISMAN.S.equals(MapUtil.getStr(map,"queryFlag"))) {
+            //取异地数据
+            list.forEach(o->{
+                if (ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insureRegCode"))
+                        && ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insuplcAdmdvs"))
+                        && !MapUtil.getStr(o,"insuplcAdmdvs").substring(0,4).equals(MapUtil.getStr(o,"insureRegCode").substring(0,4))) {
+                    result.add(o);
+                }
+            });
+        }else if (Constant.UnifiedPay.ISMAN.E.equals(MapUtil.getStr(map,"queryFlag"))) {
+            //取本地数据
+            list.forEach(o->{
+                if (ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insureRegCode"))
+                        && ObjectUtil.isNotEmpty(MapUtil.getStr(o,"insuplcAdmdvs"))
+                        && MapUtil.getStr(o,"insuplcAdmdvs").substring(0,4).equals(MapUtil.getStr(o,"insureRegCode").substring(0,4))) {
+                    result.add(o);
+                }
+            });
+        }
+        return PageDTO.of(result);
     }
 
     /**
@@ -1035,6 +1064,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if(payInfoDTO == null){
                 responseDataMap.put("estimateFund","-全自费");//预计基金支付
                 responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                responseDataMap.put("proMedicMater","-");// 药占比
+                responseDataMap.put("proConsum","-");// 耗材比
             }else{
                 //如果没有报销也算全自费
                 if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
@@ -1051,6 +1082,37 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     responseDataMap.put("estimateFund",estimateFund);//预计基金支付
                     responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                 }
+                //查询医保费用
+                Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
+                List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
+                if (ListUtils.isEmpty(feeMapList)) {
+                    throw new AppException("没有获取到医保费用明细数据");
+                }
+                //计算药占比，耗材占比
+                BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
+                BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
+                BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
+                for(Map feeMap:feeMapList){
+                    //累加药占总费用
+                    if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
+                            || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
+                        sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加耗材总费用
+                    if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
+                        sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加总费用
+                    sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                }
+                BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
+                BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
+                if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
+                    proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
+                    proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
+                }
+                responseDataMap.put("proMedicMater",proMedicMater);// 药占比
+                responseDataMap.put("proConsum",proConsum);// 耗材比
             }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){
@@ -1422,6 +1484,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
                     responseDataMap.put("estimateFund","-全自费");//预计基金支付
                     responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                    responseDataMap.put("proMedicMater","-");// 药占比
+                    responseDataMap.put("proConsum","-");// 耗材比
                 }else {
                     BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                     BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
@@ -1433,6 +1497,37 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     responseDataMap.put("estimateFund",estimateFund);//预计基金支付
                     responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                 }
+                //查询医保费用
+                Map<String, Object> data = insureUnifiedBaseService.queryFeeDetailInfo(map).getData();
+                List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
+                if (ListUtils.isEmpty(feeMapList)) {
+                    throw new AppException("没有获取到医保费用明细数据");
+                }
+                //计算药占比，耗材占比
+                BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
+                BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
+                BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
+                for(Map feeMap:feeMapList){
+                    //累加药占总费用
+                    if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
+                            || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
+                        sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加耗材总费用
+                    if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
+                        sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    //累加总费用
+                    sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                }
+                BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
+                BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
+                if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
+                    proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
+                    proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
+                }
+                responseDataMap.put("proMedicMater",proMedicMater);// 药占比
+                responseDataMap.put("proConsum",proConsum);// 耗材比
             }
             //处理排序号
             if (!ListUtils.isEmpty(qualityInfoList)){
@@ -2550,8 +2645,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         } else {
             dataMap = insureGetInfoDAO.selectOutptBillNo(map);
         }
-        if (MapUtils.isEmpty(dataMap)) {
-            throw new AppException("该患者未产生发票信息");
+
+        Map sysMap = new HashMap();
+        sysMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        sysMap.put("code","IS_JUGE_INVOICE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        // 如果该参数是1 则提醒该错误。如果是 0 则不提醒该错误
+        if(sysParameterDTO == null || Constants.SF.S.equals(sysParameterDTO.getValue())){
+            if (MapUtils.isEmpty(dataMap)) {
+                throw new AppException("该患者未产生发票信息");
+            }
         }
         billNo = MapUtils.get(dataMap, "invoice_no");
         billCode = MapUtils.get(dataMap, "prefix");
@@ -2704,32 +2807,32 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
-        List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
-        List<InptDiagnoseDTO> xiCollect2 = new ArrayList<>();
         List<InptDiagnoseDTO> zxCollect2 = new ArrayList<>();
-        if(ObjectUtil.isNotEmpty(xiCollect)){
-            for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
-                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
-                    inptDiagnoseDTO.setIsMain("0");
-                }
-            }
-            //主诊断排第一位
-            for(int i = 0;i < xiCollect.size(); i++){
-                if(Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())){
-                    xiCollect2.add(xiCollect.get(i));
-                    xiCollect.remove(i);
-                }
-            }
-            //根据id排序
-            xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
-                    xiCollect.stream().sorted((a, b) ->
-                            (b.getId() == null ? "" : b.getId())
-                                    .compareTo(a.getId()))
-                            .collect(Collectors.toList());
-            if(ObjectUtil.isNotEmpty(xiCollect1)){
-                xiCollect2.addAll(xiCollect1);
-            }
-        }
+//        List<InptDiagnoseDTO> xiCollect1 = new ArrayList<>();
+//        List<InptDiagnoseDTO> xiCollect2 = new ArrayList<>();
+//        if(ObjectUtil.isNotEmpty(xiCollect)){
+//            for(InptDiagnoseDTO inptDiagnoseDTO:xiCollect){
+//                if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
+//                    inptDiagnoseDTO.setIsMain("0");
+//                }
+//            }
+//            //主诊断排第一位
+//            for(int i = 0;i < xiCollect.size(); i++){
+//                if(Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())){
+//                    xiCollect2.add(xiCollect.get(i));
+//                    xiCollect.remove(i);
+//                }
+//            }
+//            //根据id排序
+//            xiCollect1 = ListUtils.isEmpty(xiCollect) ? null :
+//                    xiCollect.stream().sorted((a, b) ->
+//                            (b.getId() == null ? "" : b.getId())
+//                                    .compareTo(a.getId()))
+//                            .collect(Collectors.toList());
+//            if(ObjectUtil.isNotEmpty(xiCollect1)){
+//                xiCollect2.addAll(xiCollect1);
+//            }
+//        }
         if(ObjectUtil.isNotEmpty(zxCollect)){
             for(InptDiagnoseDTO inptDiagnoseDTO:zxCollect){
                 if(StringUtils.isEmpty(inptDiagnoseDTO.getIsMain())){
@@ -2753,7 +2856,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 zxCollect2.addAll(zxCollect1);
             }
         }
-        diseaseMap.put("xiCollect",xiCollect2);
+        diseaseMap.put("xiCollect",xiCollect);
         diseaseMap.put("zxCollect",zxCollect2);
         diseaseMap.put("diseaseCount",diseaseCount);
         return diseaseMap;

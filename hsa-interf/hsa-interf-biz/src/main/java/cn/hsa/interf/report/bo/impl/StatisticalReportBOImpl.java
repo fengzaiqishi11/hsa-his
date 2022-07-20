@@ -3,12 +3,14 @@ package cn.hsa.interf.report.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.interf.report.bo.StatisticalReportBO;
 import cn.hsa.module.interf.report.dao.StatisticalReportDAO;
 import cn.hsa.util.BigDecimalUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -114,6 +116,26 @@ public class StatisticalReportBOImpl extends HsafBO implements StatisticalReport
         String str = (String) paramMap.get("searchTypeList");
         List<String> searchTypeList = new ArrayList<>(Arrays.asList(str.split(",")));
         paramMap.put("searchTypeList", searchTypeList);
+        //人员身份类别list
+        String codeStr = (String) paramMap.get("codeList");
+        StringBuffer sqlStr = new StringBuffer();
+        if (ObjectUtil.isEmpty(codeStr)) {
+          paramMap.put("codeList", null);
+          sqlStr.append(" 1 = 1");
+          paramMap.put("sqlStr",sqlStr);
+        }else{
+          List<String> codeList = new ArrayList<>(Arrays.asList(codeStr.split(",")));
+          paramMap.put("codeList", codeList);
+          //拼接sql语句
+          for (String str1 : codeList){
+            sqlStr.append("psnIdetType = '").append(str1).append("' or ");
+            sqlStr.append("psnIdetType like CONCAT('%,', '").append(str1).append("') or ");
+            sqlStr.append("psnIdetType like CONCAT('").append(str1).append("',',%' or ");
+            sqlStr.append("psnIdetType like CONCAT('%,', '").append(str1).append("' ,',','%')) or ");
+          }
+          sqlStr.delete(sqlStr.length()-3,sqlStr.length());
+          paramMap.put("sqlStr",sqlStr);
+        }
         //汇总方式
         String type = (String) paramMap.get("type");
         if (StringUtils.isEmpty(type)) {

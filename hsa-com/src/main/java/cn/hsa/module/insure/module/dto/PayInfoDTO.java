@@ -42,4 +42,8 @@ public class PayInfoDTO implements Serializable {
 
     private String insureSettleId;
 
+    private String medicalRegNo; //医保登记号
+
+    private String psnNo; //人员编号
+
 }

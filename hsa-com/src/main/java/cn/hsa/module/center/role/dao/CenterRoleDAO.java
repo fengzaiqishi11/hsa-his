@@ -3,6 +3,8 @@ package cn.hsa.module.center.role.dao;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.center.role.dto.CenterRoleDTO;
 import cn.hsa.module.center.role.entity.CenterRoleDO;
+import cn.hsa.module.center.user.dto.CenterUserRoleDTO;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -105,4 +107,9 @@ public interface CenterRoleDAO {
      **/
     int insertRoleMenus(CenterRoleDTO centerRoleDTO);
 
+    List<CenterUserRoleDTO> getRoleUsers(CenterUserRoleDTO centerUserRoleDTO);
+
+    void deleteRoleUsers(CenterUserRoleDTO centerUserRoleDTO);
+
+    void saveRoleUsers(@Param("list") List<CenterUserRoleDTO> list);
 }

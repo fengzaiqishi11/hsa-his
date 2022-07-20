@@ -18,175 +18,175 @@ public class AnaOrderDTO implements Serializable {
     /**
      * 处方(医嘱)标识
      */
-    @JSONField(name = "rx_id")
+//    @JSONField(name = "rx_id")
     private String rxId;
     /**
      * 处方号
      */
-    @JSONField(name = "rxno")
+//    @JSONField(name = "rxno")
     private String rxno;
     /**
      * 组编号
      */
-    @JSONField(name = "grpno")
+//    @JSONField(name = "grpno")
     private String grpno;
     /**
      * 是否为长期医嘱
      */
-    @JSONField(name = "long_drord_flag")
+//    @JSONField(name = "long_drord_flag")
     private String longDrordFlag;
     /**
      * 目录类别
      */
-    @JSONField(name = "hilist_type")
+//    @JSONField(name = "hilist_type")
     private String hilistType;
     /**
      * 收费类别
      */
-    @JSONField(name = "chrg_type")
+//    @JSONField(name = "chrg_type")
     private String chrgType;
     /**
      * 医嘱行为
      */
-    @JSONField(name = "drord_bhvr")
+//    @JSONField(name = "drord_bhvr")
     private String drordBhvr;
     /**
      * 医保目录代码
      */
-    @JSONField(name = "hilist_code")
+//    @JSONField(name = "hilist_code")
     private String hilistCode;
     /**
      * 医保目录名称
      */
-    @JSONField(name = "hilist_name")
+//    @JSONField(name = "hilist_name")
     private String hilistName;
     /**
      * 医保目录(药品)剂型
      */
-    @JSONField(name = "hilist_dosform")
+//    @JSONField(name = "hilist_dosform")
     private String hilistDosform;
     /**
      * 医保目录等级
      */
-    @JSONField(name = "hilist_lv")
+//    @JSONField(name = "hilist_lv")
     private String hilistLv;
     /**
      * 医保目录价格
      */
-    @JSONField(name = "hilist_pric")
+//    @JSONField(name = "hilist_pric")
     private BigDecimal hilistPric;
     /**
      * 一级医院目录价格
      */
-    @JSONField(name = "lv1_hosp_item_pric")
+//    @JSONField(name = "lv1_hosp_item_pric")
     private BigDecimal lv1HospItemPric;
     /**
      * 二级医院目录价格
      */
-    @JSONField(name = "lv2_hosp_item_pric")
+//    @JSONField(name = "lv2_hosp_item_pric")
     private BigDecimal lv2HospItemPric;
     /**
      * 三级医院目录价格;
      */
-    @JSONField(name = "lv3_hosp_item_pric")
+//    @JSONField(name = "lv3_hosp_item_pric")
     private BigDecimal lv3HospItemPric;
     /**
      * 医保目录备注
      */
-    @JSONField(name = "hilist_memo")
+//    @JSONField(name = "hilist_memo")
     private String hilistMemo;
     /**
      * 医院目录代码
      */
-    @JSONField(name = "hosplist_code")
+//    @JSONField(name = "hosplist_code")
     private String hosplistCode;
     /**
      * 医院目录名称
      */
-    @JSONField(name = "hosplist_name")
+//    @JSONField(name = "hosplist_name")
     private String hosplistName;
     /**
      * 医院目录(药品)剂型
      */
-    @JSONField(name = "hosplist_dosform")
+//    @JSONField(name = "hosplist_dosform")
     private String hosplistDosform;
     /**
      * 数量
      */
-    @JSONField(name = "cnt")
+//    @JSONField(name = "cnt")
     private BigDecimal cnt;
     /**
      * 单价
      */
-    @JSONField(name = "pric")
+//    @JSONField(name = "pric")
     private BigDecimal pric;
     /**
      * 总费用
      */
-    @JSONField(name = "sumamt")
+//    @JSONField(name = "sumamt")
     private BigDecimal sumamt;
     /**
      * 自费金额
      */
-    @JSONField(name = "ownpay_amt")
+//    @JSONField(name = "ownpay_amt")
     private BigDecimal ownpayAmt;
     /**
      * 自付金额
      */
-    @JSONField(name = "selfpay_amt")
+//    @JSONField(name = "selfpay_amt")
     private BigDecimal selfpayAmt;
     /**
      * 规格
      */
-    @JSONField(name = "spec")
+//    @JSONField(name = "spec")
     private String spec;
     /**
      * 数量单位
      */
-    @JSONField(name = "spec_unt")
+//    @JSONField(name = "spec_unt")
     private String specUnt;
     /**
      * 医嘱开始日期
      */
-    @JSONField(name = "drord_begn_date")
+//    @JSONField(name = "drord_begn_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date drordBegnDate;
     /**
      * 医嘱停止日期
      */
-    @JSONField(name = "drord_stop_date")
+//    @JSONField(name = "drord_stop_date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date drordStopDate;
     /**
      * 下达医嘱的科室标识
      */
-    @JSONField(name = "drord_dept_codg")
+//    @JSONField(name = "drord_dept_codg")
     private String drordDeptCodg;
     /**
      * 下达医嘱科室名称
      */
-    @JSONField(name = "drord_dept_name")
+//    @JSONField(name = "drord_dept_name")
     private String drordDeptName;
     /**
      * 开处方(医嘱)医生标识
      */
-    @JSONField(name = "drord_dr_codg")
+//    @JSONField(name = "drord_dr_codg")
     private String drordDrCodg;
     /**
      * 开处方(医嘱)医生姓名
      */
-    @JSONField(name = "drord_dr_name")
+//    @JSONField(name = "drord_dr_name")
     private String drordDrName;
     /**
      * 开处方(医嘱)医职称
      */
-    @JSONField(name = "drord_dr_profttl")
+//    @JSONField(name = "drord_dr_profttl")
     private String drordDrProfttl;
     /**
      * 是否当前处方(医嘱)
      */
-    @JSONField(name = "curr_drord_flag")
+//    @JSONField(name = "curr_drord_flag")
     private String currDrordFlag;
 }

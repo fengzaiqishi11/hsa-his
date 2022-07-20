@@ -521,7 +521,7 @@
 		max(a.split_unit_code) as split_unit_code
 		FROM
 		stro_stock_detail AS a
-		WHERE(a.biz_id,a.item_id,a.batch_no,a.hosp_code) in
+		WHERE(a.biz_id,a.item_id,binary a.batch_no,a.hosp_code) in
 		<foreach collection="list" item="item" open="(" close=")" separator=",">
 			(#{item.bizId},#{item.itemId},#{item.batchNo},#{item.hospCode})
 		</foreach>

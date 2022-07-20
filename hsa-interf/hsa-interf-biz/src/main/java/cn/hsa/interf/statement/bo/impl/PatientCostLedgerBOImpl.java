@@ -19,6 +19,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -130,6 +131,26 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         if(ListUtils.isEmpty(inptCostDTOSAll)){
             return PageDTO.of(new ArrayList());
         }
+        //人员身份类别list
+        List<String> codeList = new ArrayList<>();
+        StringBuffer sqlStr1 = new StringBuffer();
+        if (ObjectUtil.isNotEmpty(inptVisitDTO.getCodes())){
+          String codes = inptVisitDTO.getCodes();
+          codeList = Arrays.asList(codes.split(","));
+          //拼接sql语句
+          for (String str1 : codeList){
+            sqlStr1.append("iiv.psn_idet_type = '").append(str1).append("' or ");
+            sqlStr1.append("iiv.psn_idet_type like CONCAT('%,', '").append(str1).append("') or ");
+            sqlStr1.append("iiv.psn_idet_type like CONCAT('").append(str1).append("',',%' or ");
+            sqlStr1.append("iiv.psn_idet_type like CONCAT('%,', '").append(str1).append("' ,',','%')) or ");
+          }
+          sqlStr1.delete(sqlStr1.length()-3,sqlStr1.length());
+          inptVisitDTO.setSqlStr1(sqlStr1.toString());
+        }else{
+          sqlStr1.append(" 1 = 1");
+          inptVisitDTO.setSqlStr1(sqlStr1.toString());
+        }
+
         for (InptCostDTO inptCostDTO : inptCostDTOSAll) {
             sqlStr.append("sum((case when a.bfc_id = '");
             sqlStr.append(inptCostDTO.getBfcId());
@@ -138,6 +159,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
             sqlStr.append("', ");
         }
         inptVisitDTO.setSqlStr(sqlStr.toString());
+        inptVisitDTO.setCodeList(codeList);
         if ("1".equals(inptVisitDTO.getSummMethod())) {
             //查询病人所有的费用信息明细
             List<Map> inptVisitDTOS = patientCostLedgerDAO.queryPatirntCostLedger(inptVisitDTO);

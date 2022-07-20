@@ -470,12 +470,14 @@ public class PharApplyBOImpl extends HsafBO implements PharApplyBO {
     public PageDTO queryStroOutPharApply(PharApplyDTO pharApplyDTO) {
       PageHelper.startPage(pharApplyDTO.getPageNo(), pharApplyDTO.getPageSize());
       List<PharApplyDTO> pharApplyDTOS = pharApplyDetailDAO.queryStroOutPharApply(pharApplyDTO);
-      for(PharApplyDTO item :pharApplyDTOS) {
-        PharApplyDetailDTO pharApplyDetailDTO = new PharApplyDetailDTO();
-        pharApplyDetailDTO.setApplyId(item.getId());
-        pharApplyDetailDTO.setHospCode(pharApplyDTO.getHospCode());
-        List<PharApplyDetailDTO> pharApplyDetailDTOS = pharApplyDetailDAO.pharApplyDetail(pharApplyDetailDTO);
-        pharApplyDTO.setPharApplyDetailDTOS(pharApplyDetailDTOS);
+      if (pharApplyDTOS!=null&&pharApplyDTOS.size()>0) {
+          for (PharApplyDTO item : pharApplyDTOS) {
+              PharApplyDetailDTO pharApplyDetailDTO = new PharApplyDetailDTO();
+              pharApplyDetailDTO.setApplyId(item.getId());
+              pharApplyDetailDTO.setHospCode(pharApplyDTO.getHospCode());
+              List<PharApplyDetailDTO> pharApplyDetailDTOS = pharApplyDetailDAO.pharApplyDetail(pharApplyDetailDTO);
+              item.setPharApplyDetailDTOS(pharApplyDetailDTOS);
+          }
       }
       return PageDTO.of(pharApplyDTOS);
     }

@@ -2569,8 +2569,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         } else {
             dataMap = insureGetInfoDAO.selectOutptBillNo(map);
         }
-        if (MapUtils.isEmpty(dataMap)) {
-            throw new AppException("该患者未产生发票信息");
+
+        Map sysMap = new HashMap();
+        sysMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        sysMap.put("code","IS_JUGE_INVOICE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        // 如果该参数是1 则提醒该错误。如果是 0 则不提醒该错误
+        if(sysParameterDTO == null || Constants.SF.S.equals(sysParameterDTO.getValue())){
+            if (MapUtils.isEmpty(dataMap)) {
+                throw new AppException("该患者未产生发票信息");
+            }
         }
         billNo = MapUtils.get(dataMap, "invoice_no");
         billCode = MapUtils.get(dataMap, "prefix");

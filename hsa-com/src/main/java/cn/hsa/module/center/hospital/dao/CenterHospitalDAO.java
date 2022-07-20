@@ -131,6 +131,14 @@ public interface CenterHospitalDAO {
      */
     void updateAudit(CenterHospitalDTO centerHospitalDTO);
 
+    /**
+     *  更新医院服务状态
+     * @param serviceStatus 服务状态 来自码表 FWZT
+     * @param list 医院id列表
+     * @return 更新的行数
+     */
+    int updateServiceStatus(@Param("serviceStatus") String serviceStatus , @Param("hospIdList") List<String> list);
+
     void updateBatchCenterSyncFlow(@Param("list")List<CenterSyncFlowDto> centerSyncFlowDtos);
 
     CenterRootDatabaseBO findRootDataBase();

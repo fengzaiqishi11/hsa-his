@@ -183,4 +183,21 @@ public class CenterHospitalDO extends PageDO implements Serializable {
      * 医院国家编码（H码） 
      * */
     private String nationCode;
+    /**
+     *  医院服务状态 来自码表FWZT(1:即将到期(剩15天)，2：已过期，3：正常)
+     */
+    private String serviceStatus;
+
+
+    /**
+     *  医院服务状态常量
+     */
+    public static class FWZT{
+        /**
+         *  即将到期
+         */
+        public static final String JJDQ = "1";
+        public static final String YGQ = "2";
+        public static final String ZC = "3";
+    }
 }

@@ -1,5 +1,6 @@
 package cn.hsa.module.insure.module.dao;
 
+import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
@@ -865,6 +866,14 @@ public interface InsureGetInfoDAO {
      * @Param [deptMap]
      **/
     String queryInptVist(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 门特查询档案信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    OutptProfileFileDTO queryProfileFile(Map<String, Object> map);
 
     List<TcmDiseScoreDO> queryByTcmDiseCode(String tcmDiseCode);
 }

@@ -6,7 +6,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import org.springframework.cglib.beans.BeanMap;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -51,7 +53,21 @@ public class FastJsonUtils {
         //JavaBean序列化为json字符串
         return JSONUtil.toBean(toJson(object), Map.class);
     }
+    /**
+     * @Author gory
+     * @Description bean 转map
+     * @Date 2022/7/20 9:09
+     * @Param [bean]
+     **/
+    public static Map<String, Object> newBeanToMap(Object bean) {
+        BeanMap beanMap = BeanMap.create(bean);
+        Map<String, Object> map = new HashMap<>();
 
+        beanMap.forEach((key, value) -> {
+            map.put(String.valueOf(key), value);
+        });
+        return map;
+    }
     /**
      * json字符串反序列化为JavaBean
      *

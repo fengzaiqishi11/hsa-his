@@ -1,5 +1,6 @@
 package cn.hsa.base;
 
+import cn.hsa.util.ListUtils;
 import com.github.pagehelper.PageInfo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.ToString;
 import org.springframework.data.domain.Page;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +49,26 @@ public class PageDTO implements Serializable {
         dto.setResult(list);
         return dto;
     }
-
+    /**
+     * @Author gory
+     * @Description 手动分页
+     * @Date 2022/7/20 10:40
+     * @Param [list,pageNo,pageSize]
+     **/
+    public static PageDTO ofByManual(List list,Integer pageNo,Integer pageSize) {
+        // 设置分页集合
+        PageInfo pageInfo = new PageInfo(list);
+        PageDTO dto = new PageDTO();
+        dto.setTotal(pageInfo.getTotal());
+        if (ListUtils.isEmpty(list)) {
+            dto.setResult(new ArrayList<>());
+        } else {
+            int firstIndex = Math.min((pageNo - 1) * pageSize, list.size());
+            int lastIndex = Math.min(pageNo * pageSize, list.size());
+            dto.setResult(list.subList(firstIndex, lastIndex));
+        }
+        return dto;
+    }
     /**
      * @Method 分页数据传输构造器
      * @Description

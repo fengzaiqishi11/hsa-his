@@ -5,14 +5,14 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.interf.extract.bo.ExtractConsumptionBO;
 import cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
-import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
+import cn.hsa.util.FastJsonUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
-import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,6 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         if (ListUtils.isEmpty(extractConsumptionDTO.getDeptList())){
             throw new AppException("筛选科室不能为空");
         }
-        PageHelper.startPage(extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());
         // todo 1.根据项目id进行分组汇总
         List<ExtractConsumptionDTO> extractConsumptions = extraConsumptionDAO.
                 queryExtractConsumptionsByItemId(extractConsumptionDTO);
@@ -56,20 +55,22 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         Map<String, List<ExtractConsumptionDTO>> comsumptionMap = extractConsumptionDTOS.stream().
                 collect(Collectors.groupingBy(ExtractConsumptionDTO::getItemId));
         // todo 4. 遍历第一步中的集合数据，通过第三步中获得的Map获取到每一个项目下面的list，进行add
+        List<Map> resultList = new ArrayList<>();
         for (ExtractConsumptionDTO extractConsumption: extractConsumptions) {
+            Map<String, Object> resultMap = FastJsonUtils.newBeanToMap(extractConsumption);
             List<ExtractConsumptionDTO> consumptions = MapUtils.get(comsumptionMap, extractConsumption.getItemId());
             for (ExtractConsumptionDTO e: consumptions) {
-                Map<String, Object> extractConsumptionMap = new HashMap<>();
                 // 封装属性，行转列
-                extractConsumptionMap.put( "consumNum" + e.getBizId(),e.getConsumNum());// 消耗数量
-                extractConsumptionMap.put( "sellPriceAll" + e.getBizId(),e.getSellPriceAll());// 零售金额
-                extractConsumptionMap.put( "avgSellPrice" + e.getBizId(),e.getAvgSellPrice());// 平均售价
-                extractConsumptionMap.put( "avgBuyPrice" + e.getBizId(),e.getAvgBuyPrice());// 成本价
-                extractConsumptionMap.put( "buyPriceAll" + e.getBizId(),e.getBuyPriceAll());// 成本金额
-                extractConsumptionMap.put( "profitPrice" + e.getBizId(),e.getProfitPrice());// 盈利
-                extractConsumption.setExtractConMap(extractConsumptionMap);
+                resultMap.put( "consumNum" + e.getBizId(),e.getConsumNum());// 消耗数量
+                resultMap.put( "sellPriceAll" + e.getBizId(),e.getSellPriceAll());// 零售金额
+                resultMap.put( "avgSellPrice" + e.getBizId(),e.getAvgSellPrice());// 平均售价
+                resultMap.put( "avgBuyPrice" + e.getBizId(),e.getAvgBuyPrice());// 成本价
+                resultMap.put( "buyPriceAll" + e.getBizId(),e.getBuyPriceAll());// 成本金额
+                resultMap.put( "profitPrice" + e.getBizId(),e.getProfitPrice());// 盈利
+                resultList.add(resultMap);
             }
         }
-        return PageDTO.of(extractConsumptions);
+        // 手动分页
+        return PageDTO.ofByManual(resultList,extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());
     }
 }

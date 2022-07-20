@@ -542,4 +542,6 @@ public interface InptVisitDAO {
     int getInCnt(Map map);
 
     int updateUplod(InptVisitDTO inptVisitDTO);
+
+    List<InptVisitDTO> queryInptVisitPageNoMerge(InptVisitDTO inptVisitDTO);
 }

@@ -134,6 +134,9 @@ public class InsureIndividualVisitDO extends PageDO implements Serializable {
         // 人员身份类别
         private String psnIdetType;
 
+        // 人员身份类别码值
+        private String psnIdetTypeName;
+
         // 开始时间
         private Date idetStartDate;
 

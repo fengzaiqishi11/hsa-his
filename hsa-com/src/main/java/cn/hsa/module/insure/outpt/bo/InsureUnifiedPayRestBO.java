@@ -6,6 +6,7 @@ import cn.hsa.module.insure.module.dto.InsureItemDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 import cn.hsa.module.insure.module.entity.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -260,4 +261,14 @@ public interface InsureUnifiedPayRestBO {
      * @return cn.hsa.base.PageDTO
      */
     PageDTO queryPageInsureUnifiedNationDrug(InsureUnifiedNationDrugDO insureUnifiedNationDrugDO);
+    /**
+     * @param map
+     * @Method getMedisnInfo
+     * @Desrciption 医保统一支付;医疗机构信息获取
+     * @Param map
+     * @Author fuhui
+     * @Date 2021/4/13 20:28
+     * @Return
+     */
+    PageDTO getMedisnInfoByMedisnInName(Map<String, Object> map);
 }

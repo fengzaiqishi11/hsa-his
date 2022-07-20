@@ -2537,4 +2537,67 @@
 		where hosp_code = #{hospCode}
 		and id = #{id}
 	</update>
+
+	<select id="queryInptVisitPageNoMerge" resultMap="InptVisitMap">
+		select
+		iv.id, iv.hosp_code, iv.profile_id, iv.in_profile, iv.in_no, iv.name, iv.gender_code, iv.age, iv.age_unit_code, iv.birthday,
+		iv.nationality_cation, iv.occupation_code, iv.education_code, iv.contact_name, iv.contact_rela_code, iv.contact_address,
+		iv.contact_phone, iv.nation_code, iv.cert_code, iv.cert_no, iv.marry_code, iv.phone, iv.address, iv.preferential_type_id, iv.patient_code,
+		iv.receive_hosp_name, iv.bed_id, iv.bed_name, iv.nursing_code, iv.diet_type, iv.Illness_code, iv.status_code, iv.in_ward_id, iv.in_dept_id,
+		iv.in_dept_name, iv.in_time, iv.zz_doctor_id, iv.zz_doctor_name, iv.jz_doctor_id, iv.jz_doctor_name, iv.zg_doctor_id, iv.zg_doctor_name,
+		iv.in_remark, iv.in_mode_code, iv.in_disease_id, iv.in_disease_name, iv.in_disease_icd10, iv.in_situation_code, iv.outpt_visit_no,
+		iv.outpt_doctor_id, iv.outpt_doctor_name, iv.outpt_disease_id, iv.outpt_disease_name, iv.outpt_disease_icd10, iv.out_ward_id,
+		iv.out_dept_id, iv.out_dept_name, iv.out_time, iv.out_disease_id, iv.out_disease_name, iv.out_disease_icd10, iv.out_oper_id,
+		iv.out_oper_name, iv.out_oper_time, iv.out_situation_code, iv.out_remark, iv.out_mode_code, iv.is_archive, iv.archive_time,
+		iv.archive_id, iv.archive_name, iv.insure_code, iv.insure_org_code, iv.insure_no, iv.insure_biz_code, iv.insure_treat_code,
+		iv.insure_patient_id, iv.insure_remark, iv.total_advance, iv.total_cost, iv.total_balance, iv.crte_id, iv.crte_name, iv.crte_time,
+		(select name from base_dept where in_ward_id = base_dept.id) as wardName,bb.seq_no,
+		CONCAT(
+		iv.name,'/',
+		IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+		IFNULL(iv.age,'-'),
+		IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '')
+		) AS keyword,
+		iv.total_balance as totalMergeBalance,
+		iv.total_cost as totalMergeCost
+		from inpt_visit iv
+		left join
+		base_bed bb
+		on
+		iv.bed_id=bb.id
+		where iv.hosp_code = #{hospCode}
+		<if test="id != null and id != ''">
+			and iv.id = #{id}
+		</if>
+		<if test="keyword != null and keyword != ''">
+			and (iv.name like concat('%',#{keyword},'%') or iv.cert_no like concat('%',#{keyword},'%')
+			or iv.in_no like concat('%',#{keyword},'%') or iv.bed_name like concat('%',#{keyword},'%'))
+		</if>
+
+		<!-- 入院开始时间 zhongming by 20201219 -->
+		<if test="startTime != null and startTime != ''">
+			and iv.in_time > STR_TO_DATE(#{startTime},'%Y-%m-%d')
+		</if>
+		<if test="endTime != null and endTime != ''">
+			and iv.in_time &lt;= DATE_ADD(STR_TO_DATE(#{endTime},'%Y-%m-%d'),INTERVAL 1 day)
+		</if>
+		<if test="statusCode != null and statusCode != ''">
+			and iv.status_code = #{statusCode}
+		</if>
+		<if test="inDeptId != null and inDeptId != ''">
+			and iv.in_dept_id = #{inDeptId}
+		</if>
+		<if test="Stime != null and Stime != '' and Etime != null and Etime != '' ">
+			and iv.in_time BETWEEN #{Stime} and #{Etime}
+		</if>
+		<choose>
+			<when test="statusCode != null and statusCode != ''and statusCode == '5'.toString()">
+				order by iv.out_time desc
+			</when>
+			<otherwise>
+				order by bb.seq_no asc
+			</otherwise>
+		</choose>
+	</select>
+
 </mapper>

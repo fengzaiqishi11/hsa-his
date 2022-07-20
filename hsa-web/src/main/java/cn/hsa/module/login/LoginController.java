@@ -28,6 +28,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
@@ -550,6 +551,8 @@ public class LoginController extends BaseController {
 
             // 用户信息放入会话中，并设置有效期为30分钟
             setSession(SESSION_USER_INFO, sysUserDTO, 120 * 60, req, res);
+            String token = base64Encode(req.getSession().getId());
+            sysUserDTO.setPassword(token);
             return WrapperResponse.success(sysUserDTO);
         }finally{
             rnLock.unlock();
@@ -577,5 +580,21 @@ public class LoginController extends BaseController {
         int g = fc + random.nextInt(bc - fc);
         int b = fc + random.nextInt(bc - fc);
         return new Color(r,g,b);
+    }
+
+    /**
+     *  基于url64为编码
+     * @param value2Encode 需要
+     * @return
+     */
+    protected String base64Encode(String value2Encode) {
+        try {
+            byte[] decodedCookieBytes = Base64.getEncoder().encode(value2Encode.getBytes(StandardCharsets.UTF_8));
+            return new String(decodedCookieBytes,StandardCharsets.UTF_8);
+        }
+        catch (Exception ex) {
+            ex.printStackTrace(System.err);
+            return null;
+        }
     }
 }

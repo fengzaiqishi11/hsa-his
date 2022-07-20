@@ -1923,7 +1923,7 @@
     <insert id="insertMrisInptDiagnoseBatch" parameterType="list">
         INSERT INTO mris_inpt_diagnose (
         id, hosp_code, mbi_id, visit_id, disease_code, disease_name, icd_version,
-         disease_icd10, disease_icd10_name, in_situation_code
+         disease_icd10, disease_icd10_name, in_situation_code,columns_index
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -1936,7 +1936,8 @@
             #{item.icdVersion},
             #{item.diseaseIcd10},
             #{item.diseaseIcd10Name},
-            #{item.inSituationCode}
+            #{item.inSituationCode},
+            #{item.columnIndex}
             )
         </foreach>
     </insert>
@@ -1947,7 +1948,7 @@
             SELECT md.id, md.hosp_code, mbi_id, md.visit_id, disease_code, disease_name,
                    md.icd_version, md.disease_icd10, md.disease_icd10_name,md.in_situation_code,
                    ifnull((select type_code from base_disease where `code` = md.disease_icd10
-                   and hosp_code = #{hospCode} limit 1),'') as typeCode
+                   and hosp_code = #{hospCode} limit 1),'') as typeCode,md.columns_index
             FROM mris_inpt_diagnose md join mris_base_info mbi on md.mbi_id = mbi.id and mbi.hosp_code = md.hosp_code
             WHERE md.hosp_code = #{hospCode}
             AND md.visit_id = #{id}
@@ -1985,6 +1986,9 @@
             </if>
             <if test="inSituationCode != null">
                 in_situation_code = #{inSituationCode}
+            </if>
+            <if test="columnIndex != null">
+                columns_index = #{columnIndex}
             </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}

@@ -1537,7 +1537,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
-        paramMap.put("caty", deptDTO.getNationCode()); // 科别
+        paramMap.put("caty", deptDTO.getCatyCode()); // 科别  用医保科室编码
         paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
         paramMap.put("begntime", deptDTO.getCrteTime()); // 开始时间
 //        paramMap.put("endtime", deptDTO.getEndtime()); // 开始时间
@@ -1615,7 +1615,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
             Map<String, Object> paramMap = new HashMap<>();
             paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
-            paramMap.put("caty", deptDTO.getNationCode()); // 科别
+            paramMap.put("caty", deptDTO.getCatyCode()); // 科别   用医保科室编码
             paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
             paramMap.put("begntime", deptDTO.getCrteTime()); // 开始时间
             paramMap.put("endtime", null); // 结束时间
@@ -1641,7 +1641,7 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
 
                 Map<String, Object> paramMap = new HashMap<>();
                 paramMap.put("hosp_dept_codg", deptDTO.getCode()); // 医院科室编码
-                paramMap.put("caty", deptDTO.getNationCode()); // 科别
+                paramMap.put("caty", deptDTO.getCatyCode()); // 科别
                 paramMap.put("hosp_dept_name", deptDTO.getName()); // 医院科室名称
                 paramMap.put("begntime", DateUtils.parse(DateUtils.format(deptDTO.getCrteTime(), DateUtils.Y_M_DH_M_S), DateUtils.Y_M_DH_M_S)); // 开始时间
                 paramMap.put("endtime", null); // 结束时间

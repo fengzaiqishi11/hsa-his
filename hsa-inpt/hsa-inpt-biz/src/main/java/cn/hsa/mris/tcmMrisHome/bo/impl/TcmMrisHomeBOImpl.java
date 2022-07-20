@@ -804,23 +804,46 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         mrisBaseInfoDTO.setCrteTime(DateUtils.getNow());
         mrisBaseInfoDTO.setInWard(mrisBaseInfoDTO.getInBedName());
         mrisBaseInfoDTO.setInWard2(mrisBaseInfoDTO.getOutBedName());
-        mrisBaseInfoDTO.setNowAdress(mrisBaseInfoDTO.getNowAdress());
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getNowAdress())){
+            mrisBaseInfoDTO.setNowAdress(mrisBaseInfoDTO.getBfNowAddress());
+        }
         mrisBaseInfoDTO.setPhone(mrisBaseInfoDTO.getPhone());
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getPhone())){
+            mrisBaseInfoDTO.setPhone(mrisBaseInfoDTO.getBfPhone());
+        }
         mrisBaseInfoDTO.setPayWayCode(mrisBaseInfoDTO.getPayWayCode());
         mrisBaseInfoDTO.setNativePlace(mrisBaseInfoDTO.getNativePlace());
         mrisBaseInfoDTO.setNativeAdress(mrisBaseInfoDTO.getNativeAdress());
         mrisBaseInfoDTO.setInWay(mrisBaseInfoDTO.getInWay());
         mrisBaseInfoDTO.setDiseaseIcd10Name(mrisBaseInfoDTO.getDiseaseIcd10Name());
         mrisBaseInfoDTO.setDiseaseIcd10(mrisBaseInfoDTO.getDiseaseIcd10());
+        // 门诊诊断为空时，取入院诊断 lly 20220629 start
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getDiseaseIcd10Name())&&StringUtils.isEmpty(mrisBaseInfoDTO.getDiseaseIcd10())){
+            mrisBaseInfoDTO.setDiseaseIcd10Name(mrisBaseInfoDTO.getInDiseaseName());
+            mrisBaseInfoDTO.setDiseaseIcd10(mrisBaseInfoDTO.getInDiseaseIcd10());
+        }
+        // 门诊诊断为空时，取入院诊断 lly 20220629 end
         mrisBaseInfoDTO.setBabyBirthWeight(mrisBaseInfoDTO.getBabyWeight());
         mrisBaseInfoDTO.setOutptDoctorId(mrisBaseInfoDTO.getOutptDoctorId());
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
-        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName());
-        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode());
-        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress());
-        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone());
+        mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName()); // 联系人姓名
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactName())){
+            mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getBfContactName());
+        }
+        mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone()); // 联系人电话
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactPhone())){
+            mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getBfContactPhone());
+        }
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode()); // 联系人关系
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactRelaCode())){
+            mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getBfContactRelaCode());
+        }
+        mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress()); // 联系人地址
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactAddress())){
+            mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getBfContactAddress());
+        }
         // 年龄单位为岁
         if ("1".equals(mrisBaseInfoDTO.getAgeUnitCode())){
            mrisBaseInfoDTO.setAge(mrisBaseInfoDTO.getAge());

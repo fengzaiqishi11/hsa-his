@@ -23,6 +23,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.pasttreat.dto.InptPastAllergyDTO;
 import cn.hsa.module.insure.drgdip.service.DrgDipResultService;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.service.InsureConfigurationService;
@@ -116,6 +117,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     @Resource
     private InptVisitService inptVisitService;
+
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
 
 
     /**
@@ -599,6 +603,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if(!Constants.BRZT.CY.equals(statusCode)){
                 responseDataMap.put("estimateFund","-");//预计基金支付
                 responseDataMap.put("profitAndLossAmount","-");//盈亏额
+                responseDataMap.put("proMedicMater","-");// 药占比
+                responseDataMap.put("proConsum","-");// 耗材比
             }else {
                 //计算预计基金支付
                 Map<String,Object> priceMap = new HashMap<>();
@@ -608,6 +614,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 if(payInfoDTO == null){
                     responseDataMap.put("estimateFund","-全自费");//预计基金支付
                     responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                    responseDataMap.put("proMedicMater","-");// 药占比
+                    responseDataMap.put("proConsum","-");// 耗材比
                 }else{
                     if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
                         responseDataMap.put("estimateFund","-全自费");//预计基金支付
@@ -623,6 +631,37 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                         responseDataMap.put("estimateFund",estimateFund);//预计基金支付
                         responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                     }
+                    //查询医保费用
+                    Map<String, Object> data = insureUnifiedBaseService_consumer.queryFeeDetailInfo(map).getData();
+                    List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
+                    if (ListUtils.isEmpty(feeMapList)) {
+                        throw new AppException("没有获取到医保费用明细数据");
+                    }
+                    //计算药占比，耗材占比
+                    BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
+                    BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
+                    BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
+                    for(Map feeMap:feeMapList){
+                        //累加药占总费用
+                        if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
+                                || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
+                            sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                        }
+                        //累加耗材总费用
+                        if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
+                            sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                        }
+                        //累加总费用
+                        sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
+                    BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
+                    if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
+                        proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
+                        proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
+                    }
+                    responseDataMap.put("proMedicMater",proMedicMater);// 药占比
+                    responseDataMap.put("proConsum",proConsum);// 耗材比
                 }
             }
             //处理排序号
@@ -822,6 +861,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             if(!Constants.BRZT.CY.equals(statusCode)){
                 responseDataMap.put("estimateFund","-");//预计基金支付
                 responseDataMap.put("profitAndLossAmount","-");//盈亏额
+                responseDataMap.put("proMedicMater","-");// 药占比
+                responseDataMap.put("proConsum","-");// 耗材比
             }else {
                 //计算预计基金支付
                 Map<String,Object> priceMap = new HashMap<>();
@@ -831,6 +872,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                 if(payInfoDTO == null){
                     responseDataMap.put("estimateFund","-全自费");//预计基金支付
                     responseDataMap.put("profitAndLossAmount","-全自费");//盈亏额
+                    responseDataMap.put("proMedicMater","-");// 药占比
+                    responseDataMap.put("proConsum","-");// 耗材比
                 }else{
                     if(BigDecimalUtils.equals(BigDecimal.ZERO,payInfoDTO.getInsurePrice())){
                         responseDataMap.put("estimateFund","-全自费");//预计基金支付
@@ -846,6 +889,37 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                         responseDataMap.put("estimateFund",estimateFund);//预计基金支付
                         responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(estimateFund,payInfoDTO.getInsurePrice()));//盈亏额
                     }
+                    //查询医保费用
+                    Map<String, Object> data = insureUnifiedBaseService_consumer.queryFeeDetailInfo(map).getData();
+                    List<Map<String, Object>> feeMapList = MapUtils.get(data, "outptMap");
+                    if (ListUtils.isEmpty(feeMapList)) {
+                        throw new AppException("没有获取到医保费用明细数据");
+                    }
+                    //计算药占比，耗材占比
+                    BigDecimal sumProMedic = new BigDecimal(0.00); // 药占总费用
+                    BigDecimal sumProConsum = new BigDecimal(0.00); // 耗材占总费用
+                    BigDecimal sumPrice = new BigDecimal(0.00); // 总费用
+                    for(Map feeMap:feeMapList){
+                        //累加药占总费用
+                        if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
+                                || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
+                            sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                        }
+                        //累加耗材总费用
+                        if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
+                            sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                        }
+                        //累加总费用
+                        sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                    }
+                    BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
+                    BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
+                    if(!BigDecimalUtils.equals(BigDecimal.ZERO,sumPrice)){
+                        proMedicMater = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProMedic,sumPrice),new BigDecimal(100.00));
+                        proConsum = BigDecimalUtils.multiply(BigDecimalUtils.divide(sumProConsum,sumPrice),new BigDecimal(100.00));
+                    }
+                    responseDataMap.put("proMedicMater",proMedicMater);// 药占比
+                    responseDataMap.put("proConsum",proConsum);// 耗材比
                 }
             }
             //处理排序号
@@ -1660,6 +1734,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         // 存入分行表
         List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
         if (!ListUtils.isEmpty(diagnoseList)) {
+            int i=1;
             for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
                 if (sysParameterDTO != null && "1".equals(sysParameterDTO.getValue())) {
                     if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10()) && !"2".equals(mrisDiagnoseDO.getDiseaseCode())) {
@@ -1688,6 +1763,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
                     mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
                     mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                    mrisDiagnoseDO.setColumnIndex(i);
                 }
                 insertDiagnoseList.add(mrisDiagnoseDO);
                 if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())) {
@@ -1705,8 +1781,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    diagnoseDO.setColumnIndex(i+1);
                     insertDiagnoseList.add(diagnoseDO);
                 }
+                i=i+2;
             }
             if (!ListUtils.isEmpty(insertDiagnoseList)) {
                 mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);
@@ -1771,6 +1849,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         // 存入分行表
         List<MrisDiagnoseDO> insertDiagnoseList = new ArrayList<MrisDiagnoseDO>();
         if (!ListUtils.isEmpty(diagnoseList)) {
+            int i=1;
             for (MrisDiagnoseDO mrisDiagnoseDO : diagnoseList) {
                 if (sysParameterDTO != null && "1".equals(sysParameterDTO.getValue())) {
                     if (StringUtils.isEmpty(mrisDiagnoseDO.getDiseaseIcd10()) && !"2".equals(mrisDiagnoseDO.getDiseaseCode())) {
@@ -1799,6 +1878,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     mrisDiagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode1());
                     mrisDiagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd101());
                     mrisDiagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name1());
+                    mrisDiagnoseDO.setColumnIndex(i);
                 }
                 insertDiagnoseList.add(mrisDiagnoseDO);
                 if (StringUtils.isNotEmpty(mrisDiagnoseDO.getDiseaseIcd10Name2())) {
@@ -1816,8 +1896,10 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     diagnoseDO.setDiseaseIcd10(mrisDiagnoseDO.getDiseaseIcd102());
                     diagnoseDO.setDiseaseIcd10Name(mrisDiagnoseDO.getDiseaseIcd10Name2());
                     diagnoseDO.setInSituationCode(mrisDiagnoseDO.getInSituationCode2());
+                    diagnoseDO.setColumnIndex(i+1);
                     insertDiagnoseList.add(diagnoseDO);
                 }
+                i=i+2;
             }
             if (!ListUtils.isEmpty(insertDiagnoseList)) {
                 mrisHomeDAO.insertMrisInptDiagnoseBatch(insertDiagnoseList);
@@ -2183,22 +2265,46 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         mrisBaseInfoDTO.setInWard(mrisBaseInfoDTO.getInBedName());
         mrisBaseInfoDTO.setInWard2(mrisBaseInfoDTO.getOutBedName());
         mrisBaseInfoDTO.setNowAdress(mrisBaseInfoDTO.getNowAdress());
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getNowAdress())){
+            mrisBaseInfoDTO.setNowAdress(mrisBaseInfoDTO.getBfNowAddress());
+        }
         mrisBaseInfoDTO.setPhone(mrisBaseInfoDTO.getPhone());
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getPhone())){
+            mrisBaseInfoDTO.setPhone(mrisBaseInfoDTO.getBfPhone());
+        }
         mrisBaseInfoDTO.setPayWayCode(mrisBaseInfoDTO.getPayWayCode());
         mrisBaseInfoDTO.setNativePlace(mrisBaseInfoDTO.getNativePlace());
         mrisBaseInfoDTO.setNativeAdress(mrisBaseInfoDTO.getNativeAdress());
         mrisBaseInfoDTO.setInWay(mrisBaseInfoDTO.getInWay());
         mrisBaseInfoDTO.setDiseaseIcd10Name(mrisBaseInfoDTO.getDiseaseIcd10Name());
         mrisBaseInfoDTO.setDiseaseIcd10(mrisBaseInfoDTO.getDiseaseIcd10());
+        // 门诊诊断为空时，取入院诊断 lly 20220629 start
+        if(StringUtils.isEmpty(mrisBaseInfoDTO.getDiseaseIcd10Name())&&StringUtils.isEmpty(mrisBaseInfoDTO.getDiseaseIcd10())){
+            mrisBaseInfoDTO.setDiseaseIcd10Name(mrisBaseInfoDTO.getInDiseaseName());
+            mrisBaseInfoDTO.setDiseaseIcd10(mrisBaseInfoDTO.getInDiseaseIcd10());
+        }
+        // 门诊诊断为空时，取入院诊断 lly 20220629 end
         mrisBaseInfoDTO.setBabyBirthWeight(mrisBaseInfoDTO.getBabyWeight());
         mrisBaseInfoDTO.setOutptDoctorId(mrisBaseInfoDTO.getOutptDoctorId());
         mrisBaseInfoDTO.setOutptDoctorName(mrisBaseInfoDTO.getOutptDoctorName());
         mrisBaseInfoDTO.setZrNurseId(mrisBaseInfoDTO.getZrNurseId());
         mrisBaseInfoDTO.setZrNurseName(mrisBaseInfoDTO.getZrNurseName());
         mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getContactName()); // 联系人姓名
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactName())){
+            mrisBaseInfoDTO.setContactName(mrisBaseInfoDTO.getBfContactName());
+        }
         mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getContactPhone()); // 联系人电话
-        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode()); // 联系人地址
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactPhone())){
+            mrisBaseInfoDTO.setContactPhone(mrisBaseInfoDTO.getBfContactPhone());
+        }
+        mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getContactRelaCode()); // 联系人关系
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactRelaCode())){
+            mrisBaseInfoDTO.setContactRelaCode(mrisBaseInfoDTO.getBfContactRelaCode());
+        }
         mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getContactAddress()); // 联系人地址
+        if (StringUtils.isEmpty(mrisBaseInfoDTO.getContactAddress())){
+            mrisBaseInfoDTO.setContactAddress(mrisBaseInfoDTO.getBfContactAddress());
+        }
         // 年龄单位为岁
         if ("1".equals(mrisBaseInfoDTO.getAgeUnitCode())) {
             mrisBaseInfoDTO.setAge(mrisBaseInfoDTO.getAge());

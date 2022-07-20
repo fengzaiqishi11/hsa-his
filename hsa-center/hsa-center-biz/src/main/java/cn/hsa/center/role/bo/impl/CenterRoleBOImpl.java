@@ -7,6 +7,7 @@ import cn.hsa.module.center.role.dao.CenterRoleDAO;
 import cn.hsa.module.center.role.dto.CenterRoleDTO;
 import cn.hsa.module.center.role.entity.CenterRoleDO;
 import cn.hsa.module.center.role.entity.CenterRoleMenuDO;
+import cn.hsa.module.center.user.dto.CenterUserRoleDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.SnowflakeUtils;
@@ -15,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -134,6 +137,33 @@ public class CenterRoleBOImpl extends HsafBO implements CenterRoleBO {
                 centerRoleMenuDO.setRoleCode(centerRoleDTO.getCode());
             }
             return centerRoleDAO.insertRoleMenus(centerRoleDTO)>0;
+        }
+        return true;
+    }
+
+    @Override
+    public List<CenterUserRoleDTO> getRoleUsers(CenterUserRoleDTO centerUserRoleDTO) {
+        return centerRoleDAO.getRoleUsers(centerUserRoleDTO);
+    }
+
+    @Override
+    public Boolean saveRoleUsers(CenterUserRoleDTO centerUserRoleDTO) {
+
+        if(!ListUtils.isEmpty(centerUserRoleDTO.getIds())) {
+            centerRoleDAO.deleteRoleUsers(centerUserRoleDTO);
+            List<CenterUserRoleDTO> list = new ArrayList<CenterUserRoleDTO>();
+            CenterUserRoleDTO centerUserRole = null;
+            for (String roleCode:centerUserRoleDTO.getIds()){
+                centerUserRole = new CenterUserRoleDTO();
+                centerUserRole.setId(SnowflakeUtils.getId());
+                centerUserRole.setRoleCode(roleCode);
+                centerUserRole.setUserCode(centerUserRoleDTO.getUserCode());
+                centerUserRole.setCrteId(centerUserRoleDTO.getCrteId());
+                centerUserRole.setCrteName(centerUserRoleDTO.getCrteName());
+                centerUserRole.setCrteTime(new Date());
+                list.add(centerUserRole);
+            }
+            centerRoleDAO.saveRoleUsers(list);
         }
         return true;
     }

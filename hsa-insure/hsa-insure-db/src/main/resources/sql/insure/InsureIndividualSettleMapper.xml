@@ -241,6 +241,10 @@
         <if test="isHospital != null and isHospital != ''">
             and  iic.is_hospital =#{isHospital}
         </if>
+        <!--业务类型选择-->
+        <if test="aka130 != null and aka130 != ''">
+            and iic.aka130 =#{aka130}
+        </if>
         /*开始日期*/
         <if test="startDate != null">
             and date(iic.crte_time) &gt;= date(#{startDate})

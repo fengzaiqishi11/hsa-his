@@ -50,10 +50,10 @@
         <if test="endTime != null">
             and extract_time &lt;= #{endTime}
         </if>
-        <if test="itemCode != null and item_code !=''">
+        <if test="itemCode != null and itemCode !=''">
             and item_code = #{itemCode}
         </if>
-        <if test="deptList != null and deptList !=''">
+        <if test="deptList != null and deptList.size()>0">
             and biz_id in
             <foreach collection="deptList" item="item" open="(" separator="," close=")">
                 #{item}
@@ -87,10 +87,10 @@
         <if test="endTime != null">
             and extract_time &lt;= #{endTime}
         </if>
-        <if test="itemCode != null and item_code !=''">
+        <if test="itemCode != null and itemCode !=''">
             and item_code = #{itemCode}
         </if>
-        <if test="deptList != null and deptList !=''">
+        <if test="deptList != null and deptList.size()>0">
             and biz_id in
             <foreach collection="deptList" item="item" open="(" separator="," close=")">
                 #{item}

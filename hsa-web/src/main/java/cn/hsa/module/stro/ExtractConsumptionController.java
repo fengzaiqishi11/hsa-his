@@ -36,7 +36,7 @@ public class ExtractConsumptionController extends BaseController {
      **/
     @GetMapping("/queryExtractConsumptions")
     public WrapperResponse<PageDTO>
-    queryExtractConsumptions(@RequestBody ExtractConsumptionDTO extractConsumptionDTO,
+    queryExtractConsumptions(ExtractConsumptionDTO extractConsumptionDTO,
                              HttpServletRequest req, HttpServletResponse rep) {
         SysUserDTO userDTO = getSession(req, rep);
         Map map = new HashMap<>();

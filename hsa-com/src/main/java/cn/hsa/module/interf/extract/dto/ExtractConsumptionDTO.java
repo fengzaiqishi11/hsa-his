@@ -49,5 +49,5 @@ public class ExtractConsumptionDTO extends ExtractConsumptionDetailDO {
      * key:biz_id
      * value:ExtractConsumptionDTO
      */
-    private Map<String,ExtractConsumptionDTO> extractConMap;
+    private Map<String,Object> extractConMap;
 }

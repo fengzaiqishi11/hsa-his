@@ -15,6 +15,7 @@ import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import org.springframework.stereotype.Service;
 
@@ -70,6 +71,16 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
     private Map<String, Object> initPatientInfo(Map map) {
         InsureIndividualVisitDTO insureIndividualVisitDTO = MapUtils.get(map, "insureIndividualVisit");
         JSONArray jsonArray = MapUtils.get(map, "jsonArray");
+        String mainDiseCode = "";
+        String mainDiseName = "";
+        List<OutptDiagnoseDTO> diagnoseDTOList = MapUtils.get(map, "diagnoseDTOList");
+        if (ObjectUtil.isNotEmpty(diagnoseDTOList)) {
+            List<OutptDiagnoseDTO> mainDiseList = diagnoseDTOList.stream().filter(o -> Constants.SF.S.equals(o.getIsMain())).collect(Collectors.toList());
+            if (ObjectUtil.isNotEmpty(mainDiseList)) {
+                mainDiseCode = mainDiseList.get(0).getInsureInllnessCode();
+                mainDiseName = mainDiseList.get(0).getInsureInllnessName();
+            }
+        }
         // 封装患者信息
         Map<String, Object> patientInfo = new HashMap<>(10);
         // 就诊id
@@ -82,21 +93,27 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
         patientInfo.put("begntime", DateUtils.format(insureIndividualVisitDTO.getVisitTime(), DateUtils.Y_M_DH_M_S));
         // TODO 主要病情
         patientInfo.put("main_cond_dscr", "");
-        if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+//        if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+//            // 病种编号
+//            patientInfo.put("dise_code", jsonArray.getJSONObject(0).get("insureIllnessCode"));
+//            // 病种编号
+//            patientInfo.put("dise_codg", jsonArray.getJSONObject(0).get("insureIllnessCode"));
+//            //病种名称
+//            patientInfo.put("dise_name", jsonArray.getJSONObject(0).get("insureIllnessName"));
+//        } else {
+//            // 病种编号
+//            patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006());
+//            // 病种编号
+//            patientInfo.put("dise_codg", insureIndividualVisitDTO.getBka006());
+//            // 病种名称
+//            patientInfo.put("dise_name", insureIndividualVisitDTO.getBka006Name());
+//        }
             // 病种编号
-            patientInfo.put("dise_code", jsonArray.getJSONObject(0).get("insureIllnessCode"));
+            patientInfo.put("dise_code", mainDiseCode);
             // 病种编号
-            patientInfo.put("dise_codg", jsonArray.getJSONObject(0).get("insureIllnessCode"));
-            //病种名称
-            patientInfo.put("dise_name", jsonArray.getJSONObject(0).get("insureIllnessName"));
-        } else {
-            // 病种编号
-            patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006());
-            // 病种编号
-            patientInfo.put("dise_codg", insureIndividualVisitDTO.getBka006());
+            patientInfo.put("dise_codg", mainDiseCode);
             // 病种名称
-            patientInfo.put("dise_name", insureIndividualVisitDTO.getBka006Name());
-        }
+            patientInfo.put("dise_name", mainDiseName);
         // 计划生育手术类别
         patientInfo.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());
         // 计划生育手术或生育日期

@@ -19,19 +19,19 @@ public class TcmDiseScoreDO implements Serializable {
     private String id;
 
     //中医诊断编码（按医保版2.0填写）
-    private String tcm_dise_code;
+    private String tcmDiseCode;
 
     //中医诊断名称（按医保版2.0填写）
-    private String tcm_dise_name;
+    private String tcmDiseName;
 
     //对应西医诊断编码（按国家临床版2.0填写）
-    private String wm_dise_code;
+    private String wmDiseCode;
 
     //对应西医诊断名称（按国家临床版2.0填写）
-    private String wm_dise_name;
+    private String wmDiseName;
 
     //对应西医诊断编码（按医保版2.0填写）
-    private String wm_dise_code_yb;
+    private String wmDiseCodeYb;
 
     //病种分值
     private Double score;
@@ -40,11 +40,11 @@ public class TcmDiseScoreDO implements Serializable {
     private String memo;
 
     //创建人id
-    private String crte_id;
+    private String crteId;
 
     //创建人姓名
-    private String crte_name;
+    private String crteName;
 
     //创建人时间
-    private Date crte_time;
+    private Date crteTime;
 }

@@ -108,12 +108,24 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
 //            // 病种名称
 //            patientInfo.put("dise_name", insureIndividualVisitDTO.getBka006Name());
 //        }
+        //门特门慢业务的病种取bka006,其他业务取主诊断编码
+
+        if (Constant.UnifiedPay.YWLX.MZMXB.equals(insureIndividualVisitDTO.getAka130())) {
+            // 病种编号
+            patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006());
+            // 病种编号
+            patientInfo.put("dise_codg", insureIndividualVisitDTO.getBka006());
+            // 病种名称
+            patientInfo.put("dise_name", insureIndividualVisitDTO.getBka006Name());
+        }else {
             // 病种编号
             patientInfo.put("dise_code", mainDiseCode);
             // 病种编号
             patientInfo.put("dise_codg", mainDiseCode);
             // 病种名称
             patientInfo.put("dise_name", mainDiseName);
+        }
+
         // 计划生育手术类别
         patientInfo.put("birctrl_type", insureIndividualVisitDTO.getBirctrlType());
         // 计划生育手术或生育日期

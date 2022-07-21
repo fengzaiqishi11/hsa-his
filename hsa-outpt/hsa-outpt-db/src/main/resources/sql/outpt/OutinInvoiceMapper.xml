@@ -370,7 +370,7 @@
                     crte_name = #{item.crteName},
                 </if>
                 <if test="item.crteTime != null">
-                    crte_time = #{item.crteTime}
+                    crte_time = #{item.crteTime},
                 </if>
                 <if test="item.invoiceCode != null and item.invoiceCod != ''">
                     invoice_code = #{item.invoiceCode}

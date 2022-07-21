@@ -9,6 +9,7 @@ import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationSer
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.SnowflakeUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -145,6 +146,7 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
      **/
     @GetMapping("/updateAuthorization")
     public WrapperResponse<Boolean> updateAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+
         return centerFunctionAuthorizationService.updateAuthorization(centerFunctionAuthorizationDto);
     }
 
@@ -160,6 +162,10 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
      **/
     @PostMapping("/updateAuthorizationAudit")
     public WrapperResponse<CenterFunctionAuthorizationDto> updateAuthorizationAudit(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        if(centerFunctionAuthorizationDto != null){
+            centerFunctionAuthorizationDto.setAuditId(userId);
+            centerFunctionAuthorizationDto.setAuditName(userName);
+        }
         return centerFunctionAuthorizationService.updateAuthorizationAudit(centerFunctionAuthorizationDto);
     }
 
@@ -175,6 +181,17 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
      **/
     @PostMapping("/save")
     public WrapperResponse<CenterFunctionAuthorizationDto> save(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+
+        if(centerFunctionAuthorizationDto != null  && StringUtils.isEmpty(centerFunctionAuthorizationDto.getId())){
+            centerFunctionAuthorizationDto.setCrteId(userId);
+            centerFunctionAuthorizationDto.setCrteName(userName);
+            centerFunctionAuthorizationDto.setCrteTime(new Date());
+        }else{
+            centerFunctionAuthorizationDto.setUpdateId(userId);
+            centerFunctionAuthorizationDto.setUpdateName(userName);
+            centerFunctionAuthorizationDto.setUpdateTime(new Date());
+        }
+
         return centerFunctionAuthorizationService.saveBizAuthorization(centerFunctionAuthorizationDto);
     }
 }

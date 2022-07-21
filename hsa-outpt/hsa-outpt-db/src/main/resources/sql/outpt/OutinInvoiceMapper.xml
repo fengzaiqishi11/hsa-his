@@ -310,7 +310,7 @@
                 crte_name = #{crteName},
             </if>
             <if test="crteTime != null">
-                crte_time = #{crteTime}
+                crte_time = #{crteTime},
             </if>
             <if test="invoiceCode != null and invoiceCode != ''">
                 invoice_code = #{invoiceCode}

@@ -1,10 +1,12 @@
 package cn.hsa.interf.extract.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.interf.extract.bo.ExtractConsumptionBO;
 import cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
+import cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO;
 import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingMonthlyDTO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
@@ -71,5 +73,48 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
             }
         }
         return PageDTO.of(extractConsumptions);
+    }
+
+    @Override
+    public PageDTO extractStroInvoicingDetailDTO(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO) {
+
+        if(StringUtils.isEmpty(extractStroInvoicingDetailDTO.getBizId())){
+            throw new AppException("库位不能为空!");
+        }
+        if (StringUtils.isEmpty(extractStroInvoicingDetailDTO.getBuyOrSell())){
+            throw new AppException("统计选项不能为空");
+        }
+
+        //   type 0:药库实时进销存查询,1:药房实时进销存查询
+        List<ExtractStroInvoicingDetailDTO> list = null ;
+        PageHelper.startPage(extractStroInvoicingDetailDTO.getPageNo(),extractStroInvoicingDetailDTO.getPageSize());
+        if("0".equals(extractStroInvoicingDetailDTO.getType())){
+             //0：零售价，1：购进价
+            if("0".equals(extractStroInvoicingDetailDTO.getBuyOrSell())){
+                list = extraConsumptionDAO.queryStroInvoicingSell(extractStroInvoicingDetailDTO);
+            }else{
+                list = extraConsumptionDAO.queryStroInvoicingBuy(extractStroInvoicingDetailDTO);
+            }
+
+
+        }else if("1".equals(extractStroInvoicingDetailDTO.getType())){
+            //0：零售价，1：购进价
+            if("0".equals(extractStroInvoicingDetailDTO.getBuyOrSell())){
+                list = extraConsumptionDAO.queryRoomInvoicingSell(extractStroInvoicingDetailDTO);
+            }else{
+                list = extraConsumptionDAO.queryRoomInvoicingBuy(extractStroInvoicingDetailDTO);
+            }
+        }
+
+        // 筛选ItemId 为空的数据  说明这段时间内无次药品的数据，需要找到对于药品最新的一条记录作为数据
+        if(!ListUtils.isEmpty(list)){
+            List<String> ids = list.stream().filter(o ->StringUtils.isEmpty(o.getItemId())).map(ExtractStroInvoicingDetailDTO::getId).collect(Collectors.toList());
+            if(!ListUtils.isEmpty(ids)){
+                extractStroInvoicingDetailDTO.setIds(ids);
+                list.addAll(extraConsumptionDAO.queryExtraInvoicingByItemId(extractStroInvoicingDetailDTO));
+            }
+        }
+
+        return PageDTO.of(list);
     }
 }

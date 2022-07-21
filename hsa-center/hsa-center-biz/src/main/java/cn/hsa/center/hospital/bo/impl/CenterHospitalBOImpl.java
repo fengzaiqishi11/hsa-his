@@ -13,14 +13,17 @@ import cn.hsa.module.center.hospital.bo.CenterHospitalBO;
 import cn.hsa.module.center.hospital.dao.CenterHospitalDAO;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
+import cn.hsa.module.center.hospital.entity.CenterHospitalDO;
 import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import cn.hsa.module.center.sync.bo.CenterSyncBo;
 import cn.hsa.module.center.sync.dto.CenterSyncDTO;
 import cn.hsa.module.center.syncorderrule.bo.SyncOrderRuleBO;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -100,6 +103,53 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
         List<CenterHospitalDTO> centerHospitalDTOS = centerHospitalDao.queryPage(centerHospitalDTO);
         return PageDTO.of(centerHospitalDTOS);
     }
+
+    /**
+     *  每天0:10 定时更新医院服务状态信息
+     */
+    @Scheduled(cron = "0 10 0 * * ?")
+    public void updateServericeStatusByPeriod(){
+        Date nowDate = new Date();
+        log.info("updateServiceStatus:{},开始更新医院服务有效期状态",DateUtils.format(nowDate,DateUtils.Y_M_DH_M_S));
+        CenterHospitalDTO hospitalDTO = new CenterHospitalDTO();
+        hospitalDTO.setIsValid(Constants.SF.S);
+        List<CenterHospitalDTO> hospitalDTOList = centerHospitalDao.queryAll(hospitalDTO);
+        List<String> hospIdListToExpired = new ArrayList<>();
+        List<String> hospIdListExpired = new ArrayList<>();
+        List<String> hospIdListNormally= new ArrayList<>();
+        for(CenterHospitalDTO  centerHospitalDTO : hospitalDTOList){
+
+            long  timeMillsAfter15Days =  org.apache.commons.lang3.time.DateUtils.addDays(nowDate,15).getTime();
+            long  timeMillsOfNow = nowDate.getTime();
+            long  timeMillsOfEndDate = centerHospitalDTO.getEndDate().getTime();
+            if(timeMillsOfNow - timeMillsOfEndDate >= 0 && !centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.YGQ)){
+                // 已经过期 记录已经过期的医院id，只有状态未被更新的才会记录
+                hospIdListExpired.add(centerHospitalDTO.getId());
+                continue;
+            }
+            if(timeMillsAfter15Days >= timeMillsOfEndDate && !centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.JJDQ)){
+                // 还有15天过期的 记录即将过期的医院id,只有状态未被更新的才会记录
+                hospIdListToExpired.add(centerHospitalDTO.getId());
+                continue;
+            }
+            if(!centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.ZC)) {
+                hospIdListNormally.add(centerHospitalDTO.getId());
+            }
+        }
+        if(hospIdListToExpired.size() > 0){
+            centerHospitalDao.updateServiceStatus(CenterHospitalDO.FWZT.JJDQ,hospIdListToExpired);
+            log.info("updateServiceStatus:{},以上医院的有效状态被更新为即将过期", JSONArray.toJSONString(hospIdListToExpired));
+        }
+        if(hospIdListExpired.size() > 0){
+            centerHospitalDao.updateServiceStatus(CenterHospitalDO.FWZT.YGQ,hospIdListExpired);
+            log.info("updateServiceStatus:{},以上医院的有效状态被更新为已过期", JSONArray.toJSONString(hospIdListExpired));
+        }
+        if(hospIdListNormally.size() > 0){
+            centerHospitalDao.updateServiceStatus(CenterHospitalDO.FWZT.ZC,hospIdListNormally);
+            log.info("updateServiceStatus:{},以上医院的有效状态被更新为正常", JSONArray.toJSONString(hospIdListNormally));
+        }
+    }
+
     /**
      * @Menthod queryAll()
      * @Desrciption  查询所有医院信息

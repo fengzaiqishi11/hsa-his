@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.center.datasource.service.impl
@@ -212,6 +213,17 @@ public class CenterDatasourceServiceImpl extends HsafService implements CenterDa
     @Override
     public WrapperResponse exportHospitalData(String startDate,String endDate) {
         return centerDatasourceBO.exportHospitalData(startDate,endDate);
+    }
+
+    /**
+     * 根据医院编码查询医院信息
+     *
+     * @param centerHospitalDTO
+     * @return
+     */
+    @Override
+    public WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO) {
+        return  centerDatasourceBO.getHospServiceStatsByCode(centerHospitalDTO);
     }
 }
 

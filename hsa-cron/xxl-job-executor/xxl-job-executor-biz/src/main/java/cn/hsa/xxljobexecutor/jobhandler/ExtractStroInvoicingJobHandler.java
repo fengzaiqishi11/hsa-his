@@ -3,6 +3,7 @@ package cn.hsa.xxljobexecutor.jobhandler;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
+import cn.hsa.module.interf.extract.service.ExtractStroInvoicingService;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 public class ExtractStroInvoicingJobHandler extends IJobHandler {
     @Resource
     private CenterHospitalService centerHospitalService_consumer;
+    @Resource
+    ExtractStroInvoicingService extractStroInvoicingService_consumer;
     @Override
     public ReturnT<String> execute(String param) throws Exception {
         XxlJobLogger.log("定时抽取进销存任务开始");
@@ -38,7 +41,7 @@ public class ExtractStroInvoicingJobHandler extends IJobHandler {
         for(CenterHospitalDTO centerHospitalDTO : centerHospitalDTOList){
             Map map =new HashMap<>();
             map.put("hospCode",centerHospitalDTO.getCode());
-            //stroInvoicingMonthlyService_consumer.insertCopyStroInvoicing(map);
+            extractStroInvoicingService_consumer.insertDataToExtractReport(map);
         }
         return SUCCESS;
     }

@@ -280,5 +280,37 @@ public class ExtractStroInvoicingDetailDO extends PageDO implements Serializable
      */
     private String itemTypeName;
 
+    /**
+     * 药房退库销售总金额
+     */
+    private BigDecimal pharReturnStroSellPriAll;
+
+    /**
+     * 药房退库购进总金额
+     */
+    private BigDecimal pharReturnStroBuyPriAll;
+
+    /**
+     * 药房退库总数量
+     */
+    private BigDecimal pharReturnStroTotalNum;
+
+    /**
+     * 药房入库确认零售总金额
+     */
+    private BigDecimal pharInNumSellPriceAll;
+
+    /**
+     * 药房入库确认购进总金额
+     */
+    private BigDecimal pharInNumBuyPriceAll;
+
+    /**
+     * 药房入库确认总数量
+     */
+    private BigDecimal pharInNum;
+
+
+
 }
 

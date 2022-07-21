@@ -51,62 +51,69 @@
         <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
         <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
         <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
-        <result property="num" column="num" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="DECIMAL"/>
         <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
         <result property="currUnitCode" column="curr_unit_code" jdbcType="VARCHAR"/>
-        <result property="sellPrice" column="sell_price" jdbcType="VARCHAR"/>
-        <result property="buyPrice" column="buy_price" jdbcType="VARCHAR"/>
+        <result property="sellPrice" column="sell_price" jdbcType="DECIMAL"/>
+        <result property="buyPrice" column="buy_price" jdbcType="DECIMAL"/>
         <result property="splitRatio" column="split_ratio" jdbcType="VARCHAR"/>
-        <result property="splitPrice" column="split_price" jdbcType="VARCHAR"/>
-        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price" jdbcType="DECIMAL"/>
+        <result property="splitNum" column="split_num" jdbcType="DECIMAL"/>
         <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
-        <result property="upSurplusNum" column="up_surplus_num" jdbcType="VARCHAR"/>
-        <result property="surplusNum" column="surplus_num" jdbcType="VARCHAR"/>
-        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
-        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="VARCHAR"/>
-        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="upSurplusNum" column="up_surplus_num" jdbcType="DECIMAL"/>
+        <result property="surplusNum" column="surplus_num" jdbcType="DECIMAL"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="DECIMAL"/>
+        <result property="upSellPriceAll" column="up_sell_price_all" jdbcType="DECIMAL"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="DECIMAL"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
-        <result property="newPrice" column="new_price" jdbcType="VARCHAR"/>
-        <result property="newSplitPrice" column="new_split_price" jdbcType="VARCHAR"/>
-        <result property="stroInNum" column="stro_in_num" jdbcType="VARCHAR"/>
-        <result property="stroInNumPriceAll" column="stro_in_num_price_all" jdbcType="VARCHAR"/>
-        <result property="returnSuplNum" column="return_supl_num" jdbcType="VARCHAR"/>
-        <result property="returnSuplPriceAll" column="return_supl_price_all" jdbcType="VARCHAR"/>
-        <result property="stroToDeptNum" column="stro_to_dept_num" jdbcType="VARCHAR"/>
-        <result property="stroToDeptPriceAll" column="stro_to_dept_price_all" jdbcType="VARCHAR"/>
-        <result property="stroToPharNum" column="stro_to_phar_num" jdbcType="VARCHAR"/>
-        <result property="stroToPharPriceAll" column="stro_to_phar_price_all" jdbcType="VARCHAR"/>
-        <result property="reportLossesNum" column="report_losses_num" jdbcType="VARCHAR"/>
-        <result property="reportLossesPriceAll" column="report_losses_price_all" jdbcType="VARCHAR"/>
-        <result property="pharReturnStroNum" column="phar_return_stro_num" jdbcType="VARCHAR"/>
-        <result property="pharReturnStroPriceAll" column="phar_return_stro_price_all" jdbcType="VARCHAR"/>
-        <result property="adjustProfitPriceAll" column="adjust_profit_price_all" jdbcType="VARCHAR"/>
-        <result property="adjustLossPriceAll" column="adjust_loss_price_all" jdbcType="VARCHAR"/>
-        <result property="takeStrockSubtractNum" column="take_strock_subtract_num" jdbcType="VARCHAR"/>
-        <result property="takeStrockSubtractPriceAll" column="take_strock_subtract_price_all" jdbcType="VARCHAR"/>
-        <result property="takeStrockAddNum" column="take_strock_add_num" jdbcType="VARCHAR"/>
-        <result property="takeStrockAddPriceAll" column="take_strock_add_price_all" jdbcType="VARCHAR"/>
-        <result property="stroInNumBuyPriceAll" column="stro_in_num_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="returnSuplBuyPriceAll" column="return_supl_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="stroToDeptBuyPriceAll" column="stro_to_dept_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="stroToPharBuyPriceAll" column="stro_to_phar_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="reportLossesBuyPriceAll" column="report_losses_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="pharReturnStroBuyPriceAll" column="phar_return_stro_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="adjustProfitBuyPriceAll" column="adjust_profit_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="adjustLossBuyPriceAll" column="adjust_loss_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="takeStrockSubtractBuyPriceAll" column="take_strock_subtract_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="takeStrockAddBuyPriceAll" column="take_strock_add_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="outSalesNum" column="out_sales_num" jdbcType="VARCHAR"/>
-        <result property="outSalesPriceAll" column="out_sales_price_all" jdbcType="VARCHAR"/>
-        <result property="outSalesBuyPriceAll" column="out_sales_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="inSalesBuyPriceAll" column="in_sales_buy_price_all" jdbcType="VARCHAR"/>
-        <result property="inSalesPriceAll" column="in_sales_price_all" jdbcType="VARCHAR"/>
-        <result property="inSalesNum" column="in_sales_num" jdbcType="VARCHAR"/>
+        <result property="newPrice" column="new_price" jdbcType="DECIMAL"/>
+        <result property="newSplitPrice" column="new_split_price" jdbcType="DECIMAL"/>
+        <result property="stroInNum" column="stro_in_num" jdbcType="DECIMAL"/>
+        <result property="stroInNumPriceAll" column="stro_in_num_price_all" jdbcType="DECIMAL"/>
+        <result property="returnSuplNum" column="return_supl_num" jdbcType="DECIMAL"/>
+        <result property="returnSuplPriceAll" column="return_supl_price_all" jdbcType="DECIMAL"/>
+        <result property="stroToDeptNum" column="stro_to_dept_num" jdbcType="DECIMAL"/>
+        <result property="stroToDeptPriceAll" column="stro_to_dept_price_all" jdbcType="DECIMAL"/>
+        <result property="stroToPharNum" column="stro_to_phar_num" jdbcType="DECIMAL"/>
+        <result property="stroToPharPriceAll" column="stro_to_phar_price_all" jdbcType="DECIMAL"/>
+        <result property="reportLossesNum" column="report_losses_num" jdbcType="DECIMAL"/>
+        <result property="reportLossesPriceAll" column="report_losses_price_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroNum" column="phar_return_stro_num" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroPriceAll" column="phar_return_stro_price_all" jdbcType="DECIMAL"/>
+        <result property="adjustProfitPriceAll" column="adjust_profit_price_all" jdbcType="DECIMAL"/>
+        <result property="adjustLossPriceAll" column="adjust_loss_price_all" jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractNum" column="take_strock_subtract_num" jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractPriceAll" column="take_strock_subtract_price_all" jdbcType="DECIMAL"/>
+        <result property="takeStrockAddNum" column="take_strock_add_num" jdbcType="DECIMAL"/>
+        <result property="takeStrockAddPriceAll" column="take_strock_add_price_all" jdbcType="DECIMAL"/>
+        <result property="stroInNumBuyPriceAll" column="stro_in_num_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="returnSuplBuyPriceAll" column="return_supl_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="stroToDeptBuyPriceAll" column="stro_to_dept_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="stroToPharBuyPriceAll" column="stro_to_phar_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="reportLossesBuyPriceAll" column="report_losses_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroBuyPriceAll" column="phar_return_stro_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="adjustProfitBuyPriceAll" column="adjust_profit_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="adjustLossBuyPriceAll" column="adjust_loss_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractBuyPriceAll" column="take_strock_subtract_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="takeStrockAddBuyPriceAll" column="take_strock_add_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="outSalesNum" column="out_sales_num" jdbcType="DECIMAL"/>
+        <result property="outSalesPriceAll" column="out_sales_price_all" jdbcType="DECIMAL"/>
+        <result property="outSalesBuyPriceAll" column="out_sales_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="inSalesBuyPriceAll" column="in_sales_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="inSalesPriceAll" column="in_sales_price_all" jdbcType="DECIMAL"/>
+        <result property="inSalesNum" column="in_sales_num" jdbcType="DECIMAL"/>
         <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
         <result property="spec" column="spec" jdbcType="VARCHAR"/>
         <result property="code" column="code" jdbcType="VARCHAR"/>
         <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="inSalesNum" column="in_sales_num" jdbcType="DECIMAL"/>
+        <result property="pharInNum" column="phar_in_Num" jdbcType="DECIMAL"/>
+        <result property="pharInNumBuyPriceAll" column="phar_in_num_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="pharInNumSellPriceAll" column="phar_in_num_sell_price_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroTotalNum" column="phar_return_stro_total_num" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroBuyPriAll" column="phar_return_stro_buy_pri_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroSellPriAll" column="phar_return_stro_sell_pri_all" jdbcType="DECIMAL"/>
     </resultMap>
     <!--按xxx表Map映射-->
     <resultMap type="cn.hsa.module.interf.extract.entity.ExtractBusinessDO" id="extractBusinessMap">
@@ -161,8 +168,8 @@
         case siv.item_code when '1' then b.code when '2' then c.code end code,/*编码*/
         case siv.item_code when '1' then b.big_type_code	when '2' then '3' end type_code,/*品种*/
         case siv.item_code when '1' then b.spec when '2' then c.spec end spec,/*规格*/
-        case siv.item_code when '1' then b.good_pym when '2' then c.good_pym end pym,/*拼音码*/
-        case siv.item_code when '1' then b.good_wbm when '2' then c.good_wbm end wbm,/*五笔码*/
+        case siv.item_code when '1' then b.good_pym when '2' then c.pym end pym,/*拼音码*/
+        case siv.item_code when '1' then b.good_wbm when '2' then c.wbm end wbm,/*五笔码*/
         max(siv.unit_code) as unit_code,/*项目单位*/
         case siv.item_code when '1' then b.price when '2' then c.price end price,/*零售单价*/
         siv.split_num as split_num,/*拆零数量*/
@@ -268,6 +275,12 @@
         sum(if((a.outin_code='27' or a.outin_code='28'),a.buy_price * a.num,0)) in_sales_buy_price_all,     /**住院销售购进总金额**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.sell_price * a.num,0)) in_sales_price_all,     /**住院销售零售总金额**/
         sum(if((a.outin_code='27' or a.outin_code='28'),a.num,0)) in_sales_num,                  /**住院销售总数量**/
+        sum(if( a.outin_code='6',a.sell_price * a.num,0)) phar_return_stro_sell_pri_all, /**药房退药库库销售总金额**/
+        sum(if( a.outin_code='6',a.buy_price * a.num,0)) phar_return_stro_buy_pri_all, /**药房退药库库购进总金额**/
+        sum(if( a.outin_code='6',a.num,0)) phar_return_stro_total_num,                   /**药房退药库总数量**/
+        sum(if( a.outin_code='20',a.sell_price * a.num,0)) phar_in_num_sell_price_all,    /**药房入库确认销售总金额**/
+        sum(if( a.outin_code='20',a.buy_price * a.num,0)) phar_in_num_buy_price_all,    /**药房入库确认购进总金额**/
+        sum(if( a.outin_code='20',a.num,0)) phar_in_Num,                           /**药房入库确认总数量**/
         case max(a.item_code) when '1' then max(b.spec) when '2' then max(c.spec) end spec, /**规格**/
         case max(a.item_code) when '1' then max(b.code) when '2' then max(c.code) end code, /**编码**/
         #{extractId} as extract_id /*同步主表id*/
@@ -317,10 +330,10 @@
 
     <!--插入实时进销存表-->
     <insert id="insertBatchStroInvoic">
-        insert into extract_stro_invoicing_detail(id,hosp_code, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code, sell_price, buy_price, split_ratio, split_price, split_num, split_unit_code, up_surplus_num, surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all, crte_time, new_price, new_split_price, stro_in_num, stro_in_num_price_all, return_supl_num, return_supl_price_all, stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num, stro_to_phar_price_all, report_losses_num, report_losses_price_all, phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all, adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all, take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all, return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all, report_losses_buy_price_all, phar_return_stro_buy_price_all, adjust_profit_buy_price_all, adjust_loss_buy_price_all, take_strock_subtract_buy_price_all, take_strock_add_buy_price_all, out_sales_num, out_sales_price_all, out_sales_buy_price_all, in_sales_buy_price_all, in_sales_price_all, in_sales_num, extract_id, spec, code, extract_time)
+        insert into extract_stro_invoicing_detail(id,hosp_code, biz_id, item_code, item_id, item_name, num, unit_code, curr_unit_code, sell_price, buy_price, split_ratio, split_price, split_num, split_unit_code, up_surplus_num, surplus_num, up_buy_price_all, buy_price_all, up_sell_price_all, sell_price_all, crte_time, new_price, new_split_price, stro_in_num, stro_in_num_price_all, return_supl_num, return_supl_price_all, stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num, stro_to_phar_price_all, report_losses_num, report_losses_price_all, phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all, adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all, take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all, return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all, report_losses_buy_price_all, phar_return_stro_buy_price_all, adjust_profit_buy_price_all, adjust_loss_buy_price_all, take_strock_subtract_buy_price_all, take_strock_add_buy_price_all, out_sales_num, out_sales_price_all, out_sales_buy_price_all, in_sales_buy_price_all, in_sales_price_all, in_sales_num, extract_id, spec, code, extract_time,phar_return_stro_sell_pri_all,phar_return_stro_buy_pri_all,phar_return_stro_total_num,phar_in_num_sell_price_all,phar_in_num_buy_price_all,phar_in_num)
         values
         <foreach collection="list" item="entity" separator=",">
-            (#{entity.id},#{entity.hospCode}, #{entity.bizId}, #{entity.itemCode}, #{entity.itemId}, #{entity.itemName}, #{entity.num}, #{entity.unitCode}, #{entity.currUnitCode}, #{entity.sellPrice}, #{entity.buyPrice}, #{entity.splitRatio}, #{entity.splitPrice}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.upSurplusNum}, #{entity.surplusNum}, #{entity.upBuyPriceAll}, #{entity.buyPriceAll}, #{entity.upSellPriceAll}, #{entity.sellPriceAll}, #{entity.crteTime}, #{entity.newPrice}, #{entity.newSplitPrice}, #{entity.stroInNum}, #{entity.stroInNumPriceAll}, #{entity.returnSuplNum}, #{entity.returnSuplPriceAll}, #{entity.stroToDeptNum}, #{entity.stroToDeptPriceAll}, #{entity.stroToPharNum}, #{entity.stroToPharPriceAll}, #{entity.reportLossesNum}, #{entity.reportLossesPriceAll}, #{entity.pharReturnStroNum}, #{entity.pharReturnStroPriceAll}, #{entity.adjustProfitPriceAll}, #{entity.adjustLossPriceAll}, #{entity.takeStrockSubtractNum}, #{entity.takeStrockSubtractPriceAll}, #{entity.takeStrockAddNum}, #{entity.takeStrockAddPriceAll}, #{entity.stroInNumBuyPriceAll}, #{entity.returnSuplBuyPriceAll}, #{entity.stroToDeptBuyPriceAll}, #{entity.stroToPharBuyPriceAll}, #{entity.reportLossesBuyPriceAll}, #{entity.pharReturnStroBuyPriceAll}, #{entity.adjustProfitBuyPriceAll}, #{entity.adjustLossBuyPriceAll}, #{entity.takeStrockSubtractBuyPriceAll}, #{entity.takeStrockAddBuyPriceAll}, #{entity.outSalesNum}, #{entity.outSalesPriceAll}, #{entity.outSalesBuyPriceAll}, #{entity.inSalesBuyPriceAll}, #{entity.inSalesPriceAll}, #{entity.inSalesNum}, #{entity.extractId}, #{entity.spec}, #{entity.code}, #{entity.extractTime})
+            (#{entity.id},#{entity.hospCode}, #{entity.bizId}, #{entity.itemCode}, #{entity.itemId}, #{entity.itemName}, #{entity.num}, #{entity.unitCode}, #{entity.currUnitCode}, #{entity.sellPrice}, #{entity.buyPrice}, #{entity.splitRatio}, #{entity.splitPrice}, #{entity.splitNum}, #{entity.splitUnitCode}, #{entity.upSurplusNum}, #{entity.surplusNum}, #{entity.upBuyPriceAll}, #{entity.buyPriceAll}, #{entity.upSellPriceAll}, #{entity.sellPriceAll}, #{entity.crteTime}, #{entity.newPrice}, #{entity.newSplitPrice}, #{entity.stroInNum}, #{entity.stroInNumPriceAll}, #{entity.returnSuplNum}, #{entity.returnSuplPriceAll}, #{entity.stroToDeptNum}, #{entity.stroToDeptPriceAll}, #{entity.stroToPharNum}, #{entity.stroToPharPriceAll}, #{entity.reportLossesNum}, #{entity.reportLossesPriceAll}, #{entity.pharReturnStroNum}, #{entity.pharReturnStroPriceAll}, #{entity.adjustProfitPriceAll}, #{entity.adjustLossPriceAll}, #{entity.takeStrockSubtractNum}, #{entity.takeStrockSubtractPriceAll}, #{entity.takeStrockAddNum}, #{entity.takeStrockAddPriceAll}, #{entity.stroInNumBuyPriceAll}, #{entity.returnSuplBuyPriceAll}, #{entity.stroToDeptBuyPriceAll}, #{entity.stroToPharBuyPriceAll}, #{entity.reportLossesBuyPriceAll}, #{entity.pharReturnStroBuyPriceAll}, #{entity.adjustProfitBuyPriceAll}, #{entity.adjustLossBuyPriceAll}, #{entity.takeStrockSubtractBuyPriceAll}, #{entity.takeStrockAddBuyPriceAll}, #{entity.outSalesNum}, #{entity.outSalesPriceAll}, #{entity.outSalesBuyPriceAll}, #{entity.inSalesBuyPriceAll}, #{entity.inSalesPriceAll}, #{entity.inSalesNum}, #{entity.extractId}, #{entity.spec}, #{entity.code}, #{entity.extractTime},#{entity.pharReturnStroSellPriAll},#{entity.pharReturnStroBuyPriAll},#{entity.pharReturnStroTotalNum},#{entity.pharInNumSellPriceAll},#{entity.pharInNumBuyPriceAll},#{entity.pharInNum})
         </foreach>
     </insert>
     <!--批量插入stro_out-->

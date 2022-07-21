@@ -11,6 +11,7 @@ import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
 import cn.hsa.insure.util.UnifiedCommon;
+import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
@@ -1015,7 +1016,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             /**======4.获取返回的参数 begin=========**/
             Map<String,Object> baseInfoMap = MapUtils.get(resultMap, "baseInfo");// 基本信息对象
             Map<String,Object> groupInfoMap = MapUtils.get(resultMap, "groupInfo");// 分组信息对象
-            List<Map<String,Object>> qualityInfoList = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String,Object>> qualityInfo = MapUtils.get(resultMap, "qualityInfo");// 质控信息集合
+            List<Map<String, Object>> qualityInfoList = ListUtils.isEmpty(qualityInfo) ? null :
+                    qualityInfo.stream().sorted((a, b) ->
+                                     (b.get("rule_level") == null ? "" : b.get("rule_level"))
+                                    .toString()
+                                    .compareTo(a.get("rule_level").toString()))
+                            .collect(Collectors.toList());// 质控信息集合
             /**======获取返回的参数 end=========**/
             //保存质控结果
             DrgDipResultDTO drgDipResultDTO = insertDrgDipResult(dataMap,baseInfoMap,groupInfoMap,qualityInfoList);
@@ -2500,6 +2507,63 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", "医保科"); // 医疗机构填报部门 默认为 医保科
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap, "feeCrteTime")); // 医疗机构填报人
+        //门特患者信息处理，没有病案首页，取档案信息
+        if (Constants.SF.F.equals(isHospital)) {
+            setlinfo.put("hiPaymtd", "1"); // 医保支付方式   门特默认是按项目
+            setlinfo.put("admTime", insureIndividualVisitDTO.getVisitTime()); // 入院时间 *******
+            setlinfo.put("dscgTime", insureIndividualVisitDTO.getVisitTime()); // 出院时间 *******
+            setlinfo.put("admCaty", MapUtils.get(baseInfoMap, "inDeptNatinCode")); // 入院科别
+            setlinfo.put("dscgCaty", MapUtils.get(baseInfoMap, "inDeptNatinCode")); // 出院科别
+            //查询档案信息
+            Map<String, Object> profileMap = new HashMap<>();
+            profileMap.put("hospCode",hospCode);
+            profileMap.put("certNo",MapUtils.get(baseInfoMap,"cert_no"));
+            OutptProfileFileDTO outptProfileFileDTO = insureGetInfoDAO.queryProfileFile(profileMap);
+            if(outptProfileFileDTO != null){
+                profileMap = JSONObject.parseObject(JSON.toJSONString(outptProfileFileDTO));
+            }
+            setlinfo.put("ntly",MapUtils.getMapVS(profileMap, "ntly", (String) MapUtils.getMapVS(baseInfoMap, "ntly", "141"))); // 国籍,默认中国
+            Object naty =  MapUtils.getMapVS(profileMap, "nationCode", (String) MapUtils.getMapVS(baseInfoMap, "nation_code", "1"));
+            if (naty == null) {
+                setlinfo.put("naty", ""); // 民族
+            } else {
+                setlinfo.put("naty", "0" + naty); // 民族
+            }
+            setlinfo.put("patnCertType", MapUtils.getMapVS(profileMap, "certCode", (String) MapUtils.getMapVS(baseInfoMap, "cert_code", "01"))); // 患者证件类别
+            setlinfo.put("certno", MapUtils.getMapVS(profileMap, "certNo", (String) MapUtils.getMapVS(baseInfoMap, "cert_no", insureIndividualVisitDTO.getMdtrtCertNo()))); // 证件号码
+            setlinfo.put("prfs", MapUtils.getMapVS(profileMap, "occupationCode", MapUtils.get(baseInfoMap, "occupation_code"))); // 职业
+            setlinfo.put("currAddr", MapUtils.getMapVS(profileMap, "nowAddress", MapUtils.get(baseInfoMap, "now_address"))); // 现住址
+            setlinfo.put("empName", MapUtils.getMapVS(profileMap, "work", null)); // 单位名称
+            setlinfo.put("empAddr", MapUtils.getMapVS(profileMap, "workAddress", null)); // 单位地址
+            setlinfo.put("empTel", MapUtils.getMapVS(profileMap, "workPhone", null)); // 单位电话
+            setlinfo.put("poscode", MapUtils.getMapVS(profileMap, "workPostCode", null)); // 邮编
+            setlinfo.put("conerName", MapUtils.getMapVS(profileMap, "contactName", MapUtils.get(baseInfoMap, "contact_name"))); // 联系人姓名
+            Object contactRelaCode1 = MapUtils.getMapVS(profileMap, "contactRelaCode", MapUtils.get(baseInfoMap, "contact_rela_code"));
+            if ("0".equals(contactRelaCode1)) {
+                contactRelaCode1 = "1";
+            } else if ("1".equals(contactRelaCode1)) {
+                contactRelaCode1 = "10";
+            } else if ("2".equals(contactRelaCode1)) {
+                contactRelaCode1 = "20";
+            } else if ("3".equals(contactRelaCode1)) {
+                contactRelaCode1 = "30";
+            } else if ("4".equals(contactRelaCode1)) {
+                contactRelaCode1 = "40";
+            } else if ("5".equals(contactRelaCode1)) {
+                contactRelaCode1 = "50";
+            } else if ("6".equals(contactRelaCode1)) {
+                contactRelaCode1 = "69";
+            } else if ("7".equals(contactRelaCode1)) {
+                contactRelaCode1 = "70";
+            } else if ("8".equals(contactRelaCode1)) {
+                contactRelaCode1 = "99";
+            } else {
+                contactRelaCode1 = "99";
+            }
+            setlinfo.put("patnRlts", contactRelaCode1); // 与患者关系  默认患者本人
+            setlinfo.put("conerAddr", MapUtils.getMapVS(profileMap, "contactAddress", MapUtils.get(baseInfoMap, "contact_address"))); // 联系人地址
+            setlinfo.put("conerTel", MapUtils.getMapVS(profileMap, "contactPhone", MapUtils.get(baseInfoMap, "contact_phone"))); // 联系人电话
+        }
         return setlinfo;
     }
 
@@ -2563,8 +2627,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         } else {
             dataMap = insureGetInfoDAO.selectOutptBillNo(map);
         }
-        if (MapUtils.isEmpty(dataMap)) {
-            throw new AppException("该患者未产生发票信息");
+
+        Map sysMap = new HashMap();
+        sysMap.put("hospCode",MapUtils.get(map, "hospCode"));
+        sysMap.put("code","IS_JUGE_INVOICE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        // 如果该参数是1 则提醒该错误。如果是 0 则不提醒该错误
+        if(sysParameterDTO == null || Constants.SF.S.equals(sysParameterDTO.getValue())){
+            if (MapUtils.isEmpty(dataMap)) {
+                throw new AppException("该患者未产生发票信息");
+            }
         }
         billNo = MapUtils.get(dataMap, "invoice_no");
         billCode = MapUtils.get(dataMap, "prefix");

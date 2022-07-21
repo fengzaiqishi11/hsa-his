@@ -66,6 +66,10 @@
                     <groupId>com.alibaba.csb.sdk</groupId>
                     <artifactId>http-client</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework.data</groupId>
+                    <artifactId>spring-data-elasticsearch</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -173,12 +177,6 @@
             <artifactId>fastjson</artifactId>
         </dependency>
 
-        <!--Rest接口文档(注解支持)-->
-        <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-annotations</artifactId>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

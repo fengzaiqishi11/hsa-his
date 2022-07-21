@@ -11,6 +11,7 @@ import cn.hsa.util.FastJsonUtils;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

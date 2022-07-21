@@ -161,4 +161,6 @@ public interface CenterDatasourceBO {
      * @Date: 2022-05-05
      */
     WrapperResponse exportHospitalData(String startDate,String endDate);
+
+    WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO);
 }

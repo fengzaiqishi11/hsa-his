@@ -14,11 +14,11 @@ import cn.hsa.module.center.datasource.entity.CenterHospitalDatasourceDO;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.TableStructureSyncDTO;
 import cn.hsa.module.sys.user.service.SysUserService;
-import cn.hsa.util.DBUtils;
-import cn.hsa.util.ListUtils;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -48,6 +48,9 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
     private CenterHospitalDatasourceDAO centerHospitalDatasourceDAO;
 
     private final Pattern PATTERN = Pattern.compile(".+?(\\{.+?\\})");
+
+    private static final String msgToastSuffix = "天后过期，为避免过期后给您工作带来的不便，请及时续费。客服热线：400 987 5000。";
+    private static final Logger log = LoggerFactory.getLogger(CenterDatasourceBOImpl.class);
 
     /**
      * @Menthod queryCenterHospitalDatasourceAll
@@ -352,7 +355,7 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
                     }
                 }
             }
-
+            log.error("this is not an error msg, just for debug, sql parsed is：{}",sql);
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.execute();
@@ -364,6 +367,7 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+            log.error("table struct or data synchronize occurred error,the detail is",e);
             throw new  AppException(centerDatasourceDTO.getName());
         }
         finally {
@@ -448,6 +452,23 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
             }
         }
         return WrapperResponse.success("导出成功!", PageDTO.of(dataList));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO) {
+        Map<String,Object> resultMap = new HashMap<>();
+        long millsOf15Days = 15 * 24 * 3600 * 1000;
+
+        CenterHospitalDTO centerHospitalDTO1 = centerHospitalDatasourceDAO.getHospServiceStatsByCode(centerHospitalDTO);
+        long millsOfEndDate = centerHospitalDTO1.getEndDate().getTime();
+        Date now = new Date();
+        if(millsOfEndDate - now.getTime() > millsOf15Days){
+            return WrapperResponse.success(resultMap);
+        }
+       int daysLeft =  DateUtils.differentDays(now,centerHospitalDTO1.getEndDate());
+       String toastMsg = "系统将于"+daysLeft+msgToastSuffix;
+       resultMap.put("toastMsg",toastMsg);
+        return WrapperResponse.success(resultMap);
     }
 
     //根据数据库配置操作表

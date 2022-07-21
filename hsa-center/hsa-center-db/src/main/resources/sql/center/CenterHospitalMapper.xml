@@ -241,6 +241,11 @@
         ( #{id}, #{type}, #{jdbcDriver}, #{rootUser}, #{rootPassword}, #{rootUrl}, #{hospUrl})
 
     </insert>
-
+    <update id="updateServiceStatus">
+        update center_hospital set service_status = #{serviceStatus}  where id in
+            <foreach collection="list" open="(" separator="," item="item" index="index" close=")">
+                #{item}
+            </foreach>
+    </update>
 
 </mapper>

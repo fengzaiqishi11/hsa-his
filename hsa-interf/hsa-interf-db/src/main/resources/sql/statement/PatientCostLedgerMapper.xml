@@ -1689,10 +1689,13 @@
                     and a.name  like  concat('%',#{ name },'%')
                 </if>
             </if>
+            <if test="bfcId != null and bfcId != ''">
+                and b.bfc_id = #{bfcId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and b.item_code = #{itemCode}
+            </if>
             <if test="sumCode != null and sumCode = '4'.toString()">
-                <if test="bfcId != null and bfcId != ''">
-                    and b.bfc_id = #{bfcId}
-                </if>
                 <if test="insureCode != null and insureCode != ''">
                     and a.patient_code = #{insureCode}
                 </if>
@@ -1758,6 +1761,12 @@
             <if test="insureCode != null and insureCode != ''">
                 and a.patient_code = #{insureCode}
             </if>
+            <if test="bfcId != null and bfcId != ''">
+                and b.bfc_id = #{bfcId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and b.item_code = #{itemCode}
+            </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
                 <if test="userId != null and userId != ''">
                     and b.doctor_id = #{userId}
@@ -1820,6 +1829,12 @@
             </if>
             <if test="insureCode != null and insureCode != ''">
                 and a.patient_code = #{insureCode}
+            </if>
+            <if test="bfcId != null and bfcId != ''">
+                and b.bfc_id = #{bfcId}
+            </if>
+            <if test="itemCode != null and itemCode != ''">
+                and b.item_code = #{itemCode}
             </if>
             <if test="sumCode != null and sumCode == '3'.toString()">
                 <if test="userId != null and userId != ''">

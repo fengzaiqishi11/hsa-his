@@ -3,6 +3,7 @@ package cn.hsa.module.interf.extract.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
+import cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -20,4 +21,6 @@ public interface ExtractConsumptionBO {
      * @Param [extractConsumptionDTO]
      **/
     PageDTO queryExtractConsumptions(ExtractConsumptionDTO extractConsumptionDTO);
+
+    PageDTO extractStroInvoicingDetailDTO(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
 }

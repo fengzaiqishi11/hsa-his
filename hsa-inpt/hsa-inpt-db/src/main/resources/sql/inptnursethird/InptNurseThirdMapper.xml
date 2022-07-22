@@ -811,4 +811,111 @@
             and date_format(record_time,'%Y-%m-%d')  = date_format(#{dto.recordTime},'%Y-%m-%d')
         </foreach>
     </update>
+
+    <select id="queryTimeSlotList" resultMap="InptNurseThirdMap">
+        SELECT
+            dates.date,
+            T.sjd,
+            CONCAT( dates.date, ' ', T.sjd, ':00' ) time_slot,
+            CONCAT( dates.date, ' ', T.sjd, ':00' ) record_time
+        FROM
+            (
+                SELECT
+                    a.date
+                FROM
+                    (
+                        SELECT
+                            DATE_FORMAT(#{startDate},'%Y-%m-%d') - INTERVAL ( a.a + ( 10 * b.a ) + ( 100 * c.a ) ) DAY AS date
+
+                FROM
+                    (
+                    SELECT
+                    0 AS a UNION ALL
+                    SELECT
+                    1 UNION ALL
+                    SELECT
+                    2 UNION ALL
+                    SELECT
+                    3 UNION ALL
+                    SELECT
+                    4 UNION ALL
+                    SELECT
+                    5 UNION ALL
+                    SELECT
+                    6 UNION ALL
+                    SELECT
+                    7 UNION ALL
+                    SELECT
+                    8 UNION ALL
+                    SELECT
+                    9
+                    ) AS a
+                    CROSS JOIN (
+                    SELECT
+                    0 AS a UNION ALL
+                    SELECT
+                    1 UNION ALL
+                    SELECT
+                    2 UNION ALL
+                    SELECT
+                    3 UNION ALL
+                    SELECT
+                    4 UNION ALL
+                    SELECT
+                    5 UNION ALL
+                    SELECT
+                    6 UNION ALL
+                    SELECT
+                    7 UNION ALL
+                    SELECT
+                    8 UNION ALL
+                    SELECT
+                    9
+                    ) AS b
+                    CROSS JOIN (
+                    SELECT
+                    0 AS a UNION ALL
+                    SELECT
+                    1 UNION ALL
+                    SELECT
+                    2 UNION ALL
+                    SELECT
+                    3 UNION ALL
+                    SELECT
+                    4 UNION ALL
+                    SELECT
+                    5 UNION ALL
+                    SELECT
+                    6 UNION ALL
+                    SELECT
+                    7 UNION ALL
+                    SELECT
+                    8 UNION ALL
+                    SELECT
+                    9
+                    ) AS c
+            ) a
+        WHERE
+            a.Date BETWEEN DATE_FORMAT( #{startDate},'%Y-%m-%d')  and  DATE_FORMAT(#{startDate},'%Y-%m-%d')
+            ) dates
+			LEFT JOIN (
+			SELECT DISTINCT
+				CONCAT( SUBSTRING_INDEX( SUBSTRING_INDEX( a.path, ',', b.help_topic_id + 1 ), ',',- 1 ), ':00' ) AS sjd
+			FROM
+				(
+				SELECT
+					(
+					SELECT
+					VALUE
+					AS
+						sjd
+					FROM
+						sys_parameter
+					WHERE
+						CODE = 'HLSCD_KSSJ'
+						AND hosp_code = #{hospCode} ) AS path FROM DUAL ) a
+            JOIN mysql.help_topic b ON b.help_topic_id &lt;
+            ( LENGTH( a.path ) - LENGTH( REPLACE ( a.path, ',', '' )) + 1 )
+            ) T ON 1 = 1
+    </select>
 </mapper>

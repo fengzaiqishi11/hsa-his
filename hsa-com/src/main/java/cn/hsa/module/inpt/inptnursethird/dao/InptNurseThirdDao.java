@@ -10,6 +10,7 @@ import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -132,4 +133,6 @@ public interface InptNurseThirdDao {
      * @return
      */
     int updatePublicParameterList(@Param("editList") List<InptNurseThirdDTO> editList);
+
+    List<InptNurseThirdDTO> queryTimeSlotList(@Param("hospCode") String hospCode,@Param("startDate") String startDate);
 }

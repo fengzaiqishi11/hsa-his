@@ -110,7 +110,7 @@ public class OutptVisitReqUtil<T> extends InsureCommonUtil implements BaseReqUti
 //        }
         //门特门慢业务的病种取bka006,其他业务取主诊断编码
 
-        if (Constant.UnifiedPay.YWLX.MZMXB.equals(insureIndividualVisitDTO.getAka130())) {
+        if (StringUtils.isNotEmpty(insureIndividualVisitDTO.getBka006())) {
             // 病种编号
             patientInfo.put("dise_code", insureIndividualVisitDTO.getBka006());
             // 病种编号

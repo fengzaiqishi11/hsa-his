@@ -35,7 +35,8 @@
         e.is_positive,
         e.skin_result_code,
         f.daily_times,
-        MAX(ope.is_print) as is_print
+        MAX(ope.is_print) as is_print,
+        b.remark
         FROM
         outpt_infusion_register a
         inner JOIN outpt_prescribe_detail b on a.opd_id = b.id and a.visit_id = b.visit_id and a.hosp_code = b.hosp_code

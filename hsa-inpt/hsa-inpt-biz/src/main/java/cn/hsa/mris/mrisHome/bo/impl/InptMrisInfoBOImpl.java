@@ -76,6 +76,11 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
                 }else {
                     ma.put("A23C", "18");
                 }
+                ma.put("B22C",changeData(ma.get("B22C")));
+                ma.put("B23C",changeData(ma.get("B23C")));
+                ma.put("B24C",changeData(ma.get("B24C")));
+                ma.put("B25C",changeData(ma.get("B25C")));
+                ma.put("B26C",changeData(ma.get("B26C")));
                 List<Map<String, Object>> mrisDiagnose = inptMrisInfoDAO.getMrisDiagnose(diagnoseParam);
                 LinkedHashMap<String, Object> diagnoseMap = new LinkedHashMap<>();
                 diagnoseMap.put("C03C", "");

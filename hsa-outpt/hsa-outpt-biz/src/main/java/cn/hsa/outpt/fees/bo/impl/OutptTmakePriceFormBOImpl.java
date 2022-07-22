@@ -5037,9 +5037,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
         throw new AppException("未查找到医保就诊信息，请做医保登记！");
       }
-      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+      /*if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
         throw new AppException("未找到支付订单号，请先上传费用！");
-      }
+      }*/
       //判断是否已医保结算
       InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
       settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
@@ -5054,7 +5054,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (ObjectUtil.isEmpty(settleDTO)){
         throw new AppException("未查找到医保结算信息，请先做医保结算！");
       }
+      //查看移动支付表参数据
       //接口调用
+      //payOnlineInfoDAO
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       map.put("insureIndividualSettleDTO",settleDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();

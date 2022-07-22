@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.center.datasource.service
@@ -176,4 +177,11 @@ public interface CenterDatasourceService {
      * @Date: 2022-05-05
      */
     WrapperResponse exportHospitalData(String startDate,String endDate);
+
+    /**
+     *  根据医院编码查询医院信息
+     * @param centerHospitalDTO
+     * @return
+     */
+    WrapperResponse<Map<String,Object>> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO);
 }

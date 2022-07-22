@@ -150,4 +150,11 @@ public interface CenterHospitalDatasourceDAO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO> 结果集
      */
     int deleteCenterHospital(@Param(value="ids") String[] ids);
+
+    /**
+     *  根据医院编码查询医院信息
+     * @param centerHospitalDTO
+     * @return
+     */
+    CenterHospitalDTO getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO);
 }

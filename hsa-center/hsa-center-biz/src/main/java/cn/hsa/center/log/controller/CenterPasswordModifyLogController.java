@@ -9,6 +9,7 @@ import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
 import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
+import cn.hsa.module.center.log.entity.CenterOperationLogDo;
 import cn.hsa.module.center.log.entity.CenterPasswordModifyLogDo;
 import cn.hsa.module.center.log.service.CenterPasswordModifyLogService;
 import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
@@ -80,5 +81,24 @@ public class CenterPasswordModifyLogController extends CenterBaseController {
         return centerPasswordModifyLogService.insertCenterPasswordModifyLog(params);
     }
 
+    @GetMapping("/insertCenterOperationLog")
+    public WrapperResponse<Boolean> insertCenterOperationLog(){
+        Map<String,Object> params = new HashMap<>();
+        CenterOperationLogDo renewalLog = CenterOperationLogDo.builder()
+                .id(SnowflakeUtils.getId())
+                .crteId("1")
+                .crteName("系统管理员")
+                .crteTime(new Date())
+                .hospCode("0001")
+                .userCode("admin")
+                .userId("11")
+                .deptId("10001")
+                .deptName("质量管理部")
+                .hospName("测试医院")
+                .ip("127.0.0.1")
+                .bizId("YYXQ100001").build();
+        params.put("renewalLog",renewalLog);
+        return centerPasswordModifyLogService.insertCenterOperationLog(params);
+    }
 
 }

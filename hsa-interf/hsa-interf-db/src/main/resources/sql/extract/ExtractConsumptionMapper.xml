@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO">
+    <!--药房消耗报表的映射-->
+    <resultMap type="cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO" id="extractConsumptionDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="summaryType" column="summary_type" jdbcType="VARCHAR"/>
+        <result property="statisticsOptions" column="statistics_options" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="bizName" column="biz_name" jdbcType="VARCHAR"/>
+        <result property="consumNum" column="consum_num" jdbcType="VARCHAR"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="profitPrice" column="profit_price" jdbcType="VARCHAR"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="renewalTime" column="renewal_time" jdbcType="TIMESTAMP"/>
+        <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!--药房消耗报表-->
+    <select id="queryExtractConsumptions" resultMap="extractConsumptionDetailMap">
+        SELECT  hosp_code,
+        item_id, item_code,
+        item_name, code, type_code, spec, unit_code,
+        price, sum(split_num) as split_num , split_unit_code, biz_id, biz_name,
+        sum(consum_num) as consum_num, avg_sell_price, sum(sell_price_all) as sell_price_all,
+        avg_buy_price, sum(buy_price_all) as buy_price_all, sum(profit_price) as profit_price
+        from extract_consumption_detail
+        where
+        hosp_code = #{hospCode}
+        and summary_type = #{summaryType}
+        <if test="startTime != null">
+            and extract_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and extract_time &lt;= #{endTime}
+        </if>
+        <if test="itemCode != null and itemCode !=''">
+            and item_code = #{itemCode}
+        </if>
+        <if test="deptList != null and deptList.size()>0">
+            and biz_id in
+            <foreach collection="deptList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            item_name like concat('%',#{itemName},'%') or
+            pym like concat('%',#{itemName},'%') or
+            wbm like concat('%',#{itemName},'%')
+            )
+        </if>
+        group by item_id,biz_id,unit_code
+    </select>
+    <!--根据项目id对项目进行汇总-->
+    <select id="queryExtractConsumptionsByItemId"
+            resultType="cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO">
+        SELECT  hosp_code,
+        item_id, item_code,
+        item_name, code, type_code, spec, unit_code,
+        price, sum(split_num) as split_num , split_unit_code, biz_id, biz_name,
+        sum(consum_num) as consum_num, avg_sell_price, sum(sell_price_all) as sell_price_all,
+        avg_buy_price, sum(buy_price_all) as buy_price_all, sum(profit_price) as profit_price
+        from extract_consumption_detail
+        where
+        hosp_code = #{hospCode}
+        and summary_type = #{summaryType}
+        <if test="startTime != null">
+            and extract_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and extract_time &lt;= #{endTime}
+        </if>
+        <if test="itemCode != null and itemCode !=''">
+            and item_code = #{itemCode}
+        </if>
+        <if test="deptList != null and deptList.size()>0">
+            and biz_id in
+            <foreach collection="deptList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            item_name like concat('%',#{itemName},'%') or
+            pym like concat('%',#{itemName},'%') or
+            wbm like concat('%',#{itemName},'%')
+            )
+        </if>
+        group by item_id
+    </select>
+</mapper>

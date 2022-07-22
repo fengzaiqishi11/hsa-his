@@ -30,7 +30,8 @@
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         <result property="otherName" column="other_name" jdbcType="VARCHAR"/>
-
+        <result property="stockNum" column="stockNum" jdbcType="DECIMAL"/>
+        <result property="stockOccupy" column="stockOccupy" jdbcType="DECIMAL"/>
         <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
         <result property="splitPrice" column="split_price" jdbcType="VARCHAR"/>
         <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
@@ -72,7 +73,9 @@
     <!-- 查询出医院的项目和有库存的材料信息（typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码） -->
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode as split_unit_code,a.code as itemCode,a.use_code,
-        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name
+        a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name,
+        case when a.type_code = '3' then sst.num else ifnull(sst.num,0) end stockNum,/*库存数量*/
+        case when a.type_code = '3' then sst.stock_occupy else ifnull(sst.stock_occupy,0) end stockOccupy/*库存数量*/
         FROM
         ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
         '3' as type_code,
@@ -120,6 +123,7 @@
             and  (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
         </if>
         )  a
+        left join stro_stock sst on a.id = sst.item_id
         where 1=1
     </select>
 

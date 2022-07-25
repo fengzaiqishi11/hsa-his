@@ -511,6 +511,15 @@ public class BaseDeptBOImpl extends HsafBO implements BaseDeptBO {
                 if(Constants.SF.S.equals(baseDeptDTO.getIsValid())){
 //                    cacheOperate(baseDeptDTO,null,true);
                 }
+                //匹配了医保科室之后如果结算清单还是卫健委编码就更新结算清单的科室
+                if(StringUtils.isNotEmpty(baseDeptDTO.getCatyCode()) && StringUtils.isNotEmpty(baseDeptDTO.getNationCode())){
+                    //入院科室
+                    baseDeptDAO.updateSetlAdmCaty(baseDeptDTO);
+                    //出院科室
+                    baseDeptDAO.updateSetlDscgCaty(baseDeptDTO);
+                    //转院科室
+                    baseDeptDAO.updateSetlRefldeptDept(baseDeptDTO);
+                }
 
                 baseDeptDrugstoreDAO.deleteDrugStore(baseDeptDTO);
                 if (saveDrugStroe(baseDeptDTO, drugStoreList)){

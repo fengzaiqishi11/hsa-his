@@ -1626,7 +1626,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         insertOutptPrescribeDTO.setCrteName(outptPrescribeDTO.getDoctorName());
         //创建时间
         insertOutptPrescribeDTO.setCrteTime(DateUtils.getNow());
-        //备注
+        //备注，todo取分组后明细中第一条的备注?
         insertOutptPrescribeDTO.setRemark(outptPrescribeDTO.getRemark());
         //是否删除
         insertOutptPrescribeDTO.setIsSubmit(Constants.SF.F);

@@ -2150,4 +2150,8 @@
         where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}
     </select>
 
+    <select id="queryByTcmDiseCode" resultType="cn.hsa.module.insure.module.entity.TcmDiseScoreDO">
+        select * from tcm_dise_score where tcm_dise_code = #{tcmDiseCode} and vali_flag = '1'
+    </select>
+
 </mapper>

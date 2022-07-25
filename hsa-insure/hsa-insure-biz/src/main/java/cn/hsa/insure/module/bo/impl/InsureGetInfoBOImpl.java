@@ -30,6 +30,7 @@ import cn.hsa.module.insure.module.dao.InsureGetInfoDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualCostDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureIndividualCostDO;
+import cn.hsa.module.insure.module.entity.TcmDiseScoreDO;
 import cn.hsa.module.insure.module.service.InsureDictService;
 import cn.hsa.module.insure.outpt.service.InsureUnifiedPayReversalTradeService;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
@@ -50,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 
 import javax.annotation.Resource;
@@ -593,6 +595,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insertIcuInfo(map);
         // 保存门诊慢特病诊断信息
         insertOpspdiseinfo(map);
+        //校验中医病种分值规则
+        chkTcmDiseMatch(map);
         // 保存 住院诊断信息
         insertDiseaseInfo(map);
         // 保存结清单信息
@@ -2062,6 +2066,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
     }
 
+
     /**
      * @Method insertOpspdiseinfo
      * @Desrciption 处理医疗保障基金结算清单 -- 门诊慢特病诊断信息
@@ -2182,6 +2187,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
             resultDataMap.put("drgInfo",combo);
         }
+        resultDataMap.put("mrisType", map.get("mrisType"));
         return resultDataMap;
     }
 
@@ -2760,6 +2766,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
             diseaseCount = inptDiagnoseDTOList.size();
+            map.put("mrisType",Constant.UnifiedPay.MRISTYPE.XY);
         }else {
             if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS)) {
                 tcmZyDiagnoseDTOS.stream().forEach(diag ->{
@@ -2770,8 +2777,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                         diag.setDiseaseCode(diag.getTcmSyndromesId());
                         diag.setDiseaseName(diag.getTcmSyndromesName());
                     }
-                    //ID1003812 结算清单以西医的主诊断为准
-                    diag.setIsMain(Constant.UnifiedPay.ISMAN.F);
                 });
                 zxCollect = tcmZyDiagnoseDTOS;
             }
@@ -2784,6 +2789,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
             diseaseCount = zxCollect.size()+xiCollect.size();
+            map.put("mrisType",Constant.UnifiedPay.MRISTYPE.ZY);
         }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
@@ -3860,5 +3866,113 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
         }
         return dataMap;
+    }
+
+    /**
+     * @Description  校验中医诊断与西医诊断的匹配
+     * 2、在住院医保结算清单保存的时候，对该医院进行校验，判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
+     *
+     * 2.1、如果在范围内(比如为：急性腰扭伤/闪腰A03.06.04.08)，根据1维护的对照关系，获取对应的西医诊断的编码（可能有多个，比如：腰部扭伤 S33.501、腰椎扭伤和劳损 S33.500、腰椎扭伤 S33.502、腰骶关节扭伤 S33.500x011），再校验结算清单中出院西医诊断的主诊断，是否在其中。
+     *
+     * 2.1.1、如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
+     *
+     * 2.1.2、如果不在其中，则提示“中医主要诊断急性腰扭伤/闪腰A03.06.04.08)符合《中医优势住院病种分值表》，西医主要诊断不符合。该中医诊断映射的西医诊断有“腰部扭伤 S33.501、腰椎扭伤和劳损 S33.500、腰椎扭伤 S33.502、腰骶关节扭伤 S33.500x011，请根据映射关系修改西医主诊断编码和名称””
+     *
+     * 2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
+     * @Author 产品三部-郭来
+     * @Date 2022-07-19 10:44
+     * @param map
+     * @return void
+     */
+    public void chkTcmDiseMatch(Map map){
+
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode",MapUtil.getStr(map,"hospCode"));
+        sysMap.put("code","CHK_TCMDISE_MATCH");
+        WrapperResponse<SysParameterDTO> response = sysParameterService_consumer.getParameterByCode(sysMap);
+        if (WrapperResponse.SUCCESS != response.getCode()) {
+            throw new AppException(response.getMessage());
+        }
+        //1.开关配置  1:开启   0：关闭
+        if (ObjectUtil.isEmpty(response.getData()) || !Constants.SF.S.equals(response.getData().getValue())) {
+            return;
+        }
+        //非住院业务不校验
+        if (!Constants.SF.S.equals(MapUtil.getStr(map,"isHospital"))) {
+            return;
+        }
+        //中医主诊断编码
+        String tcmMainCode = "";
+        //中医主诊断名称
+        String tcmMainName = "";
+        //西医主诊断编码
+        String wmMainCode = "";
+        //西医主诊断名称
+        String wmMainName = "";
+        Map<String, Object> diseaseMap = MapUtils.get(map, "diseinfo");
+        if (MapUtils.isEmpty(diseaseMap)) {
+            log.info("中医病种分值校验—未获取到诊断信息");
+            return;
+        }
+        List<Map<String, Object>> zxCollect = MapUtils.get(diseaseMap, "zxCollect");
+        List<Map<String, Object>> xiCollect = MapUtils.get(diseaseMap, "xiCollect");
+        if (ObjectUtil.isEmpty(zxCollect)) {
+            log.info("中医病种分值校验—未获取到中医诊断信息");
+            return;
+        }
+        if (ObjectUtil.isEmpty(xiCollect)) {
+            log.info("中医病种分值校验—未获取到西医诊断信息");
+            return;
+        }
+        //中医主诊断
+        for (Map<String, Object> objectMap : zxCollect) {
+            if (Constants.SF.S.equals(MapUtil.getStr(objectMap,"isMain"))) {
+                    tcmMainCode = MapUtil.getStr(objectMap,"diseaseCode");
+                    tcmMainName = MapUtil.getStr(objectMap,"diseaseName");
+            }
+        }
+
+        //西医主诊断
+        for (Map<String, Object> objectMap : xiCollect) {
+            if (Constants.SF.S.equals(MapUtil.getStr(objectMap,"isMain"))) {
+                wmMainCode = MapUtil.getStr(objectMap,"diseaseCode");
+                wmMainName = MapUtil.getStr(objectMap,"diseaseName");
+            }
+        }
+        if (StringUtils.isEmpty(tcmMainCode)) {
+            log.info("中医病种分值校验—未获取到中医主诊断信息");
+            return;
+        }
+        if (StringUtils.isEmpty(wmMainCode)) {
+            log.info("中医病种分值校验—未获取到西医主诊断信息");
+            return;
+        }
+        //2.判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
+        List<TcmDiseScoreDO> tcmDiseScoreDOS = insureGetInfoDAO.queryByTcmDiseCode(tcmMainCode);
+        //2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
+        if (CollectionUtils.isEmpty(tcmDiseScoreDOS)) {
+            log.info("中医病种分值校验—中医主诊断"+tcmMainName+tcmMainCode+"不在维护的中医诊断范围内");
+            return;
+        }
+
+        StringBuilder builder = new StringBuilder();
+        List<String> wmDiseList = new ArrayList<>();
+        for (TcmDiseScoreDO tcmDiseScoreDO : tcmDiseScoreDOS) {
+            wmDiseList.add(tcmDiseScoreDO.getWmDiseCode());
+            builder.append(tcmDiseScoreDO.getWmDiseName())
+                    .append(tcmDiseScoreDO.getWmDiseCode())
+                    .append(";");
+        }
+        if (CollectionUtils.isEmpty(wmDiseList)) {
+            throw new AppException("未查询到中医主诊断"+tcmMainName+tcmMainCode+"对应的西医诊断信息,请先维护！");
+        }
+        if (!wmDiseList.contains(wmMainCode)) {
+            throw new AppException("中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，请根据映射关系修改西医主诊断编码和名称");
+        }
+        //如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
+        Map<String, Object> setlInfoMap = MapUtils.get(map, "setlinfo");
+        setlInfoMap.put("hiPaymtd","60");
+        map.put("setlinfo",setlInfoMap);
     }
 }

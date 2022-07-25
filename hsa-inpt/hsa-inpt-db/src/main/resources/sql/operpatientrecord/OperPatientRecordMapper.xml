@@ -439,7 +439,7 @@
     </select>
 
     <select id="getNonSurgicalDiseasesInfo" resultType="map" parameterType="map">
-        select `code`,`name`, pym,wbm , #{afterOrBefore} AS afterOrBefore from base_disease
+        select id,`code`,`name`, pym,wbm , #{afterOrBefore} AS afterOrBefore from base_disease
         where
             type_code != '3'
             and hosp_Code = #{hospCode}

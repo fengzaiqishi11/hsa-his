@@ -849,11 +849,11 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             responseDataMap.put("scorePrice",groupInfoMap.get("score_price"));// 分值单价
             //自行计算盈亏额
             if(baseInfoMap.get("totalFee") != null && !"".equals(baseInfoMap.get("totalFee")) && groupInfoMap.get("feeStand")!= null && !"".equals(groupInfoMap.get("feeStand"))){
-                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2));// 盈亏额
+                responseDataMap.put("profitAndLossAmount",BigDecimalUtils.subtract(BigDecimalUtils.convert(groupInfoMap.get("feeStand").toString()),BigDecimalUtils.convert(baseInfoMap.get("totalFee").toString())).setScale(2,2));// 盈亏额
             }
             //自行计算标杆费用
             if(groupInfoMap.get("feePay") != null && !"".equals(groupInfoMap.get("feePay")) && groupInfoMap.get("score_price")!= null && !"".equals(groupInfoMap.get("score_price"))){
-                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2));// 标杆费用
+                responseDataMap.put("feeStand",BigDecimalUtils.multiply(BigDecimalUtils.convert(groupInfoMap.get("feePay").toString()),BigDecimalUtils.convert(groupInfoMap.get("score_price").toString())).setScale(2,2));// 标杆费用
             }
             //先查询是否出院
             String statusCode = mrisHomeDAO.queryInptVist(map);
@@ -881,7 +881,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     }else {
                         BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                         BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2,2);
                         //如果小于0当做0处理
                         if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
                             estimateFund = BigDecimal.ZERO;
@@ -903,14 +903,14 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                         //累加药占总费用
                         if(Constants.UNIFIED_PAY_TYPE.XY.equals(feeMap.get("list_type")) || Constants.UNIFIED_PAY_TYPE.ZCY.equals(feeMap.get("list_type"))
                                 || Constants.UNIFIED_PAY_TYPE.ZYYP.equals(feeMap.get("list_type"))|| Constants.UNIFIED_PAY_TYPE.ZZJ.equals(feeMap.get("list_type"))){
-                            sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                            sumProMedic = BigDecimalUtils.add(sumProMedic,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2,2)).setScale(2,2);
                         }
                         //累加耗材总费用
                         if(Constants.UNIFIED_PAY_TYPE.YYCL.equals(feeMap.get("list_type"))){
-                            sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                            sumProConsum = BigDecimalUtils.add(sumProConsum,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2,2)).setScale(2,2);
                         }
                         //累加总费用
-                        sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2)).setScale(2);
+                        sumPrice = BigDecimalUtils.add(sumPrice,BigDecimalUtils.convert(feeMap.get("det_item_fee_sumamt").toString()).setScale(2,2)).setScale(2,2);
                     }
                     BigDecimal proMedicMater =  new BigDecimal(0.00);//药占比
                     BigDecimal proConsum =  new BigDecimal(0.00);//耗材占比
@@ -2906,7 +2906,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         drgDipResultDTO.setBl(MapUtils.get(groupInfo, "bl"));
         drgDipResultDTO.setGroupMessages(JSONObject.toJSONString(MapUtils.get(groupInfo, "groupMessages")));
         if (MapUtils.get(baseInfoMap, "totalFee") != null) {
-            drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2));
+            drgDipResultDTO.setTotalFee(BigDecimalUtils.convert(MapUtils.get(baseInfoMap, "totalFee").toString()).setScale(2,2));
         }
         if (MapUtils.get(baseInfoMap, "pro_medic_mater") != null) {
             drgDipResultDTO.setProMedicMater(MapUtils.get(baseInfoMap, "pro_medic_mater").toString());
@@ -2918,16 +2918,16 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             drgDipResultDTO.setWeightValue(MapUtils.get(groupInfo, "weight").toString());
         }
         if (MapUtils.get(groupInfo, "profit") != null) {
-            drgDipResultDTO.setProfit(BigDecimalUtils.convert(MapUtils.get(groupInfo, "profit").toString()).setScale(2));
+            drgDipResultDTO.setProfit(BigDecimalUtils.convert(MapUtils.get(groupInfo, "profit").toString()).setScale(2,2));
         }
         if (MapUtils.get(groupInfo, "feeStand") != null) {
-            drgDipResultDTO.setStandFee(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feeStand").toString()).setScale(2));
+            drgDipResultDTO.setStandFee(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feeStand").toString()).setScale(2,2));
         }
         if( drgDipResultDTO.getStandFee()!=null && drgDipResultDTO.getTotalFee() != null){
             drgDipResultDTO.setProfit(BigDecimalUtils.subtract(drgDipResultDTO.getStandFee(),drgDipResultDTO.getTotalFee()));
         }
         if (MapUtils.get(groupInfo, "feePay") != null) {
-            drgDipResultDTO.setFeePay(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feePay").toString()).setScale(2));
+            drgDipResultDTO.setFeePay(BigDecimalUtils.convert(MapUtils.get(groupInfo, "feePay").toString()).setScale(2,2));
         }
         if (MapUtils.get(groupInfo, "pro_medic_mater") != null) {
             drgDipResultDTO.setStandProMedicMater(MapUtils.get(groupInfo, "pro_medic_mater").toString());
@@ -2936,7 +2936,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             drgDipResultDTO.setStandProConsum(MapUtils.get(groupInfo, "pro_consum").toString());
         }
         if(MapUtils.get(groupInfo, "score_price") !=null){
-            drgDipResultDTO.setScorePrice(BigDecimalUtils.convert(MapUtils.get(groupInfo, "score_price").toString()).setScale(2));
+            drgDipResultDTO.setScorePrice(BigDecimalUtils.convert(MapUtils.get(groupInfo, "score_price").toString()).setScale(2,2));
         }
         List<DrgDipResultDetailDTO> drgDipResultDetailDTOList = FastJsonUtils.fromJsonArray(JSONArray.toJSONString(qualityInfo), DrgDipResultDetailDTO.class);
         Map<String, Object> resultMap = new HashMap<>();

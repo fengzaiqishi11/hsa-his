@@ -214,4 +214,8 @@ public class OutptPrescribeDetailsDO extends PageDO implements Serializable {
      * 备注
      */
     private String remark;
+    /**
+     * 煎药方式
+     */
+    private String decoctionMethod;
 }

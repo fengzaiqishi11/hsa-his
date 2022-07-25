@@ -1612,7 +1612,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             anaOrderDTO.setHilistLv(ObjectUtil.isEmpty(MapUtil.getStr(map,"hilistLv"))?"1":MapUtil.getStr(map,"hilistLv"));
             //*医保目录价格
 
-            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")));
+            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //医保目录备注
             anaOrderDTO.setHilistMemo("");
             //*医院目录代码
@@ -1622,15 +1622,15 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
             //医院目录(药品)剂型
             anaOrderDTO.setHosplistDosform(MapUtil.getStr(map,"hospItemPrepCode"));
             //*数量
-            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")));
+            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*单价
-            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")));
+            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*总费用
-            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")));
+            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自费金额
-            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")));
+            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自付金额
-            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")));
+            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*规格
             anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
             //*数量单位
@@ -1804,7 +1804,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
         //任务ID
         analysisDTO.setTaskId("");
         //触发场景
-        analysisDTO.setTrigScen(TrigScen.TRIG_SCEN_2.getCode());
+        analysisDTO.setTrigScen(TrigScen.TRIG_SCEN_7.getCode());
         //规则标识集合
         analysisDTO.setRuleIds("");
         //*参保人信息

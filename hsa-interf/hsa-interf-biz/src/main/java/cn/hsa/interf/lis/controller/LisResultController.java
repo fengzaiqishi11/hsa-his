@@ -44,7 +44,7 @@ public class LisResultController extends BaseController {
     }
 
     /**
-     * @Description: 查找没有lis结果的就诊人的医嘱id处方号（康德）
+     * @Description: 查询没有结果的申请单
      * @Param: [outptVisitDTOList]
      * @return: java.util.List<cn.hsa.module.medic.apply.dto.MedicalApplyDTO>
      * @Author: zhangxuan

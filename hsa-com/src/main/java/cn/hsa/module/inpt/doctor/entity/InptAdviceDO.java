@@ -430,5 +430,6 @@ public class InptAdviceDO extends PageDO implements Serializable {
   private String stageDetailItemId;
 
   private String clinicalPathStageId;
+  private String decoctionMethod;
 
 }

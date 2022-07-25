@@ -1,5 +1,6 @@
 package cn.hsa.module.oper.operrecord.dto;
 
+import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.oper.operrecord.entity.OperAnesthesiaRecordDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,4 +28,6 @@ public class OperAnesthesiaRecordDTO extends OperAnesthesiaRecordDO implements S
   private List<OperAnesthesiaDurgDTO> operAnesthesiaDurgDTOS;
   private List<OperAnesthesiaMonitorDTO> operAnesthesiaMonitorDTOS;
   private String Flag;
+  private List<BaseDiseaseDTO> baseDiseaseDTOS;
+  private String diseaseName;
 }

@@ -8,7 +8,11 @@ import cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO;
 import cn.hsa.module.inpt.inptnursethird.entity.InptNurseThirdDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.util.*;
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.iterators.ObjectArrayListIterator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
@@ -444,19 +448,27 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
      **/
     @Override
     public Boolean saveBatch(List<InptNurseThirdDTO> inptNurseThirdDTOS) {
-        List<String> visitIds = inptNurseThirdDTOS.stream().map(InptNurseThirdDO::getBabyId).collect(Collectors.toList());
+        //将visitid出来转成list
+        List<String> visitIds = inptNurseThirdDTOS.stream().map(InptNurseThirdDO::getVisitId).collect(Collectors.toList());
         // 过滤出婴儿id不为空的babyIds
         List<String> babyIds = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isNotEmpty(inptNurseThirdDTO.getBabyId())).map(InptNurseThirdDTO::getBabyId).collect(Collectors.toList());
+        //新增的三测单数据
         List<InptNurseThirdDTO> addList = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isEmpty(inptNurseThirdDTO.getId())).collect(Collectors.toList());
+        //编辑的三测单数据
         List<InptNurseThirdDTO> editList = inptNurseThirdDTOS.stream().filter(inptNurseThirdDTO -> StringUtils.isNotEmpty(inptNurseThirdDTO.getId())).collect(Collectors.toList());
-        String sjd = inptNurseThirdDTOS.get(0).getSjd(); //录入时间点
-        String queryTime = inptNurseThirdDTOS.get(0).getQueryTime(); //录入日期
-        String isQueryBaby = inptNurseThirdDTOS.get(0).getIsQueryBaby();//是否录入婴儿
-
+        //录入时间点
+        String sjd = inptNurseThirdDTOS.get(0).getSjd();
+        //录入日期
+        String queryTime = inptNurseThirdDTOS.get(0).getQueryTime();
+        //是否录入婴儿
+        String isQueryBaby = inptNurseThirdDTOS.get(0).getIsQueryBaby();
+        //医院编码
+        String hospCode = inptNurseThirdDTOS.get(0).getHospCode();
+        //时间格式转换
         Date date = DateUtil.stringToDate(queryTime, "yyyy-MM-dd");
         String format = DateUtils.format(date, "yyyy-MM-dd");
         Date startDate = DateUtil.stringToDate(format, "yyyy-MM-dd");
-
+        //前端传入数据校验
         if (ListUtils.isEmpty(visitIds)) {
             throw new RuntimeException("批量录入三测单失败：录入患者为空");
         }
@@ -481,7 +493,7 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             } else {
                 resultList = inptNurseThirdDao.queryInptThirdRecordByBatch(nurseThirdDTO);
             }
-
+            //判断是否填过数据
             if (!ListUtils.isEmpty(resultList)){
                 for (InptNurseThirdDTO dto : resultList) {
                     if (StringUtils.isNotEmpty(dto.getVisitId()) && visitIds.indexOf(dto.getVisitId()) != -1){
@@ -492,10 +504,15 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
             }
 
             List<InptNurseThirdDTO> iNThirdList = new ArrayList<>();
+            //查询时间段三测单拼接数据
+            List<InptNurseThirdDTO> thirdTimeList = inptNurseThirdDao.queryTimeSlotList(hospCode,format);
+            if(null == thirdTimeList){
+                throw new RuntimeException("请确认是否配置参数 HLSCD_KSSJ ！");
+            }
+            //分开遍历每个患者数据
             for (InptNurseThirdDTO addDTO : addList) {
-                addDTO.setStartDate(startDate);
-                addDTO.setEndDate(startDate);
-                List<InptNurseThirdDTO> thirdItem= inptNurseThirdDao.queryAllByTimeSlot(addDTO);
+                //深拷贝复制出新list，可以使用ObjectUtil.cloneByStream 或者 BeanUtils.copyProperties
+                List<InptNurseThirdDTO> thirdItem= ObjectUtil.cloneByStream(thirdTimeList);
                 for (InptNurseThirdDTO thirdDTO : thirdItem) {
                     if (thirdDTO.getTimeSlot().equals(addDTO.getTimeSlot())){
                         BeanUtils.copyProperties(addDTO,thirdDTO);
@@ -528,7 +545,6 @@ public class InptNurseThirdBOImpl implements InptNurseThirdBO {
                 }
                 iNThirdList.addAll(thirdItem);
             }
-
             inptNurseThirdDao.insertList(iNThirdList);
         }
 

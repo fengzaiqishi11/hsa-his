@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.entity.TcmDiseScoreDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -873,4 +874,6 @@ public interface InsureGetInfoDAO {
      * @Param [deptMap]
      **/
     OutptProfileFileDTO queryProfileFile(Map<String, Object> map);
+
+    List<TcmDiseScoreDO> queryByTcmDiseCode(String tcmDiseCode);
 }

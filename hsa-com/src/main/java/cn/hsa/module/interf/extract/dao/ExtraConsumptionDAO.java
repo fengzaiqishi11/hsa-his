@@ -1,6 +1,7 @@
 package cn.hsa.module.interf.extract.dao;
 
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
+import cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO;
 
 import java.util.List;
 
@@ -24,4 +25,11 @@ public interface ExtraConsumptionDAO {
      * @Param [extractConsumptionDTO]
      **/
     List<ExtractConsumptionDTO> queryExtractConsumptionsByItemId(ExtractConsumptionDTO extractConsumptionDTO);
+    List<ExtractStroInvoicingDetailDTO> queryStroInvoicingBuy(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
+    List<ExtractStroInvoicingDetailDTO> queryStroInvoicingSell(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
+
+    List<ExtractStroInvoicingDetailDTO> queryRoomInvoicingBuy(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
+    List<ExtractStroInvoicingDetailDTO> queryRoomInvoicingSell(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
+
+    List<ExtractStroInvoicingDetailDTO> queryExtraInvoicingByItemId(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
 }

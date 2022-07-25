@@ -539,7 +539,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         //判断是否是移动支付，是移动支付退款则推送退款申请 todo 并且这一笔结算是移动支付
         /*Map<String, String> ydzfMap = new HashMap<>();
-        ydzfMap.put("code", "HN_YDZF_FLAG");
+        ydzfMap.put("code", "HAINAN_YDZF_FLAG");
         ydzfMap.put("hospCode", hospCode);
         SysParameterDTO ydzfParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
         if(ydzfParameterDTO !=null && "1".equals(ydzfParameterDTO.getValue())) {

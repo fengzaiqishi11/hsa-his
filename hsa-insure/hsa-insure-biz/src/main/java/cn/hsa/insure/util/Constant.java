@@ -927,6 +927,12 @@ public interface Constant {
             public static final String SQSH_HAINAN = "3660"; // 海南事前审核
             public static final String SZSH_HAINAN = "3661"; // 海南事中审核
         }
+
+        //病案首页类型
+        public static class MRISTYPE {
+            public static final String XY = "1"; // 西医病案首页
+            public static final String ZY = "2"; // 中医病案首页
+        }
     }
 
 

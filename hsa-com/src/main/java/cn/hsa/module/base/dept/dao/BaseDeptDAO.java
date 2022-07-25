@@ -292,4 +292,37 @@ public interface BaseDeptDAO {
      * @Return: List<BaseDeptDTO>
      **/
     List<BaseDeptDTO> queryBaseDeptByInsure(BaseDeptDTO baseDeptDTO);
+
+    /**
+     * @Method: update()s
+     * @Description: 根据医保编码修改结算清单科室信息
+     * @Param: baseDeptDTO 科室维护信息数据传输对象
+     * @Author: fuhui
+     * @Email: 3277857701@qq.com
+     * @Date: 2020/7/16 14:15
+     * @Return: 返回影响的行数
+     */
+    boolean updateSetlAdmCaty(BaseDeptDTO baseDeptDTO);
+
+    /**
+     * @Method: update()s
+     * @Description: 根据医保编码修改结算清单科室信息
+     * @Param: baseDeptDTO 科室维护信息数据传输对象
+     * @Author: fuhui
+     * @Email: 3277857701@qq.com
+     * @Date: 2020/7/16 14:15
+     * @Return: 返回影响的行数
+     */
+    boolean updateSetlDscgCaty(BaseDeptDTO baseDeptDTO);
+
+    /**
+     * @Method: update()s
+     * @Description: 根据医保编码修改结算清单科室信息
+     * @Param: baseDeptDTO 科室维护信息数据传输对象
+     * @Author: fuhui
+     * @Email: 3277857701@qq.com
+     * @Date: 2020/7/16 14:15
+     * @Return: 返回影响的行数
+     */
+    boolean updateSetlRefldeptDept(BaseDeptDTO baseDeptDTO);
 }

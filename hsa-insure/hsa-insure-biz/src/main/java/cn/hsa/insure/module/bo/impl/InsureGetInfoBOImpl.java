@@ -1695,6 +1695,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 updateMap.put("insureSettleId",infoDTO.getInsureSettleId());
                 updateMap.put("hospCode",MapUtils.get(map, "hospCode"));
                 updateMap.put("visitId",infoDTO.getVisitId());
+                updateMap.put("billCode",MapUtils.get(billNoMap, "billCode"));
+                updateMap.put("billNo", MapUtils.get(billNoMap, "billNo"));
                 insureGetInfoDAO.updateBill(updateMap);
             }
         }

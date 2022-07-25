@@ -876,4 +876,15 @@ public interface InsureGetInfoDAO {
     OutptProfileFileDTO queryProfileFile(Map<String, Object> map);
 
     List<TcmDiseScoreDO> queryByTcmDiseCode(String tcmDiseCode);
+
+    /**
+     * @Method updateInsureGetInfo
+     * @Desrciption  更新结算清单票据代码
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 20:54
+     * @Return
+     **/
+    void updateBill(Map<String, Object> map);
 }

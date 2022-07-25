@@ -398,6 +398,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("acp_medins_name", settleInfoDTO.getAcpMedinsName()); // 拟接收机构名称 *******
         setlinfo.put("acp_medins_code", settleInfoDTO.getAcpMedinsName()); // 拟接收机构代码 ******
 
+        //判断票据代码不能为空
+        if(StringUtils.isEmpty(settleInfoDTO.getBillCode())){
+            throw new AppException("票据代码不能为空");
+        }
+        if(StringUtils.isEmpty(settleInfoDTO.getBillNo())){
+            throw new AppException("票据号码不能为空");
+        }
         setlinfo.put("bill_code", settleInfoDTO.getBillCode()); // 票据代码**********
         setlinfo.put("bill_no", settleInfoDTO.getBillNo()); // 票据号码**********
         setlinfo.put("biz_sn", settleInfoDTO.getBizSn()); // 业务流水号
@@ -1652,7 +1659,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("fixmedinsCode", infoDTO.getFixmedinsCode()); // 定点医药机构编号
         setlinfo.put("hiSetlLv", infoDTO.getHiSetlLv());//医保结算等级
         //如果之前没保存从参数获取医保结算等级
-        if(StringUtils.isNotEmpty(infoDTO.getHiSetlLv())){
+        if(StringUtils.isEmpty(infoDTO.getHiSetlLv())){
             SysParameterDTO data = insureGetInfoDAO.getParameterByCode(MapUtils.get(map, "hospCode"),"SETTLELEVEL");
             if (data == null) {
                 throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
@@ -1676,6 +1683,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
             setlinfo.put("hiSetlLv", settleLv);//医保结算等级
+        }
+        //如果之前没保存发票，再查询发票
+        if(StringUtils.isEmpty(infoDTO.getBillCode()) || StringUtils.isEmpty(infoDTO.getBillNo())){
+            Map<String, Object> billNoMap = generatorBillNo(map);
+            if(ObjectUtil.isNotEmpty(MapUtils.get(billNoMap, "billCode")) && ObjectUtil.isNotEmpty(MapUtils.get(billNoMap, "billNo"))){
+                setlinfo.put("billCode", MapUtils.get(billNoMap, "billCode")); // 票据代码**********
+                setlinfo.put("billNo", MapUtils.get(billNoMap, "billNo")); // 票据号码**********
+                //更新结算清单的数据
+                Map<String, Object> updateMap = new HashMap<>();
+                updateMap.put("insureSettleId",infoDTO.getInsureSettleId());
+                updateMap.put("hospCode",MapUtils.get(map, "hospCode"));
+                updateMap.put("visitId",infoDTO.getVisitId());
+                insureGetInfoDAO.updateBill(updateMap);
+            }
         }
         setlinfo.put("psnNo", infoDTO.getHiNo()); // 医保编号
         setlinfo.put("hiNo", infoDTO.getHiNo()); //医保编号
@@ -1822,6 +1843,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if(MapUtils.get(setlInfoMap, "hsorg") == null){
             setlInfoMap.put("hsorg","");
         }
+        //票据代码处理
+        if(MapUtils.get(setlInfoMap, "billCode") == null){
+            setlInfoMap.put("billCode","");
+        }
+        //票据号码处理
+        if(MapUtils.get(setlInfoMap, "billNo") == null){
+            setlInfoMap.put("billNo","");
+        }
         setlInfoMap.put("id", SnowflakeUtils.getId());
         setlInfoMap.put("hospCode", MapUtils.get(map, "hospCode"));
         setlInfoMap.put("crteId", MapUtils.get(map, "crteId"));
@@ -1842,8 +1871,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         getEmptyErr(setlInfoMap, "conerTel", "联系人电话不能为空");
         getEmptyErr(setlInfoMap, "hiType", "医保类型不能为空");
         getEmptyErr(setlInfoMap, "insuplc", "参保地不能为空");
-        getEmptyErr(setlInfoMap, "billNo", "票据号码不能为空");
-        getEmptyErr(setlInfoMap, "billCode", "票据代码不能为空");
+        //允许先不填发票
+//        getEmptyErr(setlInfoMap, "billNo", "票据号码不能为空");
+//        getEmptyErr(setlInfoMap, "billCode", "票据代码不能为空");
         getEmptyErr(setlInfoMap, "bizSn", "业务流水号不能为空");
         getEmptyErr(setlInfoMap, "setlBegnDate", "结算期间开始时间不能为空");
         getEmptyErr(setlInfoMap, "setlEndDate", "结算期间结束时间不能为空");
@@ -2644,10 +2674,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 throw new AppException("该患者未产生发票信息");
             }
         }
-        billNo = MapUtils.get(dataMap, "invoice_no");
-        billCode = MapUtils.get(dataMap, "prefix");
-        map.put("billNo", billNo);
-        map.put("billCode", billCode);
+        //如果允许不开发票先存空
+        if (MapUtils.isEmpty(dataMap)) {
+            map.put("billNo", "");
+            map.put("billCode", "");
+        }else {
+            billNo = MapUtils.get(dataMap, "invoice_no");
+            billCode = MapUtils.get(dataMap, "prefix");
+            map.put("billNo", billNo);
+            map.put("billCode", billCode);
+        }
         return map;
     }
 

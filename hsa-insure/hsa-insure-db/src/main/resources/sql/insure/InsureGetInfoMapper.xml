@@ -2154,4 +2154,13 @@
         select * from tcm_dise_score where tcm_dise_code = #{tcmDiseCode} and vali_flag = '1'
     </select>
 
+    <update id="updateBill">
+        update insure_setl_info
+        set bill_code = #{billCode}
+        set bill_no = #{billNo}
+        where insure_settle_id = #{insureSettleId}
+          and hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
+
 </mapper>

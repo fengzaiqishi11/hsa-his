@@ -67,8 +67,8 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
                 resultMap.put( "avgBuyPrice" + e.getBizId(),e.getAvgBuyPrice());// 成本价
                 resultMap.put( "buyPriceAll" + e.getBizId(),e.getBuyPriceAll());// 成本金额
                 resultMap.put( "profitPrice" + e.getBizId(),e.getProfitPrice());// 盈利
-                resultList.add(resultMap);
             }
+            resultList.add(resultMap);
         }
         // 手动分页
         return PageDTO.ofByManual(resultList,extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());

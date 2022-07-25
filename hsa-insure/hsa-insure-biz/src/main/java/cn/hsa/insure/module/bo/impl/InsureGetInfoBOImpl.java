@@ -2560,7 +2560,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if(outptProfileFileDTO != null){
                 profileMap = JSONObject.parseObject(JSON.toJSONString(outptProfileFileDTO));
             }
-            setlinfo.put("ntly",MapUtils.getMapVS(profileMap, "ntly", (String) MapUtils.getMapVS(baseInfoMap, "ntly", "141"))); // 国籍,默认中国
+            setlinfo.put("ntly",MapUtils.getMapVS(profileMap, "nationalityCation", (String) MapUtils.getMapVS(baseInfoMap, "ntly", "141"))); // 国籍,默认中国
             Object naty =  MapUtils.getMapVS(profileMap, "nationCode", (String) MapUtils.getMapVS(baseInfoMap, "nation_code", "1"));
             if (naty == null) {
                 setlinfo.put("naty", ""); // 民族

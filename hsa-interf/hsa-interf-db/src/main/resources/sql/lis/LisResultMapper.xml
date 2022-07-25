@@ -10,8 +10,8 @@
         values
         <foreach collection="list" item="entity" separator=",">
             (#{entity.id}, #{entity.hospCode}, #{entity.applyNo}, #{entity.typeCode}, #{entity.visitId},
-            #{entity.babyId}, #{entity.inNo}, #{entity.adviceId}, #{entity.isInpt}, #{entity.deptId}, #{entity.deptName},
-            #{entity.doctorId}, #{entity.doctorName}, #{entity.applyTime}, #{entity.impDeptId}, #{entity.barCode},
+            #{entity.babyId}, #{entity.inNo}, #{entity.adviceId}, #{entity.isInpt}, #{entity.deptId},
+            #{entity.deptName},#{entity.doctorId}, #{entity.doctorName}, #{entity.applyTime}, #{entity.impDeptId}, #{entity.barCode},
             #{entity.printTime}, #{entity.printTimes}, #{entity.rporter}, #{entity.isAllergy}, #{entity.resultId},
             #{entity.isPositive}, #{entity.documentSta}, #{entity.opdId}, #{entity.content}, #{entity.medicType},
             #{entity.isMerge}, #{entity.mergeId}, #{entity.remark}, #{entity.reportTime}, #{entity.crteId},
@@ -21,171 +21,189 @@
     </insert>
 
     <select id="queryNoResult" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
-        select visit_id from medic_apply where result_id is null and crte_time > DATE_SUB(now(), INTERVAL #{days} DAY)
+        select visit_id
+        from medic_apply
+        where result_id is null
+          and crte_time > DATE_SUB(now(), INTERVAL #{days} DAY)
     </select>
 
     <select id="queryNoResultLis" resultType="java.util.Map">
-        SELECT
-	a.hosp_code,
-	a.apply_no,
-	a.order_no,
-	a.type_code,
-	a.visit_id AS pid,
-	a.in_no,
-	a.opd_id,
-	a.id,
-	c.item_id,
-	b.age_unit_code AS ageunit,
-	'门诊' AS patType,
-	'无' AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
-	c.item_name AS sfname,
-	c.total_price AS sfmoney,
-	'1' AS sfcount,
-	a.is_inpt,
-	a.dept_id,
-	a.dept_name,
-	a.doctor_id,
-	a.doctor_name,
-	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
-	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
-	a.crte_time AS sftime,
-	b.name,
-IF
-	( b.gender_code = '1', '男', '女' ) AS sex,
-	ifnull( b.age, 18 ) AS age,
-	a.bar_code AS barcode
-FROM
-	medic_apply a
-	LEFT JOIN outpt_visit b ON a.visit_id = b.id
-	AND a.hosp_code = b.hosp_code
-	LEFT JOIN outpt_prescribe_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '0' and a.report_time is null and a.document_sta = '02' and a.print_time is not null
-	UNION ALL
-SELECT
-	a.hosp_code,
-	a.apply_no,
-	a.order_no,
-	a.type_code,
-	a.visit_id AS pid,
-	a.in_no,
-	a.opd_id,
-	a.id,
-	c.ba_id as item_id,
-	b.age_unit_code AS ageunit,
-	'住院' AS patType,
-	b.bed_name AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
-	c.item_name AS sfname,
-	c.total_price AS sfmoney,
-	'1' AS sfcount,
-	a.is_inpt,
-	a.dept_id,
-	a.dept_name,
-	a.doctor_id,
-	a.doctor_name,
-	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
-	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
-	a.crte_time AS sftime,
-	b.name,
-IF
-	( b.gender_code = '1', '男', '女' ) AS sex,
-	ifnull( b.age, 18 ) AS age,
-	a.bar_code AS barcode
-FROM
-	medic_apply a
-	LEFT JOIN inpt_visit b ON a.visit_id = b.id
-	AND a.hosp_code = b.hosp_code
-	LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '1' and a.report_time is null and a.document_sta = '01' and a.print_time is not null
+        SELECT a.hosp_code,
+               a.apply_no,
+               a.order_no,
+               a.type_code,
+               a.visit_id AS pid,
+               a.in_no,
+               a.opd_id,
+               a.id,
+               c.item_id,
+               b.age_unit_code  AS ageunit,
+               '门诊' AS patType,
+               '无' AS bednum,
+               (SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code) AS sfcode,
+               c.item_name AS sfname,
+               c.total_price AS sfmoney,
+               '1' AS sfcount,
+               a.is_inpt,
+               a.dept_id,
+               a.dept_name,
+               a.doctor_id,
+               a.doctor_name,
+               (SELECT bd.CODE
+                FROM base_dept bd
+                WHERE bd.id = a.dept_id
+                  AND bd.hosp_code = a.hosp_code)  AS department,
+               (SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code)  AS doctor,
+               a.crte_time AS sftime,
+               b.name,
+               IF
+                   (b.gender_code = '1', '男', '女')    AS sex,
+               ifnull(b.age, 18)  AS age,
+               a.bar_code  AS barcode
+        FROM medic_apply a
+                 LEFT JOIN outpt_visit b ON a.visit_id = b.id
+            AND a.hosp_code = b.hosp_code
+                 LEFT JOIN outpt_prescribe_detail c ON a.opd_id = c.id
+            AND a.hosp_code = c.hosp_code
+        where a.is_inpt = '0'
+          and a.report_time is null
+          and a.document_sta = '02'
+          and a.print_time is not null
+        UNION ALL
+        SELECT a.hosp_code,
+               a.apply_no,
+               a.order_no,
+               a.type_code,
+               a.visit_id AS pid,
+               a.in_no,
+               a.opd_id,
+               a.id,
+               c.ba_id AS item_id,
+               b.age_unit_code AS ageunit,
+               '住院' AS patType,
+               b.bed_name AS bednum,
+               (SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code)  AS sfcode,
+               c.item_name AS sfname,
+               c.total_price AS sfmoney,
+               '1' AS sfcount,
+               a.is_inpt,
+               a.dept_id,
+               a.dept_name,
+               a.doctor_id,
+               a.doctor_name,
+               (SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code)  AS department,
+               (SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code) AS doctor,
+               a.crte_time AS sftime,
+               b.name,
+               IF
+                   (b.gender_code = '1', '男', '女') AS sex,
+               ifnull(b.age, 18) AS age,
+               a.bar_code AS barcode
+        FROM medic_apply a
+                 LEFT JOIN inpt_visit b ON a.visit_id = b.id
+            AND a.hosp_code = b.hosp_code
+                 LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
+            AND a.hosp_code = c.hosp_code
+        where a.is_inpt = '1'
+          and a.report_time is null
+          and a.document_sta = '01'
+          and a.print_time is not null
     </select>
 
     <select id="queryNoResultLisS" resultType="java.util.Map">
-        SELECT
-	a.hosp_code,
-	a.apply_no,
-	a.order_no,
-	a.type_code,
-	a.visit_id AS pid,
-	a.in_no,
-	a.opd_id,
-	a.id,
-	c.item_id,
-	b.age_unit_code AS ageunit,
-	'门诊' AS patType,
-	'无' AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
-	c.item_name AS sfname,
-	c.total_price AS sfmoney,
-	'1' AS sfcount,
-	a.is_inpt,
-	a.dept_id,
-	a.dept_name,
-	a.doctor_id,
-	a.doctor_name,
-	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
-	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
-	a.crte_time AS sftime,
-	b.name,
-IF
-	( b.gender_code = '1', '男', '女' ) AS sex,
-	ifnull( b.age, 18 ) AS age,
-	a.bar_code AS barcode
-FROM
-	medic_apply a
-	LEFT JOIN outpt_visit b ON a.visit_id = b.id
-	AND a.hosp_code = b.hosp_code
-	LEFT JOIN outpt_prescribe_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '0' and a.report_time is null and a.document_sta = '02'
-	UNION ALL
-SELECT
-	a.hosp_code,
-	a.apply_no,
-	a.order_no,
-	a.type_code,
-	a.visit_id AS pid,
-	a.in_no,
-	a.opd_id,
-	a.id,
-	c.ba_id as item_id,
-	b.age_unit_code AS ageunit,
-	'住院' AS patType,
-	b.bed_name AS bednum,
-	( SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code ) AS sfcode,
-	c.item_name AS sfname,
-	c.total_price AS sfmoney,
-	'1' AS sfcount,
-	a.is_inpt,
-	a.dept_id,
-	a.dept_name,
-	a.doctor_id,
-	a.doctor_name,
-	( SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code ) AS department,
-	( SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code ) AS doctor,
-	a.crte_time AS sftime,
-	b.name,
-IF
-	( b.gender_code = '1', '男', '女' ) AS sex,
-	ifnull( b.age, 18 ) AS age,
-	a.bar_code AS barcode
-FROM
-	medic_apply a
-	LEFT JOIN inpt_visit b ON a.visit_id = b.id
-	AND a.hosp_code = b.hosp_code
-	LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
-	AND a.hosp_code = c.hosp_code
-	where a.is_inpt = '1' and a.report_time is null and a.document_sta = '01'
+        SELECT a.hosp_code,
+               a.apply_no,
+               a.order_no,
+               a.type_code,
+               a.visit_id AS pid,
+               a.in_no,
+               a.opd_id,
+               a.id,
+               c.item_id,
+               b.age_unit_code AS ageunit,
+               '门诊' AS patType,
+               '无' AS bednum,
+               (SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.item_id AND ba.hosp_code = a.hosp_code) AS sfcode,
+               c.item_name AS sfname,
+               c.total_price AS sfmoney,
+               '1' AS sfcount,
+               a.is_inpt,
+               a.dept_id,
+               a.dept_name,
+               a.doctor_id,
+               a.doctor_name,
+               (SELECT bd.CODE
+                FROM base_dept bd
+                WHERE bd.id = a.dept_id
+                  AND bd.hosp_code = a.hosp_code) AS department,
+               (SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code)  AS doctor,
+               a.crte_time AS sftime,
+               b.name,
+               IF
+                   (b.gender_code = '1', '男', '女') AS sex,
+               ifnull(b.age, 18) AS age,
+               a.bar_code AS barcode
+        FROM medic_apply a
+                 LEFT JOIN outpt_visit b ON a.visit_id = b.id
+            AND a.hosp_code = b.hosp_code
+                 LEFT JOIN outpt_prescribe_detail c ON a.opd_id = c.id
+            AND a.hosp_code = c.hosp_code
+        where a.is_inpt = '0'
+          and a.report_time is null
+          and a.document_sta = '02'
+        UNION ALL
+        SELECT a.hosp_code,
+               a.apply_no,
+               a.order_no,
+               a.type_code,
+               a.visit_id AS pid,
+               a.in_no,
+               a.opd_id,
+               a.id,
+               c.ba_id AS item_id,
+               b.age_unit_code AS ageunit,
+               '住院' AS patType,
+               b.bed_name AS bednum,
+               (SELECT ba.CODE FROM base_advice ba WHERE ba.id = c.ba_id AND ba.hosp_code = a.hosp_code)  AS sfcode,
+               c.item_name AS sfname,
+               c.total_price AS sfmoney,
+               '1' AS sfcount,
+               a.is_inpt,
+               a.dept_id,
+               a.dept_name,
+               a.doctor_id,
+               a.doctor_name,
+               (SELECT bd.CODE FROM base_dept bd WHERE bd.id = a.dept_id AND bd.hosp_code = a.hosp_code)  AS department,
+               (SELECT ba.CODE FROM sys_user ba WHERE ba.id = a.doctor_id AND ba.hosp_code = a.hosp_code) AS doctor,
+               a.crte_time  AS sftime,
+               b.name,
+               IF
+                   (b.gender_code = '1', '男', '女') AS sex,
+               ifnull(b.age, 18) AS age,
+               a.bar_code  AS barcode
+        FROM medic_apply a
+                 LEFT JOIN inpt_visit b ON a.visit_id = b.id
+            AND a.hosp_code = b.hosp_code
+                 LEFT JOIN inpt_advice_detail c ON a.opd_id = c.id
+            AND a.hosp_code = c.hosp_code
+        where a.is_inpt = '1'
+          and a.report_time is null
+          and a.document_sta = '01'
     </select>
 
     <select id="queryDXNoResult" resultType="java.lang.String">
-        select opd_id from medic_apply where report_time is null and hosp_code = #{hospCode}
+        select opd_id
+        from medic_apply
+        where report_time is null
+          and hosp_code = #{hospCode}
     </select>
 
     <select id="queryDXBackResult" resultType="java.lang.String">
-        select opd_id from medic_apply where document_sta in ('05','06') and hosp_code = #{hospCode}
+        select id
+        from medic_apply
+        where document_sta in ('05', '06')
+          and hosp_code = #{hospCode}
+          and crte_time &gt;= curdate()
     </select>
 
     <update id="updateIsIssue">
@@ -196,8 +214,24 @@ FROM
         </foreach>
     </update>
 
+    <insert id="insertResult" keyProperty="" useGeneratedKeys="false">
+        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        crte_name, crte_time, apply_no, checker, check_time, reviewer, audit_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
+            #{entity.testitemName}, #{entity.reportText}, #{entity.picUrl}, #{entity.isPositive},
+            #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
+            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo},
+            #{entity.checker}, #{entity.checkTime}, #{entity.reviewer}, #{entity.auditTime})
+        </foreach>
+    </insert>
 
-    <insert id="insertResult" keyProperty="" useGeneratedKeys="true">
+    <insert id="insertDXResult" keyProperty="" useGeneratedKeys="true">
         insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
         item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
         range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
@@ -205,47 +239,31 @@ FROM
         values
         <foreach collection="list" item="entity" separator=",">
             (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
-            #{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.result_type}, #{entity.result},
-            #{entity.testitem_name}, #{entity.reportte_text}, #{entity.pic_url}, #{entity.isPositive},
+            #{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.resultType}, #{entity.result},
+            #{entity.resultDetail}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
             #{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
             #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
             #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
         </foreach>
     </insert>
 
-    <insert id="insertDXResult" keyProperty="" useGeneratedKeys="true">
-		insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
-		item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
-		range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
-		crte_name, crte_time, apply_no)
-		values
-		<foreach collection="list" item="entity" separator=",">
-			(#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
-			#{entity.typeCode}, #{entity.item_id}, #{entity.item_name}, #{entity.resultType}, #{entity.result},
-			#{entity.resultDetail}, #{entity.reporteText}, #{entity.pic_url}, #{entity.isPositive},
-			#{entity.reference_value}, #{entity.result_unit}, #{entity.rangeState}, #{entity.rangeStateColor},
-			#{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
-			#{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo})
-		</foreach>
-    </insert>
-
-	<!--根据barcode 删除旧的医技结果（线上版通用）-->
+    <!--根据id 删除旧的医技结果（线上版通用）-->
     <delete id="deleteResult">
-        delete from medic_result where bar_code in
+        delete from medic_result where id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
-          #{entity}
+            #{entity.id}
         </foreach>
     </delete>
 
-	<!--根据adviceId 删除旧的医技结果（适用落地版德星）-->
-	<delete id="deleteResultDX">
-		delete from medic_result where advice_id in
-		<foreach collection="list" item="entity" separator="," open="(" close=")">
-			#{entity}
-		</foreach>
-	</delete>
+    <!--根据adviceId 删除旧的医技结果（适用落地版德星）-->
+    <delete id="deleteResultDX">
+        delete from medic_result where advice_id in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+            #{entity}
+        </foreach>
+    </delete>
 
-	<update id="updateApplyStatus">
+    <update id="updateApplyStatus">
         update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
         where opd_id in
         <foreach collection="list" item="entity" separator="," open="(" close=")">
@@ -269,20 +287,57 @@ FROM
         </foreach>
     </update>
 
+    <!--根据medic_apply 的 apply_no 更新申请单状态为 已完成状态-->
+    <update id="updateApplyStatusForLine">
+        update medic_apply set report_time = DATE_FORMAT(NOW(),'%Y-%m-%d %H:%m:%s') , document_sta = '08'
+        where apply_no in
+        <foreach collection="list" item="entity" separator="," open="(" close=")">
+            #{entity}
+        </foreach>
+    </update>
+
     <select id="queryAdvice" resultType="java.util.Map">
-        select id,hosp_code,code,name,type_code,price,unit_code,container_code,specimen_code,is_cost
-        from base_advice where hosp_code = #{hospCode} and type_code = #{typeCode} and is_valid = '1'
+        select ba.id,
+               ba.hosp_code as hospCode,
+               ba.code,
+               ba.name,
+               ba.type_code as typeCode,
+               ba.price,
+               scddw.name as unitCode,
+               scdrq.name as containerCode,
+               scd.name specimenCode,
+               ba.is_cost as isCost
+        from base_advice ba
+        left join sys_code_detail scd on scd.value = ba.specimen_code and scd.c_code ='BBLX' and scd.hosp_code = ba.hosp_code
+        left join sys_code_detail scddw on scddw.value = ba.unit_code and scddw.c_code ='DW' and scd.hosp_code = ba.hosp_code
+        left join sys_code_detail scdrq on scdrq.value = ba.container_code and scdrq.c_code ='RQ' and scdrq.hosp_code = ba.hosp_code
+        where ba.hosp_code = #{hospCode}
+          and ba.type_code = #{typeCode}
+          and ba.is_valid = '1'
     </select>
 
     <select id="queryDept" resultType="java.util.Map">
-        select id,hosp_code,code,name,intro,place,remark
-        from base_dept where hosp_code = #{hospCode} and is_valid = '1'
+        select id, hosp_code as hospCode, code, name, intro, place, remark
+        from base_dept
+        where hosp_code = #{hospCode}
+          and is_valid = '1'
     </select>
 
     <select id="queryUser" resultType="java.util.Map">
-        select id,hosp_code,dept_code,code,is_in_job,name,age,gender_code,
-               introduce,speciality,email,phone
-        from sys_user where hosp_code = #{hospCode}
+        select id,
+               hosp_code as hospCode,
+               dept_code as deptCode,
+               code,
+               is_in_job as isInJob,
+               name,
+               age,
+               gender_code as genderCode,
+               introduce,
+               speciality,
+               email,
+               phone
+        from sys_user
+        where hosp_code = #{hospCode}
     </select>
 
 </mapper>

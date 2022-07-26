@@ -273,8 +273,9 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
             return  true;
         }else{
-            int affectRows = centerHospitalDao.update(centerHospitalDTO) ;
             CenterHospitalDTO sourceHospitalInfoFromDB = centerHospitalDao.getById(centerHospitalDTO);
+            int affectRows = centerHospitalDao.update(centerHospitalDTO) ;
+
             if(!sourceHospitalInfoFromDB.getEndDate().equals(centerHospitalDTO.getEndDate())){
                 String dateBeforeRenewalStr = DateUtils.format(sourceHospitalInfoFromDB.getStartDate(),DateUtils.Y_M_DH_M_S)+'~'+
                         DateUtils.format(sourceHospitalInfoFromDB.getEndDate(),DateUtils.Y_M_DH_M_S);
@@ -284,6 +285,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 CenterOperationLogDo operationLogDo = CenterOperationLogDo.builder()
                         .id(SnowflakeUtils.getId())
                         .hospCode(centerHospitalDTO.getCode())
+                        .hospName(centerHospitalDTO.getName())
                         .crteId(centerHospitalDTO.getCrteId())
                         .crteName(centerHospitalDTO.getCrteName())
                         .bizId("YYYXQXG10001") // 医院有效期修改

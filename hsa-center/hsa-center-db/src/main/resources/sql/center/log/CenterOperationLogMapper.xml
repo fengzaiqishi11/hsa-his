@@ -10,7 +10,7 @@
                                                  `dept_id`, `dept_name`, `ip`, `request_param`, `crte_id`, `crte_name`,
                                                  `crte_time`,`biz_id`,  `date_before_renewal` ,`date_after_renewal`)
         VALUES (#{id}, #{hospCode}, #{hospName}, #{userId}, #{userName}, #{userCode}, #{deptId}, #{deptName}, #{ip},
-                #{requestParam}, #{crteId}, #{crteName}, #{crteTime}, #{bizId});
+                #{requestParam}, #{crteId}, #{crteName}, #{crteTime}, #{bizId},#{dateBeforeRenewal},#{dateAfterRenewal});
 
     </insert>
 

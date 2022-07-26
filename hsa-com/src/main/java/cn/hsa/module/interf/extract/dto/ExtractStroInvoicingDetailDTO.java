@@ -63,6 +63,13 @@ public class ExtractStroInvoicingDetailDTO extends ExtractStroInvoicingDetailDO 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date endTime;
-
+    // 期初零售总金额
+    private BigDecimal upSellPrice;
+    // 期末零售总金额
+    private BigDecimal sellPrice;
+    // 期初购进总金额
+    private BigDecimal upBuyPrice;
+    // 期末购进总金额
+    private BigDecimal buyPrice;
 }
 

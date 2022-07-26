@@ -1,6 +1,7 @@
 package cn.hsa.module.sys.parameter.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 
 import java.util.List;
@@ -110,4 +111,11 @@ public interface SysParameterBO {
    * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
    **/
     Map getLoginInfo(Map map);
+  /**
+   * @Author gory
+   * @Description 过期提醒(后续天数要做出参数配置)
+   * @Date 2022/7/26 9:50
+   * @Param [centerHospitalDTO]
+   **/
+  Map<String, Object> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO);
 }

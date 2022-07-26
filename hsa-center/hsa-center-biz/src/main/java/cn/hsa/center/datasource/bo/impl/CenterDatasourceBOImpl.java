@@ -457,7 +457,7 @@ public class CenterDatasourceBOImpl extends HsafBO implements CenterDatasourceBO
     @Override
     public WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO) {
         Map<String,Object> resultMap = new HashMap<>();
-        long millsOf15Days = 15 * 24 * 3600 * 1000;
+        long millsOf15Days = centerHospitalDTO.getMillsOfDays();
 
         CenterHospitalDTO centerHospitalDTO1 = centerHospitalDatasourceDAO.getHospServiceStatsByCode(centerHospitalDTO);
         long millsOfEndDate = centerHospitalDTO1.getEndDate().getTime();

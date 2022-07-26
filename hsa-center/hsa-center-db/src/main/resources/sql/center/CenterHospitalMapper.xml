@@ -38,6 +38,7 @@
         <result property="operCode" column="oper_code" jdbcType="VARCHAR"/>
         <result property="auditFlag" column="audit_flag" jdbcType="VARCHAR"/>
         <result property="auditMsg" column="audit_msg" jdbcType="VARCHAR"/>
+        <result property="serviceStatus" column="service_status" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -117,7 +118,7 @@
     select
     id, code, name, pro_code, city_code, area_code, disease_code, oper_code, buli_image_path, address, phone, fax, email, post_code,
     hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date,
-    end_date, is_valid, crte_id, crte_name, crte_time,audit_flag,audit_msg
+    end_date, is_valid, crte_id, crte_name, crte_time,audit_flag,audit_msg,service_status
     from center_hospital
         <where>
             <if test="keyword != null and keyword != ''">
@@ -130,6 +131,7 @@
                and  NOT ((end_date &lt;= #{start_time}) OR (#{end_time} &lt;start_date))
             </if>
                 and is_valid = '1'
+                and service_status=#{serviceStatus}
         </where>
         order by crte_time desc
     </select>

@@ -29,4 +29,7 @@ public class CenterHospitalDTO extends CenterHospitalDO implements Serializable 
     private String end_time ;
 
     private String dataName ;
+
+    private Long millsOfDays;
+    private String workTypeCode;
 }

@@ -1,5 +1,6 @@
 package cn.hsa.module.sys.parameter.dao;
 
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterUpdateDTO;
 import org.apache.ibatis.annotations.MapKey;

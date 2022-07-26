@@ -214,6 +214,11 @@ public class SysParameterController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         CenterHospitalDTO centerHospitalDTO = new CenterHospitalDTO();
         centerHospitalDTO.setCode(sysUserDTO.getHospCode());
-        return centerDatasourceService.getHospServiceStatsByCode(centerHospitalDTO);
+        centerHospitalDTO.setWorkTypeCode(sysUserDTO.getWorkTypeCode());
+        Map map = new HashMap();
+        map.put("centerHospitalDTO",centerHospitalDTO);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return sysParameterService_consumer.getHospServiceStatsByCode(map);
     }
+
 }

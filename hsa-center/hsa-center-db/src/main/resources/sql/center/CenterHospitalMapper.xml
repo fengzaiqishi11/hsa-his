@@ -96,7 +96,7 @@
         select
         id, code, name, pro_code, city_code, disease_code, oper_code, area_code, buli_image_path, address, phone, fax, email, post_code,
         hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date,
-        end_date, is_valid, crte_id, crte_name, crte_time
+        end_date, is_valid, crte_id, crte_name, crte_time,service_status
         from center_hospital
         <where>
             <if test="id != null and id != ''">

@@ -360,6 +360,7 @@ public class RequestInsure {
                     throw new AppException((String) resultObj.get("msg"));
                 }
                 resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
+              logger.info("调用工商医保出参数：{}",resultData);
             }
             int errortype = Integer.parseInt((String) resultData.get("errortype"));
             if (errortype != 0){
@@ -370,7 +371,8 @@ public class RequestInsure {
           //调接口后，请求失败插入医保人员信息获取日志
            params.put("resultStr", e.getMessage() == null ? "null" : e.getMessage().length() > 4000 ?
               e.getMessage().substring(0, 4000) : e.getMessage());
-            throw new AppException("调用医保提示【"+e.getMessage()+"】");
+            logger.error("call insure HUNAN province error: ",e);
+            throw new AppException("调用医保提示【"+e.getMessage()+"】",e);
         }finally {
           logger.info("*****调用省工伤接口保存日志记录开始*****");
           insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
@@ -474,15 +476,18 @@ public class RequestInsure {
                 ConsumerRecords<String, String> records = consumer.poll(100);
                 for (ConsumerRecord<String, String> record : records) {
                     String value = record.value();
+                    logger.error("call kafka consumer receive msg from server: {}",value);
                     if (StringUtils.isNotEmpty(value)){
-                        if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){ value = DesUtil.decrypt(value); }
+                        if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){
+                            value = DesUtil.decrypt(value); }
                         Map<String,Object> result = JSON.parseObject(value,HashMap.class);
                         if (activityCode.equals(result.get("activityCode"))) {
                             consumer.commitAsync();
                             logger.info("【医保调用】KAFKA返参字符串：" + JSON.toJSONString(result));
                             logger.info("*****结束【医保调用】KAFKA方法*****");
                             return result;
-
+                        }else{
+                            logger.warn("发送的交易号：activityCode: {},接收的交易号：result.get('activityCode'){},不一致，完整数据包：{}",activityCode,result.get("activityCode"),JSON.toJSONString(result));
                         }
                     }
                 }

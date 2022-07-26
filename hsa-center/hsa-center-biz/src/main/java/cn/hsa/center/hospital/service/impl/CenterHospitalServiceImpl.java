@@ -194,4 +194,9 @@ public class CenterHospitalServiceImpl extends HsafService implements CenterHosp
     public WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
         return WrapperResponse.success(centerHospitalBO.findRootBase(centerRootDatabaseBO));
     }
+
+    @Override
+    public WrapperResponse<Boolean> triggerSchedulingManual(CenterRootDatabaseBO centerRootDatabaseBO) {
+        return WrapperResponse.success(centerHospitalBO.triggerSchedulingManual(centerRootDatabaseBO));
+    }
 }

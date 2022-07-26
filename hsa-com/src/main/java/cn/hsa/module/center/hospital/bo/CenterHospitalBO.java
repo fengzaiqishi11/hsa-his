@@ -112,4 +112,11 @@ public interface CenterHospitalBO {
     boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 
     CenterRootDatabaseBO findRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    /**
+     *  手动触发定时任务调度执行
+     * @param centerRootDatabaseBO 形参
+     * @return
+     */
+    boolean triggerSchedulingManual(CenterRootDatabaseBO centerRootDatabaseBO);
 }

@@ -476,10 +476,11 @@ public class RequestInsure {
                 ConsumerRecords<String, String> records = consumer.poll(100);
                 for (ConsumerRecord<String, String> record : records) {
                     String value = record.value();
-                    logger.error("call kafka consumer receive msg from server: {}",value);
+                    logger.error("call kafka consumer receive encrypt msg from server: {}",value);
                     if (StringUtils.isNotEmpty(value)){
                         if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){
                             value = DesUtil.decrypt(value); }
+                        logger.error("call kafka consumer receive msg from server: activityId is {},out_params content:{},in_params:{}",activityCode,value,JSON.toJSONString(param));
                         Map<String,Object> result = JSON.parseObject(value,HashMap.class);
                         if (activityCode.equals(result.get("activityCode"))) {
                             consumer.commitAsync();

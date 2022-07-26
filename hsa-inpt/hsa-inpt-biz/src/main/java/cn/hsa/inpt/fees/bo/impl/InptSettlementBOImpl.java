@@ -430,10 +430,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     unifiedMap.put("inptVisitDTO",inptVisitDTO1);
                     insureIndividualVisitDTO.setIsOut(Constants.SF.S);
                     unifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-                    List<InsureIndividualVisitDTO> byCondition = insureIndividualVisitService.findByCondition(unifiedMap);
+                    //试算不再需要出院才能做
+                    /*List<InsureIndividualVisitDTO> byCondition = insureIndividualVisitService.findByCondition(unifiedMap);
                     if(ListUtils.isEmpty(byCondition)){
                         throw new AppException("请先做医保出院登记操作,再进行试算操作");
-                    }
+                    }*/
                     inptInsureResult = insureUnifiedPayInptService.UP_2303(unifiedMap).getData();
 
 
@@ -1757,6 +1758,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO.setId(id);
             inptVisitDTO.setHospCode(hospCode);
             inptVisitDTO.setIsOut("0");
+            inptVisitDTO.setMedicalRegNo(medicalRegNo);
             map.put("inptVisitDTO",inptVisitDTO);
             insureIndividualVisitService.updateInsureInidivdual(map).getData();
         }
@@ -2855,7 +2857,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             anaOrderDTO.setHilistLv(ObjectUtil.isEmpty(MapUtil.getStr(map,"hilistLv"))?"1":MapUtil.getStr(map,"hilistLv"));
             //*医保目录价格
 
-            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")));
+            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //医保目录备注
             anaOrderDTO.setHilistMemo("");
             //*医院目录代码
@@ -2865,15 +2867,15 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             //医院目录(药品)剂型
             anaOrderDTO.setHosplistDosform(MapUtil.getStr(map,"hospItemPrepCode"));
             //*数量
-            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")));
+            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*单价
-            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")));
+            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*总费用
-            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")));
+            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自费金额
-            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")));
+            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自付金额
-            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")));
+            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*规格
             anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
             //*数量单位
@@ -2920,6 +2922,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             diagnoseDTO.setDiseName(inptDiagnoseDTO.getDiseaseName());
             //*诊断日期
             diagnoseDTO.setDiseDate(inptDiagnoseDTO.getCrteTime());
+            //*诊断类目  --海南必传
+            diagnoseDTO.setDiseCgy("1");
             anaDiagnoseDTOS.add(diagnoseDTO);
         }
         //就诊信息
@@ -3017,6 +3021,10 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         anaMdtrtDTO.setFsiOrderDtos(anaOrderDTOS);
         //诊断信息DTO
         anaMdtrtDTO.setFsiDiagnoseDtos(anaDiagnoseDTOS);
+        //公务员标志  --海南必传
+        anaMdtrtDTO.setCvlservFlag(ObjectUtil.isNotEmpty(basicDTO.getBac001())?basicDTO.getBac001():"0");
+        anaMdtrtDTO.setOrderDtos(anaOrderDTOS);
+        anaMdtrtDTO.setDiagnoseDtos(anaDiagnoseDTOS);
 
         //参保信息
         AnaInsuDTO anaInsuDTO = new AnaInsuDTO();
@@ -3034,6 +3042,8 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
         anaInsuDTO.setCurrMdtrtId(mdtrtDTO.getId());
         //*就诊信息集合
         anaInsuDTO.setFsiEncounterDtos(anaMdtrtDTO);
+        //*就诊信息集合  --海南
+        anaInsuDTO.setEncounterDtos(anaMdtrtDTO);
 
         //入参DTO
         AnalysisDTO analysisDTO = new AnalysisDTO();

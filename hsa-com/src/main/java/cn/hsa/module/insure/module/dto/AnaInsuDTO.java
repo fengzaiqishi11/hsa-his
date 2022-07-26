@@ -18,38 +18,42 @@ public class AnaInsuDTO implements Serializable {
     /**
      * 参保人标识
      */
-    @JSONField(name = "patn_id")
+//    @JSONField(name = "patn_id")
     private String patnId;
     /**
      * 姓名
      */
-    @JSONField(name = "patn_name")
+//    @JSONField(name = "patn_name")
     private String patnName;
     /**
      * 性别
      */
-    @JSONField(name = "gend")
+//    @JSONField(name = "gend")
     private String gend;
     /**
      * 出生日期
      */
-    @JSONField(name = "brdy")
+//    @JSONField(name = "brdy")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date brdy;
     /**
      * 统筹区编码
      */
-    @JSONField(name = "poolarea")
+//    @JSONField(name = "poolarea")
     private String poolarea;
     /**
      * 当前就诊标识
      */
-    @JSONField(name = "curr_mdtrt_id")
+//    @JSONField(name = "curr_mdtrt_id")
     private String currMdtrtId;
     /**
      * 就诊信息集合
      */
-    @JSONField(name = "fsi_encounter_dtos")
+//    @JSONField(name = "fsi_encounter_dtos")
     private AnaMdtrtDTO fsiEncounterDtos;
+    /**
+     * 就诊信息集合--海南
+     */
+    private AnaMdtrtDTO encounterDtos;
 }

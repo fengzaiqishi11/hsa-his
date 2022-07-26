@@ -131,7 +131,7 @@
                and  NOT ((end_date &lt;= #{start_time}) OR (#{end_time} &lt;start_date))
             </if>
                 and is_valid = '1'
-                and service_status = #{serviceStatus}
+                and service_status=#{serviceStatus}
         </where>
         order by crte_time desc
     </select>
@@ -192,13 +192,6 @@
         UPDATE center_hospital SET AUDIT_FLAG =#{auditFlag},AUDIT_MSG = #{auditMsg} where code =#{code}
     </update>
 
-    <update id="updateServiceStatus">
-        update center_hospital set service_status = #{serviceStatus} where id
-                in
-            <foreach collection="hospIdList" open="(" separator="," item="id" index="index" close=")">
-                #{id}
-            </foreach>
-    </update>
     <select id="findRootDataBase" resultType="cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO">
         SELECT
         a.id,
@@ -250,6 +243,11 @@
         ( #{id}, #{type}, #{jdbcDriver}, #{rootUser}, #{rootPassword}, #{rootUrl}, #{hospUrl})
 
     </insert>
-
+    <update id="updateServiceStatus">
+        update center_hospital set service_status = #{serviceStatus}  where id in
+            <foreach collection="list" open="(" separator="," item="item" index="index" close=")">
+                #{item}
+            </foreach>
+    </update>
 
 </mapper>

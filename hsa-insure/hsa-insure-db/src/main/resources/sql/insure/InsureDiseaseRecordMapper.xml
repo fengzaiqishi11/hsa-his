@@ -191,7 +191,11 @@ VALUES( #{id}, #{hosp_code}, #{dcla_souc}, #{insutype}, #{psn_no}, #{psn_insurlt
         visitDrptName,iiv.visit_icd_name as visitIcdName,
         iiv.aac001,iiv.aka130_name as aka130Name,iiv.insure_reg_code,iiv.visit_id
         as visitId,iib.aae140 as aae140,iib.aac003 as name,
+        <if test="isHospital == '1'.toString()">
+            iv.in_time,iv.out_time,iv.out_disease_name,iv.out_disease_icd10,
+        </if>
         iir.*
+
         from insure_individual_visit iiv
         <if test="isHospital == '1'.toString()">
             join inpt_visit iv on iiv.visit_id = iv.id and iiv.hosp_code = iv.hosp_code

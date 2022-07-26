@@ -5037,9 +5037,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
         throw new AppException("未查找到医保就诊信息，请做医保登记！");
       }
-      if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
+      /*if (StringUtils.isEmpty(insureIndividualVisitDTO.getPayToken()) || StringUtils.isEmpty(insureIndividualVisitDTO.getPayOrdId())) {
         throw new AppException("未找到支付订单号，请先上传费用！");
-      }
+      }*/
       //判断是否已医保结算
       InsureIndividualSettleDTO settleDTO = new InsureIndividualSettleDTO();
       settleDTO.setVisitId(setlRefundQueryDTO.getVisitId());
@@ -5054,7 +5054,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
       if (ObjectUtil.isEmpty(settleDTO)){
         throw new AppException("未查找到医保结算信息，请先做医保结算！");
       }
+      //查看移动支付表参数据
       //接口调用
+      //payOnlineInfoDAO
       map.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
       map.put("insureIndividualSettleDTO",settleDTO);
       Map<String, Object> resultMap = (Map<String, Object>) insureUnifiedPayOutptService_consumer.AmpRefund(map).getData();
@@ -5932,7 +5934,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             anaOrderDTO.setHilistLv(ObjectUtil.isEmpty(MapUtil.getStr(map,"hilistLv"))?"1":MapUtil.getStr(map,"hilistLv"));
             //*医保目录价格
 
-            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")));
+            anaOrderDTO.setHilistPric(ObjectUtil.isEmpty(MapUtil.getStr(map,"insureItemPrice"))?BigDecimal.ZERO:new BigDecimal(MapUtil.getStr(map,"insureItemPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //医保目录备注
             anaOrderDTO.setHilistMemo("");
             //*医院目录代码
@@ -5942,15 +5944,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             //医院目录(药品)剂型
             anaOrderDTO.setHosplistDosform(MapUtil.getStr(map,"hospItemPrepCode"));
             //*数量
-            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")));
+            anaOrderDTO.setCnt(BigDecimalUtils.convert(MapUtil.getStr(map,"num")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*单价
-            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")));
+            anaOrderDTO.setPric(BigDecimalUtils.convert(MapUtil.getStr(map,"price")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*总费用
-            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")));
+            anaOrderDTO.setSumamt(BigDecimalUtils.convert(MapUtil.getStr(map,"totalPrice")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自费金额
-            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")));
+            anaOrderDTO.setOwnpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"fulamtOwnpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*自付金额
-            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")));
+            anaOrderDTO.setSelfpayAmt(BigDecimalUtils.convert(MapUtil.getStr(map,"preselfpayAmt")).setScale(2, BigDecimal.ROUND_HALF_UP));
             //*规格
             anaOrderDTO.setSpec(ObjectUtil.isEmpty(MapUtil.getStr(map,"spec"))?"-":MapUtil.getStr(map,"spec"));
             //*数量单位
@@ -5996,6 +5998,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             diagnoseDTO.setDiseName(outptDiagnose.get(i).getDiseaseName());
             //*诊断日期
             diagnoseDTO.setDiseDate(outptDiagnose.get(i).getCrteTime());
+            //*诊断类目  --海南必传
+            diagnoseDTO.setDiseCgy("1");
             anaDiagnoseDTOS.add(diagnoseDTO);
         }
         //就诊信息
@@ -6091,6 +6095,10 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         anaMdtrtDTO.setFsiOrderDtos(anaOrderDTOS);
         //诊断信息DTO
         anaMdtrtDTO.setFsiDiagnoseDtos(anaDiagnoseDTOS);
+        //公务员标志  --海南必传
+        anaMdtrtDTO.setCvlservFlag(ObjectUtil.isNotEmpty(basicDTO.getBac001())?basicDTO.getBac001():"0");
+        anaMdtrtDTO.setOrderDtos(anaOrderDTOS);
+        anaMdtrtDTO.setDiagnoseDtos(anaDiagnoseDTOS);
 
         //参保信息
         AnaInsuDTO anaInsuDTO = new AnaInsuDTO();
@@ -6108,6 +6116,8 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         anaInsuDTO.setCurrMdtrtId(outptVisitDTO.getId());
         //*就诊信息集合
         anaInsuDTO.setFsiEncounterDtos(anaMdtrtDTO);
+        //*就诊信息集合  --海南
+        anaInsuDTO.setEncounterDtos(anaMdtrtDTO);
 
         //入参DTO
         AnalysisDTO analysisDTO = new AnalysisDTO();

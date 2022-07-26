@@ -108,18 +108,21 @@
         d.total_num as totalNum,
         d.num as preNum,
         d.num_unit_code as numUnitCode,
-
+        d.remark,
         b.visit_no as visitNo,
         b.dept_name as deptName,
         b.name as name,
         b.age as age,
         b.age_unit_code as ageUnitCode,
-        b.gender_code as genderCode
-
+        b.gender_code as genderCode,
+        (select iiv.aka130 from insure_individual_visit iiv where iiv.visit_id = b.id and iiv.hosp_code = b.hosp_code ) as aka130,
+        bd.name as diseaseName
         from phar_out_receive_detail a
         join phar_out_receive c on a.or_id = c.id  and c.hosp_code = a.hosp_code
         left join outpt_prescribe_detail d on a.opd_id = d.id and d.hosp_code=a.hosp_code
         left join outpt_visit b on b.id = c.visit_id and b.hosp_code = a.hosp_code
+        left join outpt_diagnose od on od.is_main = '1' and  b.id = od.visit_id and b.hosp_code = od.hosp_code
+        left join base_disease bd on bd.is_valid = '1' and bd.id = od.disease_id and bd.hosp_code = od.hosp_code
         where 1=1 and a.hosp_code=#{hospCode}
         <if test="id != null and id !='' ">
             and a.or_id = #{id}
@@ -529,7 +532,8 @@
         a.use_code useCode, a.exec_dept_id execDeptId, a.exec_date execDate, a.exec_id execId, a.exec_name execName, a.exec_num execNm,
         case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
         case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
-        i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark
+        i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, phar.dist_user_id distUserId,
+        phar.dist_user_name distUserName, a.remark,a.decoction_method as decoctionMethod
         from  outpt_prescribe_detail a
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
         left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'

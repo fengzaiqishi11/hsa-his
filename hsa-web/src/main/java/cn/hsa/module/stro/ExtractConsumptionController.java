@@ -4,7 +4,9 @@ import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
+import cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO;
 import cn.hsa.module.interf.extract.service.ExtractConsumptionService;
+import cn.hsa.module.interf.extract.service.ExtractStroInvoicingService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -36,7 +38,7 @@ public class ExtractConsumptionController extends BaseController {
      **/
     @GetMapping("/queryExtractConsumptions")
     public WrapperResponse<PageDTO>
-    queryExtractConsumptions(@RequestBody ExtractConsumptionDTO extractConsumptionDTO,
+    queryExtractConsumptions(ExtractConsumptionDTO extractConsumptionDTO,
                              HttpServletRequest req, HttpServletResponse rep) {
         SysUserDTO userDTO = getSession(req, rep);
         Map map = new HashMap<>();
@@ -46,5 +48,22 @@ public class ExtractConsumptionController extends BaseController {
         return extraConsumptionService_consumer.queryExtractConsumptions(map);
     }
 
+
+    /**
+     * @Author pengbo
+     * @Description 药房药库实时进销存统计分析
+     * @Date 2022/7/15 9:26
+     * @Param [extractConsumptionDTO, req, rep]
+     **/
+    @GetMapping("/queryStroInvoicing")
+    public WrapperResponse<PageDTO> queryStroInvoicing(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO,
+                             HttpServletRequest req, HttpServletResponse rep) {
+        SysUserDTO userDTO = getSession(req, rep);
+        Map map = new HashMap<>();
+        map.put("hospCode",userDTO.getHospCode());
+        extractStroInvoicingDetailDTO.setHospCode(userDTO.getHospCode());
+        map.put("extractStroInvoicingDetailDTO",extractStroInvoicingDetailDTO);
+        return extraConsumptionService_consumer.extractStroInvoicingDetailDTO(map);
+    }
 
 }

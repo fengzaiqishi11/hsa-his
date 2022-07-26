@@ -89,7 +89,19 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
     @Override
     public PageDTO queryPatientInfoPage(InptVisitDTO inptVisitDTO) {
         PageHelper.startPage(inptVisitDTO.getPageNo(),inptVisitDTO.getPageSize());
-        List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryInptVisitPage(inptVisitDTO);
+        // 获取系统参数 是否开启大人婴儿合并结算
+        SysParameterDTO mergeParameterDTO =null;
+        Map<String, Object> isMergeParam = new HashMap<>();
+        isMergeParam.put("hospCode", inptVisitDTO.getHospCode());
+        isMergeParam.put("code", "BABY_INSURE_FEE");
+        mergeParameterDTO = sysParameterService_consumer.getParameterByCode(isMergeParam).getData();
+        List<InptVisitDTO> inptVisitDTOS = null;
+        if (mergeParameterDTO != null && Constants.SF.S.equals(mergeParameterDTO.getValue())) {
+            // 开启合并结算
+            inptVisitDTOS = inptVisitDAO.queryInptVisitPage(inptVisitDTO);
+        } else {
+            inptVisitDTOS =  inptVisitDAO.queryInptVisitPageNoMerge(inptVisitDTO);
+        }
         return PageDTO.of(inptVisitDTOS);
     }
 
@@ -1326,13 +1338,32 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
         isInsureUnifiedMap.put("hospCode", inptVisitDTO.getHospCode());
         isInsureUnifiedMap.put("code", "BABY_INSURE_FEE");
         sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        // 获取医院医保编码
+        Map<String, Object> hMap = new HashMap<>();
+        hMap.put("hospCode", inptVisitDTO.getHospCode());
+        hMap.put("code", "HOSP_INSURE_CODE");
+        SysParameterDTO sysParameterDTO1 = sysParameterService_consumer.getParameterByCode(hMap).getData();
         // 开启大人婴儿合并结算
         if(sysParameterDTO !=null && "1".equals(sysParameterDTO.getValue())){
             List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryMergeInptVisitPage(inptVisitDTO);
+            if (sysParameterDTO1 != null ) {
+                if(!ListUtils.isEmpty(inptVisitDTOS)){
+                    for(InptVisitDTO inptVisitDTO1 :inptVisitDTOS){
+                        inptVisitDTO1.setOrgCode(sysParameterDTO1.getValue());
+                    }
+                }
+            }
             return PageDTO.of(inptVisitDTOS);
         //    <--------是否开启大人婴儿合并 liuliyun 2021/09/04------>
         }else {
             List<InptVisitDTO> inptVisitDTOS = inptVisitDAO.queryBabyInptVisitPage(inptVisitDTO);
+            if (sysParameterDTO1 != null ) {
+                if(!ListUtils.isEmpty(inptVisitDTOS)){
+                    for(InptVisitDTO inptVisitDTO1 :inptVisitDTOS){
+                        inptVisitDTO1.setOrgCode(sysParameterDTO1.getValue());
+                    }
+                }
+            }
             return PageDTO.of(inptVisitDTOS);
         }
     }

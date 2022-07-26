@@ -334,6 +334,7 @@
     <!--医保结算统计报表(按明细)-->
     <select id="queryYbSettleReportByMX" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
+        (planPrice+civilPrice+seriousPrice+retirePrice+restsPrice) fundPay,/*统筹基金+公务员补助支付+大病互助支付+离休基金支付+其他支付*/
         ywlx,
         visitNo,
         name,
@@ -356,7 +357,9 @@
         remark,
         mafPay,
         personalPrice,
-        restsPrice
+        restsPrice,
+        psnIdetType,
+        psnIdetTypeName
         FROM
         (
         SELECT
@@ -382,12 +385,16 @@
         b.remark,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
+        v.psn_idet_type as psnIdetType,
+        ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM
         outpt_settle a,
-        insure_individual_settle b
+        insure_individual_settle b,
+        insure_individual_visit v
         WHERE
         a.id = b.settle_id
+        and a.visit_id = v.visit_id
         and a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
         <if test="medType != null and medType != ''">
@@ -417,14 +424,17 @@
         b.remark,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
+        v.psn_idet_type as psnIdetType,
+        ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM insure_individual_settle b
         LEFT JOIN inpt_settle a ON a.id = b.settle_id AND a.hosp_code = b.hosp_code
         JOIN inpt_visit c ON b.visit_id = c.id AND b.hosp_code = c.hosp_code
+        left join insure_individual_visit v on b.visit_id = v.visit_id  AND b.hosp_code = c.hosp_code
         WHERE
         b.hosp_code = #{hospCode}
         AND a.is_settle = '1'
-        AND a.status_code = '0'
+      --  AND a.status_code = '0'
         <if test="medType != null and medType != ''">
             AND b.aka130 = #{medType}
         </if>
@@ -460,6 +470,16 @@
         <if test="patientCode != null and patientCode != ''">
             and patientCode =#{patientCode}
         </if>
+        <if test="sqlStr != null">
+            and  (${sqlStr})
+        </if>
+        <!--<if test="codeList != null and codeList.size > 0">
+            and
+            <foreach collection="codeList" separator="," open="(" close=")" item="item">
+                psnIdetType = #{item} or psnIdetType like CONCAT('%,',#{item}) or psnIdetType like
+                CONCAT(#{item},',%') or psnIdetType like CONCAT('%',',',#{item},',','%')
+            </foreach>
+        </if>-->
         ORDER BY settleTime DESC
     </select>
 
@@ -682,6 +702,7 @@
     <!--医保结算统计报表(按病人类型)-->
     <select id="queryYbSettleReportByBRLX" parameterType="java.util.Map" resultType="java.util.Map">
         SELECT
+        SUM(ss.planPrice+ss.civilPrice+ss.seriousPrice+ss.retirePrice+ss.restsPrice) fundPay,/*统筹基金+公务员补助支付+大病互助支付+离休基金支付+其他支付*/
         ywlx,
         patientCode,
         SUM( ss.totalPrice ) AS totalPrice,
@@ -695,7 +716,9 @@
         SUM( ss.ynyh ) AS ynyh,
         SUM( ss.mafPay) AS mafPay,
         SUM( ss.comPay ) AS comPay, /*企业补充医疗*/
-        SUM( ss.personalPrice) as personalPrice
+        SUM( ss.personalPrice) as personalPrice,
+        psnIdetType,
+        psnIdetTypeName
         FROM
         (
         SELECT
@@ -709,17 +732,22 @@
         IFNULL( b.retire_price, 0 ) AS retirePrice,
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
+        IFNULL( b.rests_price, 0 ) as restsPrice,
         0 AS apTotalPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
+        v.psn_idet_type as psnIdetType,
+        ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM
         outpt_settle a,
-        insure_individual_settle b
+        insure_individual_settle b,
+        insure_individual_visit v
         WHERE
         a.hosp_code = b.hosp_code
         AND a.id = b.settle_id
+        and a.visit_id = v.visit_id
         AND a.is_settle = '1'
         AND a.hosp_code = #{hospCode}
         <if test="medType != null and medType != ''">
@@ -738,18 +766,23 @@
         IFNULL( b.hosp_price, 0 ) AS hospPrice,
         IFNULL( b.person_price, 0 ) AS personPrice,
         IFNULL( a.ap_total_price, 0 ) AS apTotalPrice,
+        IFNULL( b.rests_price, 0 ) as restsPrice,
         IFNULL(( a.total_price - a.reality_price ), 0 ) AS ynyh,
         ifnull(b.maf_pay, 0.00) as mafPay,
         ifnull(b.com_pay, 0.00) as comPay, /*企业补充医疗*/
-        ifnull(b.personal_price, 0.00) as personalPrice
+        ifnull(b.personal_price, 0.00) as personalPrice,
+        v.psn_idet_type as psnIdetType,
+        ifnull(v.psn_idet_type_name,'-') as psnIdetTypeName
         FROM
         inpt_settle a,
-        insure_individual_settle b
+        insure_individual_settle b,
+        insure_individual_visit v
         WHERE
         a.id = b.settle_id
         AND a.hosp_code = b.hosp_code
+        and a.visit_id = v.visit_id
         AND a.is_settle = '1'
-        AND a.status_code = '0'
+       -- AND a.status_code = '0'
         AND a.hosp_code = #{hospCode}
         <if test="medType != null and medType != ''">
             AND b.aka130 = #{medType}
@@ -774,6 +807,16 @@
         <if test="patientCode != null and patientCode != ''">
             and patientCode =#{patientCode}
         </if>
+        <if test="sqlStr != null">
+            and  (${sqlStr})
+        </if>
+        <!--<if test="codeList != null and codeList.size > 0">
+            and
+            <foreach collection="codeList" separator="," open="(" close=")" item="item">
+                psnIdetType = #{item} or psnIdetType like CONCAT('%,',#{item}) or psnIdetType like
+                CONCAT(#{item},',%') or psnIdetType like CONCAT('%',',',#{item},',','%')
+            </foreach>
+        </if>-->
         GROUP BY ywlx, patientCode
     </select>
 
@@ -1630,7 +1673,7 @@
         <if test="deptId != null and deptId != ''">
             and in_dept_id = #{deptId}
         </if>
-        GROUP BY in_dept_id, in_dept_name, hosp_code
+        GROUP BY in_dept_id, hosp_code
         ) t1
         LEFT JOIN (
         SELECT
@@ -1649,8 +1692,8 @@
         <if test="startDate != null and endDate != null">
             and DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')
         </if>
-        GROUP BY out_dept_id, out_dept_name, hosp_code
-        ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_id = t2.dept_id
+        GROUP BY out_dept_id,  hosp_code
+        ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_name = t2.dept_name
         left join (
         SELECT
         a.in_dept_id as dept_id,
@@ -1663,7 +1706,7 @@
         <if test="endDate != null">
             and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
         </if>
-        GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
+        GROUP BY a.in_dept_id, a.hosp_code
         ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_id = t3.dept_id
     </select>
 

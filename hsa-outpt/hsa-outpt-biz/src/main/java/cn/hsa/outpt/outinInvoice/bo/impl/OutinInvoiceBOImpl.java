@@ -17,6 +17,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.entity.SysParameterDO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -627,6 +628,18 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 		} else if (Constants.PJLX.ZY.equals(outinInvoiceDTO.getInvoiceType())) { // 住院
 			resultList = outinInvoiceDao.queryOutinItemInfoDetail(outinInvoiceDTO);
 		}
+		// 获取医院医保编码
+		Map<String, Object> hMap = new HashMap<>();
+		hMap.put("hospCode", outinInvoiceDTO.getHospCode());
+		hMap.put("code", "HOSP_INSURE_CODE");
+		SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(hMap).getData();
+		if (sysParameterDTO != null ) {
+			if(!ListUtils.isEmpty(resultList)){
+				for(Map<String, Object> map :resultList){
+					map.put("orgCode",sysParameterDTO.getValue());
+				}
+			}
+		}
 		return resultList;
 	}
 
@@ -933,6 +946,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 		OutinInvoiceDTO dto = new OutinInvoiceDTO();
 		dto.setId(outinInvoiceDTO.getId());
 		dto.setHospCode(outinInvoiceDTO.getHospCode());
+		dto.setInvoiceCode(outinInvoiceDTO.getInvoiceCode());
 		dto.setUseId(outinInvoiceDTO.getUseId());
 		dto.setUseName(outinInvoiceDTO.getUseName());
 		dto.setStatusCode(outinInvoiceDTO.getStatusCode());

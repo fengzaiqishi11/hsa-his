@@ -248,27 +248,31 @@
     <select id="getInspectionReportInfo"
             resultType="cn.hsa.module.inpt.inspectionreport.dto.InspectionReportDTO">
         SELECT
-            apply_no AS applyNo,
-            in_no AS inNo,
-            order_no AS orderNo,
-            dept_id AS deptId,
-            dept_name AS deptName,
-            doctor_name AS doctorName,
-            apply_time AS applyTime,
-            rporter AS reporter,
-            remark,
-            content,
-            (select a.crte_time from medic_result a where opd_id = a.advice_id and hosp_code = a.hosp_code limit 1) AS reportTime,
-            (select a.crte_name from medic_result a where opd_id = a.advice_id and hosp_code = a.hosp_code limit 1) AS crteName,
-            coll_blood_name AS collBloodName,
-            coll_blood_time AS collBloodTime
-        FROM
-            medic_apply
-
-        where in_no = #{inNo}
-          and type_code= '4'
-          and apply_no = #{applyNo}
-            LIMIT 1
+            a.apply_no AS applyNo,
+            a.in_no AS inNo,
+            a.order_no AS orderNo,
+            a.dept_id AS deptId,
+            a.dept_name AS deptName,
+            a.doctor_name AS doctorName,
+            a.apply_time AS applyTime,
+            a.rporter AS reporter,
+            a.remark,
+            a.content,
+            a.coll_blood_name AS collBloodName,
+            a.coll_blood_time AS collBloodTime,
+            mr.crte_time as reportTime,
+            mr.crte_name as crteName,
+            mr.checker as checker,
+            mr.check_time as checkTime,
+            mr.reviewer as reviewer,
+            mr.audit_time as auditTime
+        FROM medic_apply a
+            left join medic_result mr
+            on a.opd_id = mr.advice_id and a.hosp_code = mr.hosp_code
+        where a.in_no = #{inNo}
+          and a.type_code= '4'
+          and a.apply_no = #{applyNo}
+        LIMIT 1
     </select>
     <select id="getPacsImageReportInfo"
             resultType="cn.hsa.module.inpt.inspectionreport.dto.PacsImageReportDTO">

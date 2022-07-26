@@ -1,9 +1,11 @@
 package cn.hsa.module.insure.module.dao;
 
+import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.module.dto.*;
+import cn.hsa.module.insure.module.entity.TcmDiseScoreDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -864,4 +866,25 @@ public interface InsureGetInfoDAO {
      * @Param [deptMap]
      **/
     String queryInptVist(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 门特查询档案信息
+     * @Date 2022/6/14 15:43
+     * @Param [deptMap]
+     **/
+    OutptProfileFileDTO queryProfileFile(Map<String, Object> map);
+
+    List<TcmDiseScoreDO> queryByTcmDiseCode(String tcmDiseCode);
+
+    /**
+     * @Method updateInsureGetInfo
+     * @Desrciption  更新结算清单票据代码
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 20:54
+     * @Return
+     **/
+    void updateBill(Map<String, Object> map);
 }

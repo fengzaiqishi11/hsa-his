@@ -25,5 +25,12 @@ public interface CenterPasswordModifyLogService {
      * @return
      */
     WrapperResponse<Boolean> insertCenterPasswordModifyLog(Map map);
-    
+
+    /**
+     *  系统操作日志记录
+     * @param map
+     * @return
+     */
+    WrapperResponse<Boolean> insertCenterOperationLog(Map map);
+
 }

@@ -140,18 +140,20 @@ public class InptRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqU
         mdtrtinfoMap.put("dscg_maindiag_code", dscg_maindiag_code);//	住院主诊断代码
         mdtrtinfoMap.put("dscg_maindiag_name", dscg_maindiag_name);//	住院主诊断名称
         mdtrtinfoMap.put("main_cond_dscr", dscg_maindiag_name);//	主要病情描述
-        String diseCode = inptVisitDTO.getInsureIndividualBasicDTO().getBka006();
-        String diseCodeName = inptVisitDTO.getInsureIndividualBasicDTO().getBka006Name();
-        if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
-            mdtrtinfoMap.put("dise_code", "");//	病种编码
-        }else{
-            mdtrtinfoMap.put("dise_code", diseCode);//	病种编码
-        }
-        if(StringUtils.isEmpty(diseCodeName) || "null".equals(diseCodeName)){
-            mdtrtinfoMap.put("dise_name", "");//	病种名称
-        }else{
-            mdtrtinfoMap.put("dise_name", diseCodeName);//	病种名称
-        }
+//        String diseCode = inptVisitDTO.getInsureIndividualBasicDTO().getBka006();
+//        String diseCodeName = inptVisitDTO.getInsureIndividualBasicDTO().getBka006Name();
+//        if(StringUtils.isEmpty(diseCode) || "null".equals(diseCode)){
+//            mdtrtinfoMap.put("dise_code", "");//	病种编码
+//        }else{
+//            mdtrtinfoMap.put("dise_code", diseCode);//	病种编码
+//        }
+//        if(StringUtils.isEmpty(diseCodeName) || "null".equals(diseCodeName)){
+//            mdtrtinfoMap.put("dise_name", "");//	病种名称
+//        }else{
+//            mdtrtinfoMap.put("dise_name", diseCodeName);//	病种名称
+//        }
+        mdtrtinfoMap.put("dise_code", dscg_maindiag_code);//	病种编码
+        mdtrtinfoMap.put("dise_name", dscg_maindiag_name);//	病种名称
 
         mdtrtinfoMap.put("oprn_oprt_code", null);//	手术操作代码
         mdtrtinfoMap.put("oprn_oprt_name", null);//	手术操作名称

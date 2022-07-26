@@ -8,6 +8,7 @@ import cn.hsa.module.center.role.bo.CenterRoleBO;
 import cn.hsa.module.center.role.dto.CenterRoleDTO;
 import cn.hsa.module.center.role.entity.CenterRoleDO;
 import cn.hsa.module.center.role.service.CenterRoleService;
+import cn.hsa.module.center.user.dto.CenterUserRoleDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hsa.util.TreeUtils;
@@ -160,5 +161,37 @@ public class CenterRoleServiceImpl extends HsafService implements CenterRoleServ
             e.printStackTrace();
             return WrapperResponse.error(500,e.getMessage(),null);
         }
+    }
+
+    /**
+     * @param map
+     * @Method: queryAll
+     * @Description: 获取所有的角色用户列表
+     * @Param: [sysSystemDo]
+     * @Author: pengbo
+     * @Email: 254580179@qq.com
+     * @Date: 2022/7/14 9:34
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.module.sys.system.entity.SysSystemDo>>
+     */
+    @Override
+    public WrapperResponse<List<CenterUserRoleDTO>> getRoleUsers(Map map) {
+        CenterUserRoleDTO centerUserRoleDTO = MapUtils.get(map,"centerUserRoleDTO");
+        return WrapperResponse.success(centerRoleBO.getRoleUsers(centerUserRoleDTO));
+    }
+
+    /**
+     * @param map
+     * @Method: saveRoleUsers
+     * @Description: 保存所有的角色列表
+     * @Param: [sysSystemDo]
+     * @Author: pengbo
+     * @Email: 254580179@qq.com
+     * @Date: 2020/7/14 9:34
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.List < cn.hsa.module.sys.system.entity.SysSystemDo>>
+     */
+    @Override
+    public WrapperResponse<Boolean> saveRoleUsers(Map map) {
+        CenterUserRoleDTO centerUserRoleDTO = MapUtils.get(map,"centerUserRoleDTO");
+        return WrapperResponse.success(centerRoleBO.saveRoleUsers(centerUserRoleDTO));
     }
 }

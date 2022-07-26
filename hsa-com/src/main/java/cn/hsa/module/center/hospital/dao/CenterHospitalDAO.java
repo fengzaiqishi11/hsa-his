@@ -146,4 +146,6 @@ public interface CenterHospitalDAO {
     boolean updateRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
 
     boolean insertRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    int updateServiceStatus(@Param("serviceStatus") String serviceStatus,@Param("list") List<String> hospIdList);
 }

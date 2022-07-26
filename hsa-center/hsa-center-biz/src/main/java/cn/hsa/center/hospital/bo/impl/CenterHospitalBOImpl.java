@@ -1,6 +1,7 @@
 package cn.hsa.center.hospital.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.event.CenterOperationLogRecordEvent;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.datasource.bo.CenterDatasourceBO;
@@ -15,6 +16,7 @@ import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.dto.CenterSyncFlowDto;
 import cn.hsa.module.center.hospital.entity.CenterHospitalDO;
 import cn.hsa.module.center.hospital.entity.CenterRootDatabaseBO;
+import cn.hsa.module.center.log.entity.CenterOperationLogDo;
 import cn.hsa.module.center.sync.bo.CenterSyncBo;
 import cn.hsa.module.center.sync.dto.CenterSyncDTO;
 import cn.hsa.module.center.syncorderrule.bo.SyncOrderRuleBO;
@@ -23,6 +25,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -56,6 +59,11 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
     @Resource
     private SyncOrderRuleBO syncOrderRuleBO;
 
+    /**
+     *  app事件发布管理器
+     */
+    @Resource
+    private ApplicationEventPublisher eventPublisher;
 
     @Resource
     private CenterHospitalDatasourceDAO centerHospitalDatasourceDAO;
@@ -107,7 +115,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
     /**
      *  每天0:10 定时更新医院服务状态信息
      */
-    @Scheduled(cron = "0 10 0 * * ? *")
+    @Scheduled(cron = "0 10 0 * * ?")
     public void updateServericeStatusByPeriod(){
         Date nowDate = new Date();
         log.info("updateServiceStatus:{},开始更新医院服务有效期状态",DateUtils.format(nowDate,DateUtils.Y_M_DH_M_S));
@@ -265,7 +273,29 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
             return  true;
         }else{
-            return centerHospitalDao.update(centerHospitalDTO) > 0;
+            int affectRows = centerHospitalDao.update(centerHospitalDTO) ;
+            CenterHospitalDTO sourceHospitalInfoFromDB = centerHospitalDao.getById(centerHospitalDTO);
+            if(!sourceHospitalInfoFromDB.getEndDate().equals(centerHospitalDTO.getEndDate())){
+                String dateBeforeRenewalStr = DateUtils.format(sourceHospitalInfoFromDB.getStartDate(),DateUtils.Y_M_DH_M_S)+'~'+
+                        DateUtils.format(sourceHospitalInfoFromDB.getEndDate(),DateUtils.Y_M_DH_M_S);
+                String dateAfterRenewalStr = DateUtils.format(centerHospitalDTO.getStartDate(),DateUtils.Y_M_DH_M_S)+'~'+
+                        DateUtils.format(centerHospitalDTO.getEndDate(),DateUtils.Y_M_DH_M_S);
+                // 日期不一致说明修改了有效期记录操作日志
+                CenterOperationLogDo operationLogDo = CenterOperationLogDo.builder()
+                        .id(SnowflakeUtils.getId())
+                        .hospCode(centerHospitalDTO.getCode())
+                        .crteId(centerHospitalDTO.getCrteId())
+                        .crteName(centerHospitalDTO.getCrteName())
+                        .bizId("YYYXQXG10001") // 医院有效期修改
+                        .userId("1")
+                        .userCode("admin")
+                        .dateBeforeRenewal(dateBeforeRenewalStr)
+                        .dateAfterRenewal(dateAfterRenewalStr)
+                        .build();
+                eventPublisher.publishEvent(new CenterOperationLogRecordEvent(this,operationLogDo));
+
+            }
+            return affectRows > 0;
         }
     }
 

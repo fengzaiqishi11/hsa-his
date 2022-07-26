@@ -20,13 +20,14 @@
         <result column="crte_id" property="crteId" jdbcType="VARCHAR" />
         <result column="crte_name" property="crteName" jdbcType="VARCHAR" />
         <result column="crte_time" property="crteTime" jdbcType="TIMESTAMP" />
+        <result column="invoice_code" property="invoiceCode" jdbcType="VARCHAR" />
     </resultMap>
 
     <!-- 表查询字段 -->
     <sql id="allColumns">
         id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
         prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
-        crte_name, crte_time
+        crte_name, crte_time, invoice_code
     </sql>
 
     <!-- 根据条件参数查询数据列表 -->
@@ -94,6 +95,9 @@
         </if>
         <if test="crteTime != null">
             AND crte_time = #{crteTime}
+        </if>
+        <if test="invoiceCode != null">
+            AND invoice_code = #{invoiceCode}
         </if>
         order by receive_time desc
     </select>
@@ -173,6 +177,9 @@
         <if test="crteTime != null">
             AND crte_time = #{crteTime}
         </if>
+        <if test="invoiceCode != null">
+            AND invoice_code = #{invoiceCode}
+        </if>
     </select>
 
     <!-- 根据主键查询数据 -->
@@ -197,7 +204,7 @@
         INSERT INTO outin_invoice (
             id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
             prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
-            crte_name, crte_time
+            crte_name, crte_time, invoice_code
         ) VALUES (
             #{id},
             #{hospCode},
@@ -216,7 +223,8 @@
             #{remark},
             #{crteId},
             #{crteName},
-            #{crteTime}
+            #{crteTime},
+            #{invoiceCode}
         )
     </insert>
 
@@ -225,7 +233,7 @@
         INSERT INTO outin_invoice (
         id, hosp_code, receive_id, receive_name, receive_time, use_id, use_name, type_code,
         prefix, start_no, end_no, curr_no, status_code, num, remark, crte_id,
-        crte_name, crte_time
+        crte_name, crte_time, invoice_code
         ) VALUES
         <foreach collection="list" index="index" item="item" separator=",">
             (
@@ -246,7 +254,8 @@
             #{item.remark},
             #{item.crteId},
             #{item.crteName},
-            #{item.crteTime}
+            #{item.crteTime},
+            #{item.invoiceCode}
             )
         </foreach>
     </insert>
@@ -301,7 +310,10 @@
                 crte_name = #{crteName},
             </if>
             <if test="crteTime != null">
-                crte_time = #{crteTime}
+                crte_time = #{crteTime},
+            </if>
+            <if test="invoiceCode != null and invoiceCode != ''">
+                invoice_code = #{invoiceCode}
             </if>
         </set>
         WHERE id = #{id} and hosp_code = #{hospCode}
@@ -358,7 +370,10 @@
                     crte_name = #{item.crteName},
                 </if>
                 <if test="item.crteTime != null">
-                    crte_time = #{item.crteTime}
+                    crte_time = #{item.crteTime},
+                </if>
+                <if test="item.invoiceCode != null and item.invoiceCod != ''">
+                    invoice_code = #{item.invoiceCode}
                 </if>
             </set>
             WHERE id = #{item.id} and hosp_code = #{item.hospCode}

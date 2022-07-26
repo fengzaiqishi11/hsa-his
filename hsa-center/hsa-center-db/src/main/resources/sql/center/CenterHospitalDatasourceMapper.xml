@@ -309,4 +309,11 @@
     </foreach>
   </delete>
 
+  <!--查询单个-->
+  <select id="getHospServiceStatsByCode" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
+    select
+      id, code, name, pro_code, disease_code, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time,nation_code
+    from center_hospital
+    where  code = #{code}
+  </select>
 </mapper>

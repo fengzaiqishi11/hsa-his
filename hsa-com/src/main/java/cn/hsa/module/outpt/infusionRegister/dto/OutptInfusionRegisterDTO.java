@@ -166,4 +166,5 @@ public class OutptInfusionRegisterDTO extends OutptInfusionRegisterDO {
      * 护理执行卡打印数据是否共享，判断是否根据单据类型区分打印状态
      */
     private String isShared;
+    private String remark;
 }

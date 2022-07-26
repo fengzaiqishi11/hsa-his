@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,14 @@ public interface ExtractConsumptionService {
      * @Param [extractConsumptionDTO]
      **/
     WrapperResponse<PageDTO> queryExtractConsumptions(Map map);
+    /**
+     * @Author pengbo
+     * @Description 药房药库实时进销存统计分析
+     * @Date 2022/7/15 9:26
+     * @Param [extractConsumptionDTO, req, rep]
+     **/
+    @GetMapping("/service/interf/ExtractStroInvoicingService/extractStroInvoicingDetailDTO")
+    WrapperResponse<PageDTO> extractStroInvoicingDetailDTO(Map map);
 
 
 }

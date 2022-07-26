@@ -129,5 +129,13 @@ public class BaseDeptDO extends PageDO implements Serializable {
      * 科室负责人姓名
      */
     private String personName;
+    /**
+     * 医保科室名称
+     */
+    private String catyName;
+    /**
+     * 医保科室编码
+     */
+    private String catyCode;
 
 }

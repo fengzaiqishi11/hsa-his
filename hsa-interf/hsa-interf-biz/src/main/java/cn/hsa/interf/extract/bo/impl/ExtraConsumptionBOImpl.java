@@ -15,10 +15,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -88,8 +85,7 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         }
 
         //   type 0:药库实时进销存查询,1:药房实时进销存查询
-        List<ExtractStroInvoicingDetailDTO> list = null ;
-        PageHelper.startPage(extractStroInvoicingDetailDTO.getPageNo(),extractStroInvoicingDetailDTO.getPageSize());
+        List<ExtractStroInvoicingDetailDTO> list = new ArrayList<>();
         if("0".equals(extractStroInvoicingDetailDTO.getType())){
              //0：零售价，1：购进价
             if("0".equals(extractStroInvoicingDetailDTO.getBuyOrSell())){
@@ -97,7 +93,6 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
             }else{
                 list = extraConsumptionDAO.queryStroInvoicingBuy(extractStroInvoicingDetailDTO);
             }
-
 
         }else if("1".equals(extractStroInvoicingDetailDTO.getType())){
             //0：零售价，1：购进价
@@ -107,22 +102,22 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
                 list = extraConsumptionDAO.queryRoomInvoicingBuy(extractStroInvoicingDetailDTO);
             }
         }
-        List<ExtractStroInvoicingDetailDTO> newList  = null ;
-
-        // 筛选ItemId 为空的数据  说明这段时间内无次药品的数据，需要找到对于药品最新的一条记录作为数据
-        if(!ListUtils.isEmpty(list)){
-            //保留 itemId不为空的
-            newList = list.stream().filter(o ->StringUtils.isNotEmpty(o.getItemId())).collect(Collectors.toList());
-            //替换 itemName为空的
-            List<String> ids = list.stream().filter(o ->StringUtils.isEmpty(o.getItemId())).map(ExtractStroInvoicingDetailDTO::getId).collect(Collectors.toList());
-            if(!ListUtils.isEmpty(ids)){
-                extractStroInvoicingDetailDTO.setIds(ids);
-                newList.addAll(extraConsumptionDAO.queryExtraInvoicingByItemId(extractStroInvoicingDetailDTO));
-            }
-            list.clear();
-            list.addAll(newList) ;
+        // 根据库存表进行关联，查找出库存中所有药品，最近一次的记录
+        List<ExtractStroInvoicingDetailDTO> allExtractDatas = extraConsumptionDAO.
+                queryAllExtractData(extractStroInvoicingDetailDTO);
+        // 过滤掉在这个时间段出现的数据
+        if (!ListUtils.isEmpty(allExtractDatas)){
+            List<ExtractStroInvoicingDetailDTO> finalList = list;
+            List<ExtractStroInvoicingDetailDTO> resultList = allExtractDatas.stream().parallel().filter(a ->
+                            !finalList.stream().map(ExtractStroInvoicingDetailDTO::getItemId).collect(Collectors.toList())
+                                    .contains(a.getItemId())
+                    )
+                    .collect(Collectors.toList());
+            resultList.addAll(list);
+            // 手动分页
+            return PageDTO.ofByManual(resultList,extractStroInvoicingDetailDTO.getPageNo(),extractStroInvoicingDetailDTO.getPageSize());
         }
-
-        return PageDTO.of(list);
+        // 手动分页
+        return PageDTO.ofByManual(list,extractStroInvoicingDetailDTO.getPageNo(),extractStroInvoicingDetailDTO.getPageSize());
     }
 }

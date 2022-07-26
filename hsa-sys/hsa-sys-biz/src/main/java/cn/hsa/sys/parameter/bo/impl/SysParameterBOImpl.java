@@ -319,13 +319,13 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
         Map<String, SysParameterDTO> parameterMap = sysParameterDao.getParameterByCodeList(centerHospitalDTO.getCode(),
                 codeList);
         SysParameterDTO notifyUsersDTO = MapUtils.get(parameterMap, "WHOISNOTIFY");
-        String notifyUsers = notifyUsersDTO.getValue() == null ? "1" : notifyUsersDTO.getValue();
+        String notifyUsers = notifyUsersDTO == null ? "1" : notifyUsersDTO.getValue();
         if (!notifyUsers.contains(centerHospitalDTO.getWorkTypeCode())) {
             return new HashMap<>();
         } else {
             // 成功之后直接调
             SysParameterDTO overdueNotifyDaysDTO = MapUtils.get(parameterMap, "OVERDUENOTIFYDAYS");
-            Integer overdueNotifyDays = overdueNotifyDaysDTO.getValue() == null ? 15 :
+            Integer overdueNotifyDays = overdueNotifyDaysDTO == null ? 15 :
                     Integer.parseInt(overdueNotifyDaysDTO.getValue());
             centerHospitalDTO.setMillsOfDays(overdueNotifyDays * 24 * 3600 * 1000l);
             WrapperResponse<Map<String, Object>> hospServiceStatsByCode =

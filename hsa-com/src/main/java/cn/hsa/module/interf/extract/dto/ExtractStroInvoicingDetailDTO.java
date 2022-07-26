@@ -29,7 +29,7 @@ import java.util.List;
 public class ExtractStroInvoicingDetailDTO extends ExtractStroInvoicingDetailDO implements Serializable {
     private static final long serialVersionUID = 869890362720398685L;
 
-    private String stroName;
+    private String deptName;
 
     private String keyWord;
 

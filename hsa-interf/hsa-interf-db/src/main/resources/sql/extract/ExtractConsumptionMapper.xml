@@ -99,6 +99,12 @@
         <result property="extractTime" column="extract_time"  jdbcType="VARCHAR"/>
         <result property="itemType" column="item_type"  jdbcType="VARCHAR"/>
         <result property="itemTypeName" column="item_type_name"  jdbcType="VARCHAR"/>
+        <result property="pharInNum" column="phar_in_Num" jdbcType="DECIMAL"/>
+        <result property="pharInNumBuyPriceAll" column="phar_in_num_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="pharInNumSellPriceAll" column="phar_in_num_sell_price_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroTotalNum" column="phar_return_stro_total_num" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroBuyPriAll" column="phar_return_stro_buy_pri_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroSellPriAll" column="phar_return_stro_sell_pri_all" jdbcType="DECIMAL"/>
     </resultMap>
     <!--药房消耗报表-->
     <select id="queryExtractConsumptions" resultMap="extractConsumptionDetailMap">
@@ -175,17 +181,39 @@
     </select>
 
 
+    <sql id="andSql" >
+            <if test="startTime != null  and endTime != null ">
+                and b.extract_time &gt;= #{startTime}
+                and b.extract_time &lt;= #{endTime}
+            </if>
+    </sql>
+
+    <sql id="whereSql" >
+        <where>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
+                and ((a.item_code = '1' and  a.item_type  = #{drugType}) or (a.item_code = '2'and a.item_type  = #{materialType}))
+            </if>
+            <if test="keyWord != null and keyWord != ''">
+                and (a.item_name like '%${keyWord}%')
+            </if>
+        </where>
+    </sql>
+
     <select id="queryStroInvoicingBuy" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
         select
-        a.id,
+        a.item_id as id,
         a.code,-- 项目编码
-        a.good_name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
+        a.item_name,-- 项目名称
+        max(b.item_id) as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        min(b.buy_price) as upSellPrice,-- 零售单价
+        max(b.buy_price) as buyPrice,-- 购进单价
         sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
         sum(b.up_buy_price_all) as up_buy_price_all, -- 本日期初购进总金额
         sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
@@ -209,96 +237,31 @@
         sum(b.surplus_num) as surplus_num ,-- 本日期末数量
         sum(b.buy_price_all) as buy_price_all-- 本日期末购进总金额
         from
-        base_drug a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="drugType != null and drugType != ''">
-                and a.type_code  = #{drugType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.good_name like '%${keyWord}%' or a.good_wbm like '%${keyWord}%' or a.good_pym like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.good_name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
-
-        union
-
-        select
-        a.id,
-        a.code,-- 项目编码
-        a.name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
-        sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
-        sum(b.buy_price_all) as buy_price_all,-- 本日期末购进总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_buy_price_all) as stro_in_num_buy_price_all,-- 药库入库购进总金额
-        sum(b.return_supl_num) as return_supl_num,-- 药库退供应商数量
-        sum(b.return_supl_buy_price_all) as return_supl_buy_price_all,-- 药库退供应商购进总金额
-        sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(b.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
-        sum(b.stro_to_dept_num) as stro_to_dept_num, -- 出库科室数量
-        sum(b.stro_to_dept_buy_price_all) as stro_to_dept_buy_price_all, -- 出库科室购进价总额
-        sum(b.phar_return_stro_num) as phar_return_stro_num, -- 药房退库数量
-        sum(b.phar_return_stro_buy_price_all) as phar_return_stro_buy_price_all, -- 药房退库购进总金额
-        sum(b.adjust_profit_buy_price_all) as adjust_profit_buy_price_all,-- 调价调盈购进总金额
-        sum(b.adjust_loss_buy_price_all) as adjust_loss_buy_price_all,-- 调价亏损购进总金额
-        sum(b.report_losses_num) as report_losses_num,-- 报损消耗数量
-        sum(b.report_losses_buy_price_all) as report_losses_buy_price_all,-- 报损消耗数量购进总金额
-        sum(b.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
-        sum(b.take_strock_subtract_buy_price_all) as take_strock_subtract_buy_price_all,-- 盘亏购进总金额
-        sum(b.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
-        sum(b.take_strock_add_buy_price_all) as take_strock_add_buy_price_all,-- 盘盈购进总金额
-        sum(b.surplus_num) as surplus_num ,-- 本日期末数量
-        sum(b.up_buy_price_all) as up_buy_price_all -- 本日期初购进总金额
-        from
-        base_material a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="materialType != null and materialType != ''">
-                and a.type_code  = #{materialType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.name like '%${keyWord}%' or a.pym like '%${keyWord}%' or a.wbm like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
+        extract_stro_invoicing_detail a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.id
+        <include refid="andSql"></include>
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec,
+        a.curr_unit_code
     </select>
 
 
     <select id="queryStroInvoicingSell" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
         select
-        a.id,
+        a.item_id as id,
         a.code,-- 项目编码
-        a.good_name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
+        a.item_name,-- 项目名称
+        max(b.item_id) as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        min(b.sell_price) as upSellPrice,-- 零售单价
+        max(b.sell_price) as buyPrice,-- 购进单价
         sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
         sum(b.up_sell_price_all) as up_sell_price_all,-- 本日期初零售总金额
         sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
@@ -322,104 +285,39 @@
         sum(b.surplus_num) as surplus_num,-- 本日期末数量
         sum(b.sell_price_all) as sell_price_all-- 本日期末零售总金额
         from
-        base_drug a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="drugType != null and drugType != ''">
-                and a.type_code  = #{drugType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.good_name like '%${keyWord}%' or a.good_wbm like '%${keyWord}%' or a.good_pym like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.good_name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
-
-        union
-
-        select
-        a.id,
-        a.code,-- 项目编码
-        a.name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
-        sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
-        sum(b.up_sell_price_all) as up_sell_price_all,-- 本日期初零售总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_price_all) as stro_in_num_price_all,-- 药库入库零售总金额
-        sum(b.return_supl_num) as return_supl_num,-- 药库退供应商数量
-        sum(b.return_supl_price_all) as return_supl_price_all,-- 药库退供应商零售总金额
-        sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(b.stro_to_phar_price_all) as stro_to_phar_price_all,-- 药库出库到药房零售总金额
-        sum(b.stro_to_dept_num) as stro_to_dept_num, -- 出库科室数量
-        sum(b.stro_to_dept_price_all) as stro_to_dept_price_all, -- 出库科室零售价总额
-        sum(b.phar_return_stro_num) as phar_return_stro_num, -- 药房退库数量
-        sum(b.phar_return_stro_price_all) as phar_return_stro_price_all, -- 药房退库零售总金额
-        sum(b.adjust_profit_price_all) as adjust_profit_price_all,-- 调价调盈零售总金额
-        sum(b.adjust_loss_price_all) as adjust_loss_price_all,-- 调价亏损零售总金额
-        sum(b.report_losses_num) as report_losses_num,-- 报损消耗数量
-        sum(b.report_losses_price_all) as report_losses_price_all,-- 报损消耗数量零售总金额
-        sum(b.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
-        sum(b.take_strock_subtract_price_all) as take_strock_subtract_price_all,-- 盘亏零售总金额
-        sum(b.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
-        sum(b.take_strock_add_price_all) as take_strock_add_price_all,-- 盘盈零售总金额
-        sum(b.surplus_num) as surplus_num,-- 本日期末数量
-        sum(b.sell_price_all) as sell_price_all-- 本日期末零售总金额
-        from
-        base_material a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="materialType != null and materialType != ''">
-                and a.type_code  = #{materialType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.name like '%${keyWord}%' or a.pym like '%${keyWord}%' or a.wbm like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
+        extract_stro_invoicing_detail a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.id
+        <include refid="andSql"></include>
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec,
+        a.curr_unit_code
     </select>
 
 
     <select id="queryRoomInvoicingBuy" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
         select
-        a.id,
+        a.item_id as id,
         a.code,-- 项目编码
-        a.good_name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
+        a.item_name,-- 项目名称
+        max(b.item_id) as item_id,
+        a.biz_id,--
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        min(b.buy_price) as upSellPrice,-- 零售单价
+        max(b.buy_price) as buyPrice,-- 购进单价
         sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
         sum(b.up_buy_price_all) as up_buy_price_all,-- 本日期初购进总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_buy_price_all) as stro_in_num_buy_price_all,-- 药库入库购进总金额
+        sum(b.phar_in_Num) as phar_in_Num,-- 药库入库数量
+        sum(b.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库购进总金额
         sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
         sum(b.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
-        sum(b.phar_return_stro_num) as phar_return_stro_num,-- 药房退库数量
-        sum(b.phar_return_stro_buy_price_all) as phar_return_stro_buy_price_all,-- 药房退库购进总金额
+        sum(b.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
+        sum(b.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库购进总金额
         sum(b.out_sales_num) as out_sales_num,-- 门诊销售数量
         sum(b.out_sales_buy_price_all) as out_sales_buy_price_all,-- 门诊销售购进总金额
         sum(b.in_sales_num) as in_sales_num,-- 住院销售数量
@@ -435,105 +333,40 @@
         sum(b.surplus_num) as surplus_num,-- 本日期末数量
         sum(b.buy_price_all) as buy_price_all -- 本日期末购进总金额
         from
-        base_drug a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="drugType != null and drugType != ''">
-                and a.type_code  = #{drugType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.good_name like '%${keyWord}%' or a.good_wbm like '%${keyWord}%' or a.good_pym like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.good_name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
-
-        union
-
-        select
-        a.id,
-        a.code,-- 项目编码
-        a.name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
-        sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
-        sum(b.up_buy_price_all) as up_buy_price_all,-- 本日期初购进总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_buy_price_all) as stro_in_num_buy_price_all,-- 药库入库购进总金额
-        sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(b.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
-        sum(b.phar_return_stro_num) as phar_return_stro_num,-- 药房退库数量
-        sum(b.phar_return_stro_buy_price_all) as phar_return_stro_buy_price_all,-- 药房退库购进总金额
-        sum(b.out_sales_num) as out_sales_num,-- 门诊销售数量
-        sum(b.out_sales_buy_price_all) as out_sales_buy_price_all,-- 门诊销售购进总金额
-        sum(b.in_sales_num) as in_sales_num,-- 住院销售数量
-        sum(b.in_sales_buy_price_all) as in_sales_buy_price_all,-- 住院销售购进总金额
-        sum(b.report_losses_num) as report_losses_num,-- 报损消耗数量
-        sum(b.report_losses_buy_price_all) as report_losses_buy_price_all,-- 报损消耗数量购进总金额
-        sum(b.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
-        sum(b.take_strock_subtract_buy_price_all) as take_strock_subtract_buy_price_all,-- 盘亏购进总金额
-        sum(b.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
-        sum(b.take_strock_add_buy_price_all) as take_strock_add_buy_price_all,-- 盘盈购进总金额
-        sum(b.adjust_profit_buy_price_all) as adjust_profit_buy_price_all,-- 调价调盈购进总金额
-        sum(b.adjust_loss_buy_price_all) as adjust_loss_buy_price_all,-- 调价亏损购进总金额
-        sum(b.surplus_num) as surplus_num,-- 本日期末数量
-        sum(b.buy_price_all) as buy_price_all -- 本日期末购进总金额
-        from
-        base_material a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="materialType != null and materialType != ''">
-                and a.type_code  = #{materialType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.name like '%${keyWord}%' or a.pym like '%${keyWord}%' or a.wbm like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
+        extract_stro_invoicing_detail a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.id
+        <include refid="andSql"></include>
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec,
+        a.curr_unit_code
     </select>
 
 
 
     <select id="queryRoomInvoicingSell" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
         select
-        a.id,
+        a.item_id as id,
         a.code,-- 项目编码
-        a.good_name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
+        a.item_name,-- 项目名称
+        max(b.item_id) as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        min(b.sell_price) as upSellPrice,-- 零售单价
+        max(b.sell_price) as buyPrice,-- 购进单价
         sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
         sum(b.up_sell_price_all) as up_sell_price_all,-- 本日期初零售总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_price_all) as stro_in_num_price_all,-- 药库入库零售总金额
+        sum(b.phar_in_Num) as phar_in_Num,-- 药库入库数量
+        sum(b.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库零售总金额
         sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(b.stro_to_phar_price_all) as stro_to_phar_price_all,-- 药库出库到药房零售总金额
-        sum(b.phar_return_stro_num) as phar_return_stro_num,-- 药房退库数量
-        sum(b.phar_return_stro_price_all) as phar_return_stro_price_all,-- 药房退库零售总金额
+        sum(b.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房零售总金额
+        sum(b.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
+        sum(b.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库零售总金额
         sum(b.out_sales_num) as out_sales_num,-- 门诊销售数量
         sum(b.out_sales_price_all) as out_sales_price_all,-- 门诊销售零售总金额
         sum(b.in_sales_num) as in_sales_num,-- 住院销售数量
@@ -549,152 +382,44 @@
         sum(b.surplus_num) as surplus_num,-- 本日期末数量
         sum(b.sell_price_all) as sell_price_all-- 本日期末零售总金额
         from
-        base_drug a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="drugType != null and drugType != ''">
-                and a.type_code  = #{drugType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.good_name like '%${keyWord}%' or a.good_wbm like '%${keyWord}%' or a.good_pym like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.good_name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
-        union
-        select
-        a.id,
-        a.code,-- 项目编码
-        a.name as item_name,-- 项目名称
-        b.item_id ,
-        b.biz_id,-- 科室id
-        b.spec,-- 规格
-        b.curr_unit_code,-- 单位代码（DW）
-        0 as upSellPrice,-- 零售单价
-        0 as buyPrice,-- 购进单价
-        sum(b.up_surplus_num) as up_surplus_num,-- 本日期初数量
-        sum(b.up_sell_price_all) as up_sell_price_all,-- 本日期初零售总金额
-        sum(b.stro_in_num) as stro_in_num,-- 药库入库数量
-        sum(b.stro_in_num_price_all) as stro_in_num_price_all,-- 药库入库零售总金额
-        sum(b.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(b.stro_to_phar_price_all) as stro_to_phar_price_all,-- 药库出库到药房零售总金额
-        sum(b.phar_return_stro_num) as phar_return_stro_num,-- 药房退库数量
-        sum(b.phar_return_stro_price_all) as phar_return_stro_price_all,-- 药房退库零售总金额
-        sum(b.out_sales_num) as out_sales_num,-- 门诊销售数量
-        sum(b.out_sales_price_all) as out_sales_price_all,-- 门诊销售零售总金额
-        sum(b.in_sales_num) as in_sales_num,-- 住院销售数量
-        sum(b.in_sales_price_all) as in_sales_price_all,-- 住院销售零售总金额
-        sum(b.report_losses_num) as report_losses_num,-- 报损消耗数量
-        sum(b.report_losses_price_all) as report_losses_price_all,-- 报损消耗数量零售总金额
-        sum(b.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
-        sum(b.take_strock_subtract_price_all) as take_strock_subtract_price_all,-- 盘亏零售总金额
-        sum(b.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
-        sum(b.take_strock_add_price_all) as take_strock_add_price_all,-- 盘盈零售总金额
-        sum(b.adjust_profit_price_all) as adjust_profit_price_all,-- 调价调盈零售总金额
-        sum(b.adjust_loss_price_all) as adjust_loss_price_all,-- 调价亏损零售总金额
-        sum(b.surplus_num) as surplus_num,-- 本日期末数量
-        sum(b.sell_price_all) as sell_price_all-- 本日期末零售总金额
-        from
-        base_material a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.item_id
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="code != null and code != ''">
-                and a.item_code = #{code}
-            </if>
-            <if test="materialType != null and materialType != ''">
-                and a.type_code  = #{materialType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.name like '%${keyWord}%' or a.pym like '%${keyWord}%' or a.wbm like '%${keyWord}%')
-            </if>
-            <if test="startTime != null  and endTime != null ">
-                and b.extract_time &gt;= #{startTime}
-                and b.extract_time &lt;= #{endTime}
-            </if>
-        </where>
-        group by a.code ,a.name ,a.id,b.item_id ,b.spec ,b.biz_id,b.curr_unit_code
+        extract_stro_invoicing_detail a left join extract_stro_invoicing_detail b on a.hosp_code  = b.hosp_code  and a.id  = b.id
+        <include refid="andSql"></include>
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec,
+        a.curr_unit_code
     </select>
 
 
     <select id="queryExtraInvoicingByItemId" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
         select
-            b.*
+        b.*,
+        (select bd.name from base_dept bd where bd.hosp_code = b.hosp_code and b.biz_id = bd.id) as deptName
         from
             (
                 select
-                    t.item_id,
-                    max(extract_time) extract_time
+                t.item_id,
+                t.biz_id,
+                t.curr_unit_code,
+                max(extract_time) extract_time
                 from
                     extract_stro_invoicing_detail t
                 group by
-                    t.item_id) as c
+                t.item_id,t.curr_unit_code,t.biz_id) as c
                 inner join extract_stro_invoicing_detail b on
-                        c.item_id = b.item_id
-                    and c.extract_time = b.extract_time
-                join base_drug a on
-                        a.id = b.item_id
-                    and a.id = c.item_id
-                    and a.hosp_code = b.hosp_code
+                c.item_id = b.item_id
+                and c.biz_id = b.biz_id
+                and c.extract_time = b.extract_time
         <where>
             <if test="bizId != null and bizId != ''">
                 and b.biz_id = #{bizId}
             </if>
-            <if test="drugType != null and drugType != ''">
-                and a.type_code  = #{drugType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.good_name like '%${keyWord}%' or a.good_wbm like '%${keyWord}%' or a.good_pym like '%${keyWord}%')
-            </if>
             <if test="ids != null and ids.size()>0">
-                and a.id in
-                <foreach collection="ids" close=")" open="(" separator="," item="id">
-                    #{id}
-                </foreach>
-            </if>
-        </where>
-
-        union
-
-        select
-        b.*
-        from
-        (
-        select
-        t.item_id,
-        max(extract_time) extract_time
-        from
-        extract_stro_invoicing_detail t
-        group by
-        t.item_id) as c
-        inner join extract_stro_invoicing_detail b on
-        c.item_id = b.item_id
-        and c.extract_time = b.extract_time
-        join base_material a on
-        a.id = b.item_id
-        and a.id = c.item_id
-        and a.hosp_code = b.hosp_code
-        <where>
-            <if test="bizId != null and bizId != ''">
-                and b.biz_id = #{bizId}
-            </if>
-            <if test="materialType != null and materialType != ''">
-                and a.type_code  = #{materialType}
-            </if>
-            <if test="keyWord != null and keyWord != ''">
-                and (a.name like '%${keyWord}%' or a.pym like '%${keyWord}%' or a.wbm like '%${keyWord}%')
-            </if>
-            <if test="ids != null and ids.size()>0">
-                and a.id in
+                and b.item_id in
                 <foreach collection="ids" close=")" open="(" separator="," item="id">
                     #{id}
                 </foreach>

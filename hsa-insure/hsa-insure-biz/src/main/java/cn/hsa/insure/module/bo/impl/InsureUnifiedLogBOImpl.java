@@ -125,7 +125,7 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             if (status != null) {
                 transactionManager.rollback(status);
             }
-            System.out.println(e.getMessage());
+            log.error("insert insure function log error: ",e);
         }
         return functionLog;
     }

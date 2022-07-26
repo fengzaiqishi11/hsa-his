@@ -267,6 +267,12 @@ public class CenterHospitalController extends CenterBaseController {
         return centerHospitalService.findRootBase(centerRootDatabaseBO);
     }
 
+
+    @GetMapping("/triggerSchedulingManual")
+    public WrapperResponse<Boolean> triggerSchedulingManual(){
+        CenterRootDatabaseBO centerRootDatabaseBO = new CenterRootDatabaseBO();
+        return centerHospitalService.triggerSchedulingManual(centerRootDatabaseBO);
+    }
     /**
      *   中心端统一修改管理员账号密码
      * @param modifiedInfo 修改参数信息，传递过来的修改参数，必填参数有：

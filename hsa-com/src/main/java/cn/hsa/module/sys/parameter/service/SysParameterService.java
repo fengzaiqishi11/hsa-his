@@ -2,6 +2,7 @@ package cn.hsa.module.sys.parameter.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -120,4 +121,11 @@ public interface SysParameterService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
      **/
     WrapperResponse<Map> getLoginInfo(Map map);
+    /**
+     * @Author gory
+     * @Description 过期提醒
+     * @Date 2022/7/26 9:47
+     * @Param [Map map]
+     **/
+    WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(Map map);
 }

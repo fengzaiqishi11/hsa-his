@@ -470,6 +470,18 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
         return centerHospitalDao.findRootDataBase();
     }
 
+    /**
+     * 手动触发定时任务调度执行
+     *
+     * @param centerRootDatabaseBO 形参
+     * @return
+     */
+    @Override
+    public boolean triggerSchedulingManual(CenterRootDatabaseBO centerRootDatabaseBO) {
+        this.updateServericeStatusByPeriod();
+        return true;
+    }
+
 
     public CenterHospitalDatasourceDO createDataSource (CenterHospitalDTO centerHospitalDTO,CenterRootDatabaseBO centerRootDatabaseBO ){
         String dsCode = "DS"+centerHospitalDTO.getCode();

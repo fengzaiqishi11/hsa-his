@@ -66,7 +66,16 @@ public class InspectionReportDTO  implements Serializable {
     /** 采血时间 **/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date collBloodTime;
-
+    /**检查人*/
+    private String checker;
+    /**检查时间*/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date checkTime;
+    /**审核人*/
+    private String reviewer;
+    /**审核时间*/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+    private Date auditTime;
 
     /** 检验检测具体项目列表 **/
     private List<ExaminationItem> examinationItems;

@@ -90,7 +90,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     }
 
     /**
-     * @Description: lis结果数据存库
+     * @Description: 保存lis结果（lis系统对接，线上通用版）
      * @Param: [map]
      * @return: java.lang.Boolean
      * @Author: zhangxuan
@@ -99,28 +99,24 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public Map insertLisResult(Map map) {
         List<Map> medicalResultDTOList = MapUtils.get(map, "lisResult");
-        List<String> stringList = new ArrayList<>();
         for(Map resultMap : medicalResultDTOList){
-            resultMap.put("id", SnowflakeUtils.getId());
             resultMap.put("crteTime", DateUtils.getNow());
             resultMap.put("crteId", "lis");
             resultMap.put("crteName", "lis");
-
-            stringList.add(MapUtils.get(resultMap,"barCode"));
         }
-        List<String> collect = stringList.stream().distinct().collect(Collectors.toList());
-
-        // 删除已经有结果的结果,
-        lisResultDAO.deleteResult(collect);
+        // 根据medic_result 的 id 删除已存在的lis结果
+        lisResultDAO.deleteResult(medicalResultDTOList);
         // 新增结果
-        int num = lisResultDAO.insertResult(medicalResultDTOList);
-        // 更新申请单状态
-        int applyStatus = lisResultDAO.updateApplyStatus(collect);
+        lisResultDAO.insertResult(medicalResultDTOList);
+        // 根据medic_apply 的 apply_no 更新申请单状态为 已完成状态
+        List<String> applyNoList = medicalResultDTOList.stream().map(m -> MapUtils.get(m,"applyNo").toString()).distinct().collect(Collectors.toList());
+        lisResultDAO.updateApplyStatusForLine(applyNoList);
 
         return map;
     }
+
     /**
-     * @Description: lis结果数据存库
+     * @Description: lis结果数据存库(德星落地版)
      * @Param: [map]
      * @return: java.lang.Boolean
      * @Author: zhangxuan
@@ -139,9 +135,9 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
 
             lisResultDAO.deleteResultDX(collect); // 删除已经有结果的结果
             // 新增结果
-            int num = lisResultDAO.insertDXResult(medicalResultDTOList);
+            lisResultDAO.insertDXResult(medicalResultDTOList);
             // 更新申请单状态
-            int applyStatus = lisResultDAO.updateApplyStatus(collect);
+            lisResultDAO.updateApplyStatus(collect);
         }
         return map;
     }
@@ -171,6 +167,7 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         List<String> list = lisResultDAO.queryDXBackResult(map);
         return list;
     }
+
     /** 
     * @Description: 获取没有结果的申请单的医嘱id
     * @Param: 
@@ -183,22 +180,26 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
         Map codeMap = new HashMap();
         codeMap.put("hospCode", MapUtils.get(map,"hospCode"));
         codeMap.put("code", "LIS_TXM");
+        // 查询 LIS_TXM 系统参数值，1：his系统打印条码  2：lis系统打印条码
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(codeMap).getData();
         String a = sysParameterDTO.getValue();
         List<Map> mapList = new ArrayList<>();
         List<String> backList = new ArrayList<>();
         Map newMap = new HashMap();
         if(a.equals("1")){
+            // 查询项目费用状态为已结算、已打印条码、未打印报告的申请单数据
             mapList = lisResultDAO.queryNoResultLis(map);
             if(mapList.size() > 0){
                 lisResultDAO.updateStatusMap(mapList);
             }
         } else {
+            // 查询项目费用状态为已结算和未打印报告的申请单数据
             mapList = lisResultDAO.queryNoResultLisS(map);
             if(mapList.size() > 0){
                 lisResultDAO.updateStatusMap(mapList);
             }
         }
+        // 查询当天已退费的申请单数据
         backList = lisResultDAO.queryDXBackResult(map);
         newMap.put("result",mapList);
         newMap.put("backList",backList);
@@ -232,7 +233,6 @@ public class LisResultBOImpl extends HsafBO implements LisResultBO {
     @Override
     public Map queryDept(Map map){
         List<Map> mapList = lisResultDAO.queryDept(map);
-
         Map newMap = new HashMap();
         newMap.put("result",mapList);
         return newMap;

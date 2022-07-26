@@ -120,7 +120,7 @@ public interface LisResultDAO {
      * @Author: zhangxuan
      * @Date: 2021-07-09
      */
-    int deleteResult(@Param("list") List<String> stringList);
+    int deleteResult(@Param("list") List<Map> list);
 
     /**
      * 根据adviceId 删除旧的医技结果（适用落地版德星）
@@ -128,5 +128,12 @@ public interface LisResultDAO {
      * @return
      */
     int deleteResultDX(@Param("list") List<String> stringList);
+
+    /**
+     * 根据medic_apply 的 apply_no 更新申请单状态为 已完成状态
+     * @param list
+     * @return
+     */
+    int updateApplyStatusForLine(@Param("list") List<String> list);
 
 }

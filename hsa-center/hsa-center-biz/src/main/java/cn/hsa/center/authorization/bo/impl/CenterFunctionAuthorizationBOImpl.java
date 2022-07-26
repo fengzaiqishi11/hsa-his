@@ -203,12 +203,12 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         sql1.append(" )) sfysh") ;
         centerFunctionAuthorizationDto.setSql1(sql1.toString());
         centerFunctionAuthorizationDto.setSql2(sql2.toString());
-        //PageHelper.startPage(centerFunctionAuthorizationDto.getPageNo(), centerFunctionAuthorizationDto.getPageSize());
+        PageHelper.startPage(centerFunctionAuthorizationDto.getPageNo(), centerFunctionAuthorizationDto.getPageSize());
         List<Map<String,Object>> list = centerFunctionAuthorizationDAO.queryHospZzywPage(centerFunctionAuthorizationDto);
 
         Map<String,Object> resultMap = new HashMap();
         resultMap.put("tableHead",tableHead);
-        resultMap.put("tableData",list);
+        resultMap.put("tableData",PageDTO.of(list));
 
 
 

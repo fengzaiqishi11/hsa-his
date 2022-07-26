@@ -107,14 +107,20 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
                 list = extraConsumptionDAO.queryRoomInvoicingBuy(extractStroInvoicingDetailDTO);
             }
         }
+        List<ExtractStroInvoicingDetailDTO> newList  = null ;
 
         // 筛选ItemId 为空的数据  说明这段时间内无次药品的数据，需要找到对于药品最新的一条记录作为数据
         if(!ListUtils.isEmpty(list)){
+            //保留 itemId不为空的
+            newList = list.stream().filter(o ->StringUtils.isNotEmpty(o.getItemId())).collect(Collectors.toList());
+            //替换 itemName为空的
             List<String> ids = list.stream().filter(o ->StringUtils.isEmpty(o.getItemId())).map(ExtractStroInvoicingDetailDTO::getId).collect(Collectors.toList());
             if(!ListUtils.isEmpty(ids)){
                 extractStroInvoicingDetailDTO.setIds(ids);
-                list.addAll(extraConsumptionDAO.queryExtraInvoicingByItemId(extractStroInvoicingDetailDTO));
+                newList.addAll(extraConsumptionDAO.queryExtraInvoicingByItemId(extractStroInvoicingDetailDTO));
             }
+            list.clear();
+            list.addAll(newList) ;
         }
 
         return PageDTO.of(list);

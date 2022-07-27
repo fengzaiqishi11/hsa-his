@@ -48,7 +48,7 @@ public class ExtractStroInvoicingJobHandler extends IJobHandler {
                 e.printStackTrace();
                 XxlJobLogger.log("["+centerHospitalDTO.getCode()+"]"+e.getMessage());
             } finally {
-                XxlJobLogger.log("====================["+centerHospitalDTO.getCode()+"]长期费用结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+                XxlJobLogger.log("====================["+centerHospitalDTO.getCode()+"]进销存同步结束:"+DateUtils.format("yyyy-MM-dd HH:mm:ss"));
             }
         }
         return SUCCESS;

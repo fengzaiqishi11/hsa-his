@@ -140,7 +140,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 hospIdListToExpired.add(centerHospitalDTO.getId());
                 continue;
             }
-            if(!centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.ZC)) {
+            if(timeMillsOfEndDate > timeMillsAfter15Days && !centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.ZC)) {
                 hospIdListNormally.add(centerHospitalDTO.getId());
             }
         }
@@ -273,8 +273,9 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
 
             return  true;
         }else{
-            int affectRows = centerHospitalDao.update(centerHospitalDTO) ;
             CenterHospitalDTO sourceHospitalInfoFromDB = centerHospitalDao.getById(centerHospitalDTO);
+            int affectRows = centerHospitalDao.update(centerHospitalDTO) ;
+
             if(!sourceHospitalInfoFromDB.getEndDate().equals(centerHospitalDTO.getEndDate())){
                 String dateBeforeRenewalStr = DateUtils.format(sourceHospitalInfoFromDB.getStartDate(),DateUtils.Y_M_DH_M_S)+'~'+
                         DateUtils.format(sourceHospitalInfoFromDB.getEndDate(),DateUtils.Y_M_DH_M_S);
@@ -284,6 +285,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 CenterOperationLogDo operationLogDo = CenterOperationLogDo.builder()
                         .id(SnowflakeUtils.getId())
                         .hospCode(centerHospitalDTO.getCode())
+                        .hospName(centerHospitalDTO.getName())
                         .crteId(centerHospitalDTO.getCrteId())
                         .crteName(centerHospitalDTO.getCrteName())
                         .bizId("YYYXQXG10001") // 医院有效期修改
@@ -466,6 +468,18 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
     @Override
     public CenterRootDatabaseBO findRootBase(CenterRootDatabaseBO centerRootDatabaseBO) {
         return centerHospitalDao.findRootDataBase();
+    }
+
+    /**
+     * 手动触发定时任务调度执行
+     *
+     * @param centerRootDatabaseBO 形参
+     * @return
+     */
+    @Override
+    public boolean triggerSchedulingManual(CenterRootDatabaseBO centerRootDatabaseBO) {
+        this.updateServericeStatusByPeriod();
+        return true;
     }
 
 

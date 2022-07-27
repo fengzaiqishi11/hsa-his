@@ -360,6 +360,7 @@ public class RequestInsure {
                     throw new AppException((String) resultObj.get("msg"));
                 }
                 resultData = HygeiaUtil.xml2map((String) resultObj.get("data"));
+              logger.info("调用工商医保出参数：{}",resultData);
             }
             int errortype = Integer.parseInt((String) resultData.get("errortype"));
             if (errortype != 0){
@@ -370,7 +371,8 @@ public class RequestInsure {
           //调接口后，请求失败插入医保人员信息获取日志
            params.put("resultStr", e.getMessage() == null ? "null" : e.getMessage().length() > 4000 ?
               e.getMessage().substring(0, 4000) : e.getMessage());
-            throw new AppException("调用医保提示【"+e.getMessage()+"】");
+            logger.error("call insure HUNAN province error: ",e);
+            throw new AppException("调用医保提示【"+e.getMessage()+"】",e);
         }finally {
           logger.info("*****调用省工伤接口保存日志记录开始*****");
           insureUnifiedLogService_consumer.insertInsureFunctionLog(params).getData();
@@ -465,29 +467,41 @@ public class RequestInsure {
             logger.info("【医保调用】入参：" + JSON.toJSONString(param));
             String producerTopic = hospCode + producerTopicKey;//生产者消息推送Topic
             String consumerTopic = hospCode + consumerTopicKey;//消费者消费信息Topic
+            logger.info("工伤kafka producerTopic：{},consumerTopic:{}：" + producerTopic,consumerTopic);
             consumer = KafkaUtil.createConsumer(servers,consumerTopic);//消费处理结果消息
+            logger.info("*****消费处理结果消息*****");
             KafkaProducer<String, String> producer = KafkaUtil.createProducer(servers);//推送需处理的消息
             KafkaUtil.sendMessage(producer, producerTopic, DesUtil.encrypt(JSON.toJSONString(param)).replaceAll("[\\s*\t\n\r]", ""));
+            logger.info("*****kafka请求完成*****");
             producer.close();
             int count = 0;
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(100);
+                logger.info("*****KafkaUtil获取records : {}",records);
                 for (ConsumerRecord<String, String> record : records) {
                     String value = record.value();
+                    logger.info("call kafka consumer receive encrypt msg hospCode:{}, from server: {}",
+                        hospCode,value);
                     if (StringUtils.isNotEmpty(value)){
-                        if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){ value = DesUtil.decrypt(value); }
+                        if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){
+                            value = DesUtil.decrypt(value); }
+                        logger.info("call kafka consumer receive msg from server: hospCode is {}," +
+                            "activityId is {},out_params content:{},in_params:{}",hospCode,activityCode,value,
+                            JSON.toJSONString(param));
                         Map<String,Object> result = JSON.parseObject(value,HashMap.class);
                         if (activityCode.equals(result.get("activityCode"))) {
                             consumer.commitAsync();
                             logger.info("【医保调用】KAFKA返参字符串：" + JSON.toJSONString(result));
                             logger.info("*****结束【医保调用】KAFKA方法*****");
                             return result;
-
+                        }else{
+                            logger.warn("发送的交易号：activityCode: {},接收的交易号：result.get('activityCode'){},不一致，完整数据包：{}",activityCode,result.get("activityCode"),JSON.toJSONString(result));
                         }
                     }
                 }
                 count ++ ;
                 if (count > 500*3) {
+                    logger.error("医保访问超市，count :"+count);
                     throw new AppException("医保访问超时");
                 }
             }

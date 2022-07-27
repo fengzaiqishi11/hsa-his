@@ -32,4 +32,11 @@ public interface ExtraConsumptionDAO {
     List<ExtractStroInvoicingDetailDTO> queryRoomInvoicingSell(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
 
     List<ExtractStroInvoicingDetailDTO> queryExtraInvoicingByItemId(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
+    /**
+     * @Author gory
+     * @Description 查询出根据库存关联所有的最近的一条数据
+     * @Date 2022/7/26 17:22
+     * @Param [extractStroInvoicingDetailDTO]
+     **/
+    List<ExtractStroInvoicingDetailDTO> queryAllExtractData(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO);
 }

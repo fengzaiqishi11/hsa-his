@@ -21,7 +21,13 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
+import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.alibaba.fastjson.JSON;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -42,6 +48,7 @@ import java.util.Map;
 @Component
 public class OutptBoImpl extends HsafBO implements OutptBo {
 
+    private static final Logger logger = LoggerFactory.getLogger(OutptBoImpl.class);
     @Resource
     private Transpond transpond;
 
@@ -140,13 +147,25 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
     @Override
     public Map<String, Object> setOutptCostUploadAndSettlement(Map<String, Object> param) {
         String hospCode = (String) param.get("hospCode");
-        Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"),Constant.FUNCTION.FC_2003,param);
+        Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"), Constant.FUNCTION.FC_2003,param);
         try {
             if ("settle".equals(param.get("action")) && trialMap != null && trialMap.containsKey("payinfo")) {
-                Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
+                String aaz217 = null;
+                //Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
+                if (trialMap.containsKey("bizinfo")){
+                  List<Map<String, String>> bizinfo =  (List<Map<String, String>>)trialMap.get("bizinfo");
+                  if (bizinfo.size() > 0){
+                    aaz217 = bizinfo.get(0).get("serial_no");//就医登记号
+                  }else{
+                    throw new AppException("门诊工伤结算业务节点信息为空！");
+                  }
+                }else{
+                  throw new AppException("门诊工伤结算未获取到biz业务节点信息！");
+                }
+                //Map<String, String> bizinfo = (Map<String, String>) trialMap.get("bizinfo");
                 String visitId = (String) param.get("visitId");//就诊id
-                String akb020 = payinfo.get("akb020");//医院编码
-                String aaz217 = payinfo.get("aaz217");//就医登记号
+                /*String akb020 = payinfo.get("akb020");//医院编码
+                String aaz217 = payinfo.get("aaz217");//就医登记号*/
                 //编辑医保患者信息表
                 InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
                 insureIndividualVisitDTO.setVisitId(visitId);//就诊id
@@ -159,6 +178,7 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                 }
             }
         }catch (RuntimeException e){
+            logger.error("医保结算：门诊费用上传并结算出现异常：",e);
             throw new AppException("医保结算成功，系统出现异常，请到医保结算系统取消本次结算。");
         }
         return trialMap;

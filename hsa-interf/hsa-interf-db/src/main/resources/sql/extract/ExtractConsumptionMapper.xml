@@ -323,8 +323,8 @@
         (select d.buy_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as buy_price_all,-- 本日期末零售总金额
         sum(a.phar_in_Num) as phar_in_Num,-- 药库入库数量
         sum(a.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库购进总金额
-        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(a.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
+        sum(a.stro_to_dept_num) as stro_to_dept_num,-- 药房出库数量
+        sum(a.stro_to_dept_buy_price_all) as stro_to_dept_buy_price_all,-- 药房出库到科室购进总金额
         sum(a.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
         sum(a.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库购进总金额
         sum(a.out_sales_num) as out_sales_num,-- 门诊销售数量
@@ -370,8 +370,8 @@
         (select d.sell_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as sell_price_all,-- 本日期末零售总金额
         sum(a.phar_in_Num) as phar_in_Num,-- 药库入库数量
         sum(a.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库零售总金额
-        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
-        sum(a.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房零售总金额
+        sum(a.stro_to_dept_num) as stro_to_dept_num,-- 药房出库数量
+        sum(a.stro_to_dept_price_all) as stro_to_dept_price_all,-- 药房出库到科室零售总金额
         sum(a.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
         sum(a.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库零售总金额
         sum(a.out_sales_num) as out_sales_num,-- 门诊销售数量

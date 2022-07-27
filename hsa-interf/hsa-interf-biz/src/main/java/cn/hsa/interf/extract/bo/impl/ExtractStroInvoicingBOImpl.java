@@ -198,6 +198,7 @@ public class ExtractStroInvoicingBOImpl implements ExtractStroInvoicingBO {
         } else {
             recentlyTime = DateUtils.parse(DateUtil.formatDate(recentlyTime), DateUtils.Y_M_D);
         }
+        recentlyTime = DateUtils.dateAdd(recentlyTime, 1);
         while (recentlyTime.before(DateUtils.parse(
                 DateUtil.formatDate(DateUtils.getNow()), DateUtils.Y_M_D))) {// 最近执行时间小于当前时间
             // 业务主表id
@@ -272,6 +273,7 @@ public class ExtractStroInvoicingBOImpl implements ExtractStroInvoicingBO {
         } else {
             recentlyTime = DateUtils.parse(DateUtil.formatDate(recentlyTime), DateUtils.Y_M_D);
         }
+        recentlyTime = DateUtils.dateAdd(recentlyTime, 1);
         while (recentlyTime.before(DateUtils.parse(
                 DateUtil.formatDate(DateUtils.getNow()), DateUtils.Y_M_D))) {// 最近执行时间小于当前时间
             // 业务主表id

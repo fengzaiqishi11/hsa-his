@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.extract.dao.ExtraConsumptionDAO">
+    <!--药房消耗报表的映射-->
+    <resultMap type="cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO" id="extractConsumptionDetailMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="summaryType" column="summary_type" jdbcType="VARCHAR"/>
+        <result property="statisticsOptions" column="statistics_options" jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id" jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code" jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="VARCHAR"/>
+        <result property="splitNum" column="split_num" jdbcType="VARCHAR"/>
+        <result property="splitUnitCode" column="split_unit_code" jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id" jdbcType="VARCHAR"/>
+        <result property="bizName" column="biz_name" jdbcType="VARCHAR"/>
+        <result property="consumNum" column="consum_num" jdbcType="VARCHAR"/>
+        <result property="avgSellPrice" column="avg_sell_price" jdbcType="VARCHAR"/>
+        <result property="sellPriceAll" column="sell_price_all" jdbcType="VARCHAR"/>
+        <result property="avgBuyPrice" column="avg_buy_price" jdbcType="VARCHAR"/>
+        <result property="buyPriceAll" column="buy_price_all" jdbcType="VARCHAR"/>
+        <result property="profitPrice" column="profit_price" jdbcType="VARCHAR"/>
+        <result property="extractType" column="extract_type" jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time" jdbcType="TIMESTAMP"/>
+        <result property="renewalTime" column="renewal_time" jdbcType="TIMESTAMP"/>
+        <result property="extractId" column="extract_id" jdbcType="VARCHAR"/>
+        <result property="pym" column="pym" jdbcType="VARCHAR"/>
+        <result property="wbm" column="wbm" jdbcType="VARCHAR"/>
+    </resultMap>
+
+
+    <resultMap type="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" id="extractStroInvoicingDetailMap">
+        <result property="id" column="id"  jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code"  jdbcType="VARCHAR"/>
+        <result property="bizId" column="biz_id"  jdbcType="VARCHAR"/>
+        <result property="itemCode" column="item_code"  jdbcType="VARCHAR"/>
+        <result property="itemId" column="item_id"  jdbcType="VARCHAR"/>
+        <result property="itemName" column="item_name"  jdbcType="VARCHAR"/>
+        <result property="num" column="num"  jdbcType="DECIMAL"/>
+        <result property="unitCode" column="unit_code"  jdbcType="VARCHAR"/>
+        <result property="currUnitCode" column="curr_unit_code"  jdbcType="VARCHAR"/>
+        <result property="sellPrice" column="sell_price"  jdbcType="DECIMAL"/>
+        <result property="buyPrice" column="buy_price"  jdbcType="DECIMAL"/>
+        <result property="splitRatio" column="split_ratio"  jdbcType="VARCHAR"/>
+        <result property="splitPrice" column="split_price"  jdbcType="DECIMAL"/>
+        <result property="splitNum" column="split_num"  jdbcType="DECIMAL"/>
+        <result property="splitUnitCode" column="split_unit_code"  jdbcType="VARCHAR"/>
+        <result property="upSurplusNum" column="up_surplus_num"  jdbcType="DECIMAL"/>
+        <result property="surplusNum" column="surplus_num"  jdbcType="DECIMAL"/>
+        <result property="upBuyPriceAll" column="up_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="buyPriceAll" column="buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="upSellPriceAll" column="up_sell_price_all"  jdbcType="DECIMAL"/>
+        <result property="sellPriceAll" column="sell_price_all"  jdbcType="DECIMAL"/>
+        <result property="crteTime" column="crte_time"  jdbcType="VARCHAR"/>
+        <result property="newPrice" column="new_price"  jdbcType="DECIMAL"/>
+        <result property="newSplitPrice" column="new_split_price"  jdbcType="DECIMAL"/>
+        <result property="stroInNum" column="stro_in_num"  jdbcType="DECIMAL"/>
+        <result property="stroInNumPriceAll" column="stro_in_num_price_all"  jdbcType="DECIMAL"/>
+        <result property="returnSuplNum" column="return_supl_num"  jdbcType="DECIMAL"/>
+        <result property="returnSuplPriceAll" column="return_supl_price_all"  jdbcType="DECIMAL"/>
+        <result property="stroToDeptNum" column="stro_to_dept_num"  jdbcType="DECIMAL"/>
+        <result property="stroToDeptPriceAll" column="stro_to_dept_price_all"  jdbcType="DECIMAL"/>
+        <result property="stroToPharNum" column="stro_to_phar_num"  jdbcType="DECIMAL"/>
+        <result property="stroToPharPriceAll" column="stro_to_phar_price_all"  jdbcType="DECIMAL"/>
+        <result property="reportLossesNum" column="report_losses_num"  jdbcType="DECIMAL"/>
+        <result property="reportLossesPriceAll" column="report_losses_price_all"  jdbcType="DECIMAL"/>
+        <result property="pharReturnStroNum" column="phar_return_stro_num"  jdbcType="DECIMAL"/>
+        <result property="pharReturnStroPriceAll" column="phar_return_stro_price_all"  jdbcType="DECIMAL"/>
+        <result property="adjustProfitPriceAll" column="adjust_profit_price_all"  jdbcType="DECIMAL"/>
+        <result property="adjustLossPriceAll" column="adjust_loss_price_all"  jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractNum" column="take_strock_subtract_num"  jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractPriceAll" column="take_strock_subtract_price_all"  jdbcType="DECIMAL"/>
+        <result property="takeStrockAddNum" column="take_strock_add_num"  jdbcType="DECIMAL"/>
+        <result property="takeStrockAddPriceAll" column="take_strock_add_price_all"  jdbcType="DECIMAL"/>
+        <result property="stroInNumBuyPriceAll" column="stro_in_num_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="returnSuplBuyPriceAll" column="return_supl_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="stroToDeptBuyPriceAll" column="stro_to_dept_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="stroToPharBuyPriceAll" column="stro_to_phar_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="reportLossesBuyPriceAll" column="report_losses_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="pharReturnStroBuyPriceAll" column="phar_return_stro_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="adjustProfitBuyPriceAll" column="adjust_profit_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="adjustLossBuyPriceAll" column="adjust_loss_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="takeStrockSubtractBuyPriceAll" column="take_strock_subtract_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="takeStrockAddBuyPriceAll" column="take_strock_add_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="outSalesNum" column="out_sales_num"  jdbcType="DECIMAL"/>
+        <result property="outSalesPriceAll" column="out_sales_price_all"  jdbcType="DECIMAL"/>
+        <result property="outSalesBuyPriceAll" column="out_sales_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="inSalesBuyPriceAll" column="in_sales_buy_price_all"  jdbcType="DECIMAL"/>
+        <result property="inSalesPriceAll" column="in_sales_price_all"  jdbcType="DECIMAL"/>
+        <result property="inSalesNum" column="in_sales_num"  jdbcType="DECIMAL"/>
+        <result property="extractId" column="extract_id"  jdbcType="VARCHAR"/>
+        <result property="spec" column="spec"  jdbcType="VARCHAR"/>
+        <result property="code" column="code"  jdbcType="VARCHAR"/>
+        <result property="extractTime" column="extract_time"  jdbcType="VARCHAR"/>
+        <result property="itemType" column="item_type"  jdbcType="VARCHAR"/>
+        <result property="itemTypeName" column="item_type_name"  jdbcType="VARCHAR"/>
+        <result property="pharInNum" column="phar_in_Num" jdbcType="DECIMAL"/>
+        <result property="pharInNumBuyPriceAll" column="phar_in_num_buy_price_all" jdbcType="DECIMAL"/>
+        <result property="pharInNumSellPriceAll" column="phar_in_num_sell_price_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroTotalNum" column="phar_return_stro_total_num" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroBuyPriAll" column="phar_return_stro_buy_pri_all" jdbcType="DECIMAL"/>
+        <result property="pharReturnStroSellPriAll" column="phar_return_stro_sell_pri_all" jdbcType="DECIMAL"/>
+        <result property="sellPrice" column="sell_price" jdbcType="DECIMAL"/>
+        <result property="upSellPrice" column="up_sell_price" jdbcType="DECIMAL"/>
+        <result property="buyPrice" column="buy_price" jdbcType="DECIMAL"/>
+        <result property="upBuyPrice" column="up_buy_price" jdbcType="DECIMAL"/>
+    </resultMap>
+    <!--药房消耗报表-->
+    <select id="queryExtractConsumptions" resultMap="extractConsumptionDetailMap">
+        SELECT  hosp_code,
+        item_id, item_code,
+        item_name, code, type_code, spec, unit_code,
+        price, sum(split_num) as split_num , split_unit_code, biz_id, biz_name,
+        sum(consum_num) as consum_num, avg_sell_price, sum(sell_price_all) as sell_price_all,
+        avg_buy_price, sum(buy_price_all) as buy_price_all, sum(profit_price) as profit_price
+        from extract_consumption_detail
+        where
+        hosp_code = #{hospCode}
+        and summary_type = #{summaryType}
+        <if test="startTime != null">
+            and extract_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and extract_time &lt;= #{endTime}
+        </if>
+        <if test="itemCode != null and itemCode !=''">
+            and item_code = #{itemCode}
+        </if>
+        <if test="deptList != null and deptList.size()>0">
+            and biz_id in
+            <foreach collection="deptList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            item_name like concat('%',#{itemName},'%') or
+            pym like concat('%',#{itemName},'%') or
+            wbm like concat('%',#{itemName},'%')
+            )
+        </if>
+        group by item_id,biz_id,unit_code
+    </select>
+    <!--根据项目id对项目进行汇总-->
+    <select id="queryExtractConsumptionsByItemId"
+            resultType="cn.hsa.module.interf.extract.dto.ExtractConsumptionDTO">
+        SELECT  hosp_code,
+        item_id, item_code,
+        item_name, code, type_code, spec, unit_code,
+        price, sum(split_num) as split_num , split_unit_code, biz_id, biz_name,
+        sum(consum_num) as consum_num, avg_sell_price, sum(sell_price_all) as sell_price_all,
+        avg_buy_price, sum(buy_price_all) as buy_price_all, sum(profit_price) as profit_price
+        from extract_consumption_detail
+        where
+        hosp_code = #{hospCode}
+        and summary_type = #{summaryType}
+        <if test="startTime != null">
+            and extract_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null">
+            and extract_time &lt;= #{endTime}
+        </if>
+        <if test="itemCode != null and itemCode !=''">
+            and item_code = #{itemCode}
+        </if>
+        <if test="deptList != null and deptList.size()>0">
+            and biz_id in
+            <foreach collection="deptList" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="itemName != null and itemName != ''">
+            and (
+            item_name like concat('%',#{itemName},'%') or
+            pym like concat('%',#{itemName},'%') or
+            wbm like concat('%',#{itemName},'%')
+            )
+        </if>
+        group by item_id
+    </select>
+
+
+    <sql id="andSql" >
+            <if test="startTime != null  and endTime != null ">
+                and a.extract_time &gt;= #{startTime}
+                and a.extract_time &lt;= #{endTime}
+            </if>
+    </sql>
+
+    <sql id="whereSql" >
+        <where>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="startTime != null  and endTime != null ">
+                and a.extract_time &gt;= #{startTime}
+                and a.extract_time &lt;= #{endTime}
+            </if>
+            <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
+                and ((a.item_code = '1' and  a.item_type  = #{drugType}) or (a.item_code = '2'and a.item_type  = #{materialType}))
+            </if>
+            <if test="keyWord != null and keyWord != ''">
+                and (a.item_name like '%${keyWord}%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryStroInvoicingBuy" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
+        select
+        a.item_id as id,
+        a.code,-- 项目编码
+        a.item_name,-- 项目名称
+        max(a.item_id) as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        min(a.buy_price) as upSellPrice,-- 零售单价
+        max(a.buy_price) as buyPrice,-- 购进单价
+        (select d.buy_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id))as up_buy_price,-- 期初标准零售单价
+        (select d.buy_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as buy_price,-- 期末零售总金额
+        (select d.up_surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_surplus_num,-- 本日期初数量
+        (select d.up_buy_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_buy_price_all,-- 期初零售总金额
+        (select d.surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as surplus_num,-- 本日期末数量
+        (select d.buy_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as buy_price_all,-- 本日期末零售总金额
+        sum(a.stro_in_num) as stro_in_num,-- 药库入库数量
+        sum(a.stro_in_num_buy_price_all) as stro_in_num_buy_price_all,-- 药库入库购进总金额
+        sum(a.return_supl_num) as return_supl_num,-- 药库退供应商数量
+        sum(a.return_supl_buy_price_all) as return_supl_buy_price_all,-- 药库退供应商购进总金额
+        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
+        sum(a.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
+        sum(a.stro_to_dept_num) as stro_to_dept_num, -- 出库科室数量
+        sum(a.stro_to_dept_buy_price_all) as stro_to_dept_buy_price_all, -- 出库科室购进价总额
+        sum(a.phar_return_stro_num) as phar_return_stro_num, -- 药房退库数量
+        sum(a.phar_return_stro_buy_price_all) as phar_return_stro_buy_price_all, -- 药房退库购进总金额
+        sum(a.adjust_profit_buy_price_all) as adjust_profit_buy_price_all,-- 调价调盈购进总金额
+        sum(a.adjust_loss_buy_price_all) as adjust_loss_buy_price_all,-- 调价亏损购进总金额
+        sum(a.report_losses_num) as report_losses_num,-- 报损消耗数量
+        sum(a.report_losses_buy_price_all) as report_losses_buy_price_all,-- 报损消耗数量购进总金额
+        sum(a.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
+        sum(a.take_strock_subtract_buy_price_all) as take_strock_subtract_buy_price_all,-- 盘亏购进总金额
+        sum(a.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
+        sum(a.take_strock_add_buy_price_all) as take_strock_add_buy_price_all-- 盘盈购进总金额
+        from
+        extract_stro_invoicing_detail a
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec,
+        a.curr_unit_code
+    </select>
+
+
+    <select id="queryStroInvoicingSell" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
+        select
+        a.id,
+        a.code,-- 项目编码
+        a.item_name,-- 项目名称
+        a.item_id as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        (select d.sell_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id))as up_sell_price,-- 期初标准零售单价
+        (select d.sell_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as sell_price,-- 期末零售总金额
+        (select d.up_surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_surplus_num,-- 本日期初数量
+        (select d.up_sell_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_sell_price_all,-- 期初零售总金额
+        (select d.surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as surplus_num,-- 本日期末数量
+        (select d.sell_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as sell_price_all,-- 本日期末零售总金额
+        sum(a.stro_in_num) as stro_in_num,-- 药库入库数量
+        sum(a.stro_in_num_price_all) as stro_in_num_price_all,-- 药库入库零售总金额
+        sum(a.return_supl_num) as return_supl_num,-- 药库退供应商数量
+        sum(a.return_supl_price_all) as return_supl_price_all,-- 药库退供应商零售总金额
+        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
+        sum(a.stro_to_phar_price_all) as stro_to_phar_price_all,-- 药库出库到药房零售总金额
+        sum(a.stro_to_dept_num) as stro_to_dept_num, -- 出库科室数量
+        sum(a.stro_to_dept_price_all) as stro_to_dept_price_all, -- 出库科室零售价总额
+        sum(a.phar_return_stro_num) as phar_return_stro_num, -- 药房退库数量
+        sum(a.phar_return_stro_price_all) as phar_return_stro_price_all, -- 药房退库零售总金额
+        sum(a.adjust_profit_price_all) as adjust_profit_price_all,-- 调价调盈零售总金额
+        sum(a.adjust_loss_price_all) as adjust_loss_price_all,-- 调价亏损零售总金额
+        sum(a.report_losses_num) as report_losses_num,-- 报损消耗数量
+        sum(a.report_losses_price_all) as report_losses_price_all,-- 报损消耗数量零售总金额
+        sum(a.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
+        sum(a.take_strock_subtract_price_all) as take_strock_subtract_price_all,-- 盘亏零售总金额
+        sum(a.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
+        sum(a.take_strock_add_price_all) as take_strock_add_price_all-- 盘盈零售总金额
+        from
+        extract_stro_invoicing_detail a
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec
+    </select>
+
+
+    <select id="queryRoomInvoicingBuy" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
+        select
+        a.item_id as id,
+        a.code,-- 项目编码
+        a.item_name,-- 项目名称
+        max(a.item_id) as item_id,
+        a.biz_id,
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        (select d.buy_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id))as up_buy_price,-- 期初标准零售单价
+        (select d.buy_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as buy_price,-- 期末零售总金额
+        (select d.up_surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_surplus_num,-- 本日期初数量
+        (select d.up_buy_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_buy_price_all,-- 期初零售总金额
+        (select d.surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as surplus_num,-- 本日期末数量
+        (select d.buy_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as buy_price_all,-- 本日期末零售总金额
+        sum(a.phar_in_Num) as phar_in_Num,-- 药库入库数量
+        sum(a.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库购进总金额
+        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
+        sum(a.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房购进总金额
+        sum(a.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
+        sum(a.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库购进总金额
+        sum(a.out_sales_num) as out_sales_num,-- 门诊销售数量
+        sum(a.out_sales_buy_price_all) as out_sales_buy_price_all,-- 门诊销售购进总金额
+        sum(a.in_sales_num) as in_sales_num,-- 住院销售数量
+        sum(a.in_sales_buy_price_all) as in_sales_buy_price_all,-- 住院销售购进总金额
+        sum(a.report_losses_num) as report_losses_num,-- 报损消耗数量
+        sum(a.report_losses_buy_price_all) as report_losses_buy_price_all,-- 报损消耗数量购进总金额
+        sum(a.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
+        sum(a.take_strock_subtract_buy_price_all) as take_strock_subtract_buy_price_all,-- 盘亏购进总金额
+        sum(a.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
+        sum(a.take_strock_add_buy_price_all) as take_strock_add_buy_price_all,-- 盘盈购进总金额
+        sum(a.adjust_profit_buy_price_all) as adjust_profit_buy_price_all,-- 调价调盈购进总金额
+        sum(a.adjust_loss_buy_price_all) as adjust_loss_buy_price_all-- 调价亏损购进总金额
+        from
+        extract_stro_invoicing_detail a
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec
+    </select>
+
+
+
+    <select id="queryRoomInvoicingSell" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
+        select
+        a.item_id as id,
+        a.code,-- 项目编码
+        a.item_name,-- 项目名称
+        max(a.item_id) as item_id,
+        a.biz_id,-- 科室id
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.spec,-- 规格
+        a.curr_unit_code,-- 单位代码（DW）
+        (select d.sell_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id))as up_sell_price,-- 期初标准零售单价
+        (select d.sell_price from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as sell_price,-- 期末零售总金额
+        (select d.up_surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_surplus_num,-- 本日期初数量
+        (select d.up_sell_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = min(a.id)) as up_sell_price_all,-- 期初零售总金额
+        (select d.surplus_num from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as surplus_num,-- 本日期末数量
+        (select d.sell_price_all from extract_stro_invoicing_detail d where d.item_id = a.item_id  and d.id = max(a.id)) as sell_price_all,-- 本日期末零售总金额
+        sum(a.phar_in_Num) as phar_in_Num,-- 药库入库数量
+        sum(a.phar_in_num_buy_price_all) as phar_in_num_buy_price_all,-- 药库入库零售总金额
+        sum(a.stro_to_phar_num) as stro_to_phar_num,-- 药库出库到药房数量
+        sum(a.stro_to_phar_buy_price_all) as stro_to_phar_buy_price_all,-- 药库出库到药房零售总金额
+        sum(a.phar_return_stro_total_num) as phar_return_stro_total_num,-- 药房退库数量
+        sum(a.phar_return_stro_buy_pri_all) as phar_return_stro_buy_pri_all,-- 药房退库零售总金额
+        sum(a.out_sales_num) as out_sales_num,-- 门诊销售数量
+        sum(a.out_sales_price_all) as out_sales_price_all,-- 门诊销售零售总金额
+        sum(a.in_sales_num) as in_sales_num,-- 住院销售数量
+        sum(a.in_sales_price_all) as in_sales_price_all,-- 住院销售零售总金额
+        sum(a.report_losses_num) as report_losses_num,-- 报损消耗数量
+        sum(a.report_losses_price_all) as report_losses_price_all,-- 报损消耗数量零售总金额
+        sum(a.take_strock_subtract_num) as take_strock_subtract_num,-- 盘亏数量
+        sum(a.take_strock_subtract_price_all) as take_strock_subtract_price_all,-- 盘亏零售总金额
+        sum(a.take_strock_add_num) as take_strock_add_num,-- 盘盈总数量
+        sum(a.take_strock_add_price_all) as take_strock_add_price_all,-- 盘盈零售总金额
+        sum(a.adjust_profit_price_all) as adjust_profit_price_all,-- 调价调盈零售总金额
+        sum(a.adjust_loss_price_all) as adjust_loss_price_all-- 调价亏损零售总金额
+        from
+        extract_stro_invoicing_detail a
+        <include refid="whereSql"></include>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec
+    </select>
+
+
+    <select id="queryExtraInvoicingByItemId" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
+        select
+        b.*,
+        (select bd.name from base_dept bd where bd.hosp_code = b.hosp_code and b.biz_id = bd.id) as deptName
+        from
+            (
+                select
+                t.item_id,
+                t.biz_id,
+                t.curr_unit_code,
+                max(extract_time) extract_time
+                from
+                    extract_stro_invoicing_detail t
+                group by
+                t.item_id,t.curr_unit_code,t.biz_id) as c
+                inner join extract_stro_invoicing_detail b on
+                c.item_id = b.item_id
+                and c.biz_id = b.biz_id
+                and c.extract_time = b.extract_time
+        <where>
+            <if test="bizId != null and bizId != ''">
+                and b.biz_id = #{bizId}
+            </if>
+            <if test="ids != null and ids.size()>0">
+                and b.item_id in
+                <foreach collection="ids" close=")" open="(" separator="," item="id">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="queryAllExtractData"
+            resultMap="extractStroInvoicingDetailMap">
+        select
+        a.id, hosp_code, biz_id, (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        item_code, item_id, item_name,
+        num, unit_code, curr_unit_code, sell_price, buy_price,
+        sell_price as up_sell_price, buy_price as up_buy_price,
+        split_ratio, split_price, split_num, split_unit_code,
+        up_surplus_num, surplus_num, up_buy_price_all,
+        buy_price_all, up_sell_price_all, sell_price_all,
+        crte_time, new_price, new_split_price, stro_in_num,
+        stro_in_num_price_all, return_supl_num, return_supl_price_all,
+        stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
+        stro_to_phar_price_all, report_losses_num, report_losses_price_all,
+        phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all,
+        adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all,
+        take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all,
+        return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
+        report_losses_buy_price_all, phar_return_stro_buy_price_all,
+        adjust_profit_buy_price_all, adjust_loss_buy_price_all,
+        take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
+        out_sales_num, out_sales_price_all, out_sales_buy_price_all,
+        in_sales_buy_price_all, in_sales_price_all, in_sales_num,
+        extract_id, spec, code, extract_time, item_type,
+        phar_return_stro_sell_pri_all, phar_return_stro_buy_pri_all,
+        phar_return_stro_total_num, phar_in_num_sell_price_all,
+        phar_in_num_buy_price_all, phar_in_num
+            from extract_stro_invoicing_detail a,(select max(id) as id from extract_stro_invoicing_detail a
+        <where>
+            <if test="bizId != null and bizId != ''">
+                and a.biz_id = #{bizId}
+            </if>
+            <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
+                and ((a.item_code = '1' and  a.item_type  = #{drugType}) or (a.item_code = '2'and a.item_type  = #{materialType}))
+            </if>
+            <if test="keyWord != null and keyWord != ''">
+                and (a.item_name like '%${keyWord}%')
+            </if>
+        </where>
+        group by
+        a.item_id,
+        a.code,
+        a.item_name,
+        a.biz_id,
+        a.spec) b
+    where b.id = a.id
+
+    </select>
+
+
+</mapper>

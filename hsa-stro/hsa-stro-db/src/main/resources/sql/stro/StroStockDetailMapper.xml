@@ -596,60 +596,174 @@
 
     <!--查询住院药品和材料利润统计信息-->
     <select id="queryZYDrugAndMaterialProfit" resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
-        SELECT
-            ic.dept_id as deptId, -- 科室id
-            bd.name as deptName, -- 科室名称
-            bfc.name as bfcName, -- 财务分类名称
-            ic.doctor_name as doctorName, -- 医生姓名
-            pidd.batch_no as batchNo, -- 批号
-            pidd.item_id as itemId, -- 项目id
-            pidd.item_name as itemName,  -- 项目名称
-            pidd.spec as itemSpec, -- 项目规格
-            ssd.buy_price as buyPrice,  -- 购进单价
-            ssd.sell_price as sellPrice,  -- 零售单价
-            ssd.split_ratio as splitRatio, -- 拆分比
-            sum(pidd.num)  as sellCount,
-            pidd.unit_code as unitCode,
-            sum(ssd.buy_price * pidd.num) as buyPriceAll,
-            sum(ssd.sell_price * pidd.num) as sellPriceAll,
-            sum((ssd.sell_price - ssd.buy_price) * pidd.num) as profit,
-            ROUND(sum((ssd.sell_price - ssd.buy_price) * pidd.num) / sum(ssd.buy_price * pidd.num),4) as profitRate
-        FROM inpt_cost ic
-             join phar_in_distribute_all_detail pidad
-                on pidad.id = ic.distribute_all_detail_id and pidad.hosp_code =  #{hospCode}
-             join phar_in_distribute_detail pidd
-                on pidd.distribute_id = pidad.distribute_id and pidd.hosp_code =  #{hospCode}
-            left join stro_stock_detail ssd
-                on ssd.id = pidd.stock_detail_id and ssd.hosp_code =  #{hospCode}
-            left join base_dept bd
-                on bd.id = ic.dept_id and bd.hosp_code =  #{hospCode}
-            left join base_finance_classify bfc
-                on bfc.id = ic.bfc_id and bfc.hosp_code = #{hospCode}
+        select
+        profitTable.*,(profitTable.sellPriceAll - buyPriceAll) as profit,
+        ROUND((profitTable.sellPriceAll - buyPriceAll) / sellPriceAll,4) as profitRate
+        from
+        (
+        select
+        B.source_dept_id as dept_id,
+        (select name from base_dept bd where bd.id = B.source_dept_id) as deptName,
+        sum(ifnull(B.reality_price,0)) as sellPriceAll,/*零售总金额*/
+        ifnull(bfc.name,'其他') as bfcName, /*财务分类名称*/
+        ifnull(B.doctor_name,'收费室') as doctorName,/*医生姓名*/
+        B.total_num_unit_code as unitCode,
+        case when B.item_code = '1' then
+        (sum(case when B.total_num_unit_code = bd.split_unit_code then B.total_num/bd.split_ratio else B.total_num end)
+        * bd.avg_buy_price) else
+        (sum(case when B.total_num_unit_code = bm.split_unit_code then B.total_num/bm.split_ratio else B.total_num end)
+        * bm.avg_buy_price) end buyPriceAll,/*购进总金额*/
+        case when B.item_code = '1' then bd.avg_buy_price else bm.avg_buy_price end buyPrice, /*平均购进价*/
+        case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
+        case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
+        case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        B.item_id as itemId,/*项目id*/
+        B.item_name as itemName,/*项目名称*/
+        sum(ifnull(B.total_num,0)) as sellCount/*数量*/
+        from
+        inpt_cost B
+        inner join inpt_visit t on t.hosp_code = B.hosp_code and B.visit_id = t.id
+        left join inpt_cost_settle ics on
+        ics.hosp_code = B.hosp_code
+        and ics.cost_id = B.id
+        left join base_drug bd on bd.id = B.item_id
+        left join base_finance_classify bfc on bfc.id = B.bfc_id
+        left join base_material bm  on bm.id = B.item_id
         where
-            ic.is_dist ='1'
-          and ic.is_wait = '1'
-          and ic.item_code in('1','2')
-          and ic.hosp_code= #{hospCode}
-        <if test="deptId != null and deptId != ''">
-            and ic.dept_id = #{deptId}
-        </if>
-        <if test="doctorId != null and doctorId != ''">
-            and ic.doctorId = #{doctorId}
-        </if>
+        B.hosp_code = #{hospCode}
+        and bfc.code in ('J01','L01','M01','N01')
         <if test="startDate != null ">
-            and ic.cost_time &gt;= #{startDate}
+            and B.cost_time >= STR_TO_DATE(#{startDate},
+            '%Y-%m-%d %H:%i:%s')/*结束日期*/
         </if>
         <if test="endDate != null ">
-            and ic.cost_time &lt;= #{endDate}
+            and B.cost_time &lt;=STR_TO_DATE(#{endDate},
+            '%Y-%m-%d %H:%i:%s')
         </if>
         <choose>
             <when test='sumCode != null and sumCode == "2"'>
-                group by ic.dept_id
+                group by B.dept_id,B.doctor_id,B.bfc_id
             </when>
             <otherwise>
-                group by pidd.item_id,pidd.batch_no,ic.dept_id,ic.doctor_id
+                group by B.doctor_id,B.dept_id,B.item_id,B.bfc_id
             </otherwise>
         </choose>
+        ) profitTable
+
+    </select>
+    <!--门诊发药利润-->
+    <select id="queryNewMZDrugAndMaterialProfit"
+            resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+        select profitTable.*,(profitTable.sellPriceAll - buyPriceAll) as profit,
+        ROUND((profitTable.sellPriceAll - buyPriceAll) / sellPriceAll,4) as profitRate
+        from (select
+        B.source_dept_id as dept_id,
+        (select name from base_dept bd where bd.id = B.source_dept_id) as deptName,
+        sum(ifnull(B.reality_price,0)) as sellPriceAll,/*零售总金额*/
+        ifnull(bfc.name,'其他') as bfcName, /*财务分类名称*/
+        ifnull(B.doctor_name,'收费室') as doctorName,/*医生姓名*/
+        B.num_unit_code as unitCode,
+        case when B.item_code = '1' then
+        (sum(case when B.num_unit_code = bd.split_unit_code then B.total_num/bd.split_ratio else B.total_num end)
+        * bd.avg_buy_price) else
+        (sum(case when B.num_unit_code = bm.split_unit_code then B.total_num/bm.split_ratio else B.total_num end)
+        * bm.avg_buy_price) end buyPriceAll,/*购进总金额*/
+        case when B.item_code = '1' then bd.avg_buy_price else bm.avg_buy_price end buyPrice, /*平均购进价*/
+        case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
+        case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
+        case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        B.item_id as itemId,/*项目id*/
+        B.item_name as itemName,/*项目名称*/
+        sum(ifnull(B.total_num,0)) as sellCount/*数量*/
+        from
+        outpt_settle A
+        left join outpt_cost B on A.id = B.settle_id and A.hosp_code = B.hosp_code and b.settle_code = '2' and B.item_code in ('1','2')
+        left join base_finance_classify bfc on bfc.id = B.bfc_id
+        left join base_drug bd on bd.id = B.item_id
+        left join base_material bm on bm.id = B.item_id
+        where
+        A.hosp_code = #{hospCode}
+        and A.is_settle = '1' and bfc.code in ('J01','L01','M01','N01')
+        <if test="startDate != null ">
+            and A.settle_time >=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endDate != null ">
+            and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <choose>
+            <when test='sumCode != null and sumCode == "2"'>
+                group by B.source_dept_id,B.bfc_id
+            </when>
+            <otherwise>
+                group by B.source_dept_id,B.bfc_id,B.doctor_id,B.item_id
+            </otherwise>
+        </choose>
+        ) profitTable
+    </select>
+    <!--按结算时间算利润-->
+    <select id="queryZYDrugAndMaterialProfitBySettleTime"
+            resultType="cn.hsa.module.stro.stock.dto.ItemProfitStatisticsDTO">
+
+        select
+        profitTable.*,(profitTable.sellPriceAll - buyPriceAll) as profit,
+        ROUND((profitTable.sellPriceAll - buyPriceAll) / sellPriceAll,4) as profitRate
+        from
+        (
+        select
+        B.source_dept_id as dept_id,
+        (select name from base_dept bd where bd.id = B.source_dept_id) as deptName,
+        sum(ifnull(B.reality_price,0)) as sellPriceAll,/*零售总金额*/
+        ifnull(bfc.name,'其他') as bfcName, /*财务分类名称*/
+        ifnull(B.doctor_name,'收费室') as doctorName,/*医生姓名*/
+        B.total_num_unit_code as unitCode,
+        case when B.item_code = '1' then
+        (sum(case when B.total_num_unit_code = bd.split_unit_code then B.total_num/bd.split_ratio else B.total_num end)
+        * bd.avg_buy_price) else
+        (sum(case when B.total_num_unit_code = bm.split_unit_code then B.total_num/bm.split_ratio else B.total_num end)
+        * bm.avg_buy_price) end buyPriceAll,/*购进总金额*/
+        case when B.item_code = '1' then bd.avg_buy_price else bm.avg_buy_price end buyPrice, /*平均购进价*/
+        case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
+        case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
+        case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        B.item_id as itemId,/*项目id*/
+        B.item_name as itemName,/*项目名称*/
+        sum(ifnull(B.total_num,0)) as sellCount/*数量*/
+        from
+        inpt_settle A
+        inner join inpt_cost B on
+        A.id = B.settle_id
+        and A.hosp_code = B.hosp_code
+        inner join inpt_cost_settle ics on
+        B.id = ics.cost_id
+        and A.id = ics.settle_id
+        inner join inpt_visit t on
+        t.hosp_code = b.hosp_code
+        and t.id = B.visit_id
+        left join base_drug bd on bd.id = B.item_id
+        left join base_finance_classify bfc on bfc.id = B.bfc_id
+        left join base_material bm  on bm.id = B.item_id
+
+        where
+        A.hosp_code = #{hospCode}
+        and bfc.code in ('J01','L01','M01','N01')
+        and A.is_settle = '1'
+        and B.settle_code = '2'
+        and A.status_code = '0'
+        <if test="startDate != null ">
+            and A.settle_time >=STR_TO_DATE(#{startDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <if test="endDate != null ">
+            and A.settle_time &lt;= STR_TO_DATE(#{endDate},'%Y-%m-%d %H:%i:%s')
+        </if>
+        <choose>
+            <when test='sumCode != null and sumCode == "2"'>
+                group by B.doctor_id,B.source_dept_id,B.bfc_id
+            </when>
+            <otherwise>
+                group by B.doctor_id,B.source_dept_id,B.item_id,B.bfc_id
+            </otherwise>
+        </choose>
+        ) profitTable
     </select>
 
 </mapper>

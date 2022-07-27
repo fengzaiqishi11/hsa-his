@@ -658,4 +658,22 @@
         GROUP BY a.id, b.dept_code
         ORDER BY a.code
     </select>
+
+    <update id="updateSetlAdmCaty" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        update insure_setl_info isi
+        set isi.adm_caty = #{catyCode}
+        where isi.adm_caty = #{nationCode}
+    </update>
+
+    <update id="updateSetlDscgCaty" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        update insure_setl_info isi
+        set isi.dscg_caty = #{catyCode}
+        where isi.dscg_caty = #{nationCode}
+    </update>
+
+    <update id="updateSetlRefldeptDept" parameterType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
+        update insure_setl_info isi
+        set isi.refldept_dept = #{catyCode}
+        where isi.refldept_dept = #{nationCode}
+    </update>
 </mapper>

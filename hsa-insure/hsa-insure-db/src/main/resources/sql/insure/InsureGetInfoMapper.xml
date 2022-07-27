@@ -1722,8 +1722,8 @@
         from insure_individual_visit
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
-        <if test="insureSettleId != null and insureSettleId != ''">
-            and insure_settle_id =#{insureSettleId}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and medical_reg_no =#{medicalRegNo}
         </if>
     </select>
     <select id="selectBldInfo" resultType="java.util.Map">
@@ -2135,5 +2135,31 @@
     <select id="queryInptVist" resultType="java.lang.String">
         select status_code from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
     </select>
+
+    <select id="queryProfileFile" resultType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
+       select
+            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code, nationality_cation,
+            native_place, education_code, occupation_code, marry_code, cert_code, cert_no, phone, email, often_code,
+            now_prov, now_city, now_area, now_address, now_post_code, native_prov, native_city, native_area, native_address, native_post_code,
+            contact_name, contact_rela_code, contact_phone, contact_post_code, contact_address, take_name, take_rela_code,
+            take_cert_no, take_phone, work, work_phone, work_post_code, work_address, blood_code, family_disease,
+            expose_disease, heredity_disease, allergy_disease, past_disease, past_oper, past_trauma, past_blood,
+            past_remark, allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
+            outpt_last_visit_time, inpt_last_visit_time, remark, patient_code, preferential_type_id, is_valid, crte_id, crte_name, crte_time,age_unit_code
+        from  base_profile_file
+        where hosp_code = #{hospCode} and is_valid = '1' and cert_no = #{certNo}
+    </select>
+
+    <select id="queryByTcmDiseCode" resultType="cn.hsa.module.insure.module.entity.TcmDiseScoreDO">
+        select * from tcm_dise_score where tcm_dise_code = #{tcmDiseCode} and vali_flag = '1'
+    </select>
+
+    <update id="updateBill">
+        update insure_setl_info
+        set bill_code = #{billCode}, bill_no = #{billNo}
+        where insure_settle_id = #{insureSettleId}
+          and hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
 
 </mapper>

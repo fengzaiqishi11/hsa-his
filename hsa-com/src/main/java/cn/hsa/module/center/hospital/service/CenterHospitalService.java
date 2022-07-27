@@ -147,4 +147,6 @@ public interface CenterHospitalService {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.module.center.Hospital.dto.CenterHospitalDTO>
      **/
     WrapperResponse<CenterRootDatabaseBO> findRootBase(CenterRootDatabaseBO centerRootDatabaseBO);
+
+    WrapperResponse<Boolean> triggerSchedulingManual(CenterRootDatabaseBO centerRootDatabaseBO);
 }

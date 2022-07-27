@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.bo.SysParameterBO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -157,4 +158,15 @@ public class SysParameterServiceImpl extends HsafService implements SysParameter
     public WrapperResponse<Map> getLoginInfo(Map map) {
         return WrapperResponse.success(sysParameterBO.getLoginInfo(map));
     }
+    /**
+     * @Author gory
+     * @Description 过期提醒
+     * @Date 2022/7/26 9:47
+     * @Param [Map]
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> getHospServiceStatsByCode(Map map) {
+        return WrapperResponse.success(sysParameterBO.getHospServiceStatsByCode(MapUtils.get(map,"centerHospitalDTO")));
+    }
+
 }

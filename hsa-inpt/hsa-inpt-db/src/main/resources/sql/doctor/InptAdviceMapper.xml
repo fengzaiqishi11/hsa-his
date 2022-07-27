@@ -110,6 +110,7 @@
         <result property="execDeptName" column="execDeptName" jdbcType="VARCHAR"/>
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
+        <result property="decoctionMethod" column="decoction_method" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -301,7 +302,7 @@
         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
         a.exec_id, a.exec_name, a.second_exec_id, a.second_exec_name, a.long_start_time, a.teach_doctor_id, a.teach_doctor_name,
         a.is_check, a.check_id, a.check_name, a.check_time, a.stop_doctor_id, a.stop_doctor_name, a.stop_time, a.stop_check_id, a.stop_check_name,
-        a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,
+        a.stop_check_time, a.is_long, is_stop, a.is_reject, a.reject_remark, a.crte_id, a.crte_name, a.crte_time,a.decoction_method,
         (select et.exec_time from inpt_advice_exec et where et.advice_id = a.id and et.hosp_code = a.hosp_code and et.exec_time
         is not null order by exec_time limit 1) as last_exec_time,
         case when a.item_code = '4' then (
@@ -359,7 +360,7 @@
         last_exec_time, teach_doctor_id, teach_doctor_name, is_check, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
         stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, is_stop, is_reject, reject_remark, crte_id, crte_name, crte_time,
         skin_durg_id, skin_phar_id, skin_unit_code, source_ia_id, is_submit, advice_prefix, advice_suffix, collect_blood_time,yylx,stage_detail_item_id,
-        clinical_path_stage_id
+        clinical_path_stage_id,decoction_method
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -447,7 +448,8 @@
             #{item.collectBloodTime},
             #{item.yylx},
             #{item.stageDetailItemId},
-            #{item.clinicalPathStageId}
+            #{item.clinicalPathStageId},
+            #{item.decoctionMethod}
             )
         </foreach>
     </insert>
@@ -2167,7 +2169,8 @@
             a.crte_name,
             a.group_no,
             a.group_seq_no,
-            bd.split_unit_code
+            bd.split_unit_code,
+            a.decoction_method
         FROM inpt_advice a
         JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
         LEFT JOIN base_drug bd on a.hosp_code = bd.hosp_code and a.item_id = bd.id

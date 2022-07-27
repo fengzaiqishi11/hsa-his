@@ -3,11 +3,14 @@ package cn.hsa.module.sys;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.datasource.service.CenterDatasourceService;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,6 +38,13 @@ public class SysParameterController extends BaseController {
      */
     @Resource
     private SysParameterService sysParameterService_consumer;
+
+    private CenterDatasourceService centerDatasourceService;
+
+    @Autowired
+    public void setCenterDatasourceService(CenterDatasourceService centerDatasourceService){
+        this.centerDatasourceService = centerDatasourceService;
+    }
 
     /**
      * @Menthod queryPage()
@@ -198,4 +208,17 @@ public class SysParameterController extends BaseController {
         map.put("sysUserDTO",sysUserDTO);
         return sysParameterService_consumer.getLoginInfo(map);
     }
+
+    @GetMapping("/getHospServiceStats")
+    public WrapperResponse<Map<String,Object>> getHospServiceStats(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        CenterHospitalDTO centerHospitalDTO = new CenterHospitalDTO();
+        centerHospitalDTO.setCode(sysUserDTO.getHospCode());
+        centerHospitalDTO.setWorkTypeCode(sysUserDTO.getWorkTypeCode());
+        Map map = new HashMap();
+        map.put("centerHospitalDTO",centerHospitalDTO);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return sysParameterService_consumer.getHospServiceStatsByCode(map);
+    }
+
 }

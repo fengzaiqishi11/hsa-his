@@ -430,10 +430,11 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     unifiedMap.put("inptVisitDTO",inptVisitDTO1);
                     insureIndividualVisitDTO.setIsOut(Constants.SF.S);
                     unifiedMap.put("insureIndividualVisitDTO",insureIndividualVisitDTO);
-                    List<InsureIndividualVisitDTO> byCondition = insureIndividualVisitService.findByCondition(unifiedMap);
+                    //试算不再需要出院才能做
+                    /*List<InsureIndividualVisitDTO> byCondition = insureIndividualVisitService.findByCondition(unifiedMap);
                     if(ListUtils.isEmpty(byCondition)){
                         throw new AppException("请先做医保出院登记操作,再进行试算操作");
-                    }
+                    }*/
                     inptInsureResult = insureUnifiedPayInptService.UP_2303(unifiedMap).getData();
 
 
@@ -1757,6 +1758,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
             inptVisitDTO.setId(id);
             inptVisitDTO.setHospCode(hospCode);
             inptVisitDTO.setIsOut("0");
+            inptVisitDTO.setMedicalRegNo(medicalRegNo);
             map.put("inptVisitDTO",inptVisitDTO);
             insureIndividualVisitService.updateInsureInidivdual(map).getData();
         }

@@ -2,8 +2,11 @@ package cn.hsa.sys.parameter.bo.impl;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.center.datasource.service.CenterDatasourceService;
+import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.sys.parameter.bo.SysParameterBO;
 import cn.hsa.module.sys.parameter.dao.SysParameterDAO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -16,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.sys.data.bo.impl
@@ -51,14 +51,15 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
 
     @Resource
     RedisUtils redisUtils;
+    @Resource
+    CenterDatasourceService centerDatasourceService;
 
     /**
      * @Menthod queryPage()
      * @Desrciption 根据条件查询参数信息
-     * @Param
-     * 1. SysParameterDTO  参数数据传输对象
+     * @Param 1. SysParameterDTO  参数数据传输对象
      * @Author zhangxuan
-     * @Date   2020/7/28 17:02
+     * @Date 2020/7/28 17:02
      * @Return cn.hsa.sys.PageDTO
      **/
     @Override
@@ -72,12 +73,10 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
 
     /**
      * @Menthod queryAll()
-     * @Desrciption  查询所有参数信息
-     *
-     * @Param
-     * [SysParameterDTO]
+     * @Desrciption 查询所有参数信息
+     * @Param [SysParameterDTO]
      * @Author zhangxuan
-     * @Date   2020/7/28 15:31
+     * @Date 2020/7/28 15:31
      * @Return java.util.List<cn.hsa.module.sys.parameter.dto.SysParameterDTO>
      **/
     @Override
@@ -90,64 +89,62 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
     /**
      * @Menthod insert()
      * @Desrciption 新增参数
-     * @Param
-     * 1. SysParameterDTO  参数数据传输对象
+     * @Param 1. SysParameterDTO  参数数据传输对象
      * @Author zhangxuan
-     * @Date   2020/7/28 15:53
+     * @Date 2020/7/28 15:53
      * @Return int
      **/
     @Override
     public boolean insert(SysParameterDTO sysParameterDTO) {
-            return save(sysParameterDTO);
+        return save(sysParameterDTO);
     }
 
     /**
      * @Menthod delete()
      * @Desrciption 删除参数
-     * @Param
-     * 1. map
+     * @Param 1. map
      * @Author zhangxuan
-     * @Date   2020/7/28 15:57
+     * @Date 2020/7/28 15:57
      * @Return int
      **/
     @Override
     public boolean delete(SysParameterDTO sysParameterDTO) {
-      List<SysParameterUpdateDTO> sysParameterUpdateDTOS = sysParameterDao.querySysParameterByIds(sysParameterDTO);
-      int delete = sysParameterDao.delete(sysParameterDTO);
-      if(ListUtils.isEmpty(sysParameterUpdateDTOS)) {
-        throw new AppException("删除失败，未查找到数据");
-      }
-      for(SysParameterUpdateDTO sysParameterUpdateDTO: sysParameterUpdateDTOS) {
-        // 主键id
-        sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
-        sysParameterUpdateDTO.setAfterValue(null);
-        sysParameterUpdateDTO.setAfterCode(null);
-        // 删除置为无效
-        sysParameterUpdateDTO.setIsValid("0");
-        // 删除时间
-        sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
-        // 删除人
-        sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
-        // 删除人姓名
-        sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
-      }
-      sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
-      return delete> 0;
+        List<SysParameterUpdateDTO> sysParameterUpdateDTOS = sysParameterDao.querySysParameterByIds(sysParameterDTO);
+        int delete = sysParameterDao.delete(sysParameterDTO);
+        if (ListUtils.isEmpty(sysParameterUpdateDTOS)) {
+            throw new AppException("删除失败，未查找到数据");
+        }
+        for (SysParameterUpdateDTO sysParameterUpdateDTO : sysParameterUpdateDTOS) {
+            // 主键id
+            sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
+            sysParameterUpdateDTO.setAfterValue(null);
+            sysParameterUpdateDTO.setAfterCode(null);
+            // 删除置为无效
+            sysParameterUpdateDTO.setIsValid("0");
+            // 删除时间
+            sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
+            // 删除人
+            sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
+            // 删除人姓名
+            sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
+        }
+        sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
+        return delete > 0;
     }
 
     /**
      * @Menthod update()
      * @Desrciption 修改参数信息
-     * @Param
-     * 1. SysParameterDTO  参数数据传输对象
+     * @Param 1. SysParameterDTO  参数数据传输对象
      * @Author zhangxuan
-     * @Date   2020/7/28 15:58
+     * @Date 2020/7/28 15:58
      * @Return int
      **/
     @Override
     public boolean update(SysParameterDTO sysParameterDTO) {
         return save(sysParameterDTO);
     }
+
     /**
      * @Method: save()
      * @Description: 该方法主要用来保存参数信息维护修改和新增的信息
@@ -173,44 +170,44 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
             sysParameterDTO.setId(SnowflakeUtils.getId());
             //不重复执行插入
             int insert = sysParameterDao.insert(sysParameterDTO);
-            return insert> 0;
+            return insert > 0;
         } else {
-          // 修改前数据
-          SysParameterDTO beforeItem = sysParameterDao.getById(sysParameterDTO);
-          int update = sysParameterDao.update(sysParameterDTO);
-          // 修改后数据
-          SysParameterDTO afterItem = sysParameterDao.getById(sysParameterDTO);
-          if(afterItem == null || beforeItem == null) {
-            throw new AppException("修改失败，未查到该数据");
-          }
-          SysParameterUpdateDTO sysParameterUpdateDTO = new SysParameterUpdateDTO();
-          // 主键
-          sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
-          // 系统参数主键
-          sysParameterUpdateDTO.setSysParamterId(afterItem.getId());
-          // 修改前编码
-          sysParameterUpdateDTO.setAfterCode(afterItem.getCode());
-          // 修改后编码
-          sysParameterUpdateDTO.setBeforeCode(beforeItem.getCode());
-          // 修改前参数值
-          sysParameterUpdateDTO.setBeforeValue(beforeItem.getValue());
-          // 修改后参数值
-          sysParameterUpdateDTO.setAfterValue(afterItem.getValue());
-          sysParameterUpdateDTO.setName(afterItem.getName());
-          sysParameterUpdateDTO.setHospCode(afterItem.getHospCode());
-          sysParameterUpdateDTO.setRemark(afterItem.getRemark());
-          sysParameterUpdateDTO.setPym(afterItem.getPym());
-          sysParameterUpdateDTO.setWbm(afterItem.getWbm());
-          sysParameterUpdateDTO.setIsValid(afterItem.getIsValid());
-          sysParameterUpdateDTO.setIsShow(afterItem.getIsShow());
-          sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
-          sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
-          sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
-          sysParameterUpdateDTO.setIsNeedPwd(sysParameterDTO.getIsNeedPwd());
-          List<SysParameterUpdateDTO> sysParameterUpdateDTOS = new ArrayList<>();
-          sysParameterUpdateDTOS.add(sysParameterUpdateDTO);
-          sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
-          return update > 0;
+            // 修改前数据
+            SysParameterDTO beforeItem = sysParameterDao.getById(sysParameterDTO);
+            int update = sysParameterDao.update(sysParameterDTO);
+            // 修改后数据
+            SysParameterDTO afterItem = sysParameterDao.getById(sysParameterDTO);
+            if (afterItem == null || beforeItem == null) {
+                throw new AppException("修改失败，未查到该数据");
+            }
+            SysParameterUpdateDTO sysParameterUpdateDTO = new SysParameterUpdateDTO();
+            // 主键
+            sysParameterUpdateDTO.setId(SnowflakeUtils.getId());
+            // 系统参数主键
+            sysParameterUpdateDTO.setSysParamterId(afterItem.getId());
+            // 修改前编码
+            sysParameterUpdateDTO.setAfterCode(afterItem.getCode());
+            // 修改后编码
+            sysParameterUpdateDTO.setBeforeCode(beforeItem.getCode());
+            // 修改前参数值
+            sysParameterUpdateDTO.setBeforeValue(beforeItem.getValue());
+            // 修改后参数值
+            sysParameterUpdateDTO.setAfterValue(afterItem.getValue());
+            sysParameterUpdateDTO.setName(afterItem.getName());
+            sysParameterUpdateDTO.setHospCode(afterItem.getHospCode());
+            sysParameterUpdateDTO.setRemark(afterItem.getRemark());
+            sysParameterUpdateDTO.setPym(afterItem.getPym());
+            sysParameterUpdateDTO.setWbm(afterItem.getWbm());
+            sysParameterUpdateDTO.setIsValid(afterItem.getIsValid());
+            sysParameterUpdateDTO.setIsShow(afterItem.getIsShow());
+            sysParameterUpdateDTO.setCrteId(sysParameterDTO.getCrteId());
+            sysParameterUpdateDTO.setCrteName(sysParameterDTO.getCrteName());
+            sysParameterUpdateDTO.setCrteTime(sysParameterDTO.getCrteTime());
+            sysParameterUpdateDTO.setIsNeedPwd(sysParameterDTO.getIsNeedPwd());
+            List<SysParameterUpdateDTO> sysParameterUpdateDTOS = new ArrayList<>();
+            sysParameterUpdateDTOS.add(sysParameterUpdateDTO);
+            sysParameterDao.insertParameterUpdate(sysParameterUpdateDTOS);
+            return update > 0;
         }
     }
 
@@ -240,77 +237,104 @@ public class SysParameterBOImpl extends HsafBO implements SysParameterBO {
     }
 
 
-    public void cacheOperate(SysParameterDTO sysParameterDTO, Boolean operation){
-        if(!ListUtils.isEmpty(sysParameterDTO.getCodes())){
-            for(String code : sysParameterDTO.getCodes()){
+    public void cacheOperate(SysParameterDTO sysParameterDTO, Boolean operation) {
+        if (!ListUtils.isEmpty(sysParameterDTO.getCodes())) {
+            for (String code : sysParameterDTO.getCodes()) {
                 String key = StringUtils.createKey("parameter", sysParameterDTO.getHospCode(), code);
-                if(redisUtils.hasKey(key)){
+                if (redisUtils.hasKey(key)) {
                     redisUtils.del(key);
                 }
-                if(operation){
-                    redisUtils.set(key,sysParameterDTO);
+                if (operation) {
+                    redisUtils.set(key, sysParameterDTO);
                 }
             }
         } else {
             String key = StringUtils.createKey("parameter", sysParameterDTO.getHospCode(), sysParameterDTO.getCode());
-            if(redisUtils.hasKey(key)){
+            if (redisUtils.hasKey(key)) {
                 redisUtils.del(key);
             }
-            if(operation){
-                redisUtils.set(key,sysParameterDTO);
+            if (operation) {
+                redisUtils.set(key, sysParameterDTO);
             }
         }
     }
 
 
-  /**
-  * @Menthod getIsReallyPwd
-  * @Desrciption
-  *
-  * @Param
-  * [map]
-  *
-  * @Author jiahong.yang
-  * @Date   2021/12/20 14:18
-  * @Return java.util.Map
-  **/
-  @Override
-  public Map getIsReallyPwd(Map map) {
-    Boolean flag = true;
-    Map message = new HashMap();
-    SysUserDTO sysUserDTO = MapUtils.get(map,"sysUserDTO");
-    SysParameterDTO sysParameterDTO = MapUtils.get(map,"sysParameterDTO");
-    SysUserDTO sysUser = new SysUserDTO();
-    sysUser.setHospCode(sysUserDTO.getHospCode());
-    sysUser.setId(sysUserDTO.getId());
-    SysUserDTO byId = sysUserDAO.getById(sysUser);
-    // 密码错误
-    if (!MD5Utils.verifySha(sysParameterDTO.getMdPwd(), byId.getPassword())) {
-      flag = false;
-      throw new AppException("密码错误！");
+    /**
+     * @Menthod getIsReallyPwd
+     * @Desrciption
+     * @Param [map]
+     * @Author jiahong.yang
+     * @Date 2021/12/20 14:18
+     * @Return java.util.Map
+     **/
+    @Override
+    public Map getIsReallyPwd(Map map) {
+        Boolean flag = true;
+        Map message = new HashMap();
+        SysUserDTO sysUserDTO = MapUtils.get(map, "sysUserDTO");
+        SysParameterDTO sysParameterDTO = MapUtils.get(map, "sysParameterDTO");
+        SysUserDTO sysUser = new SysUserDTO();
+        sysUser.setHospCode(sysUserDTO.getHospCode());
+        sysUser.setId(sysUserDTO.getId());
+        SysUserDTO byId = sysUserDAO.getById(sysUser);
+        // 密码错误
+        if (!MD5Utils.verifySha(sysParameterDTO.getMdPwd(), byId.getPassword())) {
+            flag = false;
+            throw new AppException("密码错误！");
+        }
+        message.put("flag", flag);
+        return message;
     }
-    message.put("flag",flag);
-    return message;
-  }
+
     /**
      * @Menthod getIsReallyPwd
      * @Desrciption 请求登录人员与机构信息信息
-     *
-     * @Param
-     * [sysParameterDTO, req, res]
-     *
+     * @Param [sysParameterDTO, req, res]
      * @Author yuelong.chen
-     * @Date   2022/5/10 10:05
+     * @Date 2022/5/10 10:05
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
      **/
     @Override
     public Map getLoginInfo(Map map) {
-        SysUserDTO sysUserDTO = MapUtils.get(map,"sysUserDTO");
+        SysUserDTO sysUserDTO = MapUtils.get(map, "sysUserDTO");
         String hospCode = sysUserDTO.getHospCode();
         SysParameterDTO sysParameterDTO = sysParameterDao.getParameterByCode(hospCode, "HOSP_INSURE_NATION_INFO");
-        Map<String,Object> resultMap = new HashMap();
-        resultMap.put("pracCertiNo",sysUserDTO.getPracCertiNo());
-        resultMap.put("sysParameterDTO",sysParameterDTO);
+        Map<String, Object> resultMap = new HashMap();
+        resultMap.put("pracCertiNo", sysUserDTO.getPracCertiNo());
+        resultMap.put("sysParameterDTO", sysParameterDTO);
         return resultMap;
+    }
+
+    /**
+     * @Author gory
+     * @Description 过期时间
+     * @Date 2022/7/26 9:56
+     * @Param [centerHospitalDTO]
+     **/
+    @Override
+    public Map<String, Object> getHospServiceStatsByCode(CenterHospitalDTO centerHospitalDTO) {
+        // 判断是否为那些用户需要配置，获取过期天数
+        String[] codeList = {"WHOISNOTIFY", "OVERDUENOTIFYDAYS"};
+        Map<String, SysParameterDTO> parameterMap = sysParameterDao.getParameterByCodeList(centerHospitalDTO.getCode(),
+                codeList);
+        SysParameterDTO notifyUsersDTO = MapUtils.get(parameterMap, "WHOISNOTIFY");
+        String notifyUsers = notifyUsersDTO == null ? "1" : notifyUsersDTO.getValue();
+        if (!notifyUsers.contains(centerHospitalDTO.getWorkTypeCode())) {
+            return new HashMap<>();
+        } else {
+            // 成功之后直接调
+            SysParameterDTO overdueNotifyDaysDTO = MapUtils.get(parameterMap, "OVERDUENOTIFYDAYS");
+            Integer overdueNotifyDays = overdueNotifyDaysDTO == null ? 15 :
+                    Integer.parseInt(overdueNotifyDaysDTO.getValue());
+            centerHospitalDTO.setMillsOfDays(overdueNotifyDays * 24 * 3600 * 1000l);
+            WrapperResponse<Map<String, Object>> hospServiceStatsByCode =
+                    centerDatasourceService.getHospServiceStatsByCode(centerHospitalDTO);
+            if (null == hospServiceStatsByCode) {
+                throw new AppException("未找到医院编码为：" + centerHospitalDTO.getCode() + "的医院信息");
+            }
+            return hospServiceStatsByCode.getData();
+        }
+
     }
 }

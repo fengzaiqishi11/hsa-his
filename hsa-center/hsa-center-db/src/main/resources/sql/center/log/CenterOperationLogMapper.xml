@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.log.dao.CenterOperationLogDAO">
+
+    <!--新增值域代码-->
+    <insert id="insertCenterOperationLogLog" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.center.log.entity.CenterOperationLogDo">
+        INSERT INTO `center_operation_log`(`id`, `hosp_code`, `hosp_name`, `user_id`, `user_name`, `user_code`,
+                                                 `dept_id`, `dept_name`, `ip`, `request_param`, `crte_id`, `crte_name`,
+                                                 `crte_time`,`biz_id`,  `date_before_renewal` ,`date_after_renewal`)
+        VALUES (#{id}, #{hospCode}, #{hospName}, #{userId}, #{userName}, #{userCode}, #{deptId}, #{deptName}, #{ip},
+                #{requestParam}, #{crteId}, #{crteName}, #{crteTime}, #{bizId},#{dateBeforeRenewal},#{dateAfterRenewal});
+
+    </insert>
+
+</mapper>

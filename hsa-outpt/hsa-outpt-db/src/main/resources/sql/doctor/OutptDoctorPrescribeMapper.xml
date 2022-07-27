@@ -95,6 +95,7 @@
             <result property="isWz" column="isWz" jdbcType="VARCHAR"></result>
             <result property="unitCode" column="unitCode" jdbcType="VARCHAR"></result>
             <result property="remark" column="remarkDetail" jdbcType="VARCHAR"></result>
+            <result property="decoctionMethod" column="decoctionMethod" jdbcType="VARCHAR"></result>
             <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
             <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         </collection>
@@ -584,7 +585,7 @@
                case when b.item_code = '1' then f.split_unit_code when b.item_code = '2' then g.split_unit_code else b.num_unit_code end splitUnitCode,
                case when b.item_code = '1' then f.unit_code when b.item_code = '2' then g.unit_code else b.num_unit_code end unitCode,
                f.drug_remark drugRemark, f.drug_img_path drugImgPath, case when b.item_code = '4' and h.type_code = '5' then '1' end isSf,
-               b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,
+               b.prescribe_prefix, b.prescribe_suffix,case when parameter.id is null then '0' else '1' end isWz, b.remark remarkDetail,b.decoction_method decoctionMethod,
                ifnull(a.tcm_syndromes_id,'') as tcmSyndromesId,ifnull(a.tcm_syndromes_name,'') as tcmSyndromesName,
                ifnull(a.tcm_disease_id,'') as tcmDiseaseId, ifnull(a.tcm_disease_name,'') as tcmDiseaseName,
                (case when b.item_code = '1' then f.nation_code when b.item_code = '2' then g.nation_code when b.item_code = '4' then h.union_nation_code else '' end) as nation_code,
@@ -733,7 +734,7 @@
                case when c.id is not null then c.big_type_code  when a.item_code = '2' then '3' when a.item_code = '4' then '4' end bigTypeCode,
                case when a.item_code = '1' then c.split_unit_code when a.item_code = '2' then g.split_unit_code else a.usage_code end splitUnitCode,
                i.settleCrteId, i.settleCrteName, phar.assign_user_id assignUserId, phar.assign_user_name assignUserName, a.use_days as herbNum,
-               phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes
+               phar.dist_user_id distUserId, phar.dist_user_name distUserName, a.remark, br.daily_times dailyTimes,a.decoction_method decoctionMethod
         from  outpt_prescribe_detail a
                   left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
                   left join base_material g on a.item_id = g.id and a.hosp_code = g.hosp_code and a.item_code = '2'
@@ -1204,7 +1205,7 @@
         group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
         rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content,
         phar_id, bfc_id, use_code, exec_dept_id, exec_date,exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id,
-        skin_unit_code, prescribe_prefix, prescribe_suffix, remark
+        skin_unit_code, prescribe_prefix, prescribe_suffix, remark,decoction_method
         )
         values
         <foreach collection="list" item="item" index="index" separator=",">
@@ -1253,7 +1254,8 @@
             #{item.skinUnitCode},
             #{item.prescribePrefix},
             #{item.prescribeSuffix},
-            #{item.remark}
+            #{item.remark},
+            #{item.decoctionMethod}
             )
         </foreach>
     </insert>

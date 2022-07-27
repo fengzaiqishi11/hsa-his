@@ -149,4 +149,10 @@
         order by ch.code,cd.value
     </select>
 
+    <select id="queryCodeValue" resultType="cn.hsa.module.center.code.dto.CenterCodeDetailDTO">
+        select  id,c_code code ,name,value from  center_code_detail where c_code = 'QXDJ'
+        <if test="orderTypeCode != null and orderTypeCode != ''">
+            and value  = #{orderTypeCode}
+        </if>
+    </select>
 </mapper>

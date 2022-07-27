@@ -36,4 +36,6 @@
     <dubbo:reference id="insureConfigurationService_consumer" interface="cn.hsa.module.insure.module.service.InsureConfigurationService" check="false"/>
     <!-- 用户密码修改记录服务-->
     <dubbo:reference id="centerPasswordModifyLogService_consumer" interface="cn.hsa.module.center.log.service.CenterPasswordModifyLogService" check="false"/>
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
 </beans>

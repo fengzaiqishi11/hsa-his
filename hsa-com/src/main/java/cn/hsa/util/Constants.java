@@ -1351,4 +1351,17 @@ public interface Constants {
         public static final String JGGSHZ = "4";//结构格式汇总打印
         public static final String XMHZMX = "7";//项目汇总-明细打印
     }
+
+    /**
+     * @Desrciption 增值服务
+     * @Author yuelong.chen
+     * @Date 2022/07/27 10:02
+     */
+    class ZZFW {
+        public static final String DEFAULT = ""; // 默认值
+        public static final String DIP = "1"; // 默认值
+        public static final String DRG = "2"; // 默认值
+        public static final String DRGDIP = "3"; // 默认值
+        public static final String HQMS = "4"; // HQMS
+    }
 }

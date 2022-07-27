@@ -140,7 +140,7 @@ public class CenterHospitalBOImpl extends HsafBO implements CenterHospitalBO {
                 hospIdListToExpired.add(centerHospitalDTO.getId());
                 continue;
             }
-            if(!centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.ZC)) {
+            if(timeMillsOfEndDate > timeMillsAfter15Days && !centerHospitalDTO.getServiceStatus().equals(CenterHospitalDO.FWZT.ZC)) {
                 hospIdListNormally.add(centerHospitalDTO.getId());
             }
         }

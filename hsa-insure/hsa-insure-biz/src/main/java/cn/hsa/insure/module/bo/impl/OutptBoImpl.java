@@ -22,6 +22,8 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -42,6 +44,7 @@ import java.util.Map;
 @Component
 public class OutptBoImpl extends HsafBO implements OutptBo {
 
+    private static final Logger logger = LoggerFactory.getLogger(OutptBoImpl.class);
     @Resource
     private Transpond transpond;
 
@@ -159,6 +162,7 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                 }
             }
         }catch (RuntimeException e){
+            logger.error("医保结算：门诊费用上传并结算出现异常：",e);
             throw new AppException("医保结算成功，系统出现异常，请到医保结算系统取消本次结算。");
         }
         return trialMap;

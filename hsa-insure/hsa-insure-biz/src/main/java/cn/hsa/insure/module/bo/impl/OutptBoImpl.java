@@ -147,25 +147,13 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
     @Override
     public Map<String, Object> setOutptCostUploadAndSettlement(Map<String, Object> param) {
         String hospCode = (String) param.get("hospCode");
-        Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"), Constant.FUNCTION.FC_2003,param);
+        Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"),Constant.FUNCTION.FC_2003,param);
         try {
             if ("settle".equals(param.get("action")) && trialMap != null && trialMap.containsKey("payinfo")) {
-                String aaz217 = null;
-                //Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
-                if (trialMap.containsKey("bizinfo")){
-                  List<Map<String, String>> bizinfo =  (List<Map<String, String>>)trialMap.get("bizinfo");
-                  if (bizinfo.size() > 0){
-                    aaz217 = bizinfo.get(0).get("serial_no");//就医登记号
-                  }else{
-                    throw new AppException("门诊工伤结算业务节点信息为空！");
-                  }
-                }else{
-                  throw new AppException("门诊工伤结算未获取到biz业务节点信息！");
-                }
-                //Map<String, String> bizinfo = (Map<String, String>) trialMap.get("bizinfo");
+                Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
                 String visitId = (String) param.get("visitId");//就诊id
-                /*String akb020 = payinfo.get("akb020");//医院编码
-                String aaz217 = payinfo.get("aaz217");//就医登记号*/
+                String akb020 = payinfo.get("akb020");//医院编码
+                String aaz217 = payinfo.get("aaz217");//就医登记号
                 //编辑医保患者信息表
                 InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
                 insureIndividualVisitDTO.setVisitId(visitId);//就诊id

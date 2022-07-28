@@ -467,20 +467,27 @@ public class RequestInsure {
             logger.info("【医保调用】入参：" + JSON.toJSONString(param));
             String producerTopic = hospCode + producerTopicKey;//生产者消息推送Topic
             String consumerTopic = hospCode + consumerTopicKey;//消费者消费信息Topic
+            logger.info("工伤kafka producerTopic：{},consumerTopic:{}：" + producerTopic,consumerTopic);
             consumer = KafkaUtil.createConsumer(servers,consumerTopic);//消费处理结果消息
+            logger.info("*****消费处理结果消息*****");
             KafkaProducer<String, String> producer = KafkaUtil.createProducer(servers);//推送需处理的消息
             KafkaUtil.sendMessage(producer, producerTopic, DesUtil.encrypt(JSON.toJSONString(param)).replaceAll("[\\s*\t\n\r]", ""));
+            logger.info("*****kafka请求完成*****");
             producer.close();
             int count = 0;
             while (true) {
                 ConsumerRecords<String, String> records = consumer.poll(100);
+                logger.info("*****KafkaUtil获取records : {}",records);
                 for (ConsumerRecord<String, String> record : records) {
                     String value = record.value();
-                    logger.error("call kafka consumer receive encrypt msg from server: {}",value);
+                    logger.info("call kafka consumer receive encrypt msg hospCode:{}, from server: {}",
+                        hospCode,value);
                     if (StringUtils.isNotEmpty(value)){
                         if (value.indexOf("activityCode") == -1 || value.indexOf("code") == -1){
                             value = DesUtil.decrypt(value); }
-                        logger.error("call kafka consumer receive msg from server: activityId is {},out_params content:{},in_params:{}",activityCode,value,JSON.toJSONString(param));
+                        logger.info("call kafka consumer receive msg from server: hospCode is {}," +
+                            "activityId is {},out_params content:{},in_params:{}",hospCode,activityCode,value,
+                            JSON.toJSONString(param));
                         Map<String,Object> result = JSON.parseObject(value,HashMap.class);
                         if (activityCode.equals(result.get("activityCode"))) {
                             consumer.commitAsync();
@@ -494,6 +501,7 @@ public class RequestInsure {
                 }
                 count ++ ;
                 if (count > 500*3) {
+                    logger.error("医保访问超市，count :"+count);
                     throw new AppException("医保访问超时");
                 }
             }

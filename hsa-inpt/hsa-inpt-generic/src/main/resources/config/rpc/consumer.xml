@@ -127,5 +127,6 @@
     <!--DRGDIP质控服务-->
     <dubbo:reference interface="cn.hsa.module.insure.drgdip.service.DrgDipResultService" id="drgDipResultService_consumer" check="false"/>
     <dubbo:reference interface="cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService" id="drgDipBusinessOptInfoLogService_consumer" check="false" retries="0"/>
-
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
 </beans>

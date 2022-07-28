@@ -540,6 +540,7 @@
     <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false" retries="0"/>
     <!--同步药房消耗报表-->
     <dubbo:reference id="extraConsumptionService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractConsumptionService" check="false" retries="0"/>
-
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
 </beans>
 

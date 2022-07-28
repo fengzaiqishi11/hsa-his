@@ -45,4 +45,6 @@
     <dubbo:reference interface="cn.hsa.module.stro.stock.service.CheckStockService" id="checkStockService_consumer" check="false"/>
     <!--月度进销存-->
     <dubbo:reference interface="cn.hsa.module.stro.stroinvoicing.service.StroInvoicingMonthlyService" id="stroInvoicingMonthlyService_consumer" check="false"/>
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
 </beans>

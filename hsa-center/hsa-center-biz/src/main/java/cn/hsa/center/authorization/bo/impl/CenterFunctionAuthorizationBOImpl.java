@@ -37,10 +37,23 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     private final String rsaprivateKey = "MIIBVAIBADANBgkqhkiG9w0BAQEFAASCAT4wggE6AgEAAkEAiZ5ah6YBBP5FWhgJXZnCSn9Z3y1kl0t6Q/x9QzNecAoiK94CMz28gEWSjPHoV+UJPNS5EhaHK3KrQt/bn5cY8QIDAQABAkARx46kpdLN5Vfqat6S5DGQ1GE1DzVGwq6aJ/269+EEkmlgLJGq0J2PFQEozWcfTZyvqDFZxaOc5fjGl7n9q4AdAiEA3qyShES5SNCSwJCG+0x+vPNY5YGKo95654te8A+Ef9sCIQCeNwEt09dvjaMHv+49LR6kLBGUjk8xzgYD28U70yY6IwIhAJIkKLTudbw4R1hignSDq9pOy9U0w8zwwzEb418ikA9pAiBc9MJLk6CLGTOFNR4bcWwEVyQJHUeoYnykPbZ3PMrD8wIgUHstQTolAIfvDSNJtt5f7XAZDDqI+HXh+cjR2Tj49B0=";
 
     private static final String CONTACT_US = "请通过400电话400-987500或者企业微信联系我们";
+
+    /**
+     *  权限未开通或正在审核都返回此文案前缀
+     */
+    private static  final String AUTHORIZATION_AUDITING_OR_NOT_FOUND_PREFIX = "未查询到本机构的";
+    /**
+     *  权限未开通或正在审核都返回此文案后缀
+     */
+    private static  final String AUTHORIZATION_AUDITING_OR_NOT_FOUND_SUFFIX = "信息，"+CONTACT_US;
+    /**
+     *  未找到单据类型提示信息
+     */
+    private static  final String AUTHORIZATION_AUDITING_OR_NOT_FOUND_TYPE = "权限单据类型";
     /**
      *  权限未开通或正在审核都返回此文案
      */
-    private static final String AUTHORIZATION_AUDITING_OR_NOT_FOUND = "未查询到本机构的DIP，DRG质控信息，"+CONTACT_US;
+    private static final String AUTHORIZATION_AUDITING_OR_NOT_FOUND = "未查询到本机构的DIP，DRG质控，"+CONTACT_US;
     /**
      *  数据被篡改返回此文案
      */
@@ -68,12 +81,14 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         CenterFunctionAuthorizationDO functionAuthorizationDO = centerFunctionAuthorizationDAO.queryBizAuthorizationByOrderTypeCode(hospCode,orderTypeCode);
         if(null == functionAuthorizationDO) {
             log.error("==-==权限单据类型不存在==-==httpStatus:{}, hospCode：{},orderTypeCode：{}", HttpStatus.NOT_FOUND.value(),hospCode, orderTypeCode);
-            return WrapperResponse.error(-1, AUTHORIZATION_AUDITING_OR_NOT_FOUND, null);
+            String resultStr = resultString(orderTypeCode);
+            return WrapperResponse.error(-1, resultStr, null);
         }
         // 1.校验是否审核完成
         if(!Constants.SF.S.equals(functionAuthorizationDO.getAuditStatus())) {
             log.info("==-==authorization not audit==-==httpStatus:{}, hospCode：{},orderTypeCode：{}",HttpStatus.UNAUTHORIZED.value(), hospCode, orderTypeCode);
-            return WrapperResponse.error(-1, AUTHORIZATION_AUDITING_OR_NOT_FOUND, null);
+            String resultStr = resultString(orderTypeCode);
+            return WrapperResponse.error(-1, resultStr, null);
         }
         // 2.校验时间是否被人为修改，医院编码与权限类型是否一致  医院编码:单据类型:时间戳 加密串解密
         String encryptStartDate = functionAuthorizationDO.getEncryptStartDate();
@@ -115,6 +130,20 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
             return WrapperResponse.error(-1,SERVICE_HAS_EXPIRED+dateRange,null);
         }
         return WrapperResponse.success(functionAuthorizationDO);
+    }
+    /**
+     * 回参拼接
+     *
+     * @param orderTypeCode
+     * @return
+     */
+    private String resultString(String orderTypeCode) {
+        String resStr = AUTHORIZATION_AUDITING_OR_NOT_FOUND_TYPE;
+        CenterCodeDetailDTO codeDetailDTO = centerFunctionAuthorizationDAO.queryCodeValue(orderTypeCode);
+        if(null != codeDetailDTO){
+            resStr = codeDetailDTO.getName();
+        }
+        return  AUTHORIZATION_AUDITING_OR_NOT_FOUND_PREFIX + resStr + AUTHORIZATION_AUDITING_OR_NOT_FOUND_SUFFIX;
     }
 
     /**

@@ -76,5 +76,7 @@
     <!--明细审核分析服务-->
     <dubbo:reference interface="cn.hsa.module.insure.module.service.InsureDetailAuditService" id="insureDetailAuditService" check="false"/>
     <dubbo:reference interface="cn.hsa.module.center.syshospital.service.SysHospitalService" id="sysHospitalService_consummer" check="false"/>
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
 </beans>
 

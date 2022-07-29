@@ -3,6 +3,7 @@ package cn.hsa.module.center.authorization.dao;
 
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -46,4 +47,6 @@ public interface CenterFunctionAuthorizationDAO {
   List<Map<String, Object>> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
   List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+  CenterCodeDetailDTO queryCodeValue(@Param("orderTypeCode")String orderTypeCode);
 }

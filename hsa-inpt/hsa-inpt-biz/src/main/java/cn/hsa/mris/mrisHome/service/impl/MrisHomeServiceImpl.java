@@ -1,5 +1,6 @@
 package cn.hsa.mris.mrisHome.service.impl;
 
+import cn.hsa.base.OpenAdditionalService;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
@@ -18,6 +19,7 @@ import cn.hsa.module.mris.mrisHome.service.MrisHomeService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.CSVWriterUtils;
+import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -411,7 +413,8 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
         return WrapperResponse.success(retMap);
     }
 
-
+    @OpenAdditionalService(desc = "病案首页HQMS上报",addEnable = true,orderTypeCode = Constants.ZZFW.HQMS)
+    @Override
     public WrapperResponse<String> importCSVMrisInfo(Map map) throws Exception {
         List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
         String rootPath = "/logs/";

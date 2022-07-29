@@ -13,6 +13,7 @@ import cn.hsa.module.insure.module.dto.InsureInptRegisterDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import org.springframework.stereotype.Service;
 
@@ -130,8 +131,8 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         }else{
             dscginfoMap.put("endtime", DateUtils.format(insureIndividualVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));//	结束时间
         }
-        dscginfoMap.put("dise_code", insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
-        dscginfoMap.put("dise_name", insureIndividualVisitDTO.getVisitIcdName());//	病种名称
+        dscginfoMap.put("dise_code", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006())?insureIndividualVisitDTO.getBka006():insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
+        dscginfoMap.put("dise_name", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006Name())?insureIndividualVisitDTO.getBka006Name():insureIndividualVisitDTO.getVisitIcdName());//	病种名称
         dscginfoMap.put("oprn_oprt_code", null);//	手术操作代码
         dscginfoMap.put("fpsc_no", insureIndividualVisitDTO.getFpscNo());//	计划生育服务证号
         dscginfoMap.put("matn_type", insureIndividualVisitDTO.getMatnType());//	生育类别

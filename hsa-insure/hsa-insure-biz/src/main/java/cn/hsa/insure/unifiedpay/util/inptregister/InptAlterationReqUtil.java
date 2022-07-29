@@ -8,6 +8,7 @@ import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
+import cn.hutool.core.util.ObjectUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -123,8 +124,8 @@ public class InptAlterationReqUtil<T> extends InsureCommonUtil implements BaseRe
         adminfoMap.put("dscg_maindiag_code", insureIndividualVisitDTO.getVisitIcdCode());//	住院主诊断代码
         adminfoMap.put("dscg_maindiag_name", insureIndividualVisitDTO.getVisitDrptName());//	住院主诊断名称
         adminfoMap.put("main_cond_dscr", null);//	主要病情描述
-        adminfoMap.put("dise_code", insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
-        adminfoMap.put("dise_name", insureIndividualVisitDTO.getVisitIcdName());//	病种名称
+        adminfoMap.put("dise_code", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006())?insureIndividualVisitDTO.getBka006():insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
+        adminfoMap.put("dise_name", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006Name())?insureIndividualVisitDTO.getBka006Name():insureIndividualVisitDTO.getVisitIcdName());//	病种名称
         adminfoMap.put("oprn_oprt_code", null);//	手术操作代码
         adminfoMap.put("oprn_oprt_name", null);//	手术操作名称
         adminfoMap.put("fpsc_no",insureIndividualVisitDTO.getFpscNo());//	计划生育服务证号

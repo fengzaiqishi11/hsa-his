@@ -76,6 +76,9 @@ public class ReportDataDownLoadBOImpl extends HsafBO implements ReportDataDownLo
         String tempCode = map.get("tempCode").toString();
         String fileName = map.get("fileName") == null || "".equals(map.get("fileName")) ? tempCode+hospCode+crteId : map.get("fileName").toString();
         ReportConfigurationDTO configuration = reportConfigurationDAO.queryByTempCode(hospCode, tempCode);
+        if(configuration == null){
+            throw new RuntimeException("未查询到tempCode为"+tempCode+"的模板配置");
+        }
         String customConfigStr = configuration.getCustomConfig().replace("\\", "").replace("\"{", "{").replace("}\"", "}");
         // 自定义配置
         Map customConfigMap = JSON.parseObject(customConfigStr, Map.class);

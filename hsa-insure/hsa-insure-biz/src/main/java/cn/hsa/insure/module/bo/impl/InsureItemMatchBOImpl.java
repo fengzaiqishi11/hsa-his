@@ -1062,7 +1062,7 @@ public class InsureItemMatchBOImpl extends HsafBO implements InsureItemMatchBO {
 //        if (sys != null && Constants.SF.S.equals(sys.getValue())) {
         if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
             InsureItemMatchDTO itemMatchDTO = insureItemMatchDAO.selectInsureItemMatch(insureItemMatchDTO);
-            if (Constants.SF.S.equals(itemMatchDTO.getAuditCode())) {
+            if (itemMatchDTO != null&&Constants.SF.S.equals(itemMatchDTO.getAuditCode())) {
                 map.put("itemMatchDTO", itemMatchDTO);
                 map.put("insureRegCode", itemMatchDTO.getInsureRegCode());
                 insureUnifiedPayRestService.UP_3302(map);

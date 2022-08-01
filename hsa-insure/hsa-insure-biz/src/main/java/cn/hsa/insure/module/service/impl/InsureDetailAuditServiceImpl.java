@@ -1,8 +1,6 @@
 package cn.hsa.insure.module.service.impl;
 import cn.hsa.insure.util.Constant;
-import cn.hsa.module.insure.module.dto.AnaMdtrtDTO;
-import com.google.common.collect.Lists;
-import java.math.BigDecimal;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
@@ -21,13 +19,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,7 +73,8 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
             data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
         }
         param.put("input",data);
-        String json = JSONObject.toJSONString(param);
+        //增加参数消除对同一对象循环引用的问题
+        String json = JSONObject.toJSONString(param,SerializerFeature.DisableCircularReferenceDetect);
         log.info("统一支付平台明细审核事前分析入参:" + json);
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
         log.info("统一支付平台明细审核事前分析回参:" + resultStr);
@@ -135,7 +130,8 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
             data.put("data",HumpUnderlineUtils.humpToUnderline(analysisDTO));
         }
         param.put("input",data);
-        String json = JSONObject.toJSONString(param);
+        //增加参数消除对同一对象循环引用的问题
+        String json = JSONObject.toJSONString(param,SerializerFeature.DisableCircularReferenceDetect);
         log.info("统一支付平台明细审核事中分析入参:" + json);
         String resultStr = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
         log.info("统一支付平台明细审核事中分析回参:" + resultStr);

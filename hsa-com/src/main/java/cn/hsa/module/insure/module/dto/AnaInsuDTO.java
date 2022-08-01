@@ -36,6 +36,7 @@ public class AnaInsuDTO implements Serializable {
 //    @JSONField(name = "brdy")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @JSONField(format = "yyyy-MM-dd")
     private Date brdy;
     /**
      * 统筹区编码

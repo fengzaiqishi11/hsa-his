@@ -197,8 +197,10 @@
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
             </if>
-            <if test="startTime != null  and endTime != null ">
+            <if test="startTime != null">
                 and a.extract_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null ">
                 and a.extract_time &lt;= #{endTime}
             </if>
             <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
@@ -444,6 +446,9 @@
         <where>
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="endTime != null">
+                and a.extract_time &lt;= #{endTime}
             </if>
             <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
                 and ((a.item_code = '1' and  a.item_type  = #{drugType}) or (a.item_code = '2'and a.item_type  = #{materialType}))

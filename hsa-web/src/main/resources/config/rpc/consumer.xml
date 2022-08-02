@@ -98,7 +98,7 @@
 
     <!-- ########################################### 药库服务consumer end ########################################### -->
     <!-- 药房入库查询与确认 -->
-    <dubbo:reference id="stockInQueryService_consumer" interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" check="false"/>
+    <dubbo:reference id="stockInQueryService_consumer" interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" check="false" retries = "0" timeout="1200000"/>
     <!--药房领药申请-->
     <dubbo:reference id="pharApplyService_consumer" interface="cn.hsa.module.phar.pharapply.service.PharApplyService" check="false"/>
 

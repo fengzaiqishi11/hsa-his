@@ -20,7 +20,8 @@ import cn.hsa.module.sys.log.service.HisLogInfoCzService;
 import cn.hsa.module.sys.log.service.HisLogInfoYcService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import com.alibaba.fastjson.JSON;
-import com.alibaba.nacos.common.util.UuidUtils;
+
+import com.alibaba.nacos.common.utils.UuidUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.rpc.RpcContext;
 import org.aspectj.lang.JoinPoint;

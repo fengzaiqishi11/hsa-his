@@ -2265,7 +2265,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<InptDiagnoseDTO> xiCollect = MapUtils.get(map, "xiCollect");
         if (ObjectUtil.isNotEmpty(xiCollect) && xiCollect.size() > 0) {
             for (InptDiagnoseDTO diagnoseDTO : xiCollect) {
-                if ("1".equals(diagnoseDTO.getIsMain())) {
+                if (Constant.UnifiedPay.ISMAN.S.equals(diagnoseDTO.getIsMain())) {
                     otpWmDiseCode = diagnoseDTO.getDiseaseCode();
                     otpWmDiseName = diagnoseDTO.getDiseaseName();
                 }

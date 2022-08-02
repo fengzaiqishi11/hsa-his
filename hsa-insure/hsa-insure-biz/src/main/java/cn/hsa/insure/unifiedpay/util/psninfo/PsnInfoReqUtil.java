@@ -92,6 +92,10 @@ public class PsnInfoReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T
             visitMap.put("psn_name", insureIndividualBasicDTO.getAac003());
             // 传值证件号码
             visitMap.put("certno", insureIndividualBasicDTO.getAac002());
+            // 读卡原始信息
+            visitMap.put("orgin_card_info", insureIndividualBasicDTO.getHcardBasinfo());
+            // 读卡签名
+            visitMap.put("sign", insureIndividualBasicDTO.getHcardChkinfo());
         }
         // 澳门证件类型  香港
         else if (Constant.UnifiedPay.CKLX.AM.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.XG.equals(mdtrtCertType)) {

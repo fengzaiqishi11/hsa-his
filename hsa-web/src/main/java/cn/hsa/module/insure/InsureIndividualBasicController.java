@@ -126,6 +126,7 @@ public class InsureIndividualBasicController extends BaseController {
         String bka896 = String.valueOf(param.get("bka896"));
         String cardIden = MapUtils.get(param,"cardIden");
         String outInfo = MapUtils.get(param,"outInfo");
+        String sign = MapUtils.get(param,"sign");
         String aab001 = String.valueOf(param.get("aab001"));
         String patientCode = String.valueOf(param.get("patientCode"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
@@ -165,6 +166,8 @@ public class InsureIndividualBasicController extends BaseController {
         insureIndividualBasicDTO.setIsRemote(isRemote);
         insureIndividualBasicDTO.setUserCode(sysUserDTO.getCode());
         insureIndividualBasicDTO.setCardIden(cardIden);
+        insureIndividualBasicDTO.setHcardBasinfo(outInfo);
+        insureIndividualBasicDTO.setHcardChkinfo(sign);
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
         Object insuplcAdmdvs = MapUtils.get(param,"insuplcAdmdvs");
         if (insuplcAdmdvs != null && StringUtils.isNotEmpty(insuplcAdmdvs.toString())) {

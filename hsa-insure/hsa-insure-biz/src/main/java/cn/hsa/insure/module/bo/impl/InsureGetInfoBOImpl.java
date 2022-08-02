@@ -1984,6 +1984,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 date.setTime(MapUtils.get(setlInfoMap, "admTime"));
                 setlInfoMap.put("admTime", simpleDateFormat.format(date)); // 入院时间
             }
+            // 门特也需要处理治疗类别
+            if (MapUtils.get(setlInfoMap, "trtType") != null) {
+                String trtType = MapUtils.get(setlInfoMap, "trtType").toString();
+                if ("1".equals(trtType)) {
+                    setlInfoMap.put("trtType", "10"); // 西医
+                } else if ("2.1".equals(trtType)) {
+                    setlInfoMap.put("trtType", "21"); // 中医
+                } else if ("2.2".equals(trtType)) {
+                    setlInfoMap.put("trtType", "22"); // 民族医
+                } else {
+                    setlInfoMap.put("trtType", "30"); // 中西医
+                }
+            }
         }
         if (MapUtils.get(setlInfoMap, "dclaTime") instanceof Long) {
             date.setTime(MapUtils.get(setlInfoMap, "dclaTime"));
@@ -2172,6 +2185,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             }
 
             map.put("diseaseCount", MapUtils.get(diseaMap, "diseaseCount"));
+            map.put("xiCollect", MapUtils.get(diseaMap, "xiCollect"));
             // 7.结算清单基本信息
             Map<String, Object> setlInfoMap = handerBaseSetlInfo(map, setlinfo);
             // 输血信息
@@ -2242,6 +2256,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             for (InptDiagnoseDTO diagnoseDTO : tcmZyDiagnoseDTOS) {
                 if ("1".equals(diagnoseDTO.getIsMain())) {
                     otpTcmDise = diagnoseDTO.getDiseaseName();
+                }
+            }
+        }
+        //取主诊断的编码和名称
+        String otpWmDiseCode = "";
+        String otpWmDiseName = "";
+        List<InptDiagnoseDTO> xiCollect = MapUtils.get(map, "xiCollect");
+        if (ObjectUtil.isNotEmpty(xiCollect) && xiCollect.size() > 0) {
+            for (InptDiagnoseDTO diagnoseDTO : xiCollect) {
+                if ("1".equals(diagnoseDTO.getIsMain())) {
+                    otpWmDiseCode = diagnoseDTO.getDiseaseCode();
+                    otpWmDiseName = diagnoseDTO.getDiseaseName();
                 }
             }
         }
@@ -2406,8 +2432,15 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("dscgCaty", MapUtils.get(baseInfoMap, "outDeptNatinCode")); // 出院科别
         setlinfo.put("actIptDays", insureIndividualVisitDTO.getHospitalDay()); // 实际住院天数 *******
 
-        setlinfo.put("otpWmDise", MapUtils.getMapVS(mriBaseInfo, "disease_icd10_name", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断名称 *******
-        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(mriBaseInfo, "disease_icd10", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断编码 *******
+        setlinfo.put("otpWmDise", MapUtils.getMapVS(baseInfoMap, "out_disease_name", (String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10_name",null))); // 门（急）诊诊断名称 *******
+        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(baseInfoMap, "out_disease_icd10",(String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10",null))); // 门（急）诊诊断编码 *******
+        //取主诊断的疾病名称和编码
+        if(StringUtils.isNotEmpty(otpWmDiseCode)){
+            setlinfo.put("otpWmDiseCode",otpWmDiseCode);
+        }
+        if(StringUtils.isNotEmpty(otpWmDiseName)){
+            setlinfo.put("otpWmDise",otpWmDiseName);
+        }
         setlinfo.put("wmDiseCcode", ""); // 西医诊断疾病代码 *******
         setlinfo.put("otpTcmDise", otpTcmDise); // 门（急）诊中医诊断 *******
         setlinfo.put("tcmDiseCode", ""); // 中医诊断代码 *******

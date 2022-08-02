@@ -1754,7 +1754,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("trtType", "2.1"); // 中医
         } else if ("22".equals(trtType)) {
             setlinfo.put("trtType", "2.2"); // 民族医
-        } else {
+        } else if ("30".equals(trtType)){
             setlinfo.put("trtType", "3"); // 中西医
         }
         setlinfo.put("admTime", infoDTO.getAdmTime()); // 入院时间 *******
@@ -1963,7 +1963,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     setlInfoMap.put("trtType", "21"); // 中医
                 } else if ("2.2".equals(trtType)) {
                     setlInfoMap.put("trtType", "22"); // 民族医
-                } else {
+                } else if ("3".equals(trtType)){
                     setlInfoMap.put("trtType", "30"); // 中西医
                 }
             }
@@ -1993,7 +1993,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                     setlInfoMap.put("trtType", "21"); // 中医
                 } else if ("2.2".equals(trtType)) {
                     setlInfoMap.put("trtType", "22"); // 民族医
-                } else {
+                } else if ("3".equals(trtType)){
                     setlInfoMap.put("trtType", "30"); // 中西医
                 }
             }

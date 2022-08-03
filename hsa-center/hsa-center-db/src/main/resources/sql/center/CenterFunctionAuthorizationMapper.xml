@@ -39,8 +39,8 @@
     <insert id="insertAuthorization"  parameterType="cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO">
         INSERT INTO `center_function_authorization`(`id`, `hosp_code`, `order_type_code`, `start_date`, `end_date`, `encrypt_start_date`,
                                                     `encrypt_end_date`, `remark`, `audit_status`, `audit_id`, `audit_name`, `audit_time`,
-                                                    `is_valid`, `crte_id`, `crte_name`, `crte_time`, `update_id`, `update_name`, `update_time`)
-        VALUES (#{id}, #{hospCode}, #{orderTypeCode}, #{startDate},#{endDate}, #{encryptStartDate}, #{encryptEndDate},#{remark},#{auditStatus},#{auditId} ,#{auditName}, #{auditTime}, #{isValid}, #{crteId},#{crteName}, #{crteTime}, #{updateId}, #{updateName},#{updateTime});
+                                                    `is_valid`, `crte_id`, `crte_name`, `crte_time`, `update_id`, `update_name`, `update_time`,service_code)
+        VALUES (#{id}, #{hospCode}, #{orderTypeCode}, #{startDate},#{endDate}, #{encryptStartDate}, #{encryptEndDate},#{remark},#{auditStatus},#{auditId} ,#{auditName}, #{auditTime}, #{isValid}, #{crteId},#{crteName}, #{crteTime}, #{updateId}, #{updateName},#{updateTime},#{serviceCode});
     </insert>
 
 
@@ -65,7 +65,8 @@
             crte_time =  #{crteTime},
             update_id =  #{updateId},
             update_name = #{updateName},
-            update_time = #{updateTime}
+            update_time = #{updateTime},
+            service_code = #{serviceCode}
         where
             id = #{id}
     </update>
@@ -81,11 +82,32 @@
             audit_name = #{auditName},
             audit_time = now()
         where
-            id = #{id}
+            hosp_code = #{hospCode} and service_code = #{serviceCode}
     </update>
 
 
 
+    <select id="queryCenterFunctionDetailPage" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionDetailDto" resultType="cn.hsa.module.center.authorization.dto.CenterFunctionDetailDto">
+        select
+            a.*
+        from
+            center_function_detail a
+        where
+            a.is_valid = '0'
+    </select>
+
+    <delete id="deleteAuthorization" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto">
+        delete from center_function_authorization where hosp_code =#{hospCode} and service_code = #{serviceCode}
+    </delete>
+
+    <select id="queryCenterFuctionPage" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionDto" resultType="cn.hsa.module.center.authorization.dto.CenterFunctionDto">
+        select
+            a.*
+        from
+            center_function a
+        where
+            a.is_valid = '0'
+    </select>
 
 
     <select id="queryHospZzywPage" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto" resultType="java.util.Map">
@@ -122,9 +144,10 @@
 
     <select id="queryPage" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto"  resultType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto">
         select
-        cf.id,
-        (case when cf.id is null then '0' else '1' end) as openFlag ,
+        group_concat(cf.id) as id,
+        (case when max(cf.id) is null then '0' else '1' end) as openFlag ,
         ch.code as hospCode,
+        cd.code  as serviceCode,
         ch.name as hospName,
         concat(ch.start_date, ' ~ ', ch.end_date) as yyyxq,
         cf.start_date as startDate ,
@@ -132,22 +155,44 @@
         cf.audit_status  as auditStatus,
         ch.admin_name as adminName,
         ch.admin_phone as adminPhone,
-        cd.value as orderTypeCode,
+        group_concat(cf.order_type_code order by cf.order_type_code)  as orderTypeCode,
         cd.name,
         cf.remark,
         (date(now()) &lt;=date(cf.start_date) and date(now()) &gt;= date(cf.end_date) ) as sfgq
         from
         center_hospital ch
-        left join center_code_detail cd on 1 = 1
-        left join center_function_authorization cf on ch.code = cf.hosp_code and cd.value = cf.order_type_code
-        where cd.c_code ='QXDJ'
-        and ch.is_valid ='1'
-        <if test="orderTypeCode != null and orderTypeCode != ''">
-            and cd.value  = #{orderTypeCode}
-        </if>
+        left join center_function cd on 1 = 1
+        left join center_function_authorization cf on ch.code = cf.hosp_code and cd.code  = cf.service_code
+        where ch.is_valid ='1'
         and ch.code = #{hospCode}
-        order by ch.code,cd.value
+        <if test="serviceCode != null and serviceCode != ''">
+            and cd.code  = #{serviceCode}
+        </if>
+        group by
+        ch.code,
+        cd.code,
+        ch.name,
+        cf.start_date,
+        cf.end_date,
+        cf.audit_status ,
+        ch.admin_name,
+        ch.admin_phone,
+        cd.name,
+        cf.remark,
+        cf.start_date,
+        cf.end_date
+        order by ch.code,cf.order_type_code
     </select>
+
+    <insert id="insertBtchAuthorization" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto">
+        INSERT INTO `center_function_authorization`(`id`, `hosp_code`, `order_type_code`, `start_date`, `end_date`, `encrypt_start_date`,
+                                                    `encrypt_end_date`, `remark`, `audit_status`, `audit_id`, `audit_name`, `audit_time`,
+                                                    `is_valid`, `crte_id`, `crte_name`, `crte_time`, `update_id`, `update_name`, `update_time`,service_code)
+        VALUES
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id}, #{item.hospCode}, #{item.orderTypeCode}, #{item.startDate},#{item.endDate}, #{item.encryptStartDate}, #{item.encryptEndDate},#{item.remark},#{item.auditStatus},#{item.auditId} ,#{item.auditName}, #{item.auditTime}, #{item.isValid}, #{item.crteId},#{item.crteName}, #{item.crteTime}, #{item.updateId}, #{item.updateName},#{item.updateTime},#{item.serviceCode})
+        </foreach>
+    </insert>
 
     <select id="queryCodeValue" resultType="cn.hsa.module.center.code.dto.CenterCodeDetailDTO">
         select  id,c_code code ,name,value from  center_code_detail where c_code = 'QXDJ'

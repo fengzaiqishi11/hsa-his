@@ -7,13 +7,18 @@ import cn.hsa.module.center.authorization.bo.CenterFunctionAuthorizationBO;
 import cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO;
 import cn.hsa.module.center.authorization.dao.CenterInterceptUrlRecordDAO;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDetailDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
 import cn.hsa.module.center.code.bo.CenterCodeBO;
 import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
+import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,6 +26,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author luonianxin
@@ -179,9 +186,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         centerCodeDetailDTO.setValue(centerFunctionAuthorizationDto.getOrderTypeCode());
         centerCodeDetailDTO.setPageNo(0);
         centerCodeDetailDTO.setPageSize(10000);
-        List<CenterCodeDetailDTO> centerCodeDetailDos = (List<CenterCodeDetailDTO>) centerCodeBO.queryCodeDetailPage(centerCodeDetailDTO).getResult();
+        List<CenterFunctionDto> centerFunctionDtos = centerFunctionAuthorizationDAO.queryCenterFuctionPage(centerCodeDetailDTO);
 
-        if (ListUtils.isEmpty(centerCodeDetailDos)){
+        if (ListUtils.isEmpty(centerFunctionDtos)){
             return null;
         }
 
@@ -192,35 +199,35 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
         Map<String,Object> parentMap = null;
         Map<String,Object> childMap = null;
-        for(CenterCodeDetailDTO centerCodeDetail :centerCodeDetailDos){
-            sql1.append(centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
+        for(CenterFunctionDto centerFunctionDto :centerFunctionDtos){
+            sql1.append(centerFunctionDto.getCode()  +"SH,");
 
-            sql2.append("if( MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then cf.id end) is null,'0','1')  as "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +",");
-            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then cf.audit_status end) as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"SH,");
-            sql2.append("MAX(case when cf.order_type_code = '"+ centerCodeDetail.getValue() +"' then concat(cf.start_date,' ~ ',cf.end_date)  end )as  "+ centerCodeDetail.getCode() + centerCodeDetail.getValue() +"YXQ,");
+            sql2.append("if( MAX(case when cf.service_code = '"+ centerFunctionDto.getCode() +"' then cf.id end) is null,'0','1')  as "+ centerFunctionDto.getCode() +",");
+            sql2.append("MAX(case when cf.service_code = '"+ centerFunctionDto.getCode() +"' then cf.audit_status end) as  "+ centerFunctionDto.getCode() +"SH,");
+            sql2.append("MAX(case when cf.service_code = '"+ centerFunctionDto.getCode() +"' then concat(cf.start_date,' ~ ',cf.end_date)  end )as  "+ centerFunctionDto.getCode() +"YXQ,");
 
             parentMap = new HashMap();
-            parentMap.put("label",centerCodeDetail.getName() );
+            parentMap.put("label",centerFunctionDto.getName() );
 
 
             childList = new ArrayList<>();
             childMap = new HashMap();
             childMap.put("label","开通状态");
-            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue());
+            childMap.put("prop",centerFunctionDto.getCode());
             childMap.put("minWidth","150");
             childMap.put("code","KTZT");
             childList.add(childMap);
 
             childMap = new HashMap();
             childMap.put("label","审核状态");
-            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"SH");
+            childMap.put("prop",centerFunctionDto.getCode() +"SH");
             childMap.put("minWidth","150");
             childMap.put("code","YYSHZT");
             childList.add(childMap);
 
             childMap = new HashMap();
             childMap.put("label","服务时间");
-            childMap.put("prop",centerCodeDetail.getCode() + centerCodeDetail.getValue()+"YXQ");
+            childMap.put("prop",centerFunctionDto.getCode() +"YXQ");
             childMap.put("minWidth","150");
             childList.add(childMap);
 
@@ -248,6 +255,19 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     @Override
     public List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        List<CenterFunctionDetailDto> centerFunctionDetailDtos = centerFunctionAuthorizationDAO.queryCenterFunctionDetailPage(centerFunctionAuthorizationDto);
+        Map<String,List<CenterFunctionDetailDto>> detailDtoMaps = centerFunctionDetailDtos.stream().collect(Collectors.groupingBy(CenterFunctionDetailDto::getFunctionCode));
+
+        for (CenterFunctionAuthorizationDto functionAuthorizationDto :list){
+            List<CenterFunctionDetailDto> detailDtos = detailDtoMaps.get(functionAuthorizationDto.getServiceCode());
+            if(!ListUtils.isEmpty(detailDtoMaps.get(functionAuthorizationDto.getServiceCode())) && detailDtoMaps.get(functionAuthorizationDto.getServiceCode()).size()>1){
+                CenterFunctionDetailDto centerFunctionDetailDto = new CenterFunctionDetailDto();
+                centerFunctionDetailDto.setValue(detailDtos.stream().map(CenterFunctionDetailDto::getValue).collect(Collectors.joining(",")));
+                centerFunctionDetailDto.setName(detailDtos.stream().map(CenterFunctionDetailDto::getName).collect(Collectors.joining("/")));
+                detailDtos.add(centerFunctionDetailDto);
+            }
+            functionAuthorizationDto.setCenterFunctionDetailDtoList(detailDtos);
+        }
         return list;
     }
 
@@ -262,6 +282,18 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
         if (!ListUtils.isEmpty(list)) {
             centerFunctionAuthorizationDto = list.get(0);
+            List<CenterFunctionDetailDto> centerFunctionDetailDtos = centerFunctionAuthorizationDAO.queryCenterFunctionDetailPage(centerFunctionAuthorizationDto);
+            Map<String,List<CenterFunctionDetailDto>> detailDtoMaps = centerFunctionDetailDtos.stream().collect(Collectors.groupingBy(CenterFunctionDetailDto::getFunctionCode));
+            if (!MapUtils.isEmpty(detailDtoMaps)) {
+                List<CenterFunctionDetailDto> detailDtos = detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode());
+                if(!ListUtils.isEmpty(detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode())) && detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode()).size()>1){
+                    CenterFunctionDetailDto centerFunctionDetailDto = new CenterFunctionDetailDto();
+                    centerFunctionDetailDto.setValue(detailDtos.stream().map(CenterFunctionDetailDto::getValue).collect(Collectors.joining(",")));
+                    centerFunctionDetailDto.setName(detailDtos.stream().map(CenterFunctionDetailDto::getName).collect(Collectors.joining("/")));
+                    detailDtos.add(centerFunctionDetailDto);
+                }
+                centerFunctionAuthorizationDto.setCenterFunctionDetailDtoList(detailDtos);
+            }
         }
         return centerFunctionAuthorizationDto;
     }
@@ -282,7 +314,7 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         }
 
         if(centerFunctionAuthorizationDto.getOrderTypeCode() == null){
-            throw new RuntimeException("开始时间不能为空!");
+            throw new RuntimeException("服务模式不能为空!");
         }
         centerFunctionAuthorizationDto.setAuditId("1");
         centerFunctionAuthorizationDto.setAuditName("admin");
@@ -304,18 +336,40 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
             log.error("加密时间出现问题",e);
         }
 
-        if(StringUtils.isEmpty(centerFunctionAuthorizationDto.getId())){
-            centerFunctionAuthorizationDto.setId(SnowflakeUtils.getId());
-            centerFunctionAuthorizationDAO.insertAuthorization(centerFunctionAuthorizationDto);
-        }else{
-            centerFunctionAuthorizationDAO.updateAuthorization(centerFunctionAuthorizationDto);
-            centerFunctionAuthorizationDto.setUpdateTime(new Date());
+        centerFunctionAuthorizationDAO.deleteAuthorization(centerFunctionAuthorizationDto);
+
+        List<CenterFunctionAuthorizationDto> list = new ArrayList<CenterFunctionAuthorizationDto>();
+        if(StringUtils.isNotEmpty(centerFunctionAuthorizationDto.getOrderTypeCode())){
+            String [] types = centerFunctionAuthorizationDto.getOrderTypeCode().split(",");
+            CenterFunctionAuthorizationDto newCenterFunctionAuthorizationDto = null ;
+            for(String type:types){
+                newCenterFunctionAuthorizationDto = new CenterFunctionAuthorizationDto();
+               BeanUtils.copyProperties(centerFunctionAuthorizationDto,newCenterFunctionAuthorizationDto);
+                newCenterFunctionAuthorizationDto.setOrderTypeCode(type);
+                newCenterFunctionAuthorizationDto.setId(SnowflakeUtils.getId());
+                list.add(newCenterFunctionAuthorizationDto);
+            }
+            centerFunctionAuthorizationDAO.insertBtchAuthorization(list);
         }
 
-        List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
+        list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
         if (!ListUtils.isEmpty(list)) {
             centerFunctionAuthorizationDto = list.get(0);
         }
+
+        List<CenterFunctionDetailDto> centerFunctionDetailDtos = centerFunctionAuthorizationDAO.queryCenterFunctionDetailPage(centerFunctionAuthorizationDto);
+        Map<String,List<CenterFunctionDetailDto>> detailDtoMaps = centerFunctionDetailDtos.stream().collect(Collectors.groupingBy(CenterFunctionDetailDto::getFunctionCode));
+        if (!MapUtils.isEmpty(detailDtoMaps)) {
+            List<CenterFunctionDetailDto> detailDtos = detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode());
+            if(!ListUtils.isEmpty(detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode())) && detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode()).size()>1){
+                CenterFunctionDetailDto centerFunctionDetailDto = new CenterFunctionDetailDto();
+                centerFunctionDetailDto.setValue(detailDtos.stream().map(CenterFunctionDetailDto::getValue).collect(Collectors.joining(",")));
+                centerFunctionDetailDto.setName(detailDtos.stream().map(CenterFunctionDetailDto::getName).collect(Collectors.joining("/")));
+                detailDtos.add(centerFunctionDetailDto);
+            }
+            centerFunctionAuthorizationDto.setCenterFunctionDetailDtoList(detailDtos);
+        }
+
         return centerFunctionAuthorizationDto;
     }
 }

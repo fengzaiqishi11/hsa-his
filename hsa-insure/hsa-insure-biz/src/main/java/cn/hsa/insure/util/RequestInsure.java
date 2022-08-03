@@ -501,7 +501,6 @@ public class RequestInsure {
                 }
                 count ++ ;
                 if (count > 500*3) {
-                    logger.error("医保访问超市，count :"+count);
                     throw new AppException("医保访问超时");
                 }
             }

@@ -91,13 +91,24 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             String paramMapJson = MapUtils.get(map,"paramMapJson");
             String medisCode = MapUtils.get(map,"medisCode");
             String resultStr = MapUtils.get(map,"resultStr");
-            Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-            String resultCode = MapUtils.get(m,"infcode","0");
+            InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
+            //先判断返回串是否包含infcode
+            String resultCode = "0";
+            if (resultStr.contains("infcode")) {
+                Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
+                resultCode = MapUtils.get(m,"infcode","0");
+                if(!"0".equals(resultCode)){
+                  insureFunctionDO.setErrorMsg("调用失败");
+                }else{
+                  insureFunctionDO.setErrorMsg("调用成功");
+                }
+              }else{
+                insureFunctionDO.setErrorMsg("调用成功");
+              }
             // 开启独立新事务
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             status = transactionManager.getTransaction(def);
-            InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
             insureFunctionDO.setId(SnowflakeUtils.getId());
             insureFunctionDO.setHospCode(hospCode);
             insureFunctionDO.setVisitId(visitId);

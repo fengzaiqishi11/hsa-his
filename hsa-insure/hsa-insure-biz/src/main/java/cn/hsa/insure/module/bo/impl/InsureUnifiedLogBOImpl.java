@@ -80,47 +80,53 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
         TransactionStatus status = null;
         boolean functionLog = false;
         try {
-            String hospCode = MapUtils.get(map,"hospCode");
-            String crteId = MapUtils.get(map,"crteId");
-            String crteName = MapUtils.get(map,"crteName");
-            String visitId = MapUtils.get(map,"visitId");
-            String msgId = MapUtils.get(map,"msgId");
-            String msgInfo = MapUtils.get(map,"msgInfo");
-            String msgName = MapUtils.get(map,"msgName");
-            String isHospital = MapUtils.get(map,"isHospital");
-            String paramMapJson = MapUtils.get(map,"paramMapJson");
-            String medisCode = MapUtils.get(map,"medisCode");
-            String resultStr = MapUtils.get(map,"resultStr");
+          String hospCode = MapUtils.get(map,"hospCode");
+          String crteId = MapUtils.get(map,"crteId");
+          String crteName = MapUtils.get(map,"crteName");
+          String visitId = MapUtils.get(map,"visitId");
+          String msgId = MapUtils.get(map,"msgId");
+          String msgInfo = MapUtils.get(map,"msgInfo");
+          String msgName = MapUtils.get(map,"msgName");
+          String isHospital = MapUtils.get(map,"isHospital");
+          String paramMapJson = MapUtils.get(map,"paramMapJson");
+          String medisCode = MapUtils.get(map,"medisCode");
+          String resultStr = MapUtils.get(map,"resultStr");
+          InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
+          //先判断返回串是否包含infcode
+          String resultCode = "0";
+          if (resultStr.contains("infcode")) {
             Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-            String resultCode = MapUtils.get(m,"infcode","0");
-            // 开启独立新事务
-            DefaultTransactionDefinition def = new DefaultTransactionDefinition();
-            def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-            status = transactionManager.getTransaction(def);
-            InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
-            insureFunctionDO.setId(SnowflakeUtils.getId());
-            insureFunctionDO.setHospCode(hospCode);
-            insureFunctionDO.setVisitId(visitId);
-            insureFunctionDO.setMedisCode(medisCode);
-            insureFunctionDO.setMsgId(msgId);
-            insureFunctionDO.setMsgInfo(msgInfo);
-            insureFunctionDO.setMsgName(msgName);
-            insureFunctionDO.setInParams(paramMapJson);
-            insureFunctionDO.setOutParams(resultStr);
-            insureFunctionDO.setCode(resultCode);
-            insureFunctionDO.setCrteId(crteId);
-            insureFunctionDO.setCrteTime(DateUtils.getNow());
-            insureFunctionDO.setCrteName(crteName);
+            resultCode = MapUtils.get(m,"infcode","0");
             if(!"0".equals(resultCode)){
-                insureFunctionDO.setErrorMsg("调用失败");
+              insureFunctionDO.setErrorMsg("调用失败");
             }else{
-                insureFunctionDO.setErrorMsg("调用成功");
+              insureFunctionDO.setErrorMsg("调用成功");
             }
-            insureFunctionDO.setIsHospital(isHospital);
-            insureFunctionDO.setStatus(Constants.SF.F);
-            functionLog = insureUnifiedLogDAO.insertInsureFunctionLog(insureFunctionDO);
-            // 提交独立事务
-            transactionManager.commit(status);
+          }else{
+            insureFunctionDO.setErrorMsg("调用成功");
+          }
+          // 开启独立新事务
+          DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+          def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+          status = transactionManager.getTransaction(def);
+          insureFunctionDO.setId(SnowflakeUtils.getId());
+          insureFunctionDO.setHospCode(hospCode);
+          insureFunctionDO.setVisitId(visitId);
+          insureFunctionDO.setMedisCode(medisCode);
+          insureFunctionDO.setMsgId(msgId);
+          insureFunctionDO.setMsgInfo(msgInfo);
+          insureFunctionDO.setMsgName(msgName);
+          insureFunctionDO.setInParams(paramMapJson);
+          insureFunctionDO.setOutParams(resultStr);
+          insureFunctionDO.setCode(resultCode);
+          insureFunctionDO.setCrteId(crteId);
+          insureFunctionDO.setCrteTime(DateUtils.getNow());
+          insureFunctionDO.setCrteName(crteName);
+          insureFunctionDO.setIsHospital(isHospital);
+          insureFunctionDO.setStatus(Constants.SF.F);
+          functionLog = insureUnifiedLogDAO.insertInsureFunctionLog(insureFunctionDO);
+          // 提交独立事务
+          transactionManager.commit(status);
         } catch (Exception e) {
             if (status != null) {
                 transactionManager.rollback(status);

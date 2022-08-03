@@ -122,11 +122,6 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             insureFunctionDO.setCrteId(crteId);
             insureFunctionDO.setCrteTime(DateUtils.getNow());
             insureFunctionDO.setCrteName(crteName);
-            if(!"0".equals(resultCode)){
-                insureFunctionDO.setErrorMsg("调用失败");
-            }else{
-                insureFunctionDO.setErrorMsg("调用成功");
-            }
             insureFunctionDO.setIsHospital(isHospital);
             insureFunctionDO.setStatus(Constants.SF.F);
             functionLog = insureUnifiedLogDAO.insertInsureFunctionLog(insureFunctionDO);

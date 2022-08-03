@@ -792,8 +792,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         throw new AppException("取消预配药数据不能为空");
       }
       PharInReceiveDO inReceiveById = inDistributeDrugDAO.getInReceiveById(pharInReceiveDTO);
-      if("2".equals(inReceiveById.getStatusCode())) {
-        throw new AppException("已配药不能取消预配药，请先取消配药");
+      if(!Constants.FYZT.QL.equals(inReceiveById.getStatusCode())) {
+        throw new AppException("不是请领状态的单据，无法取消预配药");
       }
       List<PharInReceiveDetailDTO> canclePharInReceiveDetailDTO = new ArrayList<>();
       PharInReceiveDetailDTO pharInReceiveDetailDTO = new PharInReceiveDetailDTO();

@@ -1,6 +1,7 @@
 package cn.hsa.module.phar;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -71,6 +72,7 @@ public class StockInQueryController extends BaseController {
      * @Return: boolean
      */
     @PostMapping("/batchCheck")
+    @NoRepeatSubmit
     public WrapperResponse<Boolean> updateBatchCheck(@RequestBody StroOutDTO stroOutDTO, HttpServletRequest req, HttpServletResponse res){
         /**
          * 判断批量审核参数是否为空

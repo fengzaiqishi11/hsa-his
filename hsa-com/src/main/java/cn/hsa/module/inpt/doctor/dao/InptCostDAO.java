@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.nurse.dto.InptAdviceExecDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.msg.entity.MsgTempRecordDO;
 import cn.hsa.module.phar.pharinbackdrug.dto.*;
+import cn.hsa.module.phar.pharinbackdrug.entity.PharInReceiveDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
@@ -589,4 +590,11 @@ public interface InptCostDAO {
      * @Param [inptCostDTO]
      **/
     void updateInptCostIsOkByIds(InptCostDTO inptCostDTO);
+    /**
+     * @Author gory
+     * @Description 通过单据id，获得单据状态
+     * @Date 2022/8/1 17:06
+     * @Param [pharInReceiveDTO]
+     **/
+    PharInReceiveDO getInReceiveById(PharInReceiveDTO pharInReceiveDTO);
 }

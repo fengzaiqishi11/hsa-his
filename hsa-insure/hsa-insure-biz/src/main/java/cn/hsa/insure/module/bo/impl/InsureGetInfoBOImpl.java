@@ -2253,11 +2253,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> baseInfoMap = handerBaseInfo(map);
         Map<String, Object> mriBaseInfo = handerMriBaseInfo(map);
         String otpTcmDise = "";
+        String otpTcmDiseCode = "";
         List<InptDiagnoseDTO> tcmZyDiagnoseDTOS = insureGetInfoDAO.selectTcmSyndromesMriInptDiagNose(map);
         if (ObjectUtil.isNotEmpty(tcmZyDiagnoseDTOS) && tcmZyDiagnoseDTOS.size() > 0) {
             for (InptDiagnoseDTO diagnoseDTO : tcmZyDiagnoseDTOS) {
                 if ("1".equals(diagnoseDTO.getIsMain())) {
                     otpTcmDise = diagnoseDTO.getDiseaseName();
+                    otpTcmDiseCode = diagnoseDTO.getDiseaseCode();
                 }
             }
         }
@@ -2445,6 +2447,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         setlinfo.put("wmDiseCcode", ""); // 西医诊断疾病代码 *******
         setlinfo.put("otpTcmDise", otpTcmDise); // 门（急）诊中医诊断 *******
+        setlinfo.put("otpTcmDiseCode", otpTcmDiseCode); // 门（急）诊中医诊断 *******
         setlinfo.put("tcmDiseCode", ""); // 中医诊断代码 *******
         setlinfo.put("diagCodeCnt", MapUtils.get(map, "diseaseCount")); // 诊断代码计数 *******
         setlinfo.put("oprnOprtCodeCnt", MapUtils.get(map, "operCount")); // 手术操作代码计数 *******

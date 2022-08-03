@@ -1029,8 +1029,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             unifiedPayMap.put("crteId", outptVisitDTO.getCrteId());
             unifiedPayMap.put("code", outptVisitDTO.getCode());
             unifiedPayMap.put("crteName", outptVisitDTO.getCrteName());
+
+            Map<String, Object> stringObjectMap = updateFeeSubmit(unifiedPayMap);
             try {
-                Map<String, Object> stringObjectMap = updateFeeSubmit(unifiedPayMap);
                 unifiedPayMap.put("batchNo",MapUtils.get(stringObjectMap,"batchNo"));
                 List<Map<String, Object>> costDOList = MapUtils.get(stringObjectMap, "insureCostList");
                 unifiedPayMap.put("costList", costDOList);

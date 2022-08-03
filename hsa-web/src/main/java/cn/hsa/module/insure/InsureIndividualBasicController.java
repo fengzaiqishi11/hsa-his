@@ -20,10 +20,7 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -112,8 +109,8 @@ public class InsureIndividualBasicController extends BaseController {
      * @Date   2020/11/4 20:36
      * @Return 医保个人信息数据传输对象
      **/
-    @GetMapping("/getInsurePatientInfo")
-    public WrapperResponse<Map<String,Object>> getInsurePatientInfo(@RequestParam Map<String,Object> param, HttpServletRequest req, HttpServletResponse res) {
+    @PostMapping("/getInsurePatientInfo")
+    public WrapperResponse<Map<String,Object>> getInsurePatientInfo(@RequestBody Map<String,Object> param, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         String aac001 = String.valueOf(param.get("aac001"));
         String aac002 = String.valueOf(param.get("aac002"));

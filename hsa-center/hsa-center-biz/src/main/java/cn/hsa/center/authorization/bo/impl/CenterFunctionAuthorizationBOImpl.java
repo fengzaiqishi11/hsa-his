@@ -181,12 +181,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     @Override
     public Map<String,Object> queryHospZzywPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
 
-        CenterCodeDetailDTO centerCodeDetailDTO = new CenterCodeDetailDTO();
-        centerCodeDetailDTO.setCode("QXDJ");
-        centerCodeDetailDTO.setValue(centerFunctionAuthorizationDto.getOrderTypeCode());
-        centerCodeDetailDTO.setPageNo(0);
-        centerCodeDetailDTO.setPageSize(10000);
-        List<CenterFunctionDto> centerFunctionDtos = centerFunctionAuthorizationDAO.queryCenterFuctionPage(centerCodeDetailDTO);
+        CenterFunctionDto centerFunction = new CenterFunctionDto();
+        centerFunction.setCode(centerFunctionAuthorizationDto.getServiceCode());
+        List<CenterFunctionDto> centerFunctionDtos = centerFunctionAuthorizationDAO.queryCenterFuctionPage(centerFunction);
 
         if (ListUtils.isEmpty(centerFunctionDtos)){
             return null;
@@ -371,5 +368,10 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
         }
 
         return centerFunctionAuthorizationDto;
+    }
+
+    @Override
+    public List<CenterFunctionDto> queryCenterFunction(CenterFunctionDto centerFunctionDto) {
+        return centerFunctionAuthorizationDAO.queryCenterFuctionPage(null);
     }
 }

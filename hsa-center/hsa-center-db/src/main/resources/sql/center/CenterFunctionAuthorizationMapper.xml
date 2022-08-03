@@ -107,6 +107,9 @@
             center_function a
         where
             a.is_valid = '0'
+        <if test="code != null and code != ''">
+            and a.code  = #{code}
+        </if>
     </select>
 
 
@@ -125,11 +128,11 @@
         <if test="hospName != null and hospName != ''">
             and (ch.name like '%${hospName}%' or  ch.code like '%${hospName}%')
         </if>
-        <if test="orderTypeCode != null and orderTypeCode != ''">
-            and cf.order_type_code  = #{orderTypeCode}
-        </if>
         <if test="openFlag == '1'">
             and cf.id is not null
+        </if>
+        <if test="serviceCode != null and serviceCode != ''">
+            and cf.service_code =#{serviceCode}
         </if>
         <if test="auditStatus != null and auditStatus != ''">
             and cf.audit_status  = #{auditStatus}

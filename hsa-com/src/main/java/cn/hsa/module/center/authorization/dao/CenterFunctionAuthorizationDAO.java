@@ -54,11 +54,11 @@ public interface CenterFunctionAuthorizationDAO {
 
   CenterCodeDetailDTO queryCodeValue(@Param("orderTypeCode")String orderTypeCode);
 
-  List<CenterFunctionDto> queryCenterFuctionPage(CenterCodeDetailDTO centerCodeDetailDTO);
+  List<CenterFunctionDto> queryCenterFuctionPage(CenterFunctionDto centerFunctionDto);
 
   List<CenterFunctionDetailDto> queryCenterFunctionDetailPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-    void deleteAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+  void deleteAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
   void insertBtchAuthorization(List<CenterFunctionAuthorizationDto> list);
 }

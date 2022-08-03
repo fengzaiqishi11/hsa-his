@@ -131,7 +131,10 @@
                and  NOT ((end_date &lt;= #{start_time}) OR (#{end_time} &lt;start_date))
             </if>
                 and is_valid = '1'
+            <if test="serviceStatus!=null and serviceStatus != ''">
                 and service_status=#{serviceStatus}
+            </if>
+
         </where>
         order by crte_time desc
     </select>

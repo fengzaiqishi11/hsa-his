@@ -1439,7 +1439,7 @@
     </select>
     <select id="selectOutDiagnose" resultType="java.lang.String">
         select b.insure_illness_name from inpt_diagnose a join  insure_disease_match b on
-        a.disease_id = b.hosp_illness_id
+        a.disease_id = b.hosp_illness_id and a.hosp_code=b.hosp_code
         where a.hosp_code =#{hospCode} and a.visit_id =#{visitId} and b.insure_reg_code =#{insureRegCode}
         and a.type_code ='204' and a.is_main ='1'
     </select>

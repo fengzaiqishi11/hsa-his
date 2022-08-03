@@ -49,7 +49,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
      *  存储channel的id和用户主键的映射，客户端保证用户主键传入的是唯一值，
      *  解决问题四，如果是集群中需要换成redis的hash数据类型存储即可
      */
-    private static Map<String, Long> clientMap = new ConcurrentHashMap<>();
+    private static Map<String, String> clientMap = new ConcurrentHashMap<>();
 
     /**
      * 任务map，存储future，用于停止队列任务
@@ -117,7 +117,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 //                    messageInfoModel.addAll(sysMessageInfoList);
                     List<MessageInfoModel> messageInfoModels = messageInfoService.getUnReadMsgList(getParam(messageRequest));
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("first connected do business. the param is:{}" + JSON.toJSONString(messageInfoModels));
+                    log.info("first connected do business. the param is:{}" , JSON.toJSONString(messageInfoModels));
                 }
             } else {
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
@@ -242,7 +242,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
         return futureMap;
     }
 
-    public static Map<String, Long> getClientMap() {
+    public static Map<String, String> getClientMap() {
         return clientMap;
     }
 

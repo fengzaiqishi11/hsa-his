@@ -45,6 +45,12 @@
         <if test="patientCode != null and patientCode !=''">
             and a.patient_code = #{patientCode}
         </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and a.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
         <if test="statusCode != null and statusCode !=''">
             and a.status_code = #{statusCode}
         </if>

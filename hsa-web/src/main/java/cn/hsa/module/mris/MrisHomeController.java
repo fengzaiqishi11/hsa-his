@@ -22,10 +22,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.module.mris
@@ -450,12 +447,13 @@ public class MrisHomeController extends BaseController {
      * @Return: csv文件
      **/
     @GetMapping("/importCSVMrisInfo")
-    public void importCSVMrisInfo(HttpServletRequest req, HttpServletResponse res,String statusCode,String keyword,String startTime,String endTime) throws Exception {
+    public void importCSVMrisInfo(HttpServletRequest req, HttpServletResponse res, @RequestParam("brlxList") ArrayList<String> brlxList, String statusCode, String keyword, String startTime, String endTime) throws Exception {
         SysUserDTO sysUserDTO = getSession(req, res);
         String systemCode = sysUserDTO.getSystemCode();
         Map param =new HashMap();
         param.put("statusCode",statusCode);
         param.put("keyword",keyword);
+        param.put("brlxList",brlxList);
         if (StringUtils.isEmpty(startTime)||startTime.equals("null")){
             startTime =null;
         }

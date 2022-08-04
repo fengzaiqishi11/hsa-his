@@ -240,7 +240,8 @@
         else (case when DATEDIFF(ifnull(a.out_time, now()),ib.birth_time)=0 then 1 else DATEDIFF(ifnull(a.out_time, now()),ib.birth_time) end) end as inDay,
         b.*,
         ifnull(iiv.psn_idet_type,'') as psn_idet_type,
-        ifnull(iiv.psn_idet_type_name,'') AS psn_idet_type_name
+        ifnull(iiv.psn_idet_type_name,'') AS psn_idet_type_name,
+        isi.invoice_no as invoiceNo
         from inpt_visit a
         left join (
         select ${sqlStr} d.id visistID, c.baby_id
@@ -299,6 +300,7 @@
         left join inpt_settle c on a.id = c.visit_id and a.hosp_code = c.hosp_code and c.status_code = '0' and (c.baby_id = b.baby_id || (b.baby_id is null and c.baby_id is null) )
         left join inpt_baby ib on ib.hosp_code = a.hosp_code and ib.visit_id = a.id and ib.id = c.baby_id
         left join insure_individual_visit iiv on iiv.visit_id = a.id
+        left join inpt_settle_invoice isi on c.id = isi.settle_id and isi.hosp_code = c.hosp_code
         where a.hosp_code = #{hospCode}
         <if test="statusCode != null and statusCode != ''">
             and a.status_code = #{statusCode}

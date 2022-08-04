@@ -887,6 +887,12 @@
        <if test="visitId!=null and visitId!=''">
           and b.visit_id =#{visitId}
        </if>
+       <if test="brlxList != null and brlxList.size()>0">
+          and v.patient_code in
+          <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+           #{item}
+          </foreach>
+       </if>
        <if test="startTime != null and startTime != ''">
          and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
        </if>

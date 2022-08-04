@@ -721,4 +721,17 @@ public interface MrisHomeDAO {
      * @Param [deptMap]
      **/
     String queryInptVist(Map<String, Object> map);
+
+    /**
+     * @Menthod: queryExportNum
+     * @Desrciption: 查询导出数据的数量
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-03 09:35
+     * @Return:  Map
+     **/
+    Map queryExportNum(Map<String,Object> map);
+
+   List<InptVisitDTO> queryUnExportData(Map<String,Object> map);
 }

@@ -2957,4 +2957,21 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         return dataMap;
     }
 
+    /**
+     * @Menthod: queryExportNum
+     * @Desrciption: 查询病案导出数据的数量
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-03 09:35
+     * @Return:  Map
+     **/
+    @Override
+    public Map<String, Object> queryExportNum(Map<String, Object> map) {
+        Map<String,Object> info = mrisHomeDAO.queryExportNum(map);
+        List<InptVisitDTO> visitDTOS = mrisHomeDAO.queryUnExportData(map);
+        info.put("visitDTOS",visitDTOS);
+        return info;
+    }
+
 }

@@ -501,4 +501,43 @@ public class MrisHomeController extends BaseController {
             ex.printStackTrace();
         }
     }
+
+    /**
+     * @Menthod: inptMrisInfoDownload
+     * @Desrciption:
+     * @Param: 1. hospCode: 医院编码
+     * 2. data: 入参 code-科室编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-19 17:25
+     * @Return: csv文件
+     **/
+    @GetMapping("/queryExportNum")
+    public WrapperResponse<Map> queryExportNum(HttpServletRequest req, HttpServletResponse res, @RequestParam("brlxList") ArrayList<String> brlxList, String statusCode, String keyword, String startTime, String endTime) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
+        Map param = new HashMap();
+        param.put("statusCode", statusCode);
+        param.put("keyword", keyword);
+        param.put("brlxList", brlxList);
+        if (StringUtils.isEmpty(startTime) || startTime.equals("null")) {
+            startTime = null;
+        }
+        if (StringUtils.isEmpty(endTime) || endTime.equals("null")) {
+            endTime = null;
+        }
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        param.put("hospName", sysUserDTO.getHospName());
+        param.put("hospCode", sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                param.put("inDeptId", null);
+            } else {
+                param.put("inDeptId", sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
+        }
+        return mrisHomeService_consumer.queryExportNum(param);
+    }
 }

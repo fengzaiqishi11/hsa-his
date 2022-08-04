@@ -77,6 +77,18 @@ public class CenterMsgInfoBOImpl extends HsafBO implements MessageInfoBO {
         }
         return count>0;
     }
+    /**
+     * @Author gory
+     * @Description 查询推送的系统消息
+     * @Date 2022/8/4 15:30
+     * @Param [messageInfoDTO]
+     **/
+    @Override
+    public PageDTO queryMessageInfos(MessageInfoDTO messageInfoDTO) {
+        // 设置分页
+        PageHelper.startPage(messageInfoDTO.getPageNo(),messageInfoDTO.getPageSize());
+        return PageDTO.of(messageInfoDAO.queryMessageInfos(messageInfoDTO));
+    }
 
     // 发送消息
     public void sendMessage(MessageInfoDTO messageInfoDTO){

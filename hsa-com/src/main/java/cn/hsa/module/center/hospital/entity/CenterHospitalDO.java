@@ -187,6 +187,14 @@ public class CenterHospitalDO extends PageDO implements Serializable {
      *  医院服务状态 自码表FWZT(1:即将到期(剩15天)，2：已过期，3：正常)
      */
     public String serviceStatus;
+    /**
+     *  迁移状态
+     */
+    private String migrationStatus;
+    /**
+     *  迁移地址
+     */
+    private String migrationAddress;
     public static class FWZT {
         public static final String JJDQ = "1";
         public static final String YGQ = "2";

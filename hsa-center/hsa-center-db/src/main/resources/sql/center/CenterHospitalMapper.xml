@@ -44,14 +44,19 @@
     <!--查询单个-->
     <select id="getByHospCode" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
         select
-          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time,encrypt_start_date,encrypt_end_date,access_ips
+          id, code, name, pro_code, disease_code, oper_code, city_code, area_code,
+          admin_name, admin_phone, buli_image_path, address, phone, fax, email,
+          post_code, hosp_image_path, introduce, website, legal_name, legal_phone,
+          level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name,
+          crte_time,encrypt_start_date,encrypt_end_date,access_ips,migration_status,
+          migration_address
         from center_hospital
         where code = #{code}
     </select>
     <!--查询单个-->
     <select id="getById" resultType="cn.hsa.module.center.hospital.dto.CenterHospitalDTO">
         select
-          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time,nation_code
+          id, code, name, pro_code, disease_code, oper_code, city_code, area_code, admin_name, admin_phone, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, crte_time,nation_code,migration_status,migration_address
         from center_hospital
         where  id = #{id}
     </select>
@@ -87,6 +92,8 @@
                 end_date = #{endDate},
             encrypt_end_date = #{encryptEndDate},
             encrypt_start_date = #{encryptStartDate},
+            migration_status = #{migrationStatus},
+            migration_address = #{migrationAddress},
             nation_code =#{nationCode}
         </set>
         where id = #{id}
@@ -138,8 +145,8 @@
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="" useGeneratedKeys="true">
-        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code,audit_flag,nation_code)
-        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode},#{auditFlag},#{nationCode})
+        insert into center_hospital(id, code, name, pro_code, city_code, area_code, buli_image_path, address, phone, fax, email, post_code, hosp_image_path, introduce, website, legal_name, legal_phone, admin_name, admin_phone, level_code, pym, wbm, long_lat, start_date, end_date, is_valid, crte_id, crte_name, disease_code, oper_code,audit_flag,nation_code,migration_status,migration_address)
+        values (#{id}, #{code}, #{name}, #{proCode}, #{cityCode}, #{areaCode}, #{buliImagePath}, #{address}, #{phone}, #{fax}, #{email}, #{postCode}, #{hospImagePath}, #{introduce}, #{website}, #{legalName}, #{legalPhone}, #{adminName}, #{adminPhone}, #{levelCode}, #{pym}, #{wbm}, #{longLat}, #{startDate}, #{endDate}, '1', #{crteId}, #{crteName}, #{diseaseCode}, #{operCode},#{auditFlag},#{nationCode},#{migrationStatus},#{migrationAddress})
     </insert>
 
     <!--通过主键删除-->

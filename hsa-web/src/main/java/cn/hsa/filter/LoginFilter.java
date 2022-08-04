@@ -38,6 +38,7 @@ public class LoginFilter implements Filter {
         excludeList.add("/web/login/authCode");
         excludeList.add("/web/login/doLogin");
         excludeList.add("/monitor/health");
+        excludeList.add("/web/login/migration");
     }
 
     @Override

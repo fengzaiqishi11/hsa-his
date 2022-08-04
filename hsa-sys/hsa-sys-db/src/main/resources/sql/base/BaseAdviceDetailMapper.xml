@@ -36,7 +36,7 @@
         <result property="splitPrice" column="split_price" jdbcType="VARCHAR"/>
         <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
         <result property="checkPrice" column="checkPrice" jdbcType="VARCHAR"/>
-
+        <result property="strockName" column="strockName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
@@ -74,8 +74,9 @@
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode as split_unit_code,a.code as itemCode,a.use_code,
         a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name,
-        case when a.type_code = '3' then sst.num else ifnull(sst.num,0) end stockNum,/*库存数量*/
-        case when a.type_code = '3' then sst.stock_occupy else ifnull(sst.stock_occupy,0) end stockOccupy/*库存数量*/
+        case when a.type_code = '2' then sst.num else ifnull(sst.num,0) end stockNum,/*库存数量*/
+        case when a.type_code = '2' then sst.stock_occupy else ifnull(sst.stock_occupy,0) end stockOccupy,/*库存数量*/
+        case when a.type_code = '2' then (select b.name from base_dept b where sst.biz_id = b.id) else '' end strockName/*库存数量*/
         FROM
         ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
         '3' as type_code,

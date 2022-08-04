@@ -96,4 +96,8 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
     private String isValid ;
     private String  checkUnitCode;
     private String  checkPrice;
+    /**
+     * 库房名称
+     */
+    private String strockName;
 }

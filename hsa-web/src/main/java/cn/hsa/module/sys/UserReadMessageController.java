@@ -1,10 +1,10 @@
-package cn.hsa.module.center;
+package cn.hsa.module.sys;
 
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.center.hospital.service.UserReadMessageService;
-import cn.hsa.module.center.message.dto.MessageInfoDTO;
+import cn.hsa.module.sys.message.dto.UserReadMessageDTO;
+import cn.hsa.module.sys.message.service.UserReadMessageService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +23,7 @@ import java.util.Map;
  * @date 2022/8/4 16:08
  */
 @RestController
-@RequestMapping("/web/center/message")
+@RequestMapping("/web/sys/message")
 @Slf4j
 public class UserReadMessageController extends BaseController {
 
@@ -37,12 +37,14 @@ public class UserReadMessageController extends BaseController {
      * @Param [messageInfoDTO]
      **/
     @PostMapping("/queryMessageInfos")
-    public WrapperResponse<PageDTO> queryMessageInfos(@RequestBody MessageInfoDTO messageInfoDTO, HttpServletRequest request,
+    public WrapperResponse<PageDTO> queryMessageInfos(@RequestBody UserReadMessageDTO messageInfoDTO, HttpServletRequest request,
                                                       HttpServletResponse response){
         SysUserDTO userDTO = getSession(request,response);
         Map map = new HashMap();
         messageInfoDTO.setHospCode(userDTO.getHospCode());
+        messageInfoDTO.setUserId(userDTO.getId());
         map.put("messageInfoDTO",messageInfoDTO);
+        map.put("hospCode",userDTO.getHospCode());
         return userReadMessageService.queryMessageInfos(map);
     }
 }

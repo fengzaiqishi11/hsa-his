@@ -75,7 +75,7 @@ public class CenterMsgInfoServiceImpl extends HsafService implements MessageInfo
      * @Param [map]
      **/
     @Override
-    public WrapperResponse<PageDTO> queryMessageInfos(Map map) {
+    public WrapperResponse<List<MessageInfoDTO>> queryMessageInfos(Map map) {
         MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
         return WrapperResponse.success(messageInfoBO.queryMessageInfos(messageInfoDTO));
     }

@@ -184,7 +184,7 @@
         cf.remark,
         cf.start_date,
         cf.end_date
-        order by ch.code,cf.order_type_code
+        order by ch.code,cd.code
     </select>
 
     <insert id="insertBtchAuthorization" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto">

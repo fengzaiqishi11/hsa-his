@@ -50,8 +50,8 @@ public class OutptController extends BaseController {
      * @Date 2020/11/17 20:23
      * @Return java.util.Map<java.lang.String,java.lang.Object>
      */
-    @GetMapping("/getOutptVisitInfo")
-    public WrapperResponse getOutptVisitInfo(@RequestParam Map<String,Object> param, HttpServletRequest req, HttpServletResponse res){
+    @PostMapping("/getOutptVisitInfo")
+    public WrapperResponse getOutptVisitInfo(@RequestBody Map<String,Object> param, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         param.put("hospCode",sysUserDTO.getHospCode());
         param.put("crteId",sysUserDTO.getCrteId());

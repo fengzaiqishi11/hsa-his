@@ -20,4 +20,5 @@ import java.util.List;
 @ToString(callSuper = true)
 public class UserReadMessageDTO extends UserReadMessageDO implements Serializable {
    private MessageInfoDTO messageInfoDTO;
+   private List<String> messageIds;
 }

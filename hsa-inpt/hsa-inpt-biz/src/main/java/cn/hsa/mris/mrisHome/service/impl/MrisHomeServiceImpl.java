@@ -385,7 +385,7 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
 
     @Override
     public WrapperResponse<List<LinkedHashMap<String,Object>>> importMrisInfo(Map map) throws Exception {
-        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.updateImportMrisInfo(map);
 //        String rootPath = System.getProperty("user.dir")+"/data/files/";
 //        String hospName= (String) map.get("hospName");
 //        String fileName="hqmsts_"+hospName+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
@@ -395,7 +395,7 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     }
     @Override
     public WrapperResponse<Map> getTableConfig(Map map) throws Exception {
-        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.updateImportMrisInfo(map);
         Map retMap = new HashMap();
         List<Map> listTableConfig = new ArrayList<>();
         if (mrisInfos!=null&&mrisInfos.size()>0) {
@@ -416,7 +416,7 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     @OpenAdditionalService(desc = "病案首页HQMS上报",addEnable = true,orderTypeCode = Constants.ZZFW.HQMS)
     @Override
     public WrapperResponse<String> importCSVMrisInfo(Map map) throws Exception {
-        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.importMrisInfo(map);
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.updateImportMrisInfo(map);
         String rootPath = "/logs/";
         Map mapPatamater = new HashMap();
         mapPatamater.put("hospCode", MapUtils.get(map,"hospCode"));
@@ -431,6 +431,18 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
         CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
         String path = rootPath+"/"+fileName+".csv";
         return WrapperResponse.success(path);
+    }
+
+    /**@Method queryExportNum
+     * @Author liuliyun
+     * @Description 获取病案导出的条数
+     * @Date 2022/08/03 09:28
+     * @Param [map]
+     * @return  map
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryExportNum(Map<String, Object> map) {
+        return WrapperResponse.success(mrisHomeBO.queryExportNum(map));
     }
 
 }

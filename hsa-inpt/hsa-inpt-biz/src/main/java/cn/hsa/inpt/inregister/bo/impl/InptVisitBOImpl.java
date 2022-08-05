@@ -1471,7 +1471,19 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
 
         //设置 '累计费用'
         inptVisitDTO.setTotalCost(BigDecimalUtils.convert("0"));
-
+        // 入院登记防止页面带入出院信息进来 liuliyun 2022-08-02
+        inptVisitDTO.setOutDiseaseId(null);
+        inptVisitDTO.setOutDiseaseName(null);
+        inptVisitDTO.setOutDiseaseIcd10(null);
+        inptVisitDTO.setOutWardId(null);
+        inptVisitDTO.setOutDeptId(null);
+        inptVisitDTO.setOutDeptName(null);
+        inptVisitDTO.setOutTime(null);
+        inptVisitDTO.setOutOperId(null);
+        inptVisitDTO.setOutOperName(null);
+        inptVisitDTO.setOutOperTime(null);
+        inptVisitDTO.setIllnessCode(null); // 病情标识（医嘱回写）
+        // 入院登记防止页面带入出院信息进来 liuliyun 2022-08-02
 
         //设置status_code 为1 待入院状态
         inptVisitDTO.setStatusCode("1");

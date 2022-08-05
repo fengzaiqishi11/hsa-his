@@ -15,5 +15,5 @@ public interface UserReadMessageBO {
      * @Date 2022/8/4 17:05
      * @Param [messageInfoDTO]
      **/
-    WrapperResponse<PageDTO> queryMessageInfos(UserReadMessageDTO messageInfoDTO);
+    PageDTO queryMessageInfos(UserReadMessageDTO messageInfoDTO);
 }

@@ -88,6 +88,7 @@
         <if test="receiverId != null and receiverId != ''">
             and receiver_id =#{receiverId}
         </if>
+        order by crte_time desc
     </select>
 
     <!--单个删除-->

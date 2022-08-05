@@ -30,6 +30,6 @@ public class UserReadMessageServiceImpl implements UserReadMessageService {
      **/
     @Override
     public WrapperResponse<PageDTO> queryMessageInfos(Map map) {
-        return userReadMessageBO.queryMessageInfos(MapUtils.get(map,"messageInfoDTO"));
+        return WrapperResponse.success(userReadMessageBO.queryMessageInfos(MapUtils.get(map,"messageInfoDTO")));
     }
 }

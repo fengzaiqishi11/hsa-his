@@ -42,7 +42,7 @@ public class WebSocketController {
         //获取所有连接的客户端,如果是集群环境使用redis的hash数据类型存储即可
         Map<String, Channel> channelMap = HsaPlatformWebSocketHandler.getChannelMap();
         //获取与用户主键绑定的channel,如果是集群环境使用redis的hash数据类型存储即可
-        Map<String, Long> clientMap = HsaPlatformWebSocketHandler.getClientMap();
+        Map<String, String> clientMap = HsaPlatformWebSocketHandler.getClientMap();
         //解决问题六,websocket集群中一个客户端向其他客户端主动发送消息，如何实现？
         clientMap.forEach((k,v)->{
             if (idList.contains(v)){

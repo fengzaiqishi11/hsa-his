@@ -43,9 +43,6 @@ public class InsureCommonUtil {
             insureConfigurationDTO.setRegCode(map.get("configRegCode").toString());
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-        if(ObjectUtil.isEmpty(insureConfigurationDTO)){
-            throw new AppException("未查询到医保登记信息，请先进行医保登记！");
-        }
 
         String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
 

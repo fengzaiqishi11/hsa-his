@@ -1,4 +1,4 @@
-package cn.hsa.interf.dzpz.controller.statement.bo.impl;
+package cn.hsa.interf.statement.bo.impl;
 
 import cn.hsa.base.DynamicTable;
 import cn.hsa.base.PageDTO;

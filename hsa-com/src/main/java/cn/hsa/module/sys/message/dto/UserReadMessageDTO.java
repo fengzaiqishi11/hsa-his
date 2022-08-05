@@ -21,4 +21,5 @@ import java.util.List;
 public class UserReadMessageDTO extends UserReadMessageDO implements Serializable {
    private MessageInfoDTO messageInfoDTO;
    private List<String> messageIds;
+   private String messageIdsStr;
 }

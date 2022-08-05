@@ -552,4 +552,29 @@
   <delete id="deleteCanclePharInReceivelDTO">
     delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
   </delete>
+
+    <select id="queryDMDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+            a.*,
+            '1' as cfTypeCode,
+            case
+                bd.ph_code when '6' then '5'
+                           else '4'
+                end prescribeTypeCode,
+            pc.total_price as printTotalPrice
+        from
+            inpt_advice a
+                join phar_in_receive_detail pc on
+                    pc.advice_id = a.id
+                    and pc.hosp_code = a.hosp_code
+                    and pc.receive_id =
+                        #{id} and pc.visit_id = #{visitId}
+                left join base_drug bd on
+                    a.item_id = bd.id
+                    and a.hosp_code = bd.hosp_code
+        where
+                a.hosp_code =
+                #{hospCode}
+          and bd.ph_code in ('2', '3', '6')
+    </select>
 </mapper>

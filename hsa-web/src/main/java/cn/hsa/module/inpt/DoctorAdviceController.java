@@ -509,4 +509,26 @@ public class DoctorAdviceController extends BaseController {
         map.put("inptAdviceDTO", inptAdviceDTO);
         return doctorAdviceService_consumer.queryLisOrPacsAdvice(map);
     }
+
+    /**
+     * @Menthod: getCFAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药、精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @GetMapping("/getCFAdviceByVisitId")
+    public WrapperResponse<List<InptAdviceDTO>> getCFAdviceByVisitId(InptVisitDTO inptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(inptVisitDTO.getId())) {
+            throw new RuntimeException("未选择就诊人信息");
+        }
+        inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("inptVisitDTO", inptVisitDTO);
+        return doctorAdviceService_consumer.getCFAdviceByVisitId(map);
+    }
 }

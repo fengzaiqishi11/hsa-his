@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import cn.hsa.module.center.message.bo.MessageInfoBO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
+import cn.hsa.module.center.message.entity.MessageInfoDO;
 import cn.hsa.module.center.message.service.MessageInfoService;
 import cn.hsa.module.sys.message.bo.UserReadMessageBO;
 import cn.hsa.module.sys.message.dao.UserReadMessageDAO;

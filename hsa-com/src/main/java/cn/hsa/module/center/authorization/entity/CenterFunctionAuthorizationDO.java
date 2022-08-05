@@ -29,6 +29,7 @@ public class CenterFunctionAuthorizationDO extends PageDO implements Serializabl
     private String	id;
     private String	hospCode;
     private String	orderTypeCode;
+    private String	serviceCode;
     @JsonFormat(pattern = "yyyy-MM-dd",timezone="GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date startDate;

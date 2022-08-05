@@ -2,7 +2,11 @@ package cn.hsa.module.center.authorization.dao;
 
 
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDetailDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
+import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
+import com.github.pagehelper.Page;
 import cn.hsa.module.center.code.dto.CenterCodeDetailDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -49,4 +53,12 @@ public interface CenterFunctionAuthorizationDAO {
   List<CenterFunctionAuthorizationDto> queryPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
   CenterCodeDetailDTO queryCodeValue(@Param("orderTypeCode")String orderTypeCode);
+
+  List<CenterFunctionDto> queryCenterFuctionPage(CenterFunctionDto centerFunctionDto);
+
+  List<CenterFunctionDetailDto> queryCenterFunctionDetailPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+  void deleteAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+  void insertBtchAuthorization(List<CenterFunctionAuthorizationDto> list);
 }

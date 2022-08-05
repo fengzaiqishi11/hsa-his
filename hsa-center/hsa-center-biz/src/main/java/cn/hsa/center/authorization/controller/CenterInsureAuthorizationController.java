@@ -4,6 +4,7 @@ import cn.hsa.base.CenterBaseController;
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.util.DateUtils;
@@ -193,5 +194,20 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
         }
 
         return centerFunctionAuthorizationService.saveBizAuthorization(centerFunctionAuthorizationDto);
+    }
+
+    /**
+     * @Menthod updateAuthorization()
+     * @Desrciption   根据条件分页查询参数信息
+     * @Param
+     * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @GetMapping("/queryCenterFunction")
+    public WrapperResponse<List<CenterFunctionDto>> queryCenterFunction(CenterFunctionDto centerFunctionDto){
+
+        return centerFunctionAuthorizationService.queryCenterFunction(centerFunctionDto);
     }
 }

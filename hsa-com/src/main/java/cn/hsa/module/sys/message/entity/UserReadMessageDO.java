@@ -41,4 +41,10 @@ public class UserReadMessageDO extends PageDO implements Serializable {
      * 消息类型
      */
     private String messageType;
+
+    /**
+     * 是否已读
+     */
+    private String messageStatus;
+
 }

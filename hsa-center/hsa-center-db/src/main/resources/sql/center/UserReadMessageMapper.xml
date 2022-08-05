@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.hsa.module.sys.message.dao.UserReadMessageDAO">
+    <insert id="insertUserReadMessage"  keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
+        INSERT INTO `user_read_messages`(`id`, `hosp_code`, `user_id`, `message_id`, `message_type`,message_status)
+        VALUES (null, #{hospCode}, #{userId}, #{messageId}, #{messageType},#{messageStatus});
+    </insert>
 
+    <select id="queryMessageByUser" resultType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
+        SELECT id, hosp_code, user_id, message_id, message_type
+            from user_read_messages
+             where user_id = #{userId} and
+               message_id in
+             <foreach collection="messageIds" item="item" open="("  separator="," close=")">
+                 #{item}
+             </foreach>
+    </select>
 </mapper>

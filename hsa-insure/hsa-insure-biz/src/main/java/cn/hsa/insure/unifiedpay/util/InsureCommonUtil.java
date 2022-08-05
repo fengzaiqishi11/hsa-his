@@ -1,10 +1,12 @@
 package cn.hsa.insure.unifiedpay.util;
 
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.stereotype.Component;
@@ -41,6 +43,9 @@ public class InsureCommonUtil {
             insureConfigurationDTO.setRegCode(map.get("configRegCode").toString());
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if(ObjectUtil.isEmpty(insureConfigurationDTO)){
+            throw new AppException("未查询到医保登记信息，请先进行医保登记！");
+        }
 
         String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
 

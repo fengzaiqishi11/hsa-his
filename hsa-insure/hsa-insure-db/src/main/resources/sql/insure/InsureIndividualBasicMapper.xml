@@ -403,7 +403,29 @@
         </if>
     </select>
 
-
+    <select id="queryInptAndOutptMtPatientPage"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select * from
+        (select o.id,e.aac001 as aac002,o.hosp_code,o.age,o.age_unit_code,o.gender_code,o.name as aac003,o.visit_no as visitNo, o.dept_name as visitDrptName,'门诊' as aka130Name  from outpt_visit o left join insure_individual_visit e
+        on o.hosp_code=e.hosp_code and o.id=e.visit_id and o.hosp_code =#{hospCode}
+        union all
+        select i.id,e.aac001 as aac002,  i.hosp_code, i.age, i.age_unit_code, i.gender_code,  i.name as aac003,  i.in_no  as visitNo, i.in_dept_name as visitDrptName,'住院' as aka130Name from inpt_visit i left join insure_individual_visit e
+        on i.hosp_code=e.hosp_code and i.id=e.visit_id and i.hosp_code =#{hospCode}
+        )t where t.hosp_code =#{hospCode}
+        <if test="keyWord != null and keyWord != ''">
+            and (t.aac003 like concat('%',#{keyWord},'%')
+            or t.aac002 like concat('%',#{keyWord},'%')
+            )
+        </if>
+        <if test="isHospital != null and isHospital != ''">
+            <if test="isHospital == 1">
+                and t.aka130Name = '住院'
+            </if>
+            <if test="isHospital == 0">
+                and t.aka130Name = '门诊'
+            </if>
+        </if>
+    </select>
     <select id="queryOutptSettleInfo" resultType="java.util.Map" parameterType="java.util.Map">
         SELECT
         a.hosp_code,

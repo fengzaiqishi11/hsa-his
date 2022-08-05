@@ -103,5 +103,6 @@
     <dubbo:service interface="cn.hsa.module.base.diagnosistemplate.service.BaseDiagnosisTemplateService" ref="baseDiagnosisTemplateService_provider"/>
   <!--诊室信息-->
     <dubbo:service interface="cn.hsa.module.base.clinic.service.BaseClinicService" ref="baseClinicService_provider"/>
-
+    <!--sys生产者-->
+    <dubbo:service interface="cn.hsa.module.sys.message.service.UserReadMessageService" ref="userReadMessageService_provider"/>
 </beans>

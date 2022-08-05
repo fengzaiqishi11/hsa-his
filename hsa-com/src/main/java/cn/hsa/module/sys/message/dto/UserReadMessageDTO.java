@@ -1,6 +1,7 @@
-package cn.hsa.module.center.hospital.dto;
+package cn.hsa.module.sys.message.dto;
 
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
+import cn.hsa.module.sys.message.entity.UserReadMessageDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
-public class UserReadMessageDTO implements Serializable {
-    private List<MessageInfoDTO> messageList;
+public class UserReadMessageDTO extends UserReadMessageDO implements Serializable {
+   private MessageInfoDTO messageInfoDTO;
 }

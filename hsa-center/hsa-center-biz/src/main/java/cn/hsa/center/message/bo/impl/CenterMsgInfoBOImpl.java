@@ -84,10 +84,10 @@ public class CenterMsgInfoBOImpl extends HsafBO implements MessageInfoBO {
      * @Param [messageInfoDTO]
      **/
     @Override
-    public PageDTO queryMessageInfos(MessageInfoDTO messageInfoDTO) {
+    public List<MessageInfoDTO> queryMessageInfos(MessageInfoDTO messageInfoDTO) {
         // 设置分页
         PageHelper.startPage(messageInfoDTO.getPageNo(),messageInfoDTO.getPageSize());
-        return PageDTO.of(messageInfoDAO.queryMessageInfos(messageInfoDTO));
+        return messageInfoDAO.queryMessageInfos(messageInfoDTO);
     }
 
     // 发送消息

@@ -1,4 +1,4 @@
-package cn.hsa.module.center.hospital.entity;
+package cn.hsa.module.sys.message.entity;
 
 import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonInclude;

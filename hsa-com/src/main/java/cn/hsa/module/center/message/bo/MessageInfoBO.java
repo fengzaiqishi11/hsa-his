@@ -77,5 +77,5 @@ public interface MessageInfoBO {
    * @Date 2022/8/4 15:30
    * @Param [messageInfoDTO]
    **/
-  PageDTO queryMessageInfos(MessageInfoDTO messageInfoDTO);
+  List<MessageInfoDTO> queryMessageInfos(MessageInfoDTO messageInfoDTO);
 }

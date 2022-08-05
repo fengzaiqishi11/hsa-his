@@ -183,7 +183,8 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         List<InsureIndividualVisitDTO> list = new ArrayList<>();
         //人员慢特病备案查询--门诊住院信息查询
         if(Constant.UnifiedPay.YWLX.MZMXB.equals(medType)){
-            list =  insureIndividualBasicDAO.queryInptAndOutptMtPatientPage(map);
+            List<Map<String,Object>> listMap = insureIndividualBasicDAO.queryInptAndOutptMtPatientPage(map);
+            return  PageDTO.of(listMap);
         }else{
             list =  insureIndividualBasicDAO.queryInptAndOutptPatientPage(map);
         }

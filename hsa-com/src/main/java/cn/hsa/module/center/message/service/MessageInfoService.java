@@ -97,5 +97,5 @@ public interface MessageInfoService {
      * @Param [map]
      **/
     @PostMapping("/service/msg/message/queryMessageInfoByType")
-    WrapperResponse<PageDTO> queryMessageInfos(Map map);
+    WrapperResponse<List<MessageInfoDTO>> queryMessageInfos(Map map);
 }

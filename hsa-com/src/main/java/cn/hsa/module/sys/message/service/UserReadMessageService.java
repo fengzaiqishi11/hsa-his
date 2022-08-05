@@ -1,7 +1,8 @@
-package cn.hsa.module.center.hospital.service;
+package cn.hsa.module.sys.message.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import java.util.Map;
  * @author gory
  * @date 2022/8/4 16:35
  */
+@FeignClient(value = "hsa-sys")
 public interface UserReadMessageService {
     /**
      * @Author gory

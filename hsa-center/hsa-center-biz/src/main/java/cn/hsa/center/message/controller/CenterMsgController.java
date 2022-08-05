@@ -109,10 +109,9 @@ public class CenterMsgController extends CenterBaseController {
      * @Param [messageInfoDTO]
      **/
     @PostMapping("/queryMessageInfos")
-    public WrapperResponse<PageDTO> queryMessageInfos(@RequestBody MessageInfoDTO messageInfoDTO){
+    public WrapperResponse<List<MessageInfoDTO>> queryMessageInfos(@RequestBody MessageInfoDTO messageInfoDTO){
         Map map = new HashMap();
         map.put("messageInfoDTO",messageInfoDTO);
-
         return messageInfoService_consumer.queryMessageInfos(map);
     }
 }

@@ -5,12 +5,13 @@
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="type" column="type" jdbcType="VARCHAR"/>
         <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="isPublish" column="is_publish" jdbcType="VARCHAR"/>
         <result property="level" column="level" jdbcType="VARCHAR"/>
         <result property="receiverId" column="receiver_id" jdbcType="VARCHAR"/>
         <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
         <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="intervalTime" column="interval_time" jdbcType="TIMESTAMP"/>
         <result property="sendCount" column="send_count" jdbcType="INTEGER"/>
-        <result property="isPublish" column="is_publish" jdbcType="VARCHAR"/>
         <result property="url" column="url" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
@@ -70,6 +71,22 @@
         </if>
         <if test="level != null and level != ''">
             and level =#{level}
+        </if>
+    </select>
+    <!--查询消息推送-->
+    <select id="queryMessageInfos" resultMap="MessageInfoMap">
+        SELECT id, `type`, content, is_publish, `level`, receiver_id, start_time, end_time, interval_time,
+               send_count, url, crte_time, crte_name, crte_id, msg_status
+        from center_msg
+        where type ='1'
+        <if test="isPublish != null and isPublish != ''">
+            and is_publish =#{is_publish}
+        </if>
+        <if test="level != null and level != ''">
+            and level =#{level}
+        </if>
+        <if test="receiverId != null and receiverId != ''">
+            and receiver_id =#{receiverId}
         </if>
     </select>
 

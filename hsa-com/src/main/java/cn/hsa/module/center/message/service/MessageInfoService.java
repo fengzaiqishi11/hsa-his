@@ -2,10 +2,12 @@ package cn.hsa.module.center.message.service;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -88,6 +90,12 @@ public interface MessageInfoService {
      **/
     @GetMapping("/service/msg/message/queryMessageInfoByType")
     WrapperResponse<PageDTO> queryMessageInfoByType(Map map);
-
-
+    /**
+     * @Author gory
+     * @Description 查询消息推送的信息
+     * @Date 2022/8/4 15:28
+     * @Param [map]
+     **/
+    @PostMapping("/service/msg/message/queryMessageInfoByType")
+    WrapperResponse<PageDTO> queryMessageInfos(Map map);
 }

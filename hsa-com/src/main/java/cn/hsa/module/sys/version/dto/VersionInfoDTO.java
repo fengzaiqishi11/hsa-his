@@ -26,5 +26,13 @@ public class VersionInfoDTO extends VersionInfoDO implements Serializable {
      */
     private String endDate;
 
+    /**
+     *  当前登录医院编码
+     */
+    private String hospCode;
+    /**
+     *  当前登录用户id
+     */
+    private String userId;
 
 }

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,4 +23,5 @@ public class UserReadMessageDTO extends UserReadMessageDO implements Serializabl
    private MessageInfoDTO messageInfoDTO;
    private List<String> messageIds;
    private String messageIdsStr;
+   private Date messageTime;
 }

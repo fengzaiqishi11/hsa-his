@@ -12,8 +12,19 @@
 
     <insert id="insertUserReadMessage"  keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
         INSERT INTO `user_read_messages`(`id`, `hosp_code`, `user_id`, `message_id`, `message_type`,message_status)
-        VALUES (null, #{hospCode}, #{userId}, #{messageId}, #{messageType},#{messageStatus});
+        VALUES (null, #{hospCode}, #{userId}, #{messageId}, #{messageType},#{messageStatus}) on duplicate key
+        update message_status = #{messageStatus}
     </insert>
+    <!--一键修改已读状态-->
+    <update id="updateMessageStatus">
+        INSERT INTO `user_read_messages`(`id`, `hosp_code`, `user_id`, `message_id`, `message_type`,message_status)
+        VALUES
+        <foreach collection="messageIds" item="item"   separator=",">
+            (null, #{hospCode}, #{userId}, #{item}, #{messageType},#{messageStatus})
+        </foreach>
+        on duplicate key
+        update message_status = #{messageStatus}
+    </update>
 
     <select id="queryMessageByUser" resultMap="userReadMessageMap" parameterType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
         SELECT id, hosp_code, user_id, message_id, message_type,message_status

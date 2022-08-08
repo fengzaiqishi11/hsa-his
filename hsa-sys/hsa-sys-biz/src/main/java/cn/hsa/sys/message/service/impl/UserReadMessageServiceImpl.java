@@ -32,4 +32,14 @@ public class UserReadMessageServiceImpl implements UserReadMessageService {
     public WrapperResponse<PageDTO> queryMessageInfos(Map map) {
         return WrapperResponse.success(userReadMessageBO.queryMessageInfos(MapUtils.get(map,"messageInfoDTO")));
     }
+    /**
+     * @Author gory
+     * @Description 修改一键已读
+     * @Date 2022/8/5 13:51
+     * @Param [map]
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateMessageStatus(Map map) {
+        return WrapperResponse.success(userReadMessageBO.updateMessageStatus(MapUtils.get(map,"messageInfoDTO")));
+    }
 }

@@ -3,24 +3,21 @@ package cn.hsa.sys.message.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
-import cn.hsa.module.center.hospital.service.CenterHospitalService;
-import cn.hsa.module.center.message.bo.MessageInfoBO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
-import cn.hsa.module.center.message.entity.MessageInfoDO;
 import cn.hsa.module.center.message.service.MessageInfoService;
 import cn.hsa.module.sys.message.bo.UserReadMessageBO;
 import cn.hsa.module.sys.message.dao.UserReadMessageDAO;
 import cn.hsa.module.sys.message.dto.UserReadMessageDTO;
 import cn.hsa.util.Constants;
-import cn.hsa.util.ListUtils;
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnels;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +31,9 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
     private MessageInfoService messageInfoService_consumer;
     @Resource
     private UserReadMessageDAO userReadMessageDAO;
+    private long expectedVersionMessagesNums = 1000000L;
+
+    BloomFilter<CharSequence> bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8),expectedVersionMessagesNums,0.02d);
 
     /**
      * @Author gory
@@ -57,33 +57,37 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
             new AppException("未查询到系统消息");
         }
         List<MessageInfoDTO> messageInfoDTOList = data.getData();
-        List<String> messageIds = messageInfoDTOList.stream().map(MessageInfoDTO::getId).collect(Collectors.toList());
-        // 这部分逻辑后续可用部落过滤器代替
-        userReadMessageDTO.setMessageIds(messageIds);
-        List<UserReadMessageDTO> userReadMessageDTOS = userReadMessageDAO.queryMessageByUser(userReadMessageDTO);
         List<UserReadMessageDTO> resultList = new ArrayList<>();
         for (MessageInfoDTO messageInfo: messageInfoDTOList) {
             UserReadMessageDTO readMessageDTO = new UserReadMessageDTO();
             readMessageDTO.setMessageInfoDTO(messageInfo);
             readMessageDTO.setMessageStatus(Constants.SF.F);
             readMessageDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
-            for (UserReadMessageDTO readMessage:userReadMessageDTOS) {
-                if (messageInfo.getId().equals(readMessage.getMessageId())){
-                    readMessageDTO.setMessageStatus(Constants.SF.S);
-                }
+            String bloomKey = userReadMessageDTO.getHospCode()+':'+userReadMessageDTO.getUserId()+':'+ messageInfo.getId();
+            if(bloomFilter.mightContain(bloomKey)){
+                readMessageDTO.setMessageStatus(Constants.SF.S);
             }
             resultList.add(readMessageDTO);
         }
-//        for (MessageInfoDTO messageInfo: messageInfoDTOList) {
-//            // 通过布隆过滤器查询是否已读
-//            // 如果在布隆过滤器中未查询到，则说明是未读
-//            UserReadMessageDTO paramDTO = new UserReadMessageDTO();
-//            paramDTO.setHospCode(userReadMessageDTO.getHospCode());
-//            paramDTO.setMessageId(messageInfo.getId());
-//            paramDTO.setUserId(userReadMessageDTO.getUserId());
-//            paramDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
-//            userReadMessageDAO.insertUserReadMessage(paramDTO);
-//        }
         return PageDTO.ofByManual(resultList,userReadMessageDTO.getPageNo(),userReadMessageDTO.getPageSize());
+    }
+    /**
+     * @Author gory
+     * @Description 一键修改已读状态
+     * @Date 2022/8/5 13:52
+     * @Param [messageInfoDTO]
+     **/
+    @Override
+    public Boolean updateMessageStatus(UserReadMessageDTO messageInfoDTO) {
+        List<String> messageIdList = messageInfoDTO.getMessageIds();
+        messageInfoDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
+        messageInfoDTO.setMessageStatus(Constants.SF.S);
+        // 1.插入userRead表
+        for(String messageId : messageIdList){
+            // 2.更新布隆过滤器
+            String bloomKey = messageInfoDTO.getHospCode()+':'+messageInfoDTO.getUserId()+':'+messageId;
+            bloomFilter.put(bloomKey);
+        }
+        return userReadMessageDAO.updateMessageStatus(messageInfoDTO) > 0;
     }
 }

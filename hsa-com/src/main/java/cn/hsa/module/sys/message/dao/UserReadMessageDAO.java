@@ -18,4 +18,11 @@ public interface  UserReadMessageDAO {
      * @Param [userReadMessageDTO]
      **/
     List<UserReadMessageDTO> queryMessageByUser(UserReadMessageDTO userReadMessageDTO);
+    /**
+     * @Author gory
+     * @Description 一键修改已读状态
+     * @Date 2022/8/5 13:54
+     * @Param [messageInfoDTO]
+     **/
+    int updateMessageStatus(UserReadMessageDTO messageInfoDTO);
 }

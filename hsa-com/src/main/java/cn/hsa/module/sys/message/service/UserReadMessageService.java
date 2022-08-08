@@ -19,4 +19,6 @@ public interface UserReadMessageService {
      * @Param [map]
      **/
     WrapperResponse<PageDTO> queryMessageInfos(Map map);
+
+    WrapperResponse<Boolean> updateMessageStatus(Map map);
 }

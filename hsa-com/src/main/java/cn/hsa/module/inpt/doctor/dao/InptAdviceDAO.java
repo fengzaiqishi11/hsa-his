@@ -907,4 +907,14 @@ public interface InptAdviceDAO {
     List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
 
     List<InptVisitDTO> queryInptVisitPageNoMerge(InptVisitDTO inptVisitDTO);
+    /**
+     * @Menthod: getCFAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药、精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<InptAdviceDTO> getDMAdviceByVisitId(InptVisitDTO inptVisitDTO);
 }

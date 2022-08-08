@@ -27,6 +27,7 @@ import java.util.List;
 @ToString
 public class PageDTO implements Serializable {
     private Long total;
+    private Integer count;// 用于一些特殊总数的返回，比如系统消息的已读和未读
     private Object result;
     private Object sumData;
 
@@ -60,6 +61,27 @@ public class PageDTO implements Serializable {
         PageInfo pageInfo = new PageInfo(list);
         PageDTO dto = new PageDTO();
         dto.setTotal(pageInfo.getTotal());
+        if (ListUtils.isEmpty(list)) {
+            dto.setResult(new ArrayList<>());
+        } else {
+            int firstIndex = Math.min((pageNo - 1) * pageSize, list.size());
+            int lastIndex = Math.min(pageNo * pageSize, list.size());
+            dto.setResult(list.subList(firstIndex, lastIndex));
+        }
+        return dto;
+    }
+    /**
+     * @Author gory
+     * @Description 手动分页2：可以设置自定义的count
+     * @Date 2022/7/20 10:40
+     * @Param [list,pageNo,pageSize]
+     **/
+    public static PageDTO ofByManual(List list,Integer pageNo,Integer pageSize,Integer count) {
+        // 设置分页集合
+        PageInfo pageInfo = new PageInfo(list);
+        PageDTO dto = new PageDTO();
+        dto.setTotal(pageInfo.getTotal());
+        dto.setCount(count);
         if (ListUtils.isEmpty(list)) {
             dto.setResult(new ArrayList<>());
         } else {

@@ -51,6 +51,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
         messageInfoDTO.setPageNo(userReadMessageDTO.getPageNo());
         messageInfoDTO.setPageSize(userReadMessageDTO.getPageSize());
+        messageInfoDTO.setIsPublish(Constants.SF.S);
         map.put("messageInfoDTO",messageInfoDTO);
         WrapperResponse<List<MessageInfoDTO>>  data = messageInfoService_consumer.queryMessageInfos(map);
         if (null == data){
@@ -58,18 +59,28 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         }
         List<MessageInfoDTO> messageInfoDTOList = data.getData();
         List<UserReadMessageDTO> resultList = new ArrayList<>();
+        // 未读数量
+        int count = 0;
         for (MessageInfoDTO messageInfo: messageInfoDTOList) {
             UserReadMessageDTO readMessageDTO = new UserReadMessageDTO();
             readMessageDTO.setMessageInfoDTO(messageInfo);
             readMessageDTO.setMessageStatus(Constants.SF.F);
             readMessageDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
+            readMessageDTO.setMessageTime(messageInfo.getCrteTime());
             String bloomKey = userReadMessageDTO.getHospCode()+':'+userReadMessageDTO.getUserId()+':'+ messageInfo.getId();
             if(bloomFilter.mightContain(bloomKey)){
                 readMessageDTO.setMessageStatus(Constants.SF.S);
+            } else {
+                count++;
             }
             resultList.add(readMessageDTO);
         }
-        return PageDTO.ofByManual(resultList,userReadMessageDTO.getPageNo(),userReadMessageDTO.getPageSize());
+        // todo 先根据读取状态进行升序，再根据消息时间降序
+        List<UserReadMessageDTO> finallyResultList = resultList.stream().sorted(
+                Comparator.comparing(UserReadMessageDTO::getMessageStatus).
+                thenComparing(UserReadMessageDTO::getMessageTime,Comparator.reverseOrder())
+        ).collect(Collectors.toList());
+        return PageDTO.ofByManual(finallyResultList,userReadMessageDTO.getPageNo(),userReadMessageDTO.getPageSize(),count);
     }
     /**
      * @Author gory

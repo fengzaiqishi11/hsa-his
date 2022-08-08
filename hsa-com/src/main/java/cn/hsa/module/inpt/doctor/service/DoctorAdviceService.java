@@ -260,4 +260,16 @@ public interface DoctorAdviceService {
      * @Return:
      **/
     WrapperResponse<List<InptAdviceDTO>> queryLisOrPacsAdvice(Map map);
+
+    /**
+     * @Menthod: getCFAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药、精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @GetMapping("/service/inpt/doctorAdviceController/getCFAdviceByVisitId")
+    WrapperResponse<List<InptAdviceDTO>> getCFAdviceByVisitId(Map map);
 }

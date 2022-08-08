@@ -16,4 +16,6 @@ public interface UserReadMessageBO {
      * @Param [messageInfoDTO]
      **/
     PageDTO queryMessageInfos(UserReadMessageDTO messageInfoDTO);
+
+    Boolean updateMessageStatus(UserReadMessageDTO messageInfoDTO);
 }

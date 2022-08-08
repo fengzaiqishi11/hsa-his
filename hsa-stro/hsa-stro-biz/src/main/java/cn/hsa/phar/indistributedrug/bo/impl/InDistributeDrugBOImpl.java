@@ -850,4 +850,34 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
       }
       return true;
     }
+    /**
+     * @Menthod: queryDMDrugByOrderAndVisitId
+     * @Desrciption: 根据就诊id查询精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public List<InptAdviceDTO> queryDMDrugByOrderAndVisitId(PharInReceiveDTO pharInReceiveDTO) {
+        List<InptAdviceDTO> inptAdviceDTOS = inDistributeDrugDAO.queryDMDrugByOrderAndVisitId(pharInReceiveDTO);
+        List<InptAdviceDTO> resultList = new ArrayList<>();
+        Map<String, List<InptAdviceDTO>> listMap = inptAdviceDTOS.stream().collect(Collectors.groupingBy(InptAdviceDTO::getPrescribeTypeCode));
+        listMap.forEach((k,v)->{
+            InptAdviceDTO adviceDTO = new InptAdviceDTO();
+            if(Constants.CFLX.JE.equals(k)){
+                adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                adviceDTO.setPrescribeTypeCode(Constants.CFLX.JE);
+                adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                resultList.add(adviceDTO);
+            }else if(Constants.CFLX.MJY.equals(k)){
+                adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                adviceDTO.setPrescribeTypeCode(Constants.CFLX.MJY);
+                adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                resultList.add(adviceDTO);
+            }
+        });
+        return resultList;
+    }
 }

@@ -43,4 +43,9 @@ public class VersionInfoDO extends PageDO implements Serializable {
      */
     private String versionUrl;
 
+    /**
+     *  公告消息状态(0：未读，1：已读)
+     */
+    private Integer msgStatus;
+
 }

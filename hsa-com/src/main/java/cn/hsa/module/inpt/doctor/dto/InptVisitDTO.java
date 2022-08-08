@@ -513,4 +513,6 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
 
     //病人类型集合
     private List<String> brlxList;
+
+    private String errorMessage;
 }

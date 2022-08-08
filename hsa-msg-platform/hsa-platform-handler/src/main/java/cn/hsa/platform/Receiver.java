@@ -47,6 +47,7 @@ public class Receiver {
     @KafkaListener(topics = "msg_product_topic", groupId = "msg_product_topic")
     public void consumerMessageInfo(ConsumerRecord<?, String> consumerRecord) {
         Optional<String> kafkaMessage = Optional.ofNullable(consumerRecord.value());
+        log.info("hsaKafkaListener receive msg,topic is {},groupId is {}, content is {}","msg_product_topic","msg_product_topic", kafkaMessage);
         if (kafkaMessage.isPresent()) {
             List<MessageInfoModel> lists = JSON.parseArray(kafkaMessage.get(), MessageInfoModel.class);
             List<TaskInfo> taskInfos =new ArrayList<>();
@@ -66,6 +67,7 @@ public class Receiver {
     @KafkaListener(topics = "msg_consumer_topic", groupId = "msg_consumer_topic")
     public void consumerUpdateMessageInfo(ConsumerRecord<?, String> consumerRecord) {
         Optional<String> kafkaMessage = Optional.ofNullable(consumerRecord.value());
+        log.info("hsaKafkaListener receive msg,topic is {},groupId is {}, content is {}","msg_consumer_topic","msg_consumer_topic", kafkaMessage);
         if (kafkaMessage.isPresent()) {
             List<MessageInfoModel> lists = JSON.parseArray(kafkaMessage.get(), MessageInfoModel.class);
             List<TaskInfo> taskInfos =new ArrayList<>();

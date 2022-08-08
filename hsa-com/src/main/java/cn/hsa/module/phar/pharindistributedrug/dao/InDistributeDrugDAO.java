@@ -355,4 +355,6 @@ public interface InDistributeDrugDAO {
      * @Date: 2021/10/18
      */
     List<String> getOldCostIds(InptCostDTO inptCostDTO);
+
+    List<InptAdviceDTO> queryDMDrugByOrderAndVisitId(PharInReceiveDTO pharInReceiveDTO);
 }

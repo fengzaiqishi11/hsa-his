@@ -10,6 +10,7 @@ import cn.hsa.module.center.config.dto.CenterGlobalConfigDTO;
 import cn.hsa.module.center.config.service.CenterGlobalConfigService;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
+import cn.hsa.module.center.parameter.dto.CenterParameterDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.system.service.SysSystemService;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpSession;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.*;
@@ -596,5 +598,32 @@ public class LoginController extends BaseController {
             ex.printStackTrace(System.err);
             return null;
         }
+    }
+
+    /**
+     * @Author gory
+     * @Description 获取迁移状态
+     * @Date 2022/8/3 10:47
+     * @Param []
+     **/
+    @PostMapping("/migration")
+    public WrapperResponse<CenterHospitalDTO> migration(@RequestParam(required = true) String hospCode,HttpServletRequest request) {
+        String code  = null;
+        try {
+            // 医院编码
+            code = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);
+        } catch (Exception e) {
+            throw new AppException("解析医院编码失败：" + e.getMessage());
+        }
+        
+        CenterHospitalDTO resultDTO = getData(centerHospitalService_consumer.getByHospCode(code));
+        if (null == resultDTO){
+            throw new AppException("未查找到对应数据源：" + code);
+        }else{
+            String migrationAddress = resultDTO.getMigrationAddress();
+            String newAddress = migrationAddress + "/his-web/?hospCode=" + hospCode;
+            resultDTO.setMigrationAddress(newAddress);
+        }
+        return WrapperResponse.success(resultDTO);
     }
 }

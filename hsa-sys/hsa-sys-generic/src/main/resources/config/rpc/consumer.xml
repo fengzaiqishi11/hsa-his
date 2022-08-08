@@ -38,4 +38,9 @@
     <dubbo:reference id="centerPasswordModifyLogService_consumer" interface="cn.hsa.module.center.log.service.CenterPasswordModifyLogService" check="false"/>
     <!-- 中心端授权 -->
     <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
+    <!-- sys系统消息消费者 -->
+    <dubbo:reference id="userMessageInfoService_consumer" interface="cn.hsa.module.sys.message.service.UserReadMessageService" check="false"/>
+    <!--中心端系统消费者-->
+    <dubbo:reference id="messageInfoService_consumer" interface="cn.hsa.module.center.message.service.MessageInfoService" check="false"/>
+
 </beans>

@@ -151,20 +151,20 @@ public class BackCostByInptBOImpl extends HsafBO implements BackCostByInputBO {
             throw new AppException("退费数量小于等于0不能退费");
         }
         String comkey = new StringBuilder(hospCode).append(deptId).append(Constants.INPT_DISPENSE_TF_REDIS_KEY).toString();
-        if (redisUtils.hasKey(comkey)) {
-          throw new AppException("药房有人正在发药,请稍后!");
-        }
         //生成redis结算Key，医院编码 + 证件号码 + 划价收费KEY
         String visitId = inptCostDTOs.get(0).getVisitId();
         String key = new StringBuilder(hospCode).append("ZYTF").append(StringUtils.isEmpty(visitId)).append(Constants.OUTPT_FEES_REDIS_KEY).toString();
-        if (StringUtils.isNotEmpty(redisUtils.get(key))) {
-            throw new AppException("当前患者正在退费,请稍后操作");
-        }
         try {
-            // 锁住退费，发药防止两个并发操作
-            redisUtils.set(comkey, deptId, 600);
-            // 使用redis锁病人，并设置自动过期时间600秒，防止异常情况没有结算成功且redis不会自动清除的问题
-            redisUtils.set(key, visitId, 600);
+            if(!redisUtils.setIfAbsent(comkey,comkey,600)) {
+                throw new AppException("药房有人正在发药,请稍后!");
+            }
+            if(!redisUtils.setIfAbsent(key,key,600)) {
+                throw new AppException("当前患者正在退费,请稍后操作");
+            }
+//            // 锁住退费，发药防止两个并发操作
+//            redisUtils.set(comkey, deptId, 600);
+//            // 使用redis锁病人，并设置自动过期时间600秒，防止异常情况没有结算成功且redis不会自动清除的问题
+//            redisUtils.set(key, visitId, 600);
             //退费费用ID
             List<String> ids = inptCostDTOs.stream().map(InptCostDTO::getId).collect(Collectors.toList());
 

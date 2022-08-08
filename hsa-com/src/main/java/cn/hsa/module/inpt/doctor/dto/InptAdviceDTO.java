@@ -176,4 +176,13 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
      * 国家卫健委编码名称
      */
     private String nationName;
+
+    private String prescribeTypeCode;
+    private String cfTypeCode;
+    /**
+     * 精麻分单时间
+     */
+    private String fdDrteTime;
+
+
 }

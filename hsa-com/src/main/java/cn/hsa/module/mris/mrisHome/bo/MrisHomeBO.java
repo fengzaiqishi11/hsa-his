@@ -268,4 +268,13 @@ public interface MrisHomeBO {
     Map<String, Object> insertMrisForDIP(Map<String, Object> map);
 
     Map<String,Object> insertMrisForDIPorDRG(Map<String, Object> map);
+
+    /**@Method queryExportNum
+     * @Author liuliyun
+     * @Description 获取病案导出的条数
+     * @Date 2022/08/03 09:28
+     * @Param [map]
+     * @return  map
+     **/
+    Map<String,Object> queryExportNum(Map<String, Object> map);
 }

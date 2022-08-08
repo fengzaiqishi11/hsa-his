@@ -431,5 +431,17 @@ public class InptAdviceDO extends PageDO implements Serializable {
 
   private String clinicalPathStageId;
   private String decoctionMethod;
+    /**
+     * 是否代办
+     */
+  private String isAgent;
+    /**
+     * 代办人
+     */
+  private String agentName;
+    /**
+     * 代办人身份证
+     */
+  private String agentCertNo;
 
 }

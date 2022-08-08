@@ -44,6 +44,11 @@ public interface MessageInfoDAO {
     */
    int updateMssageInfoStatusById(MessageInfoDTO messageInfoDTO);
 
-
-
+   /**
+    * @Author gory
+    * @Description 查询消息推送
+    * @Date 2022/8/4 15:31
+    * @Param [messageInfoDTO]
+    **/
+   List<MessageInfoDTO> queryMessageInfos(MessageInfoDTO messageInfoDTO);
 }

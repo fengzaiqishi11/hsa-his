@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.bo.CenterFunctionAuthorizationBO;
 import cn.hsa.module.center.authorization.dao.CenterFunctionAuthorizationDAO;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService;
 import cn.hsa.util.MapUtils;
@@ -96,5 +97,10 @@ public class CenterFunctionAuthorizationServiceImpl implements CenterFunctionAut
     @Override
     public WrapperResponse<CenterFunctionAuthorizationDto> saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         return WrapperResponse.success(centerFunctionAuthorizationBO.saveBizAuthorization(centerFunctionAuthorizationDto));
+    }
+
+    @Override
+    public WrapperResponse<List<CenterFunctionDto>> queryCenterFunction(CenterFunctionDto centerFunctionDto) {
+        return WrapperResponse.success(centerFunctionAuthorizationBO.queryCenterFunction(centerFunctionDto));
     }
 }

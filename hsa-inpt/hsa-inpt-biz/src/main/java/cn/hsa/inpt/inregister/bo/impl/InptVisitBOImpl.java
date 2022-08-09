@@ -1158,6 +1158,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             insureIndividualVisitDTO.setMdtrtCertNo(insureIndividualBasicDTO.getBka896());  // 就诊凭证号码
             insureIndividualVisitDTO.setHcardBasinfo(insureIndividualBasicDTO.getHcardBasinfo()); //广州读卡就诊基本填信息
             insureIndividualVisitDTO.setHcardChkinfo(insureIndividualBasicDTO.getHcardChkinfo()); //广州读卡就诊校验信息
+            insureIndividualVisitDTO.setRepeatIptFlag(inptVisitDTO.getRepeatIptFlag());//重复住院标志
             // 统一支付平台需要的值 end
 
             Map<String, Object> insertMap = new HashMap<>();

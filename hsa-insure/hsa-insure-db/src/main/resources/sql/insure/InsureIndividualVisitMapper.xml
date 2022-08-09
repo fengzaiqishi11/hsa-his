@@ -201,7 +201,8 @@
          psn_idet_type_name,
          is_one_settle,
          hcard_basinfo,
-         hcard_chkinfo)
+         hcard_chkinfo,
+         repeat_ipt_flag)
         values (#{id,jdbcType=VARCHAR},
                 #{hospCode,jdbcType=VARCHAR},
                 #{visitId,jdbcType=VARCHAR},
@@ -245,7 +246,8 @@
                 #{psnIdetTypeName,jdbcType=VARCHAR},
                 #{isOneSettle,jdbcType=VARCHAR},
                 #{hcardBasinfo,jdbcType=VARCHAR},
-                #{hcardChkinfo,jdbcType=VARCHAR}
+                #{hcardChkinfo,jdbcType=VARCHAR},
+                #{repeatIptFlag,jdbcType=VARCHAR}
                 )
     </insert>
 

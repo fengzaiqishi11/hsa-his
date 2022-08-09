@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.sys.message.dao.UserReadMessageDAO">
+
+    <resultMap id="userReadMessageMap" type="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="messageId" column="message_id" jdbcType="VARCHAR"/>
+        <result property="messageStatus" column="message_status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <insert id="insertUserReadMessage"  keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
+        INSERT INTO `user_read_messages`(`id`, `hosp_code`, `user_id`, `message_id`, `message_type`,message_status)
+        VALUES (null, #{hospCode}, #{userId}, #{messageId}, #{messageType},#{messageStatus}) on duplicate key
+        update message_status = #{messageStatus}
+    </insert>
+    <!--一键修改已读状态-->
+    <update id="updateMessageStatus">
+        INSERT INTO `user_read_messages`(`id`, `hosp_code`, `user_id`, `message_id`, `message_type`,message_status)
+        VALUES
+        <foreach collection="messageIds" item="item"   separator=",">
+            (null, #{hospCode}, #{userId}, #{item}, #{messageType},#{messageStatus})
+        </foreach>
+        on duplicate key
+        update message_status = #{messageStatus}
+    </update>
+
+    <select id="queryMessageByUser" resultMap="userReadMessageMap" parameterType="cn.hsa.module.sys.message.dto.UserReadMessageDTO">
+        SELECT id, hosp_code, user_id, message_id, message_type,message_status
+            from user_read_messages
+             where user_id = #{userId} and
+               message_id in
+             <foreach collection="messageIds" item="item" open="("  separator="," close=")">
+                 #{item}
+             </foreach>
+    </select>
+</mapper>

@@ -18,8 +18,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -116,8 +119,8 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             insureFunctionDO.setMsgId(msgId);
             insureFunctionDO.setMsgInfo(msgInfo);
             insureFunctionDO.setMsgName(msgName);
-            insureFunctionDO.setInParams(paramMapJson);
-            insureFunctionDO.setOutParams(resultStr);
+            insureFunctionDO.setInParams(subStringByBytes(paramMapJson,0,4096));
+            insureFunctionDO.setOutParams(subStringByBytes(resultStr,0,4096));
             insureFunctionDO.setCode(resultCode);
             insureFunctionDO.setCrteId(crteId);
             insureFunctionDO.setCrteTime(DateUtils.getNow());
@@ -173,5 +176,30 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
         String inputParams = JSONObject.toJSONString(map);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureInsureConfiguration.getUrl(),inputParams);
         return resultJson;
+    }
+
+    /** 截取字符串的指定字节长度
+     * @Param [str, bengin, end]
+     * @return java.lang.String
+     **/
+    public static String subStringByBytes(String str,int bengin,int end){
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
+        if (str.getBytes().length <= 4096) {
+            return str;
+        }
+        String newStr="";
+        try {
+            //按指定的编码获取字节数组
+            byte[] bytes = str.getBytes("UTF-8");
+            //按指定的长度截取新的字符数组
+            byte[] newBytes = Arrays.copyOfRange(bytes,bengin,end);
+            //将新的字符数组转化为字符串
+            newStr = new String(newBytes,"UTF-8");
+        }catch (UnsupportedEncodingException e){
+            log.info("医保日志记录出入参长度截取-字符转码异常");
+        }
+        return newStr.trim();
     }
 }

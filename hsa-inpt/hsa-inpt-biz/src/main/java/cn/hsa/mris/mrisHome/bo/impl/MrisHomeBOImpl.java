@@ -1015,7 +1015,17 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
 
     private Map<String, Object> requestDRGorDIPDataMap(Map<String, Object> map) {
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
+        // 获取医院医保编码
+        Map<String, Object> isInsureUnifiedMap = new HashMap<>();
+        isInsureUnifiedMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        isInsureUnifiedMap.put("code", "HOSP_INSURE_CODE");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(isInsureUnifiedMap).getData();
+        if (sysParameterDTO == null) {
+            throw new AppException("请先配置默认的医疗机构编码参数信息:编码为:HOSP_INSURE_CODE,值为对应的医疗机构编码值");
+        }
+        //org_id传医保编码H码
+        dataMap.put("org_id", JSONObject.toJSONString(sysParameterDTO.getValue()));// 机构码
+//        dataMap.put("org_id", JSONObject.toJSONString(MapUtils.get(map, "hospCode")));// 机构码
         Map<String, Object> baseInfoStr = getMaisPatientInfo(map);// 病案基本信息
         if (MapUtils.isEmpty(baseInfoStr)){
             throw new AppException("病案基本信息不能为空");
@@ -2955,6 +2965,23 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
             }
         }
         return dataMap;
+    }
+
+    /**
+     * @Menthod: queryExportNum
+     * @Desrciption: 查询病案导出数据的数量
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-03 09:35
+     * @Return:  Map
+     **/
+    @Override
+    public Map<String, Object> queryExportNum(Map<String, Object> map) {
+        Map<String,Object> info = mrisHomeDAO.queryExportNum(map);
+        List<InptVisitDTO> visitDTOS = mrisHomeDAO.queryUnExportData(map);
+        info.put("visitDTOS",visitDTOS);
+        return info;
     }
 
 }

@@ -20,7 +20,7 @@ public interface InptMrisInfoBO {
      * @param map
      * @return
      */
-    List<LinkedHashMap<String, Object>> importMrisInfo(Map map) throws Exception;
+    List<LinkedHashMap<String, Object>> updateImportMrisInfo(Map map) throws Exception;
 
     /**
      * @Method: importTcmMrisInfo

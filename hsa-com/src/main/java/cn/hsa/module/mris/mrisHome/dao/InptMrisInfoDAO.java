@@ -1,5 +1,6 @@
 package cn.hsa.module.mris.mrisHome.dao;
 
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.LinkedHashMap;
@@ -134,5 +135,16 @@ public interface InptMrisInfoDAO {
      * @Return:  List<Map<String, Object>>
      **/
     List<Map<String, Object>> getTcmMrisOperInfo(Map<String, Object> map);
+
+    /**
+     * @Menthod: updateInptVisitExportMris
+     * @Desrciption: 批量更新住院病人病案导出状态
+     * @Param: ids
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-02 16:33
+     * @Return:  int
+     **/
+    int updateInptVisitExportMris(List<InptVisitDTO> inptVisitDTOS);
 
 }

@@ -160,4 +160,6 @@ public interface InsureIndividualBasicDAO {
      * @Return
      */
     List<Map<String, Object>> queryOutptSettleInfo(Map<String, Object> map);
+
+    List<Map<String,Object>>  queryInptAndOutptMtPatientPage(Map<String, Object> map);
 }

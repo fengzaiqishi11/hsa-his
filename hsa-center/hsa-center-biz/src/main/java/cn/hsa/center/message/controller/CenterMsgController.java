@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -100,5 +101,17 @@ public class CenterMsgController extends CenterBaseController {
         Map map = new HashMap();
         map.put("messageInfoDTO",messageInfoDTO);
         return messageInfoService_consumer.deleteMessageInfoBatch(map);
+    }
+    /**
+     * @Author gory
+     * @Description 查询消息推送
+     * @Date 2022/8/4 15:24
+     * @Param [messageInfoDTO]
+     **/
+    @PostMapping("/queryMessageInfos")
+    public WrapperResponse<List<MessageInfoDTO>> queryMessageInfos(@RequestBody MessageInfoDTO messageInfoDTO){
+        Map map = new HashMap();
+        map.put("messageInfoDTO",messageInfoDTO);
+        return messageInfoService_consumer.queryMessageInfos(map);
     }
 }

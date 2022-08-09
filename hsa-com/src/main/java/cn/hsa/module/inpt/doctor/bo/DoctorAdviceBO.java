@@ -238,4 +238,14 @@ public interface DoctorAdviceBO {
      * @Return:
      **/
     List<InptAdviceDTO> queryLisOrPacsAdvice(InptAdviceDTO inptAdviceDTO);
+    /**
+     * @Menthod: getCFAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药、精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<InptAdviceDTO> getCFAdviceByVisitId(InptVisitDTO inptVisitDTO);
 }

@@ -2153,6 +2153,7 @@
             a.long_start_time,
             iv.address,
             iv.phone,
+            iv.cert_no,
             a.item_name,
             a.spec,
             a.prep_code,
@@ -2175,7 +2176,9 @@
             a.group_no,
             a.group_seq_no,
             bd.split_unit_code,
-            date_format(a.crte_time, '%Y-%m-%d') as fdDrteTime,
+            a.crte_time,
+            '3' as cfTypeCode,
+            '1' as prescribeTypeCode,
             a.decoction_method
         FROM inpt_advice a
         JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
@@ -2456,6 +2459,7 @@
 
     <select id="getDMAdviceByVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" >
         select
+            a.id,
             iv.name,
             iv.patient_code,
             iv.gender_code,
@@ -2464,6 +2468,7 @@
             iv.in_no,
             iv.in_dept_name,
             iv.bed_name,
+            iv.cert_no,
             iv.in_disease_name,
             a.long_start_time,
             iv.address,
@@ -2491,18 +2496,19 @@
             a.group_seq_no,
             bd.split_unit_code,
             a.decoction_method,
-            date_format(a.crte_time, '%Y-%m-%d') as fdDrteTime,
+            a.crte_time,
             '1' as cfTypeCode,
            a.is_agent as  isAgent,
            a.agent_name as agentName,
            a.agent_cert_no as agentCertNo,
+            a.total_price as printTotalPrice,
             case bd.ph_code when '6' then '5' else '4' end prescribeTypeCode
         FROM inpt_advice a
                  JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
                  LEFT JOIN base_drug bd on a.hosp_code = bd.hosp_code and a.item_id = bd.id
         WHERE a.hosp_code = #{hospCode}
           and a.visit_id = #{id}
-          and bd.ph_code in ('2','3','6')
+          and bd.ph_code in ('1','2','3','6')
           and a.is_submit = '1'
           and a.is_stop = '0'
           and (a.cancel_id is null or a.cancel_id = '')

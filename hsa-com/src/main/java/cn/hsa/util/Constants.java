@@ -18,8 +18,14 @@ public interface Constants {
      * 推送类型（MESSAGE）
      */
     class MESSAGETYPE {
-        public static final String ANNOUNCEMENT = "1"; // 系统公告
-        public static final String SYSTEMMESSAGE = "2"; // 系统消息
+        /**
+         *  系统公告
+         */
+        public static final String ANNOUNCEMENT = "1";
+        /**
+         *  系统消息
+         */
+        public static final String SYSTEMMESSAGE = "2";
     }
 
     /**

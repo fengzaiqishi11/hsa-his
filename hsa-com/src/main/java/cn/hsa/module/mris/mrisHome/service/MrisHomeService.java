@@ -325,4 +325,12 @@ public interface MrisHomeService {
      **/
     @GetMapping("/service/mris/mrisHome/queryExportNum")
     WrapperResponse<Map<String, Object>> queryExportNum(Map<String, Object> map);
+    /**@Method queryExportNum
+     * @Author yuelong.chen
+     * @Description 导出权限校验
+     * @Date 2022/08/09 09:28
+     * @Param [map]
+     * @return
+     **/
+    Boolean checkImportHQMSAuthority(Map param);
 }

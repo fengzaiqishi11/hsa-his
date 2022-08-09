@@ -338,4 +338,26 @@ public class InDistributeController  extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return inDistributeDrugService_consumer.queryDMDrugByOrderAndVisitId(map);
     }
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @GetMapping("/queryDMPatientByOrder")
+    public WrapperResponse<List<InptVisitDTO>> queryDMPatientByOrder(PharInReceiveDTO pharInReceiveDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        pharInReceiveDTO.setHospCode(sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            pharInReceiveDTO.setPharId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        }
+
+        Map map = new HashMap();
+        map.put("pharInReceiveDTO",pharInReceiveDTO);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return inDistributeDrugService_consumer.queryDMPatientByOrder(map);
+    }
 }

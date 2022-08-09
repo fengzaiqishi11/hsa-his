@@ -868,16 +868,52 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
             InptAdviceDTO adviceDTO = new InptAdviceDTO();
             if(Constants.CFLX.JE.equals(k)){
                 adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                BigDecimal reduce = adviceDTO.getInptAdviceDTOList().stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
                 adviceDTO.setPrescribeTypeCode(Constants.CFLX.JE);
                 adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
                 resultList.add(adviceDTO);
             }else if(Constants.CFLX.MJY.equals(k)){
                 adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                BigDecimal reduce = adviceDTO.getInptAdviceDTOList().stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
                 adviceDTO.setPrescribeTypeCode(Constants.CFLX.MJY);
                 adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
                 resultList.add(adviceDTO);
             }
         });
         return resultList;
+    }
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public List<InptVisitDTO> queryDMPatientByOrder(PharInReceiveDTO pharInReceiveDTO) {
+        List<String> strings = new ArrayList<>();
+        List<InptVisitDTO> inptVisitDTOS = new ArrayList<>();
+        // 查询标志为1则查询发药表
+        if("1".equals(pharInReceiveDTO.getQueryFlag())) {
+            // 获取该发药单下所有有精麻的病人id集合
+            strings = inDistributeDrugDAO.queryDMVisitByDistributeOrder(pharInReceiveDTO);
+        } else {
+            // 获取该配药单下所有有精麻的病人id集合
+            strings = inDistributeDrugDAO.queryDMVisitByReceiveOrder(pharInReceiveDTO);
+        }
+        if(ListUtils.isEmpty(strings)) {
+            return null;
+        }
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(pharInReceiveDTO.getHospCode());
+        inptVisitDTO.setIds(strings);
+        inptVisitDTOS = inDistributeDrugDAO.queryDMPatientInfoByVitsitId(inptVisitDTO);
+        return inptVisitDTOS;
     }
 }

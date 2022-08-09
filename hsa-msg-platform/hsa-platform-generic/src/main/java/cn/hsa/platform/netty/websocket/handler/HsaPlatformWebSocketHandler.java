@@ -5,8 +5,6 @@ import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.runner.WebSysSocketRunnable;
 import cn.hsa.platform.netty.websocket.runner.WebsocketRunnable;
-import cn.hsa.platform.process.MessageProcessStrategyFactory;
-import cn.hsa.platform.process.message.IChannelMessageProcessor;
 import cn.hsa.platform.service.MessageInfoService;
 import cn.hsa.platform.util.Constants;
 import cn.hsa.platform.utils.WebSocketUtils;
@@ -17,7 +15,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;

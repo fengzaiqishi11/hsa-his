@@ -1,6 +1,7 @@
 package cn.hsa.module.base;
 
 import cn.hsa.base.BaseController;
+import cn.hsa.base.NoRepeatSubmit;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.base.card.dto.BaseCardDTO;
@@ -191,6 +192,7 @@ public class BaseCardController extends BaseController {
      * @Date: 2021-08-06 10:10
      * @Return: Boolean
      **/
+    @NoRepeatSubmit
     @GetMapping("/saveInCharge")
     public WrapperResponse<Boolean> saveInCharge(BaseCardRechargeChangeDO baseCardRechargeChangeDO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req,res);
@@ -216,6 +218,7 @@ public class BaseCardController extends BaseController {
      * @Date: 2021-08-06 10:13
      * @Return: Boolean
      **/
+    @NoRepeatSubmit
     @GetMapping("/saveCardRefund")
     public WrapperResponse<Boolean> saveCardRefund(BaseCardRechargeChangeDO baseCardRechargeChangeDO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req,res);

@@ -11,13 +11,11 @@ import cn.hsa.module.base.card.entity.BaseCardChangeDO;
 import cn.hsa.module.base.card.entity.BaseCardRechargeChangeDO;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
-import cn.hsa.util.BigDecimalUtils;
-import cn.hsa.util.Constants;
-import cn.hsa.util.SnowflakeUtils;
-import cn.hsa.util.StringUtils;
+import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -43,6 +41,8 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
     @Resource
     private BaseCardDAO baseCardDAO;
 
+    @Resource
+    private RedisUtils redisUtils;
     /**
      * 值域码表服务
      */
@@ -165,6 +165,7 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
      **/
     @Override
     public Boolean saveInCharge(BaseCardRechargeChangeDO cardRechargeChangeDO) {
+        Boolean flag = false;
         Map param =new HashMap();
         param.put("hospCode",cardRechargeChangeDO.getHospCode());
         param.put("profileId",cardRechargeChangeDO.getProfileId());
@@ -179,29 +180,40 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
                 throw new AppException("充值金额最多输入两位小数");
             }
         }
-        BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
-        if (beforeChange!=null){
-            cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
-            BigDecimal end= BigDecimalUtils.add(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice());
-            cardRechargeChangeDO.setEndBalance(end);
-        }else {
-            cardRechargeChangeDO.setStartBalance(new BigDecimal(0));
-            cardRechargeChangeDO.setEndBalance(cardRechargeChangeDO.getPrice());
+        String key = cardRechargeChangeDO.getHospCode() +"_CARDID_"+ cardRechargeChangeDO.getCardId();
+        try {
+            if (!redisUtils.setIfAbsent(key, cardRechargeChangeDO, 600)) {
+                throw new AppException("正在充值，请勿重复操作!");
+            }
+            BaseCardRechargeChangeDO beforeChange = baseCardDAO.findCardRechargeInfoById(param);
+            if (beforeChange != null) {
+                cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+                BigDecimal end = BigDecimalUtils.add(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice());
+                cardRechargeChangeDO.setEndBalance(end);
+            } else {
+                cardRechargeChangeDO.setStartBalance(new BigDecimal(0));
+                cardRechargeChangeDO.setEndBalance(cardRechargeChangeDO.getPrice());
+            }
+            if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
+                cardRechargeChangeDO.setId(SnowflakeUtils.getId());
+            }
+            if (baseCardDAO.insertBaseCardRechargeChange(cardRechargeChangeDO) > 0) {
+                BaseCardDTO baseCardDTO = new BaseCardDTO();
+                baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
+                baseCardDTO.setId(cardRechargeChangeDO.getCardId());
+                baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
+                // 更新一卡通表账户余额
+                baseCardDAO.updateCardAccountBalance(baseCardDTO);
+                flag = true;
+            } else {
+                flag = false;
+            }
+        }catch (Exception e){
+            throw new AppException("充值失败,原因："+ e.getMessage());
+        }finally {
+            redisUtils.del(key);
         }
-        if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
-            cardRechargeChangeDO.setId(SnowflakeUtils.getId());
-        }
-        if (baseCardDAO.insertBaseCardRechargeChange(cardRechargeChangeDO) > 0) {
-            BaseCardDTO baseCardDTO =new BaseCardDTO();
-            baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
-            baseCardDTO.setId(cardRechargeChangeDO.getCardId());
-            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
-            // 更新一卡通表账户余额
-            baseCardDAO.updateCardAccountBalance(baseCardDTO);
-            return true;
-        } else {
-            return false;
-        }
+        return flag;
     }
 
     /**
@@ -216,36 +228,49 @@ public class BaseCardBOImpl extends HsafBO implements BaseCardBO {
     @Override
     public Boolean saveCardRefund(BaseCardRechargeChangeDO cardRechargeChangeDO) {
         Map param =new HashMap();
+        Boolean flag = false;
         param.put("hospCode",cardRechargeChangeDO.getHospCode());
         param.put("profileId",cardRechargeChangeDO.getProfileId());
         param.put("id",cardRechargeChangeDO.getCardId());
-        BaseCardRechargeChangeDO beforeChange =baseCardDAO.findCardRechargeInfoById(param);
-        if (beforeChange!=null){
-            cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
-            if (BigDecimalUtils.greater(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndBalance(),cardRechargeChangeDO.getPrice())) {
-                BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice());
-                cardRechargeChangeDO.setEndBalance(end);
-                cardRechargeChangeDO.setPrice(BigDecimalUtils.negate(cardRechargeChangeDO.getPrice()));
-            }else {
-                throw new AppException("退费金额不能大于一卡通余额！");
+        //这个分布式锁只能锁住一般情况的问题，如果产生极端情况，redis锁失效，这个方式是没有看门狗机制的，也有可能导致并发情况
+        String key = cardRechargeChangeDO.getHospCode() + "_CARDID_"+ cardRechargeChangeDO.getCardId();
+        try {
+            if (!redisUtils.setIfAbsent(key, cardRechargeChangeDO, 600)) {
+                throw new AppException("正在退款，请勿重复操作!");
             }
-        }else {
-            throw new AppException("一卡通余额为0，不能进行退费！");
+            BaseCardRechargeChangeDO beforeChange = baseCardDAO.findCardRechargeInfoById(param);
+            if (beforeChange != null) {
+                cardRechargeChangeDO.setStartBalance(beforeChange.getEndBalance());
+                if (BigDecimalUtils.greater(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice()) || BigDecimalUtils.equalTo(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice())) {
+                    BigDecimal end = BigDecimalUtils.subtract(beforeChange.getEndBalance(), cardRechargeChangeDO.getPrice());
+                    cardRechargeChangeDO.setEndBalance(end);
+                    cardRechargeChangeDO.setPrice(BigDecimalUtils.negate(cardRechargeChangeDO.getPrice()));
+                } else {
+                    throw new AppException("退费金额不能大于一卡通余额！");
+                }
+            } else {
+                throw new AppException("一卡通余额为0，不能进行退费！");
+            }
+            if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
+                cardRechargeChangeDO.setId(SnowflakeUtils.getId());
+            }
+            if (baseCardDAO.insertBaseCardRechargeChange(cardRechargeChangeDO) > 0) {
+                BaseCardDTO baseCardDTO = new BaseCardDTO();
+                baseCardDTO.setId(cardRechargeChangeDO.getCardId());
+                baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
+                baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
+                // 更新一卡通表账户余额
+                baseCardDAO.updateCardAccountBalance(baseCardDTO);
+                flag = true;
+            } else {
+                flag = false;
+            }
+        }catch (Exception e){
+            throw new AppException("退款失败失败，原因："+ e.getMessage());
+        }finally {
+            redisUtils.del(key);
         }
-        if (StringUtils.isEmpty(cardRechargeChangeDO.getId())) {
-            cardRechargeChangeDO.setId(SnowflakeUtils.getId());
-        }
-        if (baseCardDAO.insertBaseCardRechargeChange(cardRechargeChangeDO) > 0) {
-            BaseCardDTO baseCardDTO =new BaseCardDTO();
-            baseCardDTO.setId(cardRechargeChangeDO.getCardId());
-            baseCardDTO.setAccountBalance(cardRechargeChangeDO.getEndBalance());
-            baseCardDTO.setHospCode(cardRechargeChangeDO.getHospCode());
-            // 更新一卡通表账户余额
-            baseCardDAO.updateCardAccountBalance(baseCardDTO);
-            return true;
-        } else {
-            return false;
-        }
+        return flag;
     }
 
     @Override

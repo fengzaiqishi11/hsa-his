@@ -52,11 +52,5 @@ public interface VersionInfoDAO  {
      */
     List<VersionInfoDTO> queryHistoryVersionInfo(VersionInfoDTO versionInfoDTO);
 
-    /**
-     *  一键已读
-     * @param versionInfoDTO 版本参数
-     * @return
-     */
-    int oneClickRead(VersionInfoDTO versionInfoDTO);
 
 }

@@ -101,7 +101,7 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
           AtomicInteger count = new AtomicInteger(); // 未读消息总数量
           allVersionInfoDTOList.forEach(versionInfoDTO1 -> {
                String bloomKey = versionInfoDTO.getHospCode()+':'+versionInfoDTO.getUserId()+':'+versionInfoDTO1.getId();
-               if(redisBloomFilter.includeByBloomFilter(bloomFilterHelper,DEFAULT_BLOOMFILTER_NAME,bloomKey)){
+               if(redisBloomFilter.includeByHashContainer(bloomKey,1)){
                     versionInfoDTO1.setMsgStatus(Integer.valueOf(Constants.SF.S));
                }else{
                     count.incrementAndGet();
@@ -142,7 +142,7 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
                affectRows += userReadMessageDAO.insertUserReadMessage(userReadMessageDTO);
                String bloomKey = hospCode+':'+userId+':'+messageId;
                // 2.更新布隆过滤器
-               redisBloomFilter.addByBloomFilter(bloomFilterHelper,DEFAULT_BLOOMFILTER_NAME,bloomKey);
+               redisBloomFilter.addByHashContainer(bloomKey,1);
           }
 
           return affectRows > 0 ;

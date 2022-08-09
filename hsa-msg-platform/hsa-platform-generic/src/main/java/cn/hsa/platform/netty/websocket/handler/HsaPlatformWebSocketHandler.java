@@ -5,6 +5,8 @@ import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.runner.WebSysSocketRunnable;
 import cn.hsa.platform.netty.websocket.runner.WebsocketRunnable;
+import cn.hsa.platform.process.MessageProcessStrategyFactory;
+import cn.hsa.platform.process.message.IChannelMessageProcessor;
 import cn.hsa.platform.service.MessageInfoService;
 import cn.hsa.platform.util.Constants;
 import cn.hsa.platform.utils.WebSocketUtils;
@@ -44,7 +46,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     /**
      * 任务map，存储future，用于停止队列任务
      */
-    private static Map<String, Future> futureMap = new ConcurrentHashMap<>();
+    private static Map<String, Future<?>> futureMap = new ConcurrentHashMap<>();
     /**
      *  存储channel的id和用户主键的映射，客户端保证用户主键传入的是唯一值，
      *  解决问题四，如果是集群中需要换成redis的hash数据类型存储即可
@@ -79,7 +81,6 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         try {
             String msa = msg.text();
-            log.info("received msg from client,chanel id is: {} msg text is: {}",ctx.channel().id().asShortText(),msa);
             if(PING_MSG.equalsIgnoreCase(msa)) return;
             //接受客户端发送的消息
             ImContentModel messageRequest = JSON.parseObject(msg.text(), ImContentModel.class);
@@ -90,7 +91,6 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             clientMap.put(key, messageRequest.getUnionId());
             // 存储客户端请求参数
             paramMap.put(key,messageRequest);
-            log.info("accept msg from client......" + ctx.channel().remoteAddress() + "-params[" + messageRequest.getUnionId() + "]");
             if (!channelMap.containsKey(key)&&!sysChannelMap.containsKey(key)) {
                 Future future =null;
                 // 存储系统消息连接用户
@@ -144,7 +144,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
 //                        }
 //                    }
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("active processing business :{}"+JSON.toJSONString(messageInfoModels));
+                    log.info("active processing business :{}",JSON.toJSONString(messageInfoModels));
                     messageInfoService.updateMessageInfoList(messageInfoModels);
                 }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
 //                       MessageInfoModel messageInfoModel =new MessageInfoModel();
@@ -238,7 +238,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
         return channelMap;
     }
 
-    public static Map<String, Future> getFutureMap() {
+    public static Map<String, Future<?>> getFutureMap() {
         return futureMap;
     }
 

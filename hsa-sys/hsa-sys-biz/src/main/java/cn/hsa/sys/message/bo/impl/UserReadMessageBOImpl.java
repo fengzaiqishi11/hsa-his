@@ -73,7 +73,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
             readMessageDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
             readMessageDTO.setMessageTime(messageInfo.getCrteTime());
             String bloomKey = userReadMessageDTO.getHospCode()+':'+userReadMessageDTO.getUserId()+':'+ messageInfo.getId();
-            if(redisBloomFilter.includeByBloomFilter(bloomFilterHelper,"sys_msg_bloom",bloomKey)){
+            if(redisBloomFilter.includeByHashContainer(bloomKey,1)){
                 readMessageDTO.setMessageStatus(Constants.SF.S);
             } else {
                 count++;
@@ -103,7 +103,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         for(String messageId : messageIdList){
             // 2.更新布隆过滤器
             String bloomKey = messageInfoDTO.getHospCode()+':'+messageInfoDTO.getUserId()+':'+messageId;
-            redisBloomFilter.addByBloomFilter(bloomFilterHelper,"sys_msg_bloom",bloomKey);
+            redisBloomFilter.addByHashContainer(bloomKey,1);
         }
         return userReadMessageDAO.updateMessageStatus(messageInfoDTO) > 0;
     }

@@ -27,7 +27,6 @@ public interface Constants {
          */
         public static final String SYSTEMMESSAGE = "2";
     }
-
     /**
      * 抽取类型（CQLX）
      */
@@ -1044,6 +1043,10 @@ public interface Constants {
         public static final String CODEDETAIL ="CODEDETAIL";
         /** 中心端配置信息map的key名称 **/
         public static final String CENTER_GLOBAL_CONFIG_KEY = "CENTER_GLOBAL_CONFIG";
+        /**
+         *  用户已读信息hash map的key
+         */
+        public static final String USER_READ_MSG_KEY = "sys_msg";
     }
 
     /**

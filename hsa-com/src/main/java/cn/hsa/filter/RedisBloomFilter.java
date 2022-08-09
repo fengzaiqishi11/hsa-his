@@ -1,9 +1,14 @@
 package cn.hsa.filter;
 
+import cn.hsa.util.Constants;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 
 /**
@@ -18,6 +23,7 @@ public class RedisBloomFilter {
     @Autowired
     private RedisTemplate<String,Object> redisTemplate;
 
+    private final Map<String,Boolean> USER_READ_MSG_CONTAINER = new ConcurrentHashMap<String, Boolean>(100);
     /**
      *  根据给定的布隆过滤器添加值
      * @param bloomFilterHelper 布隆过滤器计算值
@@ -47,5 +53,33 @@ public class RedisBloomFilter {
             }
         }
         return true;
+    }
+
+    /**
+     *  将值存入已读容器列表中
+     * @param hashKey
+     * @param value
+     */
+    public void addByHashContainer(String hashKey,Integer value) {
+       USER_READ_MSG_CONTAINER.put(hashKey,1 == value ? Boolean.TRUE : Boolean.FALSE);
+       redisTemplate.boundHashOps(Constants.REDISKEY.USER_READ_MSG_KEY).put(hashKey,1 == value);
+    }
+
+    /**
+     *  判断消息是否已读
+     * @param hashKey 消息key
+     * @param value 值
+     * @return
+     */
+    public boolean includeByHashContainer(String hashKey,Integer value){
+        boolean exists = USER_READ_MSG_CONTAINER.containsKey(hashKey);
+        if(!exists){
+            exists = redisTemplate.boundHashOps(Constants.REDISKEY.USER_READ_MSG_KEY).hasKey(hashKey);
+            // 在redis中存在说明该值已经存储过了，系统重启后需要重新加载进入内存
+            if(exists) {
+                USER_READ_MSG_CONTAINER.put(hashKey, 1 == value ? Boolean.TRUE : Boolean.FALSE);
+            }
+        }
+        return exists;
     }
 }

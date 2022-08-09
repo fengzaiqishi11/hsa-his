@@ -444,5 +444,17 @@ public class MrisHomeServiceImpl extends HsafService implements MrisHomeService 
     public WrapperResponse<Map<String, Object>> queryExportNum(Map<String, Object> map) {
         return WrapperResponse.success(mrisHomeBO.queryExportNum(map));
     }
+    /**@Method queryExportNum
+     * @Author yuelong.chen
+     * @Description 导出权限校验
+     * @Date 2022/08/09 09:28
+     * @Param [map]
+     * @return
+     **/
+    @OpenAdditionalService(desc = "病案首页HQMS上报",addEnable = true,orderTypeCode = Constants.ZZFW.HQMS)
+    @Override
+    public Boolean checkImportHQMSAuthority(Map param) {
+        return true;
+    }
 
 }

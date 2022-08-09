@@ -1761,23 +1761,23 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         List<InptAdviceDTO> DMAdviceByVisitId = inptAdviceDAO.getDMAdviceByVisitId(inptVisitDTO);
         List<InptAdviceDTO> resultList = new ArrayList<>();
         if (!ListUtils.isEmpty(DMAdviceByVisitId)) {
-            //精麻处方设定、根据时间段与处方类型分组
-            Map<String, Map<String, List<InptAdviceDTO>>> listMap = DMAdviceByVisitId.stream().collect(Collectors.groupingBy(InptAdviceDTO::getFdDrteTime,
+            //精麻处方设定、根据id与处方类型分组
+            Map<String, Map<String, List<InptAdviceDTO>>> listMap = DMAdviceByVisitId.stream().collect(Collectors.groupingBy(InptAdviceDTO::getId,
                     Collectors.groupingBy(InptAdviceDTO::getPrescribeTypeCode)));
             listMap.forEach((key, value) -> {
                 value.forEach((k, v) -> {
                     InptAdviceDTO adviceDTO = new InptAdviceDTO();
                     if (Constants.CFLX.JE.equals(k)) {
-                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k));
-                        adviceDTO.setPrescribeTypeCode(Constants.CFLX.JE);
-                        adviceDTO.setCfTypeCode(Constants.CFLB.XY);
-                        adviceDTO.setFdDrteTime(key);
+                        if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                            BeanUtils.copyProperties(v.get(0),adviceDTO);
+                        }
+                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k,new ArrayList<InptAdviceDTO>()));
                         resultList.add(adviceDTO);
                     } else if (Constants.CFLX.MJY.equals(k)) {
-                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k));
-                        adviceDTO.setPrescribeTypeCode(Constants.CFLX.MJY);
-                        adviceDTO.setCfTypeCode(Constants.CFLB.XY);
-                        adviceDTO.setFdDrteTime(key);
+                        if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                            BeanUtils.copyProperties(v.get(0),adviceDTO);
+                        }
+                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k,new ArrayList<InptAdviceDTO>()));
                         resultList.add(adviceDTO);
                     }
                 });
@@ -1786,13 +1786,29 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         //获取中药处方数据
         List<InptAdviceDTO> zyAdviceByVisitId = inptAdviceDAO.getZyAdviceByVisitId(inptVisitDTO);
         if (!ListUtils.isEmpty(zyAdviceByVisitId)) {
-            BigDecimal reduce = zyAdviceByVisitId.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
-            zyAdviceByVisitId.forEach(item -> item.setPrintTotalPrice(reduce));
-            InptAdviceDTO adviceZYDTO = new InptAdviceDTO();
-            adviceZYDTO.setInptAdviceDTOList(zyAdviceByVisitId);
-            adviceZYDTO.setPrescribeTypeCode(Constants.CFLX.PT);
-            adviceZYDTO.setCfTypeCode(Constants.CFLB.ZCY);
-            resultList.add(adviceZYDTO);
+            Map<Integer, List<InptAdviceDTO>> zyListMap = zyAdviceByVisitId.stream().collect(Collectors.groupingBy(InptAdviceDTO::getGroupNo));
+            zyListMap.forEach((k,v)->{
+                InptAdviceDTO adviceDTO = new InptAdviceDTO();
+                if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                    BeanUtils.copyProperties(v.get(0),adviceDTO);
+                }
+                BigDecimal reduce = v.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
+                adviceDTO.setInptAdviceDTOList(v);
+                resultList.add(adviceDTO);
+
+            });
+//            BigDecimal reduce = zyAdviceByVisitId.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+//            zyAdviceByVisitId.forEach(item -> {
+//                item.setPrintTotalPrice(reduce);
+//                item.setTotalPrice(reduce);
+//            });
+//            InptAdviceDTO adviceZYDTO = new InptAdviceDTO();
+//            adviceZYDTO.setInptAdviceDTOList(zyAdviceByVisitId);
+//            adviceZYDTO.setPrescribeTypeCode(Constants.CFLX.PT);
+//            adviceZYDTO.setCfTypeCode(Constants.CFLB.ZCY);
+//            resultList.add(adviceZYDTO);
         }
         return resultList;
     }

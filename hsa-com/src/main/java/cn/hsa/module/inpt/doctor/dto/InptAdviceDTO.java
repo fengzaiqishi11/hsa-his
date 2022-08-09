@@ -168,6 +168,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String address;
     // 联系电话
     private String phone;
+    private String certNo;
     /**
      * 国家卫健委编码
      */

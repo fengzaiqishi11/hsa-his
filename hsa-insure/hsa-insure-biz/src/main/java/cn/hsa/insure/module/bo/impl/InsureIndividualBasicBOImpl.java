@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,7 +179,16 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
     @Override
     public PageDTO queryInptAndOutptPatientPage(@RequestParam  Map<String, Object> map) {
         PageHelper.startPage(Integer.parseInt(MapUtils.get(map,"pageNo")),Integer.parseInt(MapUtils.get(map,"pageSize")));
-        List<InsureIndividualVisitDTO> list =  insureIndividualBasicDAO.queryInptAndOutptPatientPage(map);
+        String medType = MapUtils.get(map,"medType");
+        List<InsureIndividualVisitDTO> list = new ArrayList<>();
+        //人员慢特病备案查询--门诊住院信息查询
+        if(Constant.UnifiedPay.YWLX.MZMXB.equals(medType)){
+            List<Map<String,Object>> listMap = insureIndividualBasicDAO.queryInptAndOutptMtPatientPage(map);
+            return  PageDTO.of(listMap);
+        }else{
+            list =  insureIndividualBasicDAO.queryInptAndOutptPatientPage(map);
+        }
+
         return PageDTO.of(list);
     }
 

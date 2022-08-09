@@ -80,7 +80,7 @@
         from center_msg
         where type ='1'
         <if test="isPublish != null and isPublish != ''">
-            and is_publish =#{is_publish}
+            and is_publish =#{isPublish}
         </if>
         <if test="level != null and level != ''">
             and level =#{level}

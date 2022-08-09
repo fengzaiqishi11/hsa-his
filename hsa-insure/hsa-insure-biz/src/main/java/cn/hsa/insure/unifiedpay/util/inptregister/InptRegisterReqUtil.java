@@ -210,7 +210,7 @@ public class InptRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqU
         mdtrtinfoMap.put("clnc_flag", null);//	临床试验标志
         mdtrtinfoMap.put("er_flag", "0");//	急诊标志
         mdtrtinfoMap.put("advpay", "0");//	预付款
-        mdtrtinfoMap.put("repeat_ipt_flag", "0");//	重复住院标志
+        mdtrtinfoMap.put("repeat_ipt_flag", inptVisitDTO.getRepeatIptFlag());//	重复住院标志
         mdtrtinfoMap.put("ttp_resp", "0");//	是否第三方责任标志
         mdtrtinfoMap.put("merg_setl_flag", "0");//	合并结算标志
         mdtrtinfoMap.put("card_sn", insureInptRegisterDTO.getCardIden());//	卡识别码（跨省异地必传）

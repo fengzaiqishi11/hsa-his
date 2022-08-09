@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 
 /**
  *  基于guava 布隆过滤器算法实现的 redis布隆过滤器
@@ -43,7 +42,7 @@ public class RedisBloomFilter {
         int[] offset = bloomFilterHelper.murmurHashOffset(value);
         for (int i : offset) {
             System.out.println("key : " + key + " " + "value : " + i);
-            if (!redisTemplate.opsForValue().getBit(key, i)) {
+            if (Boolean.FALSE.equals(redisTemplate.opsForValue().getBit(key, i))) {
                 return false;
             }
         }

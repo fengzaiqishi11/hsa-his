@@ -1548,12 +1548,16 @@
                (select name from sys_user su where mbi.zz_doctor_id = su.id)          zzDoctor_name,
                (select prac_certi_no from sys_user su where mbi.zr_nurse_id = su.id)  zr_nurse_code,
                (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
+               idm.insure_illness_code diseaseCode,
+               idm.insure_illness_name diseaseName,
                (select bd.caty_code
                     from base_dept bd
                     where bd.hosp_code =
                     mbi.hosp_code
                     and bd.id = mbi.turn_dept_ids) as nation_code
         from mris_base_info mbi
+        left join insure_disease_match idm on mbi.hosp_code = idm.hosp_code and  idm.hosp_illness_code = mbi.disease_icd10
+        and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
         where mbi.hosp_code = #{hospCode}
           and mbi.visit_id = #{visitId}
     </select>

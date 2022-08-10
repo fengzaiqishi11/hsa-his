@@ -552,4 +552,84 @@
   <delete id="deleteCanclePharInReceivelDTO">
     delete from phar_in_receive where hosp_code = #{hospCode} and id = #{id}
   </delete>
+
+    <select id="queryDMDrugByOrderAndVisitId" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+            a.item_name,
+            a.spec,
+            a.prep_code,
+            a.dosage,
+            a.dosage_unit_code,
+            a.usage_code,
+            a.use_days,
+            a.num,
+            a.rate_id,
+            a.unit_code,
+            a.total_price ,
+            a.total_num_unit_code,
+            a.herb_num,
+            a.herb_note_code,
+            a.price,
+            ifnull(sum(a.total_num), 0) totalNum,
+            a.use_code,
+            a.is_give,
+            a.remark,
+            a.crte_name,
+            a.crte_time,
+            a.group_no,
+            a.group_seq_no,
+            '1' as cfTypeCode,
+            case
+                bd.ph_code when '6' then '5'
+                           else '4'
+                end prescribeTypeCode,
+            pc.total_price as printTotalPrice
+        from
+            inpt_advice a
+                join phar_in_receive_detail pc on
+                    pc.advice_id = a.id
+                    and pc.hosp_code = a.hosp_code
+                    and pc.receive_id =#{id} and pc.visit_id = #{visitId}
+                left join base_drug bd on
+                    a.item_id = bd.id
+                    and a.hosp_code = bd.hosp_code
+        where
+                a.hosp_code =
+                #{hospCode}
+          and bd.ph_code in ('1','2', '3', '6')
+        group by a.id,a.item_code,a.unit_code,a.dosage_unit_code
+    </select>
+
+    <select id="queryDMVisitByDistributeOrder" resultType="java.lang.String">
+        select distinct a.visit_id
+        from phar_in_distribute_detail a
+                 join base_drug b on b.id = a.item_id  and a.hosp_code = b.hosp_code
+                 left join phar_in_distribute c on c.id = a.distribute_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
+        where a.hosp_code = #{hospCode} and a.distribute_id = #{id} and b.ph_code in ('1','2','3','6')
+          and item_code = '1'
+    </select>
+
+    <select id="queryDMVisitByReceiveOrder" resultType="java.lang.String">
+        select distinct a.visit_id
+        from phar_in_receive_detail a
+                 join base_drug b on b.id = a.item_id  and a.hosp_code = b.hosp_code
+                 left join phar_in_receive c on c.id = a.receive_id and a.hosp_code = c.hosp_code and c.phar_id = #{pharId}
+        where a.hosp_code = #{hospCode} and a.receive_id = #{id} and b.ph_code in ('1','2','3','6')
+          and item_code = '1'
+    </select>
+
+    <select id="queryDMPatientInfoByVitsitId" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select a.*,
+        (CONCAT(a.name,'/',
+        (ifnull((case a.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '' )),'/',
+        a.age,
+        (ifnull((case a.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end), '岁' )))) as patientInfo
+        from inpt_visit a where a.hosp_code = #{hospCode}
+        <if test="ids!=null and ids.size()>0">
+            and (a.id) in
+            <foreach collection="ids" item="item" separator=","  open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

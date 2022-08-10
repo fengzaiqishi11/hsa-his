@@ -159,5 +159,24 @@ public interface InDistributeDrugService {
     **/
     @PostMapping("/service/stro/inDistributeDrug/updatePremedication")
     WrapperResponse<Boolean> updatePremedication(Map map);
-
+    /**
+     * @Menthod: queryDMDrugByOrderAndVisitId
+     * @Desrciption: 根据就诊id查询精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    WrapperResponse<List<InptAdviceDTO>> queryDMDrugByOrderAndVisitId(Map map);
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    WrapperResponse<List<InptVisitDTO>> queryDMPatientByOrder(Map map);
 }

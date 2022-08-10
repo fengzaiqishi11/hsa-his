@@ -355,4 +355,36 @@ public interface InDistributeDrugDAO {
      * @Date: 2021/10/18
      */
     List<String> getOldCostIds(InptCostDTO inptCostDTO);
+
+    List<InptAdviceDTO> queryDMDrugByOrderAndVisitId(PharInReceiveDTO pharInReceiveDTO);
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<String> queryDMVisitByDistributeOrder(PharInReceiveDTO pharInReceiveDTO);
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<String> queryDMVisitByReceiveOrder(PharInReceiveDTO pharInReceiveDTO);
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<InptVisitDTO> queryDMPatientInfoByVitsitId(InptVisitDTO inptVisitDTO);
 }

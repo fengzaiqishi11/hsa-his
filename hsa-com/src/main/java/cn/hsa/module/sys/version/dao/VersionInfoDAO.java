@@ -44,4 +44,13 @@ public interface VersionInfoDAO  {
      * @Return cn.hsa.base.PageDTO
      **/
     VersionInfoDTO queryVersionInfo();
+
+    /**
+     *  查询历史升级公告消息
+     * @param versionInfoDTO 参数只需要传递分页号
+     * @return
+     */
+    List<VersionInfoDTO> queryHistoryVersionInfo(VersionInfoDTO versionInfoDTO);
+
+
 }

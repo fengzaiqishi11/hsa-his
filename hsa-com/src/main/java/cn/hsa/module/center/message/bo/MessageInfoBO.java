@@ -3,6 +3,8 @@ package cn.hsa.module.center.message.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
 
+import java.util.List;
+
 /**
  * @Package_name: cn.hsa.module.message.bo
  * @Class_name: SysMessageServiceBO
@@ -69,5 +71,11 @@ public interface MessageInfoBO {
    * @return Boolean
    */
   Boolean updateMssageInfoStatusById(MessageInfoDTO messageInfoDTO);
-
+  /**
+   * @Author gory
+   * @Description 查询消息推送的内容
+   * @Date 2022/8/4 15:30
+   * @Param [messageInfoDTO]
+   **/
+  List<MessageInfoDTO> queryMessageInfos(MessageInfoDTO messageInfoDTO);
 }

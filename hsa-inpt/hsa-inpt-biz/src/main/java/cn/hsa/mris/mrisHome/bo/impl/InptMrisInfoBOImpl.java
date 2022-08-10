@@ -1,6 +1,7 @@
 package cn.hsa.mris.mrisHome.bo.impl;
 
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.mris.mrisHome.bo.InptMrisInfoBO;
 import cn.hsa.module.mris.mrisHome.dao.InptMrisInfoDAO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -35,7 +36,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
     SysParameterService sysParameterService_consumer;
 
     @Override
-    public List<LinkedHashMap<String, Object>> importMrisInfo(Map map) throws Exception {
+    public List<LinkedHashMap<String, Object>> updateImportMrisInfo(Map map) throws Exception {
 //        map.put("type","N042");
 //        List<Map<String, Object>> uploadTypeList = inptMrisInfoDAO.queryUploadType(map);
         List<LinkedHashMap<String, Object>> data =inptMrisInfoDAO.getMrisBaseInfo(map);
@@ -63,6 +64,7 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
 //                sql_str = sql_str.replaceAll("\\{" + key + "}", map.get(key) == null ? "" : map.get(key) instanceof Integer?(Integer) map.get(key)+"":(String) map.get(key));
 //            }
 //            data = inptMrisInfoDAO.queryData(sql_str);
+        List<InptVisitDTO> visitInfo =new ArrayList<>();
         if (data!=null&&data.size()>0) {
             for (LinkedHashMap<String, Object> ma : data) {
                 Map diagnoseParam = new HashMap();
@@ -146,7 +148,14 @@ public class InptMrisInfoBOImpl extends HsafBO implements InptMrisInfoBO {
                     }
                 }
                 ma.putAll(operInfoMap);
+                InptVisitDTO inptVisitDTO= new InptVisitDTO();
+                inptVisitDTO.setId(ma.get("visit_id")==null?"":(String)ma.get("visit_id"));
+                inptVisitDTO.setHospCode((String) map.get("hospCode"));
+                visitInfo.add(inptVisitDTO);
                 ma.remove("visit_id");
+            }
+            if (visitInfo!=null&&visitInfo.size()>0){
+                inptMrisInfoDAO.updateInptVisitExportMris(visitInfo);
             }
         }
         return data;

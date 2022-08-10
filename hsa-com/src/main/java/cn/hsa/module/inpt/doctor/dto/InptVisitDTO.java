@@ -511,4 +511,10 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private List<String> codeList;
     private String sqlStr1;
 
+    //病人类型集合
+    private List<String> brlxList;
+
+    private String errorMessage;
+    //重复住院标志   1：是重复住院   0：不是重复住院
+    private String repeatIptFlag;
 }

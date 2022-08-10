@@ -15,6 +15,19 @@ import java.util.List;
 public interface Constants {
 
     /**
+     * 推送类型（MESSAGE）
+     */
+    class MESSAGETYPE {
+        /**
+         *  系统公告
+         */
+        public static final String ANNOUNCEMENT = "1";
+        /**
+         *  系统消息
+         */
+        public static final String SYSTEMMESSAGE = "2";
+    }
+    /**
      * 抽取类型（CQLX）
      */
     class CQLX {
@@ -1030,6 +1043,10 @@ public interface Constants {
         public static final String CODEDETAIL ="CODEDETAIL";
         /** 中心端配置信息map的key名称 **/
         public static final String CENTER_GLOBAL_CONFIG_KEY = "CENTER_GLOBAL_CONFIG";
+        /**
+         *  用户已读信息hash map的key
+         */
+        public static final String USER_READ_MSG_KEY = "sys_msg";
     }
 
     /**
@@ -1350,5 +1367,18 @@ public interface Constants {
         public static final String JGGSZR = "3";//结构格式逐日打印
         public static final String JGGSHZ = "4";//结构格式汇总打印
         public static final String XMHZMX = "7";//项目汇总-明细打印
+    }
+
+    /**
+     * @Desrciption 增值服务
+     * @Author yuelong.chen
+     * @Date 2022/07/27 10:02
+     */
+    class ZZFW {
+        public static final String DEFAULT = ""; // 默认值
+        public static final String DIP = "1"; // 默认值
+        public static final String DRG = "2"; // 默认值
+        public static final String DRGDIP = "3"; // 默认值
+        public static final String HQMS = "4"; // HQMS
     }
 }

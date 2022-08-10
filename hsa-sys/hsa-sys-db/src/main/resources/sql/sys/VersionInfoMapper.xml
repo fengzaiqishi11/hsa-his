@@ -14,7 +14,7 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, version_code, create_time, version_update, version_service, version_url
+        id, version_code, create_time, version_update, version_service, version_url,msg_status
     </sql>
 
     <select id="queryPage" parameterType="cn.hsa.module.sys.version.dto.VersionInfoDTO" resultType="cn.hsa.module.sys.version.dto.VersionInfoDTO">
@@ -43,5 +43,10 @@
         order by create_time desc limit 1
     </select>
 
+    <select id="queryHistoryVersionInfo" parameterType="cn.hsa.module.sys.version.dto.VersionInfoDTO" resultType="cn.hsa.module.sys.version.dto.VersionInfoDTO">
+        SELECT <include refid="Base_Column_List"/>
+        FROM version_info
+        order by create_time desc
+    </select>
 
 </mapper>

@@ -792,8 +792,8 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         throw new AppException("取消预配药数据不能为空");
       }
       PharInReceiveDO inReceiveById = inDistributeDrugDAO.getInReceiveById(pharInReceiveDTO);
-      if("2".equals(inReceiveById.getStatusCode())) {
-        throw new AppException("已配药不能取消预配药，请先取消配药");
+      if(!Constants.FYZT.QL.equals(inReceiveById.getStatusCode())) {
+        throw new AppException("不是请领状态的单据，无法取消预配药");
       }
       List<PharInReceiveDetailDTO> canclePharInReceiveDetailDTO = new ArrayList<>();
       PharInReceiveDetailDTO pharInReceiveDetailDTO = new PharInReceiveDetailDTO();
@@ -849,5 +849,71 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
         inDistributeDrugDAO.deleteCanclePharInReceivelDTO(pharInReceiveDTO);
       }
       return true;
+    }
+    /**
+     * @Menthod: queryDMDrugByOrderAndVisitId
+     * @Desrciption: 根据就诊id查询精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public List<InptAdviceDTO> queryDMDrugByOrderAndVisitId(PharInReceiveDTO pharInReceiveDTO) {
+        List<InptAdviceDTO> inptAdviceDTOS = inDistributeDrugDAO.queryDMDrugByOrderAndVisitId(pharInReceiveDTO);
+        List<InptAdviceDTO> resultList = new ArrayList<>();
+        Map<String, List<InptAdviceDTO>> listMap = inptAdviceDTOS.stream().collect(Collectors.groupingBy(InptAdviceDTO::getPrescribeTypeCode));
+        listMap.forEach((k,v)->{
+            InptAdviceDTO adviceDTO = new InptAdviceDTO();
+            if(Constants.CFLX.JE.equals(k)){
+                adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                BigDecimal reduce = adviceDTO.getInptAdviceDTOList().stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                adviceDTO.setPrescribeTypeCode(Constants.CFLX.JE);
+                adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
+                resultList.add(adviceDTO);
+            }else if(Constants.CFLX.MJY.equals(k)){
+                adviceDTO.setInptAdviceDTOList(MapUtils.get(listMap,k));
+                BigDecimal reduce = adviceDTO.getInptAdviceDTOList().stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                adviceDTO.setPrescribeTypeCode(Constants.CFLX.MJY);
+                adviceDTO.setCfTypeCode(Constants.CFLB.XY);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
+                resultList.add(adviceDTO);
+            }
+        });
+        return resultList;
+    }
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public List<InptVisitDTO> queryDMPatientByOrder(PharInReceiveDTO pharInReceiveDTO) {
+        List<String> strings = new ArrayList<>();
+        List<InptVisitDTO> inptVisitDTOS = new ArrayList<>();
+        // 查询标志为1则查询发药表
+        if("1".equals(pharInReceiveDTO.getQueryFlag())) {
+            // 获取该发药单下所有有精麻的病人id集合
+            strings = inDistributeDrugDAO.queryDMVisitByDistributeOrder(pharInReceiveDTO);
+        } else {
+            // 获取该配药单下所有有精麻的病人id集合
+            strings = inDistributeDrugDAO.queryDMVisitByReceiveOrder(pharInReceiveDTO);
+        }
+        if(ListUtils.isEmpty(strings)) {
+            return null;
+        }
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(pharInReceiveDTO.getHospCode());
+        inptVisitDTO.setIds(strings);
+        inptVisitDTOS = inDistributeDrugDAO.queryDMPatientInfoByVitsitId(inptVisitDTO);
+        return inptVisitDTOS;
     }
 }

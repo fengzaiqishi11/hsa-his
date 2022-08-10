@@ -18,8 +18,11 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.ResourceTransactionManager;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -91,13 +94,24 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             String paramMapJson = MapUtils.get(map,"paramMapJson");
             String medisCode = MapUtils.get(map,"medisCode");
             String resultStr = MapUtils.get(map,"resultStr");
-            Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
-            String resultCode = MapUtils.get(m,"infcode","0");
+            InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
+            //先判断返回串是否包含infcode
+            String resultCode = "0";
+            if (resultStr.contains("infcode")) {
+                Map<String,Object> m = JSONObject.parseObject(resultStr,Map.class);
+                resultCode = MapUtils.get(m,"infcode","0");
+                if(!"0".equals(resultCode)){
+                  insureFunctionDO.setErrorMsg("调用失败");
+                }else{
+                  insureFunctionDO.setErrorMsg("调用成功");
+                }
+              }else{
+                insureFunctionDO.setErrorMsg("调用成功");
+              }
             // 开启独立新事务
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
             def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
             status = transactionManager.getTransaction(def);
-            InsureFunctionLogDO insureFunctionDO = new InsureFunctionLogDO();
             insureFunctionDO.setId(SnowflakeUtils.getId());
             insureFunctionDO.setHospCode(hospCode);
             insureFunctionDO.setVisitId(visitId);
@@ -105,8 +119,8 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
             insureFunctionDO.setMsgId(msgId);
             insureFunctionDO.setMsgInfo(msgInfo);
             insureFunctionDO.setMsgName(msgName);
-            insureFunctionDO.setInParams(paramMapJson);
-            insureFunctionDO.setOutParams(resultStr);
+            insureFunctionDO.setInParams(subStringByBytes(paramMapJson,0,4096));
+            insureFunctionDO.setOutParams(subStringByBytes(resultStr,0,4096));
             insureFunctionDO.setCode(resultCode);
             insureFunctionDO.setCrteId(crteId);
             insureFunctionDO.setCrteTime(DateUtils.getNow());
@@ -167,5 +181,30 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
         String inputParams = JSONObject.toJSONString(map);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureInsureConfiguration.getUrl(),inputParams);
         return resultJson;
+    }
+
+    /** 截取字符串的指定字节长度
+     * @Param [str, bengin, end]
+     * @return java.lang.String
+     **/
+    public static String subStringByBytes(String str,int bengin,int end){
+        if (StringUtils.isEmpty(str)) {
+            return str;
+        }
+        if (str.getBytes().length <= 4096) {
+            return str;
+        }
+        String newStr="";
+        try {
+            //按指定的编码获取字节数组
+            byte[] bytes = str.getBytes("UTF-8");
+            //按指定的长度截取新的字符数组
+            byte[] newBytes = Arrays.copyOfRange(bytes,bengin,end);
+            //将新的字符数组转化为字符串
+            newStr = new String(newBytes,"UTF-8");
+        }catch (UnsupportedEncodingException e){
+            log.info("医保日志记录出入参长度截取-字符转码异常");
+        }
+        return newStr.trim();
     }
 }

@@ -50,8 +50,8 @@ public class OutptController extends BaseController {
      * @Date 2020/11/17 20:23
      * @Return java.util.Map<java.lang.String,java.lang.Object>
      */
-    @GetMapping("/getOutptVisitInfo")
-    public WrapperResponse getOutptVisitInfo(@RequestParam Map<String,Object> param, HttpServletRequest req, HttpServletResponse res){
+    @PostMapping("/getOutptVisitInfo")
+    public WrapperResponse getOutptVisitInfo(@RequestBody Map<String,Object> param, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         param.put("hospCode",sysUserDTO.getHospCode());
         param.put("crteId",sysUserDTO.getCrteId());
@@ -68,6 +68,7 @@ public class OutptController extends BaseController {
         String bka896 = String.valueOf(param.get("bka896"));
         String cardIden = MapUtils.get(param,"cardIden");
         String outInfo = MapUtils.get(param,"outInfo");
+        String sign = MapUtils.get(param,"sign");
         String aab001 = String.valueOf(param.get("aab001"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
         String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
@@ -89,6 +90,8 @@ public class OutptController extends BaseController {
         insureIndividualBasicDTO.setAac002(aac002);
         insureIndividualBasicDTO.setAac003(aac003);
         insureIndividualBasicDTO.setAac004(aac004);
+        insureIndividualBasicDTO.setHcardBasinfo(outInfo);
+        insureIndividualBasicDTO.setHcardChkinfo(sign);
 
         //海南读社保卡单独传参
         Map<String, Object> isInsureUnifiedMap = new HashMap<>();

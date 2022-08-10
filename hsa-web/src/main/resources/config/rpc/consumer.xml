@@ -98,7 +98,7 @@
 
     <!-- ########################################### 药库服务consumer end ########################################### -->
     <!-- 药房入库查询与确认 -->
-    <dubbo:reference id="stockInQueryService_consumer" interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" check="false"/>
+    <dubbo:reference id="stockInQueryService_consumer" interface="cn.hsa.module.phar.stockinquery.service.StockInQueryService" check="false" retries = "0" timeout="1200000"/>
     <!--药房领药申请-->
     <dubbo:reference id="pharApplyService_consumer" interface="cn.hsa.module.phar.pharapply.service.PharApplyService" check="false"/>
 
@@ -540,6 +540,10 @@
     <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false" retries="0"/>
     <!--同步药房消耗报表-->
     <dubbo:reference id="extraConsumptionService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractConsumptionService" check="false" retries="0"/>
+    <!-- 中心端授权 -->
+    <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
+    <!-- 中心端系统消息消费者 -->
+    <dubbo:reference id="userMessageInfoService_consumer" interface="cn.hsa.module.sys.message.service.UserReadMessageService" check="false"/>
 
 </beans>
 

@@ -197,8 +197,10 @@
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
             </if>
-            <if test="startTime != null  and endTime != null ">
+            <if test="startTime != null">
                 and a.extract_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null ">
                 and a.extract_time &lt;= #{endTime}
             </if>
             <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
@@ -433,34 +435,20 @@
     <select id="queryAllExtractData"
             resultMap="extractStroInvoicingDetailMap">
         select
-        a.id, hosp_code, biz_id, (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
+        a.id, hosp_code, biz_id,
+        (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
         item_code, item_id, item_name,
         num, unit_code, curr_unit_code, sell_price, buy_price,
         sell_price as up_sell_price, buy_price as up_buy_price,
         split_ratio, split_price, split_num, split_unit_code,
-        up_surplus_num, surplus_num, up_buy_price_all,
-        buy_price_all, up_sell_price_all, sell_price_all,
-        crte_time, new_price, new_split_price, stro_in_num,
-        stro_in_num_price_all, return_supl_num, return_supl_price_all,
-        stro_to_dept_num, stro_to_dept_price_all, stro_to_phar_num,
-        stro_to_phar_price_all, report_losses_num, report_losses_price_all,
-        phar_return_stro_num, phar_return_stro_price_all, adjust_profit_price_all,
-        adjust_loss_price_all, take_strock_subtract_num, take_strock_subtract_price_all,
-        take_strock_add_num, take_strock_add_price_all, stro_in_num_buy_price_all,
-        return_supl_buy_price_all, stro_to_dept_buy_price_all, stro_to_phar_buy_price_all,
-        report_losses_buy_price_all, phar_return_stro_buy_price_all,
-        adjust_profit_buy_price_all, adjust_loss_buy_price_all,
-        take_strock_subtract_buy_price_all, take_strock_add_buy_price_all,
-        out_sales_num, out_sales_price_all, out_sales_buy_price_all,
-        in_sales_buy_price_all, in_sales_price_all, in_sales_num,
-        extract_id, spec, code, extract_time, item_type,
-        phar_return_stro_sell_pri_all, phar_return_stro_buy_pri_all,
-        phar_return_stro_total_num, phar_in_num_sell_price_all,
-        phar_in_num_buy_price_all, phar_in_num
+        surplus_num, buy_price_all, sell_price_all
             from extract_stro_invoicing_detail a,(select max(id) as id from extract_stro_invoicing_detail a
         <where>
             <if test="bizId != null and bizId != ''">
                 and a.biz_id = #{bizId}
+            </if>
+            <if test="endTime != null">
+                and a.extract_time &lt;= #{endTime}
             </if>
             <if test="(drugType != null and drugType != '') or (materialType != null and materialType != '') ">
                 and ((a.item_code = '1' and  a.item_type  = #{drugType}) or (a.item_code = '2'and a.item_type  = #{materialType}))

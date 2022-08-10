@@ -887,6 +887,12 @@
        <if test="visitId!=null and visitId!=''">
           and b.visit_id =#{visitId}
        </if>
+       <if test="brlxList != null and brlxList.size()>0">
+          and v.patient_code in
+          <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+           #{item}
+          </foreach>
+       </if>
        <if test="startTime != null and startTime != ''">
          and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
        </if>
@@ -2032,4 +2038,15 @@
       ifnull((select name from sys_user where id =ana_id1 and hosp_code =#{hospCode}),'无') as ana_name1
       from tcm_mris_oper_info where visit_id =#{visitId} and hosp_code =#{hospCode}
    </select>
+
+   <!--更新病人导出状态 liuliyun 20220803-->
+  <update id="updateInptVisitExportMris">
+   <foreach collection="list" index="index" item="item" separator=";">
+    update inpt_visit
+    set export_flag ='1',
+    export_mark='导出成功'
+    where id = #{item.id} and hosp_code = #{item.hospCode}
+   </foreach>
+  </update>
+
 </mapper>

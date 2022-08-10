@@ -314,4 +314,23 @@ public interface MrisHomeService {
     Map<String, Object> upMrisForDIP(Map<String, Object> map);
     @PutMapping("/service/mris/mrisHome/upMrisForDIPorDRG")
     WrapperResponse<Map<String, Object>> upMrisForDIPorDRG(Map<String, Object> map);
+
+
+    /**@Method queryExportNum
+     * @Author liuliyun
+     * @Description 获取病案导出的条数
+     * @Date 2022/08/03 09:28
+     * @Param [map]
+     * @return  map
+     **/
+    @GetMapping("/service/mris/mrisHome/queryExportNum")
+    WrapperResponse<Map<String, Object>> queryExportNum(Map<String, Object> map);
+    /**@Method queryExportNum
+     * @Author yuelong.chen
+     * @Description 导出权限校验
+     * @Date 2022/08/09 09:28
+     * @Param [map]
+     * @return
+     **/
+    Boolean checkImportHQMSAuthority(Map param);
 }

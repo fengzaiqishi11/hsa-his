@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +37,7 @@ public class CenterMsgInfoServiceImpl extends HsafService implements MessageInfo
     public WrapperResponse<Boolean> insertMessageInfo(Map map) {
         MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
         messageInfoDTO.setId(SnowflakeUtils.getId());
+        messageInfoDTO.setCrteTime(new Date());
         return WrapperResponse.success(messageInfoBO.insertMessageInfo(messageInfoDTO));
     }
 
@@ -66,6 +69,17 @@ public class CenterMsgInfoServiceImpl extends HsafService implements MessageInfo
     public WrapperResponse<PageDTO> queryMessageInfoByType(Map map) {
         MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
         return WrapperResponse.success(messageInfoBO.queryMessageInfoByType(messageInfoDTO));
+    }
+    /**
+     * @Author gory
+     * @Description 查询消息推送的内容
+     * @Date 2022/8/4 15:29
+     * @Param [map]
+     **/
+    @Override
+    public WrapperResponse<List<MessageInfoDTO>> queryMessageInfos(Map map) {
+        MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
+        return WrapperResponse.success(messageInfoBO.queryMessageInfos(messageInfoDTO));
     }
 
 }

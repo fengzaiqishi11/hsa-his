@@ -145,4 +145,24 @@ public interface InDistributeDrugBO {
     * @Return java.lang.Boolean
     **/
     Boolean updatePremedication(PharInReceiveDTO pharInReceiveDTO);
+    /**
+     * @Menthod: queryDMDrugByOrderAndVisitId
+     * @Desrciption: 根据就诊id查询精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<InptAdviceDTO> queryDMDrugByOrderAndVisitId(PharInReceiveDTO pharInReceiveDTO);
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    List<InptVisitDTO> queryDMPatientByOrder(PharInReceiveDTO pharInReceiveDTO);
 }

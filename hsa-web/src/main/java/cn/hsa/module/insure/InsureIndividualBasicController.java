@@ -20,10 +20,7 @@ import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -112,8 +109,8 @@ public class InsureIndividualBasicController extends BaseController {
      * @Date   2020/11/4 20:36
      * @Return 医保个人信息数据传输对象
      **/
-    @GetMapping("/getInsurePatientInfo")
-    public WrapperResponse<Map<String,Object>> getInsurePatientInfo(@RequestParam Map<String,Object> param, HttpServletRequest req, HttpServletResponse res) {
+    @PostMapping("/getInsurePatientInfo")
+    public WrapperResponse<Map<String,Object>> getInsurePatientInfo(@RequestBody Map<String,Object> param, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         String aac001 = String.valueOf(param.get("aac001"));
         String aac002 = String.valueOf(param.get("aac002"));
@@ -126,6 +123,7 @@ public class InsureIndividualBasicController extends BaseController {
         String bka896 = String.valueOf(param.get("bka896"));
         String cardIden = MapUtils.get(param,"cardIden");
         String outInfo = MapUtils.get(param,"outInfo");
+        String sign = MapUtils.get(param,"sign");
         String aab001 = String.valueOf(param.get("aab001"));
         String patientCode = String.valueOf(param.get("patientCode"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
@@ -165,6 +163,8 @@ public class InsureIndividualBasicController extends BaseController {
         insureIndividualBasicDTO.setIsRemote(isRemote);
         insureIndividualBasicDTO.setUserCode(sysUserDTO.getCode());
         insureIndividualBasicDTO.setCardIden(cardIden);
+        insureIndividualBasicDTO.setHcardBasinfo(outInfo);
+        insureIndividualBasicDTO.setHcardChkinfo(sign);
         insureIndividualBasicDTO.setInsuplc_admdvs(String.valueOf(param.get("insuplc_admdvs")));
         Object insuplcAdmdvs = MapUtils.get(param,"insuplcAdmdvs");
         if (insuplcAdmdvs != null && StringUtils.isNotEmpty(insuplcAdmdvs.toString())) {

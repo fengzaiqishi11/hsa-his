@@ -18,6 +18,7 @@ import cn.hsa.module.phar.pharapply.service.PharApplyService;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharinbackdrug.dto.PharInWaitReceiveDTO;
+import cn.hsa.module.phar.pharinbackdrug.entity.PharInReceiveDO;
 import cn.hsa.module.phar.pharinbackdrug.entity.PharInWaitReceiveDO;
 import cn.hsa.module.phar.pharinbackdrug.service.InBackDrugService;
 import cn.hsa.module.phar.pharinbackdrug.service.PharInWaitReceiveService;
@@ -502,6 +503,10 @@ public class DrawMedicineBOImpl implements DrawMedicineBO {
     pharInReceiveDetailDTO.setFlag("1");
     mapQuery.put("hospCode", hospCode);
     mapQuery.put("pharInReceiveDetailDTO", pharInReceiveDetailDTO);
+    PharInReceiveDO inReceiveById = inptCostDAO.getInReceiveById(pharInReceiveDTO);
+    if(!Constants.FYZT.QL.equals(inReceiveById.getStatusCode())) {
+      throw new AppException("不是请领状态的单据，无法取消预配药");
+    }
     WrapperResponse<List<PharInReceiveDetailDTO>> response = inBackDrugService.getPharInReceiveDetailList(mapQuery);
     List<PharInReceiveDetailDTO> pharInReceiveDetailList = response.getData();
     List<String> wrIds = pharInReceiveDetailList.stream().map(PharInReceiveDetailDTO::getWrId).collect(Collectors.toList());

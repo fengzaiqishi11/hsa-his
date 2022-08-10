@@ -2,6 +2,7 @@ package cn.hsa.module.center.authorization.bo;
 
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto;
+import cn.hsa.module.center.authorization.dto.CenterFunctionDto;
 import cn.hsa.module.center.authorization.entity.CenterFunctionAuthorizationDO;
 import cn.hsa.module.center.authorization.entity.CenterInterceptUrlRecordDO;
 
@@ -48,4 +49,6 @@ public interface CenterFunctionAuthorizationBO {
     CenterFunctionAuthorizationDto updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     CenterFunctionAuthorizationDto saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+
+    List<CenterFunctionDto> queryCenterFunction(CenterFunctionDto centerFunctionDto);
 };

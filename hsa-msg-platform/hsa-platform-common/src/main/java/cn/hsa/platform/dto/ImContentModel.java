@@ -12,7 +12,7 @@ public class ImContentModel extends ContentModel {
     /**
      *  用户主键ID,用来标识会话,便于webSocketHanlder处理。为必传参数
      */
-    private Long unionId;
+    private String unionId;
 
     private Integer current = 1;
 

@@ -168,6 +168,7 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
     private String address;
     // 联系电话
     private String phone;
+    private String certNo;
     /**
      * 国家卫健委编码
      */
@@ -176,4 +177,13 @@ public class InptAdviceDTO extends InptAdviceDO implements Serializable {
      * 国家卫健委编码名称
      */
     private String nationName;
+
+    private String prescribeTypeCode;
+    private String cfTypeCode;
+    /**
+     * 精麻分单时间
+     */
+    private String fdDrteTime;
+
+
 }

@@ -192,4 +192,30 @@ public class InDistributeDrugServiceImpl extends HsafService implements InDistri
     public WrapperResponse<Boolean> updatePremedication(Map map) {
       return WrapperResponse.success(inDistributeDrugBO.updatePremedication(MapUtils.get(map,"pharInReceiveDTO")));
     }
+    /**
+     * @Menthod: queryDMDrugByOrderAndVisitId
+     * @Desrciption: 根据就诊id查询精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<InptAdviceDTO>> queryDMDrugByOrderAndVisitId(Map map) {
+        return WrapperResponse.success(inDistributeDrugBO.queryDMDrugByOrderAndVisitId(MapUtils.get(map,"pharInReceiveDTO")));
+    }
+    /**
+     * @Menthod: queryDMPatientByOrder
+     * @Desrciption: 查询配药发药精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    @Override
+    public WrapperResponse<List<InptVisitDTO>> queryDMPatientByOrder(Map map) {
+        return WrapperResponse.success(inDistributeDrugBO.queryDMPatientByOrder(MapUtils.get(map,"pharInReceiveDTO")));
+    }
 }

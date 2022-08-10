@@ -45,6 +45,12 @@
         <if test="patientCode != null and patientCode !=''">
             and a.patient_code = #{patientCode}
         </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and a.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
         <if test="statusCode != null and statusCode !=''">
             and a.status_code = #{statusCode}
         </if>
@@ -2285,4 +2291,88 @@
         select status_code from inpt_visit where hosp_code = #{hospCode} and id = #{visitId}
     </select>
 
+    <!--查询导出数量、总数量、导出数量、未写数量、费用为0数量 liuliyun 20220803-->
+    <select id="queryExportNum" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+        count(*) as totalNum,
+        count(if( v.export_flag  = '1' ,1,null)) as exportNum,
+        (count(if( v.export_flag = '0',1,null))-count(if( c.fy01 &lt;=0 ,1,null))) as unWriteNum,
+        count(if( c.fy01 &lt;=0 ,1,null)) as noChargeNum
+        from inpt_visit v
+        left join mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
+        left join mris_cost c on c.hosp_code= #{hospCode} and  c.visit_id = v.id
+        where v.hosp_code= #{hospCode}
+        <if test="keyword != null and keyword !=''">
+            and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or v.in_no LIKE CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="inDeptId!=null and inDeptId!=''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.visit_id =#{visitId}
+        </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and v.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="offset!=null and limit!=null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <!--查询导出数量、总数量、导出数量、未写数量、费用为0数量 liuliyun 20220803-->
+    <select id="queryUnExportData" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" parameterType="java.util.Map">
+        select
+        v.in_no,
+        v.name,
+        v.in_profile,
+        v.out_time,
+        case when c.fy01 &lt;=0 then '费用为0'
+        when c.fy01 is null and b.id is not null then '费用为0'
+        when b.id is null then '未写病案' end as errorMessage
+        from inpt_visit v
+        left join mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
+        left join mris_cost c on c.hosp_code= #{hospCode} and  c.visit_id = v.id
+        where v.hosp_code= #{hospCode} and v.export_flag = '0'
+        <if test="keyword != null and keyword !=''">
+            and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or v.in_no LIKE CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="inDeptId!=null and inDeptId!=''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.visit_id =#{visitId}
+        </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and v.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="offset!=null and limit!=null">
+            limit #{offset}, #{limit}
+        </if>
+        order by errorMessage
+    </select>
 </mapper>

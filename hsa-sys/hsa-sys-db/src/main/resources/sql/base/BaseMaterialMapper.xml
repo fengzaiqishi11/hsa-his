@@ -115,7 +115,7 @@
                 and bm.is_valid = '1'
             </if>
             <if test="isNationCode == true">
-                and bm.nation_code is not null and LENGTH(trim(nation_code))>0
+                and bm.nation_code is not null and LENGTH(trim(bm.nation_code))>0
             </if>
             <if test="ids != null">
                 and bm.id in

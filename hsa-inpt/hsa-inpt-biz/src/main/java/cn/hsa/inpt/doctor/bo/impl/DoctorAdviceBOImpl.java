@@ -1605,6 +1605,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         return zyAdviceByVisitId;
     }
 
+
     /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode
@@ -1740,5 +1741,75 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
         KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
         String message = JSONObject.toJSONString(messageInfoDTOS);
         KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
+    }
+    /**
+     * @Menthod: getCFAdviceByVisitId
+     * @Desrciption: 根据就诊id查询中药、精麻处方
+     * @Param: inptVisitDTO
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-03 19:31
+     * @Return:
+     **/
+    public List<InptAdviceDTO> getCFAdviceByVisitId(InptVisitDTO inptVisitDTO) {
+        InptVisitDTO visitById = inptVisitDAO.getInptVisitById(inptVisitDTO);
+        if (visitById == null) {
+            throw new RuntimeException("未查询到相关就诊信息");
+        }
+        //todo优化  中药数据查询与精麻数据查询可以用同一个sql处理，时间原因先写这版
+        //获取精麻处方数据
+        List<InptAdviceDTO> DMAdviceByVisitId = inptAdviceDAO.getDMAdviceByVisitId(inptVisitDTO);
+        List<InptAdviceDTO> resultList = new ArrayList<>();
+        if (!ListUtils.isEmpty(DMAdviceByVisitId)) {
+            //精麻处方设定、根据id与处方类型分组
+            Map<String, Map<String, List<InptAdviceDTO>>> listMap = DMAdviceByVisitId.stream().collect(Collectors.groupingBy(InptAdviceDTO::getId,
+                    Collectors.groupingBy(InptAdviceDTO::getPrescribeTypeCode)));
+            listMap.forEach((key, value) -> {
+                value.forEach((k, v) -> {
+                    InptAdviceDTO adviceDTO = new InptAdviceDTO();
+                    if (Constants.CFLX.JE.equals(k)) {
+                        if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                            BeanUtils.copyProperties(v.get(0),adviceDTO);
+                        }
+                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k,new ArrayList<InptAdviceDTO>()));
+                        resultList.add(adviceDTO);
+                    } else if (Constants.CFLX.MJY.equals(k)) {
+                        if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                            BeanUtils.copyProperties(v.get(0),adviceDTO);
+                        }
+                        adviceDTO.setInptAdviceDTOList(MapUtils.get(value, k,new ArrayList<InptAdviceDTO>()));
+                        resultList.add(adviceDTO);
+                    }
+                });
+            });
+        }
+        //获取中药处方数据
+        List<InptAdviceDTO> zyAdviceByVisitId = inptAdviceDAO.getZyAdviceByVisitId(inptVisitDTO);
+        if (!ListUtils.isEmpty(zyAdviceByVisitId)) {
+            Map<Integer, List<InptAdviceDTO>> zyListMap = zyAdviceByVisitId.stream().collect(Collectors.groupingBy(InptAdviceDTO::getGroupNo));
+            zyListMap.forEach((k,v)->{
+                InptAdviceDTO adviceDTO = new InptAdviceDTO();
+                if(!MapUtils.isEmpty(k) && (v.get(0) instanceof InptAdviceDTO)){
+                    BeanUtils.copyProperties(v.get(0),adviceDTO);
+                }
+                BigDecimal reduce = v.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+                adviceDTO.setPrintTotalPrice(reduce);
+                adviceDTO.setTotalPrice(reduce);
+                adviceDTO.setInptAdviceDTOList(v);
+                resultList.add(adviceDTO);
+
+            });
+//            BigDecimal reduce = zyAdviceByVisitId.stream().map(InptAdviceDTO::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+//            zyAdviceByVisitId.forEach(item -> {
+//                item.setPrintTotalPrice(reduce);
+//                item.setTotalPrice(reduce);
+//            });
+//            InptAdviceDTO adviceZYDTO = new InptAdviceDTO();
+//            adviceZYDTO.setInptAdviceDTOList(zyAdviceByVisitId);
+//            adviceZYDTO.setPrescribeTypeCode(Constants.CFLX.PT);
+//            adviceZYDTO.setCfTypeCode(Constants.CFLB.ZCY);
+//            resultList.add(adviceZYDTO);
+        }
+        return resultList;
     }
 }

@@ -421,7 +421,7 @@
         when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
         when LEFT ( e.insure_reg_code, 2 )='43' then e.insure_price - e.personal_price - e.hosp_price
         else e.insure_price - e.personal_price end as fund_pay_sumamt,
-        e.personal_price AS acct_pay
+        e.personal_price AS acct_pay,t.aka130
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1744,5 +1744,177 @@
         GROUP BY
         se_vi_id
     </select>
+    <!--江西九江医药机构门诊费用结算对总账查询-->
+    <select id="queryDataJiuJiangMzWith3201" resultType="java.util.Map">
+        select
+        A.insureRegCode as insureRegCode,
+        A.type,
+        A.insutype as insutype,
+        A.is_hospital as is_hospital,
+        A.clr_type as clr_type,
+        A.clr_optins as clr_optins,
+        sum(A.person_price) as person_price,
+        A.medicine_org_code fixmedins_code,
+        sum(A.medfee_sumamt) as medfee_sumamt,
+        sum(A.fund_pay_sumamt) as fund_pay_sumamt,
+        sum(A.acct_pay) as acct_pay,
+        count(1) as fixmedins_setl_cnt
+        from
+        (
+        select
+        distinct ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id, if ( left ( e.insure_reg_code, 4 ) = left ( t.insuplc_admdvs, 4 ), '本市参保', if ( left ( e.insure_reg_code, 4 ) != left ( t.insuplc_admdvs, 4 )
+        and left ( e.insure_reg_code, 2 ) = left ( t.insuplc_admdvs, 2 ), '省内异地', '跨省异地' ) ) type, c.aac003 as psnName, e.insure_reg_code as insureRegCode, t.aac001 as psn_no, e.settle_id, e.visit_id, t.medical_reg_no as mdtrt_id, e.insureSettleId as setl_id, c.aae140 as insutype, t.is_hospital, e.clr_type, if ( e.state = '0', '0', '1' ) as refd_setl_flag, e.state, e.clr_optins, t.insure_reg_code as setl_optins, e.total_price as medfee_sumamt, e.rests_price,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price
+        end as fund_pay_sumamt, e.person_price, e.personal_price as acct_pay,t.medicine_org_code
+        from
+        insure_individual_settle e
+        left join insure_individual_visit t on
+        e.hosp_code = t.hosp_code
+        and e.visit_id = t.visit_id
+        left join insure_individual_basic c on
+        t.mib_id = c.id
+        where
+        c.aae140 is not null
+        and e.settle_state = '1'
+        and e.is_cancel = '0'
+        and e.insureSettleId is not null
+        and e.insure_reg_code = #{insureRegCode}
+        and e.hosp_code = #{hospCode}
+        and e.insure_price > 0
+        and e.clr_type = '11'
+        and t.is_hospital = '0'
+        and e.aka130 <![CDATA[ <> ]]>'14'
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
 
+        <if test="state != null and state != ''">
+            and e.state = '0'
+        </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="insurType != null and insurType != ''">
+            and c.aae140 = #{insurType}
+        </if>
+        group by
+        se_vi_id ) A
+    </select>
+    <!--江西九江医药机构住院费用结算对总账查询-->
+    <select id="queryDataJiuJiangZyWith3201" resultType="java.util.Map">
+        select
+        A.insureRegCode as insureRegCode,
+        A.type,
+        A.insutype as insutype,
+        A.is_hospital as is_hospital,
+        A.clr_type as clr_type,
+        A.clr_optins as clr_optins,
+        sum(A.person_price) as person_price,
+        A.medicine_org_code fixmedins_code,
+        sum(A.medfee_sumamt) as medfee_sumamt,
+        sum(A.fund_pay_sumamt) as fund_pay_sumamt,
+        sum(A.acct_pay) as acct_pay,
+        count(1) as fixmedins_setl_cnt
+        from
+        (
+        select
+        distinct ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id, if ( left ( e.insure_reg_code, 4 ) = left ( t.insuplc_admdvs, 4 ), '本市参保', if ( left ( e.insure_reg_code, 4 ) != left ( t.insuplc_admdvs, 4 )
+        and left ( e.insure_reg_code, 2 ) = left ( t.insuplc_admdvs, 2 ), '省内异地', '跨省异地' ) ) type, c.aac003 as psnName, e.insure_reg_code as insureRegCode, t.aac001 as psn_no, e.settle_id, e.visit_id, t.medical_reg_no as mdtrt_id, e.insureSettleId as setl_id, c.aae140 as insutype, t.is_hospital, e.clr_type, if ( e.state = '0', '0', '1' ) as refd_setl_flag, e.state, e.clr_optins, t.insure_reg_code as setl_optins, e.total_price as medfee_sumamt, e.rests_price,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price
+        end as fund_pay_sumamt, e.person_price, e.personal_price as acct_pay,t.medicine_org_code
+        from
+        insure_individual_settle e
+        left join insure_individual_visit t on
+        e.hosp_code = t.hosp_code
+        and e.visit_id = t.visit_id
+        left join insure_individual_basic c on
+        t.mib_id = c.id
+        where
+        c.aae140 is not null
+        and e.settle_state = '1'
+        and e.is_cancel = '0'
+        and e.insureSettleId is not null
+        and e.insure_reg_code = #{insureRegCode}
+        and e.hosp_code = #{hospCode}
+        and e.insure_price > 0
+        and e.clr_type = '11'
+        and t.is_hospital = '0'
+        and e.aka130 ='14'
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+
+        <if test="state != null and state != ''">
+            and e.state = '0'
+        </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="insurType != null and insurType != ''">
+            and c.aae140 = #{insurType}
+        </if>
+        UNION ALL
+        select
+        distinct ( CONCAT( e.settle_id, e.visit_id ) ) se_vi_id, if ( left ( e.insure_reg_code, 4 ) = left ( t.insuplc_admdvs, 4 ), '本市参保', if ( left ( e.insure_reg_code, 4 ) != left ( t.insuplc_admdvs, 4 )
+        and left ( e.insure_reg_code, 2 ) = left ( t.insuplc_admdvs, 2 ), '省内异地', '跨省异地' ) ) type, c.aac003 as psnName, e.insure_reg_code as insureRegCode, t.aac001 as psn_no, e.settle_id, e.visit_id, t.medical_reg_no as mdtrt_id, e.insureSettleId as setl_id, c.aae140 as insutype, t.is_hospital, e.clr_type, if ( e.state = '0', '0', '1' ) as refd_setl_flag, e.state, e.clr_optins, t.insure_reg_code as setl_optins, e.total_price as medfee_sumamt, e.rests_price,
+        case
+        when t.aka130 = '2102' then e.insure_price - e.personal_price - e.rests_price
+        when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
+        else e.insure_price - e.personal_price
+        end as fund_pay_sumamt, e.person_price, e.personal_price as acct_pay,t.medicine_org_code
+        from
+        insure_individual_settle e
+        left join insure_individual_visit t on
+        e.hosp_code = t.hosp_code
+        and e.visit_id = t.visit_id
+        left join insure_individual_basic c on
+        t.mib_id = c.id
+        where
+        c.aae140 is not null
+        and e.settle_state = '1'
+        and e.is_cancel = '0'
+        and e.insureSettleId is not null
+        and e.insure_reg_code = #{insureRegCode}
+        and e.hosp_code = #{hospCode}
+        and e.insure_price > 0
+        and e.clr_type = '21'
+        and t.is_hospital = '1'
+        and e.aka130 ='21'
+        /*开始日期*/
+        <if test="startDate != null and startDate != '' ">
+            and date(e.crte_time) &gt;= date(#{startDate})
+        </if>
+        /*结束日期*/
+        <if test="endDate != null and endDate != ''">
+            and date(e.crte_time) &lt;= date(#{endDate})
+        </if>
+
+        <if test="state != null and state != ''">
+            and e.state = '0'
+        </if>
+        <if test="clrOptins != null and clrOptins != ''">
+            and e.clr_optins = #{clrOptins}
+        </if>
+        <if test="insurType != null and insurType != ''">
+            and c.aae140 = #{insurType}
+        </if>
+        group by
+        se_vi_id ) A
+    </select>
 </mapper>

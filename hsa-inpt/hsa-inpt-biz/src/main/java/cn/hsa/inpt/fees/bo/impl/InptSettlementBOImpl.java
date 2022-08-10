@@ -1179,7 +1179,7 @@ public class InptSettlementBOImpl extends HsafBO implements InptSettlementBO {
                     //必传值：hospCode:医院编码、visitId:就诊id、insureRegCode:医保编码
                     insureInptParam.put("hospCode", hospCode);//医院编码
                     insureInptParam.put("visitId", id);//就诊id
-                    insureInptParam.put("insureRegCode", insureConfigurationDTO.getCode());//医保编码
+                    insureInptParam.put("insureRegCode", insureConfigurationDTO.getRegCode());//医保注册编码
                     inptVisitParam.setCrteName(String.valueOf(param.get("userName")));
                     inptVisitParam.setUserCode(String.valueOf(param.get("userCode")));
                     inptVisitParam.setTreatmentCode(treatmentCode);

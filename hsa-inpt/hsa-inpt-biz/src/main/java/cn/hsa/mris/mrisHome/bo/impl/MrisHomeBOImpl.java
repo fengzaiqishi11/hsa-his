@@ -623,7 +623,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     }else {
                         BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                         BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        if(responseDataMap.get("feeStand") != null && !"".equals(responseDataMap.get("feeStand"))){
+                            estimateFund = BigDecimalUtils.subtract(BigDecimalUtils.convert(MapUtils.get(responseDataMap, "feeStand").toString()),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        }
                         //如果小于0当做0处理
                         if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
                             estimateFund = BigDecimal.ZERO;
@@ -881,7 +883,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
                     }else {
                         BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                         BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                        estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2,2);
+                        if(responseDataMap.get("feeStand") != null && !"".equals(responseDataMap.get("feeStand"))){
+                            estimateFund = BigDecimalUtils.subtract(BigDecimalUtils.convert(MapUtils.get(responseDataMap, "feeStand").toString()),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                        }
                         //如果小于0当做0处理
                         if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
                             estimateFund = BigDecimal.ZERO;

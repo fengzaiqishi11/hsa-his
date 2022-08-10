@@ -148,9 +148,15 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
     public Map<String, Object> setOutptCostUploadAndSettlement(Map<String, Object> param) {
         String hospCode = (String) param.get("hospCode");
         Map<String,Object> trialMap = transpond.<Map>to(hospCode,(String) param.get("insureRegCode"),Constant.FUNCTION.FC_2003,param);
+        logger.info("++++++++++++++++++++++++工伤结算反参打印开始(暂时)++++++++++++++++++++++++++++");
+        logger.info(trialMap.toString());
+        logger.info("++++++++++++++++++++++++工伤结算反参打印结束++++++++++++++++++++++++++++");
         try {
-            if ("settle".equals(param.get("action")) && trialMap != null && trialMap.containsKey("payinfo")) {
+                if ("settle".equals(param.get("action")) && trialMap != null && trialMap.containsKey("payinfo")) {
                 Map<String, String> payinfo = (Map<String, String>) trialMap.get("payinfo");
+                logger.info("++++++++++++++++++++++++工伤结算支付信息打印开始(暂时)++++++++++++++++++++++++++++");
+                logger.info(payinfo.toString());
+                logger.info("++++++++++++++++++++++++工伤结算支付信息打印结束++++++++++++++++++++++++++++");
                 String visitId = (String) param.get("visitId");//就诊id
                 String akb020 = payinfo.get("akb020");//医院编码
                 String aaz217 = payinfo.get("aaz217");//就医登记号
@@ -159,6 +165,9 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                 insureIndividualVisitDTO.setVisitId(visitId);//就诊id
                 insureIndividualVisitDTO.setMedicalRegNo(aaz217);//医保登记号
                 insureIndividualVisitDTO.setHospCode(hospCode);
+                    logger.info("++++++++++++++++++++++++工伤结算支付信息打印开始(暂时)++++++++++++++++++++++++++++");
+                    logger.info(insureIndividualVisitDTO.toString());
+                    logger.info("++++++++++++++++++++++++工伤结算支付信息打印结束++++++++++++++++++++++++++++");
                 insureIndividualVisitDAO.updateInsureMedicalRegNo(insureIndividualVisitDTO);
                 if (trialMap.containsKey("insureIndividualCostDOList")) {
                     List<InsureIndividualCostDO> insureIndividualCostDOList = (List<InsureIndividualCostDO>) trialMap.get("insureIndividualCostDOList");

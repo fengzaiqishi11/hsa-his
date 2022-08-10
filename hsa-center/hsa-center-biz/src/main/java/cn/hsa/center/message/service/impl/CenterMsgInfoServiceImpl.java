@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class CenterMsgInfoServiceImpl extends HsafService implements MessageInfo
     public WrapperResponse<Boolean> insertMessageInfo(Map map) {
         MessageInfoDTO messageInfoDTO = MapUtils.get(map,"messageInfoDTO");
         messageInfoDTO.setId(SnowflakeUtils.getId());
+        messageInfoDTO.setCrteTime(new Date());
         return WrapperResponse.success(messageInfoBO.insertMessageInfo(messageInfoDTO));
     }
 

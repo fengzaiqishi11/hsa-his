@@ -1,6 +1,8 @@
 package cn.hsa.sys.message.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.filter.BloomFilterHelper;
+import cn.hsa.filter.RedisBloomFilter;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
@@ -10,10 +12,8 @@ import cn.hsa.module.sys.message.dao.UserReadMessageDAO;
 import cn.hsa.module.sys.message.dto.UserReadMessageDTO;
 import cn.hsa.util.Constants;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.BloomFilter;
-import com.google.common.hash.Funnels;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -31,10 +31,14 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
     private MessageInfoService messageInfoService_consumer;
     @Resource
     private UserReadMessageDAO userReadMessageDAO;
-    private long expectedVersionMessagesNums = 1000000L;
 
-    BloomFilter<CharSequence> bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8),expectedVersionMessagesNums,0.02d);
-
+    @Autowired
+    RedisBloomFilter redisBloomFilter;
+    /**
+     *  布隆过滤器使用帮助类对象
+     */
+    @Autowired
+    private BloomFilterHelper<String> bloomFilterHelper;
     /**
      * @Author gory
      * @Description 获取消息推送
@@ -61,6 +65,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         List<UserReadMessageDTO> resultList = new ArrayList<>();
         // 未读数量
         int count = 0;
+        long startTime = System.currentTimeMillis();
         for (MessageInfoDTO messageInfo: messageInfoDTOList) {
             UserReadMessageDTO readMessageDTO = new UserReadMessageDTO();
             readMessageDTO.setMessageInfoDTO(messageInfo);
@@ -68,13 +73,14 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
             readMessageDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
             readMessageDTO.setMessageTime(messageInfo.getCrteTime());
             String bloomKey = userReadMessageDTO.getHospCode()+':'+userReadMessageDTO.getUserId()+':'+ messageInfo.getId();
-            if(bloomFilter.mightContain(bloomKey)){
+            if(redisBloomFilter.includeByHashContainer(bloomKey,1)){
                 readMessageDTO.setMessageStatus(Constants.SF.S);
             } else {
                 count++;
             }
             resultList.add(readMessageDTO);
         }
+        long costTime = System.currentTimeMillis()-startTime;
         // todo 先根据读取状态进行升序，再根据消息时间降序
         List<UserReadMessageDTO> finallyResultList = resultList.stream().sorted(
                 Comparator.comparing(UserReadMessageDTO::getMessageStatus).
@@ -97,7 +103,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         for(String messageId : messageIdList){
             // 2.更新布隆过滤器
             String bloomKey = messageInfoDTO.getHospCode()+':'+messageInfoDTO.getUserId()+':'+messageId;
-            bloomFilter.put(bloomKey);
+            redisBloomFilter.addByHashContainer(bloomKey,1);
         }
         return userReadMessageDAO.updateMessageStatus(messageInfoDTO) > 0;
     }

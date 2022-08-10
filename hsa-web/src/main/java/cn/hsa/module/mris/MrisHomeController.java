@@ -435,6 +435,21 @@ public class MrisHomeController extends BaseController {
         }
         return mrisHomeService_consumer.getTableConfig(param);
     }
+    /**@Method queryExportNum
+     * @Author yuelong.chen
+     * @Description 导出权限校验
+     * @Date 2022/08/09 09:28
+     * @Param [map]
+     * @return
+     **/
+    @GetMapping("/checkImportHQMSAuthority")
+    public WrapperResponse<Boolean> checkImportHQMSAuthority(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
+        Map param =new HashMap();
+        param.put("hospCode",sysUserDTO.getHospCode());
+       return WrapperResponse.success(mrisHomeService_consumer.checkImportHQMSAuthority(param));
+    }
 
     /**
      * @Menthod: inptMrisInfoDownload

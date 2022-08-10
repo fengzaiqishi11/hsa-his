@@ -1,6 +1,8 @@
 package cn.hsa.sys.version.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.filter.BloomFilterHelper;
+import cn.hsa.filter.RedisBloomFilter;
 import cn.hsa.module.sys.message.dao.UserReadMessageDAO;
 import cn.hsa.module.sys.message.dto.UserReadMessageDTO;
 import cn.hsa.module.sys.version.dao.VersionInfoDAO;
@@ -20,10 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import cn.hsa.module.sys.version.dto.VersionInfoDTO;
 
 import javax.annotation.Resource;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
 * @ClassName VersionInfoBOImpl
@@ -50,9 +51,16 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
      /**
       *  布隆过滤器实现数据去重,默认100w长度
       */
-     BloomFilter<CharSequence> bloomFilter = BloomFilter.create(Funnels.stringFunnel(Charsets.UTF_8),expectedVersionMessagesNums,0.02d);
+     @Autowired
+     RedisBloomFilter redisBloomFilter;
 
+     @Autowired
+     private BloomFilterHelper<String> bloomFilterHelper;
 
+     /**
+      *  默认布隆过滤器名称
+      */
+     private static final String DEFAULT_BLOOMFILTER_NAME = "bloom";
      @Override
      public PageDTO queryVersionInfoListByPage(VersionInfoDTO versionInfoDTO) {
           // 设置分页信息
@@ -78,25 +86,35 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
 
      /**
       * 查询历史升级公告消息 默认分页5条
-      *
+      *   按照消息已读状态与创建时间排序，优先消息读取状态
       * @param versionInfoDTO 分页参数信息
       * @return
       */
      @Override
+     @SuppressWarnings("unchecked")
      public PageDTO queryHistoryVersionInfo(VersionInfoDTO versionInfoDTO) {
 
-          PageHelper.startPage(versionInfoDTO.getPageNo(),5);
           // 历史消息列表
           // hospCode+':'+userId+':'+messageId;
-          List<VersionInfoDTO> versionInfoDTOList = versionInfoDAO.queryHistoryVersionInfo(versionInfoDTO);
-          versionInfoDTOList.forEach(versionInfoDTO1 -> {
+
+          List<VersionInfoDTO> allVersionInfoDTOList = versionInfoDAO.queryHistoryVersionInfo(versionInfoDTO);
+          AtomicInteger count = new AtomicInteger(); // 未读消息总数量
+          allVersionInfoDTOList.forEach(versionInfoDTO1 -> {
                String bloomKey = versionInfoDTO.getHospCode()+':'+versionInfoDTO.getUserId()+':'+versionInfoDTO1.getId();
-               if(bloomFilter.mightContain(bloomKey)){
+               if(redisBloomFilter.includeByHashContainer(bloomKey,1)){
                     versionInfoDTO1.setMsgStatus(Integer.valueOf(Constants.SF.S));
+               }else{
+                    count.incrementAndGet();
+                    versionInfoDTO1.setMsgStatus(Integer.valueOf(Constants.SF.F));
                }
           });
+          // 按照消息已读状态与创建时间排序，优先消息读取状态
+          allVersionInfoDTOList = allVersionInfoDTOList.stream().sorted(
+                  Comparator.comparing(VersionInfoDTO::getMsgStatus).
+                          thenComparing(VersionInfoDTO::getCreateTime,Comparator.reverseOrder())
+          ).collect(Collectors.toList());
 
-          return PageDTO.of(versionInfoDTOList);
+          return PageDTO.ofByManual(allVersionInfoDTOList,versionInfoDTO.getPageNo(),5, count.get());
      }
 
      /**
@@ -120,11 +138,11 @@ public class VersionInfoBOImpl extends HsafBO implements VersionInfoBO {
                userReadMessageDTO.setHospCode(hospCode);
                userReadMessageDTO.setMessageType(Constants.MESSAGETYPE.ANNOUNCEMENT);
                userReadMessageDTO.setMessageId(messageId);
-               userReadMessageDTO.setMessageStatus(Constants.SF.F);
-               affectRows = userReadMessageDAO.insertUserReadMessage(userReadMessageDTO);
+               userReadMessageDTO.setMessageStatus(Constants.SF.S);
+               affectRows += userReadMessageDAO.insertUserReadMessage(userReadMessageDTO);
                String bloomKey = hospCode+':'+userId+':'+messageId;
                // 2.更新布隆过滤器
-               bloomFilter.put(bloomKey);
+               redisBloomFilter.addByHashContainer(bloomKey,1);
           }
 
           return affectRows > 0 ;

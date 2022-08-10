@@ -33,8 +33,8 @@ import java.util.Map;
  **/
 @Service("newInsure" + Constant.UnifiedPay.REGISTER.UP_2402)
 public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseReqUtil<T> {
-    final String ZY_CHU_YUAN = "住院中医出院诊断";
-    final String XY_CHU_YUAN = "住院西医出院诊断";
+    final String ZY_CHU_YUAN = "303";
+    final String XY_CHU_YUAN = "204";
     @Resource
     private InsureIndividualCostDAO insureIndividualCostDAO;
 

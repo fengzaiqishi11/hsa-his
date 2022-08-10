@@ -293,6 +293,7 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             List<Map<String, Object>> zgZyList = new ArrayList<>();//职工住院诊对总账费用信息
             List<Map<String, Object>> jmZyList = new ArrayList<>();//居民住院对总账费用信息
             // 根据条件查询
+            map.put("clrOptins",MapUtils.get(map,"insureRegCode"));
             map.put("insurType","310");
             zgMzList = insureReversalTradeDAO.queryDataJiuJiangMzWith3201(map);
             zgZyList = insureReversalTradeDAO.queryDataJiuJiangZyWith3201(map);

@@ -1895,7 +1895,6 @@
         and e.insure_price > 0
         and e.clr_type = '21'
         and t.is_hospital = '1'
-        and e.aka130 ='21'
         /*开始日期*/
         <if test="startDate != null and startDate != '' ">
             and date(e.crte_time) &gt;= date(#{startDate})

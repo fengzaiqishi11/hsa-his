@@ -10,7 +10,6 @@ import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInptRegisterDTO;
-import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
@@ -47,7 +46,7 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         List<InptDiagnoseDTO> inptDiagnoseDTOList = MapUtils.get(map, "inptDiagnoseDTOList");
 
         Map<String, Object> inputMap = new HashMap<>();
-        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO, inptDiagnoseDTOList));
+        inputMap.put("mdtrtinfo", initMdtrtinfoMap(insureIndividualVisitDTO));
         inputMap.put("diseinfo", initDiseinfoList(insureIndividualVisitDTO,inptDiagnoseDTOList));
 
         HashMap commParam = new HashMap();
@@ -113,7 +112,7 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         return diseinfoList;
     }
 
-    private Object initMdtrtinfoMap(InsureIndividualVisitDTO insureIndividualVisitDTO, List<InptDiagnoseDTO> inptDiagnoseDTOList) {
+    private Object initMdtrtinfoMap(InsureIndividualVisitDTO insureIndividualVisitDTO) {
         //出院信息参数dscginfo
         Map<String, Object> dscginfoMap = new HashMap<>();
         dscginfoMap.put("mdtrt_id",insureIndividualVisitDTO.getMedicalRegNo());//	就诊ID
@@ -133,25 +132,8 @@ public class OutHospRegisterReqUtil<T> extends InsureCommonUtil implements BaseR
         }else{
             dscginfoMap.put("endtime", DateUtils.format(insureIndividualVisitDTO.getOutTime(),DateUtils.Y_M_DH_M_S));//	结束时间
         }
-        String code = null;
-        String name = null;
-        for (int i = 0; i < inptDiagnoseDTOList.size(); i++) {
-            // 是否是主诊断 204住院西医出院诊断  303 住院中医出院诊断
-            if (Constants.SF.S.equals(inptDiagnoseDTOList.get(i).getIsMain()) &&
-                    (XY_CHU_YUAN.equals(inptDiagnoseDTOList.get(i).getTypeCode()) || ZY_CHU_YUAN.equals(inptDiagnoseDTOList.get(i).getTypeCode()))) {
-                code = inptDiagnoseDTOList.get(i).getInsureInllnessCode();//	诊断代码
-                name = inptDiagnoseDTOList.get(i).getInsureInllnessName();//	诊断名称
-                break;
-            }
-        }
-        //如果病人的出院诊断为空则还是取 insure_individual_visit表里面的就诊信息
-        if(code != null && name != null){
-            dscginfoMap.put("dise_code", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006()) ? insureIndividualVisitDTO.getBka006() : code);//	病种编码
-            dscginfoMap.put("dise_name", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006Name()) ? insureIndividualVisitDTO.getBka006Name() : name);//	病种名称
-        }else {
-            dscginfoMap.put("dise_code", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006()) ? insureIndividualVisitDTO.getBka006() : insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
-            dscginfoMap.put("dise_name", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006Name()) ? insureIndividualVisitDTO.getBka006Name() : insureIndividualVisitDTO.getVisitIcdName());//	病种名称
-        }
+        dscginfoMap.put("dise_code", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006()) ? insureIndividualVisitDTO.getBka006() : insureIndividualVisitDTO.getVisitIcdCode());//	病种编码
+        dscginfoMap.put("dise_name", ObjectUtil.isNotEmpty(insureIndividualVisitDTO.getBka006Name()) ? insureIndividualVisitDTO.getBka006Name() : insureIndividualVisitDTO.getVisitIcdName());//	病种名称
         dscginfoMap.put("oprn_oprt_code", null);//	手术操作代码
         dscginfoMap.put("fpsc_no", insureIndividualVisitDTO.getFpscNo());//	计划生育服务证号
         dscginfoMap.put("matn_type", insureIndividualVisitDTO.getMatnType());//	生育类别

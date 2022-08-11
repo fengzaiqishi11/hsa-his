@@ -205,4 +205,8 @@ public interface InsureReversalTradeDAO {
      * @Return
      **/
     List<Map<String, Object>> queryDeclareInfos(Map<String, Object> paraMap);
+
+    List<Map<String, Object>> queryDataJiuJiangMzWith3201(Map<String, Object> map);
+
+    List<Map<String, Object>> queryDataJiuJiangZyWith3201(Map<String, Object> map);
 }

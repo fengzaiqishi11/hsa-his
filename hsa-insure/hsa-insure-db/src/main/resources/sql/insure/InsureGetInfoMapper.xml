@@ -1550,6 +1550,8 @@
                (select name from sys_user su where mbi.zr_nurse_id = su.id)           zrNurse_name,
                idm.insure_illness_code diseaseCode,
                idm.insure_illness_name diseaseName,
+               (select prac_certi_no from sys_user su where mbi.zg_doctor_id = su.id)  zg_doctor_code,
+               (select name from sys_user su where mbi.zg_doctor_id = su.id)           zg_doctor_name,
                (select bd.caty_code
                     from base_dept bd
                     where bd.hosp_code =

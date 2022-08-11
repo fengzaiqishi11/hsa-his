@@ -2504,6 +2504,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_code",null)); // 主诊医生代码 *******
         setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zrNurse_name",null)); // 责任护士名 *******
         setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code",null)); // 责任护士代码 *******
+        //根据参数判断主治医师是否取住院医师
+        SysParameterDTO sysParameterDTO = insureGetInfoDAO.getParameterByCode(hospCode,"ZZ_OR_ZG");
+        if(sysParameterDTO != null && Constant.UnifiedPay.ISMAN.S.equals(sysParameterDTO.getValue())){
+            setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_name",null)); // 主诊医生姓名 *******
+            setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_code",null)); // 主诊医生代码 *******
+        }
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
         if (ObjectUtil.isEmpty(setlBegnDate)) {
             throw new AppException("结算开始时间为空");

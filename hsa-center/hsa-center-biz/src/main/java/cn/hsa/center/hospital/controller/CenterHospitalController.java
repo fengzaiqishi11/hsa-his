@@ -192,7 +192,7 @@ public class CenterHospitalController extends CenterBaseController {
         CenterParameterDTO pathDto = MapUtils.get(map, "WEB_URL");
         String url = "";
         if(pathDto == null){
-            url = request.getScheme() + "://" +request.getServerName() + ":" + request.getServerPort() + "/his-web/?hosp_code=";
+            url = request.getScheme() + "://" +request.getServerName() + ":" + request.getServerPort() + "/his-web/?hospCode=";
         }else{
             url = pathDto.getValue();
         }

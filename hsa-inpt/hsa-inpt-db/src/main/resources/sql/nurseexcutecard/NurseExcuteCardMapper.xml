@@ -86,19 +86,23 @@
 
     <update id="updatePrintFlag">
         update inpt_advice_exec set is_print= '1'
-        <if test="inptAdviceExecIds != null and inptAdviceExecIds.size() > 0">
-          and id in
-          <foreach collection="inptAdviceExecIds" item="id" separator="," open="(" close=")">
-            #{id}
-          </foreach>
-        </if>
-        <if test="ids != null and ids.size() > 0">
-            and advice_id in
-            <foreach collection="ids" item="id" separator="," open="(" close=")">
-                #{id}
-            </foreach>
-        </if>
-        and hosp_code = #{hospCode}
+        <where>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="inptAdviceExecIds != null and inptAdviceExecIds.size() > 0">
+                and id in
+                <foreach collection="inptAdviceExecIds" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="ids != null and ids.size() > 0">
+                and advice_id in
+                <foreach collection="ids" item="id" separator="," open="(" close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
     </update>
 
     <update id="updatePrintFlagByType" parameterType="java.util.List">

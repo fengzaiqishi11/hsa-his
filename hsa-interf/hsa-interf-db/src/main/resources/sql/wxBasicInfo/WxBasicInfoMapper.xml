@@ -1157,11 +1157,8 @@
             inpt_advance_pay a
         left join inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
         where a.hosp_code = #{hospCode}
-        <if test="visitIds != null and visitIds.size() > 0">
-            and a.visit_id in
-            <foreach collection="visitIds" separator="," item="visitId" open="(" close=")">
-                #{visitId}
-            </foreach>
+        <if test="profileId != null and profileId != ''">
+            and iv.profile_id = #{profileId}
         </if>
         <if test="inNo != null and inNo != ''">
             and iv.in_no = #{inNo}

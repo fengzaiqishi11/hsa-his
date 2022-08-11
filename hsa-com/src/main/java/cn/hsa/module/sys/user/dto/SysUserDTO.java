@@ -92,4 +92,8 @@ public class SysUserDTO extends SysUserDO implements Serializable {
     private String whetherPrivateInnerAddress;
     /*人员类型*/
     private String psnType;
+    /**
+     *  职业类别名称
+     */
+    private String workName;
 }

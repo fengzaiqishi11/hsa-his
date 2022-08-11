@@ -300,7 +300,8 @@
     a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm,
     a.crte_id,a.crte_name,
     a.crte_time,a.signature_path,a.doctor_intro,a.is_guide,
-    b.name as deptName
+    b.name as deptName,
+	(select name from sys_code_detail ss where ss.c_code = 'RYZW' and ss.value =a.work_type_code  and ss.hosp_code = a.hosp_code limit 1 ) as workName
     from sys_user a
     join sys_user_system s on a.hosp_code = s.hosp_code and a.code = s.user_code
     and s.dept_code = #{loginDeptCode} and s.system_code = #{systemCode}

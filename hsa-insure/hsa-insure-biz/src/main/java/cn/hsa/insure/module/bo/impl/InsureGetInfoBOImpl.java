@@ -1080,7 +1080,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }else {
                     BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                     BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                    estimateFund = BigDecimalUtils.subtract(MapUtils.get(responseDataMap, "feeStand"),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    if(responseDataMap.get("feeStand") != null && !"".equals(responseDataMap.get("feeStand"))){
+                        estimateFund = BigDecimalUtils.subtract(BigDecimalUtils.convert(MapUtils.get(responseDataMap, "feeStand").toString()),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    }
                     //如果小于0当做0处理
                     if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
                         estimateFund = BigDecimal.ZERO;
@@ -1497,7 +1499,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }else {
                     BigDecimal estimateFund = new BigDecimal(0.00);//预计基金支付
                     BigDecimal personPriceSum = BigDecimalUtils.add(payInfoDTO.getPersonalPrice(),payInfoDTO.getPersonPrice(),2);//个人支付合计
-                    estimateFund = BigDecimalUtils.subtract(BigDecimalUtils.convert(MapUtils.get(responseDataMap, "feeStand").toString()),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    if(responseDataMap.get("feeStand") != null && !"".equals(responseDataMap.get("feeStand"))){
+                        estimateFund = BigDecimalUtils.subtract(BigDecimalUtils.convert(MapUtils.get(responseDataMap, "feeStand").toString()),BigDecimalUtils.add(personPriceSum,payInfoDTO.getRestsPrice(),2)).setScale(2);
+                    }
                     //如果小于0当做0处理
                     if(BigDecimalUtils.greater(BigDecimal.ZERO,estimateFund)){
                         estimateFund = BigDecimal.ZERO;
@@ -2263,18 +2267,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
         }
-        //取主诊断的编码和名称
-        String otpWmDiseCode = "";
-        String otpWmDiseName = "";
-        List<InptDiagnoseDTO> xiCollect = MapUtils.get(map, "xiCollect");
-        if (ObjectUtil.isNotEmpty(xiCollect) && xiCollect.size() > 0) {
-            for (InptDiagnoseDTO diagnoseDTO : xiCollect) {
-                if (Constant.UnifiedPay.ISMAN.S.equals(diagnoseDTO.getIsMain())) {
-                    otpWmDiseCode = diagnoseDTO.getDiseaseCode();
-                    otpWmDiseName = diagnoseDTO.getDiseaseName();
-                }
-            }
-        }
 
         if (MapUtils.isEmpty(baseInfoMap)) {
             throw new AppException("结算清单的基本信息数据为空，请先维护数据");
@@ -2436,15 +2428,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("dscgCaty", MapUtils.get(baseInfoMap, "outDeptNatinCode")); // 出院科别
         setlinfo.put("actIptDays", insureIndividualVisitDTO.getHospitalDay()); // 实际住院天数 *******
 
-        setlinfo.put("otpWmDise", MapUtils.getMapVS(baseInfoMap, "out_disease_name", (String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10_name",null))); // 门（急）诊诊断名称 *******
-        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(baseInfoMap, "out_disease_icd10",(String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10",null))); // 门（急）诊诊断编码 *******
-        //取主诊断的疾病名称和编码
-        if(StringUtils.isNotEmpty(otpWmDiseCode)){
-            setlinfo.put("otpWmDiseCode",otpWmDiseCode);
-        }
-        if(StringUtils.isNotEmpty(otpWmDiseName)){
-            setlinfo.put("otpWmDise",otpWmDiseName);
-        }
+        setlinfo.put("otpWmDise", MapUtils.getMapVS(mriBaseInfo, "diseaseName", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断名称 *******
+        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(mriBaseInfo, "diseaseCode", MapUtils.get(baseInfoMap, "outpt_disease_icd10"))); // 门（急）诊诊断编码 *******
         setlinfo.put("wmDiseCcode", ""); // 西医诊断疾病代码 *******
         setlinfo.put("otpTcmDise", otpTcmDise); // 门（急）诊中医诊断 *******
         setlinfo.put("otpTcmDiseCode", otpTcmDiseCode); // 门（急）诊中医诊断 *******

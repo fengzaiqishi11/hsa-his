@@ -199,6 +199,7 @@ public class BaseAdviceController extends BaseController {
         SysUserDTO sysUserDTO = getSession(req, res);
         //baseAdviceDetailDTO.setHospCode(hospCode);
         baseAdviceDetailDTO.setHospCode(sysUserDTO.getHospCode());
+        baseAdviceDetailDTO.setLoginDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map map = new HashMap();
         //map.put("hospCode",hospCode);
         map.put("hospCode",sysUserDTO.getHospCode());

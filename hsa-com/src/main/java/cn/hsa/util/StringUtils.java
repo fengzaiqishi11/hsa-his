@@ -307,6 +307,14 @@ public class StringUtils {
         return id.replaceAll("(?<=\\w{3})\\w(?=\\w{4})", "*");
     }
 
+    //数据脱敏
+    public static String stringEncrypt(String id) {
+        if (StringUtils.isEmpty(id)) {
+            return id;
+        }
+        return id.replaceAll("(?<=\\w{3})\\w(?=\\w{4})", "*");
+    }
+
     public static void main(String[] args) {
         System.out.println(mobileEncrypt("18574728194"));
         System.out.println(idEncrypt("430426199705124852"));

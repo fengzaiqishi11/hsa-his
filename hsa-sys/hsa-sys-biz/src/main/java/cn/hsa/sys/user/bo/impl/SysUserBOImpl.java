@@ -164,6 +164,12 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public List<SysUserDTO> queryAll(SysUserDTO sysUserDTO) {
          if("1".equals(sysUserDTO.getFlag())) {
+             List<SysUserDTO> sysUserDTOS = sysUserDAO.queryBedUserAll(sysUserDTO);
+             for (SysUserDTO user:sysUserDTOS){
+                 if (user!=null) {
+                     user.setPracCertiNo(StringUtils.stringEncrypt(user.getPracCertiNo())); // 数据脱敏
+                 }
+             }
             return this.sysUserDAO.queryBedUserAll(sysUserDTO);
          }
          // 111表示取门诊医生与财务人员

@@ -1,0 +1,1153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.wxBasicInfo.dao.WxOutptDAO">
+
+    <!--更新病人就诊信息标志为作废-->
+    <delete id="deleteOutptVisitByVisitId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        DELETE FROM outpt_visit WHERE id = #{visitId} and hosp_code = #{hospCode} and is_visit != '1'
+    </delete>
+
+    <!--根据科室ids查询对应的挂号类别-->
+    <select id="queryClassify" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO">
+        select
+        id, hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name, crte_time
+        from outpt_classify
+        where hosp_code = #{hospCode}
+        and is_valid = '1'
+        <if test="data.id != null and data.id != ''">
+            and id = #{data.id}
+        </if>
+        <if test="data.deptId != null and data.deptId != ''">
+            and dept_id = #{data.deptId}
+        </if>
+        <if test="data.deptIds != null and data.deptIds.size() > 0">
+            and dept_id in
+            <foreach collection="data.deptIds" item="deptId" open="(" close=")" separator=",">
+                #{deptId}
+            </foreach>
+        </if>
+        order by visit_code desc
+    </select>
+
+    <!--查询科室医生及其班次信息-->
+    <select id="queryDoctorAndClassesByDeptId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto">
+        SELECT
+        a.hosp_code,
+        b.cc_id,
+        b.cy_id,
+        b.cs_id,
+        a.id as dq_id,
+        a.cq_id,
+        b.queue_date as queue_date_str,
+        ocs.name as classes_name,
+        b.dept_id,
+        bd.code as deptCode,
+        bd.name as dept_name,
+        ocy.name as classify_name,
+        ocy.visit_code,
+        ocy.register_code,
+        a.doctor_id,
+        a.doctor_name,
+        ROUND(t1.classify_price, 2) as classify_price,
+        <!--a.register_num,-->
+        IFNULL(SUM(t2.register_num), 0) as register_num,
+        IFNULL(SUM(t2.yy_num), 0) as used_register_num,
+        IFNULL(SUM(t2.sy_num), 0) as surplus_register_num
+        FROM
+        outpt_doctor_queue a
+        LEFT JOIN outpt_classes_queue b on a.hosp_code = b.hosp_code and a.cq_id = b.id
+        JOIN outpt_classes ocs on b.hosp_code = ocs.hosp_code and b.cs_id = ocs.id
+        JOIN outpt_classify_classes occ on b.hosp_code = occ.hosp_code and b.cc_id = occ.id
+        join outpt_classify ocy on b.hosp_code = ocy.hosp_code and b.cy_id = ocy.id
+        join base_dept bd on bd.id = b.dept_id and bd.hosp_code = b.hosp_code
+        join (
+        SELECT
+        a.hosp_code,
+        a.cy_id,
+        IFNULL(CONVERT(SUM( b.price * a.num), DECIMAL(14,4)), 0) as classify_price
+        FROM
+        outpt_classify_cost a
+        JOIN base_item b on a.hosp_code = b.hosp_code and a.item_id = b.id
+        GROUP BY a.hosp_code, a.cy_id
+        )  t1 on b.cy_id = t1.cy_id and b.hosp_code = t1.hosp_code
+        LEFT JOIN (
+        SELECT
+        dq_id,
+        hosp_code,
+        start_time,
+        end_time,
+        max(register_num) as register_num,
+        IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
+        (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
+        FROM
+        outpt_doctor_register
+        GROUP BY dq_id,hosp_code,start_time, end_time
+        ) t2 on a.hosp_code = t2.hosp_code and a.id = t2.dq_id
+        WHERE a.hosp_code = #{hospCode}
+        and a.is_valid = '1'
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and date_format(b.queue_date, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and date_format(b.queue_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="data.deptId != null and data.deptId != ''">
+            and b.dept_id = #{data.deptId}
+        </if>
+        <if test="data.doctorId != null and data.doctorId != ''">
+            and a.doctor_id = #{data.doctorId}
+        </if>
+        GROUP BY a.hosp_code, b.cc_id, b.cy_id, b.cs_id, a.id, a.cq_id, b.queue_date, ocs.name, b.dept_id, bd.name, ocy.name, a.doctor_id, a.doctor_name, t1.classify_price, a.register_num
+        order by b.queue_date
+    </select>
+
+    <!--查询医生号源信息-->
+    <select id="queryDoctorNumberSourceInformation" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto">
+        SELECT
+        a.id,
+        b.cy_id,
+        (select name FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as cy_name,
+        (select visit_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as visit_code,
+        (select register_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as register_code,
+        a.doctor_id,
+        a.doctor_name,
+        b.dept_id,
+        (SELECT name from base_dept bd where bd.hosp_code = b.hosp_code and bd.id = b.dept_id) as dept_name,
+        b.queue_date,
+        LEFT(t1.start_time, 5) as start_time,
+        LEFT(t1.end_time, 5) as end_time,
+        t1.register_num,
+        t1.used_register_num,
+        t1.surplus_register_num
+        FROM
+        outpt_doctor_queue a
+        LEFT JOIN outpt_classes_queue b on a.cq_id = b.id and a.hosp_code = b.hosp_code
+        LEFT JOIN (
+        SELECT
+        hosp_code,
+        dq_id,
+        start_time,
+        end_time,
+        MAX(register_num) as register_num,
+        IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as used_register_num,
+        (MAX(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as surplus_register_num
+        FROM
+        outpt_doctor_register
+        GROUP BY
+        hosp_code, dq_id, start_time, end_time
+        ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.dq_id
+        where a.hosp_code = #{hospCode}
+        and a.is_valid = '1'
+        and b.is_valid = '1'
+        <if test="data.isToday != null and data.isToday == '1'.toString()">
+            <![CDATA[
+            and DATE_FORMAT(NOW(), '%H:%i:%s') < t1.end_time
+          ]]>
+        </if>
+        <if test="data.deptId != null and data.deptId != ''">
+            and b.dept_id = #{data.deptId}
+        </if>
+        <if test="data.doctorId != null and data.doctorId != ''">
+            and a.doctor_id = #{data.doctorId}
+        </if>
+        <if test="data.queueDate != null and data.queueDate != ''">
+            and  DATE_FORMAT(b.queue_date, '%Y-%m-%d') = DATE_FORMAT(#{data.queueDate}, '%Y-%m-%d')
+        </if>
+        ORDER BY t1.start_time
+    </select>
+
+    <!--查询挂号类别费用-->
+    <select id="queryClassifyCost" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO">
+        SELECT
+        a.id,
+        a.cy_id,
+        a.item_code,
+        a.item_id,
+        a.num,
+        a.use_code,
+        c.name,
+        c.unit_code as item_unit_code,
+        c.spec,
+        ROUND(c.price, 2) as item_price,
+        ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_price_all,
+        ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_preferential_all_price,
+        c.bfc_code,
+        (SELECT id from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_id,
+        (SELECT name from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_name
+        FROM
+        outpt_classify_cost a
+        LEFT JOIN outpt_classify b on a.hosp_code = b.hosp_code and a.cy_id = b.id
+        JOIN base_item c on a.hosp_code = c.hosp_code and a.item_id = c.id
+        where a.hosp_code = #{hospCode}
+        and b.is_valid = '1'
+        <if test="data.cyId != null and data.cyId != ''">
+            and a.cy_id = #{data.cyId}
+        </if>
+        order by a.cy_id
+    </select>
+
+    <!--查询所有的预约挂号记录列表-->
+    <select id="queryOutptRegister" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        SELECT
+        a.id,
+        a.hosp_code,
+        a.visit_id,
+        a.register_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.birthday,
+        a.cert_code,
+        a.cert_no,
+        a.source_bz_code,
+        a.visit_code,
+        a.source_tj_code,
+        a.register_time,
+        a.cf_id,
+        (SELECT name from outpt_classify oc where oc.hosp_code = a.hosp_code and oc.id = a.cf_id) as classify_name,
+        a.cq_id,
+        a.dq_id,
+        a.dr_id,
+        a.dept_id,
+        a.dept_name,
+        (select place from base_dept bd where bd.hosp_code = a.hosp_code and a.dept_id = bd.id) as place,
+        a.doctor_id,
+        a.doctor_name,
+        a.is_cancel,
+        a.is_first_visit,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        b.status_code,
+        c.bill_no,
+        (SELECT patient_code FROM outpt_visit ov where ov.hosp_code = a.hosp_code and ov.id = a.visit_id) as patient_code,
+        ROUND(b.reality_price, 2) AS reality_price,
+        c.settle_time,
+        d.visit_time,
+        CONCAT(DATE_FORMAT(a.register_time,'%Y-%m-%d'),' ( ',SUBSTR(e.start_time,1,5),'-',SUBSTR(e.end_time,1,5),' ) ') as bookingTime
+        FROM
+        outpt_register a
+        LEFT JOIN (
+        SELECT hosp_code, register_id, status_code, SUM(reality_price) as reality_price
+        from outpt_register_detail
+        GROUP BY hosp_code,register_id, status_code
+        ) b on a.hosp_code = b.hosp_code and a.id = b.register_id
+        left join outpt_register_settle c on a.hosp_code = c.hosp_code and a.id = c.register_id
+        left join outpt_visit d on a.hosp_code = d.hosp_code and a.id = d.register_id and a.visit_id = d.id
+        left join outpt_doctor_register e on a.dr_id = e.id and e.hosp_code = a.hosp_code
+        WHERE a.hosp_code = #{hospCode}
+        and b.status_code = '0'
+        and c.status_code = '0'
+        -- and a.source_bz_code = '4'
+        <if test="data.keyword != null and data.keyword != ''">
+            and (a.name like concat('%', #{data.keyword}, '%') or a.cert_no =  #{data.keyword} or a.register_no = #{data.keyword})
+        </if>
+        <if test="data.startDate != null and data.startDate != ''">
+            and DATE_FORMAT(a.register_time, '%Y-%m-%d') >= DATE_FORMAT(#{data.startDate}, '%Y-%m-%d')
+        </if>
+        <if test="data.endDate != null and data.endDate != ''">
+            and DATE_FORMAT(a.register_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{data.endDate}, '%Y-%m-%d')
+        </if>
+        <if test="data.deptId != null and data.deptId != ''">
+            and a.dept_id = #{data.deptId}
+        </if>
+        order by a.register_time desc
+    </select>
+
+
+    <!--查询存在待缴费的处方的就诊记录列表-->
+    <select id="queryVisitList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        SELECT
+        distinct
+        a.id as visit_id,
+        a.hosp_code,
+        a.profile_id,
+        a.register_id,
+        a.register_no,
+        a.name,
+        a.age,
+        a.visit_no,
+        a.cert_no,
+        a.doctor_id,
+        a.doctor_name,
+        a.dept_id,
+        a.dept_name,
+        a.visit_time,
+        a.is_visit,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time
+        FROM
+        outpt_visit a
+        JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.id = b.visit_id
+        where a.hosp_code = #{hospCode}
+        and a.is_visit = '1'
+        and b.is_settle = '0'
+        and b.is_cancel = '0'
+        and b.is_submit = '1'
+        <if test="data.keyword != null and data.keyword != ''">
+            and (a.visit_no = #{data.keyword} or a.name like concat('%', #{data.keyword}, '%') or a.cert_no = #{data.keyword} or a.register_no = #{data.keyword})
+        </if>
+        <if test="data.startDate != null and data.startDate != ''">
+            and DATE_FORMAT(a.visit_time, '%Y-%m-%d') >= DATE_FORMAT(#{data.startDate}, '%Y-%m-%d')
+        </if>
+        <if test="data.endDate != null and data.endDate != ''">
+            and DATE_FORMAT(a.visit_time, '%Y-%m-%d') &lt;= DATE_FORMAT(#{data.endDate}, '%Y-%m-%d')
+        </if>
+        <if test="data.deptId != null and data.deptId != ''">
+            and a.dept_id = #{data.deptId}
+        </if>
+        <if test="data.doctorId != null and data.doctorId != ''">
+            and a.doctor_id = #{data.doctorId}
+        </if>
+        order by a.visit_time desc
+    </select>
+
+    <!--根据visitId查询待缴费的开方处方信息-->
+    <select id="queryPrescribeList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
+        SELECT
+        ROUND(SUM(a.reality_price),  2) as order_price,
+        ROUND(c.zfje, 2) as zfje,
+        b.id,
+        b.visit_id,
+        b.order_no,
+        b.type_code,
+        b.prescribe_type_code,
+        b.is_settle,
+        b.doctor_id,
+        b.doctor_name,
+        b.dept_id,
+        b.dept_name,
+        b.diagnose_ids,
+        (SELECT GROUP_CONCAT(bd.name) FROM base_disease bd where bd.hosp_code = b.hosp_code and FIND_IN_SET(bd.id,b.diagnose_ids) GROUP BY b.id) as diagnose_names,
+        b.crte_time as prescribe_time
+        FROM
+        outpt_cost a
+        LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        LEFT JOIN (
+        SELECT
+        t1.hosp_code,
+        t1.visit_id,
+        SUM(t1.reality_price) as zfje
+        FROM
+        outpt_cost t1
+        LEFT JOIN outpt_prescribe t2 ON t1.hosp_code = t2.hosp_code AND t1.op_id = t2.id
+        WHERE t1.hosp_code = #{hospCode}
+        and t2.is_settle = '0'
+        and t2.is_submit = '1'
+        <if test="data.visitId != null and data.visitId != ''">
+            and t1.visit_id = #{data.visitId}
+        </if>
+        GROUP BY t1.visit_id
+        ) c on a.hosp_code = c.hosp_code and a.visit_id = c.visit_id
+        WHERE a.hosp_code = #{hospCode}
+        and b.is_settle = '0'
+        and b.is_submit = '1'
+        <if test="data.visitId != null and data.visitId != ''">
+            and a.visit_id = #{data.visitId}
+        </if>
+        GROUP BY b.id
+        ORDER BY b.order_no asc
+    </select>
+
+    <!--根据传入的处方号查询处方明细-->
+    <select id="queryPrescriptionDetails" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        SELECT
+        b.name,
+        a.item_code,
+        a.item_name,
+        c.content,
+        a.total_num as num,
+        a.num_unit_code,
+        a.bfc_id,
+        bfc.code as bfc_code,
+        bfc.name as bfc_name,
+        a.dosage,
+        a.dosage_unit_code,
+        a.use_days,
+        a.usage_code,
+        a.spec,
+        ROUND(a.price, 2) as price,
+        ROUND(a.total_price, 2) as total_price,
+        ROUND(a.reality_price, 2) as reality_price,
+        a.doctor_name,
+        ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.exec_dept_id ) AS exec_dept_name,
+        ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.dept_id ) AS create_dept_name,
+        d.settle_time
+        FROM
+        outpt_cost a
+        LEFT JOIN outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
+        LEFT JOIN outpt_prescribe_detail c on a.hosp_code = c.hosp_code and a.opd_id = c.id
+        JOIN base_finance_classify bfc on a.hosp_code = bfc.hosp_code and a.bfc_id = bfc.id
+        LEFT JOIN outpt_settle d on a.hosp_code = d.hosp_code and a.settle_id = d.id
+        WHERE a.hosp_code = #{hospCode}
+        <if test="data.statusCode != null and data.statusCode != ''">
+            and a.status_code = #{data.statusCode}
+        </if>
+        <if test="data.settleCode != null and data.settleCode != ''">
+            and a.settle_code = #{data.settleCode}
+        </if>
+        <if test="data.visitId != null and data.visitId != ''">
+            and a.visit_id = #{data.visitId}
+        </if>
+        <if test="data.opId != null and data.opId != ''">
+            and a.op_id = #{data.opId}
+        </if>
+        ORDER BY c.group_no, c.group_seq_no
+    </select>
+
+    <!--
+        根据医生队列id(dqId)、预约时段开始时间、结束时间查询出未锁号、未预约的号源
+        param: dqId-医生队列id；startTime-分时开始时间；endTime-分时结束时间；
+    -->
+    <select id="queryDoctorRegisterList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        SELECT
+        id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
+        FROM
+        outpt_doctor_register
+        where hosp_code = #{hospCode}
+        and is_use = '0'
+        and is_lock = '0'
+        <![CDATA[
+            and (LENGTH(TRIM(profile_id)) < 1)
+          ]]>
+        <if test="data.dqId != null and data.dqId != ''">
+            and dq_id = #{data.dqId}
+        </if>
+        <if test="data.startTime != null and data.startTime != ''">
+            <!--and date_format(start_time, '%H:%i:%s') = date_format(#{data.startTime}, '%H:%i:%s')-->
+            and left(start_time, 5) = #{data.startTime}
+        </if>
+        <if test="data.endTime != null and data.endTime != ''">
+            <!--and date_format(end_time, '%H:%i:%s') = date_format(#{data.endTime}, '%H:%i:%s')-->
+            and left(end_time, 5) = #{data.endTime}
+        </if>
+        order by register_time
+    </select>
+
+    <!--根据dqId、profileId、startTime、endTime判断人员再选择的时段内是否已经锁定过号源-->
+    <select id="queryDoctorRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        select id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
+        from outpt_doctor_register
+        where hosp_code = #{hospCode}
+        <if test="dqId != null and dqId != ''">
+            and dq_id = #{dqId}
+        </if>
+        <if test="profileId != null and profileId != ''">
+            and profile_id = #{profileId}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and start_time = #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and end_time = #{endTime}
+        </if>
+        order by register_time
+    </select>
+
+    <!--查询单个号源id记录，判断是否未当前人员的锁的号-->
+    <select id="getDoctorRegisterById" parameterType="java.lang.String" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        select id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
+        from outpt_doctor_register
+        where hosp_code = #{hospCode}
+          and id = #{sourceId}
+    </select>
+
+    <!--锁定/解锁号源-->
+    <update id="updateIsLock" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        update outpt_doctor_register
+        set is_lock = #{isLock}, profile_id = #{profileId}
+        where hosp_code = #{hospCode}
+          and id = #{sourceId}
+    </update>
+
+    <!--更新号源表数据(outpt_doctor_register)-->
+    <update id="updateOuptDoctorRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        update outpt_doctor_register
+        set is_use = #{isUse}
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+
+    <!--挂号信息表作废，更新作废状态-->
+    <update id="updateOuptRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        update outpt_register
+        set is_cancel = #{isCancel}
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+
+    <!--挂号明细表原费用被冲红-->
+    <update id="updateOutptRegisterDetailByRegisterId" parameterType="java.util.List">
+        <foreach collection="updateDetailList" separator=";" item="item">
+            UPDATE outpt_register_detail
+            <set>
+                <if test="item.registerId != null">
+                    register_id = #{item.registerId},
+                </if>
+                <if test="item.visitId != null">
+                    visit_id = #{item.visitId},
+                </if>
+                <if test="item.itemCode != null">
+                    item_code = #{item.itemCode},
+                </if>
+                <if test="item.itemId != null">
+                    item_id = #{item.itemId},
+                </if>
+                <if test="item.itemName != null">
+                    item_name = #{item.itemName},
+                </if>
+                <if test="item.bfcId!= null">
+                    bfc_id = #{item.bfcId},
+                </if>
+                <if test="item.price != null">
+                    price = #{item.price},
+                </if>
+                <if test="item.num != null">
+                    num = #{item.num},
+                </if>
+                <if test="item.useCode != null">
+                    use_code = #{item.useCode},
+                </if>
+                <if test="item.spec != null">
+                    spec = #{item.spec},
+                </if>
+                <if test="item.preferentialId != null">
+                    preferential_id = #{item.preferentialId},
+                </if>
+                <if test="item.totalPrice != null">
+                    total_price = #{item.totalPrice},
+                </if>
+                <if test="item.preferentialPrice != null">
+                    preferential_price = #{item.preferentialPrice},
+                </if>
+                <if test="item.realityPrice != null">
+                    reality_price = #{item.realityPrice},
+                </if>
+                <if test="item.unitCode != null">
+                    unit_code = #{item.unitCode},
+                </if>
+                <if test="item.statusCode != null">
+                    status_code = #{item.statusCode},
+                </if>
+                <if test="item.originId != null">
+                    origin_id = #{item.originId},
+                </if>
+                <if test="item.crteId != null">
+                    crte_id = #{item.crteId},
+                </if>
+                <if test="item.crteName != null">
+                    crte_name = #{item.crteName},
+                </if>
+                <if test="item.crteTime != null">
+                    crte_time = #{item.crteTime}
+                </if>
+            </set>
+            WHERE 1=1
+            and register_id = #{item.registerId}
+            and hosp_code = #{item.hospCode}
+        </foreach>
+    </update>
+
+    <!--挂号结算表数据冲红-->
+    <update id="updateOutptRegisterSettleByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto">
+        update
+        outpt_register_settle
+        <set>
+            status_code = #{statusCode}
+        </set>
+        where 1=1
+        and register_id = #{registerId}
+        and hosp_code = #{hospCode}
+    </update>
+
+    <!--挂号退号解锁号源信息-->
+    <update id="updateOutptDoctorRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        update
+            outpt_doctor_register
+        set
+            profile_id = null,
+            is_lock = '0',
+            is_use = '0'
+        where 1=1
+          and id = #{drId}
+          and hosp_code = #{hospCode}
+    </update>
+
+    <!--根据档案id、就诊查询起止时间查询出患者的就诊记录-->
+    <select id="getVistiListByProfileId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select
+        *
+        from outpt_visit
+        where hosp_code = #{hospCode}
+        and profile_id = #{profileId}
+        and is_visit = '1'
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+            and date_format(visit_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+          ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+            and date_format(visit_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+          ]]>
+        </if>
+        order by visit_time desc
+    </select>
+
+    <!--根据visitIds查询已缴费的处方列表-->
+    <select id="queryPaidPrescribeList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
+        SELECT
+        b.id as settle_id,
+        a.id as op_id,
+        a.visit_id,
+        c.name,
+        c.visit_no,
+        c.patient_code,
+        c.dept_name,
+        c.doctor_name,
+        b.settle_no,
+        b.status_code,
+        b.settle_time,
+        ROUND(b.total_price, 2) as total_price,
+        ROUND(t1.reality_price, 2) as reality_price,
+        ROUND(b.self_price, 2) as self_price,
+        b.is_settle,
+        b.is_print,
+        d.invoice_no
+        FROM
+        outpt_prescribe a
+        join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code
+        JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
+        join (
+        SELECT hosp_code, op_id, sum(reality_price) as reality_price
+        from outpt_cost
+        where settle_code = '2' and status_code = '0'
+        GROUP BY hosp_code, op_id
+        ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.op_id
+        LEFT JOIN outpt_settle_invoice d on b.id = d.settle_id and b.hosp_code = d.hosp_code
+        where a.hosp_code = #{hospCode}
+        and a.is_settle = '1'
+        and b.status_code = '0'
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," item="visitId" close=")" open="(">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and date_format(b.settle_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and date_format(b.settle_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+    </select>
+
+    <!--根据档案id查询出的就诊ids，查询对应的医技记录-->
+    <select id="queryMedicApplyList" parameterType="java.util.Map" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
+        SELECT
+        a.id as apply_id,
+        a.type_code,
+        b.name,
+        b.visit_no,
+        a.apply_no,
+        a.bar_code,
+        c.item_name,
+        c.price,
+        c.num,
+        a.dept_id,
+        a.dept_name,
+        a.report_time,
+        a.rporter
+        FROM
+        medic_apply a
+        JOIN outpt_prescribe_detail c on a.hosp_code = c.hosp_code and a.opd_id = c.id
+        JOIN outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
+        where a.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" open="(" close=")" item="visitId" separator=",">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and date_format(b.visit_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and date_format(b.visit_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="typeCode != null and typeCode != ''">
+            and a.type_code = #{typeCode}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and (b.name like concat('%', #{keyword}, '%') or b.visit_no = #{keyword})
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        order by b.visit_time desc
+    </select>
+
+    <!--根据医技申请id、申请单号查询医技结果-->
+    <select id="queryMedicApplyResult" parameterType="java.util.Map" resultType="cn.hsa.module.medic.result.dto.MedicalResultDTO">
+        select
+        c.name,
+        c.age,
+        c.age_unit_code,
+        c.gender_code,
+        b.apply_time,
+        b.report_time,
+        b.dept_name,
+        b.doctor_name,
+        a.item_id,
+        a.item_name,
+        a.result,
+        a.result_type,
+        a.result_unit,
+        a.result_detail,
+        a.reference_value,
+        a.range_state,
+        a.check_part,
+        a.check_ways,
+        a.check_type,
+        a.pic_url,
+        a.diagnosis_name,
+        a.reporte_text,
+        a.is_positive
+        from medic_result a
+        left join medic_apply b on a.apply_no = b.apply_no and a.hosp_code = b.hosp_code
+        JOIN outpt_visit c on a.hosp_code = c.hosp_code  and a.visit_id = c.id
+        where a.hosp_code = #{hospCode}
+        <if test="typeCode != null and typeCode != ''">
+            and b.type_code = #{typeCode}
+        </if>
+        <if test="applyNo != null and applyNo != ''">
+            and b.apply_no = #{applyNo}
+        </if>
+    </select>
+
+    <!--预缴金充值-->
+    <insert id="saveAdvancePayment" parameterType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
+        insert into inpt_advance_pay(id, hosp_code, visit_id, ap_order_no, price, is_settle, settle_id, red_id, status_code, daily_settle_id, source_pay_code, pay_code, cheque_no, service_price, order_no, remark, crte_id, crte_name, crte_time)
+        values (#{id},#{hospCode}, #{visitId}, #{apOrderNo},#{price},#{isSettle}, #{settleId}, #{redId},#{statusCode}, #{dailySettleId}, #{sourcePayCode}, #{payCode}, #{chequeNo}, #{servicePrice},#{orderNo}, #{remark}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--插入挂号表数据(outpt_register)-->
+    <insert id="insertOuptRegister" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        insert into outpt_register(id, hosp_code, visit_id, register_no, name, gender_code, age, birthday, cert_code, cert_no, phone, source_bz_code, visit_code, source_tj_code, source_tj_remark, register_time, cf_id, cq_id, dq_id, dr_id, dept_id, dept_name, doctor_id, doctor_name, is_cancel, is_first_visit, is_add, crte_id, crte_name, crte_time)
+        values (#{id}, #{hospCode}, #{visitId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{birthday}, #{certCode}, #{certNo}, #{phone}, #{sourceBzCode}, #{visitCode}, #{sourceTjCode}, #{sourceTjRemark}, #{registerTime}, #{cfId}, #{cqId}, #{dqId}, #{drId}, #{deptId}, #{deptName}, #{doctorId}, #{doctorName}, #{isCancel}, #{isFirstVisit}, #{isAdd}, #{crteId}, #{crteName}, #{crteTime} )
+    </insert>
+
+    <!--插入挂号费用表数据(outpt_register_detail)-->
+    <insert id="insertOuptRegisterDetail" parameterType="java.util.List">
+        insert into outpt_register_detail(id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id, price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price, unit_code, status_code, origin_id, crte_id, crte_name, crte_time)
+        VALUES
+        <foreach collection="list" item="dto" separator=",">
+            (#{dto.id}, #{dto.hospCode}, #{dto.registerId}, #{dto.visitId}, #{dto.itemCode}, #{dto.itemId}, #{dto.itemName}, #{dto.bfcId}, #{dto.price}, #{dto.num}, #{dto.useCode}, #{dto.spec}, #{dto.preferentialId}, #{dto.totalPrice}, #{dto.preferentialPrice}, #{dto.realityPrice}, #{dto.unitCode}, #{dto.statusCode}, #{dto.originId}, #{dto.crteId}, #{dto.crteName}, #{dto.crteTime} )
+        </foreach>
+    </insert>
+
+    <!--插入就诊表(outpt_visit)数据处理-->
+    <insert id="insertOutptVisit" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        insert into outpt_visit
+        (
+            id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
+            birthday, marry_code, nation_code, cert_code, cert_no, phone, visit_no, visit_code, patient_code,
+            preferential_type_id, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+            insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
+            pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
+        )
+        values
+            (
+                #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
+                #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
+                #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+                #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
+                #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
+            )
+    </insert>
+
+    <!--分诊队列表数据(outpt_triage_visit)-->
+    <insert id="insertOutptTriageVisit" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
+        insert into outpt_triage_visit
+        (id, hosp_code, register_id, visit_id, dq_id, triage_id, triage_name,
+         triage_no, clinic_id, doctor_id, doctor_name, clinic_name, dept_id,
+         dept_name, sort_no, name, triage_start_code, is_call, call_time,
+         call_number, is_loss, loss_time, remark, triage_peo_id, triage_peo_name,
+         triage_peo_time, crte_id, crte_name, crte_time)
+        values
+            (#{id}, #{hospCode}, #{registerId}, #{visitId}, #{dqId}, #{triageId}, #{triageName}, #{triageNo}, #{clinicId},
+             #{doctorId}, #{doctorName},#{clinicName}, #{deptId}, #{deptName}, #{sortNo}, #{name}, #{triageStartCode},
+             #{isCall}, #{callTime}, #{callNumber}, #{isLoss},#{lossTime}, #{remark}, #{triagePeoId}, #{triagePeoName},
+             #{triagePeoTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <!--挂号结算表数据(outpt_register_settle)-->
+    <insert id="insertOutptRegisterSettle" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto">
+        insert into
+            outpt_register_settle
+        (
+            id,
+            hosp_code,
+            register_id,
+            total_price,
+            preferential_price,
+            reality_price,
+            settle_time,
+            daily_settle_id,
+            status_code,
+            origin_id,
+            bill_id,
+            bill_no,
+            pay_code,
+            order_no,
+            crte_id,
+            crte_name,
+            crte_time
+        ) values (
+                     #{id,jdbcType=VARCHAR},
+                     #{hospCode,jdbcType=VARCHAR},
+                     #{registerId,jdbcType=VARCHAR},
+                     #{totalPrice,jdbcType=DECIMAL},
+                     #{preferentialPrice,jdbcType=DECIMAL},
+                     #{realityPrice,jdbcType=DECIMAL},
+                     #{settleTime,jdbcType=TIMESTAMP},
+                     #{dailySettleId,jdbcType=VARCHAR},
+                     #{statusCode,jdbcType=VARCHAR},
+                     #{originId,jdbcType=VARCHAR},
+                     #{billId,jdbcType=VARCHAR},
+                     #{billNo,jdbcType=VARCHAR},
+                     #{payCode,jdbcType=VARCHAR},
+                     #{orderNo,jdbcType=VARCHAR},
+                     #{crteId,jdbcType=VARCHAR},
+                     #{crteName,jdbcType=VARCHAR},
+                     #{crteTime,jdbcType=TIMESTAMP}
+                 )
+    </insert>
+
+    <!--结算支付表数据(outpt_register_pay)-->
+    <insert id="insertOutptRegisterPay" parameterType="java.util.List">
+        INSERT INTO outpt_register_pay (
+        id, hosp_code, rs_id, visit_id, pay_code, order_no, price, service_price
+        ) VALUES
+        <foreach collection="payList" index="index" item="item" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.rsId},
+            #{item.visitId},
+            #{item.payCode},
+            #{item.orderNo},
+            #{item.price},
+            #{item.servicePrice}
+            )
+        </foreach>
+    </insert>
+
+    <!--门诊划价收费结算，插入费用数据到(outpt_cost)表中-->
+    <insert id="insertOuptCost" parameterType="java.util.List">
+        insert into
+        outpt_cost
+        (
+        id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time,
+        distribute_all_detail_id
+        ) values
+        <foreach collection="costList" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.opeId,jdbcType=VARCHAR},
+            #{item.sourceCode,jdbcType=VARCHAR},
+            #{item.sourceId,jdbcType=VARCHAR},
+            #{item.oldCostId,jdbcType=VARCHAR},
+            #{item.sourceDeptId,jdbcType=VARCHAR},
+            #{item.bfcId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.prepCode,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.rateId,jdbcType=VARCHAR},
+            #{item.useDays,jdbcType=INTEGER},
+            #{item.numUnitCode,jdbcType=VARCHAR},
+            #{item.totalNum,jdbcType=DECIMAL},
+            #{item.herbNoteCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.herbNum,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.preferentialPrice,jdbcType=DECIMAL},
+            #{item.realityPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.isDist,jdbcType=VARCHAR},
+            #{item.backNum,jdbcType=DECIMAL},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.settleCode,jdbcType=VARCHAR},
+            #{item.oneSettleId,jdbcType=VARCHAR},
+            #{item.selfRatio,jdbcType=DECIMAL},
+            #{item.isTechnologyOk,jdbcType=VARCHAR},
+            #{item.technologyOkId,jdbcType=VARCHAR},
+            #{item.technologyOkName,jdbcType=VARCHAR},
+            #{item.technologyOkTime,jdbcType=TIMESTAMP},
+            #{item.avgBuyPrice,jdbcType=DECIMAL},
+            #{item.avgSellPrice,jdbcType=DECIMAL},
+            #{item.doctorId,jdbcType=VARCHAR},
+            #{item.doctorName,jdbcType=VARCHAR},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.execDeptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP},
+            #{item.distributeAllDetailId,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <!--根据deptId、certNo、挂号日期查询是否已挂号-->
+    <select id="queryIsRepeatRegister" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        select
+        distinct
+        a.*
+        from outpt_register a
+        left join  outpt_register_detail b on a.hosp_code = b.hosp_code and a.id = b.register_id
+        where a.hosp_code=#{hospCode}
+        and b.status_code = '0'
+        <![CDATA[ and a.is_cancel = <> '1' ]]>
+        <if test="certNo != null and certNo != ''">
+            and a.cert_no = #{certNo}
+        </if>
+        <if test="deptId != null and deptId != ''">
+            and a.dept_id = #{deptId}
+        </if>
+        <if test="nowDate != null">
+            and DATE_FORMAT(a.register_time,'%Y-%m-%d') = DATE_FORMAT(#{nowDate}, '%Y-%m-%d')
+        </if>
+        <if test="cqId != null and cqId != ''">
+            and a.cq_id = #{cqId}
+        </if>
+    </select>
+
+    <!--根据医生队列id获取所属诊室信息-->
+    <select id="queryDoctorQueueById" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto">
+        select
+        odq.*
+        from outpt_doctor_queue odq
+        where
+        odq.hosp_code=#{hospCode}
+        <if test="id !=null and id != ''">
+            and odq.id = #{id}
+        </if>
+        limit 1
+    </select>
+
+    <!--查询班次队列数据-->
+    <select id="queryClassesQueueParam" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto">
+        select
+        ocq.*
+        from outpt_classes_queue ocq
+        where ocq.hosp_code = #{hospCode,jdbcType=VARCHAR}
+        <if test="ids !=null">
+            and ocq.id in
+            <foreach collection="ids" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="deptId !=null and deptId !=''">
+            and ocq.dept_id = #{deptId}
+        </if>
+        <if test="csId !=null and csId !=''">
+            and ocq.cs_id = #{csId}
+        </if>
+        <if test="cyId !=null and cyId !=''">
+            and ocq.cy_id = #{cyId}
+        </if>
+        <if test="triageId !=null and triageId !=''">
+            and ocq.triage_id = #{triageId}
+        </if>
+        <if test="isValid !=null and isValid !=''">
+            and ocq.is_valid = #{isValid}
+        </if>
+        <if test="queueStartDate != null and queueStartDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &gt;=#{queueStartDate}
+        </if>
+        <if test="queueEndDate != null and queueEndDate != ''">
+            and DATE_FORMAT(ocq.queue_date,'%Y-%m-%d') &lt;=#{queueEndDate}
+        </if>
+    </select>
+
+    <!--通过id查询单个挂号类别排班记录-->
+    <select id="getClassifyClassesById" resultType="cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassifyClassesDTO">
+        select
+            id, hosp_code, cs_id, cy_id, triage_id, triage_code, dept_id, weeks, register_num, is_call, is_valid, crte_id, crte_name, crte_time,
+            (select name from base_dept where dept_id = base_dept.id and base_dept.hosp_code = #{hospCode}) as deptName,
+            (select name from outpt_classify where cy_id = outpt_classify.id and outpt_classify.hosp_code = #{hospCode}) as classifyName,
+            (select name from outpt_classes where cs_id = outpt_classes.id and outpt_classes.hosp_code = #{hospCode}) as classesName
+        from outpt_classify_classes
+        where id = #{id} and hosp_code = #{hospCode}
+    </select>
+
+    <!--根据挂号id、医院编码查询挂号记录-->
+    <select id="getOutptRegisterById" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
+        select
+        *
+        from outpt_register
+        where hosp_code = #{hospCode}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="registerNo != null and registerNo != ''">
+            and register_no = #{registerNo}
+        </if>
+        order by register_time
+    </select>
+
+    <!--根据visitId查询就诊表-->
+    <select id="getOutptVisitById" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select
+        *
+        from outpt_visit
+        where hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and id = #{visitId}
+        </if>
+    </select>
+
+    <!--根据挂号id、就诊id查询挂号明细记录-->
+    <select id="queryOutptRegisterDetailByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto">
+        select
+        id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id, price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price, unit_code, status_code, origin_id, crte_id, crte_name, crte_time
+        from
+        outpt_register_detail
+        where hosp_code = #{hospCode}
+        and status_code = '0'
+        <if test="id != null and id != ''">
+            and register_id = #{id}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+        order by crte_time
+    </select>
+
+    <!--根据挂号id查询挂号结算表记录-->
+    <select id="queryOutptRegisterSettleByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto">
+        select
+        id, hosp_code, register_id, total_price, preferential_price, reality_price, settle_time, daily_settle_id, status_code, origin_id, bill_id, bill_no, pay_code, order_no, crte_id, crte_name, crte_time
+        from outpt_register_settle
+        where hosp_code = #{hospCode}
+        and status_code = '0'
+        <if test="id != null and id != ''">
+            and register_id = #{id}
+        </if>
+        order by settle_time
+    </select>
+
+    <!--根据挂号id查询挂号支付方式记录-->
+    <select id="queryOutptRegisterPayByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterPayDto">
+        select
+        id, hosp_code, rs_id, visit_id, pay_code, order_no, price, service_price
+        from
+        outpt_register_pay
+        where hosp_code = #{hospCode}
+        <if test="visitId != null and visitId != ''">
+            and visit_id = #{visitId}
+        </if>
+    </select>
+
+
+
+    <!--  查询所有科室下所有七天内有排班的医生-->
+    <select id="querySevenQueueDoctor" resultType="map">
+        SELECT
+            DISTINCT
+            c.id as deptId,
+            c.name as deptName,
+            d.id as doctorId,
+            d.name as doctorName
+        FROM
+            outpt_doctor_queue a,
+            outpt_classes_queue b,
+            base_dept c ,
+            sys_user d
+        WHERE
+            a.cq_id = b.id
+          AND a.hosp_code = b.hosp_code
+          and b.dept_id = c.id and b.hosp_code = c.hosp_code
+          and a.doctor_id = d.id and a.hosp_code = d.hosp_code
+          and a.hosp_code = #{hospCode}
+          and d.name like '%${keyword}%'
+          AND date( queue_date ) BETWEEN date(now()) and date(now())+7 order by date( queue_date )
+    </select>
+
+</mapper>

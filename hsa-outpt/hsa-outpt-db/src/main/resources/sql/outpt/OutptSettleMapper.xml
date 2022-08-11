@@ -507,7 +507,7 @@
             b.age_unit_code,
             a.patient_code,
             b.dept_name,
-            b.doctor_name,
+            c.doctor_name,
             a.total_price,
             a.reality_price,
             IFNULL(a.self_price,0) as self_price,
@@ -551,7 +551,7 @@
             and a.settle_time &lt;= #{endTime}
         </if>
         <if test="chargeId != null and chargeId != ''">
-            and a.crte_id = #{chargeId}
+           and a.crte_name LIKE CONCAT('%',#{chargeId},'%')
         </if>
         <if test="doctorId != null and doctorId != ''">
             and c.doctor_id = #{doctorId}
@@ -578,7 +578,7 @@
         b.age_unit_code,
         a.patient_code,
         b.dept_name,
-        b.doctor_name,
+        oc.doctor_name,
         a.total_price,
         a.total_price as invoice_price,
         IFNULL(a.self_price,0) as self_price,
@@ -606,6 +606,8 @@
         left join base_preferential_type d on b.preferential_type_id = d.id
         left join base_card_recharge_change bcrc on bcrc.settle_id = a.id and a.status_code = '0' and a.is_settle = '1'
         left join base_card c on c.hosp_code = a.hosp_code and c.id = bcrc.card_id
+        <!--存在就诊表里的就诊医生与费用表医生不一致，导致过滤的数据不正确，医生过滤修改成费用表医生 liuliyun 2022.08.10-->
+        left join outpt_cost oc on a.id = oc.settle_id and a.hosp_code = oc.hosp_code and oc.settle_code = '2'
         where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
         <if test="keyword != null and keyword != ''">
             and ( b.name LIKE CONCAT('%',#{keyword},'%')
@@ -618,7 +620,7 @@
             and a.settle_time &lt;= #{endTime}
         </if>
         <if test="doctorId != null and doctorId != ''">
-            and b.doctor_id = #{doctorId}
+            and oc.doctor_id = #{doctorId}
         </if>
         <if test="deptId != null and deptId != ''">
             and b.dept_id = #{deptId}
@@ -626,6 +628,7 @@
         <if test="isSettle != null and isSettle != ''">
             and a.is_settle = #{isSettle}
         </if>
+        group by a.id
         order by a.settle_no desc, a.settle_time desc
     </select>
 

@@ -54,7 +54,7 @@
         b.age_unit_code,
         a.patient_code,
         b.dept_name,
-        b.doctor_name,
+        oc.doctor_name,
         a.total_price,
         a.total_price as invoice_price,
         IFNULL(a.self_price,0) as self_price,
@@ -77,6 +77,7 @@
         left join base_preferential_type d on b.preferential_type_id = d.id
         left join (select settle_id, max(status) as status from outpt_refund_apply where hosp_code = #{hospCode} GROUP BY settle_id) m
             on m.settle_id = a.id
+        left join outpt_cost oc on a.id = oc.settle_id and a.hosp_code = oc.hosp_code and oc.settle_code = '2'
         where 1=1 and a.hosp_code = #{hospCode} and b.id is not null
         <if test="keyword != null and keyword != ''">
             and (b.name LIKE CONCAT('%',#{keyword},'%') or
@@ -89,7 +90,7 @@
             and a.settle_time &lt;= DATE_FORMAT(#{endTime},'%Y-%m-%d %H:%i:%s')
         </if>
         <if test="doctorId != null and doctorId != ''">
-            and b.doctor_id = #{doctorId}
+            and oc.doctor_id = #{doctorId}
         </if>
         <if test="deptId != null and deptId != ''">
             and b.dept_id = #{deptId}
@@ -97,6 +98,7 @@
         <if test="isSettle != null and isSettle != ''">
             and a.is_settle = #{isSettle}
         </if>
+        group by a.id
         order by a.settle_no desc, a.settle_time desc
     </select>
 

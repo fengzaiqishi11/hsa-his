@@ -1083,6 +1083,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0202.put("RT_020203", odMzGh != null ? odMzGh.getRoundTotalPrice() : "0.00");
                 // 实收合计
                 RT_0202.put("RT_020204", odMzGh != null ? odMzGh.getRealityTotalPrice() : "0.00");
+                // 优惠合计
+                RT_0202.put("RT_020205", odMzGh != null ? odMzGh.getPreferentialTotalPrice() : "0.00");
                 resultMap.put("RT_0202", RT_0202);
 
                 // 门诊挂号 - 费用构成  TODO 添加一卡通
@@ -1134,6 +1136,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
                 RT_0102.put("RT_010203", odMzSF != null ? odMzSF.getRoundTotalPrice() : "0.00");
                 // 实收合计
                 RT_0102.put("RT_010204", odMzSF != null ? odMzSF.getRealityTotalPrice() : "0.00");
+                // 优惠合计
+                RT_0102.put("RT_010205", odMzSF != null ? odMzSF.getPreferentialTotalPrice() : "0.00");
                 resultMap.put("RT_0102", RT_0102);
 
                 // *******************************门诊日结 - 一卡通收入*******************************
@@ -1307,6 +1311,8 @@ public class OutinDailyBOImpl implements OutinDailyBO {
             RT_0102.put("RT_010203", BigDecimalUtils.nullToZero(TMP_0102.getRoundTotalPrice()));
             // 实收合计
             RT_0102.put("RT_010204",  BigDecimalUtils.nullToZero(TMP_0102.getRealityTotalPrice()));
+            // 优惠合计
+            RT_0102.put("RT_010205", BigDecimalUtils.nullToZero(TMP_0102.getPreferentialTotalPrice()));
             resultMap.put("RT_0102", RT_0102);
 
             // 住院收入 -->> 费用包含

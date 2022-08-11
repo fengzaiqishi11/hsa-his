@@ -61,7 +61,7 @@
         <if test="deptId != null and deptId != ''">
             and dept_id = #{deptId}
         </if>
-        ORDER BY crte_time desc
+        ORDER BY pym,crte_time desc
     </select>
 
     <!--查询单个-->

@@ -180,6 +180,11 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 if (StringUtils.isNotEmpty(profileFileDTO.getPreferentialTypeId())){
                     param.setPreferentialTypeId(profileFileDTO.getPreferentialTypeId());
                 }
+                if (StringUtils.isEmpty(profileFileDTO.getOutProfile())){
+                    // 门诊档案号
+                    String outProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "104");
+                    param.setOutProfile(outProfile);
+                }
                 //门诊
                 // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表
                 int totalOut = profileFileDTO.getTotalOut() == null ? 1 : profileFileDTO.getTotalOut() + 1;
@@ -194,6 +199,18 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
                 }
                 if (StringUtils.isNotEmpty(profileFileDTO.getPreferentialTypeId())){
                     param.setPreferentialTypeId(profileFileDTO.getPreferentialTypeId());
+                }
+                if (StringUtils.isEmpty(profileFileDTO.getInProfile())){
+                    // 住院病案号
+                    String inProfile ="";
+                    // 是否开启自定义住院号
+                    SysParameterDTO sysParameterDTO = sysParameterDAO.getParameterByCode(outptProfileFileDTO.getHospCode(), "BAH_SF");
+                    if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+                        inProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "361");
+                    } else {
+                        inProfile = baseOrderRuleBO.updateOrderNo(outptProfileFileDTO.getHospCode(), "36");
+                    }
+                    param.setInProfile(inProfile);
                 }
                 //住院
                 // update 2022-03-04 luoyong 入院登记时写入住院次数到就诊表

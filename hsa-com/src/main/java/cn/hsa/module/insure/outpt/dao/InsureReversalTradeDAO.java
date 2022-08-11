@@ -206,7 +206,18 @@ public interface InsureReversalTradeDAO {
      **/
     List<Map<String, Object>> queryDeclareInfos(Map<String, Object> paraMap);
 
+    /**
+     * 九江门诊对总账查询
+     * @param map
+     * @Author zhangjinping
+     * @return
+     */
     List<Map<String, Object>> queryDataJiuJiangMzWith3201(Map<String, Object> map);
-
+    /**
+     * 九江住院对总账查询
+     * @Author zhangjinping
+     * @param map
+     * @return
+     */
     List<Map<String, Object>> queryDataJiuJiangZyWith3201(Map<String, Object> map);
 }

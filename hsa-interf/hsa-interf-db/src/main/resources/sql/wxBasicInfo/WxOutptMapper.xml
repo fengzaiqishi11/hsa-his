@@ -1,166 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.hsa.module.interf.wxBasicInfo.dao.WxBasicInfoDAO">
+<mapper namespace="cn.hsa.module.interf.wxBasicInfo.dao.WxOutptDAO">
+
     <!--更新病人就诊信息标志为作废-->
     <delete id="deleteOutptVisitByVisitId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
         DELETE FROM outpt_visit WHERE id = #{visitId} and hosp_code = #{hospCode} and is_visit != '1'
     </delete>
 
-    <!--全院科室分布情况介绍-->
-    <select id="getDeptInfo" parameterType="java.util.Map" resultType="java.util.Map">
-        select
-            id,
-            hosp_code as hospCode,
-            type_code as typeCode,
-            nation_code as nationCode,
-            code,
-            name,
-            ward_code as wardCode,
-            phone,
-            up_dept_code as upDeptCode,
-            mg_dept_code as mgDeptCode,
-            intro,
-            place,
-            remark
-        from base_dept
-        where hosp_code = #{hospCode}
-          and is_valid = '1'
-          <if test="data.code != null and data.code != ''">
-              and code = #{data.code}
-          </if>
-    </select>
-
-    <!--医生信息查询-->
-    <select id="getDoctorListByIdOrDeptCode" parameterType="java.util.Map" resultType="java.util.Map">
-        SELECT
-        a.dept_code AS deptCode,
-        b.id AS deptId,
-        b.NAME AS deptName,
-        a.id AS doctorId,
-        a.NAME AS doctorName,
-        a.speciality,
-        a.introduce,
-        ( SELECT NAME FROM sys_code_detail scd WHERE scd.VALUE = work_type_code AND c_code = 'RYZW' ) AS dutiesName,
-        a.duties_code AS dutiesCode,
-        a.photo_image AS photoImage
-        FROM
-        sys_user a,
-        base_dept b
-        WHERE
-        a.hosp_code = b.hosp_code
-        AND a.dept_code = b.CODE
-        AND a.work_type_code LIKE concat( '1', '%' )
-        AND a.is_in_job = '1'
-        AND a.status_code = '0'
-        <if test="data.doctorId != null and data.doctorId != ''">
-            and a.id = #{data.doctorId}
-        </if>
-        <if test="data.deptCode != null and data.deptCode != ''">
-            and a.dept_code = #{data.deptCode}
-        </if>
-        order by a.dept_code
-    </select>
-
-    <!--基础业务代码查询-->
-    <select id="getSysValue" parameterType="java.util.Map" resultType="java.util.Map">
-        select
-               c_code as code,
-               name,
-               value
-        from
-             sys_code_detail
-        where hosp_code = #{hospCode}
-          and is_valid = '1'
-          <if test="data.code != null and data.code != ''">
-            and find_in_set(c_code, #{data.code})
-          </if>
-        <if test="data.value != null and data.value != ''">
-            and value = #{data.value}
-        </if>
-        <if test="data.codeList != null and data.codeList.size() > 0">
-            and c_code in
-            <foreach collection="data.codeList" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </if>
-        order by seq_no
-    </select>
-
-
-    <!--个人信息查询-->
-    <select id="queryProfileByCertNo" parameterType="java.util.Map" resultType="cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO">
-        select
-            id, hosp_code, in_profile, out_profile, name, gender_code, age, birthday, nation_code,
-               nationality_cation, native_place, education_code, occupation_code, marry_code,
-               cert_code, cert_no, phone, email, often_code, now_prov, now_city, now_area,
-               now_address, now_post_code, native_prov, native_city, native_area, native_address,
-               native_post_code, contact_name, contact_rela_code, contact_phone, contact_post_code,
-               contact_address, take_name, take_rela_code, take_cert_no, take_phone, work, work_phone,
-               work_post_code, work_address, blood_code, family_disease, expose_disease, heredity_disease,
-               allergy_disease, past_disease, past_oper, past_trauma, past_blood, past_remark,
-               allergy_remark, source_tj_code, source_tj_remark, pym, wbm, total_out, total_in,
-               outpt_last_visit_time, inpt_last_visit_time, patient_code, preferential_type_id,
-               (select name from base_preferential_type bpt where bpt.hosp_code = hosp_code and bpt.id = preferential_type_id) as preferential_type_name,
-               remark, is_valid, crte_id, crte_name, crte_time
-        from base_profile_file
-        where hosp_code = #{hospCode}
-            and is_valid = '1'
-        <if test="data.certNo != null and data.certNo != null">
-            and cert_no = #{data.certNo}
-        </if>
-        <if test="data.profileId != null and data.profileId != null">
-            and id = #{data.profileId}
-        </if>
-        <if test="data.certCode != null and data.certCode != null">
-            and cert_code = #{data.certCode}
-        </if>
-    </select>
-
-    <!--查询挂号科室-->
-    <select id="queryDeptByCode" parameterType="java.util.Map" resultType="cn.hsa.module.base.dept.dto.BaseDeptDTO">
-        select
-            id,
-            hosp_code,
-            type_code,
-            nation_code,
-            code, name,
-            ward_code,
-            phone,
-            up_dept_code,
-            mg_dept_code,
-            intro, place,
-            remark,
-            pym,
-            wbm,
-            is_valid,
-            crte_id,
-            crte_name,
-            crte_time,
-            type_identity
-        from base_dept
-        where hosp_code = #{hospCode}
-        and is_valid = '1'
-        <if test="data.id != null and data.id != ''">
-            and id = #{data.id}
-        </if>
-        <if test="data.code != null and data.code != ''">
-            and code = #{data.code}
-        </if>
-        <if test="data.typeCode != null and data.typeCode != ''">
-            and type_code = #{data.typeCode}
-        </if>
-        <if test="data.wardCode != null and data.wardCode != ''">
-            and ward_code = #{data.wardCode}
-        </if>
-    </select>
-
     <!--根据科室ids查询对应的挂号类别-->
     <select id="queryClassify" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO">
         select
-            id, hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name, crte_time
+        id, hosp_code, name, dept_id, visit_code, register_code, remark, pym, wbm, is_expert, is_valid, crte_id, crte_name, crte_time
         from outpt_classify
         where hosp_code = #{hospCode}
-            and is_valid = '1'
+        and is_valid = '1'
         <if test="data.id != null and data.id != ''">
             and id = #{data.id}
         </if>
@@ -179,56 +32,56 @@
     <!--查询科室医生及其班次信息-->
     <select id="queryDoctorAndClassesByDeptId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto">
         SELECT
-            a.hosp_code,
-            b.cc_id,
-            b.cy_id,
-            b.cs_id,
-            a.id as dq_id,
-            a.cq_id,
-            b.queue_date as queue_date_str,
-            ocs.name as classes_name,
-            b.dept_id,
-            bd.code as deptCode,
-            bd.name as dept_name,
-            ocy.name as classify_name,
-            ocy.visit_code,
-            ocy.register_code,
-            a.doctor_id,
-            a.doctor_name,
-            ROUND(t1.classify_price, 2) as classify_price,
-            <!--a.register_num,-->
-            IFNULL(SUM(t2.register_num), 0) as register_num,
-            IFNULL(SUM(t2.yy_num), 0) as used_register_num,
-            IFNULL(SUM(t2.sy_num), 0) as surplus_register_num
+        a.hosp_code,
+        b.cc_id,
+        b.cy_id,
+        b.cs_id,
+        a.id as dq_id,
+        a.cq_id,
+        b.queue_date as queue_date_str,
+        ocs.name as classes_name,
+        b.dept_id,
+        bd.code as deptCode,
+        bd.name as dept_name,
+        ocy.name as classify_name,
+        ocy.visit_code,
+        ocy.register_code,
+        a.doctor_id,
+        a.doctor_name,
+        ROUND(t1.classify_price, 2) as classify_price,
+        <!--a.register_num,-->
+        IFNULL(SUM(t2.register_num), 0) as register_num,
+        IFNULL(SUM(t2.yy_num), 0) as used_register_num,
+        IFNULL(SUM(t2.sy_num), 0) as surplus_register_num
         FROM
-            outpt_doctor_queue a
+        outpt_doctor_queue a
         LEFT JOIN outpt_classes_queue b on a.hosp_code = b.hosp_code and a.cq_id = b.id
         JOIN outpt_classes ocs on b.hosp_code = ocs.hosp_code and b.cs_id = ocs.id
         JOIN outpt_classify_classes occ on b.hosp_code = occ.hosp_code and b.cc_id = occ.id
         join outpt_classify ocy on b.hosp_code = ocy.hosp_code and b.cy_id = ocy.id
         join base_dept bd on bd.id = b.dept_id and bd.hosp_code = b.hosp_code
         join (
-            SELECT
-                a.hosp_code,
-                a.cy_id,
-                IFNULL(CONVERT(SUM( b.price * a.num), DECIMAL(14,4)), 0) as classify_price
-            FROM
-                outpt_classify_cost a
-            JOIN base_item b on a.hosp_code = b.hosp_code and a.item_id = b.id
-            GROUP BY a.hosp_code, a.cy_id
+        SELECT
+        a.hosp_code,
+        a.cy_id,
+        IFNULL(CONVERT(SUM( b.price * a.num), DECIMAL(14,4)), 0) as classify_price
+        FROM
+        outpt_classify_cost a
+        JOIN base_item b on a.hosp_code = b.hosp_code and a.item_id = b.id
+        GROUP BY a.hosp_code, a.cy_id
         )  t1 on b.cy_id = t1.cy_id and b.hosp_code = t1.hosp_code
         LEFT JOIN (
-            SELECT
-                dq_id,
-                hosp_code,
-                start_time,
-                end_time,
-                max(register_num) as register_num,
-                IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
-                (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
-            FROM
-                 outpt_doctor_register
-            GROUP BY dq_id,hosp_code,start_time, end_time
+        SELECT
+        dq_id,
+        hosp_code,
+        start_time,
+        end_time,
+        max(register_num) as register_num,
+        IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
+        (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
+        FROM
+        outpt_doctor_register
+        GROUP BY dq_id,hosp_code,start_time, end_time
         ) t2 on a.hosp_code = t2.hosp_code and a.id = t2.dq_id
         WHERE a.hosp_code = #{hospCode}
         and a.is_valid = '1'
@@ -255,43 +108,43 @@
     <!--查询医生号源信息-->
     <select id="queryDoctorNumberSourceInformation" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto">
         SELECT
-            a.id,
-            b.cy_id,
-            (select name FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as cy_name,
-            (select visit_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as visit_code,
-            (select register_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as register_code,
-            a.doctor_id,
-            a.doctor_name,
-            b.dept_id,
-            (SELECT name from base_dept bd where bd.hosp_code = b.hosp_code and bd.id = b.dept_id) as dept_name,
-            b.queue_date,
-            LEFT(t1.start_time, 5) as start_time,
-            LEFT(t1.end_time, 5) as end_time,
-            t1.register_num,
-            t1.used_register_num,
-            t1.surplus_register_num
+        a.id,
+        b.cy_id,
+        (select name FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as cy_name,
+        (select visit_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as visit_code,
+        (select register_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as register_code,
+        a.doctor_id,
+        a.doctor_name,
+        b.dept_id,
+        (SELECT name from base_dept bd where bd.hosp_code = b.hosp_code and bd.id = b.dept_id) as dept_name,
+        b.queue_date,
+        LEFT(t1.start_time, 5) as start_time,
+        LEFT(t1.end_time, 5) as end_time,
+        t1.register_num,
+        t1.used_register_num,
+        t1.surplus_register_num
         FROM
-            outpt_doctor_queue a
+        outpt_doctor_queue a
         LEFT JOIN outpt_classes_queue b on a.cq_id = b.id and a.hosp_code = b.hosp_code
         LEFT JOIN (
-            SELECT
-                hosp_code,
-                dq_id,
-                start_time,
-                end_time,
-                MAX(register_num) as register_num,
-                IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as used_register_num,
-                (MAX(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as surplus_register_num
-            FROM
-                outpt_doctor_register
-            GROUP BY
-                hosp_code, dq_id, start_time, end_time
-            ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.dq_id
+        SELECT
+        hosp_code,
+        dq_id,
+        start_time,
+        end_time,
+        MAX(register_num) as register_num,
+        IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as used_register_num,
+        (MAX(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as surplus_register_num
+        FROM
+        outpt_doctor_register
+        GROUP BY
+        hosp_code, dq_id, start_time, end_time
+        ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.dq_id
         where a.hosp_code = #{hospCode}
-            and a.is_valid = '1'
-            and b.is_valid = '1'
+        and a.is_valid = '1'
+        and b.is_valid = '1'
         <if test="data.isToday != null and data.isToday == '1'.toString()">
-          <![CDATA[
+            <![CDATA[
             and DATE_FORMAT(NOW(), '%H:%i:%s') < t1.end_time
           ]]>
         </if>
@@ -310,27 +163,27 @@
     <!--查询挂号类别费用-->
     <select id="queryClassifyCost" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.outptclassify.dto.OutptClassifyCostDTO">
         SELECT
-            a.id,
-            a.cy_id,
-            a.item_code,
-            a.item_id,
-            a.num,
-            a.use_code,
-            c.name,
-            c.unit_code as item_unit_code,
-            c.spec,
-            ROUND(c.price, 2) as item_price,
-            ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_price_all,
-            ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_preferential_all_price,
-            c.bfc_code,
-            (SELECT id from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_id,
-            (SELECT name from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_name
+        a.id,
+        a.cy_id,
+        a.item_code,
+        a.item_id,
+        a.num,
+        a.use_code,
+        c.name,
+        c.unit_code as item_unit_code,
+        c.spec,
+        ROUND(c.price, 2) as item_price,
+        ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_price_all,
+        ROUND(CONVERT((a.num * c.price), DECIMAL(14,4)), 2) as item_preferential_all_price,
+        c.bfc_code,
+        (SELECT id from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_id,
+        (SELECT name from base_finance_classify bfc where bfc.hosp_code = c.hosp_code and bfc.code = c.bfc_code) as bfc_name
         FROM
-            outpt_classify_cost a
+        outpt_classify_cost a
         LEFT JOIN outpt_classify b on a.hosp_code = b.hosp_code and a.cy_id = b.id
         JOIN base_item c on a.hosp_code = c.hosp_code and a.item_id = c.id
         where a.hosp_code = #{hospCode}
-          and b.is_valid = '1'
+        and b.is_valid = '1'
         <if test="data.cyId != null and data.cyId != ''">
             and a.cy_id = #{data.cyId}
         </if>
@@ -340,56 +193,56 @@
     <!--查询所有的预约挂号记录列表-->
     <select id="queryOutptRegister" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
         SELECT
-            a.id,
-            a.hosp_code,
-            a.visit_id,
-            a.register_no,
-            a.name,
-            a.gender_code,
-            a.age,
-            a.birthday,
-            a.cert_code,
-            a.cert_no,
-            a.source_bz_code,
-            a.visit_code,
-            a.source_tj_code,
-            a.register_time,
-            a.cf_id,
-            (SELECT name from outpt_classify oc where oc.hosp_code = a.hosp_code and oc.id = a.cf_id) as classify_name,
-            a.cq_id,
-            a.dq_id,
-            a.dr_id,
-            a.dept_id,
-            a.dept_name,
-            (select place from base_dept bd where bd.hosp_code = a.hosp_code and a.dept_id = bd.id) as place,
-            a.doctor_id,
-            a.doctor_name,
-            a.is_cancel,
-            a.is_first_visit,
-            a.crte_id,
-            a.crte_name,
-            a.crte_time,
-            b.status_code,
-            c.bill_no,
-            (SELECT patient_code FROM outpt_visit ov where ov.hosp_code = a.hosp_code and ov.id = a.visit_id) as patient_code,
-            ROUND(b.reality_price, 2) AS reality_price,
-            c.settle_time,
-            d.visit_time,
-            CONCAT(DATE_FORMAT(a.register_time,'%Y-%m-%d'),' ( ',SUBSTR(e.start_time,1,5),'-',SUBSTR(e.end_time,1,5),' ) ') as bookingTime
+        a.id,
+        a.hosp_code,
+        a.visit_id,
+        a.register_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.birthday,
+        a.cert_code,
+        a.cert_no,
+        a.source_bz_code,
+        a.visit_code,
+        a.source_tj_code,
+        a.register_time,
+        a.cf_id,
+        (SELECT name from outpt_classify oc where oc.hosp_code = a.hosp_code and oc.id = a.cf_id) as classify_name,
+        a.cq_id,
+        a.dq_id,
+        a.dr_id,
+        a.dept_id,
+        a.dept_name,
+        (select place from base_dept bd where bd.hosp_code = a.hosp_code and a.dept_id = bd.id) as place,
+        a.doctor_id,
+        a.doctor_name,
+        a.is_cancel,
+        a.is_first_visit,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time,
+        b.status_code,
+        c.bill_no,
+        (SELECT patient_code FROM outpt_visit ov where ov.hosp_code = a.hosp_code and ov.id = a.visit_id) as patient_code,
+        ROUND(b.reality_price, 2) AS reality_price,
+        c.settle_time,
+        d.visit_time,
+        CONCAT(DATE_FORMAT(a.register_time,'%Y-%m-%d'),' ( ',SUBSTR(e.start_time,1,5),'-',SUBSTR(e.end_time,1,5),' ) ') as bookingTime
         FROM
-            outpt_register a
+        outpt_register a
         LEFT JOIN (
-            SELECT hosp_code, register_id, status_code, SUM(reality_price) as reality_price
-            from outpt_register_detail
-            GROUP BY hosp_code,register_id, status_code
-            ) b on a.hosp_code = b.hosp_code and a.id = b.register_id
+        SELECT hosp_code, register_id, status_code, SUM(reality_price) as reality_price
+        from outpt_register_detail
+        GROUP BY hosp_code,register_id, status_code
+        ) b on a.hosp_code = b.hosp_code and a.id = b.register_id
         left join outpt_register_settle c on a.hosp_code = c.hosp_code and a.id = c.register_id
         left join outpt_visit d on a.hosp_code = d.hosp_code and a.id = d.register_id and a.visit_id = d.id
         left join outpt_doctor_register e on a.dr_id = e.id and e.hosp_code = a.hosp_code
         WHERE a.hosp_code = #{hospCode}
-          and b.status_code = '0'
-          and c.status_code = '0'
-          -- and a.source_bz_code = '4'
+        and b.status_code = '0'
+        and c.status_code = '0'
+        -- and a.source_bz_code = '4'
         <if test="data.keyword != null and data.keyword != ''">
             and (a.name like concat('%', #{data.keyword}, '%') or a.cert_no =  #{data.keyword} or a.register_no = #{data.keyword})
         </if>
@@ -405,36 +258,37 @@
         order by a.register_time desc
     </select>
 
+
     <!--查询存在待缴费的处方的就诊记录列表-->
     <select id="queryVisitList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         SELECT
-            distinct
-            a.id as visit_id,
-            a.hosp_code,
-            a.profile_id,
-            a.register_id,
-            a.register_no,
-            a.name,
-            a.age,
-            a.visit_no,
-            a.cert_no,
-            a.doctor_id,
-            a.doctor_name,
-            a.dept_id,
-            a.dept_name,
-            a.visit_time,
-            a.is_visit,
-            a.crte_id,
-            a.crte_name,
-            a.crte_time
+        distinct
+        a.id as visit_id,
+        a.hosp_code,
+        a.profile_id,
+        a.register_id,
+        a.register_no,
+        a.name,
+        a.age,
+        a.visit_no,
+        a.cert_no,
+        a.doctor_id,
+        a.doctor_name,
+        a.dept_id,
+        a.dept_name,
+        a.visit_time,
+        a.is_visit,
+        a.crte_id,
+        a.crte_name,
+        a.crte_time
         FROM
-            outpt_visit a
+        outpt_visit a
         JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.id = b.visit_id
         where a.hosp_code = #{hospCode}
-            and a.is_visit = '1'
-            and b.is_settle = '0'
-            and b.is_cancel = '0'
-            and b.is_submit = '1'
+        and a.is_visit = '1'
+        and b.is_settle = '0'
+        and b.is_cancel = '0'
+        and b.is_submit = '1'
         <if test="data.keyword != null and data.keyword != ''">
             and (a.visit_no = #{data.keyword} or a.name like concat('%', #{data.keyword}, '%') or a.cert_no = #{data.keyword} or a.register_no = #{data.keyword})
         </if>
@@ -456,43 +310,43 @@
     <!--根据visitId查询待缴费的开方处方信息-->
     <select id="queryPrescribeList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         SELECT
-            ROUND(SUM(a.reality_price),  2) as order_price,
-            ROUND(c.zfje, 2) as zfje,
-            b.id,
-            b.visit_id,
-            b.order_no,
-            b.type_code,
-            b.prescribe_type_code,
-            b.is_settle,
-            b.doctor_id,
-            b.doctor_name,
-            b.dept_id,
-            b.dept_name,
-            b.diagnose_ids,
-            (SELECT GROUP_CONCAT(bd.name) FROM base_disease bd where bd.hosp_code = b.hosp_code and FIND_IN_SET(bd.id,b.diagnose_ids) GROUP BY b.id) as diagnose_names,
-            b.crte_time as prescribe_time
+        ROUND(SUM(a.reality_price),  2) as order_price,
+        ROUND(c.zfje, 2) as zfje,
+        b.id,
+        b.visit_id,
+        b.order_no,
+        b.type_code,
+        b.prescribe_type_code,
+        b.is_settle,
+        b.doctor_id,
+        b.doctor_name,
+        b.dept_id,
+        b.dept_name,
+        b.diagnose_ids,
+        (SELECT GROUP_CONCAT(bd.name) FROM base_disease bd where bd.hosp_code = b.hosp_code and FIND_IN_SET(bd.id,b.diagnose_ids) GROUP BY b.id) as diagnose_names,
+        b.crte_time as prescribe_time
         FROM
-            outpt_cost a
+        outpt_cost a
         LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
         LEFT JOIN (
-            SELECT
-                t1.hosp_code,
-                t1.visit_id,
-                SUM(t1.reality_price) as zfje
-            FROM
-                outpt_cost t1
-            LEFT JOIN outpt_prescribe t2 ON t1.hosp_code = t2.hosp_code AND t1.op_id = t2.id
-            WHERE t1.hosp_code = #{hospCode}
-              and t2.is_settle = '0'
-              and t2.is_submit = '1'
-            <if test="data.visitId != null and data.visitId != ''">
-                and t1.visit_id = #{data.visitId}
-            </if>
-            GROUP BY t1.visit_id
-            ) c on a.hosp_code = c.hosp_code and a.visit_id = c.visit_id
+        SELECT
+        t1.hosp_code,
+        t1.visit_id,
+        SUM(t1.reality_price) as zfje
+        FROM
+        outpt_cost t1
+        LEFT JOIN outpt_prescribe t2 ON t1.hosp_code = t2.hosp_code AND t1.op_id = t2.id
+        WHERE t1.hosp_code = #{hospCode}
+        and t2.is_settle = '0'
+        and t2.is_submit = '1'
+        <if test="data.visitId != null and data.visitId != ''">
+            and t1.visit_id = #{data.visitId}
+        </if>
+        GROUP BY t1.visit_id
+        ) c on a.hosp_code = c.hosp_code and a.visit_id = c.visit_id
         WHERE a.hosp_code = #{hospCode}
-          and b.is_settle = '0'
-          and b.is_submit = '1'
+        and b.is_settle = '0'
+        and b.is_submit = '1'
         <if test="data.visitId != null and data.visitId != ''">
             and a.visit_id = #{data.visitId}
         </if>
@@ -503,29 +357,29 @@
     <!--根据传入的处方号查询处方明细-->
     <select id="queryPrescriptionDetails" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
         SELECT
-            b.name,
-            a.item_code,
-            a.item_name,
-            c.content,
-            a.total_num as num,
-            a.num_unit_code,
-            a.bfc_id,
-            bfc.code as bfc_code,
-            bfc.name as bfc_name,
-            a.dosage,
-            a.dosage_unit_code,
-            a.use_days,
-            a.usage_code,
-            a.spec,
-            ROUND(a.price, 2) as price,
-            ROUND(a.total_price, 2) as total_price,
-            ROUND(a.reality_price, 2) as reality_price,
-            a.doctor_name,
-            ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.exec_dept_id ) AS exec_dept_name,
-            ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.dept_id ) AS create_dept_name,
-            d.settle_time
+        b.name,
+        a.item_code,
+        a.item_name,
+        c.content,
+        a.total_num as num,
+        a.num_unit_code,
+        a.bfc_id,
+        bfc.code as bfc_code,
+        bfc.name as bfc_name,
+        a.dosage,
+        a.dosage_unit_code,
+        a.use_days,
+        a.usage_code,
+        a.spec,
+        ROUND(a.price, 2) as price,
+        ROUND(a.total_price, 2) as total_price,
+        ROUND(a.reality_price, 2) as reality_price,
+        a.doctor_name,
+        ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.exec_dept_id ) AS exec_dept_name,
+        ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.dept_id ) AS create_dept_name,
+        d.settle_time
         FROM
-            outpt_cost a
+        outpt_cost a
         LEFT JOIN outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
         LEFT JOIN outpt_prescribe_detail c on a.hosp_code = c.hosp_code and a.opd_id = c.id
         JOIN base_finance_classify bfc on a.hosp_code = bfc.hosp_code and a.bfc_id = bfc.id
@@ -552,13 +406,13 @@
     -->
     <select id="queryDoctorRegisterList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
         SELECT
-            id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
+        id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
         FROM
         outpt_doctor_register
         where hosp_code = #{hospCode}
-            and is_use = '0'
-            and is_lock = '0'
-          <![CDATA[
+        and is_use = '0'
+        and is_lock = '0'
+        <![CDATA[
             and (LENGTH(TRIM(profile_id)) < 1)
           ]]>
         <if test="data.dqId != null and data.dqId != ''">
@@ -694,21 +548,21 @@
                 </if>
             </set>
             WHERE 1=1
-              and register_id = #{item.registerId}
-              and hosp_code = #{item.hospCode}
+            and register_id = #{item.registerId}
+            and hosp_code = #{item.hospCode}
         </foreach>
     </update>
 
     <!--挂号结算表数据冲红-->
     <update id="updateOutptRegisterSettleByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto">
         update
-            outpt_register_settle
+        outpt_register_settle
         <set>
             status_code = #{statusCode}
         </set>
         where 1=1
-          and register_id = #{registerId}
-          and hosp_code = #{hospCode}
+        and register_id = #{registerId}
+        and hosp_code = #{hospCode}
     </update>
 
     <!--挂号退号解锁号源信息-->
@@ -724,26 +578,16 @@
           and hosp_code = #{hospCode}
     </update>
 
-    <!--更新住院就诊表累计预交金和累计余额-->
-    <update id="updateInptVisitTotalAdvanceAndBalance" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        update inpt_visit
-        set
-            total_advance = #{totalAdvance},
-            total_balance = #{totalBalance}
-        where hosp_code = #{hospCode}
-          and id = #{id}
-    </update>
-
     <!--根据档案id、就诊查询起止时间查询出患者的就诊记录-->
     <select id="getVistiListByProfileId" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select
-            *
+        *
         from outpt_visit
         where hosp_code = #{hospCode}
-          and profile_id = #{profileId}
-          and is_visit = '1'
+        and profile_id = #{profileId}
+        and is_visit = '1'
         <if test="startDate != null and startDate != ''">
-          <![CDATA[
+            <![CDATA[
             and date_format(visit_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
           ]]>
         </if>
@@ -758,42 +602,42 @@
     <!--根据visitIds查询已缴费的处方列表-->
     <select id="queryPaidPrescribeList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO">
         SELECT
-            b.id as settle_id,
-            a.id as op_id,
-            a.visit_id,
-            c.name,
-            c.visit_no,
-            c.patient_code,
-            c.dept_name,
-            c.doctor_name,
-            b.settle_no,
-            b.status_code,
-            b.settle_time,
-            ROUND(b.total_price, 2) as total_price,
-            ROUND(t1.reality_price, 2) as reality_price,
-            ROUND(b.self_price, 2) as self_price,
-            b.is_settle,
-            b.is_print,
-            d.invoice_no
+        b.id as settle_id,
+        a.id as op_id,
+        a.visit_id,
+        c.name,
+        c.visit_no,
+        c.patient_code,
+        c.dept_name,
+        c.doctor_name,
+        b.settle_no,
+        b.status_code,
+        b.settle_time,
+        ROUND(b.total_price, 2) as total_price,
+        ROUND(t1.reality_price, 2) as reality_price,
+        ROUND(b.self_price, 2) as self_price,
+        b.is_settle,
+        b.is_print,
+        d.invoice_no
         FROM
-            outpt_prescribe a
+        outpt_prescribe a
         join outpt_settle b on a.settle_id = b.id and a.hosp_code = b.hosp_code
         JOIN outpt_visit c on a.visit_id = c.id and a.hosp_code = c.hosp_code
         join (
-            SELECT hosp_code, op_id, sum(reality_price) as reality_price
-            from outpt_cost
-            where settle_code = '2' and status_code = '0'
-            GROUP BY hosp_code, op_id
-         ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.op_id
+        SELECT hosp_code, op_id, sum(reality_price) as reality_price
+        from outpt_cost
+        where settle_code = '2' and status_code = '0'
+        GROUP BY hosp_code, op_id
+        ) t1 on a.hosp_code = t1.hosp_code and a.id = t1.op_id
         LEFT JOIN outpt_settle_invoice d on b.id = d.settle_id and b.hosp_code = d.hosp_code
         where a.hosp_code = #{hospCode}
-          and a.is_settle = '1'
-          and b.status_code = '0'
+        and a.is_settle = '1'
+        and b.status_code = '0'
         <if test="visitIds != null and visitIds.size() > 0">
             and a.visit_id in
-          <foreach collection="visitIds" separator="," item="visitId" close=")" open="(">
+            <foreach collection="visitIds" separator="," item="visitId" close=")" open="(">
                 #{visitId}
-          </foreach>
+            </foreach>
         </if>
         <if test="startDate != null and startDate != ''">
             <![CDATA[
@@ -810,29 +654,29 @@
     <!--根据档案id查询出的就诊ids，查询对应的医技记录-->
     <select id="queryMedicApplyList" parameterType="java.util.Map" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
         SELECT
-            a.id as apply_id,
-            a.type_code,
-            b.name,
-            b.visit_no,
-            a.apply_no,
-            a.bar_code,
-            c.item_name,
-            c.price,
-            c.num,
-            a.dept_id,
-            a.dept_name,
-            a.report_time,
-            a.rporter
+        a.id as apply_id,
+        a.type_code,
+        b.name,
+        b.visit_no,
+        a.apply_no,
+        a.bar_code,
+        c.item_name,
+        c.price,
+        c.num,
+        a.dept_id,
+        a.dept_name,
+        a.report_time,
+        a.rporter
         FROM
-            medic_apply a
+        medic_apply a
         JOIN outpt_prescribe_detail c on a.hosp_code = c.hosp_code and a.opd_id = c.id
         JOIN outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
         where a.hosp_code = #{hospCode}
         <if test="visitIds != null and visitIds.size() > 0">
-          and a.visit_id in
-          <foreach collection="visitIds" open="(" close=")" item="visitId" separator=",">
-              #{visitId}
-          </foreach>
+            and a.visit_id in
+            <foreach collection="visitIds" open="(" close=")" item="visitId" separator=",">
+                #{visitId}
+            </foreach>
         </if>
         <if test="startDate != null and startDate != ''">
             <![CDATA[
@@ -859,29 +703,29 @@
     <!--根据医技申请id、申请单号查询医技结果-->
     <select id="queryMedicApplyResult" parameterType="java.util.Map" resultType="cn.hsa.module.medic.result.dto.MedicalResultDTO">
         select
-            c.name,
-            c.age,
-            c.age_unit_code,
-            c.gender_code,
-            b.apply_time,
-            b.report_time,
-            b.dept_name,
-            b.doctor_name,
-            a.item_id,
-            a.item_name,
-            a.result,
-            a.result_type,
-            a.result_unit,
-            a.result_detail,
-            a.reference_value,
-            a.range_state,
-            a.check_part,
-            a.check_ways,
-            a.check_type,
-            a.pic_url,
-            a.diagnosis_name,
-            a.reporte_text,
-            a.is_positive
+        c.name,
+        c.age,
+        c.age_unit_code,
+        c.gender_code,
+        b.apply_time,
+        b.report_time,
+        b.dept_name,
+        b.doctor_name,
+        a.item_id,
+        a.item_name,
+        a.result,
+        a.result_type,
+        a.result_unit,
+        a.result_detail,
+        a.reference_value,
+        a.range_state,
+        a.check_part,
+        a.check_ways,
+        a.check_type,
+        a.pic_url,
+        a.diagnosis_name,
+        a.reporte_text,
+        a.is_positive
         from medic_result a
         left join medic_apply b on a.apply_no = b.apply_no and a.hosp_code = b.hosp_code
         JOIN outpt_visit c on a.hosp_code = c.hosp_code  and a.visit_id = c.id
@@ -892,18 +736,6 @@
         <if test="applyNo != null and applyNo != ''">
             and b.apply_no = #{applyNo}
         </if>
-    </select>
-
-    <!--查询门诊科室树-->
-    <select id="queryDeptTree" resultType="cn.hsa.base.TreeMenuNode">
-        SELECT
-            a.CODE AS id,
-            a.name AS label,
-            a.up_dept_code AS parentId,
-            a.id AS dept_id
-        FROM
-            base_dept a
-        where a.hosp_code = #{hospCode} and a.type_code = #{data.typeCode}
     </select>
 
     <!--预缴金充值-->
@@ -938,23 +770,23 @@
             pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
         )
         values
-        (
-            #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
-            #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
-            #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
-            #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
-            #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
-        )
+            (
+                #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
+                #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
+                #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+                #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
+                #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
+            )
     </insert>
 
     <!--分诊队列表数据(outpt_triage_visit)-->
     <insert id="insertOutptTriageVisit" parameterType="cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO">
         insert into outpt_triage_visit
-            (id, hosp_code, register_id, visit_id, dq_id, triage_id, triage_name,
-             triage_no, clinic_id, doctor_id, doctor_name, clinic_name, dept_id,
-             dept_name, sort_no, name, triage_start_code, is_call, call_time,
-             call_number, is_loss, loss_time, remark, triage_peo_id, triage_peo_name,
-             triage_peo_time, crte_id, crte_name, crte_time)
+        (id, hosp_code, register_id, visit_id, dq_id, triage_id, triage_name,
+         triage_no, clinic_id, doctor_id, doctor_name, clinic_name, dept_id,
+         dept_name, sort_no, name, triage_start_code, is_call, call_time,
+         call_number, is_loss, loss_time, remark, triage_peo_id, triage_peo_name,
+         triage_peo_time, crte_id, crte_name, crte_time)
         values
             (#{id}, #{hospCode}, #{registerId}, #{visitId}, #{dqId}, #{triageId}, #{triageName}, #{triageNo}, #{clinicId},
              #{doctorId}, #{doctorName},#{clinicName}, #{deptId}, #{deptName}, #{sortNo}, #{name}, #{triageStartCode},
@@ -1142,173 +974,16 @@
         </foreach>
     </insert>
 
-    <!--预缴金记录查询-->
-    <select id="queryAdvancePayment" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
-        SELECT
-            a.hosp_code,
-            a.crte_time as pay_time,
-            a.price as pay_price,
-            a.pay_code,
-            a.status_code as pay_flag,
-            a.ap_order_no,
-            a.order_no,
-            a.remark
-        FROM
-            inpt_advance_pay a
-        left join inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
-        where a.hosp_code = #{hospCode}
-        <if test="profileId != null and profileId != ''">
-            and iv.profile_id = #{profileId}
-        </if>
-        <if test="inNo != null and inNo != ''">
-            and iv.in_no = #{inNo}
-        </if>
-        <if test="startDate != null and startDate != ''">
-            <![CDATA[
-                and date_format(a.crte_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
-            ]]>
-        </if>
-        <if test="endDate != null and endDate != ''">
-            <![CDATA[
-                and date_format(a.crte_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
-            ]]>
-        </if>
-        order by a.crte_time desc
-    </select>
-
-    <!--根据profileId查询住院记录-->
-    <select id="queryInptVisitRecord" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        SELECT
-            a.id,
-            a.profile_id,
-            a.in_profile,
-            a.in_no,
-            a.name,
-            a.gender_code,
-            a.age,
-            a.age_unit_code,
-            a.bed_id,
-            a.bed_name,
-            a.status_code,
-            a.in_ward_id,
-            a.in_dept_id,
-            a.in_dept_name,
-            a.in_time,
-            a.out_ward_id,
-            a.out_dept_id,
-            a.out_dept_name,
-            a.out_time,
-            a.out_mode_code,
-            a.out_situation_code,
-            a.zz_doctor_name,
-            a.in_disease_id,
-            a.in_disease_name,
-            a.in_remark,
-            a.out_disease_id,
-            a.out_disease_name,
-            a.out_remark,
-            a.outpt_visit_no,
-            ROUND(a.total_advance, 2) as total_advance,
-            ROUND(a.total_cost, 2) as total_cost,
-            ROUND(a.total_balance, 2) as total_balance
-        FROM
-            inpt_visit a
-        WHERE a.hosp_code = #{hospCode}
-           and a.status_code not in ('7','8')
-        <if test="profileId != null and profileId != ''">
-            and a.profile_id = #{profileId}
-        </if>
-        <if test="startDate != null and startDate != ''">
-            <![CDATA[
-                and date_format(a.in_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
-            ]]>
-        </if>
-        <if test="endDate != null and endDate != ''">
-            <![CDATA[
-                and date_format(a.in_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
-            ]]>
-        </if>
-        <if test="inNo != null and inNo != ''">
-            and a.in_no = #{inNo}
-        </if>
-        <if test="visitId != null and visitId != ''">
-            and a.id = #{visitId}
-        </if>
-        order by a.in_time desc
-    </select>
-
-    <!--日费用清单查询-->
-    <select id="queryOneDayCostListRecord" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        SELECT
-            a.visit_id,
-            a.source_code,
-            a.source_id,
-            a.bfc_id,
-            ( SELECT c.name FROM base_finance_classify c WHERE c.id = a.bfc_id AND c.hosp_code = #{hospCode} ) AS bfcName,
-            a.item_code,
-            a.item_id,
-            (select bi.type_code from base_item bi where bi.hosp_code = a.hosp_code and bi.id = a.item_id ) as itmeTypeCode,
-            a.item_name,
-            ROUND(a.price, 2) as price,
-            a.spec,
-            a.total_num AS num,
-            a.total_num_unit_code AS numUnitCode,
-            ROUND(a.total_price, 2) as total_price,
-            ROUND(a.preferential_price, 2) as preferential_price,
-            ROUND(a.reality_price, 2) as amountMoney,
-            a.doctor_id,
-            a.doctor_name,
-            a.dept_id,
-            (SELECT name from base_dept bd where bd.id = a.dept_id and bd.hosp_code = a.hosp_code) as deptName,
-            a.settle_code,
-            a.zz_doctor_id,
-            a.zz_doctor_name,
-            a.status_code,
-            a.cost_time,
-            DATE_FORMAT( a.cost_time, '%Y-%m-%d' ) AS cost_date,
-            ( SELECT min( DATE_FORMAT( cost_time, '%Y-%m-%d' )) FROM inpt_cost ic WHERE ic.hosp_code = a.hosp_code AND ic.visit_id = a.visit_id ) AS startCostDate,
-            ( SELECT max( DATE_FORMAT( cost_time, '%Y-%m-%d' )) FROM inpt_cost ic WHERE ic.hosp_code = a.hosp_code AND ic.visit_id = a.visit_id ) AS endCostDate,
-            iv.in_no
-        FROM
-            inpt_cost a
-        LEFT JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
-        where a.hosp_code = #{hospCode}
-          and a.cost_time is not null
-        <if test="visitId != null and visitId != ''">
-            AND a.visit_id = #{visitId}
-        </if>
-        <if test="inNo != null and inNo != ''">
-            and iv.in_no = #{inNo}
-        </if>
-        <if test="statusCode != null and statusCode != ''">
-            AND a.status_code = #{statusCode}
-        </if>
-        <if test="costStopTime != null and costStopTime != ''">
-            <![CDATA[
-                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') <= #{costStopTime}
-                ]]>
-        </if>
-        <if test="costStartTime != null and costStartTime != ''">
-            <![CDATA[
-                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') >= #{costStartTime}
-                ]]>
-        </if>
-        <if test="queryBaby == null">
-            and (a.baby_id is null or a.baby_id = '')
-        </if>
-        order by a.cost_time, a.bfc_id
-    </select>
-
     <!--根据deptId、certNo、挂号日期查询是否已挂号-->
     <select id="queryIsRepeatRegister" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
         select
-            distinct
-            a.*
+        distinct
+        a.*
         from outpt_register a
         left join  outpt_register_detail b on a.hosp_code = b.hosp_code and a.id = b.register_id
         where a.hosp_code=#{hospCode}
-          and b.status_code = '0'
-          <![CDATA[ and a.is_cancel = <> '1' ]]>
+        and b.status_code = '0'
+        <![CDATA[ and a.is_cancel = <> '1' ]]>
         <if test="certNo != null and certNo != ''">
             and a.cert_no = #{certNo}
         </if>
@@ -1382,49 +1057,10 @@
         where id = #{id} and hosp_code = #{hospCode}
     </select>
 
-    <!--根据住院号查询费用清单-->
-    <select id="queryInptCostRecord" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
-        SELECT
-            b.name,
-            b.bed_name,
-            b.in_time as inTime,
-            b.out_time as outTime,
-            DATE_FORMAT(b.in_time, '%Y-%m-%d') as inDate,
-            b.total_cost AS totalCost,
-            a.item_code itemCode,
-            a.item_name AS itemName,
-            a.status_code as statusCode,
-            a.price,
-            a.total_num as totalNum,
-            a.total_num_unit_code as totalNumUnitCode,
-            a.total_price AS totalPrice,
-            a.preferential_price AS preferentialPrice,
-            a.reality_price AS realityPrice
-        FROM
-            inpt_cost a, inpt_visit b where a.visit_id = b.id
-            and a.hosp_code = b.hosp_code
-            and a.hosp_code = #{hospCode}
-        <if test="inNo != null and inNo != ''">
-            and b.in_no = #{inNo}
-        </if>
-        <if test="visitId != null and visitId != ''">
-            and b.id = #{visitId}
-        </if>
-        <if test="statusCode != null and statusCode != ''">
-            and a.status_code = #{statusCode}
-        </if>
-        <if test="startTime != null and startTime != ''">
-            and date(a.cost_time) &gt;= date(#{startTime})
-        </if>
-        <if test="endTime != null and endTime != ''">
-            and date(a.cost_time) &lt;= date(#{endTime})
-        </if>
-    </select>
-
     <!--根据挂号id、医院编码查询挂号记录-->
     <select id="getOutptRegisterById" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO">
         select
-               *
+        *
         from outpt_register
         where hosp_code = #{hospCode}
         <if test="id != null and id != ''">
@@ -1439,7 +1075,7 @@
     <!--根据visitId查询就诊表-->
     <select id="getOutptVisitById" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
         select
-               *
+        *
         from outpt_visit
         where hosp_code = #{hospCode}
         <if test="visitId != null and visitId != ''">
@@ -1450,11 +1086,11 @@
     <!--根据挂号id、就诊id查询挂号明细记录-->
     <select id="queryOutptRegisterDetailByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterDetailDto">
         select
-            id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id, price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price, unit_code, status_code, origin_id, crte_id, crte_name, crte_time
+        id, hosp_code, register_id, visit_id, item_code, item_id, item_name, bfc_id, price, num, use_code, spec, preferential_id, total_price, preferential_price, reality_price, unit_code, status_code, origin_id, crte_id, crte_name, crte_time
         from
-            outpt_register_detail
+        outpt_register_detail
         where hosp_code = #{hospCode}
-          and status_code = '0'
+        and status_code = '0'
         <if test="id != null and id != ''">
             and register_id = #{id}
         </if>
@@ -1467,10 +1103,10 @@
     <!--根据挂号id查询挂号结算表记录-->
     <select id="queryOutptRegisterSettleByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterSettleDto">
         select
-               id, hosp_code, register_id, total_price, preferential_price, reality_price, settle_time, daily_settle_id, status_code, origin_id, bill_id, bill_no, pay_code, order_no, crte_id, crte_name, crte_time
+        id, hosp_code, register_id, total_price, preferential_price, reality_price, settle_time, daily_settle_id, status_code, origin_id, bill_id, bill_no, pay_code, order_no, crte_id, crte_name, crte_time
         from outpt_register_settle
         where hosp_code = #{hospCode}
-          and status_code = '0'
+        and status_code = '0'
         <if test="id != null and id != ''">
             and register_id = #{id}
         </if>
@@ -1480,54 +1116,21 @@
     <!--根据挂号id查询挂号支付方式记录-->
     <select id="queryOutptRegisterPayByRegisterId" parameterType="cn.hsa.module.outpt.register.dto.OutptRegisterDTO" resultType="cn.hsa.module.outpt.register.dto.OutptRegisterPayDto">
         select
-            id, hosp_code, rs_id, visit_id, pay_code, order_no, price, service_price
+        id, hosp_code, rs_id, visit_id, pay_code, order_no, price, service_price
         from
-            outpt_register_pay
+        outpt_register_pay
         where hosp_code = #{hospCode}
         <if test="visitId != null and visitId != ''">
             and visit_id = #{visitId}
         </if>
     </select>
 
-    <!--根据微信订单号查询预交金记录是否存在-->
-    <select id="queryInptAdvancePayByOrderNo" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
-        select * from inpt_advance_pay where hosp_code = #{hospCode} and order_no = #{orderNo} and status_code = '0'
-    </select>
 
-    <!--根据id查询就诊记录-->
-    <select id="getInptVisitById" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
-        select
-            *
-        from inpt_visit
-        where hosp_code = #{hospCode}
-          and id = #{id}
-    </select>
-
-    <!--根据visitId查询出所有状态为0正常的预交金记录-->
-    <select id="queryInptAdvancePayByVisitId" parameterType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
-        select
-            id, hosp_code, visit_id, ap_order_no, price, is_settle, settle_id, red_id, status_code, daily_settle_id, source_pay_code, pay_code, cheque_no, service_price, order_no, remark, crte_id, crte_name, crte_time
-        from inpt_advance_pay
-        where hosp_code = #{hospCode}
-          and visit_id = #{visitId}
-          and status_code = #{statusCode}
-    </select>
-
-    <!--查询优惠类别，默认普通病人-->
-    <select id="queryPreferentialTypeList" resultType="cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO">
-        select
-            id, hosp_code, code, name, is_valid, crte_id, crte_name, crte_time
-        from base_preferential_type
-        where
-            hosp_code = #{hospCode}
-        and is_valid = '1'
-        order by code ASC
-    </select>
 
     <!--  查询所有科室下所有七天内有排班的医生-->
     <select id="querySevenQueueDoctor" resultType="map">
         SELECT
-          DISTINCT
+            DISTINCT
             c.id as deptId,
             c.name as deptName,
             d.id as doctorId,
@@ -1539,11 +1142,12 @@
             sys_user d
         WHERE
             a.cq_id = b.id
-            AND a.hosp_code = b.hosp_code
-            and b.dept_id = c.id and b.hosp_code = c.hosp_code
-            and a.doctor_id = d.id and a.hosp_code = d.hosp_code
-            and a.hosp_code = #{hospCode}
-            AND date( queue_date ) BETWEEN date(now()) and date(now())+7 order by date( queue_date )
+          AND a.hosp_code = b.hosp_code
+          and b.dept_id = c.id and b.hosp_code = c.hosp_code
+          and a.doctor_id = d.id and a.hosp_code = d.hosp_code
+          and a.hosp_code = #{hospCode}
+          and d.name like '%${keyword}%'
+          AND date( queue_date ) BETWEEN date(now()) and date(now())+7 order by date( queue_date )
     </select>
 
 </mapper>

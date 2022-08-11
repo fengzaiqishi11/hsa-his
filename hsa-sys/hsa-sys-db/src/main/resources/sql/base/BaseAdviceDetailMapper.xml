@@ -74,15 +74,16 @@
     <select id="queryItemAndMaterialStockPage" resultMap="BaseAdviceDetailMap">
         select a.id as itemId,a.`name` as itemName,a.itemTypeCode,a.type_code,a.price,a.unit_code,a.splitUnitCode as split_unit_code,a.code as itemCode,a.use_code,
         a.spec ,a.out_dept_code,a.in_dept_code,a.hosp_code,a.inDeptName,a.outDeptName,a.bfcId,a.bfcName, a.nation_code, a.nation_name,
-        case when a.type_code = '2' then sst.num else ifnull(sst.num,0) end stockNum,/*库存数量*/
-        case when a.type_code = '2' then sst.stock_occupy else ifnull(sst.stock_occupy,0) end stockOccupy,/*库存数量*/
-        case when a.type_code = '2' then (select b.name from base_dept b where sst.biz_id = b.id) else '' end strockName/*库存数量*/
+        stockNum,/*库存数量*/
+        stockOccupy,/*库存数量*/
+        strockName/*库存数量*/
         FROM
         ( select m.id,m.`name`,m.type_code as itemTypeCode,m.price,m.unit_code,m.unit_code as splitUnitCode, m.spec,m.out_dept_code,m.in_dept_code,m.hosp_code,m.code,'' as use_code,
         '3' as type_code,
         (select d.id from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcId,
         (select d.name from base_finance_classify d where m.bfc_code = d.code and m.hosp_code = d.hosp_code limit 1) bfcName,
-        b.name as inDeptName,c.name as outDeptName, m.nation_code, m.nation_name
+        b.name as inDeptName,c.name as outDeptName, m.nation_code, m.nation_name,
+        '' as stockNum,''as stockOccupy,'' as strockName
         from base_item m
         left join base_dept b on m.in_dept_code = b.`code` and m.hosp_code = b.hosp_code
         left join base_dept c on m.out_dept_code = c.`code` and m.hosp_code = c.hosp_code
@@ -95,12 +96,12 @@
         UNION ALL
         select a.id,a.`name`,a.type_code as itemTypeCode,a.price,a.unit_code,
         a.split_unit_code  ,a.spec,'','',a.hosp_code,a.code,a.use_code,
-        '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName, a.nation_code, a.nation_name
+        '2' as type_code,d.id as bfcId,d.name as bfcName,	b.inDeptName,b.outDeptName, a.nation_code, a.nation_name,
+        ifnull(stock.num,0) as stockNum,ifnull(stock.stock_occupy,0) as stockOccupy,
+        (select name from base_dept bd where bd.id = stock.biz_id limit 1) as strockName
         from base_material a
         left join(
-        select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
-        '3',c.id,'0')) cyf,
-        max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code,
+        select max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code,
         a.name as inDeptName,
         c.name as outDeptName
         from base_dept a
@@ -115,16 +116,22 @@
         where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
         )b on 1 = 1
         <if test="pharId != null and pharId != ''">
-            join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code and stock.biz_id = #{pharId}
+         join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
+            and stock.biz_id = #{pharId}
+        </if>
+        <if test="pharId == null or pharId == ''">
+            left join stro_stock stock on a.id = stock.item_id and a.hosp_code = stock.hosp_code
+            and b.clf = stock.biz_id
         </if>
         left join base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
         left join base_product f on a.prod_code = f.code and a.hosp_code = f.hosp_code
-        where a.hosp_code = #{hospCode} and a.is_valid = '1' and a.is_supp_curtain = '1'
+        where a.hosp_code = #{hospCode} and a.is_valid = '1' and (a.is_offical ='0' or a.is_offical is null)
         <if test="keyword != null and keyword != ''">
-            and  (a.name like concat('%',#{keyword},'%') or a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%'))
+            and (
+            a.pym like concat('%',#{keyword},'%') or a.wbm like concat('%',#{keyword},'%') or a.name like concat('%',#{keyword},'%')
+            )
         </if>
         )  a
-        left join stro_stock sst on a.id = sst.item_id
         where 1=1
     </select>
 

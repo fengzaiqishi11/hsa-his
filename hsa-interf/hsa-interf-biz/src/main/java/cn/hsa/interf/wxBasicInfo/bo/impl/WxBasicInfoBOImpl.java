@@ -4,6 +4,7 @@ import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
@@ -16,7 +17,10 @@ import cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.interf.wxBasicInfo.bo.WxBasicInfoBO;
+import cn.hsa.module.interf.wxBasicInfo.dao.WxBaseDAO;
 import cn.hsa.module.interf.wxBasicInfo.dao.WxBasicInfoDAO;
+import cn.hsa.module.interf.wxBasicInfo.dao.WxInptDAO;
+import cn.hsa.module.interf.wxBasicInfo.dao.WxOutptDAO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
 import cn.hsa.module.medic.result.dto.MedicalResultDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
@@ -62,7 +66,13 @@ import java.util.stream.Collectors;
 public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
     @Resource
-    private WxBasicInfoDAO wxBasicInfoDAO;
+    private WxBaseDAO wxBaseoDAO;
+
+    @Resource
+    private WxOutptDAO wxOutptDAO;
+
+    @Resource
+    private WxInptDAO wxInptDAO;
 
     /**
      * 中心端医院信息服务
@@ -140,7 +150,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      **/
     @Override
     public WrapperResponse<String> getDeptInfo(Map<String, Object> map) {
-        List<Map<String, Object>> result = wxBasicInfoDAO.getDeptInfo(map);
+        List<Map<String, Object>> result = wxBaseoDAO.getDeptInfo(map);
 
         // 返参加密
         log.debug("微信小程序【科室分布情况】返参加密前：" + JSON.toJSONString(result));
@@ -166,7 +176,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      **/
     @Override
     public WrapperResponse<String> getDoctorListByIdOrDeptCode(Map<String, Object> map) {
-        List<Map<String, Object>> result = wxBasicInfoDAO.getDoctorListByIdOrDeptCode(map);
+        List<Map<String, Object>> result = wxBaseoDAO.getDoctorListByIdOrDeptCode(map);
 
         // 返参加密
         log.debug("微信小程序【医生信息查询】返参加密前：" + JSON.toJSONString(result));
@@ -199,7 +209,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         String code = MapUtils.get(data, "code");
         if (StringUtils.isEmpty(code)) return WrapperResponse.error(500, "请传入需要查询的业务代码code", null);
 
-        List<Map<String, Object>> result = wxBasicInfoDAO.getSysValue(map);
+        List<Map<String, Object>> result = wxBaseoDAO.getSysValue(map);
 
         // 返参加密
         log.debug("微信小程序【基础业务代码查询】返参加密前：" + JSON.toJSONString(result));
@@ -235,7 +245,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(hospCode)) return WrapperResponse.error(500, "医院编码不能为空", null);
 
         // 返参加密
-        OutptProfileFileDTO result = wxBasicInfoDAO.queryProfileByCertNo(map);
+        OutptProfileFileDTO result = wxBaseoDAO.queryProfileByCertNo(map);
         if (result == null) return WrapperResponse.error(500, "该身份证【" + certNo + "】未在本医院存在记录", null);
 
         log.debug("微信小程序【个人信息查询】返参加密前：" + JSON.toJSONString(result));
@@ -262,11 +272,15 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     @Override
     public WrapperResponse<String> saveProfileFile(Map<String, Object> map) {
         Map<String, Object> data = MapUtils.get(map, "data");
-        if (data == null) return WrapperResponse.error(500, "档案管理入参不能为空！", null);
+        if (data == null){
+            return WrapperResponse.error(500, "档案管理入参不能为空！", null);
+        }
+
         String profileId = MapUtils.get(data, "profileId") == null ? "" : String.valueOf(data.get("profileId"));
         String certNo =MapUtils.get(data, "certNo");
         String name = MapUtils.get(data, "name");
         String hospCode = MapUtils.get(data, "hospCode");
+
         if (StringUtils.isEmpty(certNo)) {
             return WrapperResponse.error(500, "身份证号不能为空！", null);
         }
@@ -296,7 +310,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         OutptProfileFileDTO outptProfileFileDTO = null;
         if (StringUtils.isEmpty(profileId)) {
             // 根据身份证号查询是否已经存在档案
-            OutptProfileFileDTO profileFileDTO = wxBasicInfoDAO.queryProfileByCertNo(map);
+            OutptProfileFileDTO profileFileDTO = wxBaseoDAO.queryProfileByCertNo(map);
             if (profileFileDTO == null) {
                 // 新增
                 outptProfileFileDTO = this.saveProfileFileDTOInfo(data);
@@ -344,7 +358,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      * @return
      */
     private List<BasePreferentialTypeDTO> queryPreferentialTypeList(String hospCode) {
-        return wxBasicInfoDAO.queryPreferentialTypeList(hospCode);
+        return wxBaseoDAO.queryPreferentialTypeList(hospCode);
     }
 
     /**
@@ -400,8 +414,8 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         profileFileDTO.setGenderCode(StringUtils.isEmpty(MapUtils.get(data, "genderCode")) ? MapUtils.get(getCarInfo(MapUtils.get(data, "certNo")), "sex") : MapUtils.get(data, "genderCode"));
         // 出生日期
         profileFileDTO.setBirthday(MapUtils.get(data, "birthday") == null ? DateUtils.parse(MapUtils.get(getCarInfo(MapUtils.get(data, "certNo")), "birthday"), "yyyy-MM-dd") : DateUtils.parse(MapUtils.get(data, "birthday"), "yyyy-MM-dd"));
-        // 建档来源 1.住院 2.门诊 0.建档
-        profileFileDTO.setType(MapUtils.get(data, "type"));
+        // 建档来源  0.建档，1.住院 2.门诊
+        profileFileDTO.setType(MapUtils.get(data, "type") == null ? "0" : MapUtils.get(data, "type"));
         // 联系电话
         profileFileDTO.setPhone(MapUtils.get(data, "phone"));
         // 婚姻状况
@@ -421,7 +435,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         // 创建人姓名
         profileFileDTO.setCrteName(MapUtils.get(data, "crteName"));
         // 创建时间
-//        profileFileDTO.setCrteTime(MapUtils.get(data, "crteTime") == null ? DateUtils.getNow() : DateUtils.parse(DateUtils.getDateStr(MapUtils.get(data, "crteTime")), DateUtils.Y_M_D));
         profileFileDTO.setCrteTime(MapUtils.get(data, "crteTime") == null ? DateUtils.getNow() : DateUtils.parse(MapUtils.get(data, "crteTime"), DateUtils.Y_M_DH_M_S));
 
         log.debug("直接就诊调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
@@ -554,7 +567,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         createdMenuNodes.setLabel("门诊科室");
         createdMenuNodes.setParentId("-1");
         menuNodes.add(createdMenuNodes);
-        menuNodes.addAll(wxBasicInfoDAO.queryDeptTree(map));
+        menuNodes.addAll(wxBaseoDAO.queryDeptTree(map));
         List<TreeMenuNode> treeMenuNodeList = TreeUtils.buildByRecursive(menuNodes, "-1");
         log.debug("科室树结构：" + JSON.toJSONString(treeMenuNodeList));
 
@@ -652,7 +665,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         map.put("startDate", startDate);
         map.put("endDate", endDate);
         // 根据科室id查询出未分组前的数据list
-        List<OutptDoctorQueueDto> result = wxBasicInfoDAO.queryDoctorAndClassesByDeptId(map);
+        List<OutptDoctorQueueDto> result = wxOutptDAO.queryDoctorAndClassesByDeptId(map);
         // 分组
         Map<String, Map<String, Map<String, List<OutptDoctorQueueDto>>>> groupMap = new HashMap<>();
         /*if (!ListUtils.isEmpty(result)) {
@@ -719,7 +732,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         data.put("isToday", isToday);
 
         // 根据日期、科室id、医生id查询可用号源
-        List<OutptDoctorQueueDto> list = wxBasicInfoDAO.queryDoctorNumberSourceInformation(map);
+        List<OutptDoctorQueueDto> list = wxOutptDAO.queryDoctorNumberSourceInformation(map);
 
         // 返参加密
         log.debug("微信小程序【医生号源信息】返参加密前：" + JSON.toJSONString(list));
@@ -747,14 +760,14 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     public WrapperResponse<String> queryClassifyCost(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         Map<String, Object> data = MapUtils.get(map, "data");
-        String cyId = MapUtils.get(map, "cyId");
+        String cyId = MapUtils.get(data, "cyId");
         if (StringUtils.isEmpty(hospCode)) {
             return WrapperResponse.error(500, "未检测到医院信息，请核对医院信息！", null);
         }
         if (StringUtils.isEmpty(cyId)) {
             return WrapperResponse.error(500, "未检测到挂号类别信息，请核对！", null);
         }
-        List<OutptClassifyCostDTO> list = wxBasicInfoDAO.queryClassifyCost(map);
+        List<OutptClassifyCostDTO> list = wxOutptDAO.queryClassifyCost(map);
 
         // 返参加密
         log.debug("微信小程序【挂号类别费用】返参加密前：" + JSON.toJSONString(list));
@@ -799,7 +812,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data.get("endDate") == null) {
             data.put("endDate", DateUtils.format(DateUtils.Y_M_D));
         }
-        List<OutptRegisterDTO> result = wxBasicInfoDAO.queryOutptRegister(map);
+        List<OutptRegisterDTO> result = wxOutptDAO.queryOutptRegister(map);
 
         // 返参加密
         log.debug("微信小程序【预约挂号查询】返参加密前：" + JSON.toJSONString(result));
@@ -847,7 +860,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             if (StringUtils.isEmpty(MapUtils.get(data, "profileId"))) return WrapperResponse.error(500, "未选择预约人员", null);
 
             // 根据医生队列id(dqId)、预约时段开始时间、结束时间查询出未锁号、未预约的号源
-            List<OutptDoctorRegisterDto> doctorRegisterDtoList = wxBasicInfoDAO.queryDoctorRegisterList(map);
+            List<OutptDoctorRegisterDto> doctorRegisterDtoList = wxOutptDAO.queryDoctorRegisterList(map);
             if (ListUtils.isEmpty(doctorRegisterDtoList)) {
                 return WrapperResponse.error(500, "该医生在【" + data.get("startTime") + "~" + data.get("endTime") + "】时段已经没有号源了，请预约其他时段!", null);
             }
@@ -859,7 +872,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             dto.setStartTime((String) data.get("startTime"));
             dto.setEndTime((String) data.get("endTime"));
             dto.setProfileId((String) data.get("profileId"));
-            OutptDoctorRegisterDto doctorRegister = wxBasicInfoDAO.queryDoctorRegister(dto);
+            OutptDoctorRegisterDto doctorRegister = wxOutptDAO.queryDoctorRegister(dto);
             if (doctorRegister != null && (Constants.SF.S.equals(doctorRegister.getIsLock()) || Constants.SF.S.equals(doctorRegister.getIsUse()))) {
                 return WrapperResponse.error(500, "该就诊人已在【" + data.get("startTime") + "~" + data.get("endTime") + "】时段预约过，请勿重复预约！", null);
             }
@@ -873,7 +886,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             doctorRegisterDto.setStartTime(doctorRegisterDtoList.get(0).getStartTime()); //号源时段开始时间
             doctorRegisterDto.setEndTime(doctorRegisterDtoList.get(0).getEndTime()); //号源时段结束时间
             doctorRegisterDto.setIsLock(Constants.SF.S); //是否锁号
-            wxBasicInfoDAO.updateIsLock(doctorRegisterDto);
+            wxOutptDAO.updateIsLock(doctorRegisterDto);
 
             // 返参加密
             log.debug("微信小程序【锁定号源】返参加密前：" + JSON.toJSONString(doctorRegisterDto));
@@ -939,7 +952,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (outptProfileFileDTO == null) return WrapperResponse.error(500, "未建档，请先建档！", null);
 
         // 查询挂号类别的费用list
-        List<OutptClassifyCostDTO> outptClassifyCostDTOS = wxBasicInfoDAO.queryClassifyCost(map);
+        List<OutptClassifyCostDTO> outptClassifyCostDTOS = wxOutptDAO.queryClassifyCost(map);
         if (ListUtils.isEmpty(outptClassifyCostDTOS)) return WrapperResponse.error(500, "该挂号类别未配置项目，请检查！", null);
 
         //票据规则生成【挂号单号】
@@ -963,7 +976,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
                 outptRegisterMap.put("certNo", certNo);
                 outptRegisterMap.put("deptId", deptId);
                 outptRegisterMap.put("nowDate", DateUtils.getNow());
-                List<OutptRegisterDTO> outptRegisterList = wxBasicInfoDAO.queryIsRepeatRegister(outptRegisterMap);
+                List<OutptRegisterDTO> outptRegisterList = wxOutptDAO.queryIsRepeatRegister(outptRegisterMap);
                 if(!ListUtils.isEmpty(outptRegisterList)){
                     throw new AppException("挂号限制！同一个人同一个科室每天只能挂一个号！");
                 }
@@ -984,31 +997,20 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         //6. 根据是否结算参数判断是挂号结算还是门诊划价结算
         //7.挂号结算表数据(outpt_register_settle)和结算支付表数据(outpt_register_pay)
+
         // 微信直接走挂号结算
         String settleId = this.handleOutptRegisterSettleAndPayData(data, outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
-        /*// 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
-        SysParameterDTO ghJsSysParameterDTO = this.getSysParam(hospCode, "GH_JS");
-        if (ghJsSysParameterDTO != null && "1".equals(ghJsSysParameterDTO.getValue())) {
-            // 门诊划价收费结算
-            //8.门诊划价收费结算，插入费用数据到(outpt_cost)表中
-            this.handeleOutptCostData(outptVisitDTO, outptRegisterDetailDtos);
-        } else {
-            // 挂号时结算
-            //7.挂号结算表数据(outpt_register_settle)和结算支付表数据(outpt_register_pay)
-            settleId = this.handleOutptRegisterSettleAndPayData(data, outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
-        }*/
 
-        //9.更新号源表数据(outpt_doctor_register)
+        //8.更新号源表数据(outpt_doctor_register)
         if (StringUtils.isNotEmpty(MapUtils.get(data, "sourceId"))) {
             String sourceId = MapUtils.get(data, "sourceId");
             // 根据号源id查询号源，判断是否为页面入参的档案同一人预约
-            OutptDoctorRegisterDto doctorRegisterById = wxBasicInfoDAO.getDoctorRegisterById(sourceId, hospCode);
+            OutptDoctorRegisterDto doctorRegisterById = wxOutptDAO.getDoctorRegisterById(sourceId, hospCode);
             if (doctorRegisterById == null) return WrapperResponse.error(500, "号源不存在，请核对！" , null);
             if (!profileId.equals(doctorRegisterById.getProfileId())) return WrapperResponse.error(500, "【"+ doctorRegisterById.getRegisterTime() +"】号源不为该就诊人预约，请核对！" , null);
                 //号源id不为空，通过锁号进入
             this.handleOuptDoctorRegisterData(data);
         }
-
 
         //返参加密
         log.debug("微信小程序【挂号支付】返参加密前：" + JSON.toJSONString(outptRegisterDTO));
@@ -1017,7 +1019,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(outptRegisterDTO));
             log.debug("微信小程序【挂号支付】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
-            throw new AppException("【挂号支付】返参加密错误，请联系管理员！" + e.getMessage());
+            throw new AppException("【挂号支付】返参加密错误，请联系管理员！" + e.getMessage(),e);
         }
         return WrapperResponse.success(res);
     }
@@ -1034,7 +1036,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptDoctorRegisterDto.setHospCode(hospCode);
         outptDoctorRegisterDto.setIsUse(Constants.SF.S);
         log.debug("微信挂号支付更改【医生号源表】数据：" + JSON.toJSONString(outptDoctorRegisterDto));
-        wxBasicInfoDAO.updateOuptDoctorRegister(outptDoctorRegisterDto);
+        wxOutptDAO.updateOuptDoctorRegister(outptDoctorRegisterDto);
     }
 
     /**
@@ -1080,7 +1082,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         }
         if (!ListUtils.isEmpty(outptCostDTOList)) {
             log.debug("微信挂号支付插入【门诊结算表】数据：" + JSON.toJSONString(outptCostDTOList));
-            wxBasicInfoDAO.insertOuptCost(outptCostDTOList);
+            wxOutptDAO.insertOuptCost(outptCostDTOList);
         }
     }
 
@@ -1223,11 +1225,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         }
 
         log.debug("微信挂号支付插入【挂号结算表】数据：" + JSON.toJSONString(outptRegisterSettleDto));
-        wxBasicInfoDAO.insertOutptRegisterSettle(outptRegisterSettleDto);
+        wxOutptDAO.insertOutptRegisterSettle(outptRegisterSettleDto);
 
         if (!ListUtils.isEmpty(payList)) {
             log.debug("微信挂号支付插入【挂号结算方式表】数据：" + JSON.toJSONString(payList));
-            wxBasicInfoDAO.insertOutptRegisterPay(payList);
+            wxOutptDAO.insertOutptRegisterPay(payList);
         }
 
         return settleId;
@@ -1280,7 +1282,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             OutptDoctorQueueDto doctorQueueDto = new OutptDoctorQueueDto();
             doctorQueueDto.setId(outptRegisterDTO.getDqId());
             doctorQueueDto.setHospCode(outptRegisterDTO.getHospCode());
-            doctorQueueDto = wxBasicInfoDAO.queryDoctorQueueById(doctorQueueDto);
+            doctorQueueDto = wxOutptDAO.queryDoctorQueueById(doctorQueueDto);
 
             // 2.获取分诊室信息
             Map mapParam = new HashMap();
@@ -1288,12 +1290,12 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             ids.add(doctorQueueDto.getCqId());
             mapParam.put("hospCode", outptRegisterDTO.getHospCode());
             mapParam.put("ids", ids);
-            OutptClassesQueueDto classesQueueDto = wxBasicInfoDAO.queryClassesQueueParam(mapParam).get(0);
+            OutptClassesQueueDto classesQueueDto = wxOutptDAO.queryClassesQueueParam(mapParam).get(0);
             // 3.获取班次是否排队叫号信息
             OutptClassifyClassesDTO classifyClassesDTO = new OutptClassifyClassesDTO();
             classifyClassesDTO.setId(classesQueueDto.getCcId());
             classifyClassesDTO.setHospCode(outptRegisterDTO.getHospCode());
-            classifyClassesDTO = wxBasicInfoDAO.getClassifyClassesById(classifyClassesDTO);
+            classifyClassesDTO = wxOutptDAO.getClassifyClassesById(classifyClassesDTO);
 
             triageCode = classesQueueDto.getTriageCode();
             outptTriageVisitDTO.setClinicId(doctorQueueDto.getClinicId());
@@ -1329,7 +1331,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptTriageVisitDTO.setCrteTime(DateUtils.getNow());
 
         log.debug("微信挂号支付插入【分诊表】数据：" + JSON.toJSONString(outptTriageVisitDTO));
-        wxBasicInfoDAO.insertOutptTriageVisit(outptTriageVisitDTO);
+        wxOutptDAO.insertOutptTriageVisit(outptTriageVisitDTO);
     }
 
     /**
@@ -1382,7 +1384,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptVisitDTO.setCrteTime(DateUtils.getNow());
 
         log.debug("微信挂号支付插入【就诊表】数据：" + JSON.toJSONString(outptVisitDTO));
-        wxBasicInfoDAO.insertOutptVisit(outptVisitDTO);
+        wxOutptDAO.insertOutptVisit(outptVisitDTO);
         return outptVisitDTO;
     }
 
@@ -1426,7 +1428,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             });
 
             log.debug("微信挂号支付插入【挂号登记明细表】数据：" + JSON.toJSONString(list));
-            wxBasicInfoDAO.insertOuptRegisterDetail(list);
+            wxOutptDAO.insertOuptRegisterDetail(list);
         }
         return list;
     }
@@ -1476,7 +1478,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptRegisterDTO.setCrteTime(DateUtils.getNow()); // 创建时间
 
         log.debug("微信挂号支付插入【挂号登记表】数据：" + JSON.toJSONString(outptRegisterDTO));
-        wxBasicInfoDAO.insertOuptRegister(outptRegisterDTO);
+        wxOutptDAO.insertOuptRegister(outptRegisterDTO);
         return outptRegisterDTO;
     }
 
@@ -1506,7 +1508,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(MapUtils.get(data, "profileId"))) return WrapperResponse.error(500, "未选择需要解锁号源的人员", null);
 
         //查询单个号源id记录，判断是否未当前人员的锁的号
-        OutptDoctorRegisterDto outptDoctorRegisterDto = wxBasicInfoDAO.getDoctorRegisterById((String) data.get("sourceId"), hospCode);
+        OutptDoctorRegisterDto outptDoctorRegisterDto = wxOutptDAO.getDoctorRegisterById((String) data.get("sourceId"), hospCode);
         if(outptDoctorRegisterDto== null){
             return WrapperResponse.error(500, "未获取到对应号源信息", null);
         }
@@ -1519,7 +1521,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         doctorRegisterDto.setHospCode(hospCode); //医院编码
         doctorRegisterDto.setIsLock(Constants.SF.F); //是否锁号
         doctorRegisterDto.setProfileId(null); //档案Id
-        wxBasicInfoDAO.updateIsLock(doctorRegisterDto);
+        wxOutptDAO.updateIsLock(doctorRegisterDto);
 
         //返参处理
         log.debug("微信小程序【解锁号源】返参加密前：" + JSON.toJSONString(null));
@@ -1557,21 +1559,34 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     public WrapperResponse<String> deleteRegister(Map<String, Object> map) {
         // 校验入参参数
         String hospCode = MapUtils.get(map, "hospCode");
-        if (StringUtils.isEmpty(hospCode))  return WrapperResponse.error(500,"未检测到医院信息，请核对医院信息", null);
+        if (StringUtils.isEmpty(hospCode))  {
+            return WrapperResponse.error(500,"未检测到医院信息，请核对医院信息", null);
+        }
         Map<String, Object> data = MapUtils.get(map, "data");
-        if (data == null) return WrapperResponse.error(500, "挂号支付入参不能为空", null);
+        if (data == null){
+            return WrapperResponse.error(500, "挂号支付入参不能为空", null);
+        }
         String registerId = MapUtils.get(data, "id");
-        if (StringUtils.isEmpty(registerId)) return WrapperResponse.error(500, "挂号id不能为空", null);
+        if (StringUtils.isEmpty(registerId)){
+            return WrapperResponse.error(500, "挂号id不能为空", null);
+        }
 
         // 根据挂号id、医院编码查询挂号记录
-        OutptRegisterDTO outptRegisterDTO = wxBasicInfoDAO.getOutptRegisterById(data);
-        if (outptRegisterDTO == null) return WrapperResponse.error(500, "挂号记录不存在", null);
+        data.put("hospCode",hospCode);
+        OutptRegisterDTO outptRegisterDTO = wxOutptDAO.getOutptRegisterById(data);
+        if (outptRegisterDTO == null){
+            return WrapperResponse.error(500, "挂号记录不存在", null);
+        }
         log.debug("微信小程序【挂号退号】的数据：" + JSON.toJSONString(outptRegisterDTO));
 
         //1.检查是否可以退号，根据visitId查询就诊表，已接诊的无法退号
-        OutptVisitDTO outptVisitDTO = wxBasicInfoDAO.getOutptVisitById(outptRegisterDTO);
-        if (outptVisitDTO == null) return WrapperResponse.error(500, "就诊记录不存在", null);
-        if (Constants.SF.S.equals(outptVisitDTO.getIsVisit())) return WrapperResponse.error(500, "该就诊已就诊，无法退号", null);
+        OutptVisitDTO outptVisitDTO = wxOutptDAO.getOutptVisitById(outptRegisterDTO);
+        if (outptVisitDTO == null){
+            return WrapperResponse.error(500, "就诊记录不存在", null);
+        }
+        if (Constants.SF.S.equals(outptVisitDTO.getIsVisit())){
+            return WrapperResponse.error(500, "该就诊已就诊，无法退号", null);
+        }
 
         //2.挂号信息表作废
         this.updateOuptRegisterData(outptRegisterDTO);
@@ -1616,10 +1631,10 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     private void unBlockNumberInfo(OutptRegisterDTO outptRegisterDTO) {
         if (StringUtils.isNotEmpty(outptRegisterDTO.getDrId())) {
             // 根据号源id查询号源记录
-            OutptDoctorRegisterDto doctorRegisterById = wxBasicInfoDAO.getDoctorRegisterById(outptRegisterDTO.getDrId(), outptRegisterDTO.getHospCode());
+            OutptDoctorRegisterDto doctorRegisterById = wxOutptDAO.getDoctorRegisterById(outptRegisterDTO.getDrId(), outptRegisterDTO.getHospCode());
             if (doctorRegisterById != null) {
                 // 挂号退号解锁号源信息
-                wxBasicInfoDAO.updateOutptDoctorRegister(outptRegisterDTO);
+                wxOutptDAO.updateOutptDoctorRegister(outptRegisterDTO);
             } else {
                 throw new RuntimeException("退号号源不存在，请核对！");
             }
@@ -1631,7 +1646,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      * @param outptRegisterDTO 挂号记录dto
      */
     private void updatePatientState(OutptRegisterDTO outptRegisterDTO) {
-        wxBasicInfoDAO.deleteOutptVisitByVisitId(outptRegisterDTO);
+        wxOutptDAO.deleteOutptVisitByVisitId(outptRegisterDTO);
     }
 
     /**
@@ -1641,7 +1656,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      */
     private void registerPayChangeRed(OutptRegisterDTO outptRegisterDTO, String redSettleId) {
         // 根据挂号id查询挂号支付方式记录
-        List<OutptRegisterPayDto> outptRegisterPayDtoList = wxBasicInfoDAO.queryOutptRegisterPayByRegisterId(outptRegisterDTO);
+        List<OutptRegisterPayDto> outptRegisterPayDtoList = wxOutptDAO.queryOutptRegisterPayByRegisterId(outptRegisterDTO);
         if (!ListUtils.isEmpty(outptRegisterPayDtoList)) {
             for (OutptRegisterPayDto outptRegisterPayDto : outptRegisterPayDtoList) {
                 outptRegisterPayDto.setId(SnowflakeUtils.getId());
@@ -1651,7 +1666,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
                 // 手续费（暂不考虑，默认为0）
                 outptRegisterPayDto.setServicePrice(BigDecimal.ZERO);
             }
-            wxBasicInfoDAO.insertOutptRegisterPay(outptRegisterPayDtoList);
+            wxOutptDAO.insertOutptRegisterPay(outptRegisterPayDtoList);
         }
     }
 
@@ -1662,11 +1677,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      */
     private void registerSettleChangeRed(OutptRegisterDTO outptRegisterDTO, String redSettleId) {
         // 根据挂号id查询挂号结算表记录
-        OutptRegisterSettleDto outptRegisterSettleDto = wxBasicInfoDAO.queryOutptRegisterSettleByRegisterId(outptRegisterDTO);
+        OutptRegisterSettleDto outptRegisterSettleDto = wxOutptDAO.queryOutptRegisterSettleByRegisterId(outptRegisterDTO);
         if (outptRegisterSettleDto != null) {
             // 原始数据被冲红
             outptRegisterSettleDto.setStatusCode(Constants.ZTBZ.BCH);// 状态标志(被冲红)
-            wxBasicInfoDAO.updateOutptRegisterSettleByRegisterId(outptRegisterSettleDto);
+            wxOutptDAO.updateOutptRegisterSettleByRegisterId(outptRegisterSettleDto);
 
             // 新增一条冲红数据
             outptRegisterSettleDto.setOriginId(outptRegisterSettleDto.getId()); // 原费用id
@@ -1684,7 +1699,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             outptRegisterSettleDto.setCrteId(outptRegisterDTO.getCrteId());
             outptRegisterSettleDto.setCrteName(outptRegisterDTO.getCrteName());
             outptRegisterSettleDto.setCrteTime(DateUtils.getNow());
-            wxBasicInfoDAO.insertOutptRegisterSettle(outptRegisterSettleDto);
+            wxOutptDAO.insertOutptRegisterSettle(outptRegisterSettleDto);
         }
     }
 
@@ -1694,13 +1709,13 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      */
     private void registerDetailChangeRed(OutptRegisterDTO outptRegisterDTO) {
         // 根据挂号id、就诊id查询挂号明细记录
-        List<OutptRegisterDetailDto> list = wxBasicInfoDAO.queryOutptRegisterDetailByRegisterId(outptRegisterDTO);
+        List<OutptRegisterDetailDto> list = wxOutptDAO.queryOutptRegisterDetailByRegisterId(outptRegisterDTO);
         if (!ListUtils.isEmpty(list)) {
             // 原始数据被冲红
             for (OutptRegisterDetailDto outptRegisterDetailDto : list) {
                 outptRegisterDetailDto.setStatusCode(Constants.ZTBZ.BCH); // 状态标志(被冲红)
             }
-            wxBasicInfoDAO.updateOutptRegisterDetailByRegisterId(list);
+            wxOutptDAO.updateOutptRegisterDetailByRegisterId(list);
 
             // 新增一条冲红数据
             for (OutptRegisterDetailDto outptRegisterDetailDto : list) {
@@ -1718,7 +1733,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
                 outptRegisterDetailDto.setCrteTime(DateUtils.getNow());
             }
 
-            wxBasicInfoDAO.insertOuptRegisterDetail(list);
+            wxOutptDAO.insertOuptRegisterDetail(list);
         }
     }
 
@@ -1731,7 +1746,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         registerDTO.setId(outptRegisterDTO.getId());
         registerDTO.setHospCode(outptRegisterDTO.getHospCode());
         registerDTO.setIsCancel(Constants.SF.S);
-        wxBasicInfoDAO.updateOuptRegister(registerDTO);
+        wxOutptDAO.updateOuptRegister(registerDTO);
     }
 
     /**
@@ -1764,7 +1779,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data.get("endDate") == null) {
             data.put("endDate", DateUtils.format(DateUtils.Y_M_D));
         }
-        List<OutptVisitDTO> list = wxBasicInfoDAO.queryVisitList(map);
+        List<OutptVisitDTO> list = wxOutptDAO.queryVisitList(map);
 
         // 返参加密
         log.debug("微信小程序【待缴费的就诊记录列表】返参加密前：" + JSON.toJSONString(list));
@@ -1801,7 +1816,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data.get("visitId") == null) return WrapperResponse.error(500, "未选择需要查询处方信息的患者", null);
 
         // 查询visitId查询已提交、未结算的处方单
-        List<OutptPrescribeDTO> list = wxBasicInfoDAO.queryPrescribeList(map);
+        List<OutptPrescribeDTO> list = wxOutptDAO.queryPrescribeList(map);
 
         // 返参加密
         log.debug("微信小程序【待缴费的处方信息】返参加密前：" + JSON.toJSONString(list));
@@ -1838,7 +1853,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(MapUtils.get(data, "opId"))) return WrapperResponse.error(500, "未选择需要查询处方信息", null);
         // 查询正常状态的费用
         data.put("statusCode", Constants.ZTBZ.ZC);
-        List<OutptPrescribeDetailsDTO> list = wxBasicInfoDAO.queryPrescriptionDetails(map);
+        List<OutptPrescribeDetailsDTO> list = wxOutptDAO.queryPrescriptionDetails(map);
 
         // 返参加密
         log.debug("微信小程序【查询处方明细列表】返参加密前：" + JSON.toJSONString(list));
@@ -1901,7 +1916,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         perscribeMap.put("visitIds", visitIds);
         perscribeMap.put("startDate", startDate);
         perscribeMap.put("endDate", endDate);
-        List<OutptSettleDTO> result = wxBasicInfoDAO.queryPaidPrescribeList(perscribeMap);
+        List<OutptSettleDTO> result = wxOutptDAO.queryPaidPrescribeList(perscribeMap);
 
         //返参加密
         log.debug("微信小程序【缴费记录查询】返参加密前：" + JSON.toJSONString(result));
@@ -1931,7 +1946,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         visitMap.put("profileId", profileId);
         visitMap.put("startDate", startDate);
         visitMap.put("endDate", endDate);
-        return wxBasicInfoDAO.getVistiListByProfileId(visitMap);
+        return wxOutptDAO.getVistiListByProfileId(visitMap);
     }
 
     /**
@@ -1958,7 +1973,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(opId)) return WrapperResponse.error(500, "未选择需要查询明细的处方!", null);
 
         //根据处方id查询处方明细
-        List<OutptPrescribeDetailsDTO> result = wxBasicInfoDAO.queryPrescriptionDetails(map);
+        List<OutptPrescribeDetailsDTO> result = wxOutptDAO.queryPrescriptionDetails(map);
 
         //返参加密
         log.debug("微信小程序【缴费记录明细】返参加密前：" + JSON.toJSONString(result));
@@ -2022,7 +2037,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         data.put("hospCode", hospCode);
         data.put("visitIds", visitIds);
-        List<MedicalApplyDTO> result = wxBasicInfoDAO.queryMedicApplyList(data);
+        List<MedicalApplyDTO> result = wxOutptDAO.queryMedicApplyList(data);
 
         //返参加密
         log.debug("微信小程序【报告列表查询】返参加密前：" + JSON.toJSONString(result));
@@ -2064,7 +2079,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         //设置医技类别为LIS(4)
         data.put("hospCode", hospCode);
         data.put("typeCode", Constants.CFLB.LIS);
-        List<MedicalResultDTO> result = wxBasicInfoDAO.queryMedicApplyResult(data);
+        List<MedicalResultDTO> result = wxOutptDAO.queryMedicApplyResult(data);
 
         //返参加密
         log.debug("微信小程序【LIS医技结果查询】返参加密前：" + JSON.toJSONString(result));
@@ -2106,7 +2121,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         //设置医技类别为PACS(5)
         data.put("hospCode", hospCode);
         data.put("typeCode", Constants.CFLB.PACS);
-        List<MedicalResultDTO> result = wxBasicInfoDAO.queryMedicApplyResult(data);
+        List<MedicalResultDTO> result = wxOutptDAO.queryMedicApplyResult(data);
 
         //返参加密
         log.debug("微信小程序【PACS医技结果查询】返参加密前：" + JSON.toJSONString(result));
@@ -2155,7 +2170,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(crteName)) return WrapperResponse.error(500, "未获取到创建人姓名", null);
 
         // 根据微信订单号(orderNo)查询是否已经充值过了
-        InptAdvancePayDTO inptAdvancePayDTO = wxBasicInfoDAO.queryInptAdvancePayByOrderNo(hospCode, orderNo);
+        InptAdvancePayDTO inptAdvancePayDTO = wxInptDAO.queryInptAdvancePayByOrderNo(hospCode, orderNo);
         if (inptAdvancePayDTO != null) return WrapperResponse.error(500, "该订单号【" + orderNo + "】已经充值完成！", null);
 
         // 预交金充值
@@ -2185,14 +2200,14 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         inptVisitDTO.setId(result.getVisitId());
         inptVisitDTO.setHospCode(result.getHospCode());
         // 根据id查询就诊记录
-        InptVisitDTO inptVisitDTOById = wxBasicInfoDAO.getInptVisitById(inptVisitDTO);
+        InptVisitDTO inptVisitDTOById = wxInptDAO.getInptVisitById(inptVisitDTO);
 
         // 根据visitId查询出所有状态为0正常的预交金记录
         InptAdvancePayDTO inptAdvancePayDTO = new InptAdvancePayDTO();
         inptAdvancePayDTO.setVisitId(result.getVisitId());
         inptAdvancePayDTO.setStatusCode(Constants.ZTBZ.ZC);
         inptAdvancePayDTO.setHospCode(result.getHospCode());
-        List<InptAdvancePayDTO> inptAdvancePayDTOS = wxBasicInfoDAO.queryInptAdvancePayByVisitId(inptAdvancePayDTO);
+        List<InptAdvancePayDTO> inptAdvancePayDTOS = wxInptDAO.queryInptAdvancePayByVisitId(inptAdvancePayDTO);
 
         BigDecimal totalAdvance = BigDecimal.valueOf(0);
         if (!ListUtils.isEmpty(inptAdvancePayDTOS)) {
@@ -2206,7 +2221,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         inptVisitDTOById.setTotalAdvance(totalAdvance);
         BigDecimal totalCost = BigDecimalUtils.nullToZero(inptVisitDTOById.getTotalCost());
         inptVisitDTOById.setTotalBalance(BigDecimalUtils.subtract(inptVisitDTOById.getTotalAdvance(), totalCost));
-        wxBasicInfoDAO.updateInptVisitTotalAdvanceAndBalance(inptVisitDTOById);
+        wxInptDAO.updateInptVisitTotalAdvanceAndBalance(inptVisitDTOById);
     }
 
     /**
@@ -2225,7 +2240,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         advancePayDTO.setHospCode(hospCode);
         advancePayDTO.setVisitId(MapUtils.get(data, "visitId"));
         advancePayDTO.setApOrderNo(orderNo);
-        advancePayDTO.setPrice(BigDecimal.valueOf(Long.valueOf(MapUtils.get(data, "price"))));
+        advancePayDTO.setPrice(BigDecimalUtils.convert(MapUtils.get(data, "price")));
         advancePayDTO.setIsSettle(Constants.SF.F);
         advancePayDTO.setSettleId(null);
         advancePayDTO.setRedId(null);
@@ -2240,7 +2255,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         advancePayDTO.setCrteId(MapUtils.get(data, "crteId"));
         advancePayDTO.setCrteName(MapUtils.get(data, "crteName"));
         advancePayDTO.setCrteTime(DateUtils.getNow());
-        wxBasicInfoDAO.saveAdvancePayment(advancePayDTO);
+        wxInptDAO.saveAdvancePayment(advancePayDTO);
         return advancePayDTO;
     }
 
@@ -2268,26 +2283,17 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             return WrapperResponse.error(500, "服务器异常，请联系管理员！", null);
         }
         String inNo = MapUtils.get(data, "inNo");
-        /*if (StringUtils.isEmpty(inNo)) return WrapperResponse.error(500, "住院号不能为空", null);
-
+        if (StringUtils.isEmpty(inNo)){
+            return WrapperResponse.error(500, "住院号不能为空", null);
+        }
         String profileId = MapUtils.get(data, "profileId");
-        if (StringUtils.isEmpty(profileId)) return WrapperResponse.error(500, "档案id不能为空", null);
-
-        // 查询档案表根据档案id，核实是否存在档案
-        OutptProfileFileDTO profileByIdDTO = this.getProfileById(hospCode, profileId);
-        if (profileByIdDTO == null) return WrapperResponse.error(500, "档案id无效，请核实是否建档！", null);
-
-        // 根据profileId查询到就诊记录列表
-        List<OutptVisitDTO> vistiListByProfileId = this.getVistiListByProfileId(hospCode, profileId, MapUtils.get(data, "startDate"), MapUtils.get(data, "endDate"));
-        if (ListUtils.isEmpty(vistiListByProfileId)) return WrapperResponse.error(500, "未查询到就诊人在该院存在就诊记录", null);
-        List<String> visitIds = vistiListByProfileId.stream().map(OutptVisitDTO::getId).collect(Collectors.toList());
-
-        data.put("visitIds", visitIds);*/
+        if(StringUtils.isEmpty(profileId)){
+            return WrapperResponse.error(500, "档案id不能为空", null);
+        }
 
         data.put("hospCode", hospCode);
-
         // 查询预交金记录
-        List<InptAdvancePayDTO> result = wxBasicInfoDAO.queryAdvancePayment(data);
+        List<InptAdvancePayDTO> result = wxInptDAO.queryAdvancePayment(data);
 
         // 返参加密
         log.debug("微信小程序【预缴金记录查询】返参加密前：" + JSON.toJSONString(result));
@@ -2335,7 +2341,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         // 根据档案id查询就诊人是否在院状态
         data.put("hospCode", hospCode);
-        List<InptVisitDTO> result = wxBasicInfoDAO.queryInptVisitRecord(data);
+        List<InptVisitDTO> result = wxInptDAO.queryInptVisitRecord(data);
 
         // 返参加密
         log.debug("微信小程序【住院病人信息查询】返参加密前：" + JSON.toJSONString(result));
@@ -2396,7 +2402,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (profileByIdDTO == null) return WrapperResponse.error(500, "档案id无效，请核实是否建档！", null);
 
         data.put("hospCode", hospCode);
-        List<InptVisitDTO> result = wxBasicInfoDAO.queryInptVisitRecord(data);
+        List<InptVisitDTO> result = wxInptDAO.queryInptVisitRecord(data);
 
         // 返参加密
         log.debug("微信小程序【病人住院记录】返参加密前：" + JSON.toJSONString(result));
@@ -2433,7 +2439,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         data.put("hospCode", hospCode);
         // 根据住院号查询费用清单
-        List<InptCostDTO> result = wxBasicInfoDAO.queryInptCostRecord(data);
+        List<InptCostDTO> result = wxInptDAO.queryInptCostRecord(data);
 
         // 返参加密
         log.debug("微信小程序【病人住院记录明细】返参加密前：" + JSON.toJSONString(result));
@@ -2473,7 +2479,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         //日费用清单查询
         data.put("hospCode", hospCode);
-        List<InptCostDTO> list = wxBasicInfoDAO.queryOneDayCostListRecord(data);
+        List<InptCostDTO> list = wxInptDAO.queryOneDayCostListRecord(data);
         if(ListUtils.isEmpty(list)) return WrapperResponse.error(200, "该就诊人在查询时间内未产生费用", null);
         Map<String, List<InptCostDTO>> collect = list.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate));
 
@@ -2518,7 +2524,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         //日费用清单明细查询
         data.put("hospCode", hospCode);
-        List<InptCostDTO> list = wxBasicInfoDAO.queryOneDayCostListRecord(data);
+        List<InptCostDTO> list = wxInptDAO.queryOneDayCostListRecord(data);
         if(ListUtils.isEmpty(list)) return WrapperResponse.error(500, "该就诊人在查询时间内未产生费用", null);
         Map<String, List<InptCostDTO>> collect = list.stream().collect(Collectors.groupingBy(InptCostDTO::getCostDate));
 
@@ -2545,17 +2551,42 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      */
     @Override
     public WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map) {
-
-        List<Map<String,Object>> list = wxBasicInfoDAO.querySevenQueueDoctor(map);
+        Map<String, Object> data = MapUtils.get(map, "data");
+        if (data == null) {
+            return WrapperResponse.error(500, "查询参数为空", null);
+        }
+        String keyword =  MapUtils.get(data, "keyword");
+        if (StringUtils.isEmpty(keyword)) {
+            return WrapperResponse.error(500, "查询参数为空", null);
+        }
+        data.put("hospCode",MapUtils.get(map, "hospCode"));
+        List<Map<String,Object>> list = wxOutptDAO.querySevenQueueDoctor(data);
 
         // 返参加密
-        log.debug("微信小程序【询所有科室下所有七天内有排班的医生】返参加密前：" + JSON.toJSONString(list));
+        log.debug("微信小程序【查询所有科室下所有七天内有排班的医生】返参加密前：" + JSON.toJSONString(list));
         String res = null;
         try {
             res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(list));
-            log.debug("微信小程序【询所有科室下所有七天内有排班的医生】返参加密后：" + res);
+            log.debug("微信小程序【查询所有科室下所有七天内有排班的医生】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
-            throw new AppException("【询所有科室下所有七天内有排班的医生】返参加密错误，请联系管理员！" + e.getMessage());
+            throw new AppException("【查询所有科室下所有七天内有排班的医生】返参加密错误，请联系管理员！" + e.getMessage());
+        }
+
+        return WrapperResponse.success(res);
+    }
+
+    @Override
+    public WrapperResponse<String> queryBaseDisease(Map<String, Object> map) {
+        List<BaseDiseaseDTO> list = wxBaseoDAO.queryBaseDisease(map);
+
+        // 返参加密
+        log.debug("微信小程序【查询所有疾病信息】返参加密前：" + JSON.toJSONString(list));
+        String res = null;
+        try {
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(list));
+            log.debug("微信小程序【查询所有疾病信息】返参加密后：" + res);
+        } catch (UnsupportedEncodingException e) {
+            throw new AppException("【查询所有疾病信息】返参加密错误，请联系管理员！" + e.getMessage());
         }
 
         return WrapperResponse.success(res);

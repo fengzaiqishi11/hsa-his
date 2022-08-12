@@ -406,4 +406,11 @@ public interface WxBasicInfoBO {
      * pengbo
      */
     WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map);
+
+    /**
+     * 查询所有疾病信息
+     * @param map
+     * @return
+     */
+    WrapperResponse<String> queryBaseDisease(Map<String, Object> map);
 }

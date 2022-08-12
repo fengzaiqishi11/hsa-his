@@ -44,4 +44,10 @@ public class OutptPrescribeTempDTO extends OutptPrescribeTempDO implements Seria
 
     private String loginDeptId;
 
+    // 排序字段名称
+    private String columnName;
+
+    // 排序名称 desc:降序  asc:升序
+    private String sortName;
+
 }

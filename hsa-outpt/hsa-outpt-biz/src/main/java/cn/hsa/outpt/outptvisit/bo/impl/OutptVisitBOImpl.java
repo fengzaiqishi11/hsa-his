@@ -3,6 +3,7 @@ package cn.hsa.outpt.outptvisit.bo.impl;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
@@ -11,6 +12,7 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -140,6 +142,17 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
     @Override
     public OutptVisitDTO selectOutptVisitByCertNo(OutptVisitDTO outptVisitDTO) {
         return outptVisitDAO.selectOutptVisitByCertNo(outptVisitDTO);
+    }
+
+    @Override
+    public OutptVisitDTO queryInptVisitInfo(OutptVisitDTO outptVisitDTO) {
+        OutptVisitDTO outptResultDto = outptVisitDAO.queryInptVisitInfo(outptVisitDTO);
+        return outptResultDto;
+    }
+    @Override
+    public InsureIndividualVisitDTO queryInsureVisitInfo(OutptVisitDTO outptVisitDTO) {
+        InsureIndividualVisitDTO outptResultDto = outptVisitDAO.queryInsureVisitInfo(outptVisitDTO);
+        return outptResultDto;
     }
 
     /**

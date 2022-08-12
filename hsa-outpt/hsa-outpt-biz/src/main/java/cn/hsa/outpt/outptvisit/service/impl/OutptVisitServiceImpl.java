@@ -5,6 +5,7 @@ import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
@@ -168,5 +169,15 @@ public class OutptVisitServiceImpl extends HsafService implements OutptVisitServ
     @Override
     public WrapperResponse<OutptVisitDTO> selectOutptVisitByCertNo(Map<String, Object> map) {
         return WrapperResponse.success(outptVisitBO.selectOutptVisitByCertNo(MapUtils.get(map, "outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse<OutptVisitDTO> queryInptVisitInfo(Map map) {
+        return WrapperResponse.success(outptVisitBO.queryInptVisitInfo(MapUtils.get(map, "outptVisitDTO")));
+    }
+
+    @Override
+    public WrapperResponse<InsureIndividualVisitDTO> queryInsureVisitInfo(Map map) {
+        return WrapperResponse.success(outptVisitBO.queryInsureVisitInfo(MapUtils.get(map, "outptVisitDTO")));
     }
 }

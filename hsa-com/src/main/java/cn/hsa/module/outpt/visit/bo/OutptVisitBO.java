@@ -2,6 +2,7 @@ package cn.hsa.module.outpt.visit.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -115,4 +116,7 @@ public interface OutptVisitBO {
      * @description 根据证件类型和证件号码 查询信息
      **/
     OutptVisitDTO selectOutptVisitByCertNo(OutptVisitDTO outptVisitDTO);
+
+    OutptVisitDTO queryInptVisitInfo(OutptVisitDTO outptVisitDTO);
+    InsureIndividualVisitDTO queryInsureVisitInfo(OutptVisitDTO outptVisitDTO);
 }

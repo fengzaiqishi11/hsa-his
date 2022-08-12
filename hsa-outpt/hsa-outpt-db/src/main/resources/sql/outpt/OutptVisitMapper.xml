@@ -968,4 +968,56 @@
         select mib_id from insure_individual_visit where visit_id = #{visitId} and hosp_code = #{hospCode} and medical_reg_no = #{medicalRegNo})
         and hosp_code = #{hospCode}
     </select>
+
+    <select id="queryInptVisitInfo" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select
+            iv.name ,
+            iv.age,
+            iv.gender_code,
+            iv.age_unit_code,
+            iv.in_no ,
+            iv.status_code,
+            ifnull(iv.bed_name,'-') bed_name,
+            iv.in_dept_name ,
+            ifnull(iv.zz_doctor_name,'-') zz_doctor_name,
+            iv.in_disease_name
+        from
+            inpt_visit iv
+        where iv.status_code not in ('7','8')
+            and iv.hosp_code = #{hospCode}
+          and iv.cert_code = #{certCode}
+            and iv.cert_no = #{certNo}
+        order by iv.crte_time desc limit 1
+    </select>
+
+    <select id="queryInsureVisitInfo" resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        select
+            iv.name ,
+            iv.in_no ,
+            iv.age,
+            iv.gender_code,
+            iv.age_unit_code,
+            iv.bed_name ,
+            iv.cert_no as aac002,
+            iiv.aac001,
+            (select id.name from insure_dict id where id.insure_reg_code = iiv.insure_reg_code and id.code = 'MED_TYPE' and iiv.aka130 = id.value ) as aka130_name,
+            iiv.aka130 ,
+            case iiv.aka130 when '2101' then '-'
+             else iiv.bka006_name end  bka006_name,
+            iiv.visit_time ,
+            iiv.crte_time ,
+            iiv.crte_name,
+            ic.name as insureRegName
+        from
+            inpt_visit iv,
+            insure_individual_visit iiv
+            left join insure_configuration ic on iiv.insure_reg_code  = ic.reg_code and ic.hosp_code = iiv.hosp_code
+        where iv.status_code not in ('7','8')
+          and iv.id  = iiv.visit_id
+          and iiv.is_hospital ='1'
+            and iv.hosp_code = #{hospCode}
+          and iv.cert_code = #{certCode}
+          and iv.cert_no =#{certNo}
+            order by iv.crte_time desc limit 1
+    </select>
 </mapper>

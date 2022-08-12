@@ -975,7 +975,8 @@
         when '3'
         then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '4'
-        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName,
+        a.crte_time as costTime -- 费用发生时间
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
@@ -1121,7 +1122,8 @@
         when '3'
         then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '4'
-        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName,
+        a.cost_time as costTime -- 费用发生时间
         FROM
             inpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id

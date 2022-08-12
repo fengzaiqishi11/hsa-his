@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.wxBasicInfo.dao.WxInptDAO">
+
+
+    <!--更新住院就诊表累计预交金和累计余额-->
+    <update id="updateInptVisitTotalAdvanceAndBalance" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        update inpt_visit
+        set
+            total_advance = #{totalAdvance},
+            total_balance = #{totalBalance}
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </update>
+    <!--预缴金记录查询-->
+    <select id="queryAdvancePayment" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
+        SELECT
+        a.hosp_code,
+        a.crte_time as pay_time,
+        a.price as pay_price,
+        a.pay_code,
+        a.status_code as pay_flag,
+        a.ap_order_no,
+        a.order_no,
+        a.remark
+        FROM
+        inpt_advance_pay a
+        left join inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
+        where a.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size() > 0">
+            and a.visit_id in
+            <foreach collection="visitIds" separator="," item="visitId" open="(" close=")">
+                #{visitId}
+            </foreach>
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and iv.in_no = #{inNo}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and date_format(a.crte_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and date_format(a.crte_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        order by a.crte_time desc
+    </select>
+
+    <!--根据profileId查询住院记录-->
+    <select id="queryInptVisitRecord" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        SELECT
+        a.id,
+        a.profile_id,
+        a.in_profile,
+        a.in_no,
+        a.name,
+        a.gender_code,
+        a.age,
+        a.age_unit_code,
+        a.bed_id,
+        a.bed_name,
+        a.status_code,
+        a.in_ward_id,
+        a.in_dept_id,
+        a.in_dept_name,
+        a.in_time,
+        a.out_ward_id,
+        a.out_dept_id,
+        a.out_dept_name,
+        a.out_time,
+        a.out_mode_code,
+        a.out_situation_code,
+        a.zz_doctor_name,
+        a.in_disease_id,
+        a.in_disease_name,
+        a.in_remark,
+        a.out_disease_id,
+        a.out_disease_name,
+        a.out_remark,
+        a.outpt_visit_no,
+        ROUND(a.total_advance, 2) as total_advance,
+        ROUND(a.total_cost, 2) as total_cost,
+        ROUND(a.total_balance, 2) as total_balance
+        FROM
+        inpt_visit a
+        WHERE a.hosp_code = #{hospCode}
+        and a.status_code not in ('7','8')
+        <if test="profileId != null and profileId != ''">
+            and a.profile_id = #{profileId}
+        </if>
+        <if test="startDate != null and startDate != ''">
+            <![CDATA[
+                and date_format(a.in_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="endDate != null and endDate != ''">
+            <![CDATA[
+                and date_format(a.in_time, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d')
+            ]]>
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and a.in_no = #{inNo}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and a.id = #{visitId}
+        </if>
+        order by a.in_time desc
+    </select>
+
+    <!--日费用清单查询-->
+    <select id="queryOneDayCostListRecord" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        a.visit_id,
+        a.source_code,
+        a.source_id,
+        a.bfc_id,
+        ( SELECT c.name FROM base_finance_classify c WHERE c.id = a.bfc_id AND c.hosp_code = #{hospCode} ) AS bfcName,
+        a.item_code,
+        a.item_id,
+        (select bi.type_code from base_item bi where bi.hosp_code = a.hosp_code and bi.id = a.item_id ) as itmeTypeCode,
+        a.item_name,
+        ROUND(a.price, 2) as price,
+        a.spec,
+        a.total_num AS num,
+        a.total_num_unit_code AS numUnitCode,
+        ROUND(a.total_price, 2) as total_price,
+        ROUND(a.preferential_price, 2) as preferential_price,
+        ROUND(a.reality_price, 2) as amountMoney,
+        a.doctor_id,
+        a.doctor_name,
+        a.dept_id,
+        (SELECT name from base_dept bd where bd.id = a.dept_id and bd.hosp_code = a.hosp_code) as deptName,
+        a.settle_code,
+        a.zz_doctor_id,
+        a.zz_doctor_name,
+        a.status_code,
+        a.cost_time,
+        DATE_FORMAT( a.cost_time, '%Y-%m-%d' ) AS cost_date,
+        ( SELECT min( DATE_FORMAT( cost_time, '%Y-%m-%d' )) FROM inpt_cost ic WHERE ic.hosp_code = a.hosp_code AND ic.visit_id = a.visit_id ) AS startCostDate,
+        ( SELECT max( DATE_FORMAT( cost_time, '%Y-%m-%d' )) FROM inpt_cost ic WHERE ic.hosp_code = a.hosp_code AND ic.visit_id = a.visit_id ) AS endCostDate,
+        iv.in_no
+        FROM
+        inpt_cost a
+        LEFT JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
+        where a.hosp_code = #{hospCode}
+        and a.cost_time is not null
+        <if test="visitId != null and visitId != ''">
+            AND a.visit_id = #{visitId}
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and iv.in_no = #{inNo}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND a.status_code = #{statusCode}
+        </if>
+        <if test="costStopTime != null and costStopTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') <= #{costStopTime}
+                ]]>
+        </if>
+        <if test="costStartTime != null and costStartTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') >= #{costStartTime}
+                ]]>
+        </if>
+        <if test="queryBaby == null">
+            and (a.baby_id is null or a.baby_id = '')
+        </if>
+        order by a.cost_time, a.bfc_id
+    </select>
+
+    <!--根据住院号查询费用清单-->
+    <select id="queryInptCostRecord" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+        b.name,
+        b.bed_name,
+        b.in_time as inTime,
+        b.out_time as outTime,
+        DATE_FORMAT(b.in_time, '%Y-%m-%d') as inDate,
+        b.total_cost AS totalCost,
+        a.item_code itemCode,
+        a.item_name AS itemName,
+        a.status_code as statusCode,
+        a.price,
+        a.total_num as totalNum,
+        a.total_num_unit_code as totalNumUnitCode,
+        a.total_price AS totalPrice,
+        a.preferential_price AS preferentialPrice,
+        a.reality_price AS realityPrice
+        FROM
+        inpt_cost a, inpt_visit b where a.visit_id = b.id
+        and a.hosp_code = b.hosp_code
+        and a.hosp_code = #{hospCode}
+        <if test="inNo != null and inNo != ''">
+            and b.in_no = #{inNo}
+        </if>
+        <if test="visitId != null and visitId != ''">
+            and b.id = #{visitId}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            and a.status_code = #{statusCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and date(a.cost_time) &gt;= date(#{startTime})
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date(a.cost_time) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <!--根据微信订单号查询预交金记录是否存在-->
+    <select id="queryInptAdvancePayByOrderNo" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
+        select * from inpt_advance_pay where hosp_code = #{hospCode} and order_no = #{orderNo} and status_code = '0'
+    </select>
+
+    <!--根据id查询就诊记录-->
+    <select id="getInptVisitById" parameterType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select
+            *
+        from inpt_visit
+        where hosp_code = #{hospCode}
+          and id = #{id}
+    </select>
+
+    <!--根据visitId查询出所有状态为0正常的预交金记录-->
+    <select id="queryInptAdvancePayByVisitId" parameterType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO" resultType="cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO">
+        select
+            id, hosp_code, visit_id, ap_order_no, price, is_settle, settle_id, red_id, status_code, daily_settle_id, source_pay_code, pay_code, cheque_no, service_price, order_no, remark, crte_id, crte_name, crte_time
+        from inpt_advance_pay
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+          and status_code = #{statusCode}
+    </select>
+
+</mapper>

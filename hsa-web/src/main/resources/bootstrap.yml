@@ -37,6 +37,7 @@ dubbo:
     name: hsa-web
   protocol:
     name: dubbo
+    payload: 214748364
     port: 29011
   provider:
     threads: 1000

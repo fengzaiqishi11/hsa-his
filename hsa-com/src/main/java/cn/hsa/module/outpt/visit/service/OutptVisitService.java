@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.visit.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -122,4 +123,8 @@ public interface OutptVisitService {
       *
      **/
     WrapperResponse<OutptVisitDTO> selectOutptVisitByCertNo(Map<String, Object> map);
+
+    WrapperResponse<OutptVisitDTO> queryInptVisitInfo(Map map);
+
+    WrapperResponse<InsureIndividualVisitDTO> queryInsureVisitInfo(Map map);
 }

@@ -1076,7 +1076,7 @@ public class WxBasicInfoController {
             data = AsymmetricEncryption.pubdecrypt(MapUtils.get(paramMap, "data"));
             log.debug("微信小程序【查询所有科室下所有七天内有排班的医生】入参解密后：" + JSON.parse(data));
         } catch (Exception e) {
-            throw new AppException("【住院病人日费用清单明细】入参错误，请联系管理员！" + e.getMessage());
+            throw new AppException("【查询所有科室下所有七天内有排班的医生】入参错误，请联系管理员！" + e.getMessage());
         }
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);

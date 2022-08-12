@@ -51,4 +51,6 @@ public interface CenterFunctionAuthorizationBO {
     CenterFunctionAuthorizationDto saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     List<CenterFunctionDto> queryCenterFunction(CenterFunctionDto centerFunctionDto);
+
+    CenterFunctionAuthorizationDto deleteAuthorizationByCode(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 };

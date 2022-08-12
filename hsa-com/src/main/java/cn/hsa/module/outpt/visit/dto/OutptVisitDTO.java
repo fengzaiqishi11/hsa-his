@@ -216,6 +216,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String outptDoctorId;
     // 门诊医生姓名
     private String outptDoctorName;
+    private String zzDoctorName;
 
     // 门诊结算使用的一卡通卡号
     private String cardNo;
@@ -284,4 +285,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
 
    //病案首页类型   1：中医病案首页    0：普通（西医）病案首页
    private String mrisPageType;
+   private String statusCode;
+   private String bedName;
+   private String inNo;
 }

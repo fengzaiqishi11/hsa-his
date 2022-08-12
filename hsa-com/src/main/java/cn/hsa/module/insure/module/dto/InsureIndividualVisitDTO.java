@@ -30,6 +30,7 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private static final long serialVersionUID = -4344033250932437962L;
         // 医保机构编码
         private String insureRegCode;
+        private String insureRegName;
         private String itemName; // 费用明细项目名称
         /**
          * 医保机构编码

@@ -1771,14 +1771,16 @@
                idm.insure_illness_name diseaseName,
                in_situation_code as    admCondType,
                mid.disease_code  as    isMain,
+               mid.disease_icd10 as    Icd10,
+               mid.disease_icd10_name as    Icd10Name,
                 bd.type_code
         from mris_inpt_diagnose mid
-                 join insure_disease_match idm on mid.hosp_code = idm.hosp_code
+              left   join insure_disease_match idm on mid.hosp_code = idm.hosp_code
             and idm.hosp_illness_code = mid.disease_icd10
+            and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
             left join base_disease bd on idm.hosp_illness_id=bd.id
         WHERE mid.visit_id = #{visitId}
           and mid.hosp_code = #{hospCode}
-          and idm.insure_reg_code = #{insureRegCode} and idm.audit_code ='1' and idm.is_match ='1'
         order by  mid.columns_index
     </select>
 

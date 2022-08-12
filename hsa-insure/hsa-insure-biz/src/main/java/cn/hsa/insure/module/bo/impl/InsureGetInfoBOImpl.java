@@ -2805,6 +2805,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (ObjectUtil.isEmpty(inptDiagnoseDTOList) && ObjectUtil.isEmpty(tcmXyDiagnoseDTOS) && ObjectUtil.isEmpty(tcmZyDiagnoseDTOS)) {
             throw new AppException("未获取到诊断信息，请检查！");
         }
+        //判断是否有未匹配的数据
+        if (!ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
+            String code = "";
+            for(InptDiagnoseDTO inptDiagnoseDTO:inptDiagnoseDTOList){
+                if(StringUtils.isEmpty(inptDiagnoseDTO.getDiseaseCode())){
+                    if(StringUtils.isEmpty(code)){
+                        code = inptDiagnoseDTO.getIcd10();
+                    }else {
+                        code = code + "、"+ inptDiagnoseDTO.getIcd10();
+                    }
+                }
+            }
+            if(StringUtils.isNotEmpty(code)){
+                throw new AppException("存在以下未匹配的疾病编码:"+code+",请检查");
+            }
+        }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();
         Integer diseaseCount = 0;

@@ -210,4 +210,20 @@ public class CenterInsureAuthorizationController extends CenterBaseController {
 
         return centerFunctionAuthorizationService.queryCenterFunction(centerFunctionDto);
     }
+
+
+
+    /**
+     * @Menthod deleteAuthorizationByCode()
+     * @Desrciption   关闭（删除）增值服务
+     * @Param
+     * 1. [centerFunctionAuthorizationDto] 参数数据传输DTO对象
+     * @Author pengbo
+     * @Date   2022/06/28 16:30
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.center.PageDTO>
+     **/
+    @PostMapping("/deleteAuthorizationByCode")
+    public WrapperResponse<CenterFunctionAuthorizationDto> deleteAuthorizationByCode(@RequestBody  CenterFunctionAuthorizationDto centerFunctionAuthorizationDto){
+        return centerFunctionAuthorizationService.deleteAuthorizationByCode(centerFunctionAuthorizationDto);
+    }
 }

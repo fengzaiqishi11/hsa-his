@@ -58,7 +58,7 @@ public interface CenterFunctionAuthorizationDAO {
 
   List<CenterFunctionDetailDto> queryCenterFunctionDetailPage(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
-  void deleteAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
+  int deleteAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
   void insertBtchAuthorization(List<CenterFunctionAuthorizationDto> list);
 }

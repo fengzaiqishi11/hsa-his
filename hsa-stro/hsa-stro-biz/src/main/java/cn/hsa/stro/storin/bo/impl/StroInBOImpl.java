@@ -3,6 +3,7 @@ package cn.hsa.stro.storin.bo.impl;
 import ch.qos.logback.core.util.TimeUtil;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
 import cn.hsa.module.base.bmm.service.BaseMaterialService;
@@ -21,6 +22,8 @@ import cn.hsa.module.stro.stroinvoicing.dto.StroInvoicingDTO;
 import cn.hsa.module.stro.stroout.dao.StroOutDAO;
 import cn.hsa.module.stro.stroout.dto.StroOutDTO;
 import cn.hsa.module.stro.stroout.dto.StroOutDetailDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -79,6 +82,8 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
 
   @Resource
   private BaseMaterialService baseMaterialService_customer;
+  @Resource
+  private SysParameterService sysParameterService_consumer;
 
   /**
   * @Menthod getById()
@@ -360,7 +365,18 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
     List<String> returnSuppIds = new ArrayList<>();
     // 储存平级出库
     List<String> parallelDeliveryIds = new ArrayList<>();
-
+    // 查看系统参数：是否检查验收合格
+    Map sysParamMap = new HashMap();
+    sysParamMap.put("hospCode", stroInDTO.getHospCode());
+    sysParamMap.put("code", "SHOW_ACCEPTANCE"); // 医保限制用药默认医保机构编码
+    WrapperResponse<SysParameterDTO> parameterByCode = sysParameterService_consumer.getParameterByCode(sysParamMap);
+    String showAcceptance;
+    if (null == parameterByCode) {
+      throw new AppException("获取系统参数:SHOW_ACCEPTANCE失败");
+    } else {
+      SysParameterDTO data = parameterByCode.getData() == null ? new SysParameterDTO() : parameterByCode.getData();
+      showAcceptance = data.getValue();
+    }
     //只有未审核状态才能进行作废,和审核
     if("2".equals(stroInDTO.getAuditCode())){
       stroInDTO.setAuditId(null);
@@ -369,6 +385,10 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
     // 当为入库审核的时候
     if("1".equals(stroInDTO.getAuditCode())){
       for(StroInDTO item : stroInDTOS) {
+        // 当验收参数开启，并且单据为不入库时，直接过滤掉该单据
+        if(Constants.SF.S.equals(showAcceptance) && Constants.SF.F.equals(item.getAcceptanceResult())){
+          continue;
+        }
         if("2".equals(item.getInCode())){
           // 直接入库
           stroInListIds.add(item.getId());

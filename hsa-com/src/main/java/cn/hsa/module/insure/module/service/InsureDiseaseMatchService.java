@@ -3,10 +3,12 @@ package cn.hsa.module.insure.module.service;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -140,4 +142,16 @@ public interface InsureDiseaseMatchService {
     WrapperResponse<PageDTO> queryPageInsureDisease(Map<String, Object> map);
 
     WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> map);
+
+    /**
+      * @method exportData
+      * @author wq
+      * @date 2022/8/11 8:39
+      *	@description
+      * @param  map
+      * @return void
+      *
+     **/
+    @PostMapping("/service/base/baseDisease/exportData")
+    List<InsureDiseaseMatchDO> exportData(Map<String, Object> map);
 }

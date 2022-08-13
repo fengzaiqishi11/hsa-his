@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.inpt.service.InptService;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
@@ -15,12 +16,18 @@ import cn.hsa.util.Constants;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.sun.deploy.net.URLEncoder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -277,4 +284,33 @@ public class InsureDiseaseMatchController extends BaseController {
         map.put("insureDiseaseDTO",insureDiseaseDTO);
         return insureDiseaseMatchService_consumer.queryPageInsureDisease(map);
     }
+
+    @GetMapping("/exportData")
+    public void exportData(HttpServletRequest req, HttpServletResponse res, String insureRegCode,String auditCode) {
+        InsureDiseaseMatchDO insureDiseaseMatchDO  = new InsureDiseaseMatchDO();
+        insureDiseaseMatchDO.setInsureRegCode(insureRegCode);
+        insureDiseaseMatchDO.setAuditCode(auditCode);
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>(3);
+        map.put("InsureDiseaseMatchDO", insureDiseaseMatchDO);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        List<InsureDiseaseMatchDO> insureDiseaseMatchDOS = insureDiseaseMatchService_consumer.exportData(map);
+
+        if(ObjectUtil.isNotNull(insureDiseaseMatchDOS)) {
+            //设置下载信息
+            res.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            res.setCharacterEncoding("utf-8");
+            // 这里URLEncoder.encode可以防止中文乱码 当然和easyexcel没有关系
+            //调用方法进行写操作
+            try {
+                String fileName = URLEncoder.encode("疾病匹配信息", "UTF-8").replaceAll("\\+", "%20");
+                res.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+                EasyExcel.write(res.getOutputStream(), InsureDiseaseMatchDO.class).sheet("userinfo")
+                        .doWrite(insureDiseaseMatchDOS);
+            } catch (IOException e) {
+                throw new AppException("生成excel文件出错,原因：" + e.getMessage());
+            }
+        }
+    }
+
 }

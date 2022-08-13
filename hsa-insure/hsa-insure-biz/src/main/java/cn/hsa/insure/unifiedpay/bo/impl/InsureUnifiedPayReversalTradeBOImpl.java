@@ -283,58 +283,10 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
             // 根据条件查询
             list = insureReversalTradeDAO.queryDataXiZangWith3201(map);
         }
-        //江西九江对账规则
-        selectParamterCodeMap.put("code","REFD_SETL_JIUJIANG");
-        SysParameterDTO jiujiang = sysParameterService_consumer.getParameterByCode(selectParamterCodeMap).getData();
-        if(jiujiang != null && Constants.SF.S.equals(jiujiang.getValue())){
-            List<Map<String, Object>> allList = new ArrayList<>();
-            List<Map<String, Object>> zgMzList = new ArrayList<>();//职工门诊对总账费用信息
-            List<Map<String, Object>> jmMzList = new ArrayList<>();//居民门诊对总账费用信息
-            List<Map<String, Object>> zgZyList = new ArrayList<>();//职工住院诊对总账费用信息
-            List<Map<String, Object>> jmZyList = new ArrayList<>();//居民住院对总账费用信息
-            // 根据条件查询
-            map.put("clrOptins",MapUtils.get(map,"insureRegCode"));
-            map.put("insurType","310");
-            zgMzList = insureReversalTradeDAO.queryDataJiuJiangMzWith3201(map);
-            zgZyList = insureReversalTradeDAO.queryDataJiuJiangZyWith3201(map);
-            map.put("insurType","390");
-            jmZyList = insureReversalTradeDAO.queryDataJiuJiangZyWith3201(map);
-            jmMzList = insureReversalTradeDAO.queryDataJiuJiangMzWith3201(map);
-            allList.addAll(zgMzList);
-            allList.addAll(zgZyList);
-            allList.addAll(jmMzList);
-            allList.addAll(jmZyList);
-            list = allList;
-            list = list.stream().filter(e ->Integer.valueOf(e.get("fixmedins_setl_cnt").toString())>0).collect(Collectors.toList()); //过滤
-        }
         //根据险种类型 和 清算类别 ，获得对应的 费用结算明细
         map.put("list", list);
         List<Map<String, Object>> list3202 = insureReversalTradeDAO.queryDataWith3202(map);
         List<Map<String, Object>> innerList = null;
-        if(jiujiang != null && Constants.SF.S.equals(jiujiang.getValue())){
-            //江西九江对总账业务
-            for (Map om : list) {
-                innerList = new ArrayList<>();
-                for (Map<String, Object> im : list3202) {
-                    if("0".equals(MapUtils.get(om, "is_hospital"))){//门诊费用过滤出门慢门特类型数据
-                        if( MapUtils.get(om, "clr_type").equals(MapUtils.get(im, "clr_type"))&&
-                                MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))&&
-                                MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype"))&&!Constant.UnifiedPay.YWLX.MZMXB.equals(MapUtils.get(om, "aka130"))){
-                            innerList.add(im);
-                        }
-                    }else if("1".equals(MapUtils.get(om, "is_hospital"))){//住院费用加上门慢门特类型数据
-                        if( MapUtils.get(om, "clr_type").equals(MapUtils.get(im, "clr_type"))&&
-                                MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))&&
-                                MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype"))||Constant.UnifiedPay.YWLX.MZMXB.equals(MapUtils.get(om, "aka130"))){
-                            innerList.add(im);
-                        }
-                    }
-                }
-                om.put("detailList", innerList);
-                om.put("stmt_begndate", MapUtils.get(map, "startDate"));
-                om.put("stmt_enddate", MapUtils.get(map, "endDate"));
-            }
-        }else{
             for (Map om : list) {
                 innerList = new ArrayList<>();
                 for (Map<String, Object> im : list3202) {
@@ -354,12 +306,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 om.put("stmt_begndate", MapUtils.get(map, "startDate"));
                 om.put("stmt_enddate", MapUtils.get(map, "endDate"));
             }
-        }
+
 
 
         return PageDTO.of(list);
     }
-
     /**
      * 医保通一支付平台,医药机构费用结算对总账接口调用
      *

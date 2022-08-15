@@ -276,23 +276,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     @Override
     public CenterFunctionAuthorizationDto updateAuthorizationAudit(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         centerFunctionAuthorizationDAO.updateAuthorizationAudit(centerFunctionAuthorizationDto);
-        List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
-        if (!ListUtils.isEmpty(list)) {
-            centerFunctionAuthorizationDto = list.get(0);
-            List<CenterFunctionDetailDto> centerFunctionDetailDtos = centerFunctionAuthorizationDAO.queryCenterFunctionDetailPage(centerFunctionAuthorizationDto);
-            Map<String,List<CenterFunctionDetailDto>> detailDtoMaps = centerFunctionDetailDtos.stream().collect(Collectors.groupingBy(CenterFunctionDetailDto::getFunctionCode));
-            if (!MapUtils.isEmpty(detailDtoMaps)) {
-                List<CenterFunctionDetailDto> detailDtos = detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode());
-                if(!ListUtils.isEmpty(detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode())) && detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode()).size()>1){
-                    CenterFunctionDetailDto centerFunctionDetailDto = new CenterFunctionDetailDto();
-                    centerFunctionDetailDto.setValue(detailDtos.stream().map(CenterFunctionDetailDto::getValue).collect(Collectors.joining(",")));
-                    centerFunctionDetailDto.setName(detailDtos.stream().map(CenterFunctionDetailDto::getName).collect(Collectors.joining("/")));
-                    detailDtos.add(centerFunctionDetailDto);
-                }
-                centerFunctionAuthorizationDto.setCenterFunctionDetailDtoList(detailDtos);
-            }
-        }
-        return centerFunctionAuthorizationDto;
+        centerFunctionAuthorizationDto = getCenterFunctionAuthorizationDTO(centerFunctionAuthorizationDto);
+
+        return  centerFunctionAuthorizationDto;
     }
 
     @Override
@@ -348,25 +334,9 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
             centerFunctionAuthorizationDAO.insertBtchAuthorization(list);
         }
 
-        list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
-        if (!ListUtils.isEmpty(list)) {
-            centerFunctionAuthorizationDto = list.get(0);
-        }
+        centerFunctionAuthorizationDto = getCenterFunctionAuthorizationDTO(centerFunctionAuthorizationDto);
 
-        List<CenterFunctionDetailDto> centerFunctionDetailDtos = centerFunctionAuthorizationDAO.queryCenterFunctionDetailPage(centerFunctionAuthorizationDto);
-        Map<String,List<CenterFunctionDetailDto>> detailDtoMaps = centerFunctionDetailDtos.stream().collect(Collectors.groupingBy(CenterFunctionDetailDto::getFunctionCode));
-        if (!MapUtils.isEmpty(detailDtoMaps)) {
-            List<CenterFunctionDetailDto> detailDtos = detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode());
-            if(!ListUtils.isEmpty(detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode())) && detailDtoMaps.get(centerFunctionAuthorizationDto.getServiceCode()).size()>1){
-                CenterFunctionDetailDto centerFunctionDetailDto = new CenterFunctionDetailDto();
-                centerFunctionDetailDto.setValue(detailDtos.stream().map(CenterFunctionDetailDto::getValue).collect(Collectors.joining(",")));
-                centerFunctionDetailDto.setName(detailDtos.stream().map(CenterFunctionDetailDto::getName).collect(Collectors.joining("/")));
-                detailDtos.add(centerFunctionDetailDto);
-            }
-            centerFunctionAuthorizationDto.setCenterFunctionDetailDtoList(detailDtos);
-        }
-
-        return centerFunctionAuthorizationDto;
+        return  centerFunctionAuthorizationDto;
     }
 
     @Override
@@ -377,6 +347,16 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
     @Override
     public CenterFunctionAuthorizationDto deleteAuthorizationByCode(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
         centerFunctionAuthorizationDAO.deleteAuthorization(centerFunctionAuthorizationDto);
+        centerFunctionAuthorizationDto = getCenterFunctionAuthorizationDTO(centerFunctionAuthorizationDto);
+
+        return  centerFunctionAuthorizationDto;
+    }
+
+
+
+
+    public CenterFunctionAuthorizationDto getCenterFunctionAuthorizationDTO(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto) {
+
         List<CenterFunctionAuthorizationDto> list = centerFunctionAuthorizationDAO.queryPage(centerFunctionAuthorizationDto);
         if (!ListUtils.isEmpty(list)) {
             centerFunctionAuthorizationDto = list.get(0);

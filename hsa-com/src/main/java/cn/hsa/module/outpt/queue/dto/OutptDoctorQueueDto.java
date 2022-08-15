@@ -78,4 +78,7 @@ public class OutptDoctorQueueDto extends OutptDoctorQueueDO {
     // 医生队列日期
     private String queueDateStr;
 
+    //历史挂号总量
+    private Integer registerCount;
+
 }

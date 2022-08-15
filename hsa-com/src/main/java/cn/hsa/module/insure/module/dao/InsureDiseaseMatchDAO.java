@@ -4,6 +4,7 @@ import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 import cn.hsa.module.interf.outpt.dto.Mzzd;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -32,6 +33,9 @@ public interface InsureDiseaseMatchDAO {
      * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO>
      **/
     List<InsureDiseaseMatchDTO> queryPageOrAll(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
+
+
+    List<InsureDiseaseMatchDO> queryPageOrAllByDO(InsureDiseaseMatchDO insureDiseaseMatchDO);
 
     /**
      * @Method insertHospDisease

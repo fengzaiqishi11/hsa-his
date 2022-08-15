@@ -608,22 +608,22 @@ public class LoginController extends BaseController {
      **/
     @PostMapping("/migration")
     public WrapperResponse<CenterHospitalDTO> migration(@RequestParam(required = true) String hospCode,HttpServletRequest request) {
-        String code  = null;
+        String code = null;
         try {
             // 医院编码
             code = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);
+            CenterHospitalDTO resultDTO = getData(centerHospitalService_consumer.getByHospCode(code));
+            if (null == resultDTO) {
+                throw new AppException("未查找到对应数据源：" + code);
+            } else {
+                String migrationAddress = resultDTO.getMigrationAddress();
+                String newAddress = migrationAddress + "?hospCode=" + hospCode;
+                String encode = URLEncoder.encode(newAddress, "UTF-8");
+                resultDTO.setMigrationAddress(encode);
+            }
+            return WrapperResponse.success(resultDTO);
         } catch (Exception e) {
             throw new AppException("解析医院编码失败：" + e.getMessage());
         }
-        
-        CenterHospitalDTO resultDTO = getData(centerHospitalService_consumer.getByHospCode(code));
-        if (null == resultDTO){
-            throw new AppException("未查找到对应数据源：" + code);
-        }else{
-            String migrationAddress = resultDTO.getMigrationAddress();
-            String newAddress = migrationAddress + "/his-web/?hospCode=" + hospCode;
-            resultDTO.setMigrationAddress(newAddress);
-        }
-        return WrapperResponse.success(resultDTO);
     }
 }

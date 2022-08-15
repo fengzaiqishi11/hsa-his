@@ -836,6 +836,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             throw new AppException("未查询到病人入院登记信息");
         }
 
+        if(StringUtils.isNotEmpty(inptVisitDto.getStatusCode()) && StringUtils.isNotEmpty(inptVisitDTO.getStatusCode()) && !inptVisitDto.getStatusCode().equals(inptVisitDTO.getStatusCode())){
+            throw new AppException("当前界面患者状态未更新，请刷新界面重新登记！");
+        }
         // 异地病人返回akb020参数为null,医保中心编码使用湘潭核三医保中心编码，否则使用医保端返回中心编码
         if (StringUtils.isEmpty(insureIndividualBasicDTO.getAkb020())) {
             insureIndividualBasicDTO.setAkb020(insureIndividualBasicDTO.getInsureRegCode());

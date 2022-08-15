@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.util.DateUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
+import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.center.profilefile.dto.CenterProfileFileDTO;
 import cn.hsa.module.center.profilefile.service.CenterProfileFileService;
 import cn.hsa.module.drgdip.service.DrgDipBusinessOptInfoLogService;
@@ -92,6 +93,9 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
     private MrisHomeDAO mrisHomeDAO;
 
     @Resource
+    private BaseOrderRuleService baseOrderRuleService;
+
+    @Resource
     private InsureUnifiedEmrUploadService insureUnifiedEmrUploadService_consumer;
 
     @Resource
@@ -157,6 +161,8 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
      **/
     @Override
     public Map<String, Object> updateMrisInfo(Map<String, Object> map) {
+        //档案号为空，自动填充方案
+        this.updateGenerateProfileIfNull(map);
 
         // 删除病案首页信息
         this.deleteMrisInfo(map);
@@ -398,6 +404,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         inptVisitDTO.setId(map.get("visitId").toString());
         inptVisitDTO.setHospCode(map.get("hospCode").toString());
 
+
         Map<String, Object> resultMap = new HashMap<>();
         MrisBaseInfoDTO mrisBaseInfoDTO = mrisHomeDAO.getMrisBaseInfo(inptVisitDTO);
         if (mrisBaseInfoDTO != null && (mrisBaseInfoDTO.getInCnt() == null || mrisBaseInfoDTO.getInCnt() <= 0)) {
@@ -473,6 +480,57 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         combo.setDrgMsg(drgDipAuthDTO.getDrgMsg());
         resultMap.put("drgInfo", combo);
         return resultMap;
+    }
+    /**
+     * @Author yuelong.chen
+     * @Description 档案为空自动填充
+     * @Date 2022/08/12 15:48
+     * @Param inptVisitDTO
+     **/
+    private void updateGenerateProfileIfNull(Map visitMap) {
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setId(visitMap.get("visitId").toString());
+        inptVisitDTO.setHospCode(visitMap.get("hospCode").toString());
+        InptVisitDTO inptVisitInfo = mrisHomeDAO.getInptVisitInfo(inptVisitDTO);
+//        boolean flag = false;
+        if(inptVisitInfo == null) return;
+        if (StringUtils.isEmpty(inptVisitInfo.getInProfile()) && StringUtils.isEmpty(inptVisitInfo.getBpfInProfile())){
+            // 住院病案号
+            String inProfile ="";
+            // 是否开启自定义住院号
+            SysParameterDTO sysParameterDTO = mrisHomeDAO.getParameterByCode(inptVisitDTO.getHospCode(), "BAH_SF");
+            Map map = new HashMap();
+            if (sysParameterDTO != null && StringUtils.isNotEmpty(sysParameterDTO.getValue()) && "1".equals(sysParameterDTO.getValue())) {
+                map.put("hospCode", inptVisitDTO.getHospCode());
+                map.put("typeCode", "361");
+            } else {
+                map.put("hospCode", inptVisitDTO.getHospCode());
+                map.put("typeCode", "36");
+            }
+            inProfile = baseOrderRuleService.getOrderNo(map).getData();
+            inptVisitInfo.setBpfInProfile(inProfile);
+//            flag = true;
+            try {
+                mrisHomeDAO.updateInptVisitInfo(inptVisitInfo);
+                mrisHomeDAO.updateBaseInfo(inptVisitInfo);
+            }catch (Exception e){
+                throw new AppException("由于病案号为空，重新为当前点击患者更新病案号失败！   "+ e.getMessage());
+            }
+
+        }
+//        if (StringUtils.isEmpty(inptVisitInfo.getBpfOutProfile())){
+//            // 门诊档案号
+//            Map map2 = new HashMap();
+//            map2.put("hospCode", inptVisitDTO.getHospCode());
+//            map2.put("typeCode", "104");
+//            String outProfile = baseOrderRuleService.getOrderNo(map2).getData();
+//            inptVisitInfo.setBpfOutProfile(outProfile);
+//            flag = true;
+//        }
+//        if(flag){
+//            mrisHomeDAO.updateInptVisitInfo(inptVisitInfo);
+//            mrisHomeDAO.updateBaseInfo(inptVisitInfo);
+//        }
     }
 
     /**

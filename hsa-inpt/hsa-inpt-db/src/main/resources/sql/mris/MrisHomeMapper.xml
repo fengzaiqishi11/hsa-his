@@ -2375,4 +2375,48 @@
         </if>
         order by errorMessage
     </select>
+
+    <select id="getInptVisitInfo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select
+            iv.id,iv.in_profile ,iv.in_no ,iv.profile_id,iv.hosp_code,
+            bpf.in_profile as bpfInProfile,bpf.out_profile as bpfOutProfile
+        from
+            inpt_visit iv
+                left join base_profile_file bpf on
+                    iv.hosp_code = bpf.hosp_code
+                    and iv.profile_id = bpf.id
+        where
+            iv.id = #{id}
+            and iv.hosp_code= #{hospCode}
+    </select>
+
+    <update id="updateInptVisitInfo">
+        UPDATE inpt_visit
+        <set>
+            <if test="bpfInProfile != null">
+                in_profile = #{bpfInProfile}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateBaseInfo">
+        UPDATE base_profile_file
+        <set>
+            <if test="bpfInProfile != null">
+                in_profile = #{bpfInProfile}
+            </if>
+<!--            <if test="bpfOutProfile != null">-->
+<!--                out_profile = #{bpfOutProfile},-->
+<!--            </if>-->
+        </set>
+        WHERE id = #{profileId} and hosp_code = #{hospCode}
+    </update>
+
+    <select id="getParameterByCode" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select
+            id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from sys_parameter
+        where is_valid='1' and hosp_code=#{hospCode} and code=#{code}
+    </select>
 </mapper>

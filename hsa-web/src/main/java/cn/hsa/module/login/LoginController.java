@@ -609,6 +609,7 @@ public class LoginController extends BaseController {
     @PostMapping("/migration")
     public WrapperResponse<CenterHospitalDTO> migration(@RequestParam(required = true) String hospCode,HttpServletRequest request) {
         String code = null;
+        String whetherPrivateInnerAddress = request.getHeader("Internet-Flag");
         try {
             // 医院编码
             code = RSAUtil.decryptByPrivateKey(org.apache.commons.codec.binary.Base64.decodeBase64(hospCode.getBytes()), privateKey);
@@ -617,6 +618,18 @@ public class LoginController extends BaseController {
                 throw new AppException("未查找到对应数据源：" + code);
             } else {
                 String migrationAddress = resultDTO.getMigrationAddress();
+                // 判断是不是内网,内网是1
+                if (Constants.SF.S.equals(whetherPrivateInnerAddress)){
+                    //查询新的跳转地址，通过参数 INSURE_PRIVATE_ADDRESS
+                    Map map = new HashMap(4);
+                    map.put("code","INSURE_PRIVATE_ADDRESS");
+                    map.put("hospCode",hospCode);
+                    WrapperResponse<SysParameterDTO> parameterByCode = sysParameterService_consumer.
+                            getParameterByCode(map);
+                    SysParameterDTO data = parameterByCode.getData();
+                    Optional.ofNullable(data).orElseThrow(()-> new AppException("系统参数：INSURE_PRIVATE_ADDRESS未配置"));
+                    migrationAddress = data.getValue();
+                }
                 String newAddress = migrationAddress + "?hospCode=" + hospCode;
                 String encode = URLEncoder.encode(newAddress, "UTF-8");
                 resultDTO.setMigrationAddress(encode);

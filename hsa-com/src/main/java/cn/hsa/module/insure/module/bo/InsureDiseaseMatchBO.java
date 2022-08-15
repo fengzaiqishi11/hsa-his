@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ public interface InsureDiseaseMatchBO {
      * @Return java.util.List<cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO>
      **/
     List<InsureDiseaseMatchDTO> queryAll(InsureDiseaseMatchDTO insureDiseaseMatchDTO);
+
+    List<InsureDiseaseMatchDO> queryAll(InsureDiseaseMatchDO insureDiseaseMatchDO);
 
     /**
      * @Method addDiseaseMatch

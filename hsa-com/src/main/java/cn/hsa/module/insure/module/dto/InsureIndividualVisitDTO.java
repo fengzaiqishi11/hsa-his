@@ -151,4 +151,7 @@ public class InsureIndividualVisitDTO extends InsureIndividualVisitDO implements
         private String inNo;//住院号
         //重复住院标志   1：是重复住院   0：不是重复住院
         private String repeatIptFlag;
+        private String hospCode; // 医院编码
+        private String medicalRegNo; // 就诊登记号
+        private String visitId; // 就诊id
 }

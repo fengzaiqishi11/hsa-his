@@ -7,12 +7,17 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.bo.InsureDiseaseMatchBO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
 import cn.hsa.util.MapUtils;
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -179,5 +184,11 @@ public class InsureDiseaseMatchServiceImpl extends HsafService implements Insure
     public WrapperResponse<PageDTO> queryUnMacthAllPage(Map<String, Object> map) {
         InsureDiseaseMatchDTO insureDiseaseMatchDTO = MapUtils.get(map,"insureDiseaseMatchDTO");
         return WrapperResponse.success(insureDiseaseMatchBO.queryUnMacthAllPage(insureDiseaseMatchDTO));
+    }
+
+    @Override
+    public List<InsureDiseaseMatchDO> exportData(Map<String, Object> map) {
+        InsureDiseaseMatchDO insureDiseaseMatchDO = MapUtils.get(map, "InsureDiseaseMatchDO");
+        return insureDiseaseMatchBO.queryAll(insureDiseaseMatchDO);
     }
 }

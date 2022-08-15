@@ -113,6 +113,7 @@
         (select name FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as cy_name,
         (select visit_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as visit_code,
         (select register_code FROM outpt_classify oc where oc.hosp_code = b.hosp_code and oc.id = b.cy_id) as register_code,
+        (select count(1) FROM outpt_register oc where oc.hosp_code = a.hosp_code and oc.doctor_id  = a.doctor_id) as registerCount,
         a.doctor_id,
         a.doctor_name,
         b.dept_id,
@@ -451,7 +452,7 @@
 
     <!--查询单个号源id记录，判断是否未当前人员的锁的号-->
     <select id="getDoctorRegisterById" parameterType="java.lang.String" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
-        select id, hosp_code, dq_id, register_time, start_time, end_time, register_num, profile_id, is_use, is_lock, is_add, crte_id, crte_name, crte_time
+        select *
         from outpt_doctor_register
         where hosp_code = #{hospCode}
           and id = #{sourceId}
@@ -459,10 +460,34 @@
 
     <!--锁定/解锁号源-->
     <update id="updateIsLock" parameterType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
-        update outpt_doctor_register
-        set is_lock = #{isLock}, profile_id = #{profileId}
-        where hosp_code = #{hospCode}
-          and id = #{sourceId}
+        update
+            outpt_doctor_register a,
+            outpt_doctor_queue b,
+            outpt_classes_queue c
+        set
+            a.is_lock = #{isLock},
+            a.profile_id = #{profileId},
+            <choose>
+                <when test="seqNo != null and seqNo != ''">
+                    a.seq_no = #{seqNo}
+                </when>
+                <otherwise>
+                    a.seq_no =(
+                    select
+                    count(1)
+                    from
+                    outpt_register d
+                    where
+                    d.dept_id = c.dept_id
+                    and date(d.register_time) = date(#{register_time})
+                    and is_cancel = '0')
+                </otherwise>
+            </choose>
+        where
+            a.dq_id = b.id
+          and b.cq_id = c.id
+          and a.hosp_code =#{hospCode}
+          and a.id = #{sourceId}
     </update>
 
     <!--更新号源表数据(outpt_doctor_register)-->

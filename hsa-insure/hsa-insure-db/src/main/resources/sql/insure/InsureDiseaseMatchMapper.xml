@@ -139,6 +139,77 @@
         order by audit_code desc
     </select>
 
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryPageOrAllByDO" resultMap="InsureDiseaseMatchMap">
+        select
+        id, hosp_code, insure_reg_code, hosp_illness_id, hosp_illness_code, hosp_illness_name, insure_illness_id,
+        insure_illness_code, insure_illness_name, is_trans, remark, crte_id, crte_name, crte_time,
+        treatment_code,oper_num,unoper_num,
+        (case
+            when is_match = 1 then '已匹配'
+            when is_match = 0 then '未匹配' end) as is_match,
+        (case
+        when audit_code = 0 then '未审核'
+        when audit_code = 1 then '审核完成'
+        when audit_code = 2 then '作废' end) as audit_code
+        from insure_disease_match
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                and insure_reg_code = #{insureRegCode}
+            </if>
+            <if test="hospIllnessId != null and hospIllnessId != ''">
+                and hosp_illness_id = #{hospIllnessId}
+            </if>
+            <if test="hospIllnessCode != null and hospIllnessCode != ''">
+                and hosp_illness_code = #{hospIllnessCode}
+            </if>
+            <if test="hospIllnessName != null and hospIllnessName != ''">
+                and hosp_illness_name = #{hospIllnessName}
+            </if>
+            <if test="insureIllnessId != null and insureIllnessId != ''">
+                and insure_illness_id = #{insureIllnessId}
+            </if>
+            <if test="insureIllnessCode != null and insureIllnessCode != ''">
+                and insure_illness_code = #{insureIllnessCode}
+            </if>
+            <if test="insureIllnessName != null and insureIllnessName != ''">
+                and insure_illness_name = #{insureIllnessName}
+            </if>
+            <if test="isMatch != null and isMatch != ''">
+                and is_match = #{isMatch}
+            </if>
+            <if test="isTrans != null and isTrans != ''">
+                and is_trans = #{isTrans}
+            </if>
+            <if test="auditCode != null and auditCode != ''">
+                and audit_code = #{auditCode}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="typeCode !=null and typeCode !=''">
+                and type_code =#{typeCode}
+            </if>
+        </where>
+        order by audit_code desc
+    </select>
+
     <select id="queryAll" parameterType="cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO"
             resultMap="InsureDiseaseMatchMap">
         SELECT

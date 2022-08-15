@@ -11,6 +11,7 @@ import cn.hsa.module.insure.module.bo.InsureDiseaseMatchBO;
 import cn.hsa.module.insure.module.dao.InsureDiseaseMatchDAO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseDTO;
 import cn.hsa.module.insure.module.dto.InsureDiseaseMatchDTO;
+import cn.hsa.module.insure.module.entity.InsureDiseaseMatchDO;
 import cn.hsa.util.ListUtils;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.SnowflakeUtils;
@@ -77,6 +78,12 @@ public class InsureDiseaseMatchBOImpl extends HsafBO implements InsureDiseaseMat
     public List<InsureDiseaseMatchDTO> queryAll(InsureDiseaseMatchDTO insureDiseaseMatchDTO) {
         List<InsureDiseaseMatchDTO> insureDiseaseMatchDTOS = insureDiseaseMatchDAO.queryPageOrAll(insureDiseaseMatchDTO);
         return insureDiseaseMatchDTOS;
+    }
+
+    @Override
+    public List<InsureDiseaseMatchDO> queryAll(InsureDiseaseMatchDO insureDiseaseMatchDO) {
+        List<InsureDiseaseMatchDO> insureDiseaseMatchDOS = insureDiseaseMatchDAO.queryPageOrAllByDO(insureDiseaseMatchDO);
+        return insureDiseaseMatchDOS;
     }
 
     /**

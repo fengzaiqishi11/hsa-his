@@ -3740,8 +3740,19 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
      */
     public double calculateZsl(OutptPrescribeDetailsDTO outptPrescribeDetailsDTO, BaseDrugDTO baseDrugDTO , BaseRateDTO baseRateDTO, double numNew){
         double zslNew = 0;
-        // 没有配置默认 1：单次向上取整
-        if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){
+        if (StringUtils.isEmpty(baseDrugDTO.getTruncCode())&&StringUtils.isNotEmpty(outptPrescribeDetailsDTO.getUsageCode())
+                &&Constants.PRINTFILTERPARAMETER.KF.equals(outptPrescribeDetailsDTO.getUsageCode())){ // 用法为口服时，按周期向上取整
+            // 按小单位计算  总数量 = 用量* 执行周期（向上取整）*频率次数*给药天数
+            if(outptPrescribeDetailsDTO.getNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
+                //按大单位计算 总数量 = 用量（向上取整） * 用药频率次数 * （用药天数/药品执行周期）
+                zslNew = Math.ceil(numNew * baseRateDTO.getDailyTimes().doubleValue() * Math.ceil(outptPrescribeDetailsDTO.getUseDays().doubleValue() / baseRateDTO.getExecInterval().doubleValue()));
+            }else{
+                //  总数量 = 用量（取整） * 用药频率次数 * （用药天数/药品执行周期）/药品拆分比
+                zslNew = Math.ceil(numNew * baseRateDTO.getDailyTimes().doubleValue()
+                        * Math.ceil(outptPrescribeDetailsDTO.getUseDays().doubleValue() / baseRateDTO.getExecInterval().doubleValue()) / baseDrugDTO.getSplitRatio().doubleValue());
+
+            }
+        }else if(StringUtils.isEmpty(baseDrugDTO.getTruncCode()) || "1".equals(baseDrugDTO.getTruncCode())){ // 没有配置默认 1：单次向上取整
             // 按小单位计算
             if(outptPrescribeDetailsDTO.getNumUnitCode().equals(baseDrugDTO.getSplitUnitCode())){
                 //按大单位计算 总数量 = 用量（向上取整） * 用药频率次数 * （用药天数/药品执行周期）

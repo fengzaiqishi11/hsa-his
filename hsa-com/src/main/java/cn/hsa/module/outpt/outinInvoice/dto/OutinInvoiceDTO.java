@@ -234,4 +234,10 @@ public class OutinInvoiceDTO extends OutinInvoiceDO implements Serializable {
     // 国家名称
     private String nationName;
 
+    /**
+     * 费用发生时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date costTime;
 }

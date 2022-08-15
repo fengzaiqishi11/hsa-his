@@ -37,6 +37,7 @@ dubbo:
     name: hsa-insure
   protocol:
     name: dubbo
+    payload: 214748364
     port: 29010
   provider:
     threads: 1000

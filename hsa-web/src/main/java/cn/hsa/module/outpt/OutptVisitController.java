@@ -4,6 +4,7 @@ package cn.hsa.module.outpt;
 import cn.hsa.base.BaseController;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
@@ -56,5 +57,41 @@ public class OutptVisitController extends BaseController {
         map.put("outptVisitDTO",outptVisitDTO);
 
         return outptVisitService_consumer.queryVisitRecords(map);
+    }
+    /**
+     * @Method queryInptVisitInfo
+     * @Desrciption 通过身份证查询病人是否存在正在住院的业务
+     * @Param
+     * [outptVisitDTO]
+     * @Author yuelong.chen
+     * @Date   2022/08/10:03
+     * @Return OutptVisitDTO
+     **/
+    @GetMapping("/queryInptVisitInfo")
+    public WrapperResponse<OutptVisitDTO> queryInptVisitInfo(OutptVisitDTO outptVisitDTO,HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptVisitDTO.setHospCode(userDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", userDTO.getHospCode());
+        map.put("outptVisitDTO", outptVisitDTO);
+        return outptVisitService_consumer.queryInptVisitInfo(map);
+    }
+    /**
+     * @Method queryInptVisitInfo
+     * @Desrciption 通过身份证查询病人是否存在正在住院的业务
+     * @Param
+     * [outptVisitDTO]
+     * @Author yuelong.chen
+     * @Date   2022/08/10:03
+     * @Return OutptVisitDTO
+     **/
+    @GetMapping("/queryInsureVisitInfo")
+    public WrapperResponse<InsureIndividualVisitDTO> queryInsureVisitInfo(OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO userDTO = getSession(req, res) ;
+        outptVisitDTO.setHospCode(userDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", userDTO.getHospCode());
+        map.put("outptVisitDTO", outptVisitDTO);
+        return outptVisitService_consumer.queryInsureVisitInfo(map);
     }
 }

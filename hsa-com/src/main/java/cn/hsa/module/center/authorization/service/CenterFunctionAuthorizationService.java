@@ -63,4 +63,6 @@ public interface CenterFunctionAuthorizationService {
   WrapperResponse<CenterFunctionAuthorizationDto> saveBizAuthorization(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 
     WrapperResponse<List<CenterFunctionDto>> queryCenterFunction(CenterFunctionDto centerFunctionDto);
+
+  WrapperResponse<CenterFunctionAuthorizationDto> deleteAuthorizationByCode(CenterFunctionAuthorizationDto centerFunctionAuthorizationDto);
 }

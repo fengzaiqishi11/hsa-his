@@ -236,7 +236,7 @@
         SELECT
         <include refid="Base_Column_List" />
         FROM outpt_pay
-        where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id} and price &gt;= 0
+        where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{id}
     </select>
 
     <insert id="batchInsertOutptPay" parameterType="java.util.List">

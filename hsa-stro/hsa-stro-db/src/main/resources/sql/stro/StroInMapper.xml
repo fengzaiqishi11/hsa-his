@@ -54,6 +54,7 @@
       <result property="prodCode" column="prod_code" jdbcType="VARCHAR"/>
       <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
       <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
+      <result property="prepName" column="prep_name" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -259,7 +260,9 @@
       case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
       case when a.item_code='2' then bm.model end model,
       case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code,
-      case when a.item_code='1' then bd.nation_name when a.item_code='2' then bm.nation_name end nation_name
+      case when a.item_code='1' then bd.nation_name when a.item_code='2' then bm.nation_name end nation_name,
+      case when a.item_code='1' then  (select scd.name from sys_code_detail scd where scd.c_code ='JXFL' and bd.prep_code = scd.value and scd.hosp_code = #{hospCode})
+        when a.item_code='2' then '' end prep_name -- 剂型名称
       from stro_in_detail a
       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
       left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
@@ -461,7 +464,8 @@
         a.prod_code, a.price, a.unit_code,a.split_ratio,  a.split_unit_code,  a.split_price as splitPrice,
         a.is_valid, a.crte_id,  a.crte_name, a.crte_time,"1" as itemCode,a.dosage, a.dosage_unit_code,a.ndan,a.dan,
         (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
-      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName,
+      (select scd.name from sys_code_detail scd where scd.c_code ='JXFL' and a.prep_code = scd.value and scd.hosp_code = #{hospCode} ) as prepName -- 剂型名称
       from base_drug a
       where a.hosp_code = #{hospCode}
         <if test="isValid != null and isValid != ''">
@@ -514,7 +518,8 @@
       a.prod_code, a.price, a.unit_code,a.split_ratio,  a.split_unit_code,  a.split_price as splitPrice,
       a.is_valid, a.crte_id,  a.crte_name, a.crte_time,"1" as itemCode,a.dosage, a.dosage_unit_code,a.ndan,"" as model,
       (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
-      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName,
+      (select scd.name from sys_code_detail scd where scd.c_code ='JXFL' and a.prep_code = scd.value and scd.hosp_code = #{hospCode}) as prepName -- 剂型名称
       from base_drug a
       where a.hosp_code = #{hospCode}
       <if test="isValid != null and isValid != ''">
@@ -540,7 +545,7 @@
       a.prod_code, a.price, a.unit_code, a.split_ratio, a.split_unit_code, a.split_price as splitPrice,
       a.is_valid, a.crte_id, a.crte_name, a.crte_time, "2" as itemCode,"" as dosage,"" as dosageUnitCode,reg_cert_no as ndan,a.model,
       (select name from base_product c where a.prod_code = c.code and c.hosp_code = #{hospCode}) as prodName,
-      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName
+      ifnull(a.nation_code,'') as nationCode, ifnull(a.nation_name,'') as nationName, '' as prepName
       from base_material a
       where  a.hosp_code = #{hospCode}
       <if test="isValid != null and isValid != ''">

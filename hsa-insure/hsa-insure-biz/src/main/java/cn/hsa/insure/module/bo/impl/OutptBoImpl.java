@@ -164,8 +164,10 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                 InsureIndividualVisitDTO insureIndividualVisitDTO = new InsureIndividualVisitDTO();
                 insureIndividualVisitDTO.setVisitId(visitId);//就诊id
                 insureIndividualVisitDTO.setMedicalRegNo(aaz217);//医保登记号
-                insureIndividualVisitDTO.setHospCode(hospCode);
+                    insureIndividualVisitDTO.setHospCode(hospCode);
                     logger.info("++++++++++++++++++++++++工伤结算支付信息打印开始(暂时)++++++++++++++++++++++++++++");
+                    logger.info("visitId = "+visitId+"hospCode = "+hospCode+ "medicalRegNo = "+ aaz217);
+                    logger.info("insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getHospCode()+ "insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getVisitId()+ "insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getMedicalRegNo());
                     logger.info(insureIndividualVisitDTO.toString());
                     logger.info("++++++++++++++++++++++++工伤结算支付信息打印结束++++++++++++++++++++++++++++");
                 insureIndividualVisitDAO.updateInsureMedicalRegNo(insureIndividualVisitDTO);

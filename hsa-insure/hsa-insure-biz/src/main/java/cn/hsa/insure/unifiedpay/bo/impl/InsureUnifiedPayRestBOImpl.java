@@ -959,7 +959,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 if (ListUtils.isEmpty(insureDiseaseDTOList)) {
                     throw new AppException("医保端项目数据集为空!");
                 }
-
+                //过滤掉down_load_type为空的目录数据，这种目录是手动新增进来的
+                insureDiseaseDTOList = insureDiseaseDTOList.stream().filter(o -> ObjectUtil.isNotEmpty(o.getDownLoadType())).collect(Collectors.toList());
                 List<InsureItemMatchDTO> itemMatchDTOList = handItemAutoMatch(list, insureDiseaseDTOList,itemMatchDTO);
                 insureItemMatchDAO.deleteInsureItemInfos(insureItemMatchDTO);
                 insureItemMatchDAO.insertMatchItem(itemMatchDTOList);
@@ -979,7 +980,6 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             if (ListUtils.isEmpty(list)) {
                 throw new AppException("请先进行疾病生成！");
             }
-
             InsureDiseaseDTO insureDiseaseDTO = new InsureDiseaseDTO();
             insureDiseaseDTO.setHospCode(hospCode);
             insureDiseaseDTO.setInsureRegCode(insureRegCode);
@@ -987,6 +987,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             if (ListUtils.isEmpty(insureDiseaseDTOList)) {
                 throw new AppException("医保端疾病数据集为空!");
             }
+            //过滤掉down_load_type为空的目录数据，这种目录是手动新增进来的
+            insureDiseaseDTOList = insureDiseaseDTOList.stream().filter(o -> ObjectUtil.isNotEmpty(o.getDownLoadType())).collect(Collectors.toList());
             List<InsureDiseaseMatchDTO> diseaseMatchDTOList = handDiseaseAutoMatch(list, insureDiseaseDTOList,itemMatchDTO);
             insureDiseaseMatchDAO.deleteInsureDiseaseInfos(insureDiseaseMatchDTO);
             insureDiseaseMatchDAO.insertMatchDisease(diseaseMatchDTOList);
@@ -3602,7 +3604,8 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
         if (ListUtils.isEmpty(insureItemDTOList)) {
             throw new AppException("医保端下载数据为空！");
         }
-
+        //过滤掉down_load_type为空的目录数据，这种目录是手动新增进来的
+        insureItemDTOList = insureItemDTOList.stream().filter(o -> ObjectUtil.isNotEmpty(o.getDownLoadType())).collect(Collectors.toList());
         List<InsureItemMatchDTO> insertList = new ArrayList<>();
             for (InsureItemMatchDTO hospItem : resultList) {
             for (InsureItemDTO insureItem : insureItemDTOList) {

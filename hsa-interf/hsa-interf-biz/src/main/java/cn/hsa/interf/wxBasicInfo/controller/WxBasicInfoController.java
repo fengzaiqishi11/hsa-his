@@ -1025,6 +1025,8 @@ public class WxBasicInfoController {
     @PostMapping("/dailyListDetailsQuery")
     public WrapperResponse<String> dailyListDetailsQuery(@RequestBody Map<String, Object> paramMap) {
         String hospCode = MapUtils.get(paramMap, "hospCode");
+        Integer pageNo = MapUtils.get(paramMap, "pageNo");
+        Integer pageSize = MapUtils.get(paramMap, "pageSize");
         if (StringUtils.isEmpty(hospCode)) {
             throw new AppException("入参错误，请传入医院编码！");
         }
@@ -1039,6 +1041,8 @@ public class WxBasicInfoController {
         }
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
+        map.put("pageNo", pageNo);
+        map.put("pageSize", pageSize);
         if (StringUtils.isNotEmpty(data)) {
             map.put("data", JSON.parse(data));
         }

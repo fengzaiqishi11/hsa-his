@@ -216,5 +216,11 @@ public class InptCostDTO extends InptCostDO implements Serializable {
     private String typeCode;
     //自付金额
     private BigDecimal guestRatioPriceend;
+    /**
+     * 日清单费用日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date feeDate;
 
 }

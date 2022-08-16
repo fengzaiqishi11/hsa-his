@@ -109,4 +109,31 @@ public class StroInDO extends PageDO implements Serializable {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private Date fkTime ;
 
+  /**
+   * 验收状态
+   */
+  private String acceptanceStatus;
+  /**
+   * 验收时间
+   */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
+  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  private Date acceptanceTime;
+  /**
+   * 验收人id
+   */
+  private String acceptanceId;
+  /**
+   * 验收人名称
+   */
+  private String acceptanceName;
+  /**
+   * 质量情况
+   */
+  private String qualifiedStatus;
+  /**
+   * 验收结果
+   */
+  private String acceptanceResult;
+
 }

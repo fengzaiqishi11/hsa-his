@@ -420,9 +420,12 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 		String visitId = MapUtils.get(tempMapData, "visitId");     // 患者就诊id
 		String sourcePayCode = MapUtils.get(tempMapData, "sourcePayCode");  // 支付来源
 		String actualPrice = MapUtils.get(tempMapData, "actualPrice"); // 支付金额
+		if (StringUtils.isEmpty(actualPrice)) {
+			return WrapperResponse.fail("划价收费提示：支付金额为空。", null);
+		}
+
 		BigDecimal paySettleMoney = new BigDecimal(actualPrice);  // 支付金额
 		String orderNo = MapUtils.get(tempMapData, "orderNo"); // 支付票据号（微信条码号、支付宝条码号、支票号码）
-		// String outTradeNo = MapUtils.get(tempMapData, "outTradeNo");    // 支付单号
 		String crteId = MapUtils.get(tempMapData, "crteId");         //创建人id
 		String crteName = MapUtils.get(tempMapData, "crteName");       //创建人姓名
 		String settleId =  MapUtils.get(tempMapData, "settleId");//结算id

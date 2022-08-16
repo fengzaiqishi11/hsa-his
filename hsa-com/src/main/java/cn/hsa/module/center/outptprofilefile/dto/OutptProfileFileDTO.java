@@ -27,7 +27,7 @@ public class OutptProfileFileDTO extends OutptProfileFileDO implements Serializa
     private String sex;                       //存储性别名
     private String hospCode;                  //暂存医院编码给从表使用
     private List<String>ids;                  //存储档案id集合
-    private String type;                      //（建档来源）1.住院 2.门诊 3.建档
+    private String type;                      //（建档来源） 0.建档 1.住院 2.门诊
 //    private String totalIn;                   //记录住院次数
     /**
      * 优惠类别名称

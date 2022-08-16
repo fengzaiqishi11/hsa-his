@@ -1000,7 +1000,7 @@
             iv.bed_name ,
             iv.cert_no as aac002,
             iiv.aac001,
-            (select id.name from insure_dict id where id.insure_reg_code = iiv.insure_reg_code and id.code = 'MED_TYPE' and iiv.aka130 = id.value ) as aka130_name,
+            (select id.name from insure_dict id where id.insure_reg_code = iiv.insure_reg_code and id.code = 'MED_TYPE' and iiv.aka130 = id.value and id.hosp_code =#{hospCode}) as aka130_name,
             iiv.aka130 ,
             case iiv.aka130 when '2101' then '-'
              else iiv.bka006_name end  bka006_name,

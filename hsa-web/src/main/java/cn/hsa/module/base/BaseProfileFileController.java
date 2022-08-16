@@ -91,8 +91,8 @@ public class BaseProfileFileController extends BaseController {
     @GetMapping("/isCertNoExist")
     public WrapperResponse<Boolean> isCertNoExist(OutptProfileFileDTO outptProfileFileDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
-        if (StringUtils.isEmpty(outptProfileFileDTO.getCertNo()) && !Constants.ZJLB.QT.equals(outptProfileFileDTO.getCertCode())){
-            throw new RuntimeException("未检查到身份证号");
+        if (StringUtils.isEmpty(outptProfileFileDTO.getCertNo())){
+            throw new RuntimeException("未检查到证件号");
         }
         outptProfileFileDTO.setHospCode(sysUserDTO.getHospCode());
         Map map = new HashMap();

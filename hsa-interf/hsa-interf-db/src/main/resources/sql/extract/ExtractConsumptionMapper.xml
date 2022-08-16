@@ -253,11 +253,7 @@
         <include refid="whereSql"></include>
         group by
         a.item_id,
-        a.code,
-        a.item_name,
-        a.biz_id,
-        a.spec,
-        a.curr_unit_code
+        a.biz_id
     </select>
 
 
@@ -300,10 +296,7 @@
         <include refid="whereSql"></include>
         group by
         a.item_id,
-        a.code,
-        a.item_name,
-        a.biz_id,
-        a.spec
+        a.biz_id
     </select>
 
 
@@ -346,10 +339,7 @@
         <include refid="whereSql"></include>
         group by
         a.item_id,
-        a.code,
-        a.item_name,
-        a.biz_id,
-        a.spec
+        a.biz_id
     </select>
 
 
@@ -393,11 +383,8 @@
         <include refid="whereSql"></include>
         group by
         a.item_id,
-        a.code,
-        a.item_name,
-        a.biz_id,
-        a.spec
-    </select>
+        a.biz_id
+</select>
 
 
     <select id="queryExtraInvoicingByItemId" parameterType="cn.hsa.module.interf.extract.dto.ExtractStroInvoicingDetailDTO" resultMap="extractStroInvoicingDetailMap">
@@ -431,17 +418,30 @@
             </if>
         </where>
     </select>
-
+    <!--未出现过的，期初应等于期末-->
     <select id="queryAllExtractData"
             resultMap="extractStroInvoicingDetailMap">
         select
         a.id, hosp_code, biz_id,
         (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
         item_code, item_id, item_name,
-        num, unit_code, curr_unit_code, sell_price, buy_price,
-        sell_price as up_sell_price, buy_price as up_buy_price,
-        split_ratio, split_price, split_num, split_unit_code,
-        surplus_num, buy_price_all, sell_price_all
+        num,
+        unit_code,
+        curr_unit_code,
+        sell_price,
+        buy_price,
+        surplus_num as up_surplus_num,
+        sell_price_all as up_sell_price_all,
+        buy_price_all as up_buy_price_all,
+        sell_price as up_sell_price,
+        buy_price as up_buy_price,
+        split_ratio,
+        split_price,
+        split_num,
+        split_unit_code,
+        surplus_num,
+        buy_price_all,
+        sell_price_all
             from extract_stro_invoicing_detail a,(select max(id) as id from extract_stro_invoicing_detail a
         <where>
             <if test="bizId != null and bizId != ''">
@@ -459,10 +459,8 @@
         </where>
         group by
         a.item_id,
-        a.code,
-        a.item_name,
-        a.biz_id,
-        a.spec) b
+        a.biz_id
+        ) b
     where b.id = a.id
 
     </select>

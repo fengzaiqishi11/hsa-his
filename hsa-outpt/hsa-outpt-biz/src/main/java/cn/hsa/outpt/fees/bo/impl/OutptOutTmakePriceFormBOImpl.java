@@ -626,8 +626,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 BigDecimal oldPrice = (BigDecimal) oldOutptPayMap.get(tkPayCode);  // 原支付方式的支付金额
                 // 当前支付方式的退款金额 大于 原支付方式支付金额
                 if (!BigDecimalUtils.isZero(tkPrice)&&BigDecimalUtils.greater(tkPrice, oldPrice)) {
-                    oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
-                } else {
+                    oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
+                }else {
                     // 当前支付方式的退款金额与原支付方式支付金额相等
                     if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
                         oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice)); // 原支付方式金额与退款金额一致，取负数

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
 * @Package_name: cn.hsa.module.medic.data.entity
@@ -25,6 +26,8 @@ public class MedicalResultDTO extends MedicalResultDO implements Serializable {
 
     private String keyword;
 
+    // 档案id
+    private String profileId;
     // 姓名
     private String name;
     // 年龄
@@ -41,4 +44,8 @@ public class MedicalResultDTO extends MedicalResultDO implements Serializable {
     private String deptName;
     // 申请医生名称
     private String doctorName;
+    /**
+     * 项目结果集
+     */
+    private List<MedicalResultDTO> itemList;
 }

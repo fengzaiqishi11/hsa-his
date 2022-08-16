@@ -44,6 +44,7 @@ import com.alibaba.fastjson.JSON;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.io.UnsupportedEncodingException;
@@ -73,6 +74,9 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
     @Resource
     private WxInptDAO wxInptDAO;
+
+    @Resource
+    private WxBasicInfoDAO wxBasicInfoDAO;
 
     /**
      * 中心端医院信息服务
@@ -2030,14 +2034,13 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             data.put("endDate", endDate);
         }
 
-        // 根据profileId和就诊查询起止时间查询出就诊记录
-        List<OutptVisitDTO> vistiListByProfileId = this.getVistiListByProfileId(hospCode, profileId, startDate, endDate);
-        if (ListUtils.isEmpty(vistiListByProfileId)) return WrapperResponse.error(500, "就诊人不存在就诊记录", null);
-        List<String> visitIds = vistiListByProfileId.stream().map(OutptVisitDTO::getId).collect(Collectors.toList());
-
         data.put("hospCode", hospCode);
+        // 根据profileId和就诊查询起止时间查询出就诊记录
+        List<String> visitIds = wxBasicInfoDAO.queryVisitIdsByProfileId(data);
+        if (ListUtils.isEmpty(visitIds)) return WrapperResponse.error(500, "就诊人不存在就诊记录", null);
+
         data.put("visitIds", visitIds);
-        List<MedicalApplyDTO> result = wxOutptDAO.queryMedicApplyList(data);
+        List<MedicalApplyDTO> result = wxBasicInfoDAO.queryReportListByVisitIds(data);
 
         //返参加密
         log.debug("微信小程序【报告列表查询】返参加密前：" + JSON.toJSONString(result));
@@ -2079,8 +2082,22 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         //设置医技类别为LIS(4)
         data.put("hospCode", hospCode);
         data.put("typeCode", Constants.CFLB.LIS);
-        List<MedicalResultDTO> result = wxOutptDAO.queryMedicApplyResult(data);
-
+        List<MedicalResultDTO> itemList = wxOutptDAO.queryMedicApplyResult(data);
+        MedicalResultDTO result = new MedicalResultDTO();
+        if (!CollectionUtils.isEmpty(itemList)){
+            MedicalResultDTO mr = itemList.get(0);
+            result.setProfileId(mr.getProfileId());
+            result.setName(mr.getName());
+            result.setGenderCode(mr.getGenderCode());
+            result.setAge(mr.getAge());
+            result.setInNo(mr.getInNo());
+            result.setApplytime(mr.getApplytime());
+            result.setReportTime(mr.getReportTime());
+            result.setDiagnosisName(mr.getDiagnosisName());
+            result.setDoctorName(mr.getDoctorName());
+            result.setDeptName(mr.getDeptName());
+            result.setItemList(itemList);
+        }
         //返参加密
         log.debug("微信小程序【LIS医技结果查询】返参加密前：" + JSON.toJSONString(result));
         String res = null;

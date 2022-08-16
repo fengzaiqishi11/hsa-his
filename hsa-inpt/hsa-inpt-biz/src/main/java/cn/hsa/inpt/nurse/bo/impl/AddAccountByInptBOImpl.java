@@ -367,6 +367,14 @@ public class AddAccountByInptBOImpl extends HsafBO implements AddAccountByInptBO
       if (BigDecimalUtils.compareTo(inptCostDTO.getNum(), BigDecimal.valueOf(0)) <= 0) {
         throw new AppException(inptCostDTO.getItemName()+":数量必须大于0");
       }
+      // 参数校验
+      if (inptCostDTO.getTotalNum() == null) {
+          throw new AppException(inptCostDTO.getItemName()+":总数量不能为空");
+      }
+      // 参数校验
+      if (BigDecimalUtils.compareTo(inptCostDTO.getTotalNum(), BigDecimal.valueOf(0)) <= 0) {
+          throw new AppException(inptCostDTO.getItemName()+":总数量必须大于0");
+      }
       //常规、出院带药  药品或者材料
       if ( (Constants.YYXZ.CG.equals(inptCostDTO.getUseCode())  || Constants.YYXZ.CYDY.equals(inptCostDTO.getUseCode()))
         && (Constants.XMLB.YP.equals(inptCostDTO.getItemCode())  || Constants.XMLB.CL.equals(inptCostDTO.getItemCode()))

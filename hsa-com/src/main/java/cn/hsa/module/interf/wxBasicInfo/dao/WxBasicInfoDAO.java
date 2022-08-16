@@ -309,6 +309,9 @@ public interface WxBasicInfoDAO {
      **/
     List<InptCostDTO> queryOneDayCostListRecord(Map<String, Object> data);
 
+    //查询日结费用清单明细
+    List<InptCostDTO> queryOneDayCostListRecordDetail(Map<String, Object> data);
+
     // 根据deptId、certNo、挂号日期查询是否已挂号
     List<OutptRegisterDTO> queryIsRepeatRegister(Map outptRegisterMap);
 
@@ -395,4 +398,18 @@ public interface WxBasicInfoDAO {
      * pengbo
      */
     List<Map<String,Object>> querySevenQueueDoctor(Map<String, Object> map);
+
+    /**
+     * 根据profileId和时间段查询门诊和住院的就诊id集合
+     * @param data
+     * @return
+     */
+    List<String> queryVisitIdsByProfileId(Map<String, Object> data);
+
+    /**
+     * 根据visitIds 集合查询门诊和住院的检验检查报告列表
+     * @param data
+     * @return
+     */
+    List<MedicalApplyDTO> queryReportListByVisitIds(Map<String, Object> data);
 }

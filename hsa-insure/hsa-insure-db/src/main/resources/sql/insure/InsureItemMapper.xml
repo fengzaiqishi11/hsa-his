@@ -43,7 +43,7 @@
     <select id="queryPageUnifiedItem" resultType="cn.hsa.module.insure.module.dto.InsureItemDTO">
         select ID, HOSP_CODE, INSURE_REG_CODE, ITEM_MARK, ITEM_CODE, ITEM_NAME,ITEM_TYPE,
         ITEM_DOSAGE, ITEM_SPEC, ITEM_PRICE, ITEM_UNIT_CODE, PROD, DEDUCTIBLE, CHECK_PRICE,
-        DIRECTORY, TAKE_DATE, LOSE_DATE, PYM, WBM, IS_VALID, CRTE_ID, CRTE_NAME, CRTE_TIME from insure_item
+        DIRECTORY, TAKE_DATE, LOSE_DATE, PYM, WBM, IS_VALID, CRTE_ID, CRTE_NAME, CRTE_TIME,DOWN_LOAD_TYPE from insure_item
         where hosp_code =#{hospCode}
         <if test="keyWord != null and keyWord != ''">
             and ( item_code like concat('%',#{keyWord},'%')

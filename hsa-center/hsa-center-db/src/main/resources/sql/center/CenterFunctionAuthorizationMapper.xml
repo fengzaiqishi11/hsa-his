@@ -93,7 +93,7 @@
         from
             center_function_detail a
         where
-            a.is_valid = '0'
+            a.is_valid = '1'
     </select>
 
     <delete id="deleteAuthorization" parameterType="cn.hsa.module.center.authorization.dto.CenterFunctionAuthorizationDto">
@@ -106,7 +106,7 @@
         from
             center_function a
         where
-            a.is_valid = '0'
+            a.is_valid = '1'
         <if test="code != null and code != ''">
             and a.code  = #{code}
         </if>

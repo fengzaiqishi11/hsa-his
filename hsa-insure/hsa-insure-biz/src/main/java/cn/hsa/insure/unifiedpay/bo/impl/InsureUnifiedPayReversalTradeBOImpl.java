@@ -281,36 +281,36 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
         SysParameterDTO xz = sysParameterService_consumer.getParameterByCode(selectParamterCodeMap).getData();
         if(xz != null && Constants.SF.S.equals(xz.getValue())){
             // 根据条件查询
-             list = insureReversalTradeDAO.queryDataXiZangWith3201(map);
+            list = insureReversalTradeDAO.queryDataXiZangWith3201(map);
         }
-
         //根据险种类型 和 清算类别 ，获得对应的 费用结算明细
         map.put("list", list);
         List<Map<String, Object>> list3202 = insureReversalTradeDAO.queryDataWith3202(map);
         List<Map<String, Object>> innerList = null;
-        for (Map om : list) {
-            innerList = new ArrayList<>();
-            for (Map<String, Object> im : list3202) {
-                if("369900".equals(MapUtils.get(map, "insureRegCode"))){
-                    if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) ) {
-                        innerList.add(im);
+            for (Map om : list) {
+                innerList = new ArrayList<>();
+                for (Map<String, Object> im : list3202) {
+                    if("369900".equals(MapUtils.get(map, "insureRegCode"))){
+                        if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) ) {
+                            innerList.add(im);
+                        }
+                    }else{
+                        if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) &&
+                                MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))) {
+                            innerList.add(im);
+                        }
                     }
-                }else{
-                    if (MapUtils.get(om, "insutype").equals(MapUtils.get(im, "insutype")) &&
-                            MapUtils.get(om, "is_hospital").equals(MapUtils.get(im, "is_hospital"))) {
-                        innerList.add(im);
-                    }
-                }
 
+                }
+                om.put("detailList", innerList);
+                om.put("stmt_begndate", MapUtils.get(map, "startDate"));
+                om.put("stmt_enddate", MapUtils.get(map, "endDate"));
             }
-            om.put("detailList", innerList);
-            om.put("stmt_begndate", MapUtils.get(map, "startDate"));
-            om.put("stmt_enddate", MapUtils.get(map, "endDate"));
-        }
+
+
 
         return PageDTO.of(list);
     }
-
     /**
      * 医保通一支付平台,医药机构费用结算对总账接口调用
      *

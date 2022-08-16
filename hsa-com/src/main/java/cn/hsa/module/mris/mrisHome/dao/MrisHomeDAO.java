@@ -734,4 +734,12 @@ public interface MrisHomeDAO {
     Map queryExportNum(Map<String,Object> map);
 
    List<InptVisitDTO> queryUnExportData(Map<String,Object> map);
+
+    InptVisitDTO getInptVisitInfo(InptVisitDTO inptVisitDTO);
+
+    void updateInptVisitInfo(InptVisitDTO inptVisitInfo);
+
+    void updateBaseInfo(InptVisitDTO inptVisitInfo);
+
+    SysParameterDTO getParameterByCode(String hospCode, String code);
 }

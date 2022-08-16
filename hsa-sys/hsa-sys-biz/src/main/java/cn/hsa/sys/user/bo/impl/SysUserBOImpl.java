@@ -1,6 +1,7 @@
 package cn.hsa.sys.user.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.base.RSAUtil;
 import cn.hsa.base.TreeMenuNode;
 import cn.hsa.event.PasswordModifyEvent;
 import cn.hsa.hsaf.core.framework.HsafBO;
@@ -27,11 +28,13 @@ import com.alibaba.fastjson.JSONArray;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -87,6 +90,7 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     private static final String insurePrivateInternetAddressParamName = "INSURE_PRIVATE_ADDRESS";
 
 
+    private String rsaPublicKey = "MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAImeWoemAQT+RVoYCV2Zwkp/Wd8tZJdLekP8fUMzXnAKIiveAjM9vIBFkozx6FflCTzUuRIWhytyq0Lf25+XGPECAwEAAQ==";
 
 
     /**
@@ -150,7 +154,16 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
             byId.setInsurePrivateInternetAddress("请配置医保专网访问ip地址系统参数：【INSURE_PRIVATE_ADDRESS】的值");
             return;
         }
-        byId.setInsurePrivateInternetAddress(insureAddressParameterDTO.getValue());
+        String url = "http://"+ insureAddressParameterDTO.getValue()+"/his-web/?hospCode=";
+        String rsaKey = "";
+        try {
+            rsaKey = RSAUtil.encryptByPublicKey(hospCode.getBytes(), rsaPublicKey);
+            rsaKey = URLEncoder.encode(rsaKey);
+        } catch (Exception e) {
+            throw new AppException("获取医院地址失败,原因："+e.getMessage());
+        }
+        url = url + rsaKey;
+        byId.setInsurePrivateInternetAddress(url);
     }
 
     /**
@@ -164,6 +177,12 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
     @Override
     public List<SysUserDTO> queryAll(SysUserDTO sysUserDTO) {
          if("1".equals(sysUserDTO.getFlag())) {
+             List<SysUserDTO> sysUserDTOS = sysUserDAO.queryBedUserAll(sysUserDTO);
+             for (SysUserDTO user:sysUserDTOS){
+                 if (user!=null) {
+                     user.setPracCertiNo(StringUtils.stringEncrypt(user.getPracCertiNo())); // 数据脱敏
+                 }
+             }
             return this.sysUserDAO.queryBedUserAll(sysUserDTO);
          }
          // 111表示取门诊医生与财务人员

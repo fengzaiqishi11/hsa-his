@@ -1,5 +1,6 @@
 package cn.hsa.base;
 
+import com.alibaba.excel.annotation.ExcelIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,8 @@ import java.io.Serializable;
 @ToString
 @JsonIgnoreProperties({"pageNo","pageSize"})
 public class PageDO implements Serializable {
+    @ExcelIgnore
     private int pageNo = 1;
+    @ExcelIgnore
     private int pageSize = 10;
 }

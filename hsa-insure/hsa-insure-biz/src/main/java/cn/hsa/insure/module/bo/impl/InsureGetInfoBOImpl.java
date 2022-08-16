@@ -2267,18 +2267,6 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             }
         }
-        //取主诊断的编码和名称
-        String otpWmDiseCode = "";
-        String otpWmDiseName = "";
-        List<InptDiagnoseDTO> xiCollect = MapUtils.get(map, "xiCollect");
-        if (ObjectUtil.isNotEmpty(xiCollect) && xiCollect.size() > 0) {
-            for (InptDiagnoseDTO diagnoseDTO : xiCollect) {
-                if (Constant.UnifiedPay.ISMAN.S.equals(diagnoseDTO.getIsMain())) {
-                    otpWmDiseCode = diagnoseDTO.getDiseaseCode();
-                    otpWmDiseName = diagnoseDTO.getDiseaseName();
-                }
-            }
-        }
 
         if (MapUtils.isEmpty(baseInfoMap)) {
             throw new AppException("结算清单的基本信息数据为空，请先维护数据");
@@ -2440,15 +2428,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("dscgCaty", MapUtils.get(baseInfoMap, "outDeptNatinCode")); // 出院科别
         setlinfo.put("actIptDays", insureIndividualVisitDTO.getHospitalDay()); // 实际住院天数 *******
 
-        setlinfo.put("otpWmDise", MapUtils.getMapVS(baseInfoMap, "out_disease_name", (String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10_name",null))); // 门（急）诊诊断名称 *******
-        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(baseInfoMap, "out_disease_icd10",(String) MapUtils.getMapVS(mriBaseInfo, "disease_icd10",null))); // 门（急）诊诊断编码 *******
-        //取主诊断的疾病名称和编码
-        if(StringUtils.isNotEmpty(otpWmDiseCode)){
-            setlinfo.put("otpWmDiseCode",otpWmDiseCode);
-        }
-        if(StringUtils.isNotEmpty(otpWmDiseName)){
-            setlinfo.put("otpWmDise",otpWmDiseName);
-        }
+        setlinfo.put("otpWmDise", MapUtils.getMapVS(mriBaseInfo, "diseaseName", MapUtils.get(baseInfoMap, "outpt_disease_name"))); // 门（急）诊诊断名称 *******
+        setlinfo.put("otpWmDiseCode", MapUtils.getMapVS(mriBaseInfo, "diseaseCode", MapUtils.get(baseInfoMap, "outpt_disease_icd10"))); // 门（急）诊诊断编码 *******
         setlinfo.put("wmDiseCcode", ""); // 西医诊断疾病代码 *******
         setlinfo.put("otpTcmDise", otpTcmDise); // 门（急）诊中医诊断 *******
         setlinfo.put("otpTcmDiseCode", otpTcmDiseCode); // 门（急）诊中医诊断 *******
@@ -2523,6 +2504,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zz_doctor_code",null)); // 主诊医生代码 *******
         setlinfo.put("zrNurseName", MapUtils.getMapVS(mriBaseInfo,"zrNurse_name",null)); // 责任护士名 *******
         setlinfo.put("zrNurseCode", MapUtils.getMapVS(mriBaseInfo,"zr_nurse_code",null)); // 责任护士代码 *******
+        //根据参数判断主治医师是否取住院医师
+        SysParameterDTO sysParameterDTO = insureGetInfoDAO.getParameterByCode(hospCode,"ZZ_OR_ZG");
+        if(sysParameterDTO != null && Constant.UnifiedPay.ISMAN.S.equals(sysParameterDTO.getValue())){
+            setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_name",null)); // 主诊医生姓名 *******
+            setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_code",null)); // 主诊医生代码 *******
+        }
         Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
         if (ObjectUtil.isEmpty(setlBegnDate)) {
             throw new AppException("结算开始时间为空");
@@ -2817,6 +2804,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         if (ObjectUtil.isEmpty(inptDiagnoseDTOList) && ObjectUtil.isEmpty(tcmXyDiagnoseDTOS) && ObjectUtil.isEmpty(tcmZyDiagnoseDTOS)) {
             throw new AppException("未获取到诊断信息，请检查！");
+        }
+        //判断是否有未匹配的数据
+        if (!ObjectUtil.isEmpty(inptDiagnoseDTOList)) {
+            String code = "";
+            for(InptDiagnoseDTO inptDiagnoseDTO:inptDiagnoseDTOList){
+                if(StringUtils.isEmpty(inptDiagnoseDTO.getDiseaseCode())){
+                    if(StringUtils.isEmpty(code)){
+                        code = inptDiagnoseDTO.getIcd10();
+                    }else {
+                        code = code + "、"+ inptDiagnoseDTO.getIcd10();
+                    }
+                }
+            }
+            if(StringUtils.isNotEmpty(code)){
+                throw new AppException("存在以下未匹配的疾病编码:"+code+",请检查");
+            }
         }
         List<InptDiagnoseDTO> zxCollect = new ArrayList<>();
         List<InptDiagnoseDTO> xiCollect = new ArrayList<>();

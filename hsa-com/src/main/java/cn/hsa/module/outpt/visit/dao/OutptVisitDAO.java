@@ -3,6 +3,7 @@ package cn.hsa.module.outpt.visit.dao;
 import cn.hsa.module.inpt.doctor.dto.OutptCostDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualSettleDTO;
+import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualSettleDO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -238,4 +239,8 @@ public interface OutptVisitDAO {
     OutptVisitDTO selectOutptVisitByCertNo(OutptVisitDTO outptVisitDTO);
 
     InsureIndividualBasicDTO getByVisitId(InsureIndividualBasicDTO insureIndividualBasicDTO);
+
+    OutptVisitDTO queryInptVisitInfo(OutptVisitDTO outptVisitDTO);
+
+    InsureIndividualVisitDTO queryInsureVisitInfo(OutptVisitDTO outptVisitDTO);
 }

@@ -975,7 +975,8 @@
         when '3'
         then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '4'
-        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName,
+        a.crte_time as costTime -- 费用发生时间
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
@@ -1121,7 +1122,8 @@
         when '3'
         then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '4'
-        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName
+        then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName,
+        a.cost_time as costTime -- 费用发生时间
         FROM
             inpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
@@ -1650,7 +1652,7 @@
          s.crte_name as crteName, s.settle_time, bfc.name as bfcName, bfc.code as bfcCode,
          (case when s.settle_take_price > 0 then (s.ap_total_price + s.settle_take_price) else
           (case when s.settle_back_price > 0 then (s.ap_total_price - s.settle_back_price) else (s.self_price + s.ap_total_price) end) end) as selfPrice,
-         s.mi_price as miPrice,
+         (ifnull(s.mi_price,0) - ifnull(s.acct_pay, 0)) as miPrice,ifnull(s.acct_pay, 0) as personalPrice,
          s.reality_price as inptSettleRealityPrice, s.settle_back_price as settleBackPrice, s.settle_take_price as settleTakePrice, s.ap_total_price as apTotalPrice,
          scd.name as fpglName, scd.value as fpglKey, v.in_time as inptInTime, v.out_time as inptOutTime, v.in_no as inNo, s.total_price as outptTotalFee,
          case when ifnull(datediff(v.out_time,v.in_time),0) = 0 then 1 else datediff(v.out_time,v.in_time) end inDays,

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.center.centerfunction.dao.CenterFunctionDao">
+
+    <resultMap id="codeResultMap" type="cn.hsa.module.center.centerfunction.dto.CenterFunctionDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+
+    <resultMap id="detailResultMap" type="cn.hsa.module.center.centerfunction.dto.CenterFunctionDetailDTO">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="functionCode" column="function_code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="value" column="value" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getByCode" parameterType="java.lang.String" resultType="cn.hsa.module.center.centerfunction.dto.CenterFunctionDetailDTO">
+        select
+        a.*
+        from
+        center_function b
+        left join center_function_detail a on
+        b.code = a.function_code
+        and a.is_valid = '1'
+        where
+        b.is_valid = '1'
+        <if test="codes!=null and codes.size()>0">
+            and b.code in
+            <foreach collection="codes" index="index" item="code" separator="," open="(" close=")">
+                #{code}
+            </foreach>
+        </if>
+        order by a.c_code
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码-->
+    <select id="queryCodePage" resultMap="codeResultMap" parameterType="cn.hsa.module.center.centerfunction.dto.CenterFunctionDTO">
+        select * from center_function
+        <where>
+            1=1 and is_valid='1'
+            <if test="keyword!=null and keyword!=''">
+                and ((code like CONCAT('%',#{keyword},'%')) or (name like CONCAT('%',#{keyword},'%')))
+            </if>
+        </where>
+        order by crte_time desc
+    </select>
+
+    <!--通过实体作为筛选条件查询值域代码值-->
+    <select id="queryCodeDetailPage" resultMap="detailResultMap" parameterType="cn.hsa.module.center.centerfunction.dto.CenterFunctionDetailDTO">
+        select a.*
+        from center_function_detail a
+      where
+             a.is_valid='1'
+            <if test="keyword!=null and keyword!=''">
+                and ((a.value like CONCAT('%',#{keyword},'%')) or (a.name like CONCAT('%',#{keyword},'%')))
+            </if>
+            <if test="functionCode!=null and functionCode!=''">
+                and a.function_code=#{functionCode}
+            </if>
+        order by value
+    </select>
+
+    <!--根据主键获取值域代码对象-->
+    <select id="getCodeById" resultMap="codeResultMap">
+        select * from center_function where is_valid='1' and id=#{id}
+    </select>
+
+    <!--根据主键获取值域代码值对象-->
+    <select id="getCodeDetailById" resultMap="detailResultMap">
+        select * from center_function_detail where is_valid='1' and id=#{id}
+    </select>
+
+    <select id="getMaxSeqno" resultType="java.lang.Integer">
+      select IFNULL(max(value),0) from center_function_detail where function_code=#{functionCode}
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeCount" resultType="java.lang.Integer">
+        select count(1) as num from center_function where code=#{code} and is_valid='1' and id!=#{id}
+    </select>
+
+    <!--根据编码查询数量-->
+    <select id="getCodeDetailCount" resultType="java.lang.Integer">
+        select count(1) as num from center_function_detail where function_code=#{code} and is_valid='1' and id!=#{id} and value=#{value}
+    </select>
+
+    <!--新增值域代码-->
+    <insert id="insertCode" keyProperty="id" useGeneratedKeys="true">
+        insert into center_function(id,code,name,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{code},#{name},'1',#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--新增值域代码-->
+    <insert id="insertCodeDetail">
+        insert into center_function_detail(id,function_code,name,value,is_valid,crte_id,crte_name,crte_time)
+        values (#{id},#{functionCode},#{name},#{value},'1',#{crteId},#{crteName},#{crteTime})
+    </insert>
+
+    <!--更新值域代码-->
+    <update id="updateCode" keyProperty="id" useGeneratedKeys="true">
+        update center_function
+        <set>
+            <if test="code!=null and code!=''">
+                code=#{code},
+            </if>
+            <if test="name!=null and name!=''">
+                name=#{name},
+            </if>
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <!--更新值域代码值-->
+    <update id="updateCodeDetail" keyProperty="id" useGeneratedKeys="true">
+        update center_function_detail
+        <set>
+            name=#{name},value=#{value},
+            <if test="isValid!=null and isValid!=''">
+                is_valid=#{isValid},
+            </if>
+        </set>
+        where id=#{id}
+    </update>
+
+    <update id = "updateCodeDetailByCode" >
+      update center_function_detail set function_code = #{code} where function_code= #{oldCode}
+    </update>
+
+    <!--删除值域代码-->
+    <update id="deleteCodes" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.center.centerfunction.dto.CenterFunctionDTO">
+        update center_function
+        set is_valid = 0 where 1=1 and is_valid = 1
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--删除值域代码值-->
+    <update id="deleteCodeDetails" keyProperty="id" useGeneratedKeys="true" parameterType="cn.hsa.module.center.centerfunction.dto.CenterFunctionDetailDTO">
+        update center_function_detail
+        set is_valid = 0 where 1=1 and is_valid = 1
+        <if test="ids != null and ids.size()>0">
+            and id in
+            <foreach collection="ids" index= "index" item="id"  separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
+    </update>
+
+    <!--根据值域代码编码获取值域代码值-->
+    <select id="getCodeTree" parameterType="java.lang.String" resultType="cn.hsa.base.TreeMenuNode">
+        select "-2" id, a.name label, "-1" parentId
+        from center_function a
+        where a.is_valid='1' and a.code=#{code}
+        union all
+        select a.id, a.label, a.parentId from (
+              select b.value id, b.name label, a.id parentId
+              from center_function a
+                       join center_function_detail b on a.code = b.function_code
+              where b.is_valid='1' and a.code=#{code}
+              order by b.value
+          )a
+    </select>
+
+</mapper>

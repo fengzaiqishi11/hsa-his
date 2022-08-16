@@ -191,7 +191,7 @@
         t.medical_reg_no AS mdtrt_id,
         e.insureSettleId AS setl_id,
         c.aae140 AS insutype,
-        t.is_hospital,
+        e.is_hospital,
         e.clr_type,
         IF
         ( e.state = '0', '0', '1' ) AS refd_setl_flag,
@@ -244,7 +244,7 @@
         ) A
         GROUP BY
         A.insutype,
-        <if test="insureRegCode != 369900">
+        <if test="insureRegCode != 369900 or insureRegCode != '360402'">
             A.is_hospital,
         </if>
         A.clr_type,
@@ -421,7 +421,7 @@
         when t.aka130 = '990101' then e.insure_price - e.personal_price - e.hosp_price
         when LEFT ( e.insure_reg_code, 2 )='43' then e.insure_price - e.personal_price - e.hosp_price
         else e.insure_price - e.personal_price end as fund_pay_sumamt,
-        e.personal_price AS acct_pay
+        e.personal_price AS acct_pay,t.aka130
         FROM
         insure_individual_settle e,
         insure_individual_visit t,
@@ -1744,5 +1744,4 @@
         GROUP BY
         se_vi_id
     </select>
-
 </mapper>

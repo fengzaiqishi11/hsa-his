@@ -624,44 +624,67 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             BigDecimal tkPrice = (BigDecimal) entry.getValue();  // 支付金额
             if (oldOutptPayMap.containsKey(tkPayCode)) {
                 BigDecimal oldPrice = (BigDecimal) oldOutptPayMap.get(tkPayCode);  // 原支付方式的支付金额
-                // 当前支付方式的退款金额与原支付方式支付金额相等
-                if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
-                    oldOutptPayMap.remove(tkPayCode);
-                    continue;
-                }
                 // 当前支付方式的退款金额 大于 原支付方式支付金额
-                if (BigDecimalUtils.greater(tkPrice, oldPrice)) {
-                    otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, BigDecimalUtils.subtract(tkPrice, oldPrice));
-                    oldOutptPayMap.remove(tkPayCode);
-                } else {
+                if (!BigDecimalUtils.isZero(tkPrice)&&BigDecimalUtils.greater(tkPrice, oldPrice)) {
                     oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
+                }else {
+                    // 当前支付方式的退款金额与原支付方式支付金额相等
+                    if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
+                        oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice)); // 原支付方式金额与退款金额一致，取负数
+                    }else {
+                        oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice));
+                    }
                 }
-            } else {
-                otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, tkPrice);
+            }else {
+                oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice));
             }
+//                BigDecimal oldPrice = (BigDecimal) oldOutptPayMap.get(tkPayCode);  // 原支付方式的支付金额
+//                // 当前支付方式的退款金额与原支付方式支付金额相等
+//                if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
+//                    oldOutptPayMap.remove(tkPayCode);
+//                    continue;
+//                }
+//                // 当前支付方式的退款金额 大于 原支付方式支付金额
+//                if (BigDecimalUtils.greater(tkPrice, oldPrice)) {
+//                    otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, BigDecimalUtils.subtract(tkPrice, oldPrice));
+//                    oldOutptPayMap.remove(tkPayCode);
+//                } else {
+//                    oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
+//                }
+//            } else {
+//                otherPayCodePrice = BigDecimalUtils.add(otherPayCodePrice, tkPrice);
+//            }
         }
-        // 原支付方式对应的金额小于现支付方式的金额，缺的金额需要从其他支付方式扣除
-        if (BigDecimalUtils.greaterZero(otherPayCodePrice)) {
             for (int i = 1; i < 8; i++) {
-                if (oldOutptPayMap.containsKey(i+"")) {
+                if (oldOutptPayMap.containsKey(i + "")) {
                     BigDecimal oldPrice2 = (BigDecimal) oldOutptPayMap.get(i+"");
-                    // 如果需要补充扣除的支付金额 = 某个原支付金额剩余的金额，直接扣除原支付金额
-                    if (BigDecimalUtils.equals(otherPayCodePrice, oldPrice2)) {
-                        otherPayCodePrice = new BigDecimal(0);
+                    if (BigDecimalUtils.isZero(oldPrice2)){
                         oldOutptPayMap.remove(i+"");
-                        break;
-                    }
-                    // 需要补充扣除的费用大于当前支付方式金额  eg： 还需要扣20元 但现金只剩10元， 那么现金扣完10元，剩余的10元从下一个支付方式扣除
-                    if (BigDecimalUtils.greater(otherPayCodePrice, oldPrice2)) {
-                        otherPayCodePrice = BigDecimalUtils.subtract(otherPayCodePrice, oldPrice2);
-                        oldOutptPayMap.remove(i+"");
-                    } else {
-                        oldOutptPayMap.put(i+"", BigDecimalUtils.subtract(oldPrice2, otherPayCodePrice));
-                        break;
                     }
                 }
             }
-        }
+        // 原支付方式对应的金额小于现支付方式的金额，缺的金额需要从其他支付方式扣除
+//        if (BigDecimalUtils.greaterZero(otherPayCodePrice)) {
+//            for (int i = 1; i < 8; i++) {
+//                if (oldOutptPayMap.containsKey(i+"")) {
+//                    BigDecimal oldPrice2 = (BigDecimal) oldOutptPayMap.get(i+"");
+//                    // 如果需要补充扣除的支付金额 = 某个原支付金额剩余的金额，直接扣除原支付金额
+//                    if (BigDecimalUtils.equals(otherPayCodePrice, oldPrice2)) {
+//                        otherPayCodePrice = new BigDecimal(0);
+//                        oldOutptPayMap.remove(i+"");
+//                        break;
+//                    }
+//                    // 需要补充扣除的费用大于当前支付方式金额  eg： 还需要扣20元 但现金只剩10元， 那么现金扣完10元，剩余的10元从下一个支付方式扣除
+//                    if (BigDecimalUtils.greater(otherPayCodePrice, oldPrice2)) {
+//                        otherPayCodePrice = BigDecimalUtils.subtract(otherPayCodePrice, oldPrice2);
+//                        oldOutptPayMap.remove(i+"");
+//                    } else {
+//                        oldOutptPayMap.put(i+"", BigDecimalUtils.subtract(oldPrice2, otherPayCodePrice));
+//                        break;
+//                    }
+//                }
+//            }
+//        }
         BigDecimal totalOldPriceAgain = new BigDecimal(0);
         for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
             totalOldPriceAgain = BigDecimalUtils.add(totalOldPriceAgain, (BigDecimal) entry.getValue());

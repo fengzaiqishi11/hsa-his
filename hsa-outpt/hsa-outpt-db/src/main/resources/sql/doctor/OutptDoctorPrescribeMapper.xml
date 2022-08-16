@@ -1611,7 +1611,7 @@
         <if test="keyword != null and keyword !=''">
             and (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
         </if>
-        order by a.crte_time desc
+        order by a.pym,a.crte_time desc
     </select>
 
     <!--根据处方模板id查询出处方模板明细-->
@@ -1663,7 +1663,14 @@
                 (a.item_code = '4' and e.is_valid = '1' and e.id is not null) or (a.item_code ='1' and c.is_valid = '1' and c.id is not null )
                 or (a.item_code ='2' and d.is_valid = '1' and d.id is not null )
             )
-        order by a.id asc
+        order by
+        <if test="columnName != null and sortName != ''">
+            <if test='columnName =="itemName"'>
+                CONVERT(a.item_name USING gbk) ${sortName}
+            </if>
+        </if>
+            a.id asc
+
     </select>
 
     <!--查询医嘱频率编码-->

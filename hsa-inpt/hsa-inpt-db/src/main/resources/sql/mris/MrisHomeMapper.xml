@@ -2295,8 +2295,8 @@
     <select id="queryExportNum" resultType="java.util.Map" parameterType="java.util.Map">
         select
         count(*) as totalNum,
-        count(if( v.export_flag  = '1' ,1,null)) as exportNum,
-        (count(if( v.export_flag = '0',1,null))-count(if( c.fy01 &lt;=0 ,1,null))) as unWriteNum,
+        count(if( c.fy01 >0,1,null)) as exportNum,
+        count(if( c.fy01 is null ,1,null)) as unWriteNum,
         count(if( c.fy01 &lt;=0 ,1,null)) as noChargeNum
         from inpt_visit v
         left join mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
@@ -2344,7 +2344,7 @@
         from inpt_visit v
         left join mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
         left join mris_cost c on c.hosp_code= #{hospCode} and  c.visit_id = v.id
-        where v.hosp_code= #{hospCode} and v.export_flag = '0'
+        where v.hosp_code= #{hospCode} and (c.fy01 is null or c.fy01 &lt;=0)
         <if test="keyword != null and keyword !=''">
             and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
             or v.in_no LIKE CONCAT('%',#{keyword},'%') )
@@ -2374,5 +2374,49 @@
             limit #{offset}, #{limit}
         </if>
         order by errorMessage
+    </select>
+
+    <select id="getInptVisitInfo" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO">
+        select
+            iv.id,iv.in_profile ,iv.in_no ,iv.profile_id,iv.hosp_code,
+            bpf.in_profile as bpfInProfile,bpf.out_profile as bpfOutProfile
+        from
+            inpt_visit iv
+                left join base_profile_file bpf on
+                    iv.hosp_code = bpf.hosp_code
+                    and iv.profile_id = bpf.id
+        where
+            iv.id = #{id}
+            and iv.hosp_code= #{hospCode}
+    </select>
+
+    <update id="updateInptVisitInfo">
+        UPDATE inpt_visit
+        <set>
+            <if test="bpfInProfile != null">
+                in_profile = #{bpfInProfile}
+            </if>
+        </set>
+        WHERE id = #{id} and hosp_code = #{hospCode}
+    </update>
+
+    <update id="updateBaseInfo">
+        UPDATE base_profile_file
+        <set>
+            <if test="bpfInProfile != null">
+                in_profile = #{bpfInProfile}
+            </if>
+<!--            <if test="bpfOutProfile != null">-->
+<!--                out_profile = #{bpfOutProfile},-->
+<!--            </if>-->
+        </set>
+        WHERE id = #{profileId} and hosp_code = #{hospCode}
+    </update>
+
+    <select id="getParameterByCode" resultType="cn.hsa.module.sys.parameter.dto.SysParameterDTO">
+        select
+            id, hosp_code, name, code, remark, pym, wbm, is_valid, is_show, crte_id, crte_name, crte_time, value
+        from sys_parameter
+        where is_valid='1' and hosp_code=#{hospCode} and code=#{code}
     </select>
 </mapper>

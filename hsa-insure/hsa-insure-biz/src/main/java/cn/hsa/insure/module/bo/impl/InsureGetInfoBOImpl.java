@@ -1828,6 +1828,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorgOpter", infoDTO.getHosrgOpter()); // 医保机构经办人
         setlinfo.put("medinsFillDept", infoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medinsFillPsn", infoDTO.getMedinsFillPsn()); // 医疗机构填报人
+        //查询就诊信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        //判断是否为单病种住院
+        if(Constant.UnifiedPay.YWLX.DBZZY.equals(insureIndividualVisitDTO.getAka130())){
+            setlinfo.put("medType", insureIndividualVisitDTO.getAka130());//医疗类别
+            setlinfo.put("bka006", insureIndividualVisitDTO.getBka006());//单病种编码
+            setlinfo.put("bka006Name", insureIndividualVisitDTO.getBka006Name());//单病种名称
+        }
         return setlinfo;
     }
 
@@ -2307,6 +2315,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("setlId", MapUtils.get(map, "insureSettleId")); // 结算ID
         setlinfo.put("fixmedinsName", MapUtils.get(setlinfoMap, "fixmedins_name")); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", insureIndividualVisitDTO.getMedicineOrgCode()); // 定点医药机构编号
+        //判断是否为单病种住院
+        if(Constant.UnifiedPay.YWLX.DBZZY.equals(insureIndividualVisitDTO.getAka130())){
+            setlinfo.put("medType", insureIndividualVisitDTO.getAka130());//医疗类别
+            setlinfo.put("bka006", insureIndividualVisitDTO.getBka006());//单病种编码
+            setlinfo.put("bka006Name", insureIndividualVisitDTO.getBka006Name());//单病种名称
+        }
         map.put("code", "SETTLELEVEL");
         SysParameterDTO data = insureGetInfoDAO.getParameterByCode(hospCode,"SETTLELEVEL");
         if (data == null) {

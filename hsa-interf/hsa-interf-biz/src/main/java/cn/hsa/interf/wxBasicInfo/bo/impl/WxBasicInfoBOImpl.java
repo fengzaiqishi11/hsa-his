@@ -1771,7 +1771,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data == null) {
             return null;
         }
-        if (StringUtils.isEmpty(MapUtils.get(data, "keyword"))) throw new AppException("未选择查询的就诊人信息");
+        if (StringUtils.isEmpty(MapUtils.get(data, "profileId"))) throw new AppException("未选择查询的就诊人信息");
         // 默认查询一个月时间内
         if (data.get("startDate") == null) {
             data.put("startDate", DateUtils.calculateDate(DateUtils.Y_M_D, DateUtils.format(DateUtils.Y_M_D), -30));
@@ -2330,8 +2330,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data == null) {
             return WrapperResponse.error(500, "服务器异常，请联系管理员！", null);
         }
-        String statusCode = MapUtils.get(data, "statusCode");
-        if (StringUtils.isEmpty(statusCode)) return WrapperResponse.error(500, "未传入病人状态编码", null);
         String profileId = MapUtils.get(data, "profileId");
         if (StringUtils.isEmpty(profileId)) return WrapperResponse.error(500, "未接收到就诊人档案信息", null);
 
@@ -2342,12 +2340,14 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         // 根据档案id查询就诊人是否在院状态
         data.put("hospCode", hospCode);
         List<InptVisitDTO> result = wxInptDAO.queryInptVisitRecord(data);
-
+        if (!ListUtils.isEmpty(result)){
+            return  WrapperResponse.success(null);
+        }
         // 返参加密
-        log.debug("微信小程序【住院病人信息查询】返参加密前：" + JSON.toJSONString(result));
+        log.debug("微信小程序【住院病人信息查询】返参加密前：" + JSON.toJSONString(result.get(0)));
         String res = null;
         try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result));
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result.get(0)));
             log.debug("微信小程序【住院病人信息查询】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【住院病人信息查询】返参加密错误，请联系管理员！" + e.getMessage());

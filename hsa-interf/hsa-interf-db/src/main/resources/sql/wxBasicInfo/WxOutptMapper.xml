@@ -290,8 +290,8 @@
         and b.is_settle = '0'
         and b.is_cancel = '0'
         and b.is_submit = '1'
-        <if test="data.keyword != null and data.keyword != ''">
-            and (a.visit_no = #{data.keyword} or a.name like concat('%', #{data.keyword}, '%') or a.cert_no = #{data.keyword} or a.register_no = #{data.keyword})
+        <if test="data.profileId != null and data.profileId != ''">
+            and a.profile_id = #{profileId}
         </if>
         <if test="data.startDate != null and data.startDate != ''">
             and DATE_FORMAT(a.visit_time, '%Y-%m-%d') >= DATE_FORMAT(#{data.startDate}, '%Y-%m-%d')

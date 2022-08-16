@@ -4066,7 +4066,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //如果选了中医优势病种支付方式但不满足条件的，抛出提示信息
         if (!wmDiseList.contains(wmMainCode) && hiPaymtd_tcm.equals(hiPaymtd)) {
             throw new AppException("当前医保支付方式为中医优势病种，中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
-                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，请选择是否继续以中医优势病种支付方式保存？如果选择是，请修改西医诊断为对应的诊断，如果选择否，请将医保支付方式修改为其他方式，再进行保存");
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，如果选择继续以中医优势病种支付方式保存，请修改西医诊断为对应的诊断，否则，请将医保支付方式修改为其他方式，再进行保存");
         }
 
         if (!wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd)

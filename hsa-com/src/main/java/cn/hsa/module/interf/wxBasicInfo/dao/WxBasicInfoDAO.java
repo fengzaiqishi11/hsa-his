@@ -309,6 +309,9 @@ public interface WxBasicInfoDAO {
      **/
     List<InptCostDTO> queryOneDayCostListRecord(Map<String, Object> data);
 
+    //查询日结费用清单明细
+    List<InptCostDTO> queryOneDayCostListRecordDetail(Map<String, Object> data);
+
     // 根据deptId、certNo、挂号日期查询是否已挂号
     List<OutptRegisterDTO> queryIsRepeatRegister(Map outptRegisterMap);
 

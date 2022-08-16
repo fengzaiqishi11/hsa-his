@@ -342,9 +342,9 @@
         ) A
         GROUP BY
         A.insutype,
-       <!-- <if test="insureRegCode != 369900">
+        <if test="insureRegCode != 369900">
             A.is_hospital,
-        </if>-->
+        </if>
         A.clr_type,
         A.type,
         A.clr_optins,

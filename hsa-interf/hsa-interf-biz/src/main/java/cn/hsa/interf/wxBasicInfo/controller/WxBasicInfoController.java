@@ -995,21 +995,6 @@ public class WxBasicInfoController {
         if (StringUtils.isEmpty(hospCode)) {
             throw new AppException("入参错误，请传入医院编码！");
         }
-        // 模拟入参数据
-        /*Map map1 = new HashMap();
-        map1.put("hospCode", "1000001");
-        map1.put("inNo", "ZY2021060901");
-        map1.put("costStartTime", "2021-06-29");
-        map1.put("costStopTime", "2021-06-30");
-        String s = JSON.toJSONString(map1);
-        String priencrypt = null;
-        try {
-            priencrypt = AsymmetricEncryption.priencrypt(s);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        log.debug("微信小程序【住院病人日费用清单】私钥加密：" + priencrypt);
-        paramMap.put("data", priencrypt);*/
 
         String data = null;
         try {

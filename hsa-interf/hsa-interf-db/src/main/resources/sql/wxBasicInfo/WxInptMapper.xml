@@ -87,10 +87,19 @@
         FROM
         inpt_visit a
         WHERE a.hosp_code = #{hospCode}
-        and a.status_code not in ('7','8')
+
         <if test="profileId != null and profileId != ''">
             and a.profile_id = #{profileId}
         </if>
+
+        <choose>
+            <when test="statusCode != null and statusCode == '2'">
+                and a.status_code = #{statusCode}
+            </when>
+            <otherwise>
+                and a.status_code !='8'
+            </otherwise>
+        </choose>
         <if test="startDate != null and startDate != ''">
             <![CDATA[
                 and date_format(a.in_time, '%Y-%m-%d') >= date_format(#{startDate}, '%Y-%m-%d')

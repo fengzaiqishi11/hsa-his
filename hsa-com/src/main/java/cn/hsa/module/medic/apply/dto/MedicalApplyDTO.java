@@ -101,4 +101,14 @@ public class MedicalApplyDTO extends MedicalApplyDO implements Serializable {
     private String isSettle;
     // 医技申请主键集合
     private List<String> ids;
+
+    /**
+     * 报告人
+     */
+    private String reporter;
+
+    /**
+     * 报告时间
+     */
+    private String reportTime;
 }

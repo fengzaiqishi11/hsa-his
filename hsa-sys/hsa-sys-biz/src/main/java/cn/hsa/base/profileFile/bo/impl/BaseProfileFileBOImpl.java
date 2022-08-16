@@ -74,13 +74,13 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
 
         // 业务操作界面类型为档案并且id不为空，或者业务操作界面类型为门诊或住院并且证件号存在，则走修改档案信息逻辑
         if(isIdNotEmptyByDA || isCertNoExistByNotDA){
-            update(outptProfileFileDTO);
+            outptProfileFileDTO = update(outptProfileFileDTO);
         // 如果业务操作界面类型为档案，且已存在该证件号的档案记录则抛出异常提示
         } else if (isCertNoExistByDA){
             throw new AppException("已存在该证件号码的档案信息！");
         // 否则直接新增
         } else {
-            insert(outptProfileFileDTO);
+            outptProfileFileDTO = insert(outptProfileFileDTO);
         }
 
         return outptProfileFileDTO;

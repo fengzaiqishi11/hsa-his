@@ -630,9 +630,9 @@ public class LoginController extends BaseController {
                     Optional.ofNullable(data).orElseThrow(()-> new AppException("系统参数：INSURE_PRIVATE_ADDRESS未配置"));
                     migrationAddress = data.getValue();
                 }
-                String newAddress = migrationAddress + "?hospCode=" + hospCode;
-                String encode = URLEncoder.encode(newAddress, "UTF-8");
-                resultDTO.setMigrationAddress(encode);
+                String encode = URLEncoder.encode(hospCode, "UTF-8");
+                String newAddress = migrationAddress + "?hospCode=" + encode;
+                resultDTO.setMigrationAddress(newAddress);
             }
             return WrapperResponse.success(resultDTO);
         } catch (Exception e) {

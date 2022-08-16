@@ -25,7 +25,12 @@
       <result property="fkdid" column="fkdid" jdbcType="VARCHAR"/>
       <result property="fkTime" column="fk_time" jdbcType="TIMESTAMP"/>
       <result property="supplierName" column="supplierName" jdbcType="VARCHAR"/>
-
+      <result property="acceptanceStatus" column="acceptance_status" jdbcType="VARCHAR"/>
+      <result property="acceptanceName" column="acceptance_name" jdbcType="VARCHAR"/>
+      <result property="acceptanceTime" column="acceptance_time" jdbcType="TIMESTAMP"/>
+      <result property="acceptanceId" column="acceptance_id" jdbcType="TIMESTAMP"/>
+      <result property="qualifiedStatus" column="qualified_status" jdbcType="TIMESTAMP"/>
+      <result property="acceptanceResult" column="acceptance_result" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.stro.stroin.dto.StroInDetailDTO" id="StroInDetailMap">
@@ -55,13 +60,25 @@
       <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
       <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
       <result property="prepName" column="prep_name" jdbcType="VARCHAR"/>
+      <result property="acceptanceStatus" column="acceptance_status" jdbcType="VARCHAR"/>
+      <result property="acceptanceName" column="acceptance_name" jdbcType="VARCHAR"/>
+      <result property="acceptanceTime" column="acceptance_time" jdbcType="TIMESTAMP"/>
+      <result property="acceptanceId" column="acceptance_id" jdbcType="TIMESTAMP"/>
+      <result property="qualifiedStatus" column="qualified_status" jdbcType="TIMESTAMP"/>
+      <result property="acceptanceResult" column="acceptance_result" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="getById" resultMap="StroInMap">
           select
             id, hosp_code, in_code, order_no, stock_id, supplier_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, crte_id, crte_name, crte_time,
-            (select b.name from base_supplier b where b.id = supplier_id and b.hosp_code = #{hospCode}) as name
+            (select b.name from base_supplier b where b.id = supplier_id and b.hosp_code = #{hospCode}) as name,
+            acceptance_status,
+            acceptance_name,
+            acceptance_time,
+            acceptance_id,
+            qualified_status,
+            acceptance_result
           from stro_in
           where id = #{id} and hosp_code = #{hospCode}
       </select>
@@ -92,7 +109,13 @@
       sin.fk_remark,
       sin.fkdid,
       sin.fk_time,
-      su.name as supplierName
+      su.name as supplierName,
+      sin.acceptance_status,
+      sin.acceptance_name,
+      sin.acceptance_time,
+      sin.acceptance_id,
+      sin.qualified_status,
+      sin.acceptance_result
       from stro_in sin left join base_supplier su on sin.supplier_id = su.id
         where
         sin.hosp_code = #{hospCode}
@@ -162,8 +185,8 @@
 
     <!--新增入库-->
     <insert id="insertStroIn">
-        insert into stro_in(id,hosp_code, in_code, order_no, stock_id, supplier_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, crte_id, crte_name, crte_time,in_order_no)
-        values (#{id},#{hospCode}, #{inCode}, #{orderNo}, #{stockId}, #{supplierId}, #{buyPriceAll}, #{sellPriceAll}, #{remark}, '0', #{auditId}, #{auditName}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime},#{inOrderNo})
+        insert into stro_in(id,hosp_code, in_code, order_no, stock_id, supplier_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, crte_id, crte_name, crte_time,in_order_no,acceptance_status, acceptance_name, acceptance_time, acceptance_id, qualified_status, acceptance_result)
+        values (#{id},#{hospCode}, #{inCode}, #{orderNo}, #{stockId}, #{supplierId}, #{buyPriceAll}, #{sellPriceAll}, #{remark}, '0', #{auditId}, #{auditName}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime},#{inOrderNo},#{acceptanceStatus},#{acceptanceName},#{acceptanceTime},#{acceptanceId},#{qualifiedStatus},#{acceptanceResult})
     </insert>
 
     <!--修改入库信息-->
@@ -215,6 +238,24 @@
         <if test="crteTime != null">
           crte_time = #{crteTime},
         </if>
+        <if test="acceptanceStatus != null">
+          acceptance_status = #{acceptanceStatus},
+        </if>
+        <if test="acceptanceName != null">
+          acceptance_name = #{acceptanceName},
+        </if>
+        <if test="acceptanceTime != null">
+          acceptance_time = #{acceptanceTime},
+        </if>
+        <if test="acceptanceId != null">
+          acceptance_id = #{acceptanceId},
+        </if>
+        <if test="qualifiedStatus != null">
+          qualified_status = #{qualifiedStatus},
+        </if>
+        <if test="acceptanceResult != null">
+          acceptance_result = #{acceptanceResult},
+        </if>
       </set>
         where  id = #{id} and hosp_code = #{hospCode} and stock_id = #{stockId}
     </update>
@@ -262,8 +303,15 @@
       case when a.item_code='1' then bd.nation_code when a.item_code='2' then bm.nation_code end nation_code,
       case when a.item_code='1' then bd.nation_name when a.item_code='2' then bm.nation_name end nation_name,
       case when a.item_code='1' then  (select scd.name from sys_code_detail scd where scd.c_code ='JXFL' and bd.prep_code = scd.value and scd.hosp_code = #{hospCode})
-        when a.item_code='2' then '' end prep_name -- 剂型名称
+        when a.item_code='2' then '' end prep_name, -- 剂型名称
+      b.acceptance_status ,
+      b.acceptance_name ,
+      b.acceptance_time ,
+      b.acceptance_id ,
+      b.qualified_status ,
+      b.acceptance_result
       from stro_in_detail a
+      left join stro_in b on a.in_id = b.id
       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
       left join base_material bm on bm.id = a.item_id and bm.hosp_code = #{hospCode}
       <where>
@@ -617,7 +665,13 @@
     a.prod_code,b.audit_time,b.crte_time,
     (select p.name from base_product p where p.hosp_code = #{hospCode} and a.prod_code = p.code) as prodName,
     case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
-    case when a.item_code='2' then bm.model end model
+    case when a.item_code='2' then bm.model end model,
+    b.acceptance_status as acceptanceStatus,
+    b.acceptance_name as acceptanceName,
+    b.acceptance_time AS acceptanceTime,
+    b.acceptance_id AS acceptanceId,
+    b.qualified_status AS qualifiedStatus,
+    b.acceptance_result AS acceptanceResult
     from stro_in_detail a
     join stro_in b on b.id = a.in_id and b.hosp_code = a.hosp_code
     left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}

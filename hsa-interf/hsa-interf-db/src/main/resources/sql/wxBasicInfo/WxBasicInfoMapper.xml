@@ -1237,8 +1237,48 @@
         order by a.in_time desc
     </select>
 
-    <!--日费用清单查询-->
+    <!--日费用清单记录查询-->
     <select id="queryOneDayCostListRecord" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
+        SELECT
+            iv.name,
+            iv.bed_name as bedName,
+            iv.in_no as inNo,
+            iv.in_time as inTime,
+            date_format(a.cost_time,'%Y-%m-%d') as feeDate,
+            sum(a.reality_price) as totalCost
+        FROM
+            inpt_cost a
+        LEFT JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
+        where a.hosp_code = #{hospCode}
+          and a.cost_time is not null
+        <if test="visitId != null and visitId != ''">
+            AND a.visit_id = #{visitId}
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and iv.in_no = #{inNo}
+        </if>
+        <if test="statusCode != null and statusCode != ''">
+            AND a.status_code = #{statusCode}
+        </if>
+        <if test="costStopTime != null and costStopTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') <= #{costStopTime}
+                ]]>
+        </if>
+        <if test="costStartTime != null and costStartTime != ''">
+            <![CDATA[
+                    and DATE_FORMAT(a.cost_time, '%Y-%m-%d') >= #{costStartTime}
+                ]]>
+        </if>
+        <if test="queryBaby == null">
+            and (a.baby_id is null or a.baby_id = '')
+        </if>
+        group by date_format(a.cost_time,'%Y-%m-%d')
+        order by date_format(a.cost_time,'%Y-%m-%d')
+    </select>
+
+    <!--日结费用清单明细查询-->
+    <select id="queryOneDayCostListRecordDetail" resultType="cn.hsa.module.inpt.doctor.dto.InptCostDTO">
         SELECT
             a.visit_id,
             a.source_code,
@@ -1273,7 +1313,7 @@
             inpt_cost a
         LEFT JOIN inpt_visit iv on a.hosp_code = iv.hosp_code and a.visit_id = iv.id
         where a.hosp_code = #{hospCode}
-          and a.cost_time is not null
+        and a.cost_time is not null
         <if test="visitId != null and visitId != ''">
             AND a.visit_id = #{visitId}
         </if>

@@ -54,6 +54,13 @@ public interface BaseProfileFileDAO {
     OutptProfileFileDTO queryById(OutptProfileFileDTO outptProfileFileDTO);
 
     /**
+     * 根据身份证号查询档案信息
+     * @param outptProfileFileDTO
+     * @return
+     */
+    OutptProfileFileDTO queryByCertNo(OutptProfileFileDTO outptProfileFileDTO);
+
+    /**
      * @Method update
      * @Desrciption  更新档案
      * @Param
@@ -63,6 +70,14 @@ public interface BaseProfileFileDAO {
      * @Return java.lang.Integer
      **/
     Integer update(OutptProfileFileDTO outptProfileFileDTO);
+
+
+    /**
+     * 根据证件号更新档案信息
+     * @param param
+     * @return
+     */
+    Integer updateByCertNo(OutptProfileFileDTO param);
 
     /**
      * @Menthod: queryPage

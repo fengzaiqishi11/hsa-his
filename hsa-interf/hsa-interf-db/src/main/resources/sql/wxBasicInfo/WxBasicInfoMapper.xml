@@ -1546,4 +1546,51 @@
             AND date( queue_date ) BETWEEN date(now()) and date(now())+7 order by date( queue_date )
     </select>
 
+    <!--根据profileId和时间段查询门诊和住院的就诊id集合-->
+    <select id="queryVisitIdsByProfileId" resultType="java.lang.String">
+        select ov.id as id from outpt_visit ov
+        where ov.is_visit ='1' and  ov.hosp_code = #{hospCode} and ov.profile_id = #{profileId}
+        <if test="startDate != null and startDate != ''">
+            and date_format(ov.visit_time, '%Y-%m-%d') &gt;= date_format(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(ov.visit_time, '%Y-%m-%d') &lt;= date_format(#{endDate}, '%Y-%m-%d')
+        </if>
+        union
+        select iv.id as id from inpt_visit iv
+        where iv.hosp_code = #{hospCode} and iv.profile_id = #{profileId}
+        <if test="startDate != null and startDate != ''">
+            and date_format(iv.crte_time, '%Y-%m-%d') &gt;= date_format(#{startDate}, '%Y-%m-%d')
+        </if>
+        <if test="endDate != null and endDate != ''">
+            and date_format(iv.crte_time, '%Y-%m-%d') &lt;= date_format(#{endDate}, '%Y-%m-%d')
+        </if>
+    </select>
+
+    <!--查询该档案id下的所有检验检查报告记录-->
+    <select id="queryReportListByVisitIds" resultType="cn.hsa.module.medic.apply.dto.MedicalApplyDTO">
+        select
+            ma.id as applyId,
+            ma.apply_no as applyNo,
+            ma.bar_code as barCode,
+            ma.dept_id as deptId,
+            ma.dept_name as deptName,
+            ma.report_time as reportTime,
+            case ma.is_inpt when '1' then iv.name else ov.name end as name,
+            ma.visit_id as visitNo,
+            ma.content as itemName,
+            ma.type_code as typeCode,
+            ma.crte_name as reporter
+        from medic_apply ma
+        left join outpt_visit ov on ov.id = ma.visit_id and ov.hosp_code = #{hospCode}
+        left join inpt_visit iv on iv.id = ma.visit_id and iv.hosp_code = #{hospCode}
+        where ma.hosp_code = #{hospCode}
+        <if test="visitIds != null and visitIds.size > 0">
+            and ma.visit_id in
+            <foreach collection="visitIds" item="visitId" open="(" separator="," close=")">
+                #{visitId}
+            </foreach>
+        </if>
+    </select>
+
 </mapper>

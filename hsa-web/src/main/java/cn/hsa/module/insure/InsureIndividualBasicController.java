@@ -127,7 +127,13 @@ public class InsureIndividualBasicController extends BaseController {
         String aab001 = String.valueOf(param.get("aab001"));
         String patientCode = String.valueOf(param.get("patientCode"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
-        String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
+        String nationECResult;//电子凭证返回参数
+        if (param.get("nationECResult") instanceof Map) {
+            nationECResult = JSON.toJSONString(param.get("nationECResult"));
+        }else {
+            nationECResult = (String) param.get("nationECResult");
+        }
+//        String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
         if (StringUtils.isEmpty(patientCode)) {
             throw new AppException("请选择病人类型");
         }

@@ -290,8 +290,8 @@
         and b.is_settle = '0'
         and b.is_cancel = '0'
         and b.is_submit = '1'
-        <if test="data.keyword != null and data.keyword != ''">
-            and (a.visit_no = #{data.keyword} or a.name like concat('%', #{data.keyword}, '%') or a.cert_no = #{data.keyword} or a.register_no = #{data.keyword})
+        <if test="data.profileId != null and data.profileId != ''">
+            and a.profile_id = #{profileId}
         </if>
         <if test="data.startDate != null and data.startDate != ''">
             and DATE_FORMAT(a.visit_time, '%Y-%m-%d') >= DATE_FORMAT(#{data.startDate}, '%Y-%m-%d')
@@ -728,6 +728,7 @@
     <!--根据医技申请id、申请单号查询医技结果-->
     <select id="queryMedicApplyResult" parameterType="java.util.Map" resultType="cn.hsa.module.medic.result.dto.MedicalResultDTO">
         select
+        c.profile_id as profileId,
         c.name,
         c.age,
         c.age_unit_code,

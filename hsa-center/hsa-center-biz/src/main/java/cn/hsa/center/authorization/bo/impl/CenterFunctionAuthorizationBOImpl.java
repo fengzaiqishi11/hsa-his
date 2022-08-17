@@ -302,7 +302,10 @@ public class CenterFunctionAuthorizationBOImpl implements CenterFunctionAuthoriz
 
         centerFunctionAuthorizationDto.setAuditStatus("0");
         centerFunctionAuthorizationDto.setIsValid("1");
-        centerFunctionAuthorizationDto.setRemark(centerFunctionAuthorizationDto.getName()+"授权信息");
+        if(StringUtils.isEmpty(centerFunctionAuthorizationDto.getRemark())){
+            centerFunctionAuthorizationDto.setRemark(centerFunctionAuthorizationDto.getName()+"授权信息");
+        }
+
         centerFunctionAuthorizationDto.setAuditTime(new Date());
         centerFunctionAuthorizationDto.setCrteTime(new Date());
         // 加密开始时间

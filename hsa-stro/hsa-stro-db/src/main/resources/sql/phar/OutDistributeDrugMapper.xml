@@ -140,7 +140,11 @@
         select d.name from base_disease d join outpt_diagnose e on d.id=e.disease_id where e.visit_id = b.id and d.hosp_code=b.hosp_code and e.hosp_code=b.hosp_code limit 1
         ) as diseaseName,
         b.patient_code patientCode,b.insure_no insureNo,b.out_profile outProfile,b.phone phone
-        from phar_out_distribute a join outpt_visit b on a.visit_id=b.id
+        from phar_out_distribute a
+        join outpt_visit b on a.visit_id=b.id
+            <if test="patientCode != null">
+             and b.patient_code = #{patientCode}
+            </if>
         join outpt_settle c on a.settle_id=c.id
         where 1=1 and a.hosp_code=#{hospCode} and b.hosp_code=#{hospCode} and c.hosp_code=#{hospCode} and a.status_code='0'
         <if test="pharId!=null and pharId!=''">
@@ -152,8 +156,11 @@
         <if test="assignUserId!=null and assignUserId!=''">
             and a.assign_user_id=#{assignUserId}
         </if>
-        <if test="queryDate!=null and queryDate!=''">
-            and DATE_FORMAT(a.dist_time,'%Y-%m-%d') = DATE_FORMAT(#{queryDate},'%Y-%m-%d')
+        <if test="startDate!=null">
+            and DATE_FORMAT(a.dist_time,'%Y-%m-%d') &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d')
+        </if>
+        <if test="endDate!=null">
+            and DATE_FORMAT(a.dist_time,'%Y-%m-%d') &lt;= DATE_FORMAT(#{endDate},'%Y-%m-%d')
         </if>
         <if test="settleNo!=null and settleNo!=''">
             and ((c.settle_no like CONCAT('%',#{settleNo},'%')) or (b.name like CONCAT('%',#{settleNo},'%')) or (b.visit_no like CONCAT('%',#{settleNo},'%')))

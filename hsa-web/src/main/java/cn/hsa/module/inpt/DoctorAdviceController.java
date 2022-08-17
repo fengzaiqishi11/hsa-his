@@ -177,6 +177,21 @@ public class DoctorAdviceController extends BaseController {
             inptAdviceDTO.setStopDoctorId(sysUserDTO.getId());
             //医生
             inptAdviceDTO.setStopDoctorName(sysUserDTO.getName());
+            Map paramMap = new HashMap();
+            SysUserSystemDTO sysUserSystemDTO = new SysUserSystemDTO();
+            sysUserSystemDTO.setDeptCode(sysUserDTO.getLoginBaseDeptDTO().getCode());
+            sysUserSystemDTO.setSystemCode(sysUserDTO.getSystemCode());
+            sysUserSystemDTO.setHospCode(sysUserDTO.getHospCode());
+            sysUserSystemDTO.setUserCode(sysUserDTO.getCode());
+            paramMap.put("sysUserSystemDTO",sysUserSystemDTO);
+            //医院编码
+            paramMap.put("hospCode", sysUserDTO.getHospCode());
+            //带教医生
+            SysUserDTO sysUserDTO1 = sysUserService_consumer.querySysUserHaveTeachDoctor(paramMap).getData();
+            if(sysUserDTO1 != null){
+                inptAdviceDTO.setStopTeachDoctorId(sysUserDTO1.getId());
+                inptAdviceDTO.setStopTeachDoctorName(sysUserDTO1.getName());
+            }
         }else if("2".equals(inptAdviceDTO.getType())){
             //停嘱核收标志
             inptAdviceDTO.setIsStop(Constants.SF.F);

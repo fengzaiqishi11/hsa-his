@@ -443,5 +443,12 @@ public class InptAdviceDO extends PageDO implements Serializable {
      * 代办人身份证
      */
   private String agentCertNo;
-
+    /**
+     * 停嘱带教医生id
+     */
+  private String stopTeachDoctorId;
+    /**
+     * 停嘱带教医生名称
+     */
+  private String stopTeachDoctorName;
 }

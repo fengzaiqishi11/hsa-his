@@ -140,10 +140,10 @@ public class OperInfoRecordDTO extends OperInfoRecordDO implements Serializable 
     //手术国家码
     private String operNationCode;
     private String operNationName;
-    private Long ansDrEndTime;
-    private Long ansDrStartTime;
-    private Long oprnOprtEndTime;
-    private Long oprnOprtStartTime;
+    private Date ansDrEndTime;
+    private Date ansDrStartTime;
+    private Date oprnOprtEndTime;
+    private Date oprnOprtStartTime;
 
 
 

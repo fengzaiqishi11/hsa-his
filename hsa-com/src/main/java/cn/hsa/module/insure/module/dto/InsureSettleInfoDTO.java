@@ -308,7 +308,7 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String opspDiagCaty; // 门诊慢特病诊断科别
     private BigDecimal nwbAdmWt; // 新生儿入院体重
     private String nwbAdmType;// 新生儿入院类型
-    private BigDecimal nwbBirWt; // 新生儿出生体重
+    private String nwbBirWt; // 新生儿出生体重
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date dscgTime;

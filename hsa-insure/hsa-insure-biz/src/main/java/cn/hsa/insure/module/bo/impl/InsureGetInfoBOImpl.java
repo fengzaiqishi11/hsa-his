@@ -2202,8 +2202,34 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map.put("xiCollect", MapUtils.get(diseaMap, "xiCollect"));
             // 7.结算清单基本信息
             Map<String, Object> setlInfoMap = handerBaseSetlInfo(map, setlinfo);
+            //单病种费用集合
+            List<Map<String, Object>> dbzInfo = new ArrayList<>();
+            //判断是否为单病种住院
+            if(setlInfoMap.get("medType")!= null){
+                Map<String, Object> dbzInfoMap = new HashMap<>();
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+                BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+                BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+                BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+                BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+                for(Map<String, Object> map1:itemInfoMap){
+                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("amt").toString()));
+                    AClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("claaSumfee").toString()));
+                    BClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("clabAmt").toString()));
+                    CClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("fulamtOwnpayAmt").toString()));
+                    otherClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("othAmt").toString()));
+                }
+                dbzInfoMap.put("amt", sumDetItemFeeSumamt);
+                dbzInfoMap.put("claaSumfee", AClassFee);
+                dbzInfoMap.put("clabAmt", BClassFee);
+                dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
+                dbzInfoMap.put("othAmt", otherClassFee);
+                dbzInfoMap.put("medChrgitm", setlInfoMap.get("bka006")+"+"+setlInfoMap.get("bka006Name")+"(按病种收费名称+代码)");
+                dbzInfo.add(dbzInfoMap);
+            }
             // 输血信息
             List<Map<String, Object>> bldInfoListMap = insureGetInfoDAO.selectBldInfo(map);
+            resultDataMap.put("dbzInfo", dbzInfo);
             resultDataMap.put("iteminfo", itemInfoMap);
             resultDataMap.put("bldinfo", bldInfoListMap);
             resultDataMap.put("setlinfo", setlInfoMap);

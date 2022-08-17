@@ -9,7 +9,7 @@
     var socket;
     //判断当前浏览器是否支持websocket
     if(window.WebSocket) {
-        socket = new WebSocket("ws://localhost:7000/msg");
+        socket = new WebSocket("ws://localhost:7000/msg/1290816158941450241/ZTQ5MmFiMDYtYTg2OS00MzM0LTgzNWEtNDY0ZmUyMmI3ZTFh");
         //相当于channelReado, ev 收到服务器端回送的消息
         socket.onmessage = function (ev) {
             var rt = document.getElementById("responseText");

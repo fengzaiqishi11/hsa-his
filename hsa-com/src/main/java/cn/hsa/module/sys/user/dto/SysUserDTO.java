@@ -87,7 +87,7 @@ public class SysUserDTO extends SysUserDO implements Serializable {
      */
     private String insurePrivateInternetAddress;
     /**
-     *  是否属于内网访问
+     *  是否属于内网访问 1表示是内网0表示外网
      */
     private String whetherPrivateInnerAddress;
     /*人员类型*/

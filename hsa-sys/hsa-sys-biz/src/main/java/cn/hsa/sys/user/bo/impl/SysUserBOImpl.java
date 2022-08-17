@@ -134,36 +134,36 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
      * @param byId
      */
     private void fillPrivateInternetAccessInfo(SysUserDTO byId) {
-        // 1.属于内网访问则无需填充多余信息
-        if(Constants.SF.S.equals(byId.getWhetherPrivateInnerAddress())){
-            byId.setWhetherEnableReminderBox(Constants.SF.F);
-            return;
-        }
-       String hospCode = byId.getHospCode();
-        // 2.查询是否显示提示框参数
+        String hospCode = byId.getHospCode();
         SysParameterDTO reminderParameterDTO = sysParameterDao.getParameterByCode(hospCode,whetherEnableReminderBoxParamName);
-        // 未配置则默认不开启提示框
-        if(null == reminderParameterDTO){
+        //开启提示
+        if(reminderParameterDTO != null && Constants.SF.S.equals(reminderParameterDTO.getValue()) ){
+            //不等于专网
+            if(Constants.SF.F.equals(byId.getWhetherPrivateInnerAddress())){
+                // 3.查询配置的系统参数医保专网地址
+                SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,insurePrivateInternetAddressParamName);
+                String insurePrivateInternetAddress = "http://XXX.XXX.XXX.XXX:xxxx/his-web";
+                if(null != insureAddressParameterDTO){
+                    insurePrivateInternetAddress = insureAddressParameterDTO.getValue();
+                }
+                String url = insurePrivateInternetAddress+"/?hospCode=";
+                String rsaKey = "";
+                try {
+                    rsaKey = RSAUtil.encryptByPublicKey(hospCode.getBytes(), rsaPublicKey);
+                    rsaKey = URLEncoder.encode(rsaKey,"UTF-8");
+                } catch (Exception e) {
+                    throw new AppException("获取医院地址失败,原因："+e.getMessage());
+                }
+                url = url + rsaKey;
+                byId.setInsurePrivateInternetAddress(url);
+                byId.setWhetherEnableReminderBox(Constants.SF.S);
+            }else{
+                byId.setWhetherEnableReminderBox(Constants.SF.F);
+            }
+        }
+        else{
             byId.setWhetherEnableReminderBox(Constants.SF.F);
-            return;
         }
-        byId.setWhetherEnableReminderBox(reminderParameterDTO.getValue());
-        // 3.查询配置的系统参数医保专网地址
-        SysParameterDTO insureAddressParameterDTO = sysParameterDao.getParameterByCode(hospCode,insurePrivateInternetAddressParamName);
-        if(null == insureAddressParameterDTO){
-            byId.setInsurePrivateInternetAddress("请配置医保专网访问ip地址系统参数：【INSURE_PRIVATE_ADDRESS】的值");
-            return;
-        }
-        String url = "http://"+ insureAddressParameterDTO.getValue()+"/his-web/?hospCode=";
-        String rsaKey = "";
-        try {
-            rsaKey = RSAUtil.encryptByPublicKey(hospCode.getBytes(), rsaPublicKey);
-            rsaKey = URLEncoder.encode(rsaKey);
-        } catch (Exception e) {
-            throw new AppException("获取医院地址失败,原因："+e.getMessage());
-        }
-        url = url + rsaKey;
-        byId.setInsurePrivateInternetAddress(url);
     }
 
     /**

@@ -2,8 +2,11 @@ package cn.hsa;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.session.FlushMode;
@@ -36,5 +39,21 @@ public class HsaWebApplication {
      **/
     public static void main(String[] args) {
         SpringApplication.run(HsaWebApplication.class, args);
+    }
+
+    /**
+     *  解决请求参数中带有特殊字符的问题，
+     *  参考: <a href="http://www.codebaoku.com/it-java/it-java-237691.html">springboot中请求带有特殊字符解决办法</a>
+     * @return
+     */
+    @Bean
+    public TomcatServletWebServerFactory tomcatServletWebServerFactory (){
+        // 修改内置的 tomcat 容器配置
+        TomcatServletWebServerFactory tomcatServlet = new TomcatServletWebServerFactory();
+        tomcatServlet.addConnectorCustomizers(
+                (TomcatConnectorCustomizer) connector ->
+                        connector.setProperty("relaxedQueryChars", "[]{}"));
+
+        return tomcatServlet ;
     }
 }

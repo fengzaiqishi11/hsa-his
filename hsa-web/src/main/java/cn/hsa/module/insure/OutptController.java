@@ -71,7 +71,13 @@ public class OutptController extends BaseController {
         String sign = MapUtils.get(param,"sign");
         String aab001 = String.valueOf(param.get("aab001"));
         String psnCertType = String.valueOf(param.get("psnCertType"));
-        String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
+        String nationECResult;//电子凭证返回参数
+        if (param.get("nationECResult") instanceof Map) {
+            nationECResult = JSON.toJSONString(param.get("nationECResult"));
+        }else {
+            nationECResult = (String) param.get("nationECResult");
+        }
+//        String nationECResult = (String) param.get("nationECResult");//电子凭证返回参数
         InsureIndividualBasicDTO insureIndividualBasicDTO = new InsureIndividualBasicDTO();
         insureIndividualBasicDTO.setHospCode(sysUserDTO.getHospCode());
         insureIndividualBasicDTO.setCardIden(cardIden);

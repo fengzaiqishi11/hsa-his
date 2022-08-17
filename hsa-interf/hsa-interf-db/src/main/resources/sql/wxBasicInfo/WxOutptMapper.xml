@@ -728,6 +728,7 @@
     <!--根据医技申请id、申请单号查询医技结果-->
     <select id="queryMedicApplyResult" parameterType="java.util.Map" resultType="cn.hsa.module.medic.result.dto.MedicalResultDTO">
         select
+        c.profile_id as profileId,
         c.name,
         c.age,
         c.age_unit_code,

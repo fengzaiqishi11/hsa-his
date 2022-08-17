@@ -1757,6 +1757,9 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
                 case "1314":
                     insert_1314(dataResultMap, map);
                     break;
+                case "1315":
+                    insert_1315(dataResultMap, map);
+                    break;
             }
         }
         return resultMap;

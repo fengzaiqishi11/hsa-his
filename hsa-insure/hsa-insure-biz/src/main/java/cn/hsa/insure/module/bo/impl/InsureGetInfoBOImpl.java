@@ -4072,6 +4072,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (!wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd)
                 && (ObjectUtil.isEmpty(tcmAdvPayFlag) || Constants.SF.F.equals(tcmAdvPayFlag))) {
             Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("showTip","1");
             resultMap.put("message","中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
                     "但西医主要诊断"+wmMainName+wmMainCode+"不符合，并且医保支付方式未选择中医优势病种结算，该中医诊断映射的西医诊断有【"+builder.toString()+
                     "】，请选择是否按中医优势病种结算支付方式进行保存？如果选择是，请修改西医诊断为对应的诊断，并修改医保支付方式为中医优势病种结算，再进行保存");
@@ -4080,6 +4081,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //如果满足条件但没有选择中医优势病种支付方式的，抛出提示信息
         if (wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd) && ObjectUtil.isEmpty(tcmAdvPayFlag)) {
                 Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("showTip","1");
                 resultMap.put("message","该结算清单符合中医优势病种结算条件，是否需要按中医优势病种结算支付方式进行保存？" +
                         "如果选择是，请修改医保支付方式为中医优势病种结算，再进行保存");
                 return resultMap;

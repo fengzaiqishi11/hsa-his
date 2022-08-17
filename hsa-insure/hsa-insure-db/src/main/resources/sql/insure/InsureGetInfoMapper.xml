@@ -1751,7 +1751,7 @@
           and insure_settle_id = #{insureSettleId}
     </select>
     <select id="selectInsuplcAdmdvs" resultType="java.util.Map">
-        select admdvs_code admdvCode, admdvs_name as admdvsName
+        select admdvs_code admdvCode, admdvs_name as admdvsName, up_admdvs_code as upAdmdvsCode
         from insure_admdvs
         where hosp_code = #{hospCode}
           and admdvs_code = #{insuplcAdmdvs}
@@ -2167,5 +2167,16 @@
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}
     </update>
+
+    <select id="selectOperInfoAdvice" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+               idm.oper_nation_code          as oprnOprtName,
+               idm.oper_nation_name        as oprnOprtCode
+        from oper_info_record moi
+                 left join base_advice idm on moi.oper_disease_id = idm.id
+            and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+          and moi.hosp_code = #{hospCode}
+    </select>
 
 </mapper>

@@ -1756,6 +1756,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (!MapUtils.isEmpty(admdvsMap)) {
             setlinfo.put("insuplcName", MapUtils.get(admdvsMap, "admdvsName")); // 参保地 *******
         }
+        //参保地显示市加县
+        map.put("insuplcAdmdvs", MapUtils.get(admdvsMap, "upAdmdvsCode"));
+        Map<String, Object> upAdmdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
+        if (!MapUtils.isEmpty(upAdmdvsMap)) {
+            setlinfo.put("insuplcName", (String)MapUtils.get(upAdmdvsMap, "admdvsName") + setlinfo.get("insuplcName")); // 参保地 *******
+        }
         setlinfo.put("insuplc", insuplcAdmdvs); // 参保地 *******
         setlinfo.put("spPsnType", infoDTO.getSpPsnType()); // 特殊人员类型
         setlinfo.put("nwbAdmType", infoDTO.getNwbAdmType()); // 新生儿入院类型
@@ -1947,6 +1953,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Object objNwbBirWt = MapUtils.get(setlInfoMap, "nwbBirWt"); // 新生儿出生体重
         if (ObjectUtil.isEmpty(objNwbBirWt)){
           setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
+        }
+        //校验新生儿出生体重
+        if (ObjectUtil.isNotEmpty(objNwbBirWt)){
+            String nwbBirWt = String.valueOf(objNwbBirWt) ;
+            for(int i = 0;i < nwbBirWt.length();i++){
+                if(!(Integer.valueOf(nwbBirWt.charAt(i)) >= Integer.valueOf('0') && Integer.valueOf(nwbBirWt.charAt(i)) <= Integer.valueOf('9'))
+                        && Integer.valueOf(nwbBirWt.charAt(i)) != Integer.valueOf(',') ){
+                    throw new AppException("新生儿出生体重填写格式不正确");
+                }
+            }
         }
         /*if (objNwbBirWt instanceof String || objNwbBirWt == null) {
             setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
@@ -2474,6 +2490,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (!MapUtils.isEmpty(admdvsMap)) {
             setlinfo.put("insuplcName", MapUtils.get(admdvsMap, "admdvsName")); // 参保地 *******
         }
+        //参保地显示市加县
+        map.put("insuplcAdmdvs", MapUtils.get(admdvsMap, "upAdmdvsCode"));
+        Map<String, Object> upAdmdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
+        if (!MapUtils.isEmpty(upAdmdvsMap)) {
+            setlinfo.put("insuplcName", (String)MapUtils.get(upAdmdvsMap, "admdvsName") + setlinfo.get("insuplcName")); // 参保地 *******
+        }
         setlinfo.put("insuplc", insureIndividualVisitDTO.getInsuplcAdmdvs()); // 参保地 *******
         map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
 //        Map<String, Object> data1 = insureUnifiedPayReversalTradeService.checkOneSettle(map, insureIndividualVisitDTO).getData();
@@ -2582,13 +2604,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_name",null)); // 主诊医生姓名 *******
             setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_code",null)); // 主诊医生代码 *******
         }
-        Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
+        Object setlBegnDate = MapUtils.get(setlinfoMap, "begndate");
         if (ObjectUtil.isEmpty(setlBegnDate)) {
             throw new AppException("结算开始时间为空");
         } else {
-            setlinfo.put("setlBegnDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap, "setlBegnDate")), DateUtils.Y_M_D)); //结算开始日期 *******
+            setlinfo.put("setlBegnDate", DateUtils.parse((String) setlBegnDate, DateUtils.Y_M_D)); //结算开始日期 *******
         }
-        Object setlEndDate = MapUtils.get(setlinfoMap, "setl_time");
+        Object setlEndDate = MapUtils.get(setlinfoMap, "enddate");
         if (ObjectUtil.isEmpty(setlEndDate)) {
             throw new AppException("结算结束时间为空");
         } else {
@@ -3020,26 +3042,54 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureGetInfoDAO.selectInsureIndividual(map);
         List<Map<String, Object>> mapList = new ArrayList<>();
         Map<String, Object> diagNoseMap;
-        if (insureIndividualVisitDTO != null) {
-            diagNoseMap = new HashMap<>();
-            diagNoseMap.put("id", SnowflakeUtils.getId());
-            diagNoseMap.put("hospCode", hospCode);
-            diagNoseMap.put("visitId", visitId);
-            diagNoseMap.put("medicalRegNo", medicalRegNo);
-            diagNoseMap.put("insureSettleId", insureSettleId);
-            if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
-                diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
-            } else {
-                diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+        //查询门特手术信息
+        List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
+        infoRecordDTOList = insureGetInfoDAO.selectOperInfoAdvice(map);
+        if (insureIndividualVisitDTO != null && !ListUtils.isEmpty(infoRecordDTOList)) {
+            for(OperInfoRecordDTO operInfoRecordDTO:infoRecordDTOList){
+                diagNoseMap = new HashMap<>();
+                diagNoseMap.put("id", SnowflakeUtils.getId());
+                diagNoseMap.put("hospCode", hospCode);
+                diagNoseMap.put("visitId", visitId);
+                diagNoseMap.put("medicalRegNo", medicalRegNo);
+                diagNoseMap.put("insureSettleId", insureSettleId);
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
+                } else {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+                }
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
+                } else {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+                }
+                diagNoseMap.put("oprnOprtName",operInfoRecordDTO.getOprnOprtName());
+                diagNoseMap.put("oprnOprtCode", operInfoRecordDTO.getOprnOprtCode());
+                mapList.add(diagNoseMap);
             }
-            if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
-                diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
-            } else {
-                diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+        }
+        if(ListUtils.isEmpty(mapList)){
+            if (insureIndividualVisitDTO != null) {
+                diagNoseMap = new HashMap<>();
+                diagNoseMap.put("id", SnowflakeUtils.getId());
+                diagNoseMap.put("hospCode", hospCode);
+                diagNoseMap.put("visitId", visitId);
+                diagNoseMap.put("medicalRegNo", medicalRegNo);
+                diagNoseMap.put("insureSettleId", insureSettleId);
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
+                } else {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+                }
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
+                } else {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+                }
+                diagNoseMap.put("oprnOprtName", "");
+                diagNoseMap.put("oprnOprtCode", "");
+                mapList.add(diagNoseMap);
             }
-            diagNoseMap.put("oprnOprtName", "");
-            diagNoseMap.put("oprnOprtCode", "");
-            mapList.add(diagNoseMap);
         }
         return mapList;
     }

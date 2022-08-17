@@ -291,7 +291,7 @@
         and b.is_cancel = '0'
         and b.is_submit = '1'
         <if test="data.profileId != null and data.profileId != ''">
-            and a.profile_id = #{profileId}
+            and a.profile_id = #{data.profileId}
         </if>
         <if test="data.startDate != null and data.startDate != ''">
             and DATE_FORMAT(a.visit_time, '%Y-%m-%d') >= DATE_FORMAT(#{data.startDate}, '%Y-%m-%d')
@@ -312,7 +312,7 @@
     <select id="queryPrescribeList" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO">
         SELECT
         ROUND(SUM(a.reality_price),  2) as order_price,
-        ROUND(c.zfje, 2) as zfje,
+        0 as  zfje,
         b.id,
         b.visit_id,
         b.order_no,
@@ -329,22 +329,6 @@
         FROM
         outpt_cost a
         LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
-        LEFT JOIN (
-        SELECT
-        t1.hosp_code,
-        t1.visit_id,
-        SUM(t1.reality_price) as zfje
-        FROM
-        outpt_cost t1
-        LEFT JOIN outpt_prescribe t2 ON t1.hosp_code = t2.hosp_code AND t1.op_id = t2.id
-        WHERE t1.hosp_code = #{hospCode}
-        and t2.is_settle = '0'
-        and t2.is_submit = '1'
-        <if test="data.visitId != null and data.visitId != ''">
-            and t1.visit_id = #{data.visitId}
-        </if>
-        GROUP BY t1.visit_id
-        ) c on a.hosp_code = c.hosp_code and a.visit_id = c.visit_id
         WHERE a.hosp_code = #{hospCode}
         and b.is_settle = '0'
         and b.is_submit = '1'
@@ -1160,7 +1144,8 @@
             c.id as deptId,
             c.name as deptName,
             d.id as doctorId,
-            d.name as doctorName
+            d.name as doctorName,
+            b.queue_date as queueDate
         FROM
             outpt_doctor_queue a,
             outpt_classes_queue b,

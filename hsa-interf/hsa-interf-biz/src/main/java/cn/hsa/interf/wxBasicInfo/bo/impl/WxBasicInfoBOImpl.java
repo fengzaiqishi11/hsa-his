@@ -1823,6 +1823,15 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         // 查询visitId查询已提交、未结算的处方单
         List<OutptPrescribeDTO> list = wxOutptDAO.queryPrescribeList(map);
+        BigDecimal totalPrice = new BigDecimal(0);
+        if(!ListUtils.isEmpty(list)){
+            totalPrice = list.stream().map(OutptPrescribeDTO::getOrderPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal finalTotalPrice = totalPrice;
+            list.stream().forEach(outptPrescribeDTO ->{
+                outptPrescribeDTO.setZfje(finalTotalPrice);
+            });
+        }
+
 
         // 返参加密
         log.debug("微信小程序【待缴费的处方信息】返参加密前：" + JSON.toJSONString(list));
@@ -2358,15 +2367,13 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         // 根据档案id查询就诊人是否在院状态
         data.put("hospCode", hospCode);
+        data.put("statusCode","2");
         List<InptVisitDTO> result = wxInptDAO.queryInptVisitRecord(data);
-        if (!ListUtils.isEmpty(result)){
-            return  WrapperResponse.success(null);
-        }
         // 返参加密
-        log.debug("微信小程序【住院病人信息查询】返参加密前：" + JSON.toJSONString(result.get(0)));
+        log.debug("微信小程序【住院病人信息查询】返参加密前：" + JSON.toJSONString(result));
         String res = null;
         try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result.get(0)));
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result));
             log.debug("微信小程序【住院病人信息查询】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【住院病人信息查询】返参加密错误，请联系管理员！" + e.getMessage());

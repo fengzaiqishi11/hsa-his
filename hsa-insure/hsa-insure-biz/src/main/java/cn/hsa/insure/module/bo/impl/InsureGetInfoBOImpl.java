@@ -839,6 +839,31 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         // 基金支付信息
         List<Map<String, Object>> payinfoList = insureGetInfoDAO.selectPayinfoForMap(map);
+        //单病种费用集合
+        List<Map<String, Object>> dbzInfo = new ArrayList<>();
+        //判断是否为单病种住院
+        if(setlinfo.get("medType")!= null){
+            Map<String, Object> dbzInfoMap = new HashMap<>();
+            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+            for(Map<String, Object> map1:itemInfoList){
+                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("amt").toString()));
+                AClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("claaSumfee").toString()));
+                BClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("clabAmt").toString()));
+                CClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("fulamtOwnpayAmt").toString()));
+                otherClassFee = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("othAmt").toString()));
+            }
+            dbzInfoMap.put("amt", sumDetItemFeeSumamt);
+            dbzInfoMap.put("claaSumfee", AClassFee);
+            dbzInfoMap.put("clabAmt", BClassFee);
+            dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
+            dbzInfoMap.put("othAmt", otherClassFee);
+            dbzInfoMap.put("medChrgitm", setlinfo.get("bka006")+"+"+setlinfo.get("bka006Name")+"(按病种收费名称+代码)");
+            dbzInfo.add(dbzInfoMap);
+        }
 
         // 输血信息节点
         List<Map<String, Object>> bldinfoList = insureGetInfoDAO.selectBldInfoForMap(map);
@@ -858,6 +883,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         BigDecimal bigDecimal = BigDecimalUtils.add(acctPay, cashPayamt);
         BigDecimal psnSelfpay = BigDecimalUtils.subtract(bigDecimal, psnOwnpay);
         setlinfo.put("psnSelfpay", psnSelfpay); // 个人自付
+        resultDataMap.put("dbzInfo", dbzInfo);
         resultDataMap.put("setlinfo", setlinfo);
         resultDataMap.put("payinfo", payinfoList);
         resultDataMap.put("opspdiseinfo", opspdiseinfoList);
@@ -1664,28 +1690,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("fixmedinsName", infoDTO.getFixmedinsName()); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", infoDTO.getFixmedinsCode()); // 定点医药机构编号
         setlinfo.put("hiSetlLv", infoDTO.getHiSetlLv());//医保结算等级
-        //如果之前没保存从参数获取医保结算等级
+        //如果之前没保存从字典获取医保结算等级
         if(StringUtils.isEmpty(infoDTO.getHiSetlLv())){
-            SysParameterDTO data = insureGetInfoDAO.getParameterByCode(MapUtils.get(map, "hospCode"),"SETTLELEVEL");
-            if (data == null) {
-                throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
-            }
-            String value = data.getValue();
             String settleLv = "";
-            Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
-            for (String key : stringObjectMap.keySet()) {
-                if ("settleLv".equals(key)) { //
-                    settleLv = MapUtils.get(stringObjectMap, key);
-                }
-            }
             Map dictMap = new HashMap(2);
             dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
             dictMap.put("insureRegCode", infoDTO.getInsuplc());
             dictMap.put("code", "HI_SETL_LV");
             Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
-            for(String key:dictMap1.keySet()){
-                if(dictMap1.get(key).equals(settleLv)){
-                    settleLv = key;
+            if(dictMap != null ){
+                for (Map.Entry<String,String> entry : dictMap1.entrySet()) {
+                    settleLv = entry.getKey();
+                    if (settleLv != null) {
+                        break;
+                    }
                 }
             }
             setlinfo.put("hiSetlLv", settleLv);//医保结算等级
@@ -2360,8 +2378,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if ("setlTitle".equals(key)) {
                 setlTitle = MapUtils.get(stringObjectMap, key);
             }
-            if ("settleLv".equals(key)) { //
-                settleLv = MapUtils.get(stringObjectMap, key);
+//            if ("settleLv".equals(key)) { //
+//                settleLv = MapUtils.get(stringObjectMap, key);
+//            }
+        }
+        //医保结算等级取字典值
+        Map dictMap = new HashMap(2);
+        dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        dictMap.put("insureRegCode", insureIndividualVisitDTO.getInsuplcAdmdvs());
+        dictMap.put("code", "HI_SETL_LV");
+        Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
+        if(dictMap != null ){
+            for (Map.Entry<String,String> entry : dictMap1.entrySet()) {
+                settleLv = entry.getKey();
+                if (settleLv != null) {
+                    break;
+                }
             }
         }
         setlinfo.put("setlTitle", setlTitle);//清单抬头

@@ -137,7 +137,7 @@ public interface InsureGetInfoBO {
      * @Date 2021/11/3 14:54
      * @Return
      */
-    Boolean saveInsureSettleInfo(Map<String, Object> map);
+    Map saveInsureSettleInfo(Map<String, Object> map);
 
     /**
      * @param map

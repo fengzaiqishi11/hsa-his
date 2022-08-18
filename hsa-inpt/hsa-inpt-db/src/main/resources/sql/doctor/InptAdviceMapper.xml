@@ -4,6 +4,8 @@
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO" id="InptAdviceMap">
         <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="stopTeachDoctorName" column="stop_teach_doctor_name" jdbcType="VARCHAR"/>
+        <result property="stopTeachDoctorId" column="stop_teach_doctor_id" jdbcType="VARCHAR"/>
         <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
         <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
         <result property="babyId" column="baby_id" jdbcType="VARCHAR"/>
@@ -298,7 +300,7 @@
     <!--查询住院就诊医嘱信息-->
     <select id="queryInptAdviceVisitID" resultMap="InptAdviceMap" parameterType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select
-        a.id, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
+        a.id,a.stop_teach_doctor_id,a.stop_teach_doctor_name, a.hosp_code, a.visit_id, a.baby_id, a.order_no, a.iat_id, a.iatd_group_no, a.iatd_group_seq_no, a.iatd_id, a.in_dept_id, a.exec_dept_id, a.dept_id, a.group_no, a.group_seq_no, a.type_code,
         a.sign_code, a.start_exec_num, a.end_exec_num, a.bfc_id, a.item_code, a.item_id, a.item_name, a.content, a.spec, a.prep_code, a.dosage, a.dosage_unit_code, a.usage_code, a.rate_id,
         a.speed_code, a.num, a.unit_code, a.price, a.total_price, a.total_num, a.total_num_unit_code, a.herb_num, a.use_days, a.use_code,
         a.is_skin, a.is_positive, a.herb_note_code, a.phar_id, a.remark, a.plan_stop_time, a.technology_no, a.herb_use_code, a.is_give,
@@ -518,7 +520,9 @@
             stop_doctor_id = #{stopDoctorId},
             stop_doctor_name = #{stopDoctorName},
             end_exec_num = #{endExecNum},
-            stop_time = #{stopTime}
+            stop_time = #{stopTime},
+            stop_teach_doctor_id = #{stopTeachDoctorId},
+            stop_teach_doctor_name = #{stopTeachDoctorName}
         where hosp_code = #{hospCode}
         and id in
          <foreach collection="iatIdList" item="item" open="(" separator="," close=")">

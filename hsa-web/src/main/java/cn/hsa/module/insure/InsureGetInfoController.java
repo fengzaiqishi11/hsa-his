@@ -352,6 +352,21 @@ public class InsureGetInfoController extends BaseController {
         return insureReadCardService_consumer.updateReadIdCard(map);
     }
 
+    /**
+     * @Method updateReadIdCard
+     * @Desrciption 查询医保区划
+     * @Param map
+     * @Author liuhuiming
+     * @Date   2022-08-11 10:11
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<>
+     **/
+    @GetMapping("/queryAdmdvs")
+    public WrapperResponse<List<Map<String,Object>>> queryAdmdvs(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.queryAdmdvs(map);
+    }
+
 
 
 

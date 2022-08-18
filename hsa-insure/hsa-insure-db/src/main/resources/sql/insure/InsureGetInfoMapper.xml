@@ -651,7 +651,8 @@
                                      hsorg_opter, medins_fill_dept, medins_fill_psn,
                                      crte_id, crte_name, crte_time, zr_nurse_name, zr_nurse_code, mdtrt_id,
                                      opt_tcm_dise_code,
-                                     opt_wm_dise_code)
+                                     opt_wm_dise_code,
+                                     province, city, county, detail_address, con_province, con_city, con_county, con_detail_address)
         values (#{id}, #{hospCode}, #{visitId}, #{insureSettleId}, #{settleNo},
                 #{fixmedinsName}, #{fixmedinsCode}, #{hiSetlLv},
                 #{hiNo}, #{medcasno}, #{dclaTime}, #{psnName}, #{gend},
@@ -667,7 +668,8 @@
                 #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEndDate}, #{psnSelfpay},
                 #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept},
                 #{medinsFillPsn}, #{crteId}, #{crteName}, #{crteTime}, #{zrNurseName}, #{zrNurseCode}, #{mdtrtId},
-                #{otpTcmDiseCode}, #{otpWmDiseCode})
+                #{otpTcmDiseCode}, #{otpWmDiseCode},
+                #{province}, #{city}, #{county}, #{detailAddress}, #{conProvince}, #{conCity}, #{conCounty}, #{conDetailAddress})
     </insert>
     <insert id="insertDisease">
         insert into insure_diseinfo(id, hosp_code, visit_id, medical_reg_no, insure_settle_id, diag_type,
@@ -1503,7 +1505,8 @@
                chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay,
                acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn,
                crte_id, crte_name, crte_time, setl_list_id, zr_nurse_name, zr_nurse_code,
-               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code
+               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code,
+               province, city, county, detail_address, con_province, con_city, con_county, con_detail_address
         from insure_setl_info
         WHERE visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -1751,7 +1754,7 @@
           and insure_settle_id = #{insureSettleId}
     </select>
     <select id="selectInsuplcAdmdvs" resultType="java.util.Map">
-        select admdvs_code admdvCode, admdvs_name as admdvsName, up_admdvs_code as upAdmdvsCode
+        select admdvs_code admdvCode, admdvs_name as admdvsName
         from insure_admdvs
         where hosp_code = #{hospCode}
           and admdvs_code = #{insuplcAdmdvs}
@@ -2177,6 +2180,19 @@
             and idm.hosp_code = moi.hosp_code
         where moi.visit_id = #{visitId}
           and moi.hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryAdmdvs" resultType="java.util.Map">
+        select admdvs_code as admdvsCode, admdvs_name as admdvsName
+        from insure_admdvs
+        <where>
+            <if test="upAdmdvsCode !=null and upAdmdvsCode != ''">
+                and up_admdvs_code = #{upAdmdvsCode}
+            </if>
+            <if test="admdvsCode !=null and admdvsCode != ''">
+                and admdvs_code like concat('%',#{admdvsCode}) and admdvs_code != '100000'
+            </if>
+        </where>
     </select>
 
 </mapper>

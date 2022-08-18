@@ -347,4 +347,44 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
     private String out_flag; //异地标志
     private String psn_no; //人员编号
 
+    /**
+     * 现住址-省
+     */
+    private String province;
+
+    /**
+     * 现住址-市
+     */
+    private String city;
+
+    /**
+     * 现住址-县
+     */
+    private String county;
+
+    /**
+     * 现住址-详细地址
+     */
+    private String detailAddress;
+
+    /**
+     * 联系人地址-省
+     */
+    private String conProvince;
+
+    /**
+     * 联系人地址-市
+     */
+    private String conCity;
+
+    /**
+     * 联系人地址-县
+     */
+    private String conCounty;
+
+    /**
+     * 联系人地址-详细地址
+     */
+    private String conDetailAddress;
+
 }

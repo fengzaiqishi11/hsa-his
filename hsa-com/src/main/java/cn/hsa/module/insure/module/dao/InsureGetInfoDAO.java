@@ -898,4 +898,15 @@ public interface InsureGetInfoDAO {
      * @Return
      **/
     List<OperInfoRecordDTO> selectOperInfoAdvice(Map<String, Object> map);
+
+    /**
+     * @Method updateInsureGetInfo
+     * @Desrciption  查询医保区划
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 20:54
+     * @Return
+     **/
+    List<Map<String, Object>> queryAdmdvs(Map<String, Object> map);
 }

@@ -59,11 +59,14 @@ public class SysUserController extends BaseController {
     @GetMapping("/getById")
     public WrapperResponse<SysUserDTO> getById(SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTOSession = getSession(req, res);
-        String whetherPrivateInnerAddress = req.getHeader("Internet-Flag");
-        logger.error("==-==request.getHeader('Internet-Flag')= {}(String)",whetherPrivateInnerAddress);
+        // 是否互联网访问 "1" 代表是互联网访问，"0"代表不是
+        String whetherInternetAddress = req.getHeader("Internet-Flag");
+        logger.error("==-==request.getHeader('Internet-Flag')= {}(String)",whetherInternetAddress);
         logger.error("==-==request.getIp= {}",ServletUtils.getRequestIp());
         logger.error("==-==request.getHeader('Host')= {}",req.getHeader("Host"));
-        sysUserDTO.setWhetherPrivateInnerAddress(whetherPrivateInnerAddress);
+        // 如果没有该请求头,默认是专网
+        whetherInternetAddress = whetherInternetAddress == null ? Constants.SF.F:whetherInternetAddress;
+        sysUserDTO.setWhetherPrivateInnerAddress(Constants.SF.F.equals(whetherInternetAddress)?Constants.SF.S: Constants.SF.F);
         sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
         //封装参数
         Map map = new HashMap();

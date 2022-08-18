@@ -76,7 +76,7 @@ public class InsureGetInfoController extends BaseController {
      * @Return 
     **/
     @PostMapping("/saveInsureSettleInfo")
-    public WrapperResponse<Boolean> saveInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<Map> saveInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("hospName",sysUserDTO.getHospName());

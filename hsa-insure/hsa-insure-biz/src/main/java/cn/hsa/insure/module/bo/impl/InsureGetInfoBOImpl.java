@@ -10,6 +10,7 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.ResultBean;
 import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
@@ -112,6 +113,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
     @Resource
     private InsureDictService insureDictService_consumer;
+
+    private static final String hiPaymtd_tcm = "60";
 
     /**
      * @Method getSettleInfo
@@ -595,7 +598,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     @Override
-    public Boolean saveInsureSettleInfo(Map<String, Object> map) {
+    public Map saveInsureSettleInfo(Map<String, Object> map) {
         // 保存手术信息
         insertOperInfo(map);
         // 保存重症监护信息
@@ -603,7 +606,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         // 保存门诊慢特病诊断信息
         insertOpspdiseinfo(map);
         //校验中医病种分值规则
-        chkTcmDiseMatch(map);
+        Map tcmMap = chkTcmDiseMatch(map);
+        if (ObjectUtil.isNotEmpty(MapUtil.getStr(tcmMap,"message"))) {
+            return tcmMap;
+        }
         // 保存 住院诊断信息
         insertDiseaseInfo(map);
         // 保存结清单信息
@@ -651,7 +657,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
         businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
         drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
-        return true;
+        return new HashMap();
     }
 
     /**
@@ -4089,7 +4095,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @param map
      * @return void
      */
-    public void chkTcmDiseMatch(Map map){
+    public Map chkTcmDiseMatch(Map map){
 
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode",MapUtil.getStr(map,"hospCode"));
@@ -4100,11 +4106,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         //1.开关配置  1:开启   0：关闭
         if (ObjectUtil.isEmpty(response.getData()) || !Constants.SF.S.equals(response.getData().getValue())) {
-            return;
+            return new HashMap();
         }
         //非住院业务不校验
         if (!Constants.SF.S.equals(MapUtil.getStr(map,"isHospital"))) {
-            return;
+            return new HashMap();
+        }
+        Map setlInfoMap = MapUtil.get(map, "setlinfo", Map.class);
+        //是否按中医优势病种支付方式进行保存   1;是    0：否
+        String tcmAdvPayFlag = MapUtil.getStr(map, "tcmAdvPayFlag");
+        //医保支付方式
+        String hiPaymtd = "";
+        if (ObjectUtil.isNotEmpty(setlInfoMap)) {
+            hiPaymtd = MapUtil.getStr(setlInfoMap, "hiPaymtd");
         }
         //中医主诊断编码
         String tcmMainCode = "";
@@ -4117,17 +4131,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> diseaseMap = MapUtils.get(map, "diseinfo");
         if (MapUtils.isEmpty(diseaseMap)) {
             log.info("中医病种分值校验—未获取到诊断信息");
-            return;
+            return new HashMap();
         }
         List<Map<String, Object>> zxCollect = MapUtils.get(diseaseMap, "zxCollect");
         List<Map<String, Object>> xiCollect = MapUtils.get(diseaseMap, "xiCollect");
         if (ObjectUtil.isEmpty(zxCollect)) {
             log.info("中医病种分值校验—未获取到中医诊断信息");
-            return;
+            return new HashMap();
         }
         if (ObjectUtil.isEmpty(xiCollect)) {
             log.info("中医病种分值校验—未获取到西医诊断信息");
-            return;
+            return new HashMap();
         }
         //中医主诊断
         for (Map<String, Object> objectMap : zxCollect) {
@@ -4146,18 +4160,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         if (StringUtils.isEmpty(tcmMainCode)) {
             log.info("中医病种分值校验—未获取到中医主诊断信息");
-            return;
+            return new HashMap();
         }
         if (StringUtils.isEmpty(wmMainCode)) {
             log.info("中医病种分值校验—未获取到西医主诊断信息");
-            return;
+            return new HashMap();
         }
         //2.判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
         List<TcmDiseScoreDO> tcmDiseScoreDOS = insureGetInfoDAO.queryByTcmDiseCode(tcmMainCode);
         //2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
         if (CollectionUtils.isEmpty(tcmDiseScoreDOS)) {
             log.info("中医病种分值校验—中医主诊断"+tcmMainName+tcmMainCode+"不在维护的中医诊断范围内");
-            return;
+            return new HashMap();
         }
 
         StringBuilder builder = new StringBuilder();
@@ -4171,13 +4185,29 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (CollectionUtils.isEmpty(wmDiseList)) {
             throw new AppException("未查询到中医主诊断"+tcmMainName+tcmMainCode+"对应的西医诊断信息,请先维护！");
         }
-        if (!wmDiseList.contains(wmMainCode)) {
-            throw new AppException("中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
-                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，请根据映射关系修改西医主诊断编码和名称");
+        //如果选了中医优势病种支付方式但不满足条件的，抛出提示信息
+        if (!wmDiseList.contains(wmMainCode) && hiPaymtd_tcm.equals(hiPaymtd)) {
+            throw new AppException("当前医保支付方式为中医优势病种，中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，如果选择继续以中医优势病种支付方式保存，请修改西医诊断为对应的诊断，否则，请将医保支付方式修改为其他方式，再进行保存");
         }
-        //如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
-        Map<String, Object> setlInfoMap = MapUtils.get(map, "setlinfo");
-        setlInfoMap.put("hiPaymtd","60");
-        map.put("setlinfo",setlInfoMap);
+
+        if (!wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd)
+                && (ObjectUtil.isEmpty(tcmAdvPayFlag) || Constants.SF.F.equals(tcmAdvPayFlag))) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("showTip","1");
+            resultMap.put("message","中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合，并且医保支付方式未选择中医优势病种结算，该中医诊断映射的西医诊断有【"+builder.toString()+
+                    "】，请选择是否按中医优势病种结算支付方式进行保存？如果选择是，请修改西医诊断为对应的诊断，并修改医保支付方式为中医优势病种结算，再进行保存");
+            return resultMap;
+        }
+        //如果满足条件但没有选择中医优势病种支付方式的，抛出提示信息
+        if (wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd) && ObjectUtil.isEmpty(tcmAdvPayFlag)) {
+                Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("showTip","1");
+                resultMap.put("message","该结算清单符合中医优势病种结算条件，是否需要按中医优势病种结算支付方式进行保存？" +
+                        "如果选择是，请修改医保支付方式为中医优势病种结算，再进行保存");
+                return resultMap;
+        }
+        return new HashMap();
     }
 }

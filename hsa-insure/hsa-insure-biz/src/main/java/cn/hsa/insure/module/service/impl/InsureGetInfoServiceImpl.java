@@ -177,7 +177,7 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
      * @Return
      */
     @Override
-    public WrapperResponse<Boolean> saveInsureSettleInfo(Map<String, Object> map) {
+    public WrapperResponse<Map> saveInsureSettleInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.saveInsureSettleInfo(map));
     }
 

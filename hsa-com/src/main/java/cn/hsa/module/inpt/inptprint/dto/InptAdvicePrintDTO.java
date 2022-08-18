@@ -72,4 +72,12 @@ public class InptAdvicePrintDTO extends InptAdvicePrintDO implements Serializabl
     private String remark;
 
     private String useDays;
+    /**
+     * 停嘱带教医生id
+     */
+    private String stopTeachDoctorId;
+    /**
+     * 停嘱带教医生名称
+     */
+    private String stopTeachDoctorName;
 }

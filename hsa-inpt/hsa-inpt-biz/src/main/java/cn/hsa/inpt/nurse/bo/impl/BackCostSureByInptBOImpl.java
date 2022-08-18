@@ -48,6 +48,9 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
     @Resource
     private RedisUtils redisUtils;
 
+    @Resource
+    InptVisitDAO inptVisitDAO;
+
     /**
     * @Method queryBackCostSurePage
     * @Desrciption 退费确认分页查询
@@ -419,6 +422,12 @@ public class BackCostSureByInptBOImpl extends HsafBO implements BackCostSureByIn
                             }
                         }
                     }
+                    // 取消退费后更新就诊表中的总费用（lly 2022-08-15 13:42 start）
+                    InptVisitDTO inptVisitDTO =new InptVisitDTO();
+                    inptVisitDTO.setId(visitId);
+                    inptVisitDTO.setHospCode(hospCode);
+                    inptVisitDAO.updateTotalCost(inptVisitDTO);
+                    // 取消退费后更新就诊表中的总费用（lly 2022-08-15 13:42 end）
                 } else {
                     throw new AppException("取消退费提示: 没有需要取消退费的费用，不能进行取消退费");
                 }

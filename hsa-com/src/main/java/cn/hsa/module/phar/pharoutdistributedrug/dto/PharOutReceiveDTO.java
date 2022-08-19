@@ -5,8 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
 * @Package_name: cn.hsa.module.phar.pharoutdistributedrug.entity
@@ -70,4 +72,8 @@ public class PharOutReceiveDTO extends PharOutReceiveDO implements Serializable 
     private String doctorName;
     //就诊科室名称
     private String deptName;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;        //开始日期
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;         //结束日期
 }

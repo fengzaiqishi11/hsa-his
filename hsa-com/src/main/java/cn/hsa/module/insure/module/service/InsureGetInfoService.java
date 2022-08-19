@@ -147,7 +147,7 @@ public interface InsureGetInfoService {
      * @Date   2021/11/3 14:54
      * @Return
      **/
-    WrapperResponse<Boolean> saveInsureSettleInfo(Map<String, Object> map);
+    WrapperResponse<Map> saveInsureSettleInfo(Map<String, Object> map);
 
     /**
      * @Method deleteSettleInfo

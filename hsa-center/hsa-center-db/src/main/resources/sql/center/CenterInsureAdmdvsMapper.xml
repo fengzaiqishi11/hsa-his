@@ -23,4 +23,17 @@
             hosp_code = #{hospCode}
     </select>
 
+    <select id="queryAdmdvs" resultType="java.util.Map">
+        select admdvs_code as admdvsCode, admdvs_name as admdvsName
+        from center_insure_admdvs
+        <where>
+            <if test="upAdmdvsCode !=null and upAdmdvsCode != ''">
+                and up_admdvs_code = #{upAdmdvsCode}
+            </if>
+            <if test="admdvsCode !=null and admdvsCode != ''">
+                and admdvs_code like concat('%',#{admdvsCode}) and admdvs_code != '100000'
+            </if>
+        </where>
+    </select>
+
 </mapper>

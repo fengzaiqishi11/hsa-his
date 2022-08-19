@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -255,6 +256,11 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
 
         Map resultMap =insureGetInfoBO.insertInsureSettleInfoForDRGorDIP(map);
         return WrapperResponse.success(resultMap);
+    }
+
+    @Override
+    public WrapperResponse<List<Map<String,Object>>> queryAdmdvs(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.queryAdmdvs(map));
     }
 
 }

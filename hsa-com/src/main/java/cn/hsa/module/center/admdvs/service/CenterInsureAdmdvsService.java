@@ -20,4 +20,12 @@ public interface CenterInsureAdmdvsService {
      * @return java.util.List
      **/
     WrapperResponse<List<Map<String,Object>>> queryAdmdvsInfo(Map<String,String> map);
+
+    /**
+     * @Author gory
+     * @Description 查询医保区划
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<List<Map<String,Object>>> queryAdmdvs(Map<String, Object> map);
 }

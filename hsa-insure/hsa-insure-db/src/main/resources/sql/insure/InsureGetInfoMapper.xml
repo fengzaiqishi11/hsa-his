@@ -2104,8 +2104,8 @@
 	    where
 		su.hosp_code = #{hospCode}
 		and oper_doctor_id = su.id) as oper_dr_code,
-	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as ansDrEndTime,
-	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as ansDrStartTime,
+	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as anstDrEndTime,
+	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as anstDrStartTime,
 	    oid.oper_end_time as oprnOprtEndTime,
 	    oid.oper_plan_time as oprnOprtStartTime,
 	    moi.id,

@@ -740,15 +740,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (insureConfigurationDTO == null) {
             throw new AppException("根据" + insureIndividualVisitDTO.getInsureOrgCode() + "医保机构编码获取医保机构配置信息为空");
         }
+        //查询状态分类
         InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
+        String stasType = Constant.UnifiedPay.ISMAN.S;
         if (insureSettleInfoDTO == null) {
             throw new AppException("未查询到结算清单信息");
         }
-        if (insureSettleInfoDTO != null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
-            throw new AppException("该结算清单信息未上传至医保,不能修改状态");
+        //如果是已提交，修改为未提交
+        if (Constant.UnifiedPay.ISMAN.S.equals(insureSettleInfoDTO.getStasType())) {
+            stasType = Constant.UnifiedPay.ISMAN.F;
         }
-        if ("1".equals(insureSettleInfoDTO.getStasType())) {
-            throw new AppException("该结算清单信息已修改状态不能再次修改");
+        //如果是未提交，修改为已提交
+        if (Constant.UnifiedPay.ISMAN.F.equals(insureSettleInfoDTO.getStasType())) {
+            stasType = Constant.UnifiedPay.ISMAN.S;
         }
         String functionCode = selectParamSettleInfo(map);
         if (StringUtils.isEmpty(functionCode)) {
@@ -757,9 +761,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());
-        if (StringUtils.isEmpty(MapUtils.get(map, "stasType"))) {
-            dataMap.put("stas_type", "1");
-        }
+        dataMap.put("stas_type", stasType);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("stastinfo", dataMap);
 
@@ -777,9 +779,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_UPDATE, interfaceParamDTO);
 
         //修改状态
-        if (StringUtils.isEmpty(MapUtils.get(map, "stasType"))) {
-            map.put("stasType", "1");
-        }
+        map.put("stasType", stasType);
         insureGetInfoDAO.updateStasType(map);
         return true;
     }
@@ -1695,6 +1695,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         String isHospital = MapUtils.get(map, "isHospital");
         Map<String, Object> setlinfo = new HashMap<>();
+        setlinfo.put("stasType", infoDTO.getStasType());
         setlinfo.put("medicalRegNo", MapUtils.get(map, "medicalRegNo"));
         setlinfo.put("visitId", infoDTO.getVisitId());
         setlinfo.put("mdtrtId", MapUtils.get(map, "medicalRegNo")); // 就医登记号
@@ -2725,6 +2726,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", "医保科"); // 医疗机构填报部门 默认为 医保科
+        setlinfo.put("stasType", "0"); // 状态分类 默认为 未提交
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap, "feeCrteTime")); // 医疗机构填报人
         //门特患者信息处理，没有病案首页，取档案信息
         if (Constants.SF.F.equals(isHospital)) {

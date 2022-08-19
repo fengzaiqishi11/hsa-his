@@ -265,7 +265,7 @@ public class RequestInsure {
         }
         int errortype = Integer.parseInt((String) resultData.get("errortype"));
         if (errortype != 0){
-            throw new AppException((Integer) resultData.get("errormessage"));
+            throw new AppException((String) resultData.get("errormessage"));
         }
         List<Map<String,String>> addition = (List<Map<String, String>>) resultData.get("addition-xml");
         Map<String,String> userObj = addition.get(0);
@@ -306,8 +306,9 @@ public class RequestInsure {
             params.put("visitId", MapUtils.get(param,"visitId"));
             params.put("isHospital", "0");
 
-            toLoginHNS(hospCode,insureRegCode);
             InsureConfigurationDO insureConfigurationDO = toConfig(hospCode, insureRegCode);
+            params.put("paramMapJson", "省医保登录医保的入参--login_id="+ insureConfigurationDO.getUsername()+"--login_password="+ insureConfigurationDO.getUsername()+"--url="+ insureConfigurationDO.getUrl()+ "--FunctionID="+ Constant.HuNanSheng.RESTS.LOGIN);
+            toLoginHNS(hospCode,insureRegCode);
             //请求参数
             Map<String, Object> parameters = new HashMap<String,Object>();
             parameters.put("FunctionID",param.get("function_id"));//功能号

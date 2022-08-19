@@ -837,7 +837,7 @@
         update insure_individual_visit set is_half_settle ='0',settle_count = settle_count-1
         where hosp_code =#{hospCode} and visit_id =#{visitId} and medical_reg_no =#{medicalRegNo}
     </update>
-    <update id="updateInsureMedicalRegNo">
+    <update id="updateInsureMedicalRegNo" parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         update insure_individual_visit set medical_reg_no =#{medicalRegNo}
         where hosp_code =#{hospCode} and visit_id =#{visitId}
     </update>

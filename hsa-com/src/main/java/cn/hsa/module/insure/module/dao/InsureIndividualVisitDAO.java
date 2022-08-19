@@ -481,7 +481,7 @@ public interface InsureIndividualVisitDAO {
      * @Date   2022/2/16 13:55
      * @Return
     **/
-    void updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
+    int updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
 
     InptVisitDTO selectInptVisit(Map<String, Object> map);
 

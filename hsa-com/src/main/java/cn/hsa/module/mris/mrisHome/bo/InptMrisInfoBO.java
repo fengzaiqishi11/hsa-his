@@ -33,4 +33,16 @@ public interface InptMrisInfoBO {
      */
     List<LinkedHashMap<String, Object>> importTcmMrisInfo(Map map) throws Exception;
 
+
+    /**
+     * @Method: exportTcmMrisInfoForHqms
+     * @Description: 导出中医病案首页数据上传hqms
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/08/18 14:32
+     * @param map
+     * @return  List<LinkedHashMap<String, Object>>
+     */
+    List<LinkedHashMap<String, Object>> exportTcmMrisInfoForHqms(Map map) throws Exception;
+
 }

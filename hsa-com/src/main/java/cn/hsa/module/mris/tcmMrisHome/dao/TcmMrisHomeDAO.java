@@ -319,4 +319,18 @@ public interface TcmMrisHomeDAO {
      **/
     List<InptVisitDTO> queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO);
 
+
+    /**
+     * @Menthod: queryTcmExportNum
+     * @Desrciption: 查询导出数据的数量
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-03 09:35
+     * @Return:  Map
+     **/
+    Map queryTcmExportNum(Map<String,Object> map);
+
+    List<InptVisitDTO> queryTcmUnExportData(Map<String,Object> map);
+
 }

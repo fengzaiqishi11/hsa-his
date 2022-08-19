@@ -318,7 +318,7 @@
             <if test="certName != null">
                 cert_name = #{certName},
             </if>
-            <if test="certNo != null">
+            <if test="certNo != null and certNo != ''">
                 cert_no = #{certNo},
             </if>
             <if test="nationalityCation != null">
@@ -348,34 +348,34 @@
             <if test="marryName != null">
                 marry_name = #{marryName},
             </if>
-            <if test="work != null">
+            <if test="work != null and work !=''">
                 work = #{work},
             </if>
-            <if test="workPhone != null">
+            <if test="workPhone != null and workPhone !=''">
                 work_phone = #{workPhone},
             </if>
-            <if test="workPostCode != null">
+            <if test="workPostCode != null and workPostCode !=''">
                 work_post_code = #{workPostCode},
             </if>
-            <if test="workAddress != null">
+            <if test="workAddress != null and workAddress != ''">
                 work_address = #{workAddress},
             </if>
-            <if test="contactName != null">
+            <if test="contactName != null and contactName != ''">
                 contact_name = #{contactName},
             </if>
-            <if test="contactRelaCode != null">
+            <if test="contactRelaCode != null and contactRelaCode !=''">
                 contact_rela_code = #{contactRelaCode},
             </if>
-            <if test="contactRelaName != null">
+            <if test="contactRelaName != null and contactRelaName !=''">
                 contact_rela_name = #{contactRelaName},
             </if>
-            <if test="contactPhone != null">
+            <if test="contactPhone != null and contactPhone !=''">
                 contact_phone = #{contactPhone},
             </if>
-            <if test="contactPostCode != null">
+            <if test="contactPostCode != null and contactPostCode !=''">
                 contact_post_code = #{contactPostCode},
             </if>
-            <if test="contactAddress != null">
+            <if test="contactAddress != null and contactAddress !=''">
                 contact_address = #{contactAddress},
             </if>
             <if test="nowProv != null">
@@ -597,25 +597,25 @@
             <if test="babyInWeight != null">
                 baby_in_weight = #{babyInWeight},
             </if>
-            <if test="nativeAdress != null">
+            <if test="nativeAdress != null and nativeAdress !=''">
                 native_adress = #{nativeAdress},
             </if>
-            <if test="nowAdress != null">
+            <if test="nowAdress != null and nowAdress !=''">
                 now_adress = #{nowAdress},
             </if>
             <if test="babyAgeMonth != null">
                 baby_age_month = #{babyAgeMonth},
             </if>
-            <if test="birthAdress != null">
+            <if test="birthAdress != null and birthAdress !=''">
                 birth_adress = #{birthAdress},
             </if>
-            <if test="idCard != null">
+            <if test="idCard != null and idCard !=''">
                 id_card = #{idCard},
             </if>
-            <if test="phone != null">
+            <if test="phone != null and phone !=''">
                 phone = #{phone},
             </if>
-            <if test="workInfo != null">
+            <if test="workInfo != null and workInfo !=''">
                 work_info = #{workInfo},
             </if>
             <if test="inWay != null">
@@ -1600,6 +1600,91 @@
             and iiv.insure_reg_code =#{regCode}
         </if>
         order by a.in_time desc
+    </select>
+
+    <!--查询导出数量、总数量、导出数量、未写数量、费用为0数量 liuliyun 20220803-->
+    <select id="queryTcmExportNum" resultType="java.util.Map" parameterType="java.util.Map">
+        select
+        count(*) as totalNum,
+        count(if( c.fy01 >0,1,null)) as exportNum,
+        count(if( c.fy01 is null ,1,null)) as unWriteNum,
+        count(if( c.fy01 &lt;=0 ,1,null)) as noChargeNum
+        from inpt_visit v
+        left join tcm_mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
+        left join tcm_mris_cost c on c.hosp_code= #{hospCode} and  c.visit_id = v.id
+        where v.hosp_code= #{hospCode}
+        <if test="keyword != null and keyword !=''">
+            and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or v.in_no LIKE CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="inDeptId!=null and inDeptId!=''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.visit_id =#{visitId}
+        </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and v.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="offset!=null and limit!=null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <!--查询导出数量、总数量、导出数量、未写数量、费用为0数量 liuliyun 20220803-->
+    <select id="queryTcmUnExportData" resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" parameterType="java.util.Map">
+        select
+        v.in_no,
+        v.name,
+        v.in_profile,
+        v.out_time,
+        case when c.fy01 &lt;=0 then '费用为0'
+        when c.fy01 is null and b.id is not null then '费用为0'
+        when b.id is null then '未写病案' end as errorMessage
+        from inpt_visit v
+        left join tcm_mris_base_info b on b.hosp_code=#{hospCode} and  b.visit_id = v.id
+        left join tcm_mris_cost c on c.hosp_code= #{hospCode} and  c.visit_id = v.id
+        where v.hosp_code= #{hospCode} and (c.fy01 is null or c.fy01 &lt;=0)
+        <if test="keyword != null and keyword !=''">
+            and (v.name LIKE CONCAT('%',#{keyword},'%') or v.phone LIKE CONCAT('%',#{keyword},'%') or v.cert_no LIKE CONCAT('%',#{keyword},'%')
+            or v.in_no LIKE CONCAT('%',#{keyword},'%') )
+        </if>
+        <if test="inDeptId!=null and inDeptId!=''">
+            and v.in_dept_id = #{inDeptId}
+        </if>
+        <if test="statusCode != null and statusCode !=''">
+            and v.status_code = #{statusCode}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.visit_id =#{visitId}
+        </if>
+        <if test="brlxList != null and brlxList.size()>0">
+            and v.patient_code in
+            <foreach collection="brlxList" open="(" separator="," close=")" item="item">
+                #{item}
+            </foreach>
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and v.out_time &gt;= STR_TO_DATE(#{startTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="endTime != null and endTime != '' ">
+            and v.out_time &lt;= STR_TO_DATE(#{endTime},'%Y-%m-%d %H:%i:%S')
+        </if>
+        <if test="offset!=null and limit!=null">
+            limit #{offset}, #{limit}
+        </if>
+        order by errorMessage
     </select>
 
 </mapper>

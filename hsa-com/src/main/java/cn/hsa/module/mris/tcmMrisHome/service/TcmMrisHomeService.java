@@ -175,4 +175,28 @@ public interface TcmMrisHomeService {
     @GetMapping("/service/mris/mrisHome/queryOutHospPatientPageZY")
     PageDTO queryOutHospPatientPageZY(Map<String,Object> selectMap);
 
+
+    /**
+     * @Method: exportTcmMrisInfoToCsv
+     * @Description: 导出中医病案首页数据(hqms)
+     * @param map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/08/18 14:40
+     * @return String
+     */
+    @GetMapping("/service/tcmMris/mrisHome/exportTcmMrisInfoToCsv")
+    WrapperResponse<String> exportTcmMrisInfoToCsv(Map map) throws Exception;
+
+
+    /**@Method queryExportTcmNum
+     * @Author liuliyun
+     * @Description 获取中医病案导出的条数
+     * @Date 2022/08/18 15:32
+     * @Param [map]
+     * @return  map
+     **/
+    @GetMapping("/service/tcmMris/mrisHome/queryExportTcmNum")
+    WrapperResponse<Map<String, Object>> queryExportTcmNum(Map<String, Object> map);
+
 }

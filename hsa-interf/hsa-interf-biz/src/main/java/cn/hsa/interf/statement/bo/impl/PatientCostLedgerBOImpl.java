@@ -1445,6 +1445,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "8" :
             case "9" :
+            case "13" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> deptDoctorVisitIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(a->a.getDeptId()+a.getDoctorId()+a.getVisitId()));
                 // 组装固定表头
@@ -1454,11 +1455,17 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 Map<String,Object> headItemMap10 = new HashMap<>();
                 if ("4".equals(flag)){
                     headItemMap7.put("label","所属科室");
+                }else if("13".equals(flag)) {
+                    headItemMap7.put("label","主管科室");
                 }else {
                     headItemMap7.put("label","开方科室");
                 }
                 headItemMap7.put("prop","name");
-                headItemMap8.put("label","开方医生");
+                if("13".equals(flag)) {
+                    headItemMap8.put("label", "主管医生");
+                }else {
+                    headItemMap8.put("label", "开方医生");
+                }
                 headItemMap8.put("prop","doctorName");
                 headItemMap9.put("label","患者姓名");
                 headItemMap9.put("prop","visitName");
@@ -1514,6 +1521,25 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
 
                 }
                 break;
+//            case "13" :
+////                Map<String, List<OutptCostAndReigsterCostDTO>> chargeGcManCollect = outptCostAndReigsterCostDTOS.stream().
+////                        collect(Collectors.groupingBy(OutptCostAndReigsterCostDTO::getChargeId));
+////                // 组装固定表头
+////                Map<String,Object> headItemMap13 = new HashMap<>();
+////                headItemMap13.put("label","收款人");
+////                headItemMap13.put("prop","name");
+////                tableHeader.put("name",headItemMap13);
+////                this.setFixedtableHeader(tableHeader);
+////                for (String chargeId : chargeGcManCollect.keySet()){
+////                    Map<String,Object> dataItemMap = new HashMap<>();
+////                    List<OutptCostAndReigsterCostDTO> groupByList = chargeGcManCollect.get(chargeId);
+////                    // 因为已根据科室id分组， 所以可以直接拿第一个的科室名
+////                    dataItemMap.put("name",groupByList.get(0).getChargeName());
+////
+////                    this.summerCostGroupByBfc(groupByList,tableHeader,dataList,dataItemMap);
+////
+////                }
+//                break;
             case "5" :
             case "6" :
             default:
@@ -2043,6 +2069,7 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 break;
             case "8" :
             case "9" :
+            case "13" :
                 Map<String, List<OutptCostAndReigsterCostDTO>> deptDoctorVisitIdCollect = outptCostAndReigsterCostDTOS.stream().
                         collect(Collectors.groupingBy(a->a.getDeptId()+a.getDoctorId()+a.getVisitId()));
                 // 组装固定表头
@@ -2052,11 +2079,17 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
                 Map<String,Object> headItemMap10 = new HashMap<>();
                 if ("4".equals(flag)){
                     headItemMap7.put("label","所属科室");
+                }else if("13".equals(flag)) {
+                    headItemMap7.put("label","主管科室");
                 }else {
                     headItemMap7.put("label","开方科室");
                 }
                 headItemMap7.put("prop","name");
-                headItemMap8.put("label","开方医生");
+                if("13".equals(flag)) {
+                    headItemMap8.put("label", "主管医生");
+                }else {
+                    headItemMap8.put("label","开方医生");
+                }
                 headItemMap8.put("prop","doctorName");
                 headItemMap9.put("label","患者姓名");
                 headItemMap9.put("prop","visitName");

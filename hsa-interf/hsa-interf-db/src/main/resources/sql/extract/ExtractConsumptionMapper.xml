@@ -423,6 +423,7 @@
             resultMap="extractStroInvoicingDetailMap">
         select
         a.id, hosp_code, biz_id,
+        a.spec,a.code,
         (select bd.name from base_dept bd where bd.hosp_code = a.hosp_code and a.biz_id = bd.id) as deptName,
         item_code, item_id, item_name,
         num,

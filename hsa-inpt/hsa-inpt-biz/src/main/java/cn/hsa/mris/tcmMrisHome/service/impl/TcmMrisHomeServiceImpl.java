@@ -230,4 +230,37 @@ public class TcmMrisHomeServiceImpl extends HsafService implements TcmMrisHomeSe
         return tcmMrisHomeBO.queryOutHospPatientPageZY(MapUtils.get(selectMap,"inptVisitDTO"));
     }
 
+
+    @Override
+    public WrapperResponse<String> exportTcmMrisInfoToCsv(Map map) throws Exception {
+        List<LinkedHashMap<String,Object>> mrisInfos = inptMrisInfoBO.exportTcmMrisInfoForHqms(map);
+        String rootPath = "/logs/";
+        Map mapPatamater = new HashMap();
+        mapPatamater.put("hospCode", MapUtils.get(map,"hospCode"));
+        String hospName = MapUtils.get(map,"hospName");
+        // 查询医疗机构编码
+        mapPatamater.put("code", "YLJGBM");
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapPatamater).getData();
+        String ylCode="";
+        if(sysParameterDTO!=null) {
+            ylCode =sysParameterDTO.getValue();
+        }
+        String fileName="hqmsts_"+ylCode+"_"+ DateUtils.format(DateUtils.YMDHM)+"M";
+        CSVWriterUtils.writeCsv(mrisInfos,rootPath,fileName);
+        String path = rootPath+"/"+fileName+".csv";
+        return WrapperResponse.success(path);
+    }
+
+    /**@Method queryExportTcmNum
+     * @Author liuliyun
+     * @Description 获取中医病案导出的条数
+     * @Date 2022/08/18 15:34
+     * @Param [map]
+     * @return  map
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryExportTcmNum(Map<String, Object> map) {
+        return WrapperResponse.success(tcmMrisHomeBO.queryExportTcmNum(map));
+    }
+
 }

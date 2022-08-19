@@ -355,7 +355,7 @@
         a.preferential_type_id preferentialTypeId, a.insure_code insureCode, a.insure_org_code insureOrgCode, a.insure_no insureNo,
         a.insure_biz_code insureBizCode, a.insure_treat_code insureTreatCode, a.insure_patient_id insurePatientId, a.insure_remark insureRemark,
         a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
-        a.crte_time, a.now_address as nowAddress,
+        a.crte_time, a.now_address as nowAddress,ifnull(a.tran_in_code,'0') as tranInCode,
         otv.triage_start_code as triageStatusCode,
         otv.is_call as isCanCall,
         case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
@@ -525,9 +525,6 @@
         <if test="advancePayment!=null and advancePayment!=''">
             advance_payment = #{advancePayment},
         </if>
-        <if test="tranInCode!=null and tranInCode!=''">
-            tran_in_code = #{tranInCode},
-        </if>
         <if test="inDeptId!=null and inDeptId!=''">
             in_dept_id = #{inDeptId},
         </if>
@@ -538,7 +535,19 @@
             in_remark = #{inRemark},
         </if>
         <if test="inCertTime!=null">
-            in_cert_time = #{inCertTime}
+            in_cert_time = #{inCertTime},
+        </if>
+        <if test="certCode!=null and certCode!=''">
+            cert_code = #{certCode},
+        </if>
+        <if test="certNo!=null and certNo!=''">
+            cert_no = #{certNo},
+        </if>
+        <if test="nowAddress!=null and nowAddress!=''">
+            now_address = #{nowAddress},
+        </if>
+        <if test="tranInCode!=null and tranInCode!=''">
+            tran_in_code = #{tranInCode}
         </if>
         where id = #{id} and hosp_code = #{hospCode}
     </update>

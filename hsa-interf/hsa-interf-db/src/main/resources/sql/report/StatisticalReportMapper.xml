@@ -1593,17 +1593,33 @@
 
     <!--科室人数统计报表-->
     <select id="queryDeptNum" parameterType="java.util.Map" resultType="java.util.Map">
-        select t2.zyNum, t1.*
+        select
+        t.*,
+        IFNULL(t2.zyNum,0) zyNum,
+        IFNULL(t1.ryNum,0) ryNum,
+        IFNULL(t1.babyNum,0) babyNum,
+        IFNULL(t3.ycyNum,0) ycyNum,
+        IFNULL(t3.cyNum,0) cyNum
         from (
-        SELECT
+        select
+        bd2.id inDeptId ,
+        bd2.hosp_code ,
+        bd2.name inDeptName,
+        bd2.code deptCode
+        from
+        base_dept bd2
+        where
+        bd2.type_code = '2'
+        and bd2.is_valid = '1'
+        <if test="deptId != null and deptId != ''">
+            and bd2.id = #{deptId}
+        </if>) t
+        left join
+        (SELECT
         IFNULL(SUM( CASE a.status_code WHEN '1' THEN 1 ELSE 0 END ), 0 ) AS ryNum,
-        <!--IFNULL(SUM( CASE a.status_code WHEN '2' THEN 1 ELSE 0 END ), 0 ) AS zyNum,-->
-        IFNULL(SUM( CASE a.status_code WHEN '5' THEN 1 ELSE 0 END ), 0 ) AS ycyNum,
-        IFNULL(SUM( CASE a.status_code WHEN '7' THEN 1 ELSE 0 END ), 0 ) AS cyNum,
         IFNULL(SUM( b.num ), 0 ) as babyNum,
         a.in_dept_id as inDeptId,
         a.hosp_code,
-        (SELECT code from base_dept bd where bd.id = a.in_dept_id and bd.hosp_code = a.hosp_code) as deptCode,
         a.in_dept_name as inDeptName
         FROM
         inpt_visit a
@@ -1617,12 +1633,9 @@
         <if test="endDate != null">
             and a.in_time &lt;= #{endDate}
         </if>
-        <if test="deptId != null and deptId != ''">
-            and a.in_dept_id = #{deptId}
-        </if>
-        GROUP BY a.in_dept_id, a.in_dept_name, a.hosp_code
-        ) t1
-        join (
+        GROUP BY a.in_dept_id, a.hosp_code
+        ) t1 on t1.hosp_code = t.hosp_code and t1.inDeptId = t.inDeptId
+        left join (
         SELECT
         a.in_dept_id as inDeptId,
         a.in_dept_name as inDeptName,
@@ -1634,9 +1647,30 @@
         <if test="endDate != null">
             and a.in_time &lt;= #{endDate}
         </if>
-        GROUP BY a.in_dept_id,a.in_dept_name, a.hosp_code
+        GROUP BY a.in_dept_id, a.hosp_code
         ) t2
-        on t1.hosp_code = t2.hosp_code and t1.inDeptId = t2.inDeptId
+        on t.hosp_code = t2.hosp_code and t.inDeptId = t2.inDeptId
+         left join  (
+        SELECT
+        a.in_dept_id as inDeptId,
+        a.out_dept_id as outDeptId,
+        a.out_dept_name as inDeptName,
+        a.hosp_code,
+        IFNULL(SUM( CASE a.status_code WHEN '5' THEN 1 ELSE 0 END ), 0 ) AS ycyNum,
+        IFNULL(SUM( CASE a.status_code WHEN '7' THEN 1 ELSE 0 END ), 0 ) AS cyNum
+        FROM
+        inpt_visit a
+        where a.hosp_code = #{hospCode}
+        and status_code in('5','7')
+        <if test="startDate != null">
+            and a.out_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and a.out_time &lt;= #{endDate}
+        </if>
+        GROUP BY a.out_dept_id,  a.hosp_code
+        ) t3
+        on t.hosp_code = t3.hosp_code and t.inDeptId = t3.inDeptId
     </select>
 
     <select id="queryBedNum" parameterType="java.util.Map" resultType="java.util.Map">
@@ -1685,15 +1719,18 @@
         FROM
         inpt_visit
         where hosp_code = #{hospCode}
-        and status_code in('2','5','7')
+        and status_code in('5','7')
         <if test="deptId != null and deptId != ''">
             and out_dept_id = #{deptId}
         </if>
-        <if test="startDate != null and endDate != null">
-            and DATE_FORMAT(out_time,'%Y-%m-%d %H:%i:%s') BETWEEN DATE_FORMAT(#{startDate} ,'%Y-%m-%d %H:%i:%s') and DATE_FORMAT(#{endDate} ,'%Y-%m-%d %H:%i:%s')
+        <if test="startDate != null">
+            and out_time >= #{startDate}
+        </if>
+        <if test="endDate != null">
+            and out_time &lt;= #{endDate}
         </if>
         GROUP BY out_dept_id,  hosp_code
-        ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_name = t2.dept_name
+        ) t2 on t1.hosp_code = t2.hosp_code and t1.dept_id = t2.dept_id
         left join (
         SELECT
         a.in_dept_id as dept_id,
@@ -1704,7 +1741,7 @@
         inpt_visit a
         where a.hosp_code = #{hospCode}
         <if test="endDate != null">
-            and DATE_FORMAT(a.in_time, '%Y-%m-%d %H:%i:%s') &lt;= #{endDate}
+            and a.in_time &lt;= #{endDate}
         </if>
         GROUP BY a.in_dept_id, a.hosp_code
         ) t3 on t1.hosp_code = t3.hosp_code and t1.dept_id = t3.dept_id

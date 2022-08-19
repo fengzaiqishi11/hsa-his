@@ -893,6 +893,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
 
             doctorRegisterDto = wxOutptDAO.getDoctorRegisterById(doctorRegisterDto.getSourceId(),doctorRegisterDto.getHospCode());
+            doctorRegisterDto.setSourceId(doctorRegisterDto.getId());
             // 返参加密
             log.debug("微信小程序【锁定号源】返参加密前：" + JSON.toJSONString(doctorRegisterDto));
             String res = null;
@@ -2533,8 +2534,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     @Override
     public WrapperResponse<String> queryDailyCostListDetails(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        Integer pageNo = MapUtils.get(map, "pageNo");
-        Integer pageSize = MapUtils.get(map, "pageSize");
         if (StringUtils.isEmpty(hospCode)) {
             throw new AppException("未检测到医院信息，请核对医院信息！");
         }
@@ -2546,6 +2545,8 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(MapUtils.get(data, "costStartTime"))) return WrapperResponse.error(500, "日费用清单明细查询开始时间不能为空", null);
         if (StringUtils.isEmpty(MapUtils.get(data, "costStopTime"))) return WrapperResponse.error(500, "日费用清单明细查询结束时间不能为空", null);
 
+        Integer pageNo = MapUtils.get(data, "pageNo");
+        Integer pageSize = MapUtils.get(data, "pageSize");
         // 日费用清单明细查询
         data.put("hospCode", hospCode);
         if(pageNo != null && pageSize != null){

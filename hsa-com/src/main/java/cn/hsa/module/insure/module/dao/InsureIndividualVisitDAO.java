@@ -126,6 +126,16 @@ public interface InsureIndividualVisitDAO {
     InsureIndividualVisitDTO getInsureIndividualVisitById(Map param);
 
     /**
+     * @param param 请求参数
+     * @Menthod getInsureIndividualVisitById
+     * @Desrciption 查询医保信息-----针对工伤
+     * @Author wangqiao
+     * @Date 2022/08/16
+     * @Return cn.hsa.module.insure.insureIndividualVisit.dto.InsureIndividualVisitDTO
+     */
+    InsureIndividualVisitDTO getInsureIndividualVisitByIdForGongshang(Map param);
+
+    /**
      * @Menthod deleteByMap
      * @Desrciption 根据就诊id删除
      * @param visitId 就诊id

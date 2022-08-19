@@ -949,6 +949,51 @@
         </if>
     </select>
 
+
+     <select id="getInsureIndividualVisitByIdForGongshang" parameterType="map"
+            resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        SELECT
+        iiv.*,
+        ov.doctor_id as doctorId ,ov.doctor_name as doctorName,iv.in_profile,ov.patient_code patientCode,
+        ov.phone as outPhone,ov.visit_time as visitTime,iib.aac004 as gend,iib.aac002,iib.bka035 ,iib.bka008,
+        iv.out_dept_id as outDeptId,iv.out_dept_name as outDeptName,iv.out_mode_code as outModeCode,iv.address,iv.phone,
+        iv.phone as inptPhone ,iv.out_time as outTime ,iv.in_time as inTime,iv.in_disease_name as
+        inDiseaseName,iv.out_disease_name as outDiseaseName,iv.out_disease_icd10 as outDiseaseIcd10,iv.total_in_days,
+        (IF(iiv.is_hospital ='1', (select su.prac_certi_no from sys_user su where su.hosp_code = iv.hosp_code and su.id
+        = iv.zz_doctor_id ), (select su.prac_certi_no from sys_user su where su.hosp_code = ov.hosp_code and su.id =
+        ov.doctor_id )) )as pracCertiNo,iv.total_advance as totalAdvance,
+        (IF(iiv.is_hospital ='1', iv.age, ov.age) )as age,
+        iv.zz_doctor_id as zzDoctorId ,iv.zz_doctor_name as zzDoctorName, iv.patient_code as patientType,
+        iib.baa301,iib.aae140,iib.card_iden as cardIden,iib.aac001,iib.aac003,iib.aac006,iib.aac004,
+        if((case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format( iv.in_time,
+        '%Y-%m-%d' )) END)
+        = 0,1,(case when iiv.is_hospital ='1' then DATEDIFF(date_format( iv.out_time, '%Y-%m-%d' ),date_format(
+        iv.in_time, '%Y-%m-%d' )) END))
+        as hospitalDay,iiv.settle_count,iiv.is_half_settle,ic.mdtrtarea_admvs,ic.is_remote,
+        (select bd.nation_code from base_dept bd where bd.id = iiv.visit_drpt_id and bd.hosp_code = iiv.hosp_code) as visitNationCode
+        FROM
+        insure_individual_visit iiv
+        left join insure_individual_basic iib on iib.id = iiv.mib_id and iib.hosp_code = iiv.hosp_code
+        left join inpt_visit iv on iv.id = iiv.visit_id and iv.hosp_code = iiv.hosp_code
+        left join outpt_visit ov on ov.id = iiv.visit_id and ov.hosp_code = iiv.hosp_code
+        join  insure_configuration ic on ic.reg_code = iiv.insure_reg_code and ic.hosp_code = iiv.hosp_code
+        WHERE iiv.visit_id = #{id} and iiv.hosp_code =#{hospCode}
+        <if test="medicalRegNo != null and medicalRegNo != ''">
+            and iiv.medical_reg_no = #{medicalRegNo}
+        </if>
+        <if test="inHalfSettleId != null and inHalfSettleId != ''">
+            and iiv.is_half_settle = #{inHalfSettleId}
+        </if>
+        <if test="limitFlag == '1'.toString()">
+            and iiv.insure_settle_id is null
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( iv.in_no like concat('%',#{keyword},'%')
+            or iv.name like concat('%',#{keyword},'%')
+            )
+        </if>
+    </select>
+
     <select id="queryInsureIndividualVisitByIds" parameterType="map"
             resultType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
         SELECT

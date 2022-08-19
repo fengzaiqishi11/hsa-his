@@ -105,4 +105,6 @@
     <dubbo:service interface="cn.hsa.module.base.clinic.service.BaseClinicService" ref="baseClinicService_provider"/>
     <!--sys生产者-->
     <dubbo:service interface="cn.hsa.module.sys.message.service.UserReadMessageService" ref="userReadMessageService_provider"/>
+    <!-- 基础数据日志生产者 -->
+    <dubbo:service interface="cn.hsa.module.base.log.service.BaseDataModifyLogService" ref="baseDataModifyLogService_provider"/>
 </beans>

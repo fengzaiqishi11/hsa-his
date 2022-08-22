@@ -509,8 +509,8 @@ public class FmiOwnpayPatnUploadReqUtil<T> extends InsureCommonUtil implements B
 
                 feedetail.setOrdersDeptCode(null);
                 feedetail.setOrdersDeptName(null);
-                feedetail.setOrdersDrCode(null);
-                feedetail.setOrdersDrName(null);
+                feedetail.setOrdersDrCode(feedetail.getBilgDrCodg());
+                feedetail.setOrdersDrName(feedetail.getBilgDrName());
 
                 feedetail.setTcmdrugUsedWay(null);
                 feedetail.setExtinsFlag(null);

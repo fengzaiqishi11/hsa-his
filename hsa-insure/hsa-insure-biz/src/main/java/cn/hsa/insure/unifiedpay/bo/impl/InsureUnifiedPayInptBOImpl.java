@@ -367,8 +367,8 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
             }
             objectMap.put("acord_dept_codg",""); // 受单科室编码
             objectMap.put("acord_dept_name",""); // 受单科室名称
-            objectMap.put("orders_dr_code",""); // 受单医生编码
-            objectMap.put("orders_dr_name",""); // 受单医生姓名
+            objectMap.put("orders_dr_code",MapUtil.getStr(objectMap,"bilg_dr_codg")); // 受单医生编码
+            objectMap.put("orders_dr_name",MapUtil.getStr(objectMap,"bilg_dr_name")); // 受单医生姓名
             String isReimburse = MapUtils.get(item,"isReimburse");
 
             /**

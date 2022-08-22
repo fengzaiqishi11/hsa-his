@@ -11,6 +11,8 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureConfigurationDO;
 import cn.hsa.module.insure.module.service.InsureDiseaseMatchService;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,7 @@ import java.util.*;
 @Component("hunansheng-inpt")
 public class InptFunction {
 
+    private static final String QIYANGCODE = "QI_YANG_CODE";
     @Resource
     private RequestInsure requestInsure;
 
@@ -38,12 +41,34 @@ public class InptFunction {
     private InsureConfigurationDAO insureConfigurationDAO;
 
     @Resource
+    private SysParameterService sysParameterService_consumer;
+
+    @Resource
     private InptVisitService inptVisitService;
 
     @Resource
     private InsureDiseaseMatchService insureDiseaseMatchService;
 
-
+    /**
+      * @method getSysParamDTO
+      * @author powersi
+      * @date 2022/8/17 10:55
+      *	@description 	获取系统参数
+      * @param  hospCode, code
+      * @return cn.hsa.module.sys.parameter.dto.SysParameterDTO
+      *
+     **/
+    private String getSysParamDTOValue(String hospCode, String code) {
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", hospCode);
+        sysMap.put("code", code);
+        SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        String value = null;
+        if(sysParameterDTO != null){
+            value = sysParameterDTO.getValue();
+        }
+        return value;
+    }
     private InsureIndividualInpatientDTO getIndividualInpatientProcessingData(Map<String, Object> resultMap,InsureIndividualInpatientDTO insureIndividualInpatientDTO) {
         Map<String,Object> bizinfoMap = (Map<String, Object>) resultMap.get("bizinfo");
         if(MapUtils.isEmpty(bizinfoMap)){
@@ -119,6 +144,9 @@ public class InptFunction {
         String isRemote = insureIndividualBasicDTO.getIsRemote();//是否异地
         String corpId = insureIndividualBasicDTO.getAab001(); //单位编码
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,insureRegCode);
+        // 获得祁阳骨科专用的中心编码  如果系统配置没有该参数 就用原来的code
+        String sysParamDTOValue =  getSysParamDTOValue(hospCode, QIYANGCODE);
+        String code = sysParamDTOValue != null ? sysParamDTOValue : insureConfigurationDO.getCode();
         Map<String,Object> httpParam = new HashMap<String,Object>();//入参
         if("02".equals(insureIndividualBasicDTO.getBka895())){
             httpParam.put("idcard",insureIndividualBasicDTO.getBka896());//查询条件
@@ -127,9 +155,9 @@ public class InptFunction {
         }
         httpParam.put("hospital_id",insureConfigurationDO.getOrgCode());//医疗机构编码
         httpParam.put("biz_type",insureIndividualBasicDTO.getAka130());//业务类型
-        httpParam.put("center_id",insureConfigurationDO.getCode());//医保中心编号
+        httpParam.put("center_id",code);//医保中心编号
         httpParam.put("oper_staffid","000");//员工号
-        httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
+        httpParam.put("oper_centerid",code);//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码
         // 如果是一个电脑号对应多个单位参保信息，需传入单位编码
         if (!StringUtils.isEmpty(corpId) && !"null".equals(corpId)) {
@@ -224,12 +252,15 @@ public class InptFunction {
         String hospCode = insureInptRegisterDTO.getHospCode();//医院编码
         String insureRegCode = insureInptRegisterDTO.getInsureOrgCode();//医保机构编码
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,insureRegCode);
+        // 获得祁阳骨科专用的中心编码  如果系统配置没有该参数 就用原来的code
+        String sysParamDTOValue = getSysParamDTOValue(hospCode, QIYANGCODE);
+        String code = sysParamDTOValue != null ? sysParamDTOValue : insureConfigurationDO.getCode();
         Map<String,Object> httpParam = new HashMap<String,Object>();
         httpParam.put("function_id",Constant.HuNanSheng.INPT.BIZC131204);//功能号
         httpParam.put("oper_staffid",insureInptRegisterDTO.getUserCode());//员工号
-        httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
+        httpParam.put("oper_centerid",code);//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码
-        httpParam.put("center_id",insureConfigurationDO.getCode());//中心编码
+        httpParam.put("center_id",code);//中心编码
         httpParam.put("indi_id",insureInptRegisterDTO.getAac001());//个人电脑号
         httpParam.put("pers_type",insureInptRegisterDTO.getBka035());//人员类别
         httpParam.put("in_area",insureInptRegisterDTO.getBka021());
@@ -435,9 +466,12 @@ public class InptFunction {
             advieDoctorName = insureCostList.get(0).get("doctorName")==null ?"":insureCostList.get(0).get("doctorName").toString();
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        // 获得祁阳骨科专用的中心编码  如果系统配置没有该参数 就用原来的code
+        String sysParamDTOValue = getSysParamDTOValue(inptVisitDTO.getHospCode(), QIYANGCODE);
+        String code = sysParamDTOValue != null ? sysParamDTOValue : insureConfigurationDTO.getCode();
         if(insureConfigurationDTO !=null){
             httpParam.put("oper_hospitalid",insureConfigurationDTO.getOrgCode());
-            httpParam.put("oper_centerid",insureConfigurationDTO.getCode());
+            httpParam.put("oper_centerid",code);
         }
         httpParam.put("function_id", Constant.HuNanSheng.INPT.BIZC131272);//交易号
         httpParam.put("hospital_id", inptVisitDTO.getInsureRegCode());//医疗机构编码
@@ -563,12 +597,14 @@ public class InptFunction {
             throw new AppException("未获取个人医保就诊信息。");
         }
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(insureIndividualVisitDTO.getHospCode(),insureIndividualVisitDTO.getInsureRegCode());
-
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(inptVisitDTO.getHospCode(), QIYANGCODE);
         // 获取诊断信息
         Map<String,Object> paramsMap = new HashMap<>();
         paramsMap.put("hospCode",inptVisitDTO.getHospCode());
         paramsMap.put("visitId",inptVisitDTO.getId());
-        paramsMap.put("insureRegCode",insureConfigurationDO.getCode());
+        String s = code != null ? code : insureConfigurationDO.getCode();
+        paramsMap.put("insureRegCode",s);
         List<Map<String,Object>> disaseList =  insureDiseaseMatchService.queryInptDiseaseInfoByVisitId(paramsMap);
         if (ListUtils.isEmpty(disaseList)) {
             throw new AppException("未查询到医保中心疾病,请先完成医保疾病匹配！");
@@ -597,7 +633,7 @@ public class InptFunction {
         httpParam.put("corp_id",insureIndividualVisitDTO.getAab001());// 单位ID
         httpParam.put("corp_name",insureIndividualVisitDTO.getBka008());// 单位名称
         httpParam.put("oper_staffid",inptVisitDTO.getUserCode());//员工号
-        httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
+        httpParam.put("oper_centerid",s);//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码
         if (Constants.IS_USER_ACCOUNT.S.equals(insureIndividualVisitDTO.getInsureAccoutFlag())) {
             httpParam.put("last_balance",insureIndividualVisitDTO.getAkc252());//本次业务个人帐户可用金额(系统默认使用个人帐户余额)
@@ -617,7 +653,11 @@ public class InptFunction {
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if(insureConfigurationDTO !=null) {
             httpParam.put("oper_staffid", inptVisitDTO.getUserCode());//员工号
-            httpParam.put("oper_centerid", insureConfigurationDTO.getCode());//中心编码
+            if (StringUtils.isEmpty(code)) {
+                httpParam.put("oper_centerid", insureConfigurationDTO.getCode());//中心编码
+            } else {
+                httpParam.put("oper_centerid", code);//中心编码
+            }
             httpParam.put("oper_hospitalid", insureConfigurationDTO.getOrgCode());//医疗机构编码
         }
        /* httpParam.put("civil_affairs_subsidy",null);//民政医疗补助（试算时传入民政补助金额，会返回401基金。（目前仅限常德一站式结算使用））
@@ -719,7 +759,8 @@ public class InptFunction {
         InptVisitDTO inptVisitDTO = (InptVisitDTO) param.get("inptVisit");
         InsureIndividualVisitDTO insureIndividualVisitDTO = (InsureIndividualVisitDTO) param.get("insureIndividualVisit");
         Map<String,Object> httpParam = new HashMap<>();
-
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(inptVisitDTO.getHospCode(), QIYANGCODE);
         // 获取诊断信息
         Map<String,Object> paramsMap = new HashMap<>();
         paramsMap.put("hospCode",inptVisitDTO.getHospCode());
@@ -787,7 +828,11 @@ public class InptFunction {
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if(insureConfigurationDTO !=null) {
             httpParam.put("oper_staffid", inptVisitDTO.getUserCode());//员工号
-            httpParam.put("oper_centerid", insureConfigurationDTO.getCode());//中心编码
+            if (StringUtils.isEmpty(code)){
+                httpParam.put("oper_centerid", insureConfigurationDTO.getCode());//中心编码
+            }else{
+                httpParam.put("oper_centerid", code);//中心编码
+            }
             httpParam.put("oper_hospitalid", insureConfigurationDTO.getOrgCode());//医疗机构编码
         }
         Map<String,Object> httpResult = requestInsure.callHNS((String)param.get("hospCode"),(String) param.get("insureRegCode"),httpParam);
@@ -858,13 +903,16 @@ public class InptFunction {
     **/
     public Boolean bizh120004(HashMap<String,Object> httpParam){
         InsureIndividualVisitDTO insureIndividualVisitDTO =(InsureIndividualVisitDTO) httpParam.get("insureIndividualVisitDTO");
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(insureIndividualVisitDTO.getHospCode(), QIYANGCODE);
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
         insureConfigurationDTO.setHospCode(insureIndividualVisitDTO.getHospCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        String s = code != null ? code : insureConfigurationDTO.getCode();
         if(insureConfigurationDTO !=null){
             httpParam.put("oper_hospitalid",insureConfigurationDTO.getOrgCode());
-            httpParam.put("oper_centerid",insureConfigurationDTO.getCode());
+            httpParam.put("oper_centerid",s);
         }
         httpParam.put("function_id", Constant.HuNanSheng.INPT.BIZC131274);//交易号
         httpParam.put("hospital_id", insureConfigurationDTO.getOrgCode());//医疗机构编码
@@ -893,14 +941,17 @@ public class InptFunction {
         String insureRegCode = insureIndividualBasicDTO.getInsureRegCode();//医保机构编码
         String isRemote = insureIndividualBasicDTO.getIsRemote();//是否异地
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,insureRegCode);
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(hospCode, QIYANGCODE);
+        String s = code != null ? code : insureConfigurationDO.getCode();
         Map<String,Object> httpParam = new HashMap<String,Object>();//入参
         httpParam.put("oper_staffid", insureIndividualBasicDTO.getUserCode());//员工号
-        httpParam.put("oper_centerid", insureConfigurationDO.getCode());//中心编码
+        httpParam.put("oper_centerid", s);//中心编码
         httpParam.put("oper_hospitalid", insureConfigurationDO.getOrgCode());//医疗机构编码
         httpParam.put(insureIndividualBasicDTO.getBka895(),insureIndividualBasicDTO.getBka896());//查询条件
         httpParam.put("hospital_id",insureConfigurationDO.getOrgCode());//医疗机构编码
         httpParam.put("biz_type",insureIndividualBasicDTO.getAka130());//业务类型
-        httpParam.put("center_id",insureConfigurationDO.getCode());//医保中心编号
+        httpParam.put("center_id",s);//医保中心编号
         Map<String, Object> resultMap = new HashMap<String,Object>();//回参
         if(Constants.SF.F.equals(isRemote)) {
             httpParam.put("function_id", Constant.HuNanSheng.INPT.BIZC131201);//功能号
@@ -1434,9 +1485,12 @@ public class InptFunction {
         insureConfigurationDTO.setRegCode(insureInptOutFeeDTO.getInsureOrgCode());
         insureConfigurationDTO.setHospCode(insureInptOutFeeDTO.getHospCode());
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(insureInptOutFeeDTO.getHospCode(), QIYANGCODE);
+        String s = code != null ? code : insureConfigurationDTO.getCode();
         if(insureConfigurationDTO !=null) {
             httpParam.put("oper_staffid", insureInptOutFeeDTO.getUserCode());//员工号
-            httpParam.put("oper_centerid", insureConfigurationDTO.getCode());//中心编码
+            httpParam.put("oper_centerid", s);//中心编码
             httpParam.put("oper_hospitalid", insureConfigurationDTO.getOrgCode());//医疗机构编码
         }
         /*调用医保统一访问接口*/
@@ -1457,9 +1511,12 @@ public class InptFunction {
         Map<String,Object> httpParam = new HashMap<String,Object>();
         httpParam.put("function_id",Constant.HuNanSheng.INPT.BIZC131259);//功能号
         InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(insureIndividualVisit.getHospCode(),insureIndividualVisit.getInsureRegCode());
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(insureIndividualVisit.getHospCode(), QIYANGCODE);
+        String s = code != null ? code : insureConfigurationDO.getCode();
         httpParam.put("serial_no",insureIndividualVisit.getMedicalRegNo());//就医登记号
         httpParam.put("indi_id",insureIndividualVisit.getAac001());
-        httpParam.put("oper_centerid",insureConfigurationDO.getCode());//中心编码
+        httpParam.put("oper_centerid",s);//中心编码
         httpParam.put("oper_hospitalid",insureConfigurationDO.getOrgCode());//医疗机构编码
         httpParam.put("oper_staffid",param.get("userCode"));//员工号
         httpParam.put("ic_flag", "1");//IC设备
@@ -1570,9 +1627,12 @@ public class InptFunction {
             String insureRegCode = map.get("insureRegCode");
             String condition = map.get("condition");
             InsureConfigurationDO insureConfigurationDO = requestInsure.toConfig(hospCode,insureRegCode);
+        // 获得祁阳骨科专用的中心编码
+        String code = getSysParamDTOValue(hospCode, QIYANGCODE);
+        String s = code != null ? code : insureConfigurationDO.getCode();
             httpParam.put("function_id",Constant.HuNanSheng.MATCH.BIZC110118);
             httpParam.put("oper_hospitalid", insureConfigurationDO.getOrgCode());
-            httpParam.put("oper_centerid",insureConfigurationDO.getCode());
+            httpParam.put("oper_centerid",s);
             httpParam.put("oper_staffid", "000");
             String onceFind = map.get("onceFind");
             if (StringUtils.isEmpty(onceFind)) {

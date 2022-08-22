@@ -8,6 +8,7 @@ import cn.hsa.module.insure.module.dto.InsureDictDTO;
 import cn.hsa.util.ServletUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
@@ -54,5 +55,24 @@ public class CenterInsureAdmdvsController extends CenterBaseController {
         res.setHeader("Access-Control-Allow-Methods", "GET");
         res.setHeader("Access-Control-Allow-Credentials", "true");
         return centerInsureAdmdvsService.queryAdmdvsInfo(map);
+    }
+
+    /**
+     * @Method updateReadIdCard
+     * @Desrciption 查询医保区划
+     * @Param map
+     * @Author liuhuiming
+     * @Date   2022-08-11 10:11
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<>
+     **/
+    @GetMapping("/queryAdmdvs")
+    public WrapperResponse<List<Map<String,Object>>> queryAdmdvs(@RequestParam Map<String,Object> map, HttpServletResponse res){
+        map.put("hospCode", "100001");
+        HttpSession session =  ServletUtils.getCurrentRequest().get().getSession();
+        System.err.println(session.getAttribute("SESSION_USER_INFO"));
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Methods", "GET");
+        res.setHeader("Access-Control-Allow-Credentials", "true");
+        return centerInsureAdmdvsService.queryAdmdvs(map);
     }
 }

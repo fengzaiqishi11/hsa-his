@@ -1866,6 +1866,10 @@
 		visit.out_disease_name,
 		0 as ypfy,
 		0 fyb,
+		iiv.psn_idet_type as psnIdetType,
+		ifnull(iiv.psn_idet_type_name,'-') as psnIdetTypeName,
+		(select admdvs_name from insure_admdvs i where   iiv.hosp_code = i.hosp_code and i.admdvs_code=iiv.insuplc_admdvs limit 1) as insuplcAdmdvs,
+		iib.bka008,
 		(select count(1) FROM inpt_visit a where a.cert_no = visit.cert_no and a.cert_code = visit.cert_code and a.name = visit.name) as zycs,
 		DATE_FORMAT( visit.out_time, '%Y-%m-%d %H:%i:%s' ) AS out_time,
 		visit.status_code,
@@ -1899,6 +1903,8 @@
 		GROUP BY
 		hosp_code,visit_id
 		) settle ON visit.hosp_code = settle.hosp_code and visit.id = settle.visit_id
+		left join insure_individual_visit iiv on iiv.visit_id = visit.id and iiv.hosp_code = settle.hosp_code
+		left join insure_individual_basic iib on iib.id = iiv.mib_id and iiv.hosp_code = iib.hosp_code
 		WHERE
 		visit.hosp_code =#{hospCode}
 		<if test="keyword != null and keyword !=''">
@@ -1906,7 +1912,12 @@
 			         or visit.in_profile like concat('%',#{keyword},'%')
 			         or visit.in_no like concat('%',#{keyword},'%'))
 		</if>
-
+		<if test="psnIdetType != null and psnIdetType.size()>0">
+			and
+			<foreach collection="psnIdetType" open="(" separator="or" close=")" item="item">
+				FIND_IN_SET(#{item},iiv.psn_idet_type)
+			</foreach>
+		</if>
 		<!--就诊科室-->
 		<if test="in_dept_id != null and in_dept_id !=''">
 			and visit.in_dept_id = #{in_dept_id}
@@ -2322,6 +2333,10 @@
 		visit.crte_name AS czr,
 		DATE_FORMAT( settle.settle_time, '%Y-%m-%d %H:%i:%s' ) AS jssj,
 		1 as px,
+		iiv.psn_idet_type as psnIdetType,
+		ifnull(iiv.psn_idet_type_name,'-') as psnIdetTypeName,
+		(select admdvs_name from insure_admdvs i where   iiv.hosp_code = i.hosp_code and i.admdvs_code=iiv.insuplc_admdvs limit 1) as insuplcAdmdvs,
+		iib.bka008,
 		(select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and visit.id = c.visit_id and (c.baby_id is null or c.baby_id ='')) as ypfy,
         (select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and visit.id = c.visit_id and (c.baby_id is null or c.baby_id =''))/visit.total_cost as fyb
 
@@ -2344,6 +2359,8 @@
 		hosp_code,visit_id
 		) settle ON visit.hosp_code = settle.hosp_code and visit.id = settle.visit_id and (settle.baby_id is null or
 		settle.baby_id ='')
+		left join insure_individual_visit iiv on iiv.visit_id = visit.id and iiv.hosp_code = settle.hosp_code
+		left join insure_individual_basic iib on iib.id = iiv.mib_id and iiv.hosp_code = iib.hosp_code
 		WHERE
 		visit.hosp_code =#{hospCode}
 		<if test="keyword != null and keyword !=''">
@@ -2351,7 +2368,12 @@
 			or visit.in_profile like concat('%',#{keyword},'%')
 			or visit.in_no like concat('%',#{keyword},'%'))
 		</if>
-
+		<if test="psnIdetType != null and psnIdetType.size()>0">
+			and
+			<foreach collection="psnIdetType" open="(" separator="or" close=")" item="item">
+				FIND_IN_SET(#{item},iiv.psn_idet_type)
+			</foreach>
+		</if>
 		<!--就诊科室-->
 		<if test="in_dept_id != null and in_dept_id !=''">
 			and visit.in_dept_id = #{in_dept_id}
@@ -2432,6 +2454,10 @@
 		visit.status_code,
 		visit.crte_name AS czr,
 		DATE_FORMAT( settle.settle_time, '%Y-%m-%d %H:%i:%s' ) AS jssj,2 as px,
+		iiv.psn_idet_type as psnIdetType,
+		ifnull(iiv.psn_idet_type_name,'-') as psnIdetTypeName,
+		(select admdvs_name from insure_admdvs i where   iiv.hosp_code = i.hosp_code and i.admdvs_code=iiv.insuplc_admdvs limit 1) as insuplcAdmdvs,
+		iib.bka008,
 		(select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and visit.id = c.visit_id  and c.baby_id = ib.id) as ypfy,
         (select sum(total_price) from inpt_cost c where c.hosp_code = #{hospCode} and c.item_code = '1' and visit.id = c.visit_id  and c.baby_id = ib.id)/visit.total_cost as fyb
 
@@ -2453,6 +2479,8 @@
 		GROUP BY
 		hosp_code,visit_id
 		) settle ON ib.hosp_code = settle.hosp_code and ib.id = settle.baby_id
+		left join insure_individual_visit iiv on iiv.visit_id = visit.id and iiv.hosp_code = settle.hosp_code
+		left join insure_individual_basic iib on iib.id = iiv.mib_id and iiv.hosp_code = iib.hosp_code
 		WHERE
 		visit.hosp_code =#{hospCode}
 		<if test="keyword != null and keyword !=''">
@@ -2460,7 +2488,12 @@
 			or visit.in_profile like concat('%',#{keyword},'%')
 			or visit.in_no like concat('%',#{keyword},'%'))
 		</if>
-
+		<if test="psnIdetType != null and psnIdetType.size()>0">
+			and
+			<foreach collection="psnIdetType" open="(" separator="or" close=")" item="item">
+				FIND_IN_SET(#{item},iiv.psn_idet_type)
+			</foreach>
+		</if>
 		<!--就诊科室-->
 		<if test="in_dept_id != null and in_dept_id !=''">
 			and visit.in_dept_id = #{in_dept_id}

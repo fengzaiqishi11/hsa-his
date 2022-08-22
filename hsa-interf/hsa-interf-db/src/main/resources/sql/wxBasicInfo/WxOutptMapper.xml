@@ -463,7 +463,7 @@
                     outpt_register d
                     where
                     d.dept_id = c.dept_id
-                    and date(d.register_time) = date(#{register_time})
+                    and date(d.register_time) = date(#{registerTime})
                     and is_cancel = '0')
                 </otherwise>
             </choose>

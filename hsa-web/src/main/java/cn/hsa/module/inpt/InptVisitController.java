@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.module.inpt
@@ -318,7 +316,6 @@ public class InptVisitController extends BaseController {
         paramMap.put("hospName", sysUserDTO.getHospName());
         paramMap.put("pageNo", req.getParameter("pageNo"));
         paramMap.put("pageSize", req.getParameter("pageSize"));
-
         paramMap.put("keyword", req.getParameter("keyword"));
         paramMap.put("status_code", req.getParameter("status_code"));
         paramMap.put("in_ward_id", req.getParameter("in_ward_id"));
@@ -330,7 +327,13 @@ public class InptVisitController extends BaseController {
         paramMap.put("js_start_time", req.getParameter("js_start_time"));
         paramMap.put("js_end_time", req.getParameter("js_end_time"));
         paramMap.put("patient_code", req.getParameter("patient_code"));
-
+        if(StringUtils.isNotEmpty(req.getParameter("psnIdetType"))){
+            String[] psnIdetTypes = req.getParameter("psnIdetType").split(",");
+            if(psnIdetTypes.length > 0){
+                List<String> psnIdetType = Arrays.asList(psnIdetTypes);
+                paramMap.put("psnIdetType", psnIdetType);
+            }
+        }
         return inptVisitService_consumer.queryPatients(paramMap);
     }
 /*

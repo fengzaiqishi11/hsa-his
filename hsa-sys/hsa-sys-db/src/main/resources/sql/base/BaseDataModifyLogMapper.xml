@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.base.log.dao.BaseDataModifyLogDAO">
+
+
+
+	<!--通过实体作为筛选条件查询-->
+	<select id="queryBaseDataModifyLogPage" resultType="cn.hsa.module.base.log.dto.BaseDataModifyLogDTO">
+		select
+		a.`id` ,
+		a.`create_id` ,
+		a.`create_name`,
+		a.`adjustment_time` ,
+		a.`create_time` ,
+		a.`before_modifying` ,
+		a.`after_modifying` ,
+		a.`difference` ,
+		a.`item_code` ,
+		a.`item_name`,
+		a.`hosp_code`,
+		a.`item_id` ,
+		a.`biz_id` ,
+		a.`biz_type` ,
+		a.`price_before_adjust`,
+		a.`price_after_adjust`
+		from base_data_modify_log a
+		<where>
+			a.hosp_code = #{hospCode}
+			<if test="itemCode != null and itemCode != ''">
+				and a.item_code = #{itemCode}
+			</if>
+			<if test="startDate != null">
+				and a.create_time &gt;= #{startDate}
+			</if>
+			<if test="endDate != null">
+				and a.create_time &lt;= #{endDate}
+			</if>
+
+		</where>
+		order by a.create_time asc
+	</select>
+
+	<!--新增所有列-->
+	<insert id="insertBaseDataModifyLog">
+		INSERT INTO `base_data_modify_log`(`id`, `hosp_code`, `item_code`, `item_name`,  `item_id`,`before_modifying`, `after_modifying`, `difference`, `biz_id`, `biz_type`, `create_id`, `create_name`, `adjustment_time`, `create_time`,  `price_before_adjust`,
+			`price_after_adjust`)
+                  VALUES (#{id}, #{hospCode}, #{itemCode}, #{itemName},#{itemId}, #{beforeModifying}, #{afterModifying} ,#{difference}, #{bizId}, #{bizType}, #{createId}, #{createName}, #{adjustmentTime}, #{createTime},#{priceBeforeAdjust},#{priceAfterAdjust});
+    </insert>
+
+</mapper>

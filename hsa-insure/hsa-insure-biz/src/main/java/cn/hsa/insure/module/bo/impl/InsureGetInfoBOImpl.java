@@ -10,6 +10,7 @@ import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.insure.util.ResultBean;
 import cn.hsa.insure.util.UnifiedCommon;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
 import cn.hsa.module.drgdip.bo.DrgDipBusinessOptInfoBO;
@@ -113,6 +114,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Resource
     private InsureDictService insureDictService_consumer;
 
+    private static final String hiPaymtd_tcm = "60";
+
+    @Resource
+    RedisUtils redisUtils;
     /**
      * @Method getSettleInfo
      * @Desrciption 1、交易输入结算清单信息为单行数据，输入其他信息均为多行数据；
@@ -595,7 +600,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @Return
      **/
     @Override
-    public Boolean saveInsureSettleInfo(Map<String, Object> map) {
+    public Map saveInsureSettleInfo(Map<String, Object> map) {
         // 保存手术信息
         insertOperInfo(map);
         // 保存重症监护信息
@@ -603,7 +608,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         // 保存门诊慢特病诊断信息
         insertOpspdiseinfo(map);
         //校验中医病种分值规则
-        chkTcmDiseMatch(map);
+        Map tcmMap = chkTcmDiseMatch(map);
+        if (ObjectUtil.isNotEmpty(MapUtil.getStr(tcmMap,"message"))) {
+            return tcmMap;
+        }
         // 保存 住院诊断信息
         insertDiseaseInfo(map);
         // 保存结清单信息
@@ -651,7 +659,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         businessLogMap.put("crtId",MapUtils.get(map, "crteId"));
         businessLogMap.put("crtName",MapUtils.get(map, "crtName"));
         drgDipBusinessOptInfoBO.insertDrgDipBusinessOptInfoLog(businessLogMap);
-        return true;
+        return new HashMap();
     }
 
     /**
@@ -732,15 +740,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (insureConfigurationDTO == null) {
             throw new AppException("根据" + insureIndividualVisitDTO.getInsureOrgCode() + "医保机构编码获取医保机构配置信息为空");
         }
+        //查询状态分类
         InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
+        String stasType = Constant.UnifiedPay.ISMAN.S;
         if (insureSettleInfoDTO == null) {
             throw new AppException("未查询到结算清单信息");
         }
-        if (insureSettleInfoDTO != null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
-            throw new AppException("该结算清单信息未上传至医保,不能修改状态");
+        //如果是已提交，修改为未提交
+        if (Constant.UnifiedPay.ISMAN.S.equals(insureSettleInfoDTO.getStasType())) {
+            stasType = Constant.UnifiedPay.ISMAN.F;
         }
-        if ("1".equals(insureSettleInfoDTO.getStasType())) {
-            throw new AppException("该结算清单信息已修改状态不能再次修改");
+        //如果是未提交，修改为已提交
+        if (Constant.UnifiedPay.ISMAN.F.equals(insureSettleInfoDTO.getStasType())) {
+            stasType = Constant.UnifiedPay.ISMAN.S;
         }
         String functionCode = selectParamSettleInfo(map);
         if (StringUtils.isEmpty(functionCode)) {
@@ -749,9 +761,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
         dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());
-        if (StringUtils.isEmpty(MapUtils.get(map, "stasType"))) {
-            dataMap.put("stas_type", "1");
-        }
+        dataMap.put("stas_type", stasType);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("stastinfo", dataMap);
 
@@ -769,9 +779,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_UPDATE, interfaceParamDTO);
 
         //修改状态
-        if (StringUtils.isEmpty(MapUtils.get(map, "stasType"))) {
-            map.put("stasType", "1");
-        }
+        map.put("stasType", stasType);
         insureGetInfoDAO.updateStasType(map);
         return true;
     }
@@ -839,6 +847,36 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         // 基金支付信息
         List<Map<String, Object>> payinfoList = insureGetInfoDAO.selectPayinfoForMap(map);
+        //单病种费用集合
+        List<Map<String, Object>> dbzInfo = new ArrayList<>();
+        //判断是否为单病种住院
+        if(setlinfo.get("medType")!= null){
+            Map<String, Object> dbzInfoMap = new HashMap<>();
+            BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+            BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+            BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+            BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+            BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+            for(Map<String, Object> map1:itemInfoList){
+                sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("amt").toString()));
+                AClassFee = BigDecimalUtils.add(AClassFee,BigDecimalUtils.convert(map1.get("claaSumfee").toString()));
+                BClassFee = BigDecimalUtils.add(BClassFee,BigDecimalUtils.convert(map1.get("clabAmt").toString()));
+                CClassFee = BigDecimalUtils.add(CClassFee,BigDecimalUtils.convert(map1.get("fulamtOwnpayAmt").toString()));
+                otherClassFee = BigDecimalUtils.add(otherClassFee,BigDecimalUtils.convert(map1.get("othAmt").toString()));
+            }
+            dbzInfoMap.put("amt", sumDetItemFeeSumamt);
+            dbzInfoMap.put("claaSumfee", AClassFee);
+            dbzInfoMap.put("clabAmt", BClassFee);
+            dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
+            dbzInfoMap.put("othAmt", otherClassFee);
+            dbzInfoMap.put("medChrgitm", setlinfo.get("bka006")+"+"+setlinfo.get("bka006Name"));
+            dbzInfo.add(dbzInfoMap);
+            for(int i = 0;i < itemInfoList.size(); i++){
+                if("15".equals(itemInfoList.get(i).get("medChrgitm"))){
+                    itemInfoList.remove(i);
+                }
+            }
+        }
 
         // 输血信息节点
         List<Map<String, Object>> bldinfoList = insureGetInfoDAO.selectBldInfoForMap(map);
@@ -858,6 +896,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         BigDecimal bigDecimal = BigDecimalUtils.add(acctPay, cashPayamt);
         BigDecimal psnSelfpay = BigDecimalUtils.subtract(bigDecimal, psnOwnpay);
         setlinfo.put("psnSelfpay", psnSelfpay); // 个人自付
+        resultDataMap.put("dbzInfo", dbzInfo);
         resultDataMap.put("setlinfo", setlinfo);
         resultDataMap.put("payinfo", payinfoList);
         resultDataMap.put("opspdiseinfo", opspdiseinfoList);
@@ -1656,6 +1695,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         String isHospital = MapUtils.get(map, "isHospital");
         Map<String, Object> setlinfo = new HashMap<>();
+        setlinfo.put("stasType", infoDTO.getStasType());
         setlinfo.put("medicalRegNo", MapUtils.get(map, "medicalRegNo"));
         setlinfo.put("visitId", infoDTO.getVisitId());
         setlinfo.put("mdtrtId", MapUtils.get(map, "medicalRegNo")); // 就医登记号
@@ -1664,28 +1704,20 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("fixmedinsName", infoDTO.getFixmedinsName()); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", infoDTO.getFixmedinsCode()); // 定点医药机构编号
         setlinfo.put("hiSetlLv", infoDTO.getHiSetlLv());//医保结算等级
-        //如果之前没保存从参数获取医保结算等级
+        //如果之前没保存从字典获取医保结算等级
         if(StringUtils.isEmpty(infoDTO.getHiSetlLv())){
-            SysParameterDTO data = insureGetInfoDAO.getParameterByCode(MapUtils.get(map, "hospCode"),"SETTLELEVEL");
-            if (data == null) {
-                throw new AppException("请先维护系统参数SETTLELEVEL" + "值为医院结算等级");
-            }
-            String value = data.getValue();
             String settleLv = "";
-            Map<String, Object> stringObjectMap = JSON.parseObject(value, Map.class);
-            for (String key : stringObjectMap.keySet()) {
-                if ("settleLv".equals(key)) { //
-                    settleLv = MapUtils.get(stringObjectMap, key);
-                }
-            }
             Map dictMap = new HashMap(2);
             dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
             dictMap.put("insureRegCode", infoDTO.getInsuplc());
             dictMap.put("code", "HI_SETL_LV");
             Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
-            for(String key:dictMap1.keySet()){
-                if(dictMap1.get(key).equals(settleLv)){
-                    settleLv = key;
+            if(dictMap != null ){
+                for (Map.Entry<String,String> entry : dictMap1.entrySet()) {
+                    settleLv = entry.getKey();
+                    if (settleLv != null) {
+                        break;
+                    }
                 }
             }
             setlinfo.put("hiSetlLv", settleLv);//医保结算等级
@@ -1723,6 +1755,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("certno", infoDTO.getCertNo()); // 证件号码
         setlinfo.put("prfs", infoDTO.getPrfs()); // 职业
         setlinfo.put("currAddr", infoDTO.getCurrAddr()); // 现住址
+        //现住址四级地址
+        setlinfo.put("province", infoDTO.getProvince()); // 现住址-省
+        setlinfo.put("city", infoDTO.getCity()); // 现住址-市
+        setlinfo.put("county", infoDTO.getCounty()); // 现住址-县
+        setlinfo.put("detailAddress", infoDTO.getDetailAddress()); // 现住址-详细地址
         setlinfo.put("empName", infoDTO.getEmpName()); // 单位名称
         setlinfo.put("empAddr", infoDTO.getEmpAddr()); // 单位地址
         setlinfo.put("empTel", infoDTO.getEmpTel()); // 单位电话
@@ -1730,6 +1767,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("conerName", infoDTO.getConerName()); // 联系人姓名
         setlinfo.put("patnRlts", infoDTO.getPatnRlts()); // 与患者关系
         setlinfo.put("conerAddr", infoDTO.getConerAddr()); // 联系人地址
+        //联系人地址四级地址
+        setlinfo.put("conProvince", infoDTO.getConProvince()); // 联系人地址-省
+        setlinfo.put("conCity", infoDTO.getConCity()); // 联系人地址-市
+        setlinfo.put("conCounty", infoDTO.getConCounty()); // 联系人地址-县
+        setlinfo.put("conDetailAddress", infoDTO.getConDetailAddress()); // 联系人地址-详细地址
         setlinfo.put("conerTel", infoDTO.getConerTel()); // 联系人电话
         setlinfo.put("hiType", infoDTO.getHiType()); // 医保类型  也就是险种   sp_psn_type
         String insuplcAdmdvs = infoDTO.getInsuplc();
@@ -1737,6 +1779,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> admdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
         if (!MapUtils.isEmpty(admdvsMap)) {
             setlinfo.put("insuplcName", MapUtils.get(admdvsMap, "admdvsName")); // 参保地 *******
+        }
+        //参保地显示市加县
+        String upInsuplcAdmdvs = null;
+        if("00".equals(insuplcAdmdvs.substring(insuplcAdmdvs.length()-2,insuplcAdmdvs.length()))){
+            if("00".equals(insuplcAdmdvs.substring(insuplcAdmdvs.length()-4,insuplcAdmdvs.length()-2))){
+                upInsuplcAdmdvs = insuplcAdmdvs;
+            }else {
+                upInsuplcAdmdvs = insuplcAdmdvs.substring(0,insuplcAdmdvs.length()-4) + "0000";
+            }
+        }else {
+            upInsuplcAdmdvs = insuplcAdmdvs.substring(0,insuplcAdmdvs.length()-2) + "00";
+        }
+        map.put("insuplcAdmdvs", upInsuplcAdmdvs);
+        Map<String, Object> upAdmdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
+        if (!MapUtils.isEmpty(upAdmdvsMap)) {
+            setlinfo.put("insuplcName", (String)MapUtils.get(upAdmdvsMap, "admdvsName") + setlinfo.get("insuplcName")); // 参保地 *******
         }
         setlinfo.put("insuplc", insuplcAdmdvs); // 参保地 *******
         setlinfo.put("spPsnType", infoDTO.getSpPsnType()); // 特殊人员类型
@@ -1828,6 +1886,14 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorgOpter", infoDTO.getHosrgOpter()); // 医保机构经办人
         setlinfo.put("medinsFillDept", infoDTO.getMedinsFillDept()); // 医疗机构填报部门
         setlinfo.put("medinsFillPsn", infoDTO.getMedinsFillPsn()); // 医疗机构填报人
+        //查询就诊信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        //判断是否为单病种住院
+        if(Constant.UnifiedPay.YWLX.DBZZY.equals(insureIndividualVisitDTO.getAka130())){
+            setlinfo.put("medType", insureIndividualVisitDTO.getAka130());//医疗类别
+            setlinfo.put("bka006", insureIndividualVisitDTO.getBka006());//单病种编码
+            setlinfo.put("bka006Name", insureIndividualVisitDTO.getBka006Name());//单病种名称
+        }
         return setlinfo;
     }
 
@@ -1921,6 +1987,16 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Object objNwbBirWt = MapUtils.get(setlInfoMap, "nwbBirWt"); // 新生儿出生体重
         if (ObjectUtil.isEmpty(objNwbBirWt)){
           setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
+        }
+        //校验新生儿出生体重
+        if (ObjectUtil.isNotEmpty(objNwbBirWt)){
+            String nwbBirWt = String.valueOf(objNwbBirWt) ;
+            for(int i = 0;i < nwbBirWt.length();i++){
+                if(!(Integer.valueOf(nwbBirWt.charAt(i)) >= Integer.valueOf('0') && Integer.valueOf(nwbBirWt.charAt(i)) <= Integer.valueOf('9'))
+                        && Integer.valueOf(nwbBirWt.charAt(i)) != Integer.valueOf(',') ){
+                    throw new AppException("新生儿出生体重填写格式不正确");
+                }
+            }
         }
         /*if (objNwbBirWt instanceof String || objNwbBirWt == null) {
             setlInfoMap.put("nwbBirWt", null); // 新生儿出生体重
@@ -2194,8 +2270,39 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map.put("xiCollect", MapUtils.get(diseaMap, "xiCollect"));
             // 7.结算清单基本信息
             Map<String, Object> setlInfoMap = handerBaseSetlInfo(map, setlinfo);
+            //单病种费用集合
+            List<Map<String, Object>> dbzInfo = new ArrayList<>();
+            //判断是否为单病种住院
+            if(setlInfoMap.get("medType")!= null){
+                Map<String, Object> dbzInfoMap = new HashMap<>();
+                BigDecimal sumDetItemFeeSumamt = new BigDecimal(0.00); // 总费用
+                BigDecimal AClassFee = new BigDecimal(0.00);  // 甲类费用
+                BigDecimal BClassFee = new BigDecimal(0.00);  // 乙类费用
+                BigDecimal CClassFee = new BigDecimal(0.00);  // 丙类费用
+                BigDecimal otherClassFee = new BigDecimal(0.00); // 其他费用
+                for(Map<String, Object> map1:itemInfoMap){
+                    sumDetItemFeeSumamt = BigDecimalUtils.add(sumDetItemFeeSumamt,BigDecimalUtils.convert(map1.get("amt").toString()));
+                    AClassFee = BigDecimalUtils.add(AClassFee,BigDecimalUtils.convert(map1.get("claaSumfee").toString()));
+                    BClassFee = BigDecimalUtils.add(BClassFee,BigDecimalUtils.convert(map1.get("clabAmt").toString()));
+                    CClassFee = BigDecimalUtils.add(CClassFee,BigDecimalUtils.convert(map1.get("fulamtOwnpayAmt").toString()));
+                    otherClassFee = BigDecimalUtils.add(otherClassFee,BigDecimalUtils.convert(map1.get("othAmt").toString()));
+                }
+                dbzInfoMap.put("amt", sumDetItemFeeSumamt);
+                dbzInfoMap.put("claaSumfee", AClassFee);
+                dbzInfoMap.put("clabAmt", BClassFee);
+                dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
+                dbzInfoMap.put("othAmt", otherClassFee);
+                dbzInfoMap.put("medChrgitm", setlInfoMap.get("bka006")+"+"+setlInfoMap.get("bka006Name"));
+                dbzInfo.add(dbzInfoMap);
+                for(int i = 0;i < itemInfoMap.size(); i++){
+                    if("15".equals(itemInfoMap.get(i).get("medChrgitm"))){
+                        itemInfoMap.remove(i);
+                    }
+                }
+            }
             // 输血信息
             List<Map<String, Object>> bldInfoListMap = insureGetInfoDAO.selectBldInfo(map);
+            resultDataMap.put("dbzInfo", dbzInfo);
             resultDataMap.put("iteminfo", itemInfoMap);
             resultDataMap.put("bldinfo", bldInfoListMap);
             resultDataMap.put("setlinfo", setlInfoMap);
@@ -2307,6 +2414,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("setlId", MapUtils.get(map, "insureSettleId")); // 结算ID
         setlinfo.put("fixmedinsName", MapUtils.get(setlinfoMap, "fixmedins_name")); // 定点医药机构名称
         setlinfo.put("fixmedinsCode", insureIndividualVisitDTO.getMedicineOrgCode()); // 定点医药机构编号
+        //判断是否为单病种住院
+        if(Constant.UnifiedPay.YWLX.DBZZY.equals(insureIndividualVisitDTO.getAka130())){
+            setlinfo.put("medType", insureIndividualVisitDTO.getAka130());//医疗类别
+            setlinfo.put("bka006", insureIndividualVisitDTO.getBka006());//单病种编码
+            setlinfo.put("bka006Name", insureIndividualVisitDTO.getBka006Name());//单病种名称
+        }
         map.put("code", "SETTLELEVEL");
         SysParameterDTO data = insureGetInfoDAO.getParameterByCode(hospCode,"SETTLELEVEL");
         if (data == null) {
@@ -2320,8 +2433,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if ("setlTitle".equals(key)) {
                 setlTitle = MapUtils.get(stringObjectMap, key);
             }
-            if ("settleLv".equals(key)) { //
-                settleLv = MapUtils.get(stringObjectMap, key);
+//            if ("settleLv".equals(key)) { //
+//                settleLv = MapUtils.get(stringObjectMap, key);
+//            }
+        }
+        //医保结算等级取字典值
+        Map dictMap = new HashMap(2);
+        dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
+        dictMap.put("insureRegCode", insureIndividualVisitDTO.getInsuplcAdmdvs());
+        dictMap.put("code", "HI_SETL_LV");
+        Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
+        if(dictMap != null ){
+            for (Map.Entry<String,String> entry : dictMap1.entrySet()) {
+                settleLv = entry.getKey();
+                if (settleLv != null) {
+                    break;
+                }
             }
         }
         setlinfo.put("setlTitle", setlTitle);//清单抬头
@@ -2365,6 +2492,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("certno", MapUtils.getMapVS(mriBaseInfo, "cert_no", (String) MapUtils.getMapVS(baseInfoMap, "cert_no", insureIndividualVisitDTO.getMdtrtCertNo()))); // 证件号码
         setlinfo.put("prfs", MapUtils.getMapVS(mriBaseInfo, "occupation_code", MapUtils.get(baseInfoMap, "occupation_code"))); // 职业
         setlinfo.put("currAddr", MapUtils.getMapVS(mriBaseInfo, "now_adress", MapUtils.get(baseInfoMap, "address"))); // 现住址
+        //现住址四级地址
+        setlinfo.put("province", MapUtils.getMapVS(mriBaseInfo, "province", MapUtils.get(baseInfoMap, "province"))); // 现住址-省
+        setlinfo.put("city", MapUtils.getMapVS(mriBaseInfo, "city", MapUtils.get(baseInfoMap, "city"))); // 现住址-市
+        setlinfo.put("county", MapUtils.getMapVS(mriBaseInfo, "county", MapUtils.get(baseInfoMap, "county"))); // 现住址-县
+        setlinfo.put("detailAddress", MapUtils.getMapVS(mriBaseInfo, "detail_address", MapUtils.get(baseInfoMap, "detail_address"))); // 现住址-详细地址
         setlinfo.put("empName", MapUtils.getMapVS(mriBaseInfo, "work_info", null)); // 单位名称
         setlinfo.put("empAddr", MapUtils.getMapVS(mriBaseInfo, "work_info", null)); // 单位地址
         setlinfo.put("empTel", MapUtils.getMapVS(mriBaseInfo, "work_phone", null)); // 单位电话
@@ -2394,6 +2526,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         setlinfo.put("patnRlts", contactRelaCode); // 与患者关系  默认患者本人
         setlinfo.put("conerAddr", MapUtils.getMapVS(mriBaseInfo, "contact_address", MapUtils.get(baseInfoMap, "contact_address"))); // 联系人地址
+        //联系人地址四级地址
+        setlinfo.put("conProvince", MapUtils.getMapVS(mriBaseInfo, "con_province", MapUtils.get(baseInfoMap, "con_province"))); // 联系人地址-省
+        setlinfo.put("conCity", MapUtils.getMapVS(mriBaseInfo, "con_city", MapUtils.get(baseInfoMap, "con_city"))); // 联系人地址-市
+        setlinfo.put("conCounty", MapUtils.getMapVS(mriBaseInfo, "con_county", MapUtils.get(baseInfoMap, "con_county"))); // 联系人地址-县
+        setlinfo.put("conDetailAddress", MapUtils.getMapVS(mriBaseInfo, "con_detail_address", MapUtils.get(baseInfoMap, "con_detail_address"))); // 联系人地址-详细地址
         setlinfo.put("conerTel", MapUtils.getMapVS(mriBaseInfo, "contact_phone", MapUtils.get(baseInfoMap, "contact_phone"))); // 联系人电话
         setlinfo.put("hiType", insureIndividualVisitDTO.getAae140()); // 医保类型  也就是险种   sp_psn_type
         String insuplcAdmdvs = insureIndividualVisitDTO.getInsuplcAdmdvs();
@@ -2401,6 +2538,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> admdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
         if (!MapUtils.isEmpty(admdvsMap)) {
             setlinfo.put("insuplcName", MapUtils.get(admdvsMap, "admdvsName")); // 参保地 *******
+        }
+        //参保地显示市加县
+        String upInsuplcAdmdvs = null;
+        if("00".equals(insuplcAdmdvs.substring(insuplcAdmdvs.length()-2,insuplcAdmdvs.length()))){
+            if("00".equals(insuplcAdmdvs.substring(insuplcAdmdvs.length()-4,insuplcAdmdvs.length()-2))){
+                upInsuplcAdmdvs = insuplcAdmdvs;
+            }else {
+                upInsuplcAdmdvs = insuplcAdmdvs.substring(0,insuplcAdmdvs.length()-4) + "0000";
+            }
+        }else {
+            upInsuplcAdmdvs = insuplcAdmdvs.substring(0,insuplcAdmdvs.length()-2) + "00";
+        }
+        map.put("insuplcAdmdvs", upInsuplcAdmdvs);
+        Map<String, Object> upAdmdvsMap = insureGetInfoDAO.selectInsuplcAdmdvs(map);
+        if (!MapUtils.isEmpty(upAdmdvsMap)) {
+            setlinfo.put("insuplcName", (String)MapUtils.get(upAdmdvsMap, "admdvsName") + setlinfo.get("insuplcName")); // 参保地 *******
         }
         setlinfo.put("insuplc", insureIndividualVisitDTO.getInsuplcAdmdvs()); // 参保地 *******
         map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
@@ -2510,13 +2663,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("chfpdrName", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_name",null)); // 主诊医生姓名 *******
             setlinfo.put("chfpdrCode", MapUtils.getMapVS(mriBaseInfo,"zg_doctor_code",null)); // 主诊医生代码 *******
         }
-        Object setlBegnDate = MapUtils.get(baseInfoMap, "setlBegnDate");
+        Object setlBegnDate = MapUtils.get(setlinfoMap, "begndate");
         if (ObjectUtil.isEmpty(setlBegnDate)) {
             throw new AppException("结算开始时间为空");
         } else {
-            setlinfo.put("setlBegnDate", DateUtils.parse(getDateToString(MapUtils.get(baseInfoMap, "setlBegnDate")), DateUtils.Y_M_D)); //结算开始日期 *******
+            setlinfo.put("setlBegnDate", DateUtils.parse((String) setlBegnDate, DateUtils.Y_M_D)); //结算开始日期 *******
         }
-        Object setlEndDate = MapUtils.get(setlinfoMap, "setl_time");
+        Object setlEndDate = MapUtils.get(setlinfoMap, "enddate");
         if (ObjectUtil.isEmpty(setlEndDate)) {
             throw new AppException("结算结束时间为空");
         } else {
@@ -2573,6 +2726,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("hsorg", ""); // 医保机构经办人
         setlinfo.put("hsorgOpter", ""); // 医保机构经办人
         setlinfo.put("medinsFillDept", "医保科"); // 医疗机构填报部门 默认为 医保科
+        setlinfo.put("stasType", "0"); // 状态分类 默认为 未提交
         setlinfo.put("medinsFillPsn", MapUtils.get(baseInfoMap, "feeCrteTime")); // 医疗机构填报人
         //门特患者信息处理，没有病案首页，取档案信息
         if (Constants.SF.F.equals(isHospital)) {
@@ -2948,26 +3102,54 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         InsureIndividualVisitDTO insureIndividualVisitDTO = insureGetInfoDAO.selectInsureIndividual(map);
         List<Map<String, Object>> mapList = new ArrayList<>();
         Map<String, Object> diagNoseMap;
-        if (insureIndividualVisitDTO != null) {
-            diagNoseMap = new HashMap<>();
-            diagNoseMap.put("id", SnowflakeUtils.getId());
-            diagNoseMap.put("hospCode", hospCode);
-            diagNoseMap.put("visitId", visitId);
-            diagNoseMap.put("medicalRegNo", medicalRegNo);
-            diagNoseMap.put("insureSettleId", insureSettleId);
-            if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
-                diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
-            } else {
-                diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+        //查询门特手术信息
+        List <OperInfoRecordDTO> infoRecordDTOList = new ArrayList<>();
+        infoRecordDTOList = insureGetInfoDAO.selectOperInfoAdvice(map);
+        if (insureIndividualVisitDTO != null && !ListUtils.isEmpty(infoRecordDTOList)) {
+            for(OperInfoRecordDTO operInfoRecordDTO:infoRecordDTOList){
+                diagNoseMap = new HashMap<>();
+                diagNoseMap.put("id", SnowflakeUtils.getId());
+                diagNoseMap.put("hospCode", hospCode);
+                diagNoseMap.put("visitId", visitId);
+                diagNoseMap.put("medicalRegNo", medicalRegNo);
+                diagNoseMap.put("insureSettleId", insureSettleId);
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
+                } else {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+                }
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
+                } else {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+                }
+                diagNoseMap.put("oprnOprtName",operInfoRecordDTO.getOprnOprtName());
+                diagNoseMap.put("oprnOprtCode", operInfoRecordDTO.getOprnOprtCode());
+                mapList.add(diagNoseMap);
             }
-            if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
-                diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
-            } else {
-                diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+        }
+        if(ListUtils.isEmpty(mapList)){
+            if (insureIndividualVisitDTO != null) {
+                diagNoseMap = new HashMap<>();
+                diagNoseMap.put("id", SnowflakeUtils.getId());
+                diagNoseMap.put("hospCode", hospCode);
+                diagNoseMap.put("visitId", visitId);
+                diagNoseMap.put("medicalRegNo", medicalRegNo);
+                diagNoseMap.put("insureSettleId", insureSettleId);
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006())) {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getVisitIcdCode());
+                } else {
+                    diagNoseMap.put("diagCode", insureIndividualVisitDTO.getBka006());
+                }
+                if (StringUtils.isEmpty(insureIndividualVisitDTO.getBka006Name())) {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getVisitIcdName());
+                } else {
+                    diagNoseMap.put("diagName", insureIndividualVisitDTO.getBka006Name());
+                }
+                diagNoseMap.put("oprnOprtName", "");
+                diagNoseMap.put("oprnOprtCode", "");
+                mapList.add(diagNoseMap);
             }
-            diagNoseMap.put("oprnOprtName", "");
-            diagNoseMap.put("oprnOprtCode", "");
-            mapList.add(diagNoseMap);
         }
         return mapList;
     }
@@ -3967,7 +4149,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
      * @param map
      * @return void
      */
-    public void chkTcmDiseMatch(Map map){
+    public Map chkTcmDiseMatch(Map map){
 
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode",MapUtil.getStr(map,"hospCode"));
@@ -3978,11 +4160,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         //1.开关配置  1:开启   0：关闭
         if (ObjectUtil.isEmpty(response.getData()) || !Constants.SF.S.equals(response.getData().getValue())) {
-            return;
+            return new HashMap();
         }
         //非住院业务不校验
         if (!Constants.SF.S.equals(MapUtil.getStr(map,"isHospital"))) {
-            return;
+            return new HashMap();
+        }
+        Map setlInfoMap = MapUtil.get(map, "setlinfo", Map.class);
+        //是否按中医优势病种支付方式进行保存   1;是    0：否
+        String tcmAdvPayFlag = MapUtil.getStr(map, "tcmAdvPayFlag");
+        //医保支付方式
+        String hiPaymtd = "";
+        if (ObjectUtil.isNotEmpty(setlInfoMap)) {
+            hiPaymtd = MapUtil.getStr(setlInfoMap, "hiPaymtd");
         }
         //中医主诊断编码
         String tcmMainCode = "";
@@ -3995,17 +4185,17 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> diseaseMap = MapUtils.get(map, "diseinfo");
         if (MapUtils.isEmpty(diseaseMap)) {
             log.info("中医病种分值校验—未获取到诊断信息");
-            return;
+            return new HashMap();
         }
         List<Map<String, Object>> zxCollect = MapUtils.get(diseaseMap, "zxCollect");
         List<Map<String, Object>> xiCollect = MapUtils.get(diseaseMap, "xiCollect");
         if (ObjectUtil.isEmpty(zxCollect)) {
             log.info("中医病种分值校验—未获取到中医诊断信息");
-            return;
+            return new HashMap();
         }
         if (ObjectUtil.isEmpty(xiCollect)) {
             log.info("中医病种分值校验—未获取到西医诊断信息");
-            return;
+            return new HashMap();
         }
         //中医主诊断
         for (Map<String, Object> objectMap : zxCollect) {
@@ -4024,18 +4214,18 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         if (StringUtils.isEmpty(tcmMainCode)) {
             log.info("中医病种分值校验—未获取到中医主诊断信息");
-            return;
+            return new HashMap();
         }
         if (StringUtils.isEmpty(wmMainCode)) {
             log.info("中医病种分值校验—未获取到西医主诊断信息");
-            return;
+            return new HashMap();
         }
         //2.判断出院中医诊断的主诊断编码是否在1维护的中医诊断范围；
         List<TcmDiseScoreDO> tcmDiseScoreDOS = insureGetInfoDAO.queryByTcmDiseCode(tcmMainCode);
         //2.2、如果不存在1维护的中医诊断范围，按照正常的业务流程走。
         if (CollectionUtils.isEmpty(tcmDiseScoreDOS)) {
             log.info("中医病种分值校验—中医主诊断"+tcmMainName+tcmMainCode+"不在维护的中医诊断范围内");
-            return;
+            return new HashMap();
         }
 
         StringBuilder builder = new StringBuilder();
@@ -4049,13 +4239,50 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         if (CollectionUtils.isEmpty(wmDiseList)) {
             throw new AppException("未查询到中医主诊断"+tcmMainName+tcmMainCode+"对应的西医诊断信息,请先维护！");
         }
-        if (!wmDiseList.contains(wmMainCode)) {
-            throw new AppException("中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
-                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，请根据映射关系修改西医主诊断编码和名称");
+        //如果选了中医优势病种支付方式但不满足条件的，抛出提示信息
+        if (!wmDiseList.contains(wmMainCode) && hiPaymtd_tcm.equals(hiPaymtd)) {
+            throw new AppException("当前医保支付方式为中医优势病种，中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合。该中医诊断映射的西医诊断有【"+builder.toString()+"】，如果选择继续以中医优势病种支付方式保存，请修改西医诊断为对应的诊断，否则，请将医保支付方式修改为其他方式，再进行保存");
         }
-        //如果在其中，则将HI_PAYMTD的值修改为60保存并上传。
-        Map<String, Object> setlInfoMap = MapUtils.get(map, "setlinfo");
-        setlInfoMap.put("hiPaymtd","60");
-        map.put("setlinfo",setlInfoMap);
+
+        if (!wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd)
+                && (ObjectUtil.isEmpty(tcmAdvPayFlag) || Constants.SF.F.equals(tcmAdvPayFlag))) {
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("showTip","1");
+            resultMap.put("message","中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +
+                    "但西医主要诊断"+wmMainName+wmMainCode+"不符合，并且医保支付方式未选择中医优势病种结算，该中医诊断映射的西医诊断有【"+builder.toString()+
+                    "】，请选择是否按中医优势病种结算支付方式进行保存？如果选择是，请修改西医诊断为对应的诊断，并修改医保支付方式为中医优势病种结算，再进行保存");
+            return resultMap;
+        }
+        //如果满足条件但没有选择中医优势病种支付方式的，抛出提示信息
+        if (wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd) && ObjectUtil.isEmpty(tcmAdvPayFlag)) {
+                Map<String, Object> resultMap = new HashMap<>();
+                resultMap.put("showTip","1");
+                resultMap.put("message","该结算清单符合中医优势病种结算条件，是否需要按中医优势病种结算支付方式进行保存？" +
+                        "如果选择是，请修改医保支付方式为中医优势病种结算，再进行保存");
+                return resultMap;
+        }
+        return new HashMap();
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 查询医保区划
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    public List<Map<String, Object>> queryAdmdvs(Map<String, Object> map) {
+        if(ObjectUtil.isEmpty(map.get("upAdmdvsCode"))){
+            map.put("admdvsCode","0000");
+        }
+        String key = "admdvs_code_" + map.get("hospCode") + "_" + map.get("upAdmdvsCode");
+        if (redisUtils.hasKey(key)) {
+            return redisUtils.get(key);
+        }
+        List<Map<String, Object>> list = insureGetInfoDAO.queryAdmdvs(map);
+        redisUtils.set(key,list);
+        return list;
     }
 }

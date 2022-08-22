@@ -48,4 +48,9 @@ public class CenterInsureAdmdvsServiceImpl extends HsafService implements Center
     public WrapperResponse<List<Map<String,Object>>> queryAdmdvsInfo(Map<String,String> map) {
         return WrapperResponse.success(centerInsureAdmdvsBO.queryAdmdvsInfo(map));
     }
+
+    @Override
+    public WrapperResponse<List<Map<String,Object>>> queryAdmdvs(Map<String, Object> map) {
+        return WrapperResponse.success(centerInsureAdmdvsBO.queryAdmdvs(map));
+    }
 }

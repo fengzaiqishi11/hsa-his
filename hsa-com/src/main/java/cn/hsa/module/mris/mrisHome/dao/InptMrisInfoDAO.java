@@ -147,4 +147,28 @@ public interface InptMrisInfoDAO {
      **/
     int updateInptVisitExportMris(List<InptVisitDTO> inptVisitDTOS);
 
+    /**
+     * @Menthod: getTcmMrisBaseInfoForHqms
+     * @Desrciption: 中医病案基础信息查询
+     * @Param: 1. hospCode: 医院编码
+     * 2. data: 入参 type-查询的类型、code-值域代码、value-值域值
+     * @Author: liyun.liu
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-18 13:51
+     * @Return: List<LinkedHashMap < String, Object>>
+     **/
+    List<LinkedHashMap<String,Object>> getTcmMrisBaseInfoForHqms(Map<String, Object> map);
+
+
+    /**
+     * @Menthod: getTcmMrisOperInfo
+     * @Desrciption: 获取中医病案手术（hqms）信息查询
+     * @Param: 1、visitId： 就诊id, 2、hospCode： 医院编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-19 09:53
+     * @Return:  List<Map<String, Object>>
+     **/
+    List<Map<String, Object>> getTcmMrisOperInfoForHqms(Map<String, Object> map);
+
 }

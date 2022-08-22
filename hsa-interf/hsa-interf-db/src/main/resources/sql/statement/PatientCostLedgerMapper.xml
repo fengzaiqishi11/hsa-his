@@ -3534,12 +3534,12 @@
             ),'其他')
             as bfcName,
             <!-- 按管床医生 -->
-            <if test="'7'.toString() == flag">
+            <if test="'7'.toString() == flag or '13'.toString() == flag ">
                 ifnull(B.zg_doctor_id,'0') as doctorId,
                 ifnull(B.zg_doctor_name,t.zz_doctor_name) as doctorName,
             </if>
             <!-- 按开方医生 -->
-            <if test="'7'.toString() != flag and '10'.toString() != flag and '11'.toString() != flag">
+            <if test="'7'.toString() != flag and '10'.toString() != flag and '11'.toString() != flag and '13'.toString() != flag">
                 ifnull(B.doctor_id,'0') as doctorId,
                 ifnull(B.doctor_name,t.zz_doctor_name) as doctorName,
             </if>
@@ -3563,7 +3563,7 @@
                 as deptName,
             </if>
             <!-- 按就诊科室 -->
-            <if test="'5'.toString() == flag">
+            <if test="'5'.toString() == flag or '13'.toString() == flag ">
                 ifnull(B.in_dept_id,'0') as deptId,
                 ifnull((select name from base_dept bfc where bfc.id = B.in_dept_id and bfc.hosp_code = #{hospCode}
                 ),'其他')
@@ -3634,6 +3634,7 @@
         <where>
             <if test="doctorName != null and doctorName !='' ">
                 tab.deptName like concat('%',#{doctorName},'%') or tab.doctorName like concat('%',#{doctorName},'%')
+                or tab.visitName like concat('%',#{doctorName},'%')
             </if>
         </where>
     </select>

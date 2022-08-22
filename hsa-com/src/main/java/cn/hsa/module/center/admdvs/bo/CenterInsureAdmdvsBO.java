@@ -23,4 +23,12 @@ public interface CenterInsureAdmdvsBO {
      * @return java.util.List
      **/
     List<Map<String,Object>> queryAdmdvsInfo(Map map);
+
+    /**
+     * @Author gory
+     * @Description 查询医保区划
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    List<Map<String,Object>> queryAdmdvs(Map<String, Object> map);
 }

@@ -831,7 +831,7 @@
         </if>
         group by a.item_id
     </select>
-    <!--药房门诊退药报表查询-->
+    <!--药房门诊退药报表查询，先用基础数据表的平均购进价代替实时购进价-->
     <select id="queryReturnOutDrugLedger" resultType="java.util.Map" parameterType="cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO">
         select a.id as id,a.item_name as itemName,a.spec,a.price,a.split_price as splitPrice,
         a.curr_unit_code as currUnitCode,a.unit_code as unitCode,a.split_unit_code as splitUnitCode,a.split_num as splitNum,
@@ -842,7 +842,13 @@
         '门诊病人' as statusCode,
         (case a.item_code when '1' then bd.type_code when '2' then c.type_code end ) typeCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',ifnull(v.age,''),
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo,
+        case when a.item_code = '1' then bd.avg_buy_price else c.avg_buy_price end buyPrice, /*平均购进价*/
+        case when a.item_code = '1' then
+        ((case when a.curr_unit_code = bd.split_unit_code then a.split_num/bd.split_ratio else a.num end)
+        * bd.avg_buy_price * -1) else
+        ((case when a.curr_unit_code = c.split_unit_code then a.split_num/c.split_ratio else a.num end)
+        * c.avg_buy_price * -1) end buyPriceAll/*购进总金额*/
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code
@@ -887,7 +893,13 @@
         (select name from base_dept where hosp_code = d.hosp_code and id = d.phar_id) as pharName,
         (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail where value = v.gender_code and c_code='XB' and hosp_code = e.hosp_code),'') ), '/',v.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'岁')))) patientInfo
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'岁')))) patientInfo,
+        case when e.item_code = '1' then b.avg_buy_price else c.avg_buy_price end buyPrice, /*平均购进价*/
+        case when e.item_code = '1' then
+        ((case when e.curr_unit_code = b.split_unit_code then e.split_num/b.split_ratio else e.num end)
+        * b.avg_buy_price * -1) else
+        ((case when e.curr_unit_code = c.split_unit_code then e.split_num/c.split_ratio else e.num end)
+        * c.avg_buy_price * -1) end buyPriceAll/*购进总金额*/
         from phar_in_distribute_all_detail e
         join phar_in_distribute d on e.hosp_code = d.hosp_code and d.id = e.distribute_id
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
@@ -934,7 +946,13 @@
         (select name from base_dept where hosp_code = d.hosp_code and id = ia.dept_id) as deptName,
         v.status_code as statusCode,
         (concat(v.name, '/',(ifnull((select name from sys_code_detail sc where hosp_code = v.hosp_code and sc.value=v.gender_code and sc.c_code='XB'),'') ), '/',v.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo,
+        case when e.item_code = '1' then b.avg_buy_price else c.avg_buy_price end buyPrice, /*平均购进价*/
+        case when e.item_code = '1' then
+        ((case when e.curr_unit_code = b.split_unit_code then e.split_num/b.split_ratio else e.num end)
+        * b.avg_buy_price * -1) else
+        ((case when e.curr_unit_code = c.split_unit_code then e.split_num/c.split_ratio else e.num end)
+        * c.avg_buy_price * -1) end buyPriceAll/*购进总金额*/
         FROM phar_in_distribute_all_detail e
         left join phar_in_distribute d on e.hosp_code = d.hosp_code and d.id = e.distribute_id
         left join inpt_visit v on v.id = e.visit_id and v.hosp_code = e.hosp_code
@@ -976,7 +994,13 @@
         (select name from base_dept where hosp_code = b.hosp_code and id = op.dept_id) as deptName,
         '门诊病人' as statusCode,
         (concat(v.name, '/',(ifnull((select e.name from sys_code_detail e where e.value=v.gender_code and e.c_code='XB'),'') ), '/',v.age,
-        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo
+        (ifnull((select name from sys_code_detail where c_code='NLDW' and value=v.age_unit_code and hosp_code=v.hosp_code),'')))) patientInfo,
+        case when a.item_code = '1' then bd.avg_buy_price else c.avg_buy_price end buyPrice, /*平均购进价*/
+        case when a.item_code = '1' then
+        ((case when a.curr_unit_code = bd.split_unit_code then a.split_num/bd.split_ratio else a.num end)
+        * bd.avg_buy_price * -1) else
+        ((case when a.curr_unit_code = c.split_unit_code then a.split_num/c.split_ratio else a.num end)
+        * c.avg_buy_price * -1) end buyPriceAll/*购进总金额*/
         from phar_out_distribute_all_detail a
         left join phar_out_distribute b on b.id = a.distribute_id and b.hosp_code = a.hosp_code
         left join outpt_visit v on v.id = b.visit_id and v.hosp_code = b.hosp_code

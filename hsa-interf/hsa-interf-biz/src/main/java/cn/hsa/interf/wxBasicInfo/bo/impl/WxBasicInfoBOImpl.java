@@ -12,7 +12,6 @@ import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
 import cn.hsa.module.center.hospital.dto.CenterHospitalDTO;
 import cn.hsa.module.center.hospital.service.CenterHospitalService;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
-import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileExtendDTO;
 import cn.hsa.module.center.outptprofilefile.service.OutptProfileFileService;
 import cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
@@ -115,6 +114,9 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      */
     @Resource
     private SysCodeService sysCodeService_consumer;
+
+    @Resource
+    private RedisUtils redisUtils;
 
     /**
      * @Menthod: getHospitalInfo
@@ -857,7 +859,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             if (data == null) {
                 return null;
             }
-
+            data.put("hospCode",hospCode);
             // 校验参数
             if (StringUtils.isEmpty(MapUtils.get(data, "dqId"))) return WrapperResponse.error(500, "未选择医生队列", null);
             if (StringUtils.isEmpty(MapUtils.get(data, "queueDate"))) return WrapperResponse.error(500, "未选择预约日期", null);
@@ -865,35 +867,53 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             if (StringUtils.isEmpty(MapUtils.get(data, "endTime"))) return WrapperResponse.error(500, "未选择预约时段结束时间", null);
             if (StringUtils.isEmpty(MapUtils.get(data, "profileId"))) return WrapperResponse.error(500, "未选择预约人员", null);
 
+            //判断数据库是否有占用号源(锁号未用的号源)
+            List<OutptDoctorRegisterDto>  list = wxOutptDAO.getOutptDoctorRegisterDtoIsUse(data);
+            if (!ListUtils.isEmpty(list)){
+                OutptDoctorRegisterDto outptDoctorRegister = list.get(0);
+                return WrapperResponse.error(500,"当前病人已在【"+outptDoctorRegister.getDeptName()+"-"+outptDoctorRegister.getDoctorName()+"】挂号,不允许重复挂号！",null);
+            }
+
+            //判断缓存是否有占用的号源
+            String profileId = MapUtils.get(data, "profileId");
+            String expiredKey = Constants.REDISKEY.HYKEY+"|"+hospCode+"|"+profileId;
+            if (redisUtils.hasKey(expiredKey)){
+                return WrapperResponse.error(500,"当前病人有未支付的挂号信息,不允许重复挂号！",null);
+            }
+
             // 根据医生队列id(dqId)、预约时段开始时间、结束时间查询出未锁号、未预约的号源
             List<OutptDoctorRegisterDto> doctorRegisterDtoList = wxOutptDAO.queryDoctorRegisterList(map);
             if (ListUtils.isEmpty(doctorRegisterDtoList)) {
                 return WrapperResponse.error(500, "该医生在【" + data.get("startTime") + "~" + data.get("endTime") + "】时段已经没有号源了，请预约其他时段!", null);
             }
 
-            // 根据dqId、profileId、startTime、endTime判断人员再选择的时段内是否已经锁定过号源
-            OutptDoctorRegisterDto dto = new OutptDoctorRegisterDto();
-            dto.setHospCode(hospCode);
-            dto.setDqId((String) data.get("dqId"));
-            dto.setStartTime((String) data.get("startTime"));
-            dto.setEndTime((String) data.get("endTime"));
-            dto.setProfileId((String) data.get("profileId"));
-            OutptDoctorRegisterDto doctorRegister = wxOutptDAO.queryDoctorRegister(dto);
-            if (doctorRegister != null && (Constants.SF.S.equals(doctorRegister.getIsLock()) || Constants.SF.S.equals(doctorRegister.getIsUse()))) {
-                return WrapperResponse.error(500, "该就诊人已在【" + data.get("startTime") + "~" + data.get("endTime") + "】时段预约过，请勿重复预约！", null);
-            }
-
             // 锁定号源  返回
             OutptDoctorRegisterDto doctorRegisterDto = doctorRegisterDtoList.get(0);
-            doctorRegisterDto.setProfileId(data.get("profileId").toString()); //预约人档案id
+            doctorRegisterDto.setProfileId(profileId); //预约人档案id
             doctorRegisterDto.setSourceId(doctorRegisterDto.getId()); //号源id
             doctorRegisterDto.setIsLock(Constants.SF.S); //是否锁号
+            doctorRegisterDto.setIsUse(Constants.SF.F);
             doctorRegisterDto.setRegisterTime(MapUtils.get(data, "queueDate"));
             wxOutptDAO.updateIsLock(doctorRegisterDto);
 
 
             doctorRegisterDto = wxOutptDAO.getDoctorRegisterById(doctorRegisterDto.getSourceId(),doctorRegisterDto.getHospCode());
             doctorRegisterDto.setSourceId(doctorRegisterDto.getId());
+
+            //获取订单失效时间，（维护单位：分钟）
+            Map parames = new HashMap();
+            parames.put("hospCode",hospCode);
+            parames.put("code","WX_DDYXSJ");
+
+            SysParameterDTO sysParameterDTO =  sysParameterService_consumer.getParameterByCode(parames).getData();
+            // 默认15分钟
+            int minutes = 5;
+            if(sysParameterDTO != null){
+                minutes = Integer.valueOf(sysParameterDTO.getValue());
+            }
+            // 设置多少秒过期
+            redisUtils.set(expiredKey,doctorRegisterDto,minutes*60);
+
             // 返参加密
             log.debug("微信小程序【锁定号源】返参加密前：" + JSON.toJSONString(doctorRegisterDto));
             String res = null;
@@ -942,8 +962,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
         String profileId = MapUtils.get(data, "profileId");
         if (StringUtils.isEmpty(profileId)) return WrapperResponse.error(500, "请传入就诊人档案id标识", null);
-        /*String certNo = MapUtils.get(data, "certNo");
-        if (StringUtils.isEmpty(certNo)) return WrapperResponse.error(500, "请传入就诊人证件号", null);*/
         String deptId = MapUtils.get(data, "deptId");
         if (StringUtils.isEmpty(deptId)) return WrapperResponse.error(500, "未选择需要挂号的科室", null);
         String crteId = MapUtils.get(data, "crteId");
@@ -1016,6 +1034,10 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             if (!profileId.equals(doctorRegisterById.getProfileId())) return WrapperResponse.error(500, "【"+ doctorRegisterById.getRegisterTime() +"】号源不为该就诊人预约，请核对！" , null);
                 //号源id不为空，通过锁号进入
             this.handleOuptDoctorRegisterData(data);
+
+            //取消订单的时候 需要把缓存里面的key 删除掉
+            String expiredKey = Constants.REDISKEY.HYKEY+"|"+hospCode+"|"+profileId;
+            redisUtils.del(expiredKey);
         }
 
         //返参加密
@@ -1528,7 +1550,13 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         doctorRegisterDto.setIsLock(Constants.SF.F); //是否锁号
         doctorRegisterDto.setProfileId(null); //档案Id
         doctorRegisterDto.setSeqNo("0");
+        doctorRegisterDto.setIsUse(Constants.SF.F);
         wxOutptDAO.updateIsLock(doctorRegisterDto);
+
+
+        //取消订单的时候 需要把缓存里面的key 删除掉
+        String expiredKey = Constants.REDISKEY.HYKEY+"|"+hospCode+"|"+outptDoctorRegisterDto.getProfileId();
+        redisUtils.del(expiredKey);
 
         //返参处理
         log.debug("微信小程序【解锁号源】返参加密前：" + JSON.toJSONString(null));
@@ -1584,6 +1612,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (outptRegisterDTO == null){
             return WrapperResponse.error(500, "挂号记录不存在", null);
         }
+
         log.debug("微信小程序【挂号退号】的数据：" + JSON.toJSONString(outptRegisterDTO));
 
         //1.检查是否可以退号，根据visitId查询就诊表，已接诊的无法退号
@@ -1595,6 +1624,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             return WrapperResponse.error(500, "该就诊已就诊，无法退号", null);
         }
 
+        // 判断退号时间是否超过挂号时间
+        // if (outptRegisterDTO.getRegisterTime().before(DateUtils.getNow())){
+        //     return WrapperResponse.error(500, "挂号时间已超过"+DateUtils.format(outptRegisterDTO.getRegisterTime(),DateUtils.Y_M_DH_M_S)+",不允许退号！", null);
+        // }
+
         //2.挂号信息表作废
         this.updateOuptRegisterData(outptRegisterDTO);
 
@@ -1602,18 +1636,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         this.registerDetailChangeRed(outptRegisterDTO);
 
         String redSettleId = SnowflakeUtils.getId();
-        /*// 挂号是否直接收费 0：直接收费 1：门诊划价收费，默认走直接收费
-        SysParameterDTO ghJsSysParameterDTO = this.getSysParam(hospCode, "GH_JS");
-        if (ghJsSysParameterDTO != null && "1".equals(ghJsSysParameterDTO.getValue())) {
-            //8.门诊费用表数据冲红(outpt_cost)
-            //TODO 挂号如果是在划价收费的时候，这个时候退号要怎么去冲红？ 根据就诊id去查会不会存在其他费用
-        } else {
-            //4.挂号结算表数据冲红
-            this.registerSettleChangeRed(outptRegisterDTO, redSettleId);
-
-            //5.挂号支付方式冲红
-            this.registerPayChangeRed(outptRegisterDTO, redSettleId);
-        }*/
 
         // 微信只走挂号时结算
         //4.挂号结算表数据冲红
@@ -2613,6 +2635,11 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         }
 
         return WrapperResponse.success(res);
+    }
+
+    @Override
+    public void removeLockByProfileId(Map<String, Object> map) {
+         wxOutptDAO.removeLockByProfileId(map);
     }
 
     //计算费用总金额，封装返回参数

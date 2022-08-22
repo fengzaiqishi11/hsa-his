@@ -1047,6 +1047,11 @@ public interface Constants {
          *  用户已读信息hash map的key
          */
         public static final String USER_READ_MSG_KEY = "sys_msg";
+
+        /**
+         * 微信锁号key
+         */
+        public static final String HYKEY="addInLock";
     }
 
     /**

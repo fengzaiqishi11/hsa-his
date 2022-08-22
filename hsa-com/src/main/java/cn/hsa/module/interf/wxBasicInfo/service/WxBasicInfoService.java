@@ -436,4 +436,11 @@ public interface WxBasicInfoService  {
      */
     @PostMapping("/service/interf/wxBasicInfo/querySevenQueueDoctor")
     WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map);
+
+    /**
+     *
+     * @param map
+     */
+    @PostMapping("/service/interf/wxBasicInfo/querySevenQueueDoctor")
+    void removeLockByProfileId(Map<String, Object> map);
 }

@@ -322,4 +322,17 @@ public interface WxOutptDAO {
      * pengbo
      */
     List<Map<String, Object>> querySevenQueueDoctor(Map<String, Object> map);
+
+    /**
+     * 判断是否有当前档案占用的号源
+     * @param map
+     * @return
+     */
+    List<OutptDoctorRegisterDto> getOutptDoctorRegisterDtoIsUse(Map<String, Object> map);
+    /**
+     * 根据档案号  解锁已占用的号源
+     * @param map
+     * @return
+     */
+    void removeLockByProfileId(Map<String, Object> map);
 }

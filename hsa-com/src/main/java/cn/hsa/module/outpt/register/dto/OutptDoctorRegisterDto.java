@@ -25,4 +25,14 @@ public class OutptDoctorRegisterDto extends OutptDoctorRegisterDO {
      * 号源id，与微信小程序接口匹配
      */
     private String sourceId;
+
+    /**
+     * 科室姓名
+     */
+    private String deptName;
+
+    /**
+     * 医生姓名
+     */
+    private String doctorName;
 }

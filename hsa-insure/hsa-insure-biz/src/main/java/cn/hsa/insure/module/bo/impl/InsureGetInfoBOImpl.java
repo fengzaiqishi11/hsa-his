@@ -1953,6 +1953,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         getEmptyErr(setlInfoMap, "setlEndDate", "结算期间结束时间不能为空");
         getEmptyErr(setlInfoMap, "medinsFillDept", "医疗机构填报部门不能为空");
         getEmptyErr(setlInfoMap, "medinsFillPsn", "医疗机构填报人不能为空");
+        getEmptyErr(setlInfoMap, "medcasno", "病案号不能为空");
 
 
         //结算等级处理

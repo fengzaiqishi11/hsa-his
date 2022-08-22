@@ -335,4 +335,6 @@ public interface WxOutptDAO {
      * @return
      */
     void removeLockByProfileId(Map<String, Object> map);
+
+    List<String> getCountData(Map<String, Object> map);
 }

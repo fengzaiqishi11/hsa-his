@@ -132,7 +132,18 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     public WrapperResponse<String> getHospitalInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode").toString();
         CenterHospitalDTO hospitalDTO = centerHospitalService_consumer.getByHospCode(hospCode).getData();
-        if (hospitalDTO == null) return WrapperResponse.error(500, "未匹配到【" + hospCode + "】相关医院信息，请核对！", null);
+        if (hospitalDTO == null){
+            return WrapperResponse.error(500, "未匹配到【" + hospCode + "】相关医院信息，请核对！", null);
+        }
+
+        List<String> list = wxOutptDAO.getCountData(map);
+        // 挂号量
+        hospitalDTO.setRegistNum(list.get(0));
+        // 就诊量
+        hospitalDTO.setVisitNum(list.get(1));
+        // 门诊，住院科室
+        hospitalDTO.setDeptNams(list.get(2));
+
 
         // 返参加密
         log.debug("微信小程序【医院基本信息】返参加密前：" + JSON.toJSONString(hospitalDTO));
@@ -547,26 +558,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (StringUtils.isEmpty(MapUtils.get(data, "typeCode"))) {
             data.put("typeCode", "1"); // 默认查询门诊科室
         }
-       /* List<BaseDeptDTO> list = wxBasicInfoDAO.queryDeptByCode(map);
-        List<String> ids = new ArrayList<>();
-        if (!ListUtils.isEmpty(list)) {
-            ids = list.stream().map(BaseDeptDO::getId).collect(Collectors.toList());
-        }
-        if (!ListUtils.isEmpty(ids)) {
-            data.put("deptIds", ids);
-        }
-        List<OutptClassifyDTO> classifyDTOS = wxBasicInfoDAO.queryClassify(map);
-        Map<String, List<OutptClassifyDTO>> listMap = classifyDTOS.stream().collect(Collectors.groupingBy(OutptClassifyDO::getDeptId));
-
-        //
-
-        List<BaseDeptDTO> result = new ArrayList<>();
-        for (BaseDeptDTO baseDeptDTO : list) {
-            baseDeptDTO.setChildren(MapUtils.get(listMap, baseDeptDTO.getId()));
-            if (!ListUtils.isEmpty(baseDeptDTO.getChildren())) {
-                result.add(baseDeptDTO);
-            }
-        }*/
 
         // 构建门诊科室tree结构
         List<TreeMenuNode> menuNodes = new ArrayList<>();
@@ -578,30 +569,6 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         menuNodes.addAll(wxBaseoDAO.queryDeptTree(map));
         List<TreeMenuNode> treeMenuNodeList = TreeUtils.buildByRecursive(menuNodes, "-1");
         log.debug("科室树结构：" + JSON.toJSONString(treeMenuNodeList));
-
-        /*List<String> deptIds = new ArrayList<>();
-        for (TreeMenuNode treeMenuNode : treeMenuNodeList) {
-            if (!ListUtils.isEmpty(treeMenuNode.getChildren())) {
-                this.getDeptChlidren(treeMenuNode, deptIds);
-            } else {
-                deptIds.add(treeMenuNode.getDeptId());
-            }
-        }
-        log.debug("科室树deptIds：" + deptIds);
-        if (!ListUtils.isEmpty(deptIds)) {
-            data.put("deptIds", deptIds);
-        }
-        List<OutptClassifyDTO> classifyDTOS = wxBasicInfoDAO.queryClassify(map);
-        Map<String, List<OutptClassifyDTO>> listMap = classifyDTOS.stream().collect(Collectors.groupingBy(OutptClassifyDO::getDeptId));
-
-        List<TreeMenuNode> result = new ArrayList<>();
-        for (TreeMenuNode treeMenuNode : treeMenuNodeList) {
-            if (!ListUtils.isEmpty(treeMenuNode.getChildren())) {
-                this.bulidDeptResult(listMap, treeMenuNode, result);
-            } else {
-                if (!ListUtils.isEmpty(MapUtils.get(listMap, treeMenuNode.getDeptId()))) result.add(treeMenuNode);
-            }
-        }*/
 
         //返参加密
         log.debug("微信小程序【挂号科室及挂号类别】返参加密前：" + JSON.toJSONString(treeMenuNodeList));

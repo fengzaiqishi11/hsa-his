@@ -1193,4 +1193,35 @@
         update outpt_doctor_register a set a.is_lock ='0' ,a.profile_id = null,a.seq_no = 0  where  profile_id = #{profileId} and a.is_lock = '1'  and a.is_use ='0'
     </update>
 
+
+    <select id="getCountData" parameterType="java.util.Map" resultType="string">
+        select
+            count(1) num ,
+            '1' type
+        from
+            outpt_register a
+        where
+            a.is_cancel = '0'
+          and a.hosp_code = #{hospCode}
+        union
+        select
+            count(1) as num,
+            '2' type
+        from
+            outpt_visit a
+        where
+            a.is_visit = '1'
+          and a.hosp_code = #{hospCode}
+        union
+        select
+            group_concat(a.name order by a.type_code) as num,
+            '3' type
+        from
+            base_dept a
+        where
+            a.is_valid = '1'
+          and a.hosp_code = #{hospCode}
+          and a.type_code in ('1', '2')
+    </select>
+
 </mapper>

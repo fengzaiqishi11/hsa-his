@@ -1505,7 +1505,7 @@
                chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay,
                acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn,
                crte_id, crte_name, crte_time, setl_list_id, zr_nurse_name, zr_nurse_code,
-               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code, stas_type,
+               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code, ifnull(stas_type,'0') AS stas_type,
                province, city, county, detail_address, con_province, con_city, con_county, con_detail_address
         from insure_setl_info
         WHERE visit_id = #{visitId}

@@ -2440,7 +2440,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         //医保结算等级取字典值
         Map dictMap = new HashMap(2);
         dictMap.put("hospCode", MapUtils.get(map, "hospCode"));
-        dictMap.put("insureRegCode", insureIndividualVisitDTO.getInsuplcAdmdvs());
+        dictMap.put("insureRegCode", insureIndividualVisitDTO.getInsureRegCode());
         dictMap.put("code", "HI_SETL_LV");
         Map<String, String> dictMap1 = insureDictService_consumer.queryDictByCode(dictMap).getData();
         if(dictMap != null ){

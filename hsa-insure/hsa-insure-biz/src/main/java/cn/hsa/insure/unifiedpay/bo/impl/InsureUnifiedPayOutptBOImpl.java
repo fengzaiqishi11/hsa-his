@@ -348,8 +348,8 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
                 }
                 costInfoMap.put("acord_dept_codg", null); // 受单科室编码
                 costInfoMap.put("acord_dept_name", null); // 受单科室名称
-                costInfoMap.put("orders_dr_code", null); // TODO 受单医生编码
-                costInfoMap.put("orders_dr_name", null); // TODO 受单医生姓名
+                costInfoMap.put("orders_dr_code", MapUtil.getStr(costInfoMap,"bilg_dr_codg")); //受单医生编码
+                costInfoMap.put("orders_dr_name", MapUtil.getStr(costInfoMap,"bilg_dr_name")); //受单医生姓名
                 String lmtUserFlag = MapUtils.get(map, "lmtUserFlag");
                 String insureItemType = MapUtils.get(map, "insureItemType");
                 String isReimburse = MapUtils.get(map, "isReimburse");

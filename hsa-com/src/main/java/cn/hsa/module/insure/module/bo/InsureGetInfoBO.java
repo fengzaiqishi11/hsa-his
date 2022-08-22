@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.module.dto.InsureSettleInfoDTO;
 import cn.hsa.module.insure.module.dto.PayInfoDTO;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -201,4 +202,12 @@ public interface InsureGetInfoBO {
     Map<String,Object> insertInsureSettleInfoForDIP(Map<String, Object> map);
 
     Map<String,Object>  insertInsureSettleInfoForDRGorDIP(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询医保区划
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    List<Map<String,Object>> queryAdmdvs(Map<String, Object> map);
 }

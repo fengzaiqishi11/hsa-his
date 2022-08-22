@@ -651,7 +651,8 @@
                                      hsorg_opter, medins_fill_dept, medins_fill_psn,
                                      crte_id, crte_name, crte_time, zr_nurse_name, zr_nurse_code, mdtrt_id,
                                      opt_tcm_dise_code,
-                                     opt_wm_dise_code)
+                                     opt_wm_dise_code,
+                                     province, city, county, detail_address, con_province, con_city, con_county, con_detail_address)
         values (#{id}, #{hospCode}, #{visitId}, #{insureSettleId}, #{settleNo},
                 #{fixmedinsName}, #{fixmedinsCode}, #{hiSetlLv},
                 #{hiNo}, #{medcasno}, #{dclaTime}, #{psnName}, #{gend},
@@ -667,7 +668,8 @@
                 #{daysRinpPup31}, #{chfpdrName}, #{chfpdrCode}, #{setlBegnDate}, #{setlEndDate}, #{psnSelfpay},
                 #{psnOwnpay}, #{acctPay}, #{psnCashpay}, #{hiPaymtd}, #{hsorg}, #{hsorgOpter}, #{medinsFillDept},
                 #{medinsFillPsn}, #{crteId}, #{crteName}, #{crteTime}, #{zrNurseName}, #{zrNurseCode}, #{mdtrtId},
-                #{otpTcmDiseCode}, #{otpWmDiseCode})
+                #{otpTcmDiseCode}, #{otpWmDiseCode},
+                #{province}, #{city}, #{county}, #{detailAddress}, #{conProvince}, #{conCity}, #{conCounty}, #{conDetailAddress})
     </insert>
     <insert id="insertDisease">
         insert into insure_diseinfo(id, hosp_code, visit_id, medical_reg_no, insure_settle_id, diag_type,
@@ -1079,10 +1081,6 @@
                 from sys_user su
                 where su.hosp_code = #{hospCode}
                   and oper_doctor_id = su.id) as oper_dr_code,
-                0 as ansDrEndTime,
-                0 as ansDrStartTime,
-               0 as oprnOprtEndTime,
-               0 as oprnOprtStartTime,
                '' as id,
                '' as insureSetllId,
                '' as medicalRegNo,
@@ -1494,7 +1492,7 @@
     </select>
     <select id="selectBaseSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
         select id, visit_id, insure_settle_id, settle_no, fixmedins_name, fixmedins_code,
-               (select name from insure_dict where code = 'HI_SETL_LV' and  value= hi_setl_lv limit 1) hi_setl_lv ,
+               hi_setl_lv ,
                hi_no, medcasno, dcla_time, psn_name, gend, brdy, age, ntly, neb_age,
                naty, patn_cert_type, certno, prfs, curr_addr, emp_name, emp_addr, emp_tel, poscode,
                coner_name, patn_rlts, coner_addr, coner_tel, hi_type, insuplc, sp_psn_type, nwb_adm_type,
@@ -1507,7 +1505,8 @@
                chfpdr_name, chfpdr_code, setl_begn_date, setl_en_date, psn_selfpay, psn_ownpay,
                acct_pay, psn_cashpay, hi_paymtd, hsorg, hsorg_opter, medins_fill_dept, medins_fill_psn,
                crte_id, crte_name, crte_time, setl_list_id, zr_nurse_name, zr_nurse_code,
-               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code
+               mdtrt_id, opt_tcm_dise_code, opt_wm_dise_code, hosp_code, stas_type,
+               province, city, county, detail_address, con_province, con_city, con_county, con_detail_address
         from insure_setl_info
         WHERE visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -1536,7 +1535,7 @@
         limit 1
     </select>
     <select id="querySettlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
-        select settle_no,stas_type
+        select settle_no,ifnull(stas_type,'0') AS stas_type
         from insure_setl_info
         where visit_id = #{visitId}
           and hosp_code = #{hospCode}
@@ -2105,10 +2104,10 @@
 	    where
 		su.hosp_code = #{hospCode}
 		and oper_doctor_id = su.id) as oper_dr_code,
-	    0 as ansDrEndTime,
-	    0 as ansDrStartTime,
-	    0 as oprnOprtEndTime,
-	    0 as oprnOprtStartTime,
+	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as anstDrEndTime,
+	    concat(left(oar.anesthesia_date, 11),concat(oar.anesthesia_time,':00')) as anstDrStartTime,
+	    oid.oper_end_time as oprnOprtEndTime,
+	    oid.oper_plan_time as oprnOprtStartTime,
 	    moi.id,
 	    iis.insureSettleId  as insureSetllId,
 	    iis.medicalRegNo  as medicalRegNo,
@@ -2122,7 +2121,7 @@
 		sys_user su
 	    where
 		su.hosp_code = #{hospCode}
-		and ana_id1 = su.id) as anst_dr_code,
+		and moi.ana_id1 = su.id) as anst_dr_code,
 	    moi.ana_name1 as anst_dr_name,
 	    moi.oper_time as oprnOprtDate,
 	    idm.oper_nation_code as oprnOprtCode
@@ -2132,6 +2131,8 @@
 	    moi.oper_disease_id = idm.id
 	    and idm.hosp_code = moi.hosp_code
 	    left join insure_individual_settle iis on iis.visit_id = moi.visit_id
+	    left join oper_info_record oid on moi.oper_disease_id = oid.oper_disease_id and moi.visit_id = oid.visit_id
+	    left join oper_anesthesia_record oar on oar.oper_id = oid.id and oar.anesthesia_date is not null and oar.anesthesia_time is not null
         where
 	    moi.visit_id = #{visitId}
 	    and moi.hosp_code = #{hospCode}
@@ -2169,5 +2170,29 @@
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}
     </update>
+
+    <select id="selectOperInfoAdvice" resultType="cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO">
+        select
+               idm.oper_nation_code          as oprnOprtName,
+               idm.oper_nation_name        as oprnOprtCode
+        from oper_info_record moi
+                 left join base_advice idm on moi.oper_disease_id = idm.id
+            and idm.hosp_code = moi.hosp_code
+        where moi.visit_id = #{visitId}
+          and moi.hosp_code = #{hospCode}
+    </select>
+
+    <select id="queryAdmdvs" resultType="java.util.Map">
+        select admdvs_code as admdvsCode, admdvs_name as admdvsName
+        from insure_admdvs
+        <where>
+            <if test="upAdmdvsCode !=null and upAdmdvsCode != ''">
+                and up_admdvs_code = #{upAdmdvsCode}
+            </if>
+            <if test="admdvsCode !=null and admdvsCode != ''">
+                and admdvs_code like concat('%',#{admdvsCode}) and admdvs_code != '100000'
+            </if>
+        </where>
+    </select>
 
 </mapper>

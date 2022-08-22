@@ -1,5 +1,6 @@
 package cn.hsa.insure.module.service.impl;
 import cn.hsa.insure.util.Constant;
+import cn.hutool.core.map.MapUtil;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
@@ -82,14 +83,18 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
             throw new AppException("无法访问统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
-        if ("999".equals(MapUtils.get(resultMap,"code"))) {
-            throw new AppException("明细审核事前分析返回："+(String) resultMap.get("msg"));
+        if ("999".equals(MapUtil.getStr(resultMap,"code"))) {
+            throw new AppException("明细审核事前分析返回："+MapUtil.getStr(resultMap,"msg"));
         }
-        if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-            throw new AppException("明细审核事前分析返回："+(String) resultMap.get("err_msg"));
+        if (!"0".equals(MapUtil.getStr(resultMap,"infcode"))) {
+            throw new AppException("明细审核事前分析返回："+MapUtil.getStr(resultMap,"err_msg"));
         }
-        Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
-        AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
+        //湖南医保会返回infcode=0的异常信息，如：{"infcode":"0",	"err_msg":"FSI-文件查询号不能为空[fileBO_156]"
+        if (ObjectUtil.isNotEmpty(MapUtil.getStr(resultMap,"err_msg"))) {
+            throw new AppException("明细审核事前分析返回："+MapUtil.getStr(resultMap,"err_msg"));
+        }
+        Map<String,Object> outptMap = MapUtil.get(resultMap,"output",Map.class);
+        AnaResJudgeDTO result = JSON.parseObject(MapUtil.getStr(outptMap, "result"), AnaResJudgeDTO.class);
         checkResult(result);
         return result;
     }
@@ -139,14 +144,18 @@ public class InsureDetailAuditServiceImpl implements InsureDetailAuditService {
             throw new AppException("无法访问统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultStr,Map.class);
-        if ("999".equals(MapUtils.get(resultMap,"code"))) {
-            throw new AppException("明细审核事中分析返回："+(String) resultMap.get("msg"));
+        if ("999".equals(MapUtil.getStr(resultMap,"code"))) {
+            throw new AppException("明细审核事中分析返回："+MapUtil.getStr(resultMap,"msg"));
         }
-        if (!MapUtils.get(resultMap,"infcode").equals("0")) {
-            throw new AppException("明细审核事中分析返回："+(String) resultMap.get("err_msg"));
+        if (!"0".equals(MapUtil.getStr(resultMap,"infcode"))) {
+            throw new AppException("明细审核事中分析返回："+MapUtil.getStr(resultMap,"err_msg"));
         }
-        Map<String,Object> outptMap = MapUtils.get(resultMap,"output");
-        AnaResJudgeDTO result = JSON.parseObject(JSON.toJSONString(MapUtils.get(outptMap, "result")), AnaResJudgeDTO.class);
+        //湖南医保会返回infcode=0的异常信息，如：{"infcode":"0",	"err_msg":"FSI-文件查询号不能为空[fileBO_156]"
+        if (ObjectUtil.isNotEmpty(MapUtil.getStr(resultMap,"err_msg"))) {
+            throw new AppException("明细审核事中分析返回："+MapUtil.getStr(resultMap,"err_msg"));
+        }
+        Map<String,Object> outptMap = MapUtil.get(resultMap,"output",Map.class);
+        AnaResJudgeDTO result = JSON.parseObject(MapUtil.getStr(outptMap, "result"), AnaResJudgeDTO.class);
         checkResult(result);
         return result;
     }

@@ -7,6 +7,8 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bi.service.BaseItemService;
 import cn.hsa.module.base.bmm.dto.BaseMaterialDTO;
+import cn.hsa.module.base.log.dto.BaseDataModifyLogDTO;
+import cn.hsa.module.base.log.service.BaseDataModifyLogService;
 import cn.hsa.module.center.nationstandardItem.entity.NationStandardItemDTO;
 import cn.hsa.module.center.nationstandardItem.service.NationStandardItemService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -44,6 +46,8 @@ public class BaseItemController extends BaseController {
      */
     @Resource
     private BaseItemService baseItemService_consumer;
+    @Resource
+    private BaseDataModifyLogService baseDataModifyLogService;
 
     @Resource
     private NationStandardItemService nationStandardItemService_consumer;
@@ -278,6 +282,23 @@ public class BaseItemController extends BaseController {
         String provinceCode = sysParameterDTO.getValue();
         nationStandardItemDTO.setProvinceCode(provinceCode);
         return nationStandardItemService_consumer.queryPage(nationStandardItemDTO);
+    }
+
+    /**
+     *  查询项目的调价记录
+     * @param baseDataModifyLogDTO
+     * @param req
+     * @param res
+     * @return
+     */
+    @GetMapping("/queryBaseDataModifyLogPage")
+    public WrapperResponse<PageDTO> queryBaseDataModifyLogPage(BaseDataModifyLogDTO baseDataModifyLogDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req,res);
+        Map<String,Object> mapPatamater = new HashMap<>();
+        mapPatamater.put("hospCode", sysUserDTO.getHospCode());
+        baseDataModifyLogDTO.setHospCode(sysUserDTO.getHospCode());
+        mapPatamater.put("baseDataModifyLogDTO",baseDataModifyLogDTO);
+        return baseDataModifyLogService.queryBaseDataModifyLogPage(mapPatamater);
     }
 
 }

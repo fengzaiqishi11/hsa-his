@@ -181,7 +181,7 @@ public class InsureIndividualCostBOImpl implements InsureIndividualCostBO {
         insureVisitParam.put("id", visitId);
         insureVisitParam.put("hospCode", hospCode);
         insureVisitParam.put("medicalRegNo", inptVisitDTO.getMedicalRegNo());
-        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitById(insureVisitParam);
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureIndividualVisitDAO.getInsureIndividualVisitByIdForGongshang(insureVisitParam);
         if (insureIndividualVisitDTO == null || StringUtils.isEmpty(insureIndividualVisitDTO.getId())) {
             throw new AppException("【" + inptVisitDTO.getName() + "】未完成医保登记。");
         }

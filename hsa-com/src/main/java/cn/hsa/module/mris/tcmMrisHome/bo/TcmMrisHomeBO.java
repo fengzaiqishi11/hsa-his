@@ -142,4 +142,14 @@ public interface TcmMrisHomeBO {
     PageDTO queryOutHospPatientPageZY(InptVisitDTO inptVisitDTO);
 
 
+    /**@Method queryExportTcmNum
+     * @Author liuliyun
+     * @Description 获取中医病案导出的条数
+     * @Date 2022/08/18 15:38
+     * @Param [map]
+     * @return  map
+     **/
+    Map<String,Object> queryExportTcmNum(Map<String, Object> map);
+
+
 }

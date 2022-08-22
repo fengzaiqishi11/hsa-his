@@ -2,8 +2,10 @@ package cn.hsa.interf.healthInfo.controller;
 
 import cn.hsa.base.RSAUtil;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.interf.healthInfo.service.*;
 import cn.hsa.util.MapUtils;
+import cn.hutool.core.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -15,8 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.print.attribute.HashAttributeSet;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 浏阳接口通用Controller
@@ -267,32 +274,23 @@ public class HealthInfoUniversalController {
         String startTime = MapUtils.get(map, "startTime");
         // 查询的结束日期
         String endTime = MapUtils.get(map, "endTime");
-        /* 这个入参根据自身接口的需要传入，由于我写的sql查询关联的医疗机构编码参数没有写死，
-         * 所以需要传入一个参数编码查询医保机构编码
-         */
+        // 这个入参根据自身接口的需要传入，由于我写的sql查询关联的医疗机构编码参数没有写死， 所以需要传入一个参数编码查询医保机构编码
         String sysParameter = MapUtils.get(map, "sysParameter");
 
-        if (StringUtils.isBlank(hospCode)){
-            return WrapperResponse.error(-1, "医院编码密文不能为空", null);
-        }
-        if (StringUtils.isBlank(method)){
-            return WrapperResponse.error(-1, "请求接口方法名不能为空", null);
-        }
-        if(StringUtils.isBlank(startTime) || StringUtils.isBlank(endTime)){
-            return WrapperResponse.error(-1, "请求查询的开始日期和结束日期不能为空", null);
-        }
+        // 参数断言，断言不成立则抛出异常
+        Assert.notBlank(hospCode, () -> new AppException("医院编码密文不能为空"));
+        Assert.notBlank(method, () -> new AppException("请求接口方法名不能为空"));
+        Assert.notBlank(startTime, () -> new AppException("查询的开始日期不能为空"));
+        Assert.notEmpty(endTime, () -> new AppException("查询的结束日期不能为空"));
         try{
             hospCode = RSAUtil.decryptByPrivateKey(Base64.decodeBase64(hospCode.getBytes()), privateKey);
             map.put("hospCode",hospCode);
             Method[] allDeclaredMethods = ReflectionUtils.getAllDeclaredMethods(clazz);
-            for (Method allDeclaredMethod : allDeclaredMethods) {
-                if (method.equals(allDeclaredMethod.getName())){
-                    return (WrapperResponse) allDeclaredMethod.invoke(service, map);
-                }
-            }
-            return WrapperResponse.error(-1, clazz.getName()+"不存在【" + method + "】方法", null);
+            Map<String, Method> methodMap = Arrays.stream(allDeclaredMethods).collect(Collectors.toMap(Method::getName, m -> m));
+            Assert.isTrue(methodMap.containsKey(method),() -> new AppException(clazz.getName()+"不存在【" + method + "】方法"));
+            return (WrapperResponse) methodMap.get(method).invoke(service,map);
         }catch(Exception e){
-            return WrapperResponse.error(-1, e.toString(), null);
+            throw new AppException(e.getMessage(),e);
         }
     }
 }

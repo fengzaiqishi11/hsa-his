@@ -76,7 +76,7 @@ public class InsureGetInfoController extends BaseController {
      * @Return 
     **/
     @PostMapping("/saveInsureSettleInfo")
-    public WrapperResponse<Boolean> saveInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<Map> saveInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
         map.put("hospName",sysUserDTO.getHospName());
@@ -350,6 +350,21 @@ public class InsureGetInfoController extends BaseController {
         map.put("fixmedinsCode",insureReadCardDO.getFixmedinsCode());
         map.put("insureRegCode",insureReadCardDO.getInsureRegCode());
         return insureReadCardService_consumer.updateReadIdCard(map);
+    }
+
+    /**
+     * @Method updateReadIdCard
+     * @Desrciption 查询医保区划
+     * @Param map
+     * @Author liuhuiming
+     * @Date   2022-08-11 10:11
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<>
+     **/
+    @GetMapping("/queryAdmdvs")
+    public WrapperResponse<List<Map<String,Object>>> queryAdmdvs(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.queryAdmdvs(map);
     }
 
 

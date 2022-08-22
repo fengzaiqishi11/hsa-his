@@ -379,6 +379,8 @@
     <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
       <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+      <result property="stopTeachDoctorName" column="stop_teach_doctor_name" jdbcType="VARCHAR"/>
+      <result property="stopTeachDoctorId" column="stop_teach_doctor_id" jdbcType="VARCHAR"/>
   </resultMap>
 
   <!--通过实体作为筛选条件查询医嘱信息-->
@@ -433,7 +435,9 @@
     a.long_start_time,DATE_FORMAT(a.long_start_time,'%Y-%m-%d') as startOnlyDate,DATE_FORMAT(a.long_start_time,'%H:%i') as startOnlyTime,
     DATE_FORMAT(a.stop_time,'%Y-%m-%d') as stopOnlyDate,DATE_FORMAT(a.stop_time,'%H:%i') as stopOnlyTime,
     (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName, bd.big_type_code,
-    ba.is_stop_myself
+    ba.is_stop_myself,
+      ia.stop_teach_doctor_name,
+      ia.stop_teach_doctor_id
     from inpt_advice_print a
     join inpt_advice ia on ia.id = a.ia_id and ia.hosp_code = a.hosp_code
     left JOIN base_drug bd on ia.hosp_code = bd.hosp_code and ia.item_id = bd.id

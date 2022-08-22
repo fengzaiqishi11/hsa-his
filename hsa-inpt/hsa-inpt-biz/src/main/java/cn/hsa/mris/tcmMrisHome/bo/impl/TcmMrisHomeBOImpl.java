@@ -998,4 +998,22 @@ public class TcmMrisHomeBOImpl extends HsafBO implements TcmMrisHomeBO {
         return PageDTO.of(patientInfoList);
     }
 
+
+    /**
+     * @Menthod: queryExportTcmNum
+     * @Desrciption: 查询中医病案导出数据的数量
+     * @Param: map
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-08-18 15:41
+     * @Return:  Map
+     **/
+    @Override
+    public Map<String, Object> queryExportTcmNum(Map<String, Object> map) {
+        Map<String,Object> info = tcmMrisHomeDAO.queryTcmExportNum(map);
+        List<InptVisitDTO> visitDTOS = tcmMrisHomeDAO.queryTcmUnExportData(map);
+        info.put("visitDTOS",visitDTOS);
+        return info;
+    }
+
 }

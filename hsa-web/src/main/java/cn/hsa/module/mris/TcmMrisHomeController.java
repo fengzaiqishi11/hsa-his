@@ -27,10 +27,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Package_name: cn.hsa.module.mris
@@ -295,5 +292,110 @@ public class TcmMrisHomeController extends BaseController {
       map.put("hospCode",sysUserDTO.getHospCode());
       return drgDipResultService.checkDrgDipBizAuthorization(map);
     }
+
+    /**
+     * @Menthod: importCSVTcmMrisInfo
+     * @Desrciption:
+     * @Param: 1. statusCode: 在院状态 2. keyword: 搜索关键字 3. 开始时间 4. 结束时间
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-01-19 8:59
+     * @Return: csv文件
+     **/
+    @GetMapping("/exportTcmMrisInfoToCsv")
+    public void exportTcmMrisInfoToCsv(HttpServletRequest req, HttpServletResponse res,String statusCode,String keyword,String startTime,String endTime) throws Exception {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
+        Map param =new HashMap();
+        param.put("statusCode",statusCode);
+        param.put("keyword",keyword);
+        if (StringUtils.isEmpty(startTime)||startTime.equals("null")){
+            startTime =null;
+        }
+        if (StringUtils.isEmpty(endTime)||endTime.equals("null")){
+            endTime =null;
+        }
+        param.put("startTime",startTime);
+        param.put("endTime",endTime);
+        param.put("hospName",sysUserDTO.getHospName());
+        param.put("hospCode",sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                param.put("inDeptId",null);
+            } else {
+                param.put("inDeptId",sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
+        }
+        WrapperResponse<String> returnDatas =tcmMrisHomeService_consumer.exportTcmMrisInfoToCsv(param);
+        String path = returnDatas.getData();
+        try {
+            // path是指欲下载的文件的路径。
+            File file = new File(path);
+            // 取得文件名。
+            String filename = file.getName();
+            // 取得文件的后缀名。
+            String ext = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+
+            // 以流的形式下载文件。
+            InputStream fis = new BufferedInputStream(new FileInputStream(path));
+            byte[] buffer = new byte[fis.available()];
+            fis.read(buffer);
+            fis.close();
+            // 清空response
+            res.reset();
+            // 设置response的Header
+            res.addHeader("Content-Disposition", "attachment;filename=" + new String(filename.getBytes()));
+            res.addHeader("Content-Length", "" + file.length());
+            OutputStream toClient = new BufferedOutputStream(res.getOutputStream());
+            res.setContentType("application/octet-stream");
+            toClient.write(buffer);
+            toClient.flush();
+            toClient.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+
+    /**
+     * @Menthod: queryExportTcmNum
+     * @Desrciption:
+     * @Param: 1. hospCode: 医院编码
+     * 2. data: 入参 code-科室编码
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2021-07-19 17:25
+     * @Return: csv文件
+     **/
+    @GetMapping("/queryExportTcmNum")
+    public WrapperResponse<Map> queryExportTcmNum(HttpServletRequest req, HttpServletResponse res, @RequestParam("brlxList") ArrayList<String> brlxList, String statusCode, String keyword, String startTime, String endTime) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        String systemCode = sysUserDTO.getSystemCode();
+        Map param = new HashMap();
+        param.put("statusCode", statusCode);
+        param.put("keyword", keyword);
+        param.put("brlxList", brlxList);
+        if (StringUtils.isEmpty(startTime) || startTime.equals("null")) {
+            startTime = null;
+        }
+        if (StringUtils.isEmpty(endTime) || endTime.equals("null")) {
+            endTime = null;
+        }
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        param.put("hospName", sysUserDTO.getHospName());
+        param.put("hospCode", sysUserDTO.getHospCode());
+        if (sysUserDTO.getLoginBaseDeptDTO() != null) {
+            // 病案管理子系统默认查询全院，不过滤科室
+            if (StringUtils.isNotEmpty(systemCode) && "BAGLZXT".equals(systemCode)) {
+                param.put("inDeptId", null);
+            } else {
+                param.put("inDeptId", sysUserDTO.getLoginBaseDeptDTO().getId());
+            }
+        }
+        return tcmMrisHomeService_consumer.queryExportTcmNum(param);
+    }
+
 
 }

@@ -6,6 +6,8 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.center.admdvs.bo.CenterInsureAdmdvsBO;
 import cn.hsa.module.center.admdvs.dao.CenterInsureAdmdvsDAO;
 import cn.hsa.module.insure.module.dto.InsureDictDTO;
+import cn.hsa.util.RedisUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.github.pagehelper.PageHelper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,9 @@ class CenterInsureAdmdvsBOImpl extends HsafBO implements CenterInsureAdmdvsBO {
     @Resource
     private CenterInsureAdmdvsDAO centerInsureAdmdvsDAO;
 
+    @Resource
+    RedisUtils redisUtils;
+
 
     @Override
     public PageDTO queryAdmdvsInfoPage(InsureDictDTO dictDTO) {
@@ -49,6 +54,27 @@ class CenterInsureAdmdvsBOImpl extends HsafBO implements CenterInsureAdmdvsBO {
     public List<Map<String,Object>> queryAdmdvsInfo(Map map) {
         String hospCode = "1000001";
         List<Map<String, Object>> list = centerInsureAdmdvsDAO.queryAdmdvsInfo(hospCode);
+        return list;
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 查询医保区划
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    public List<Map<String, Object>> queryAdmdvs(Map<String, Object> map) {
+        if(ObjectUtil.isEmpty(map.get("upAdmdvsCode"))){
+            map.put("admdvsCode","0000");
+        }
+        String key = "admdvs_code_" + map.get("hospCode") + "_" + map.get("upAdmdvsCode");
+        if (redisUtils.hasKey(key)) {
+            return redisUtils.get(key);
+        }
+        List<Map<String, Object>> list = centerInsureAdmdvsDAO.queryAdmdvs(map);
+        redisUtils.set(key,list);
         return list;
     }
 }

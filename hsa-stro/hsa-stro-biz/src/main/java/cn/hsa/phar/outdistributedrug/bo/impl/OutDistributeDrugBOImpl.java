@@ -23,6 +23,7 @@ import cn.hsa.module.sys.user.service.SysUserService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -73,7 +74,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
     public PageDTO getOutRecivePage(PharOutReceiveDTO pharOutReceiveDTO) {
         //设置分页参数
         PageHelper.startPage(pharOutReceiveDTO.getPageNo(),pharOutReceiveDTO.getPageSize());
-
+        Logger logger = null;
         return PageDTO.of(outDistributeDrugDAO.getOutRecivePage(pharOutReceiveDTO));
     }
 

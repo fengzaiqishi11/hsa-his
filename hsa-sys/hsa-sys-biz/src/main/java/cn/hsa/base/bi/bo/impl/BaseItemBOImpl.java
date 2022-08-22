@@ -15,6 +15,10 @@ import cn.hsa.module.base.bi.bo.BaseItemBO;
 import cn.hsa.module.base.bi.dao.BaseItemDAO;
 import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
+import cn.hsa.module.base.log.bo.BaseDataModifyLogBO;
+import cn.hsa.module.base.log.dao.BaseDataModifyLogDAO;
+import cn.hsa.module.base.log.dto.BaseDataModifyLogDTO;
+import cn.hsa.module.base.log.entity.BaseDataModifyLog;
 import cn.hsa.module.base.modify.dao.BaseModifyTraceDAO;
 import cn.hsa.module.base.modify.dto.BaseModifyTraceDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
@@ -26,6 +30,7 @@ import cn.hsa.module.sys.code.dto.SysCodeSelectDTO;
 import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.google.common.base.Joiner;
@@ -77,6 +82,10 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
 
     @Resource
     private BaseModifyTraceDAO baseModifyTraceDAO;
+
+    @Resource
+    private BaseDataModifyLogBO baseDataModifyLogBO;
+
     /**
      * @Method getById
      * @Desrciption 通过id获取项目信息
@@ -266,6 +275,21 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
             String jsonObject= JSONObject.toJSONString(conentMap);
             baseModifyTraceDTO.setUpdtConent(jsonObject);
             baseModifyTraceDAO.insert(baseModifyTraceDTO);
+            BaseDataModifyLogDTO baseDataModifyLogDTO = new BaseDataModifyLogDTO();
+            baseDataModifyLogDTO.setItemId(oldItem.getId());
+            baseDataModifyLogDTO.setItemCode(oldItem.getCode());
+            baseDataModifyLogDTO.setItemName(oldItem.getName());
+            baseDataModifyLogDTO.setHospCode(oldItem.getHospCode());
+            baseDataModifyLogDTO.setBeforeModifying(JSON.toJSONString(oldItem));
+            baseDataModifyLogDTO.setAfterModifying(JSON.toJSONString(baseItemDTO));
+            baseDataModifyLogDTO.setCreateId(baseItemDTO.getCrteId());
+            baseDataModifyLogDTO.setCreateName(baseItemDTO.getCrteName());
+            baseDataModifyLogDTO.setPriceBeforeAdjust(oldItem.getPrice());
+            baseDataModifyLogDTO.setPriceAfterAdjust(baseItemDTO.getPrice());
+            baseDataModifyLogDTO.setCreateTime(new Date());
+            baseDataModifyLogDTO.setAdjustmentTime(new Date());
+            baseDataModifyLogBO.insertBaseDataModifyLog(baseDataModifyLogDTO);
+
             return update > 0;
         }
     }

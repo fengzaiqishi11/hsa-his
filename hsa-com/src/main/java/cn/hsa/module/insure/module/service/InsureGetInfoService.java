@@ -6,6 +6,7 @@ import cn.hsa.module.insure.module.dto.PayInfoDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -147,7 +148,7 @@ public interface InsureGetInfoService {
      * @Date   2021/11/3 14:54
      * @Return
      **/
-    WrapperResponse<Boolean> saveInsureSettleInfo(Map<String, Object> map);
+    WrapperResponse<Map> saveInsureSettleInfo(Map<String, Object> map);
 
     /**
      * @Method deleteSettleInfo
@@ -212,4 +213,12 @@ public interface InsureGetInfoService {
     WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDIP(Map<String, Object> map);
 
     WrapperResponse<Map<String, Object>> uploadInsureSettleInfoForDRGorDIP(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询医保区划
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<List<Map<String,Object>>> queryAdmdvs(Map<String, Object> map);
 }

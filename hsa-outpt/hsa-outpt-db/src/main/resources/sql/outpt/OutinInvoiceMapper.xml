@@ -976,9 +976,7 @@
         then (select f.nation_name from base_item f where a.item_id = f.id and f.hosp_code=a.hosp_code)
         when '4'
         then (select f.union_nation_name from base_advice f where a.item_id = f.id and f.hosp_code=a.hosp_code) end nationName,
-        a.crte_time as costTime, -- 费用发生时间
-        min(a.crte_time) as startTime,
-        max(a.crte_time) as endTime
+        a.crte_time as costTime -- 费用发生时间
         FROM
             outpt_cost a left join base_finance_classify b
             on a.bfc_id = b.id
@@ -1877,5 +1875,22 @@
         LEFT JOIN outin_invoice e on e.hosp_code = s.hosp_code and e.id = s.invoice_id
         left join insure_individual_settle iis on iis.hosp_code = os.hosp_code and iis.settle_id = os.id
         where s.hosp_code = #{hospCode} and s.settle_id = #{settleId}
+    </select>
+    <!--获取结算开方最大日期最小日期-->
+    <select id="queryOutptItemInfoDetailDate" resultType="java.util.Map" parameterType="cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO">
+        select
+        min(a.crte_time) as startTime,
+        max(a.crte_time) as endTime
+        FROM
+        outpt_cost a left join base_finance_classify b
+        on a.bfc_id = b.id
+        left join outpt_settle s on s.id = a.settle_id and s.hosp_code = a.hosp_code
+        left join outpt_visit v on v.id = a.visit_id and v.hosp_code = a.hosp_code
+        left join sys_user u on u.id = v.doctor_id and u.hosp_code = a.hosp_code
+        left join insure_individual_visit iiv on iiv.hosp_code = a.hosp_code and iiv.visit_id = v.id
+        <!--left join (select hosp_code, hosp_item_id, insure_reg_code, max(remark) as remark from insure_item_match where hosp_code = #{hospCode} group by hosp_item_id, insure_reg_code) iim -->
+        <!--on iim.hosp_code = a.hosp_code and iim.hosp_item_id = a.item_id and iiv.insure_org_code = iim.insure_reg_code-->
+        left join insure_item_match iim on a.hosp_code = iim.hosp_code and iiv.insure_org_code = iim.insure_reg_code and a.item_id = iim.hosp_item_id
+        WHERE a.hosp_code = #{hospCode} and a.settle_id = #{settleId} order by a.crte_time
     </select>
 </mapper>

@@ -869,7 +869,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             dbzInfoMap.put("clabAmt", BClassFee);
             dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
             dbzInfoMap.put("othAmt", otherClassFee);
-            dbzInfoMap.put("medChrgitm", setlinfo.get("bka006Name")+"+"+setlinfo.get("bka006"));
+            dbzInfoMap.put("medChrgitm", (String)setlinfo.get("bka006Name") + (String)setlinfo.get("bka006"));
             dbzInfo.add(dbzInfoMap);
             for(int i = 0;i < itemInfoList.size(); i++){
                 if("15".equals(itemInfoList.get(i).get("medChrgitm"))){
@@ -2293,7 +2293,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 dbzInfoMap.put("clabAmt", BClassFee);
                 dbzInfoMap.put("fulamtOwnpayAmt", CClassFee);
                 dbzInfoMap.put("othAmt", otherClassFee);
-                dbzInfoMap.put("medChrgitm", setlInfoMap.get("bka006Name")+"+"+setlInfoMap.get("bka006"));
+                dbzInfoMap.put("medChrgitm", (String)setlInfoMap.get("bka006Name")+(String)setlInfoMap.get("bka006"));
                 dbzInfo.add(dbzInfoMap);
                 for(int i = 0;i < itemInfoMap.size(); i++){
                     if("15".equals(itemInfoMap.get(i).get("medChrgitm"))){

@@ -547,4 +547,14 @@ public interface OutinInvoiceDAO {
 	List<Map<String, Object>> queryOutptsettleInvoiceConent(OutinInvoiceDTO outinInvoiceDTO);
 
     List<OutinPartInvoiceDO> queryPartInvoicePrint(OutinInvoiceDTO outinInvoiceDTO);
+
+    /**
+     * @Menthod queryOutptItemInfoDetailDate()
+     * @Desrciption   获取门诊费用清单最大日期和最小日期
+     * @Param outinInvoiceDTO
+     * @Author liaojiguang
+     * @Date   2020/09/04 10:04
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<List<Map<String, Object>>>
+     **/
+    Map<String, Object> queryOutptItemInfoDetailDate(OutinInvoiceDTO outinInvoiceDTO);
 }

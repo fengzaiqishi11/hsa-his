@@ -275,6 +275,10 @@ public class BaseItemBOImpl extends HsafBO implements BaseItemBO {
             String jsonObject= JSONObject.toJSONString(conentMap);
             baseModifyTraceDTO.setUpdtConent(jsonObject);
             baseModifyTraceDAO.insert(baseModifyTraceDTO);
+            if(oldItem.getPrice().equals(baseItemDTO.getPrice())){
+                // 主价格未发生变化则不记录日志
+                return update > 0;
+            }
             BaseDataModifyLogDTO baseDataModifyLogDTO = new BaseDataModifyLogDTO();
             baseDataModifyLogDTO.setItemId(oldItem.getId());
             baseDataModifyLogDTO.setItemCode(oldItem.getCode());

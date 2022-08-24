@@ -54,7 +54,7 @@
         left join medic_result mr on mr.apply_no = ma.apply_no and mr.hosp_code=#{hospCode}
         left join inpt_visit iv on iv.id=ma.visit_id and iv.hosp_code=#{hospCode}
         left join outpt_visit ov on ov.id=ma.visit_id and iv.hosp_code=#{hospCode}
-        left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+        left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
         where
         ma.hosp_code=#{hospCode}
         group by ma.id
@@ -79,7 +79,7 @@
                       and iad.item_id is not null and iad.hosp_code =#{hospCode}
                  left join outpt_prescribe_detail opd on opd.id = ma.opd_id
                       and opd.item_id is not null and opd.hosp_code =#{hospCode}
-                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
         where
             ma.hosp_code=#{hospCode}
         <if test="startTime != null">
@@ -120,7 +120,7 @@
                       and iad.item_id is not null and iad.hosp_code =#{hospCode}
                  left join outpt_prescribe_detail opd on opd.id = ma.opd_id
                       and opd.item_id is not null and opd.hosp_code =#{hospCode}
-                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
         where
             mr.hosp_code =#{hospCode}
         <if test="startTime != null">
@@ -154,7 +154,7 @@
             '' as dyxh -- 打印序号
         from medic_result mr
                  left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
-                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
         where
             mr.hosp_code =#{hospCode}
         <if test="startTime != null">
@@ -183,7 +183,7 @@
             '' as dyxh -- 打印序号
         from medic_result mr
                  left join medic_apply ma on ma.apply_no = mr.apply_no and mr.hosp_code =#{hospCode}
-                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode}
+                 left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
         where
             mr.hosp_code =#{hospCode}
         <if test="startTime != null">

@@ -621,10 +621,12 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 	@Override
 	public List<Map<String, Object>> queryItemInfoDetails(OutinInvoiceDTO outinInvoiceDTO) {
 		List<Map<String, Object>> resultList = new ArrayList<>();
+		Map<String,Object> maxTime = new HashMap<>();
 		if (Constants.PJLX.GH.equals(outinInvoiceDTO.getInvoiceType())) {// 挂号
 			resultList = outinInvoiceDao.queryRegiestItemInfoDetail(outinInvoiceDTO);
 		} else if (Constants.PJLX.MZ.equals(outinInvoiceDTO.getInvoiceType())) { // 门诊
 			resultList = outinInvoiceDao.queryOutptItemInfoDetail(outinInvoiceDTO);
+			maxTime = outinInvoiceDao.queryOutptItemInfoDetailDate(outinInvoiceDTO);
 		} else if (Constants.PJLX.ZY.equals(outinInvoiceDTO.getInvoiceType())) { // 住院
 			resultList = outinInvoiceDao.queryOutinItemInfoDetail(outinInvoiceDTO);
 		}
@@ -637,6 +639,7 @@ public class OutinInvoiceBOImpl implements OutinInvoiceBO {
 			if(!ListUtils.isEmpty(resultList)){
 				for(Map<String, Object> map :resultList){
 					map.put("orgCode",sysParameterDTO.getValue());
+					map.putAll(maxTime);
 				}
 			}
 		}

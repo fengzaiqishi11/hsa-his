@@ -521,4 +521,17 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     private String bpfInProfile;
 
     private String bpfOutProfile;
+
+    /**
+     * 入院开始日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String cyStartTime;
+    /**
+     * 入院结束日期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private String cyEndTime;
 }

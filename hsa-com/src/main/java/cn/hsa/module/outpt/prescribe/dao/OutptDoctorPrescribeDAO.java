@@ -915,4 +915,6 @@ public interface OutptDoctorPrescribeDAO {
      * @Return int
      **/
     int checkCostIsSettle(OutptPrescribeDTO outptPrescribeDTO);
+
+    List<OutptVisitDTO> getCountbyCertNo(@Param("collect") List<String> collect, @Param("hospCode")String hospCode, @Param("certNo")String certNo);
 }

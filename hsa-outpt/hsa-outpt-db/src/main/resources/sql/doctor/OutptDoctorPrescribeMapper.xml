@@ -2577,4 +2577,63 @@
         </if>
     </select>
 
+    <select id="getCountbyCertNo" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select
+            '1' ywlx,
+            op.doctor_name,
+            ov.dept_name,
+            op.crte_time,
+            opd.item_name,
+            opd.item_id,
+            bd.prescribing_cycle,
+            bd.num_of_presc_allowed,
+            ov.cert_no,
+            bd.ph_code
+        from
+            outpt_prescribe_detail opd
+                left join outpt_prescribe op on
+                    opd.hosp_code = op.hosp_code
+                    and opd.op_id = op.id
+                left join base_drug bd on
+                    opd.hosp_code = bd.hosp_code
+                    and opd.item_id = bd.id
+                left join outpt_visit ov on
+                    opd.hosp_code = ov.hosp_code
+                    and opd.visit_id = ov.id
+        where opd.hosp_code = #{hospCode}
+        and ov.cert_no = #{certNo}
+        and bd.prescribing_cycle is not null
+        and (bd.ph_code is not null or bd.ph_code != '')
+        <if test="collect != null and collect.size() > 0">
+            and opd.item_id in
+            <foreach collection="collect" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        union all
+        select
+            '2' ywlx,
+            ic.doctor_name,
+            ic.dept_id,
+            ic.crte_time,
+            ic.item_name,
+            ic.item_id,
+            bd.prescribing_cycle,
+            bd.num_of_presc_allowed,
+            iv.cert_no,
+            bd.ph_code
+        from inpt_cost ic
+                 left join inpt_visit iv on ic.hosp_code = iv.hosp_code and ic.visit_id = iv.id
+                 left join base_drug bd on ic.hosp_code = bd.hosp_code and ic.item_id = bd.id
+        where ic.hosp_code = #{hospCode}
+        and  iv.cert_no = #{certNo}
+        and bd.prescribing_cycle is not null
+        and (bd.ph_code is not null or bd.ph_code != '')
+        <if test="collect != null and collect.size() > 0">
+            and ic.item_id in
+            <foreach collection="collect" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

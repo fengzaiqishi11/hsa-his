@@ -366,6 +366,12 @@
                 and DATE_FORMAT(v.in_time, '%Y-%m-%d') >= #{ryStartTime}
             ]]>
         </if>
+        <if test="cyEndTime != null">
+                and DATE_FORMAT(v.out_time, '%Y-%m-%d') &lt;= #{cyEndTime}
+        </if>
+        <if test="cyStartTime != null">
+                and DATE_FORMAT(v.out_time, '%Y-%m-%d') >= #{cyStartTime}
+        </if>
         <if test="name != null and name != ''">
             and (v.name like concat('%', #{name,jdbcType=VARCHAR}, '%')
             or v.bed_name like concat('%', #{name,jdbcType=VARCHAR}, '%')

@@ -1016,7 +1016,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
-                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
+                            && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null)
+                            || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())
+                            &&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
                             && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
@@ -1052,9 +1054,12 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     if(BigDecimalUtils.compareTo(outptCostDTO.getBackNum(), BigDecimal.ZERO ) <= 0){
                         continue;
                     }
+                    //todo 这部分判断存在问题，如果是部分退，药房批次汇总表的费用id（最原始的费用id）对不上此时的费用id
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
 //                            && pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())
-                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
+                            && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId())
+                            && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getOneDistCostId())
+                    ) {
                         // 药房未退药数量 = 药房总数量 - 药费退药总数量
                         BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(),pharOutDistributeBatchDetailDTO.getTotalBackNum());
 
@@ -1546,6 +1551,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         costDto.setTotalNum(lastNum);
         // 发药明细汇总id
         costDto.setDistributeAllDetailId(outptCostDTO.getDistributeAllDetailId());
+        // 发药明细id对应的费用id
+        costDto.setOneDistCostId(outptCostDTO.getOneDistCostId());
 
         // 回退数量
         costDto.setBackNum(BigDecimal.ZERO);

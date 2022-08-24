@@ -553,7 +553,8 @@
         crte_id,
         crte_name,
         crte_time,
-        distribute_all_detail_id
+        distribute_all_detail_id,
+        one_dist_cost_id
         ) values
         <foreach collection="list" separator="," item="item">
             (
@@ -609,7 +610,8 @@
             #{item.crteId,jdbcType=VARCHAR},
             #{item.crteName,jdbcType=VARCHAR},
             #{item.crteTime,jdbcType=TIMESTAMP},
-            #{item.distributeAllDetailId,jdbcType=VARCHAR}
+            #{item.distributeAllDetailId,jdbcType=VARCHAR},
+            #{item.oneDistCostId,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -2572,7 +2574,7 @@
         status_code as statusCode
         FROM
         phar_out_distribute_all_detail
-        WHERE hosp_code = #{hospCode} and cost_id in (select id from outpt_cost where settle_id = #{oneSettleId} and hosp_code = #{hospCode})
+        WHERE hosp_code = #{hospCode} and cost_id in (select id from outpt_cost where one_settle_id = #{oneSettleId} and hosp_code = #{hospCode})
     </select>
 
     <!-- 根据发药表ID获取门诊发药明细表信息 -->

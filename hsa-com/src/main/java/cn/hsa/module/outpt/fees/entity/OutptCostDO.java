@@ -154,4 +154,9 @@ public class OutptCostDO extends PageDO implements Serializable {
          * 发票信息ID
          */
         private String settleInvoiceId;
+
+        /**
+         * 第一次的费用id
+         */
+        private String oneDistCostId;
 }

@@ -765,7 +765,11 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 outptCostDTO.setId(SnowflakeUtils.getId());//ID
                 outptCostDTO.setVisitId(id);//门诊就诊id
                 outptCostDTO.setSourceCode(Constants.FYLYFS.ZJHJSF);//费用来源方式代码
-                outptCostDTO.setIsDist(Constants.SF.F);//是否已发药 = 否
+                if (null != outptCostDTO.getDistributeAllDetailId() && "tfcs".equals(outptVisitDTO.getTfcsMark())){
+                    outptCostDTO.setIsDist(Constants.SF.S);//是否已发药 = 是
+                }else{
+                    outptCostDTO.setIsDist(Constants.SF.F);//是否已发药 = 否
+                }
                 outptCostDTO.setSourceDeptId(outptVisitDTO.getDeptId());//来源科室ID
                 outptCostDTO.setDoctorId(outptVisitDTO.getDoctorId());//开方医生id
                 outptCostDTO.setDoctorName(outptVisitDTO.getDoctorName());//开方医生名称

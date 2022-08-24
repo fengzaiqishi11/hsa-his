@@ -77,8 +77,8 @@
         start_time,
         end_time,
         max(register_num) as register_num,
-        IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as yy_num,
-        (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as sy_num
+        IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1 when is_use = '1' then 1 when is_lock = '1' then 1 when ifnull(profile_id,'') !='' then 1 else 0 end),0) as yy_num,
+        (max(register_num) - IFNULL(SUM(case WHEN DATE_FORMAT( NOW(), '%H:%i:%s' ) > end_time  then 1  when is_use = '1' then 1 when is_lock = '1' then 1 when ifnull(profile_id,'') !='' then 1 else 0 end),0)) as sy_num
         FROM
         outpt_doctor_register
         GROUP BY dq_id,hosp_code,start_time, end_time
@@ -134,8 +134,8 @@
         start_time,
         end_time,
         MAX(register_num) as register_num,
-        IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0) as used_register_num,
-        (MAX(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when LENGTH(TRIM(profile_id)) > 0 then 1 else 0 end),0)) as surplus_register_num
+        IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when ifnull(profile_id,'') !='' then 1 else 0 end),0) as used_register_num,
+        (MAX(register_num) - IFNULL(SUM(case when is_use = '1' then 1 when is_lock = '1' then 1 when ifnull(profile_id,'') !='' then 1 else 0 end),0)) as surplus_register_num
         FROM
         outpt_doctor_register
         GROUP BY
@@ -398,7 +398,7 @@
         and is_use = '0'
         and is_lock = '0'
         <![CDATA[
-            and (LENGTH(TRIM(profile_id)) < 1)
+            and ifnull(profile_id,'') =''
           ]]>
         <if test="data.dqId != null and data.dqId != ''">
             and dq_id = #{data.dqId}
@@ -451,6 +451,7 @@
         set
             a.is_lock = #{isLock},
             a.profile_id = #{profileId},
+            a.is_use = #{isUse},
             <choose>
                 <when test="seqNo != null and seqNo != ''">
                     a.seq_no = #{seqNo}
@@ -1145,7 +1146,9 @@
             c.name as deptName,
             d.id as doctorId,
             d.name as doctorName,
-            b.queue_date as queueDate
+            b.queue_date as queueDate,
+            a.cq_id as cqId,
+            a.id as dqId
         FROM
             outpt_doctor_queue a,
             outpt_classes_queue b,
@@ -1159,6 +1162,66 @@
           and a.hosp_code = #{hospCode}
           and d.name like '%${keyword}%'
           AND date( queue_date ) BETWEEN date(now()) and date(now())+7 order by date( queue_date )
+    </select>
+
+
+    <!--判断是否有当前档案占用的号源-->
+    <select id="getOutptDoctorRegisterDtoIsUse" parameterType="java.util.Map" resultType="cn.hsa.module.outpt.register.dto.OutptDoctorRegisterDto">
+        select
+        a.id,
+        d.name as deptName,
+        b.doctor_name as doctorName
+        from
+        outpt_doctor_register a,
+        outpt_doctor_queue b,
+        outpt_classes_queue c,
+        base_dept d
+        where
+        a.is_use = '0'
+        and a.is_lock = '1'
+        and a.dq_id = b.id and a.hosp_code = b.hosp_code
+        and b.cq_id  = c.id and b.hosp_code = c.hosp_code
+        and c.dept_id = d.id  and c.hosp_code = d.hosp_code
+        and a.hosp_code = #{hospCode}
+        <if test="profileId != null and profileId != ''">
+            and profile_id = #{profileId}
+        </if>
+    </select>
+
+    <!--根据档案号  解锁已占用的号源-->
+    <update id="removeLockByProfileId" parameterType="java.util.Map" >
+        update outpt_doctor_register a set a.is_lock ='0' ,a.profile_id = null,a.seq_no = 0  where  profile_id = #{profileId} and a.is_lock = '1'  and a.is_use ='0'
+    </update>
+
+
+    <select id="getCountData" parameterType="java.util.Map" resultType="string">
+        select
+            count(1) num ,
+            '1' type
+        from
+            outpt_register a
+        where
+            a.is_cancel = '0'
+          and a.hosp_code = #{hospCode}
+        union
+        select
+            count(1) as num,
+            '2' type
+        from
+            outpt_visit a
+        where
+            a.is_visit = '1'
+          and a.hosp_code = #{hospCode}
+        union
+        select
+            group_concat(a.name order by a.type_code) as num,
+            '3' type
+        from
+            base_dept a
+        where
+            a.is_valid = '1'
+          and a.hosp_code = #{hospCode}
+          and a.type_code in ('1', '2')
     </select>
 
 </mapper>

@@ -43,4 +43,29 @@ public class InsureGoodSellBack   extends PageDO implements Serializable {
     private String insureItemCode;// 医保中心编码
     private String insureItemName;// 医保中心项目名称
     private String insureRegCode;// 医保机构编码
+
+    private String prscDrCertType	;//开方医师证件类型	字符型	6	Y　	　	新医保
+    private String prscDrCertno	;//开方医师证件号码	字符型	50	　	　	新医保
+    private String prscDrName	;//开方医师姓名	字符型	50	　	Y　	新医保
+    private String pharCertType	;//药师证件类型	字符型	6	Y　	　	新医保
+    private String pharCertno	;//药师证件号码	字符型	50	　	　	新医保
+    private String pharName	;//药师姓名	字符型	50	　	Y　	新医保
+    private String pharPracCertNo	;//药师执业资格证号	字符型	50	　	Y　	新医保
+    private String hiFeesetlType	;//医保费用结算类型	字符型	6	Y　	　	新医保
+    private String mdtrtSn	;//就医流水号	字符型	30	　	Y	新医保
+    private String rxno	;//处方号	字符型	40			新医保
+    private String rxCircFlag	;//外购处方标志	字符型	3	Y		新医保
+    private String rtalDocno	;//零售单据号	字符型	40		Y	新医保/核3	核3：aae072
+    private String stooutNo	;//销售出库单2据号	字符型	40			新医保
+    private String bchno	;//批次号	字符型	30			新医保
+
+
+    /**
+     * 产品唯一标识
+     */
+    private String prodCode;
+    /**
+     * 商品类别   1:药品   2：耗材
+     */
+    private String goodsType;
 }

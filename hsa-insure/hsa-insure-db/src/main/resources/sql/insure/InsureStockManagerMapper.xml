@@ -332,6 +332,293 @@
         </if>
     </select>
 
+
+<!--    查询药品销售信息-->
+    <select id="queryInsureDrugSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
+        /*门诊*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        outpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
+        AND a.item_id = b.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN outpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        LEFT JOIN outpt_settle os ON os.id = a.settle_id
+        AND os.hosp_code = a.hosp_code
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        and a.status_code = '0' /*正常状态*/
+        AND d.is_visit = '1' /*已就诊*/
+        AND a.status_code = '0' /*正常状态*/
+        AND a.settle_code = '2' /*已结算*/
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and (si.upload_insure = '0' or si.upload_insure is null)
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and os.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and os.settle_time &lt;= #{endTime}
+        </if>
+        UNION ALL
+        /*住院*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        inpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
+        AND a.item_id = b.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN inpt_settle is2 ON is2.id = a.settle_id
+        AND is2.hosp_code = a.hosp_code
+        LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        and a.status_code = '0' /*正常状态*/
+        and a.settle_code = '2' /*已结算*/
+        and c.audit_code = '1' /*医保项目已审核*/
+        and c.is_match = '1' /*医保项目已匹配*/
+        and c.is_trans = '1' /*医保项目已传输*/
+        and c.is_valid = '1' /*医保项目有效*/
+        AND si.outin_code in ('27','28') /*住院发药，住院退药*/
+        and (si.upload_insure = '0' or si.upload_insure is null)
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and is2.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and is2.settle_time &lt;= #{endTime}
+        </if>
+    </select>
+<!--    查询耗材销售信息-->
+    <select id="queryInsureMaterialSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
+        /*门诊*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        '0' AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        outpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_material bd ON a.hosp_code = bd.hosp_code
+        AND a.item_id = bd.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN outpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        LEFT JOIN outpt_settle os ON os.id = a.settle_id
+        AND os.hosp_code = a.hosp_code
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        and a.status_code = '0' /*正常状态*/
+        AND d.is_visit = '1' /*已就诊*/
+        AND a.status_code = '0' /*正常状态*/
+        AND a.settle_code = '2' /*已结算*/
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and (si.upload_insure = '0' or si.upload_insure is null)
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and os.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and os.settle_time &lt;= #{endTime}
+        </if>
+        UNION ALL
+        /*住院*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        '0' AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        inpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_material bd ON a.hosp_code = bd.hosp_code
+        AND a.item_id = bd.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN inpt_settle is2 ON is2.id = a.settle_id
+        AND is2.hosp_code = a.hosp_code
+        LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        and a.status_code = '0' /*正常状态*/
+        and a.settle_code = '2' /*已结算*/
+        and c.audit_code = '1' /*医保项目已审核*/
+        and c.is_match = '1' /*医保项目已匹配*/
+        and c.is_trans = '1' /*医保项目已传输*/
+        and c.is_valid = '1' /*医保项目有效*/
+        AND si.outin_code in ('27','28') /*住院发药，住院退药*/
+        and (si.upload_insure = '0' or si.upload_insure is null)
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and is2.settle_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and is2.settle_time &lt;= #{endTime}
+        </if>
+    </select>
+
+
     <select id="queryInsureGoodSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
         SELECT
         c.insure_item_code AS medListCodg,
@@ -444,6 +731,244 @@
             or b.good_wbm like concat('%',#{keyword},'%')
             or b.usual_pym like concat('%',#{keyword},'%')
             or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+    </select>
+    <select id="queryInsureDrugSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        outpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
+        AND a.item_id = b.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN outpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        UNION ALL
+        /*住院*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        inpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_drug b ON a.hosp_code = b.hosp_code
+        AND a.item_id = b.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+    </select>
+    <select id="queryInsureMaterialSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        '0' AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        outpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_material bd ON a.hosp_code = bd.hosp_code
+        AND a.item_id = bd.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN outpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        UNION ALL
+        /*住院*/
+        SELECT
+        c.insure_item_code AS prodCode,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        si.id AS fixmedinsBchno,
+        su.cert_code as prscDrCertType,
+        su.cert_no as prscDrCertno,
+        a.doctor_name AS prscDrName,
+        IFNULL(( SELECT cert_no  FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharCertno,
+        si.crte_name AS pharName,
+        IFNULL(( SELECT prac_certi_no FROM sys_user WHERE id = si.crte_id ), '-1' ) AS pharPracCertNo,
+        a.visit_id AS mdtrtSn,
+        d.cert_no as certno,
+        d.name as psnName,
+        si.batch_no AS manuLotnum,
+        DATE_SUB( si.crte_time, INTERVAL 2 MONTH ) AS manuDate,
+        '0' AS rxFlag,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag,
+        a.price as finlTrnsPric,
+        si.order_no AS rtalDocno,
+        a.num AS selRetnCnt,
+        a.num_unit_code AS numUnitCode,
+        a.crte_time AS selRetnTime,
+        a.crte_name AS selRetnOpterName
+        FROM
+        inpt_cost a
+        JOIN stro_invoicing si ON a.item_id = si.item_id
+        AND a.visit_id = si.invoicing_target_id
+        LEFT JOIN base_material bd ON a.hosp_code = bd.hosp_code
+        AND a.item_id = bd.id
+        LEFT JOIN insure_item_match c ON a.hosp_code = c.hosp_code
+        AND a.item_id = c.hosp_item_id
+        LEFT JOIN inpt_visit d ON a.hosp_code = d.hosp_code
+        AND a.visit_id = d.id
+        left join sys_user su on su.id = a.doctor_id
+        and su.hosp_code = a.hosp_code
+        WHERE
+        a.hosp_code = #{hospCode}
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and si.upload_insure = '1'
+        and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
+        <if test="keyword != null and keyword != ''">
+            and (c.insure_item_name like concat('%',#{keyword},'%')
             or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
         </if>
         <if test="insureRegCode != null and insureRegCode != ''">

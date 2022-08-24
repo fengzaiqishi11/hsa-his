@@ -142,6 +142,22 @@ public class InsureStockManagerController extends BaseController {
         return insureStockManagerService_consumer.queryInsureGoodSellPage(map);
     }
 
+
+    /**
+     * 查询商品销售信息-- 海南医保接口
+     *
+     * @param insureGoodSell
+     * @return
+     */
+    @GetMapping("/queryInsureGoodSellPageForHainan")
+    public WrapperResponse<PageDTO> queryInsureGoodSellPageForHainan(InsureGoodSell insureGoodSell, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodSell.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureGoodSell", insureGoodSell);
+        return insureStockManagerService_consumer.queryInsureGoodSellPageForHainan(map);
+    }
     /**
      * @Meth: queryPersonList
      * @Description: 查询销售/退货 人员
@@ -192,6 +208,22 @@ public class InsureStockManagerController extends BaseController {
         insureGoodSellBack.setHospCode(sysUserDTO.getHospCode());
         map.put("insureGoodSellBack", insureGoodSellBack);
         return insureStockManagerService_consumer.queryInsureGoodSellBackPage(map);
+    }
+
+    /**
+     * 查询商品销售退货信息  -- 海南医保接口
+     *
+     * @param insureGoodSellBack
+     * @return
+     */
+    @GetMapping("/queryInsureGoodSellBackPageForHainan")
+    public WrapperResponse<PageDTO> queryInsureGoodSellBackPageForHainan(InsureGoodSellBack insureGoodSellBack, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        insureGoodSellBack.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureGoodSellBack", insureGoodSellBack);
+        return insureStockManagerService_consumer.queryInsureGoodSellBackPageForHainan(map);
     }
 
 

@@ -78,6 +78,15 @@ public interface InsureStockManagerService {
      */
     WrapperResponse<PageDTO> queryInsureGoodSellPage(Map<String, Object> map);
 
+
+    /**
+     * 查询商品销售信息-海南医保接口
+     *
+     * @param map
+     * @return
+     */
+    WrapperResponse<PageDTO> queryInsureGoodSellPageForHainan(Map<String, Object> map);
+
     /**
      * 批量修改商品销售信息
      *
@@ -146,4 +155,6 @@ public interface InsureStockManagerService {
      * @Date: 2021/11/5
      */
     WrapperResponse<PageDTO> queryPersonList(Map<String, Object> map);
+
+    WrapperResponse<PageDTO> queryInsureGoodSellBackPageForHainan(Map<String, Object> map);
 }

@@ -88,66 +88,31 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
             clientMap.put(key, messageRequest.getUnionId());
             // 存储客户端请求参数
             paramMap.put(key,messageRequest);
-            if (!channelMap.containsKey(key)&&!sysChannelMap.containsKey(key)) {
+            System.err.println(LocalDateTime.now()+" channelMapSize"+channelMap.size());
+            if (!channelMap.containsKey(key)) {
                 Future future =null;
-                // 存储系统消息连接用户
-                if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_XT.equals(messageRequest.getType())) {
-                    sysChannelMap.put(key, ctx.channel());
-                    //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
-                     future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebSysSocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
-                }else {
-                    //存储客户端和服务的通信的Chanel
-                    channelMap.put(key, ctx.channel());
-                    //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
-                    future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 20, TimeUnit.SECONDS);
-                }
+                //存储客户端和服务的通信的Chanel
+                channelMap.put(key, ctx.channel());
+
+                //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
+                future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 10, TimeUnit.SECONDS);
+
                 //存储每个channel中的future，保证每个channel中有一个定时任务在执行
                 futureMap.put(key, future);
                 if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
-//                    MessageInfoModel param = new MessageInfoModel();
-//                    param.setDeptId(messageRequest.getDeptId());
-//                    param.setReceiverId(messageRequest.getUnionId() + "");
-//                    param.setHospCode(messageRequest.getHospCode());
-//                    List<MessageInfoModel> messageInfoModel = messageInfoDao.queryUnReadMessageInfoList(param);
-//                    // 查询系统消息
-//                    List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);
-//                    messageInfoModel.addAll(sysMessageInfoList);
                     List<MessageInfoModel> messageInfoModels = messageInfoService.getUnReadMsgList(getParam(messageRequest));
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("first connected do business. the param is:{}" , JSON.toJSONString(messageInfoModels));
+                    log.info("first connected do business. the param is:{}" , JSON.toJSONString(messageRequest));
                 }
             } else {
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
                 // 主动通信业务在此处填写
                 if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
-//                    MessageInfoModel param = new MessageInfoModel();
-//                    param.setDeptId(messageRequest.getDeptId());
-//                    param.setReceiverId(messageRequest.getUnionId()+"");
-//                    param.setHospCode(messageRequest.getHospCode());
-//                    List<MessageInfoModel> messageInfoModel = messageInfoDao.queryMessageInfoByType(param);
-//                    // 查询系统消息
-//                    List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);
-//                    messageInfoModel.addAll(sysMessageInfoList);
-                    List<MessageInfoModel> messageInfoModels = messageInfoService.getMessageInfoList(getParam(messageRequest));
-//                    if (messageInfoModel != null && messageInfoModel.size() > 0) {
-//                        List<String> ids = new ArrayList<>();
-//                        String hospCode = messageInfoModel.get(0).getHospCode();
-//                        for (MessageInfoModel infoModel : messageInfoModel) {
-//                            ids.add(infoModel.getId());
-//                            infoModel.setCount(infoModel.getCount()+1); // 发送次数+1
-//                        }
-//                        if (ids != null && ids.size() > 0) {
-//                            messageInfoDao.updateMssageInfoBatchByMsgId(messageInfoModel);
-//                        }
-//                    }
+                    List<MessageInfoModel> messageInfoModels = null;//messageInfoService.getMessageInfoList(getParam(messageRequest));
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-                    log.info("active processing business :{}",JSON.toJSONString(messageInfoModels));
-                    messageInfoService.updateMessageInfoList(messageInfoModels);
+                    log.info("active processing business : channel Id is {}, params is {}, resultList is :{}",key,msa,JSON.toJSONString(messageInfoModels));
+//                    messageInfoService.updateMessageInfoList(messageInfoModels);
                 }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
-//                       MessageInfoModel messageInfoModel =new MessageInfoModel();
-//                       messageInfoModel.setId(messageRequest.getMsgId());
-//                       messageInfoModel.setHospCode(messageRequest.getHospCode());
-//                       messageInfoModel.setStatusCode(Constants.MSGZT.MSG_YD);
                        messageInfoDao.updateMssageInfoById(getParam(messageRequest));
                 }
             }

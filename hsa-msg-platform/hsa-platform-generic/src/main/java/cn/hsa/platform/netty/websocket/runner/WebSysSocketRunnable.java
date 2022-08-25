@@ -12,6 +12,7 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,10 +52,11 @@ public class WebSysSocketRunnable implements Runnable {
         param.setDeptId(requestContentModel.getDeptId());
         param.setHospCode(requestContentModel.getHospCode());
         param.setReceiverId(requestContentModel.getUnionId()+"");
-            //channelHandlerContext.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
-        if (Constants.MSG_TYPE.MSG_XT.equals(requestContentModel.getType())) {
+            //channelHandlerContext.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));if (Constants.MSG_TYPE.MSG_XT.equals(requestContentModel.getType())) {
             // 推送系统消息
-            List<MessageInfoModel> sysMessageInfoList = messageInfoService.getSysMessageInfoList(param);
+            // 此处可修改为从缓存中获取数据
+            // 测试
+            List<MessageInfoModel> sysMessageInfoList = new ArrayList<>();
             if (sysMessageInfoList != null && sysMessageInfoList.size() > 0) {
                 messageInfoService.updateMessageInfoList(sysMessageInfoList);
                 //获取与系统用户主键绑定的channel
@@ -65,6 +67,4 @@ public class WebSysSocketRunnable implements Runnable {
                 });
             }
         }
-    }
-
 }

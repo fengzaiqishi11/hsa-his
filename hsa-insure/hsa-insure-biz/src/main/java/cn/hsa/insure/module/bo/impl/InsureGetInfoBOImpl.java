@@ -2640,7 +2640,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             setlinfo.put("lv3NurscareDays", null); // 三级护理天数 *******
         }
 
-        setlinfo.put("dscgWay", MapUtils.get(baseInfoMap, "out_mode_code")); // 离院方式 *******
+        setlinfo.put("dscgWay", MapUtils.getMapVS(mriBaseInfo, "out_mode_code", MapUtils.get(baseInfoMap, "out_mode_code"))); // 离院方式 *******
         setlinfo.put("acpMedinsName", ""); // 拟接收机构名称 *******
         setlinfo.put("acpMedinsCode", ""); // 拟接收机构代码 ******
         Map<String, Object> billNoMap = generatorBillNo(map);

@@ -79,6 +79,8 @@ public class InsureGoodSell   extends PageDO implements Serializable {
      */
     private String goodsType;
 
+    private String id;
+
 
 
 }

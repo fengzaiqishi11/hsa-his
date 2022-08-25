@@ -68,4 +68,6 @@ public class InsureGoodSellBack   extends PageDO implements Serializable {
      * 商品类别   1:药品   2：耗材
      */
     private String goodsType;
+
+    private String id;
 }

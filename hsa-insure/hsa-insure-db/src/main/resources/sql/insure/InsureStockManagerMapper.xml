@@ -337,6 +337,8 @@
     <select id="queryInsureDrugSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
         /*门诊*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -411,6 +413,8 @@
         UNION ALL
         /*住院*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -486,6 +490,8 @@
     <select id="queryInsureMaterialSellPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSell">
         /*门诊*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -553,6 +559,8 @@
         UNION ALL
         /*住院*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -739,6 +747,8 @@
     </select>
     <select id="queryInsureDrugSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -802,6 +812,8 @@
         UNION ALL
         /*住院*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -865,6 +877,8 @@
     </select>
     <select id="queryInsureMaterialSellBackPage" resultType="cn.hsa.module.insure.stock.entity.InsureGoodSellBack">
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,
@@ -921,6 +935,8 @@
         UNION ALL
         /*住院*/
         SELECT
+        a.id,
+        a.hosp_code,
         c.insure_item_code AS prodCode,
         c.insure_item_code AS fixmedinsHilistId,
         c.insure_item_name AS fixmedinsHilistName,

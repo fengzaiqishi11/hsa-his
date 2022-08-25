@@ -596,11 +596,11 @@
     </insert>
     <insert id="insertIcuInfo">
         insert into insure_icuinfo(id, hosp_code, visit_id, medical_reg_no,insure_settle_id, scs_cutd_ward_type,
-        scs_cutd_inpool_time, scs_cutd_exit_time, scs_cutd_sum_dura) values
+        scs_cutd_inpool_time, scs_cutd_exit_time, scs_cutd_sum_dura, scs_cutd_sum_dura_zs) values
         <foreach collection="icuinfoList" item="item" index="index" separator=",">
             (#{item.id},#{item.hospCode},#{item.visitId},#{item.medicalRegNo},#{item.insureSettleId},
             #{item.scsCutdWardType},#{item.scsCutdInpoolTime},#{item.scsCutdExitTime},
-            #{item.scsCutdSumDura})
+            #{item.scsCutdSumDura},#{item.scsCutdSumDuraZs})
         </foreach>
     </insert>
     <insert id="insertItemInfo">
@@ -1159,7 +1159,8 @@
                scs_cutd_ward_type,
                scs_cutd_inpool_time,
                scs_cutd_exit_time,
-               scs_cutd_sum_dura
+               scs_cutd_sum_dura,
+               scs_cutd_sum_dura_zs
         from insure_icuinfo
         where hosp_code = #{hospCode}
           and visit_id = #{visitId}
@@ -1587,6 +1588,7 @@
                scs_cutd_inpool_time scsCutdInpoolTime,
                scs_cutd_exit_time   scsCutdExitTime,
                scs_cutd_sum_dura    scsCutdSumDura,
+               scs_cutd_sum_dura_zs    scsCutdSumDuraZs,
                insure_settle_id     insureSettleId
         from insure_icuinfo
         where visit_id = #{visitId}

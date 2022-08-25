@@ -92,5 +92,9 @@ public class ItemProfitStatisticsDTO extends StroStockDetailDO implements Serial
      * 利润率 = 零售总金额 /进货总金额 * 10
      */
     private BigDecimal profitRate;
+    /**
+     * 编码
+     */
+    private String code;
 
 }

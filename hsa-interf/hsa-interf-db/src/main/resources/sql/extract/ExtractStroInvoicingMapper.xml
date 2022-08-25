@@ -172,13 +172,14 @@
         case siv.item_code when '1' then b.good_wbm when '2' then c.wbm end wbm,/*五笔码*/
         max(siv.unit_code) as unit_code,/*项目单位*/
         case siv.item_code when '1' then b.price when '2' then c.price end price,/*零售单价*/
-        siv.split_num as split_num,/*拆零数量*/
+        sum(siv.split_num) as split_num,/*拆零数量*/
         max(siv.split_unit_code) as split_unit_code,/*拆零单位*/
         siv.biz_id,/*科室id*/
         (select name from base_dept where id = siv.biz_id and hosp_code = siv.hosp_code) as biz_name,
         sum(siv.num) as consum_num,/*消耗数量*/
         sum(siv.num * siv.sell_price) as sell_price_all,/*零售总金额*/
-        sum(siv.num * siv.buy_price) buy_price_all,/*成本价*/
+        case siv.item_code when '1' then sum(siv.num * b.last_buy_price)
+        when '2' then (siv.num * c.last_buy_price) end buy_price_all,/*成本价*/
         '1' as extract_type,/*1表示定时器自动同步*/
         date(siv.crte_time) as extract_time,
         now() as renewal_time,

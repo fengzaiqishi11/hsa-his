@@ -169,6 +169,7 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			result.put("profileId", outptVisitDTO.getProfileId());//档案id
 			result.put("settleNo", outptSettleDO.getSettleNo());//结算单号
 			result.put("actualPrice", outptSettleDO.getSelfPrice().toString());//支付金额
+			result.put("totalPrice", outptSettleDO.getTotalPrice().toString());//总金额
 			result.put("settleId", outptSettleDO.getId());//结算id
 			result.put("visitId", visitId); // 就诊id
 		} catch (Exception e) {

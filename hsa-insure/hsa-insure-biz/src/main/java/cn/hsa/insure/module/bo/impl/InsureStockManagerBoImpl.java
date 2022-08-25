@@ -96,7 +96,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         paramMap.put("purcinfo", listMap);
 
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3503, paramMap);
-
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+/*
         Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
 
         //上传成功数据
@@ -109,7 +110,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             throw new AppException("上传失败： 本次上传数据为0");
         }
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());*/
 
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (InsureGoodBuy insureGoodBuy : listInsureGoodBuy) {
@@ -183,7 +184,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         paramMap.put("purcinfo", listMap);
 
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3504, paramMap);
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+     /*   Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //失败数据
@@ -196,7 +198,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         }
         //获取list对象 list属性 并进行去重
         List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodBuy::getFixmedinsBchno).distinct().collect(Collectors.toList());
-
+*/
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         /*for (String fixmedinsBchno : fixmedinsBchnoList) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
@@ -344,7 +346,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map dataMap2 = new HashMap();
         dataMap2.put("purcinfo", JSONObject.toJSONString(listMap));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3505, dataMap2);
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+       /* Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.get(resultDataMap, "sucessData");
         // 3505接口的反参为空 不需要解析反参
@@ -353,7 +356,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             throw new AppException("上传失败： 本次上传数据为0");
         }
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSell::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSell::getFixmedinsBchno).distinct().collect(Collectors.toList());*/
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (InsureGoodSell insureGoodSell : listInsureGoodSell) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
@@ -432,7 +435,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         Map map2 = new HashMap();
         map2.put("purcinfo", JSONObject.toJSONString(listMap));
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3506, map2);
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+       /* Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         List<InsureGoodSellBack> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureGoodSellBack.class);
@@ -440,7 +444,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             throw new AppException("上传失败： 本次上传数据为0");
         }
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSellBack::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureGoodSellBack::getFixmedinsBchno).distinct().collect(Collectors.toList());*/
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (InsureGoodSellBack insureGoodSellBack : listInsureGoodSellBack) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
@@ -512,7 +516,8 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         paramMap.put("purcinfo", listMap);
 
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3501, paramMap);
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+       /* Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         //上传失败数据
@@ -523,7 +528,7 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             throw new AppException("上传数据为空！");
         }
         //获取上传成功的数据
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryCheck::getFixmedinsBchno).distinct().collect(Collectors.toList());*/
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (InsureInventoryCheck insureInventoryCheck : listInsureInventoryCheck) {
             InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
@@ -625,12 +630,13 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         map2.put("purcinfo", JSONObject.toJSONString(listMap));
 
         Map<String, Object> resultMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.KCGL.UP_3502, map2);
-        Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
+        //该接口在接口文档中输出为无返参返回，当没有参数返回时解析结果会报错
+    /*    Map<String, Object> resultDataMap = MapUtils.get(resultMap, "output");
         //上传成功数据
         JSONArray sucessData = MapUtils.getEmptyErr(resultDataMap, "sucessData", null);
         List<InsureInventoryStockUpdate> sucessDataList = JSONArray.parseArray(sucessData.toString(), InsureInventoryStockUpdate.class);
         //获取list对象 list属性 并进行去重
-        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryStockUpdate::getFixmedinsBchno).distinct().collect(Collectors.toList());
+        List<String> fixmedinsBchnoList = sucessDataList.stream().map(InsureInventoryStockUpdate::getFixmedinsBchno).distinct().collect(Collectors.toList());*/
 
         List<InsureGoodInfoDelete> listData = new ArrayList<>();
         for (InsureInventoryStockUpdate insureInventoryStockUpdate : listInsureInventoryStockUpdate) {

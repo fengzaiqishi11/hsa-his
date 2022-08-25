@@ -76,16 +76,6 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
     @Override
     public WrapperResponse<String> departmentDistribution(Map<String, Object> map) {
         return wxBasicInfoBO.getDeptInfo(map);
-       /* List<Map<String, Object>> result = wxBasicInfoBO.getDeptInfo(map);
-        log.debug("微信小程序【科室分布情况】返参加密前：" + result.toString());
-        String res = null;
-        try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result));
-            log.debug("微信小程序【科室分布情况】返参加密后：" + res);
-        } catch (UnsupportedEncodingException e) {
-            throw new AppException("【科室分布情况】返参加密错误，请联系管理员！" + e.getMessage());
-        }
-        return WrapperResponse.success(res);*/
     }
 
     /**
@@ -537,6 +527,14 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
     @Override
     public WrapperResponse<String> querySevenQueueDoctor(Map<String, Object> map) {
         return  wxBasicInfoBO.querySevenQueueDoctor(map);
+    }
+
+    /**
+     * @param map
+     */
+    @Override
+    public void removeLockByProfileId(Map<String, Object> map) {
+        wxBasicInfoBO.removeLockByProfileId(map);
     }
 
 }

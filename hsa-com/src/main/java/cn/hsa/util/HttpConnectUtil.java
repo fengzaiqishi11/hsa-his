@@ -44,7 +44,7 @@ public class HttpConnectUtil {
             conn.setDoOutput(true);
             conn.setDoInput(true);
             //设置连接超时时间和读取超时时间
-            conn.setConnectTimeout(5000);
+            conn.setConnectTimeout(60000);
             conn.setReadTimeout(600000);
             conn.setRequestProperty("Content-Type", "text/xml;charset=utf-8");
             //获取输出流

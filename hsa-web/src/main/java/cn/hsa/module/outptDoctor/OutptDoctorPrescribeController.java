@@ -42,6 +42,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @Package_name: cn.hsa.module.outptDoctor.prescribe.service
@@ -651,7 +652,27 @@ public class OutptDoctorPrescribeController extends BaseController {
     // 保存处方信息
     return outptDoctorPrescribeService_consumer.savePrescribe(paramMap);
   }
-
+  /**
+   * @param outptPrescribeDTO
+   * @Menthod: queryDrugCount
+   * @Desrciption: 获取精麻药品允许时间内开药次数
+   * @Author: yuelong.chen
+   * @Email: yuelong.chen@powersi.com.cn
+   * @Date: 2022-08-23 19:51
+   * @Return: List<Map>
+   */
+  @PostMapping("/queryDrugCount")
+  public WrapperResponse<List<Map>> queryDrugCount(@RequestBody OutptPrescribeDTO outptPrescribeDTO, HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map paramMap = new HashMap();
+    //医院编码
+    paramMap.put("hospCode",sysUserDTO.getHospCode());
+    //医院编码
+    outptPrescribeDTO.setHospCode(sysUserDTO.getHospCode());
+    //查询数据
+    paramMap.put("outptPrescribeDTO", outptPrescribeDTO);
+    return outptDoctorPrescribeService_consumer.queryDrugCount(paramMap);
+  }
   /**
    * @Menthod queryOutptPrescribeTempDTO
    * @Desrciption  查询处方模板信息

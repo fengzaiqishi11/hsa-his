@@ -14,6 +14,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.outpt.visit.dto
@@ -144,6 +145,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
      * 项目名称（项目/材料）
      */
     private String itemName;
+    private String itemId;
     //规格
     private String spec;
     //数量单位
@@ -176,6 +178,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String isAudit;
 
     private String inDeptName; // 就诊科室名称  为了兼容页面
+    private String deptName;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -217,6 +220,7 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     // 门诊医生姓名
     private String outptDoctorName;
     private String zzDoctorName;
+    private String doctorName;
 
     // 门诊结算使用的一卡通卡号
     private String cardNo;
@@ -288,4 +292,15 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
    private String statusCode;
    private String bedName;
    private String inNo;
+   private String ywlx;
+    /**
+     * 开药周期（几天内）
+     */
+    private String prescribingCycle;
+    /**
+     * 允许开药天数（几天内允许开药次数）
+     */
+    private String numOfPrescAllowed;
+    private String phCode;
+
 }

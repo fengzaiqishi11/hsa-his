@@ -317,6 +317,9 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
         String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
@@ -334,7 +337,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8504, data);
-        } else {
+        } else if ("2".equals(itemCode)){
             // 耗材销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8509, data);
         }
@@ -363,6 +366,9 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
         String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
@@ -380,7 +386,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8505, data);
-        }else{
+        }else if ("2".equals(itemCode)){
             // 耗材销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8510, data);
         }

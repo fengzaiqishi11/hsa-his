@@ -284,7 +284,7 @@ public class BaseMaterialController extends BaseController {
         mapPatamater.put("code", "GJSDML_SF");
         SysParameterDTO sysParameterDTO = sysParameterService_consumer.getParameterByCode(mapPatamater).getData();
         if(null == sysParameterDTO){
-            throw new AppException("未查询到医院代码为：【 "+sysUserDTO.getHospCode()+" 】的`国家三大目录贯标省份`系统编码参数,请维护参数后再查询！");
+            throw new AppException("未查询到医院编码为：【 "+sysUserDTO.getHospCode()+" 】的`国家三大目录贯标省份`系统编码参数,请维护参数后再查询！");
         }
         // 省份代码
         String provinceCode = sysParameterDTO.getValue();

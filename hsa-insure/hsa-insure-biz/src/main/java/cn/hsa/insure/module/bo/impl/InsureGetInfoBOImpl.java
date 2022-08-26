@@ -954,11 +954,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     public PageDTO querySetlePage(Map<String, Object> map) {
         int pageNo = Integer.parseInt(MapUtils.get(map, "pageNo") == null ? "1" : MapUtils.get(map, "pageNo"));
         int pageSize = Integer.parseInt(MapUtils.get(map, "pageSize") == null ? "10" : MapUtils.get(map, "pageSize"));
-        PageHelper.startPage(pageNo, pageSize);
         List<Map<String, Object>> list = insureGetInfoDAO.querySetlePage(map);
         //queryFlag =0表示查询全部数据  直接返回结果集
         if (Constant.UnifiedPay.ISMAN.F.equals(MapUtil.getStr(map,"queryFlag"))) {
-            return PageDTO.of(list);
+            return PageDTO.ofByManual(list,pageNo,pageSize);
         }
 
         if (ObjectUtil.isEmpty(MapUtil.getStr(map,"queryFlag"))) {
@@ -985,7 +984,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 }
             });
         }
-        return PageDTO.of(result);
+        return PageDTO.ofByManual(result,pageNo,pageSize);
     }
 
     /**

@@ -16,6 +16,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -261,17 +262,11 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public PageDTO queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO) {
         String hospCode = insureRecruitPurchaseDTO.getHospCode();
+        String insureRegCode = insureRecruitPurchaseDTO.getInsureRegCode();
         Map map = new HashMap();
-        map.put("hospCode",hospCode);
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -315,18 +310,19 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean addDrugSells(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (ObjectUtil.isEmpty(insureRegCode)) {
+            throw new AppException("医保机构编码不能为空！");
+        }
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -341,7 +337,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8504, data);
-        } else {
+        } else if ("2".equals(itemCode)){
             // 耗材销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8509, data);
         }
@@ -363,18 +359,19 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean deleteDrugSells(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (ObjectUtil.isEmpty(insureRegCode)) {
+            throw new AppException("医保机构编码不能为空！");
+        }
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -389,7 +386,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8505, data);
-        }else{
+        }else if ("2".equals(itemCode)){
             // 耗材销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8510, data);
         }
@@ -435,7 +432,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     private Map<String, Object> commonInsureUnified(String hospCode, String insureRegCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureRegCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if (insureConfigurationDTO == null) {
@@ -498,24 +495,41 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
      */
     @Override
     public Map<String, Object> getToken(Map<String, Object> map) {
-        String hospCode = MapUtils.get(map, "hospCode");
-        String orgCode = getOrgCode(map);
+        String hospCode = MapUtil.getStr(map, "hospCode");
+        String insureRegCode = MapUtil.getStr(map, "insureRegCode");
         Map<String, Object> paramMap = new HashMap<>();
         String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
         String tokenValue = "";
         if (redisUtils.hasKey(accessToken)) {
             tokenValue = redisUtils.get(accessToken);
         } else {
-            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
-            Map<String, Object> outputMap = MapUtils.get(stringObjectMap, "output");
-            Map<String, Object> dataMap = MapUtils.get(outputMap, "data");
-            tokenValue = MapUtils.get(dataMap, "accessToken");
-
+            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+            Map<String, Object> outputMap = MapUtil.get(stringObjectMap, "output",Map.class);
+            Map<String, Object> dataMap = MapUtil.get(outputMap, "data",Map.class);
+            tokenValue = MapUtil.getStr(dataMap, "accessToken");
+            redisUtils.set(accessToken, tokenValue, 1800);
         }
-        redisUtils.set(accessToken, tokenValue, 1800);
         map.put("accessToken", tokenValue);
         return map;
     }
+
+    @Override
+    public String getToken(String hospCode,String insureRegCode) {
+        Map<String, Object> paramMap = new HashMap<>();
+        String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
+        String tokenValue = "";
+        if (redisUtils.hasKey(accessToken)) {
+            tokenValue = redisUtils.get(accessToken);
+        } else {
+        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+        Map<String, Object> outputMap = MapUtil.get(stringObjectMap, "output",Map.class);
+        Map<String, Object> dataMap = MapUtil.get(outputMap, "data",Map.class);
+        tokenValue = MapUtil.getStr(dataMap, "accessToken");
+        redisUtils.set(accessToken, tokenValue, 1800);
+        }
+        return tokenValue;
+    }
+
 
     /**
      * @Meth: uploadToInsure

@@ -155,6 +155,8 @@ public interface InsureStockManagerDAO {
     int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
 
     void updateStockUpload(Map<String, Object> map);
+    //查询已上传的商品
+    List<InsureGoodInfoDelete> queryStockUpBatch(List<String> ids);
 
     List<InsureGoodSellBack> queryInsureDrugSellBackPage(InsureGoodSellBack insureGoodSellBack);
 

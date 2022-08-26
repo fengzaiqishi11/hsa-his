@@ -353,23 +353,20 @@
                 and v.in_dept_id = #{inDeptId}
             </if>
         </if>
-        <if test="ryStartTime != null and ryEndTime != null">
-            and DATE_FORMAT(v.in_time,'%Y-%m-%d') &gt;= #{ryStartTime} and DATE_FORMAT(v.in_time,'%Y-%m-%d') &lt;= #{ryEndTime}
-        </if>
-        <if test="ryStartTime == null and ryEndTime != null">
+        <if test="ryEndTime != null and ryEndTime != ''">
             <![CDATA[
                 and DATE_FORMAT(v.in_time, '%Y-%m-%d') <= #{ryEndTime}
             ]]>
         </if>
-        <if test="ryStartTime != null and ryEndTime == null">
+        <if test="ryStartTime != null and ryStartTime != ''">
             <![CDATA[
                 and DATE_FORMAT(v.in_time, '%Y-%m-%d') >= #{ryStartTime}
             ]]>
         </if>
-        <if test="cyEndTime != null">
+        <if test="cyEndTime != null and cyEndTime != ''">
                 and DATE_FORMAT(v.out_time, '%Y-%m-%d') &lt;= #{cyEndTime}
         </if>
-        <if test="cyStartTime != null">
+        <if test="cyStartTime != null and cyStartTime != ''">
                 and DATE_FORMAT(v.out_time, '%Y-%m-%d') >= #{cyStartTime}
         </if>
         <if test="name != null and name != ''">
@@ -383,14 +380,15 @@
         <if test='zgbrQuery =="1"'>
             and v.zg_doctor_id = #{zgDoctorId}
         </if>
-        <choose>
-            <when test="statusCode != null and statusCode != ''and statusCode == '7'.toString()">
-                order by v.out_time desc
-            </when>
-            <otherwise>
-                order by v.bed_name+0 asc,v.in_time desc
-            </otherwise>
-        </choose>
+
+        <if test="columnName != null and sortName != ''">
+            <if test='columnName =="bedName"'>
+                order by v.bed_name+0 ${sortName}
+            </if>
+            <if test='columnName =="outTime"'>
+                order by v.out_time ${sortName}
+            </if>
+        </if>
     </select>
 
     <select id="selectOutptVisits" parameterType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">

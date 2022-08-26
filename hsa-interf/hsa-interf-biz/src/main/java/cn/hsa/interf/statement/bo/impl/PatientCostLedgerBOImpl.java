@@ -3864,7 +3864,9 @@ public class PatientCostLedgerBOImpl extends HsafBO implements PatientCostLedger
         List<OutptCostDTO> mapGh = patientCostLedgerDAO.queryoutptMonthDailybyGh(outptCostDTO);
         //总费用
         List<OutptCostDTO> mapZFY = patientCostLedgerDAO.queryoutptMonthDailybyZFY(outptCostDTO);
-        if("1".equals(outptCostDTO.getSF())){
+        if(Constants.SF.S.equals(outptCostDTO.getSF()) ||
+                (StringUtils.isNotEmpty(outptCostDTO.getPatientCode()) &&
+                        !Constants.BRLX.PTBR.equals(outptCostDTO.getPatientCode()))){
             map.put("mapMz",mapMz);
             map.put("mapZFY",mapZFY);
             return map;

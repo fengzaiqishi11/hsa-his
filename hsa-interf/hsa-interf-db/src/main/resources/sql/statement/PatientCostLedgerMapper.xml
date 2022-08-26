@@ -1973,6 +1973,108 @@
             b.bfc_id ,
             e.name as bfc_name,
             b.item_code ,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             (case
                 when b.item_code = '1' then (SELECT code from base_drug bd where bd.hosp_code = b.hosp_code and bd.id = b.item_id)
                 when b.item_code = '2' then (SELECT code from base_material bm where bm.hosp_code = b.hosp_code and bm.id = b.item_id)
@@ -7993,6 +8095,9 @@
         <if test="endDate != null ">
             and os.settle_time &lt;= #{endDate}
         </if>
+        <if test="patientCode != null and patientCode !=''">
+            and os.patient_code = #{patientCode}
+        </if>
         <if test="SF != null and SF !='' and SF == '1'.toString()">
             and os.patient_code != '0'
         </if>
@@ -8038,6 +8143,9 @@
         <if test="SF != null and SF !='' and SF == '0'.toString()">
             and os.patient_code = '0'
         </if>
+        <if test="patientCode != null and patientCode !=''">
+            and os.patient_code = #{patientCode}
+        </if>
         union all
         SELECT
         ors.total_price AS totalPrice,
@@ -8055,6 +8163,9 @@
         and ors.settle_time &lt;= #{endDate}
         </if>
         <if test="SF != null and SF !='' and SF == '1'.toString()">
+            and ors.id = ''
+        </if>
+        <if test="patientCode != null and patientCode !='' and patientCode != '0'.toString()">
             and ors.id = ''
         </if>
         ) A

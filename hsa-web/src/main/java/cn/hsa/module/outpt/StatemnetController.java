@@ -923,6 +923,9 @@ public class StatemnetController extends BaseController {
    * @return*/
   @GetMapping("/queryoutptMonthDaily")
   public WrapperResponse<Map<String, List<OutptCostDTO>>> queryoutptMonthDaily(OutptCostDTO outptCostDTO, HttpServletRequest req, HttpServletResponse res) {
+    if(!"".equals(outptCostDTO.getSF()) && !"".equals(outptCostDTO.getPatientCode())){
+        return WrapperResponse.error(200,"“是否医保结算”  与  “病人类型”  选项只允许选择一个！！，请重试",null);
+    }
     Map map = new HashMap();
     SysUserDTO userDTO = getSession(req, res);
     map.put("hospCode", userDTO.getHospCode());

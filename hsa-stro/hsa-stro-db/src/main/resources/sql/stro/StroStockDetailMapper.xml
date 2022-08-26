@@ -617,6 +617,7 @@
         case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
         case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        case when B.item_code = '1' then bd.code else bm.code end code, /*编码*/
         B.item_id as itemId,/*项目id*/
         B.item_name as itemName,/*项目名称*/
         sum(ifnull(B.total_num,0)) as sellCount/*数量*/
@@ -672,6 +673,7 @@
         case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
         case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        case when B.item_code = '1' then bd.code else bm.code end code, /*编码*/
         B.item_id as itemId,/*项目id*/
         B.item_name as itemName,/*项目名称*/
         sum(ifnull(B.total_num,0)) as sellCount/*数量*/
@@ -725,6 +727,7 @@
         case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
         case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
+        case when B.item_code = '1' then bd.code else bm.code end code, /*编码*/
         B.item_id as itemId,/*项目id*/
         B.item_name as itemName,/*项目名称*/
         sum(ifnull(B.total_num,0)) as sellCount/*数量*/

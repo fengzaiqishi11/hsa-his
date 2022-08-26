@@ -105,7 +105,8 @@
                     or code like concat('%',#{keyword},'%')
                     or wbm like concat('%',#{keyword},'%')
                     or pym like concat('%',#{keyword},'%')
-                    or prod like concat('%',#{keyword},'%')  )
+                    or prod like concat('%',#{keyword},'%')
+                    or reg_cert_no like concat('%',#{keyword},'%'))
             </if>
         </where>
     </select>

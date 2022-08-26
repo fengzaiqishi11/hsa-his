@@ -115,6 +115,19 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
         return WrapperResponse.success(PageDTO.of(insureStockManagerBO.queryInsureGoodSellPage(insureGoodSell)));
     }
 
+
+    /**
+     * 查询商品销售信息-- 海南医保接口
+     *
+     * @param map
+     * @return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryInsureGoodSellPageForHainan(Map<String, Object> map) {
+        InsureGoodSell insureGoodSell = MapUtils.getEmptyErr(map,"insureGoodSell","查询销售信息出错!");
+        return WrapperResponse.success(PageDTO.of(insureStockManagerBO.queryInsureGoodSellPageForHainan(insureGoodSell)));
+    }
+
     /**
      * 批量修改商品销售信息
      *
@@ -163,6 +176,12 @@ public class InsureStockManagerServiceImpl  extends HsafService implements Insur
         return WrapperResponse.success(PageDTO.of(insureStockManagerBO.queryInsureInventoryCheckPage(insureInventoryCheck)));
     }
 
+
+    @Override
+    public WrapperResponse<PageDTO> queryInsureGoodSellBackPageForHainan(Map<String, Object> map) {
+        InsureGoodSellBack insureGoodSellBack = MapUtils.getEmptyErr(map,"insureGoodSellBack","查询销售退货信息出错!");
+        return WrapperResponse.success(PageDTO.of(insureStockManagerBO.queryInsureGoodSellBackPageForHainan(insureGoodSellBack)));
+    }
     /**
      * 批量修改商品盘点信息
      *

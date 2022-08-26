@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
+import cn.hsa.module.insure.module.bo.InsureRecruitPurchaseBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
@@ -12,6 +13,7 @@ import cn.hsa.module.insure.stock.bo.InsureStockManagerBO;
 import cn.hsa.module.insure.stock.dao.InsureStockManagerDAO;
 import cn.hsa.module.insure.stock.entity.*;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -37,6 +39,9 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
 
     @Resource
     private InsureConfigurationService insureConfigurationService_consumer;
+
+    @Resource
+    private InsureRecruitPurchaseBO insureRecruitPurchaseBO;
 
     /**
      * 查询商品采购信息,并且没有上传过的数据
@@ -280,6 +285,44 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         return insureStockManagerDAO.queryInsureGoodSellPage(insureGoodSell);
     }
 
+
+    /**
+     * 查询商品销售信息
+     *
+     * @param insureGoodSell
+     * @return  queryInsureGoodSellPageForHainan
+     */
+    @Override
+    public List<InsureGoodSell> queryInsureGoodSellPageForHainan(InsureGoodSell insureGoodSell) {
+
+        if (ObjectUtil.isEmpty(insureGoodSell)) {
+            throw new AppException("入参不能为空！");
+        }
+        if (ObjectUtil.isEmpty(insureGoodSell.getGoodsType())) {
+            throw new AppException("商品类型【goodsType】不能为空！");
+        }
+        //调用医保销售列表查询【8503】【8508】接口
+        try {
+            InsureRecruitPurchaseDTO purchaseDTO = new InsureRecruitPurchaseDTO();
+            purchaseDTO.setHospCode(insureGoodSell.getHospCode());
+            purchaseDTO.setInsureRegCode(insureGoodSell.getInsureRegCode());
+            purchaseDTO.setPageNo(insureGoodSell.getPageNo());
+            purchaseDTO.setPageSize(insureGoodSell.getPageSize());
+            purchaseDTO.setItemCode(insureGoodSell.getGoodsType());
+            insureRecruitPurchaseBO.queryDrugSells(purchaseDTO);
+        } catch (Exception e) {
+            log.error("调医保销售列表查询接口失败!"+e.getMessage());
+        }
+        //查询本地数据
+        List<InsureGoodSell> insureGoodSells = new ArrayList<>();
+        PageHelper.startPage(insureGoodSell.getPageNo(), insureGoodSell.getPageSize());
+        if (Constants.XMLB.YP.equals(insureGoodSell.getGoodsType())) {
+            insureGoodSells = insureStockManagerDAO.queryInsureDrugSellPage(insureGoodSell);
+        }else if (Constants.XMLB.CL.equals(insureGoodSell.getGoodsType())){
+            insureGoodSells = insureStockManagerDAO.queryInsureMaterialSellPage(insureGoodSell);
+        }
+        return insureGoodSells;
+    }
     /**
      * 批量修改商品销售信息
      *
@@ -383,6 +426,28 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
     public List<InsureGoodSellBack> queryInsureGoodSellBackPage(InsureGoodSellBack insureGoodSellBack) {
         PageHelper.startPage(insureGoodSellBack.getPageNo(), insureGoodSellBack.getPageSize());
         return insureStockManagerDAO.queryInsureGoodSellBackPage(insureGoodSellBack);
+    }
+
+    @Override
+    public List<InsureGoodSellBack> queryInsureGoodSellBackPageForHainan(InsureGoodSellBack insureGoodSellBack) {
+
+        if (ObjectUtil.isEmpty(insureGoodSellBack)) {
+            throw new AppException("入参不能为空！");
+        }
+        if (ObjectUtil.isEmpty(insureGoodSellBack.getGoodsType())) {
+            throw new AppException("商品类型【goodsType】不能为空！");
+        }
+        List<InsureGoodSellBack> insureGoodSells = new ArrayList<>();
+        PageHelper.startPage(insureGoodSellBack.getPageNo(), insureGoodSellBack.getPageSize());
+        //查询药品
+        if (Constants.XMLB.YP.equals(insureGoodSellBack.getGoodsType())) {
+            insureGoodSells = insureStockManagerDAO.queryInsureDrugSellBackPage(insureGoodSellBack);
+        //查询耗材
+        }else if (Constants.XMLB.CL.equals(insureGoodSellBack.getGoodsType())){
+            insureGoodSells = insureStockManagerDAO.queryInsureMaterialSellBackPage(insureGoodSellBack);
+        }
+
+        return insureGoodSells;
     }
 
     /**

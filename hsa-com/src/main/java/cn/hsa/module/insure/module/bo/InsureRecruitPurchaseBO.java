@@ -143,7 +143,7 @@ public interface InsureRecruitPurchaseBO {
     Map<String,Object> selectCommonInterfaceTest(Map<String, Object> paramMap);
 
     /**
-     * @param paramMap
+     * @param hospCode
      * @Method selectCommonInterfaceTest
      * @Desrciption 招采接口： 接口连通性测试
      * @Param
@@ -151,7 +151,8 @@ public interface InsureRecruitPurchaseBO {
      * @Date 2021/8/26 9:43
      * @Return
      */
-    Map<String,Object> getToken(Map<String, Object> paramMap);
+    Map<String, Object> getToken(Map<String, Object> map);
+    String getToken(String hospCode,String insureRegCode);
     /**
      * @Meth: uploadToInsure
      * @Description: 药品库存上传变更

@@ -98,8 +98,8 @@ public interface InsureStockManagerBO {
 
     /**
      * 查询商品盘点信息
-     * @param insureInventoryCheck
      *
+     * @param insureInventoryCheck
      * @return
      */
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);

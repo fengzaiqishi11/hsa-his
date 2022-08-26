@@ -102,7 +102,7 @@
         left join inpt_visit iv on bb.visit_id = iv.id and bb.hosp_code = iv.hosp_code
         left join (
             select visit_id, hosp_code, max(disease_id) disease_id
-            from inpt_diagnose a where type_code = '204' and is_main = '1'
+            from inpt_diagnose a where type_code in('204','303')  and is_main = '1'
             group by visit_id, hosp_code
         ) diagnose on diagnose.visit_id = bb.visit_id and diagnose.hosp_code = iv.hosp_code
         left join base_disease c on diagnose.disease_id = c.id and diagnose.hosp_code = c.hosp_code

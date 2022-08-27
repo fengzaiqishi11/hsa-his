@@ -72,4 +72,8 @@ public class InsureRecruitPurchaseDTO extends PageDO {
      * 销售类型 （1：销售 2：退货）
      */
     private String sellType;
+    /**
+     * 医保注册编码
+     */
+    private String orgCode;
 }

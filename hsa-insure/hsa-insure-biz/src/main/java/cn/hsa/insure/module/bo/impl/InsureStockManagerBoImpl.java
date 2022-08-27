@@ -800,6 +800,10 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
         if (!ListUtils.isEmpty(resultList)) {
             // 过滤出进销存id
             List<String> ids = resultList.stream().map(InsureGoodInfoDelete::getFixmedinsBchno).collect(Collectors.toList());
+            //查询已上传的商品
+            List<InsureGoodInfoDelete> fixmedinsBchnos = insureStockManagerDAO.queryStockUpBatch(ids);
+            //过滤出需要新增上传表的数据
+            resultList.removeIf(dto->fixmedinsBchnos.contains(dto.getFixmedinsBchno()));
             // 更新进销存的上传状态
             insureStockManagerDAO.updateStatus(ids, hospCode, statusCode);
             // 插入上传表

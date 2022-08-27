@@ -3,6 +3,7 @@ package cn.hsa.module.insure.module.bo;
 
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
+import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 
 import java.util.List;
 import java.util.Map;
@@ -162,5 +163,13 @@ public interface InsureRecruitPurchaseBO {
      * @Date: 2021/10/20
      */
     Boolean updateToInsure(Map<String, Object> map);
+
+    /**
+     * 海南-查询药品库存变更信息
+     *
+     * @param insureInventoryStockUpdate
+     * @return
+     */
+    List<InsureInventoryStockUpdate> queryYpInsureInventoryStockUpdatePage(InsureInventoryStockUpdate insureInventoryStockUpdate);
 
 }

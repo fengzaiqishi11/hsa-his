@@ -34,6 +34,15 @@
     <insert id="insertCommoditySalesRecord"></insert>
 <!--    新增商品销售退货记录-->
     <insert id="insertCommoditySalesReturnRecord"></insert>
+    <insert id="insertStockUploadBatch">
+        INSERT INTO insure_stock_upload(
+        id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id
+        )
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.id}, #{item.hospCode},  #{item.insureType}, #{item.fixmedinsBchno}, #{item.invDataType}, #{item.uploadTime}, #{item.certId})
+        </foreach>
+    </insert>
     <!--    新增、修改当前医院库存表-->
     <update id="updateinvChgMedinsInfo">
 
@@ -260,6 +269,71 @@
           and c.is_trans = '1' /*医保项目已传输*/
           and c.is_valid = '1' /*医保项目有效*/
     </select>
+    <select id="queryStockUpBatch" resultType="java.lang.String">
+        select id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id from insure_stock_upload
+       where fixmedins_bchno in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </select>
+    <select id="queryInsureInventoryStockUpdatePage"
+            resultType="cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate">
+        SELECT
+        c.insure_item_code AS medListCodg,
+        #{invChgType} as invChgType,
+        c.insure_item_code AS fixmedinsHilistId,
+        c.insure_item_name AS fixmedinsHilistName,
+        c.insure_item_code as insureItemCode,
+        c.insure_item_name as insureItemName,
+        c.insure_reg_code as insureRegCode,
+        si.id AS fixmedinsBchno,
+        si.sell_price AS pric,
+        si.num AS cnt,
+        si.item_code as itemCode,
+        si.curr_unit_code AS currUnitCode,
+        CASE
+        WHEN si.item_code = '1' THEN
+        b.is_prescription
+        WHEN si.item_code = '2' THEN
+        '0'
+        END AS rxFlag,
+        si.crte_time AS invChgTime,
+        si.crte_name as invChgOpterName,
+        CASE
+        WHEN si.split_ratio = '1' THEN
+        '0' ELSE '1'
+        END AS trdnFlag
+        FROM
+        stro_invoicing si
+        join insure_item_match c on si.item_id = c.hosp_item_id and c.hosp_code = si.hosp_code
+        LEFT JOIN base_material bd on bd.id = si.item_id  and si.hosp_code = bd.hosp_code
+        left join base_drug b on si.item_id = b.id  and b.hosp_code = si.hosp_code
+        where si.hosp_code = #{hospCode}
+        and si.outin_code in
+        <foreach collection="outinCodeList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        <if test="keyword != null and keyword != '' ">
+            and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
+            or b.good_wbm like concat('%',#{keyword},'%')
+            or b.usual_pym like concat('%',#{keyword},'%')
+            or b.usual_wbm like concat('%',#{keyword},'%')
+            or bd.pym like concat('%',#{keyword},'%') or bd.wbm like concat('%',#{keyword},'%') )
+        </if>
+        <if test="insureRegCode != null and insureRegCode != ''">
+            and c.insure_reg_code = #{insureRegCode}
+        </if>
+        <if test="itemCode != null and itemCode != ''">
+            and si.item_code = #{itemCode}
+        </if>
+        AND c.audit_code = '1' /*医保项目已审核*/
+        AND c.is_match = '1' /*医保项目已匹配*/
+        AND c.is_trans = '1' /*医保项目已传输*/
+        AND c.is_valid = '1' /*医保项目有效*/
+        and (si.upload_insure = '0' or si.upload_insure is null)
+
+        order by fixmedinsBchno
+    </select>
 
     <!--更新费用表上传状态-->
     <update id="updateCostIsUpload" parameterType="java.util.Map">
@@ -279,5 +353,12 @@
             #{id}
         </foreach>
         ;
+    </update>
+    <update id="updateStatus">
+        update stro_invoicing set upload_insure = #{statusCode} where hosp_code = #{hospCode}
+        and id in
+        <foreach collection="ids" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
     </update>
 </mapper>

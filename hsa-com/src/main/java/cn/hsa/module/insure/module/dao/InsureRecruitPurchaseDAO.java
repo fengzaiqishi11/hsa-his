@@ -2,6 +2,8 @@ package cn.hsa.module.insure.module.dao;
 
 
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
+import cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete;
+import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 
 import java.util.List;
 import java.util.Map;
@@ -85,4 +87,12 @@ public interface InsureRecruitPurchaseDAO {
 
     // 更新费用表中上传状态
     int updateCostIsUpload(Map<String, Object> map);
+    // 更新进销存的上传状态
+    void updateStatus(List<String> ids, String hospCode, String statusCode);
+    // 插入上传表
+    void insertStockUploadBatch(List<InsureGoodInfoDelete> resultList);
+
+    List<InsureGoodInfoDelete> queryStockUpBatch(List<String> ids);
+
+    List<InsureInventoryStockUpdate> queryInsureInventoryStockUpdatePage(InsureInventoryStockUpdate insureInventoryStockUpdate);
 }

@@ -2602,6 +2602,7 @@
                     and opd.visit_id = ov.id
         where opd.hosp_code = #{hospCode}
         and ov.cert_no = #{certNo}
+        and op.is_cancel = '0'
         and bd.prescribing_cycle is not null
         and (bd.ph_code is not null or bd.ph_code != '')
         <if test="collect != null and collect.size() > 0">
@@ -2626,6 +2627,7 @@
                  left join inpt_visit iv on ic.hosp_code = iv.hosp_code and ic.visit_id = iv.id
                  left join base_drug bd on ic.hosp_code = bd.hosp_code and ic.item_id = bd.id
         where ic.hosp_code = #{hospCode}
+        and ic.status_code = '0'
         and  iv.cert_no = #{certNo}
         and bd.prescribing_cycle is not null
         and (bd.ph_code is not null or bd.ph_code != '')

@@ -1108,10 +1108,13 @@
         a.red_id as redId,a.status_code as statusCode, p.pay_code as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from inpt_settle a
         join inpt_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and p.price != 0 -- 过滤金额为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1120,18 +1123,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
-        /*开始日期*/
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
         </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
+        </if>
+
         union all
         select a.crte_name as crteName,'住院结账补交款' as inCometype,a.visit_id as visitId,a.trunc_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode, '尾款' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from inpt_settle a
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.trunc_price != 0 -- 过滤尾款为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1140,19 +1159,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
-        /*开始日期*/
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'住院结账补交款' as inCometype,a.visit_id as visitId,p.total_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode, '医保' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from inpt_settle a
         join inpt_insure_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and p.total_price != 0 -- 过滤医保支付方式为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1161,19 +1195,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
-        /*开始日期*/
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'住院结账补交款' as inCometype,a.visit_id as visitId,p.hosp_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode, '医院垫付' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from inpt_settle a
         join insure_individual_settle p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and p.hosp_price != 0 -- 过滤垫付金额为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1182,18 +1231,33 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
-        /*开始日期*/
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'住院预交款' as inCometype,a.visit_id as visitId,a.price as money,a.crte_time as time,
         a.red_id as redId,a.status_code as statusCode, a.pay_code as payCode,a.ap_order_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from inpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from inpt_advance_pay a
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.price != 0 -- 过滤金额为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.crte_time &gt;= #{startDate}
@@ -1202,19 +1266,35 @@
         <if test="endDate != null and endDate != ''">
             and a.crte_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'挂号' as inCometype,rs.visit_id as visitId,p.price as money,a.settle_time as time,
         '' as redId,a.status_code as statusCode, p.pay_code as payCode,a.register_id as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         rs.name as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from outpt_register_settle a
         left join outpt_register_pay p on p.rs_id = a.id and p.hosp_code = a.hosp_code
         left join outpt_register rs on rs.id = a.register_id and rs.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode}
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and p.price != 0 -- 过滤金额为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1223,18 +1303,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,p.price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode, p.pay_code as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from outpt_settle a
         join outpt_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_settle = '1' and p.price != 0 -- 过滤金额为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1243,17 +1339,33 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,a.trunc_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode,'尾数' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from outpt_settle a
-        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_settle = '1' and a.trunc_price != 0 -- 过滤尾数为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1262,18 +1374,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,p.total_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode,'医保' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from outpt_settle a
         join outpt_insure_pay p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_settle = '1' and p.total_price != 0 -- 过滤医保支付方式为零的结算记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1282,18 +1410,34 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         union all
         select a.crte_name as crteName,'门诊收费' as inCometype,a.visit_id as visitId,p.hosp_price as money,a.settle_time as time,
         a.red_id as redId,a.status_code as statusCode,'医院垫付' as payCode,a.settle_no as settleNo,
         (select code from sys_user b where a.crte_id = b.id and b.hosp_code = #{hospCode}) as account,
         (select name from outpt_visit o where o.id = a.visit_id and o.hosp_code = #{hospCode}) as patientName,
-        (select daily_no from outin_daily d where a.daily_settle_id = d.id and d.hosp_code = #{hospCode}) as dailyNo
+        od.daily_no as dailyNo, -- 日结缴款单号
+        od.ok_time as okTime, -- 确认缴款时间
+        od.is_ok as isOk -- 是否确认缴款
         from outpt_settle a
         join insure_individual_settle p on p.settle_id = a.id and p.hosp_code = a.hosp_code
-        where a.hosp_code = #{hospCode} and a.is_settle = '1'
+        left join outin_daily od on od.id = a.daily_settle_id and od.hosp_code = a.hosp_code
+        where a.hosp_code = #{hospCode} and a.is_settle = '1' and p.hosp_price != 0 -- 过滤垫付金额为零的记录
         /*开始日期*/
         <if test="startDate != null and startDate != ''">
             and a.settle_time &gt;= #{startDate}
@@ -1302,8 +1446,21 @@
         <if test="endDate != null and endDate != ''">
             and a.settle_time &lt;= #{endDate}
         </if>
+        /*确认缴款开始日期*/
+        <if test="okStartDate != null and okStartDate != ''">
+            and od.ok_time &gt;= #{okStartDate}
+        </if>
+        /*确认缴款结束日期*/
+        <if test="okEndDate != null and okEndDate != ''">
+            and od.ok_time &lt;= #{okEndDate}
+        </if>
+        /*关键字*/
         <if test="keyword != null and keyword != ''">
             and (a.crte_name like concat('%',#{keyword},'%'))
+        </if>
+        /*缴款单号*/
+        <if test="dailyNo != null and dailyNo != ''">
+            and (od.daily_no like concat('%',#{dailyNo},'%'))
         </if>
         ) as A   where 1=1
 
@@ -7836,6 +7993,9 @@
         <if test="endDate != null ">
             and os.settle_time &lt;= #{endDate}
         </if>
+        <if test="patientCode != null and patientCode !=''">
+            and os.patient_code = #{patientCode}
+        </if>
         <if test="SF != null and SF !='' and SF == '1'.toString()">
             and os.patient_code != '0'
         </if>
@@ -7881,6 +8041,9 @@
         <if test="SF != null and SF !='' and SF == '0'.toString()">
             and os.patient_code = '0'
         </if>
+        <if test="patientCode != null and patientCode !=''">
+            and os.patient_code = #{patientCode}
+        </if>
         union all
         SELECT
         ors.total_price AS totalPrice,
@@ -7898,6 +8061,9 @@
         and ors.settle_time &lt;= #{endDate}
         </if>
         <if test="SF != null and SF !='' and SF == '1'.toString()">
+            and ors.id = ''
+        </if>
+        <if test="patientCode != null and patientCode !='' and patientCode != '0'.toString()">
             and ors.id = ''
         </if>
         ) A

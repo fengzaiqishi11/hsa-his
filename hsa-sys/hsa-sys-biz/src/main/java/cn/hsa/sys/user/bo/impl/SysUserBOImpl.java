@@ -180,7 +180,8 @@ public class SysUserBOImpl extends HsafBO implements SysUserBO {
              List<SysUserDTO> sysUserDTOS = sysUserDAO.queryBedUserAll(sysUserDTO);
              for (SysUserDTO user:sysUserDTOS){
                  if (user!=null) {
-                     user.setPracCertiNo(StringUtils.stringEncrypt(user.getPracCertiNo())); // 数据脱敏
+                     String praCertNo = user.getPracCertiNo() == null ? "" : StringUtils.stringEncrypt(user.getPracCertiNo());
+                     user.setPracCertiNo(praCertNo); // 数据脱敏
                  }
              }
             return this.sysUserDAO.queryBedUserAll(sysUserDTO);

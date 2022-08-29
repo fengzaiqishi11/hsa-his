@@ -7,6 +7,7 @@ import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.bo.InsureRecruitPurchaseBO;
 import cn.hsa.module.insure.module.service.InsureRecruitPurchaseService;
 import cn.hsa.module.insure.stock.entity.InsureGoodBuy;
+import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -165,6 +166,16 @@ public class InsureRecruitPurchaseServiceImpl extends HsafService implements Ins
     public WrapperResponse<Boolean> updateToInsure(Map<String, Object> map) {
         return WrapperResponse.success(insureRecruitPurchaseBO.updateToInsure(map));
 
+    }
+    /**
+     * 海南-查询药品库存变更信息
+     * @param map
+     * @return
+     */
+    @Override
+    public WrapperResponse<PageDTO> queryYpInsureInventoryStockUpdatePage(Map<String, Object> map) {
+        InsureInventoryStockUpdate insureInventoryStockUpdate = MapUtils.getEmptyErr(map,"insureInventoryStockUpdate","查询药品库存变更出错!");
+        return WrapperResponse.success(PageDTO.of(insureRecruitPurchaseBO.queryYpInsureInventoryStockUpdatePage(insureInventoryStockUpdate)));
     }
 
 }

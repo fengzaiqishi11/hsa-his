@@ -6,6 +6,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
 import cn.hsa.module.insure.module.service.InsureRecruitPurchaseService;
+import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -177,6 +178,7 @@ public class InsureRecruitPurchaseController extends BaseController {
     public WrapperResponse<Boolean> updateToInsure(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureRecruitPurchaseService_consumer.updateToInsure(map);
     }
     /**
@@ -225,5 +227,18 @@ public class InsureRecruitPurchaseController extends BaseController {
         paramMap.put("hospCode",sysUserDTO.getHospCode());
         return insureRecruitPurchaseService_consumer.getToken(paramMap);
     }
-
+    /**
+     * 海南-查询药品耗材库存变更信息
+     * @param insureInventoryStockUpdate
+     * @return
+     */
+    @GetMapping("/queryYpInsureInventoryStockUpdatePage")
+    public WrapperResponse<PageDTO> queryYpInsureInventoryStockUpdatePage(InsureInventoryStockUpdate insureInventoryStockUpdate, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        insureInventoryStockUpdate.setHospCode(sysUserDTO.getHospCode());
+        map.put("insureInventoryStockUpdate",insureInventoryStockUpdate);
+        return insureRecruitPurchaseService_consumer.queryYpInsureInventoryStockUpdatePage(map);
+    }
 }

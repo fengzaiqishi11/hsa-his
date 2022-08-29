@@ -80,6 +80,7 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
         private Date settleTime;
         // 患者姓名
         private String patientName;
+        private String patientCode;
         // 当前结算单总费用
         private String totalFy;
         // 当前结算单总费用大写

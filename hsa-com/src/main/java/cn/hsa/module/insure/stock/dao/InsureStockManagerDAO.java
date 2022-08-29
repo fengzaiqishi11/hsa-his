@@ -72,6 +72,20 @@ public interface InsureStockManagerDAO {
      * @return
      */
     List<InsureGoodSell> queryInsureGoodSellPage(InsureGoodSell InsureGoodSell);
+
+    /**
+     * 查询药品销售信息
+     * @param InsureGoodSell
+     * @return
+     */
+    List<InsureGoodSell> queryInsureDrugSellPage(InsureGoodSell InsureGoodSell);
+
+    /**
+     * 查询耗材销售信息
+     * @param InsureGoodSell
+     * @return
+     */
+    List<InsureGoodSell> queryInsureMaterialSellPage(InsureGoodSell InsureGoodSell);
     /**
      * 批量修改商品销售信息
      * @param listInsureGoodSell
@@ -141,4 +155,10 @@ public interface InsureStockManagerDAO {
     int updateStatus(@Param("ids") List<String> ids, @Param("hospCode") String hospCode,@Param("statusCode")String statusCode);
 
     void updateStockUpload(Map<String, Object> map);
+    //查询已上传的商品
+    List<InsureGoodInfoDelete> queryStockUpBatch(List<String> ids);
+
+    List<InsureGoodSellBack> queryInsureDrugSellBackPage(InsureGoodSellBack insureGoodSellBack);
+
+    List<InsureGoodSellBack> queryInsureMaterialSellBackPage(InsureGoodSellBack insureGoodSellBack);
 }

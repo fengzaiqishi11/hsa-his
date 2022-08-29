@@ -58,6 +58,15 @@ public interface InsureEmrDieinfoDAO {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    /**
+     * 更新死亡信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:40
+     * @return int
+     */
+    int updateDieSelective(Map map);
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -68,6 +77,15 @@ public interface InsureEmrDieinfoDAO {
      * @Return int
      **/
     List<InsureEmrDieinfoDTO> queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+
+    /**
+     * 查询医保电子病历死亡信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 17:07
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDieinfoDTO
+     */
+    InsureEmrDieinfoDTO queryInfoByMdtrtSn(@Param("mdtrtSn")String mdtrtSn);
 
     /**
      * @Menthod queryByUuid()

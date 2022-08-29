@@ -2709,7 +2709,11 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                     if (StringUtils.isNotEmpty(isLmtDrugFlag) && "1".equals(isLmtDrugFlag)) {
                         inptCostDTO.setLmtUserFlag(inptAdviceDetailDTO.getLmtUserFlag());
                         inptCostDTO.setLimUserExplain(inptAdviceDetailDTO.getLimUserExplain());
-                        inptCostDTO.setIsReimburse(inptAdviceDetailDTO.getIsReimburse());
+                        if (StringUtils.isEmpty(inptAdviceDetailDTO.getIsReimburse())) { // 是否报销为null ,费用不报销
+                            inptCostDTO.setIsReimburse(Constants.SF.F);
+                        } else {
+                            inptCostDTO.setIsReimburse(inptAdviceDetailDTO.getIsReimburse());
+                        }
                     }
                 }
 

@@ -74,11 +74,13 @@
 		<result property="truncCode" column="truncCode" jdbcType="VARCHAR"/>
 		<result property="itemName" column="itemName" jdbcType="VARCHAR"/>
 		<result property="name" column="name" jdbcType="VARCHAR"/>
-    <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
-    <result property="dan" column="dan" jdbcType="VARCHAR"/>
+		<result property="prodName" column="prodName" jdbcType="VARCHAR"/>
+		<result property="dan" column="dan" jdbcType="VARCHAR"/>
 		<result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
 		<result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
 		<result property="gbNationName" column="gb_nation_name" jdbcType="VARCHAR"/>
+		<result property="prescribingCycle" column="prescribing_cycle" jdbcType="VARCHAR"/>
+		<result property="numOfPrescAllowed" column="num_of_presc_allowed" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<!--查询单个-->
@@ -97,7 +99,7 @@
 		a.usual_wbm,a.nation_name as gb_nation_name,a.nation_name,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,
 		(select d.name from base_product d where d.code = a.prod_code) as prod_name,
-		(select count(0) from stro_stock e where e.item_code = '1' and e.item_id = a.id ) as stockFlag,
+		(select count(0) from stro_stock e where e.item_code = '1' and e.item_id = a.id ) as stockFlag,a.prescribing_cycle,a.num_of_presc_allowed,
 		b.trunc_code truncCode, d.id bfcId, a.reimbursement_ratio
 		from  base_drug a
 		left join (
@@ -349,7 +351,7 @@
 		a.usual_wbm,
 		a.good_pym, a.good_wbm, a.is_valid, a.crte_id, a.crte_name, a.crte_time,'1' as itemCode,
 		d.name as bfcName,
-		e.name as prod_name,a.reimbursement_ratio,
+		e.name as prod_name,a.reimbursement_ratio,a.prescribing_cycle,a.num_of_presc_allowed,
 		a.nation_name,a.nation_name as gb_nation_name
 		from base_drug a
 		LEFT JOIN base_finance_classify d on a.bfc_code = d.code and a.hosp_code = d.hosp_code
@@ -517,8 +519,8 @@
 
 	<!--新增所有列-->
 	<insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time, reimbursement_ratio,nation_name)
-        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{isPrescription}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime}, #{reimbursementRatio},#{gbNationName})
+        insert into base_drug(id, hosp_code, bfc_code, type_code, big_type_code, code, usual_name, good_name, spec, prep_code, dosage, dosage_unit_code, out_unit_code, in_unit_code, rate_code, price, unit_code, last_buy_price, last_split_buy_price, avg_buy_price, avg_sell_price, split_ratio, split_unit_code, split_price, is_out, is_in, is_lvp, usage_code, insure_code, nation_code, drug_remark, drug_img_path, max_dosage, min_dosage, gender_code, min_age, max_age, ddd, durg_code, ph_code, antibacterial_code, is_skin, is_basic, is_prescription, basic_code, proton_pump, ndan, prod_code, usual_pym, usual_wbm, good_pym, good_wbm, is_valid, crte_id, crte_name, crte_time, reimbursement_ratio,nation_name,prescribing_cycle,num_of_presc_allowed,)
+        values (#{id}, #{hospCode}, #{bfcCode}, #{typeCode}, #{bigTypeCode}, #{code}, #{usualName}, #{goodName}, #{spec}, #{prepCode}, #{dosage}, #{dosageUnitCode}, #{outUnitCode}, #{inUnitCode}, #{rateCode}, #{price}, #{unitCode}, #{lastBuyPrice}, #{lastSplitBuyPrice}, #{avgBuyPrice}, #{avgSellPrice}, #{splitRatio}, #{splitUnitCode}, #{splitPrice}, #{isOut}, #{isIn}, #{isLvp}, #{usageCode}, #{insureCode}, #{nationCode}, #{drugRemark}, #{drugImgPath}, #{maxDosage}, #{minDosage}, #{genderCode}, #{minAge}, #{maxAge}, #{ddd}, #{durgCode}, #{phCode}, #{antibacterialCode}, #{isSkin}, #{isBasic}, #{isPrescription}, #{basicCode}, #{protonPump}, #{ndan}, #{prodCode}, #{usualPym}, #{usualWbm}, #{goodPym}, #{goodWbm}, '1', #{crteId}, #{crteName}, #{crteTime}, #{reimbursementRatio},#{gbNationName},#{prescribingCycle},#{numOfPrescAllowed})
     </insert>
 	<insert id="insertBatch">
         insert into base_drug
@@ -632,6 +634,8 @@
 			reimbursement_ratio = #{reimbursementRatio},
 			good_wbm = #{goodWbm},
 			nation_name= #{gbNationName},
+			prescribing_cycle = #{prescribingCycle},
+			num_of_presc_allowed= #{numOfPrescAllowed}
 		</set>
 		where id = #{id} and hosp_code = #{hospCode}
 	</update>

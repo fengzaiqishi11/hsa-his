@@ -38,6 +38,7 @@ import cn.hsa.module.outpt.prescribe.dto.OutptPrescribeTempDetailDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
+import cn.hsa.module.outpt.prescribeDetails.entity.OutptPrescribeDetailsDO;
 import cn.hsa.module.outpt.prescribeExec.dto.OutptPrescribeExecDTO;
 import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
@@ -46,12 +47,15 @@ import cn.hsa.module.outpt.triage.dao.OutptTriageVisitDAO;
 import cn.hsa.module.outpt.triage.dto.OutptTriageVisitDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.outpt.visit.entity.OutptVisitDO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.stro.stock.service.CheckStockService;
 import cn.hsa.module.sys.code.dto.SysCodeDetailDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
@@ -61,7 +65,12 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static cn.hsa.util.TreeUtils.getChidldrenIds;
 
@@ -4263,6 +4272,75 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             }
         });
         return PageDTO.of(baseDrugDTOList);
+    }
+    /**
+     * @param outptPrescribeDTO
+     * @Menthod: queryDrugCount
+     * @Desrciption: 获取精麻药品允许时间内开药次数
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-23 19:51
+     * @Return: List<Map>
+     */
+    @Override
+    public List<Map> queryDrugCount(OutptPrescribeDTO outptPrescribeDTO) {
+        List<Map> resultList = new ArrayList<>();
+        /*身份证获取为空直接不做处理*/
+        if (StringUtils.isNotEmpty(outptPrescribeDTO.getCertNo())) {
+            /*获取所有的精麻药品集合*/
+            List<String> collect = outptPrescribeDTO.getOutptPrescribeDetailsDTOList().
+                    stream().filter(outptPrescribeDetailsDTO -> Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) &&
+                    StringUtils.isNotEmpty(outptPrescribeDetailsDTO.getPhCode()) &&
+                    (!Constants.YPDL.Herbal_Medicine.equals(outptPrescribeDetailsDTO.getBigTypeCode())))
+                    .map(OutptPrescribeDetailsDO::getItemId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            /*药品处方数据为空，不做处理*/
+            if ((collect.size() > 0)) {
+                this.getCountbyCertNo(resultList,collect,outptPrescribeDTO.getHospCode(),outptPrescribeDTO.getCertNo());
+            }
+        }
+        return resultList;
+    }
+    /**
+     * 根据身份证查询开药记录
+     * @param resultList
+     * @param collect
+     * @param hospCode
+     * @param certNo
+     */
+    private void getCountbyCertNo(List<Map> resultList, List<String> collect, String hospCode, String certNo) {
+        /*先获取该身份证患者的药品记录*/
+        List<OutptVisitDTO> outptVisitDTOList = outptDoctorPrescribeDAO.getCountbyCertNo(collect,hospCode,certNo);
+        /*将查询到的开药记录分组*/
+        Map<String, List<OutptVisitDTO>> listMap = outptVisitDTOList.stream()
+                .filter(ovPh -> StringUtils.isNotEmpty(ovPh.getPhCode()))
+                .collect(Collectors.groupingBy(OutptVisitDTO::getItemId));
+        listMap.forEach((s, outptVisitDTOS) -> {
+            /*没配置周期的精麻药品跳过*/
+            if(StringUtils.isNotEmpty(outptVisitDTOS.get(0).getPrescribingCycle()) && StringUtils.isNotEmpty(outptVisitDTOS.get(0).getNumOfPrescAllowed())) {
+                Map<String,List> middleMap = new HashMap();
+                /*允许开药天数（几天内允许开药次数）*/
+                int numOfPrescAllowed = Integer.parseInt(outptVisitDTOS.get(0).getNumOfPrescAllowed());
+                /*开药周期（几天内）*/
+                long prescribingCycle = Long.parseLong(outptVisitDTOS.get(0).getPrescribingCycle());
+                /*获取所开药时间的最大值*/
+                Optional<OutptVisitDTO> maxTime = outptVisitDTOS.stream().max(Comparator.comparing(OutptVisitDTO::getCrteTime));
+                /*判断当前时间与最近开药时间*/
+                if(DateUtil.between(maxTime.get().getCrteTime(), DateUtils.getNow(), DateUnit.DAY) < prescribingCycle){
+                    /*过滤最近开药时间大于设定时间*/
+                    List<OutptVisitDTO> list = outptVisitDTOS.stream()
+                            .filter(outptVisitDTO -> DateUtil.offsetDay(DateUtils.getNow(), ((int) prescribingCycle) * -1)
+                                    .before(outptVisitDTO.getCrteTime()))
+                            .collect(Collectors.toList());
+                    /*次数大于等于规定次数*/
+                    if(!ListUtils.isEmpty(list) && list.size() >= numOfPrescAllowed){
+                        middleMap.put(s,list);
+                        resultList.add(middleMap);
+                    }
+                }
+            }
+        });
     }
 
     /**

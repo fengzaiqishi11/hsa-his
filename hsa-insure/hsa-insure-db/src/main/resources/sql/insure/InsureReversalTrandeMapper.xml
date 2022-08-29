@@ -1671,7 +1671,8 @@
 --         ia.admdvs_name as insuplcAdmdvsName,
         (select ia.admdvs_name from insure_admdvs ia where t.insuplc_admdvs = ia.admdvs_code) as insuplcAdmdvsName,
         (select tt.out_dept_name from inpt_visit tt where e.visit_id = tt.id) as outDeptName,
-        (select tt.out_disease_name from inpt_visit tt where e.visit_id = tt.id) as outDiseaseName,
+        /**如果为门诊类型业务，住院表是没有数据的，但是门诊表中没有门诊主诊断字段，所以取医保登记表中的就诊疾病名称字段**/
+        ifnull((select tt.out_disease_name from inpt_visit tt where e.visit_id = tt.id),(select it.visit_icd_name from insure_individual_visit it where e.visit_id = it.visit_id)) as outDiseaseName,
         (select DATE_FORMAT(tt.in_time,'%Y-%m-%d') from inpt_visit tt where e.visit_id = tt.id) as inTime,
         (select DATE_FORMAT(tt.out_time,'%Y-%m-%d') from inpt_visit tt where e.visit_id = tt.id) as outTime,
         (select tt.in_no from inpt_visit tt where e.visit_id = tt.id) as inNo,

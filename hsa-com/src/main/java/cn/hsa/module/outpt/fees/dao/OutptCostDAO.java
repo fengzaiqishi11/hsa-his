@@ -695,4 +695,11 @@ public interface OutptCostDAO {
     void updateCostSettleId(String settleId,@Param("list") List<OutptCostDTO> costList);
 
     void updateCostSettleIdByids(String settleId,@Param("list") List<OutptCostDTO> costList);
+    /**
+     * @Author gory
+     * @Description
+     * @Date 2022/8/24 8:42
+     * @Param [outptCostDTO]
+     **/
+    String queryOneCostId(OutptCostDTO outptCostDTO);
 }

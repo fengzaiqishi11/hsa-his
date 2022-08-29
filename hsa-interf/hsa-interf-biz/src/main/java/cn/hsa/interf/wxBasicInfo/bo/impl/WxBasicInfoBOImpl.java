@@ -2088,8 +2088,9 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         data.put("hospCode", hospCode);
         data.put("typeCode", Constants.CFLB.LIS);
         List<MedicalResultDTO> itemList = wxOutptDAO.queryMedicApplyResult(data);
-        MedicalResultDTO result = new MedicalResultDTO();
+        MedicalResultDTO result = null;
         if (!CollectionUtils.isEmpty(itemList)){
+            result = new MedicalResultDTO();
             MedicalResultDTO mr = itemList.get(0);
             result.setProfileId(mr.getProfileId());
             result.setName(mr.getName());

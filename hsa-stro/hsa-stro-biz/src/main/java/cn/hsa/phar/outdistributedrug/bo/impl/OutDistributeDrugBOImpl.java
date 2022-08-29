@@ -460,7 +460,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
 
             //解除占用库存
             stroStockBO.updateStockOccupy(list);
-            //门诊费用表回写是否已发药 和回写发药明细批次汇总id
+            //门诊费用表回写是否已发药 和回写发药明细批次汇总id,第一次发药的费用id
             outDistributeDrugDAO.updateOutptCostIsDistAndDistId(pharOutDistributeBatchDetailDTOs);
 
         } catch (IllegalAccessException e) {

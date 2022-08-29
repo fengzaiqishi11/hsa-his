@@ -298,6 +298,12 @@ public class EmrPatientController extends BaseController {
 			inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
 			inptVisitDTO.setInDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
 			inptVisitDTO.setZgDoctorId(sysUserDTO.getId()); // liuliyun 20210629 住院病历添加主管医生过滤
+			if (StringUtils.isEmpty(inptVisitDTO.getColumnName())) {
+				inptVisitDTO.setColumnName("outTime");
+			}
+			if (StringUtils.isEmpty(inptVisitDTO.getSortName())) {
+				inptVisitDTO.setSortName("asc");
+			}
 /*			//新增当前登录医生过滤条件 -caoliang 2021/6/17
 			inptVisitDTO.setDoctorName(userName);*/
 			Map map = new HashMap();
@@ -320,6 +326,12 @@ public class EmrPatientController extends BaseController {
 		SysUserDTO sysUserDTO = getSession(req, res);
 		inptVisitDTO.setHospCode(sysUserDTO.getHospCode());
 		inptVisitDTO.setZgDoctorId(sysUserDTO.getId());
+		if (StringUtils.isEmpty(inptVisitDTO.getColumnName())) {
+			inptVisitDTO.setColumnName("outTime");
+		}
+		if (StringUtils.isEmpty(inptVisitDTO.getSortName())) {
+			inptVisitDTO.setSortName("asc");
+		}
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());
 		map.put("inptVisitDTO", inptVisitDTO);

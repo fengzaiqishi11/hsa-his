@@ -59,6 +59,15 @@ public interface InsureEmrCoursrinfoDAO {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    /**
+     * 更新首次病程信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:13
+     * @return int
+     */
+    int updateSelectiveByMdtrtSn(Map map);
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -85,4 +94,6 @@ public interface InsureEmrCoursrinfoDAO {
     void deleteByMap(Map<String, Object> map);
 
     void insertList(List<InsureEmrCoursrinfoDTO> coursrinfoList);
+
+    InsureEmrCoursrinfoDTO queryInfoByMdtrtSn(@Param("mdtrtSn")String mdtrtSn);
 }

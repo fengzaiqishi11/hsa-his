@@ -60,6 +60,16 @@ public interface InsureEmrAdminfoDAO  {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    /**
+     * 根据mdtrtSn修改入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:13
+     * @return int
+     */
+    int updateSelectiveByMdtrtSn(Map map);
+
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -95,4 +105,13 @@ public interface InsureEmrAdminfoDAO  {
     InsureEmrAdminfoDTO queryByUuid(Long uuid);
 
     void deleteByMap(Map map);
+
+    /**
+     * 根据就诊ID查询入院信息
+     * @param mdtrtSns
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:05
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO
+     */
+    InsureEmrAdminfoDTO queryInfoByMdtrtSn(@Param("mdtrtSn")String mdtrtSns);
 }

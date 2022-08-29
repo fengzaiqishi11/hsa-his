@@ -210,4 +210,28 @@ public interface InsureGetInfoBO {
      * @Param [map]
      **/
     List<Map<String,Object>> queryAdmdvs(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询门特结算清单病人
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    PageDTO queryOutSetlePage(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 医疗保障基金结算清单信息:批量保存
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    Map<String, Object> saveBatchSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 医疗保障基金结算清单信息:批量上传到医保
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    Map<String, Object> insertBatchSettleInfo(Map<String, Object> map);
 }

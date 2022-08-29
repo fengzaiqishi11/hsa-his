@@ -221,4 +221,28 @@ public interface InsureGetInfoService {
      * @Param [map]
      **/
     WrapperResponse<List<Map<String,Object>>> queryAdmdvs(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 查询门特结算清单病人
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<PageDTO> queryOutSetlePage(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 医疗保障基金结算清单信息:批量保存
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<Map<String, Object>> saveBatchSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 医疗保障基金结算清单信息:批量上传到医保
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<Map<String, Object>> insertBatchSettleInfo(Map<String, Object> map);
 }

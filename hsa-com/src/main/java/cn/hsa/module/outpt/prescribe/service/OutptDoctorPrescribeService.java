@@ -505,4 +505,14 @@ public interface OutptDoctorPrescribeService {
 
     @PostMapping("/web/outpt/outptDoctorPrescribeService/queryOutptMatchDiagnose")
     WrapperResponse<List<OutptDiagnoseDTO>> queryOutptMatchDiagnose(Map<String, Object> reqMap);
+    /**
+     * @param paramMap
+     * @Menthod: queryDrugCount
+     * @Desrciption: 获取精麻药品允许时间内开药次数
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-23 19:51
+     * @Return: List<Map>
+     */
+    WrapperResponse<List<Map>> queryDrugCount(Map paramMap);
 }

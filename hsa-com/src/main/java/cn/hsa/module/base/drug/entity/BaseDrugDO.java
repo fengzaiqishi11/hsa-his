@@ -261,4 +261,13 @@ public class BaseDrugDO extends PageDO implements Serializable {
 
     // 报销比例
     private String reimbursementRatio;
+    /**
+     * 开药周期（几天内）
+     */
+    private String prescribingCycle;
+    /**
+     * 允许开药天数（几天内允许开药次数）
+     */
+    private String numOfPrescAllowed;
+
 }

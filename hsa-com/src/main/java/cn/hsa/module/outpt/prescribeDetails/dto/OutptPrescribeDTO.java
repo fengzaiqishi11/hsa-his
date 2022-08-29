@@ -104,5 +104,6 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
     private String visitNo;//就诊号
     private String decoctionMethod;//煎药方式
     private Integer age; // 年龄
+    private String certNo; // 年龄
 }
 

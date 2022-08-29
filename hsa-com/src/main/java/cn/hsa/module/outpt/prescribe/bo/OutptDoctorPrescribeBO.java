@@ -465,4 +465,14 @@ public interface OutptDoctorPrescribeBO {
     List<OutptDiagnoseDTO> queryOutptMatchDiagnose(OutptVisitDTO outptVisitDTO);
 
     PageDTO getCfData2(BaseDrugDTO baseDrugDTO);
+    /**
+     * @param outptPrescribeDTO
+     * @Menthod: queryDrugCount
+     * @Desrciption: 获取精麻药品允许时间内开药次数
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-23 19:51
+     * @Return: List<Map>
+     */
+    List<Map> queryDrugCount(OutptPrescribeDTO outptPrescribeDTO);
 }

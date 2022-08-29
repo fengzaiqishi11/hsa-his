@@ -135,4 +135,10 @@ public interface InsureRecruitPurchaseService {
      * @Date: 2021/10/20
      */
     WrapperResponse<Boolean> updateToInsure(Map<String, Object> map);
+    /**
+     * 海南-查询药品库存变更信息
+     * @param map
+     * @return
+     */
+    WrapperResponse<PageDTO> queryYpInsureInventoryStockUpdatePage(Map<String, Object> map);
 }

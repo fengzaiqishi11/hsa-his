@@ -718,6 +718,20 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
         OutptVisitDTO outptVisitDTO = MapUtils.get(reqMap, "outptVisitDTO");
         return WrapperResponse.success(outptDoctorPrescribeBO.queryOutptMatchDiagnose(outptVisitDTO));
     }
+    /**
+     * @param paramMap
+     * @Menthod: queryDrugCount
+     * @Desrciption: 获取精麻药品允许时间内开药次数
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-08-23 19:51
+     * @Return: List<Map>
+     */
+    @Override
+    public WrapperResponse<List<Map>> queryDrugCount(Map paramMap) {
+        OutptPrescribeDTO outptPrescribeDTO = MapUtils.get(paramMap, "outptPrescribeDTO");
+        return WrapperResponse.success(outptDoctorPrescribeBO.queryDrugCount(outptPrescribeDTO));
+    }
 
     @Override
     public WrapperResponse<PageDTO> getCfData2(Map paramMap) {

@@ -69,4 +69,18 @@ public class InsureGoodSell   extends PageDO implements Serializable {
      */
     private String endTime;
 
+    /**
+     * 产品唯一编码   海南医保字段
+     */
+    private String prodCode;
+
+    /**
+     * 商品类别   1:药品   2：耗材
+     */
+    private String goodsType;
+
+    private String id;
+
+
+
 }

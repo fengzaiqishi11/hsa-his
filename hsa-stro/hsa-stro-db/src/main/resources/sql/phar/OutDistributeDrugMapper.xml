@@ -350,7 +350,7 @@
 
     <update id="updateOutptCostIsDistAndDistId">
       <foreach collection="list" item="item" separator=";">
-        update outpt_cost set is_dist='1',distribute_all_detail_id = #{item.id}
+        update outpt_cost set is_dist='1',distribute_all_detail_id = #{item.id},one_dist_cost_id =  #{item.costId}
         where hosp_code = #{item.hospCode} and id = #{item.costId}
       </foreach>
     </update>

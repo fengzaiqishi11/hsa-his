@@ -68,6 +68,12 @@ public interface InsureStockManagerBO {
      */
     List<InsureGoodSell> queryInsureGoodSellPage(InsureGoodSell InsureGoodSell);
     /**
+     * 查询商品销售信息-- 海南医保接口
+     * @param InsureGoodSell
+     * @return
+     */
+    List<InsureGoodSell> queryInsureGoodSellPageForHainan(InsureGoodSell InsureGoodSell);
+    /**
      * 批量修改商品销售信息
      * @param map
      * @return
@@ -92,8 +98,8 @@ public interface InsureStockManagerBO {
 
     /**
      * 查询商品盘点信息
-     * @param insureInventoryCheck
      *
+     * @param insureInventoryCheck
      * @return
      */
     List<InsureInventoryCheck> queryInsureInventoryCheckPage(InsureInventoryCheck insureInventoryCheck);
@@ -126,4 +132,6 @@ public interface InsureStockManagerBO {
      * @Date: 2021/11/5
      */
     PageDTO queryPersonList(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO);
+
+    List<InsureGoodSellBack> queryInsureGoodSellBackPageForHainan(InsureGoodSellBack insureGoodSellBack);
 }

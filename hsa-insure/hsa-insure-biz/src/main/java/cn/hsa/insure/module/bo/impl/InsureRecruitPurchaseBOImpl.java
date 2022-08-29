@@ -11,11 +11,14 @@ import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureRecruitPurchaseDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
+import cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete;
+import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,10 +28,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -80,9 +80,12 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         String isDrugOrMaterial = insureRecruitPurchaseDTO.getItemCode();
         // 医院编码
         String hospCode = insureRecruitPurchaseDTO.getHospCode();
+
+        String orgCode = insureRecruitPurchaseDTO.getOrgCode();
         // 调用方法 获得当前医院的token
         Map map = new HashMap();
         map.put("hospCode", hospCode);
+        map.put("regCode", orgCode);
         Map<String, Object> accessTokenMap = getToken(map);
         String token = MapUtils.get(accessTokenMap, "accessToken");
         if (StringUtils.isEmpty(token)) {
@@ -95,22 +98,24 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         }
         // 封装调用参数
         Map<String, Object> httpParam = new HashMap<String, Object>();
+        Map<String, Object> inputData = new HashMap<String, Object>();
         // 必填参数 accessToken
         httpParam.put("accessToken", token);
         // 必填参数 currentPageNumber 当前是第几页
         httpParam.put("currentPageNumber", currentPageNumber);
         // todo 这个是我猜的 当前显示多少条
         httpParam.put("totalRecordCount", totalRecordCount);
+        inputData.put("data",httpParam);
         // 调医保接口 获得医保返回的库存列表
         Map<String, Object> resultMap = new HashMap<>();
         Map<String, Object> resultMap2 = new HashMap<>();
         if ("1".equals(isDrugOrMaterial)) {
             // 医保编号为8501 查询药品
-            resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8501, httpParam);
+            resultMap = this.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8501, inputData);
             resultMap2 = MapUtils.get(MapUtils.get(resultMap, "output"), "dataList");
         } else {
             // 医保编号为8506 查询材料
-            resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8506, httpParam);
+            resultMap = this.commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8506, inputData);
             resultMap2 = MapUtils.get(MapUtils.get(resultMap, "output"), "data");
         }
 
@@ -261,17 +266,11 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public PageDTO queryDrugSells(InsureRecruitPurchaseDTO insureRecruitPurchaseDTO) {
         String hospCode = insureRecruitPurchaseDTO.getHospCode();
+        String insureRegCode = insureRecruitPurchaseDTO.getInsureRegCode();
         Map map = new HashMap();
-        map.put("hospCode",hospCode);
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -315,18 +314,19 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean addDrugSells(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (ObjectUtil.isEmpty(insureRegCode)) {
+            throw new AppException("医保机构编码不能为空！");
+        }
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -341,7 +341,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8504, data);
-        } else {
+        } else if ("2".equals(itemCode)){
             // 耗材销售上传
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8509, data);
         }
@@ -363,18 +363,19 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean deleteDrugSells(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+        String insureRegCode = MapUtils.get(map, "insureRegCode");
+        if (ObjectUtil.isEmpty(insureRegCode)) {
+            throw new AppException("医保机构编码不能为空！");
+        }
         List<Map<String, Object>> dataList = MapUtils.get(map, "dataList");
         // 判断是材料还是药品 1：药品 2：材料
         String itemCode = MapUtils.get(map, "itemCode");
-        Map<String, Object> accessTokenMap = getToken(map);
-        String token = MapUtils.get(accessTokenMap, "accessToken");
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("itemCode不能为空！【1：药品 2：材料】");
+        }
+        String token = getToken(hospCode, insureRegCode);
         if (StringUtils.isEmpty(token)) {
             throw new AppException("医院的token为空，无法调用医保接口");
-        }
-        // 调用方法 获得医保注册号
-        String insureRegCode = getOrgCode(map);
-        if (StringUtils.isEmpty(insureRegCode)) {
-            throw new AppException("医院的医保注册号为空，请先配置系统参数HOSP_INSURE_CODE");
         }
         // 封装入参
         Map<String, Object> inptMap = new HashMap<String, Object>();
@@ -389,7 +390,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if ("1".equals(itemCode)){
             // 药品销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8505, data);
-        }else{
+        }else if ("2".equals(itemCode)){
             // 耗材销售退货
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8510, data);
         }
@@ -435,7 +436,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     private Map<String, Object> commonInsureUnified(String hospCode, String insureRegCode, String functionCode, Map<String, Object> paramMap) {
         InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
         insureConfigurationDTO.setHospCode(hospCode);
-        insureConfigurationDTO.setOrgCode(insureRegCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
         insureConfigurationDTO.setIsValid(Constants.SF.S);
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
         if (insureConfigurationDTO == null) {
@@ -500,22 +501,103 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     public Map<String, Object> getToken(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
         String orgCode = getOrgCode(map);
+        String regCode = MapUtils.get(map, "regCode");
         Map<String, Object> paramMap = new HashMap<>();
         String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
         String tokenValue = "";
         if (redisUtils.hasKey(accessToken)) {
             tokenValue = redisUtils.get(accessToken);
         } else {
-            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, orgCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
             Map<String, Object> outputMap = MapUtils.get(stringObjectMap, "output");
             Map<String, Object> dataMap = MapUtils.get(outputMap, "data");
             tokenValue = MapUtils.get(dataMap, "accessToken");
-
-        }
-        redisUtils.set(accessToken, tokenValue, 1800);
+            redisUtils.set(accessToken, tokenValue, 1800);
+      }
         map.put("accessToken", tokenValue);
         return map;
     }
+    /**
+     * 海南-查询药品库存变更信息
+     * @param insureInventoryStockUpdate
+     * @return
+     */
+    @Override
+    public List<InsureInventoryStockUpdate> queryYpInsureInventoryStockUpdatePage(InsureInventoryStockUpdate insureInventoryStockUpdate) {
+        PageHelper.startPage(insureInventoryStockUpdate.getPageNo(), insureInventoryStockUpdate.getPageSize());
+        String invChgType = insureInventoryStockUpdate.getInvChgType();
+        String itemCode = insureInventoryStockUpdate.getItemCode();
+        if (StringUtils.isEmpty(invChgType)) {
+            throw new AppException("变更类型不能为空！！！");
+        }
+        if (StringUtils.isEmpty(itemCode)) {
+            throw new AppException("项目类别【itemCode】不能为空！！！");
+        }
+
+        List<String> outinCodeList = new ArrayList<>();
+        Map<String, List<String>> map = new HashMap();
+        // 封装参数 后期把数字维护到常量或者枚举类里面
+        // 调拨入库 对应 本地进销存 没有,先设置为它本身
+        map.put("101", Arrays.asList("101"));
+        // 调拨出库 对应 本地进销存 没有,先设置为它本身
+        map.put("102", Arrays.asList("102"));
+        // 盘盈 对应 本地进销存 7 盘盈盘亏
+        map.put("103", Arrays.asList("7"));
+        // 盘存 对应 本地进销存 8 报损报溢
+        map.put("104", Arrays.asList("8"));
+        // 销毁 对应 本地进销存 没有,先设置为它本身
+        map.put("105", Arrays.asList("105"));
+        // 其他入库 对应本地进销存 门诊退药、住院退药
+        map.put("106", Arrays.asList("25", "28"));
+        // 其他出库 对应本地进销存 门诊发药、住院发药
+        map.put("107", Arrays.asList("23", "27"));
+        // 初始化入库 对应 本地进销存 1,2 采购入库、直接入库
+        map.put("108", Arrays.asList("1", "2"));
+        outinCodeList = MapUtils.get(map, invChgType);
+        if (ListUtils.isEmpty(outinCodeList)) {
+            throw new AppException("请选择库存变更类型");
+        } else {
+            insureInventoryStockUpdate.setOutinCodeList(outinCodeList);
+        }
+
+        try{
+            //调用海南医保库存查询接口
+            InsureRecruitPurchaseDTO insureRecruitPurchaseDTO = new InsureRecruitPurchaseDTO();
+            // 医院编码
+            String hospCode = insureInventoryStockUpdate.getHospCode();
+            insureRecruitPurchaseDTO.setHospCode(hospCode);
+            insureRecruitPurchaseDTO.setItemCode(itemCode);
+            insureRecruitPurchaseDTO.setPageNo(insureInventoryStockUpdate.getPageNo());
+            insureRecruitPurchaseDTO.setPageSize(insureInventoryStockUpdate.getPageSize());
+            insureRecruitPurchaseDTO.setOrgCode(insureInventoryStockUpdate.getInsureRegCode());
+            this.queryAll(insureRecruitPurchaseDTO);
+        }catch(Exception e){
+            e.printStackTrace();
+            logger.info("调用海南招采库存查询接口失败！");
+        }finally {
+
+        }
+        List<InsureInventoryStockUpdate> list = insureRecruitPurchaseDAO.queryInsureInventoryStockUpdatePage(insureInventoryStockUpdate);
+        return list;
+    }
+
+    @Override
+    public String getToken(String hospCode,String insureRegCode) {
+        Map<String, Object> paramMap = new HashMap<>();
+        String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
+        String tokenValue = "";
+        if (redisUtils.hasKey(accessToken)) {
+            tokenValue = redisUtils.get(accessToken);
+        } else {
+        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+        Map<String, Object> outputMap = MapUtil.get(stringObjectMap, "output",Map.class);
+        Map<String, Object> dataMap = MapUtil.get(outputMap, "data",Map.class);
+        tokenValue = MapUtil.getStr(dataMap, "accessToken");
+        redisUtils.set(accessToken, tokenValue, 1800);
+        }
+        return tokenValue;
+    }
+
 
     /**
      * @Meth: uploadToInsure
@@ -533,7 +615,11 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Boolean updateToInsure(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
+        String regCode = MapUtils.getEmptyErr(map, "orgCode", "医保机构编码不能为空！");
         //------- 1. 查询本地库存表中需要上传的数据 begin ----------
+        if(ObjectUtil.isEmpty(MapUtils.get(map, "itemCode"))){
+            throw new AppException("项目编码【itemCode】不能为空！");
+        }
         // 判断是材料还是药品 1：药品 2：材料
         String isDrugOrMaterial = MapUtils.get(map, "itemCode");
         // 封装查询参数
@@ -541,11 +627,11 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         stroStockDTO.setHospCode(hospCode);
         stroStockDTO.setIsUploadToInsure(Constants.SF.F);
         stroStockDTO.setItemCode(isDrugOrMaterial);
-        List<Map<String, Object>> invChgMedinsInfoList = insureConfigurationDAO.getNeedUploadStrockData(stroStockDTO);
         // ------- 查询本地库存表中需要上传的数据 end ----------
 
         // -----------3.获得医院的token 、 医保机构编码 begin-------------
         // 调用方法 获得当前医院的token
+        map.put("regCode",regCode);
         Map<String, Object> accessTokenMap = getToken(map);
         String token = MapUtils.get(accessTokenMap, "accessToken");
         if (StringUtils.isEmpty(token)) {
@@ -565,21 +651,47 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         httpParam.put("accessToken", token);
         // 调医保接口 获得医保返回的库存列表 医保编号为
         Map<String, Object> resultMap = new HashMap<>();
-
-        if (invChgMedinsInfoList.size() > 100){
+        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
+        List<InsureInventoryStockUpdate> listInsureInventoryStockUpdate = MapUtils.getEmptyErr(map, "listInsureInventoryStockUpdate", "未获取到需要上传的数据！");
+        if (!ListUtils.isEmpty(listInsureInventoryStockUpdate)) {
+            listInsureInventoryStockUpdate = JSONObject.parseArray(JSONObject.toJSONString(listInsureInventoryStockUpdate), InsureInventoryStockUpdate.class);
+        }
+        List<Map<String, Object>> listMap = new ArrayList<>();
+        Map<String, Object> dataMap = null;
+        Map<String, Object> inputData = new HashMap<>();
+        for (InsureInventoryStockUpdate insureInventoryStockUpdate : listInsureInventoryStockUpdate) {
+            dataMap = new HashMap<String, Object>();
+            dataMap.put("prodCode", insureInventoryStockUpdate.getInsureItemCode());//,insureInventoryStockUpdate.getMedListCodg())	;//产品唯一编码
+            dataMap.put("invChgType", insureInventoryStockUpdate.getInvChgType());//库存变更类型
+            dataMap.put("fixmedinsHilistId", insureInventoryStockUpdate.getFixmedinsHilistId());//定点医药机构目录编号
+            dataMap.put("fixmedinsHilistName", insureInventoryStockUpdate.getFixmedinsHilistName());//定点医药机构目录名称
+            dataMap.put("fixmedinsBchno", insureInventoryStockUpdate.getFixmedinsBchno());//定点医药机构批次流水号
+            dataMap.put("pric", insureInventoryStockUpdate.getPric());//单价
+            dataMap.put("invCnt", insureInventoryStockUpdate.getCnt());//数量
+            dataMap.put("rxFlag", insureInventoryStockUpdate.getRxFlag());//处方药标志
+            dataMap.put("invdate", insureInventoryStockUpdate.getInvChgTime());//库存变更时间
+            dataMap.put("memo", insureInventoryStockUpdate.getMemo());//备注
+            dataMap.put("trdnFlag", insureInventoryStockUpdate.getTrdnFlag());//拆零标志
+            dataMap.put("manuLotnum","");
+            dataMap.put(" manuDate","");
+            dataMap.put(" expyEnd","");
+            listMap.add(dataMap);
+        }
+        if (listMap.size() > 100){
                int toIndex = 100;
-               for (int i =0; i<invChgMedinsInfoList.size();i+= 100){
-                   if (i + 100 > invChgMedinsInfoList.size()){
-                       toIndex = invChgMedinsInfoList.size() - i;
+               for (int i =0; i<listMap.size();i+= 100){
+                   if (i + 100 > listMap.size()){
+                       toIndex = listMap.size() - i;
                    }
-                   List newList = invChgMedinsInfoList.subList(i,i + toIndex);
+                   List newList = listMap.subList(i,i + toIndex);
                    httpParam.put("invChgMedinsInfo", newList);
+                   inputData.put("data",httpParam);
                    if ("1".equals(isDrugOrMaterial)){
                        // 药品变更上传
-                       resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
-                   } else{
+                       resultMap = this.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8502, inputData);
+                   } else  if ("2".equals(isDrugOrMaterial)){
                        // 材料变更上传
-                       resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
+                       resultMap = this.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8507, inputData);
                    }
                    try {
                        // 因为调用间隔不能低于五秒，所以暂时休眠五秒
@@ -589,13 +701,14 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
                    }
                }
         } else{
-            httpParam.put("invChgMedinsInfo", invChgMedinsInfoList);
+            httpParam.put("invChgMedinsInfo", listMap);
+            inputData.put("data",httpParam);
             if ("1".equals(isDrugOrMaterial)){
                 // 药品变更上传
-                resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8502, httpParam);
-            } else{
+               resultMap = this.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8502, inputData);
+            } else if ("2".equals(isDrugOrMaterial)){
                 // 材料变更上传
-                resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8507, httpParam);
+                resultMap = this.commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8507, inputData);
             }
         }
         //------------- 4.封装参数 调用接口上传 end --------
@@ -603,12 +716,51 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         // 5.如果上传成功 回写库存表
         if ("0".equals(MapUtils.get(resultMap, "infcode"))) {
             // 获得修改的ids
+
+            List<InsureGoodInfoDelete> listData = new ArrayList<>();
+            for (InsureInventoryStockUpdate insureInventoryStockUpdate : listInsureInventoryStockUpdate) {
+                InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
+                insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+                insureGoodInfoDelete.setFixmedinsBchno(insureInventoryStockUpdate.getFixmedinsBchno());
+                insureGoodInfoDelete.setHospCode(hospCode);
+                insureGoodInfoDelete.setInsureType(regCode);
+                insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
+                insureGoodInfoDelete.setInvDataType("2");
+                insureGoodInfoDelete.setCertId(certId);
+                listData.add(insureGoodInfoDelete);
+            }
+
+            this.updateStroAndSaveResultData(listData, hospCode, "1");
             return true;
         } else {
             return false;
         }
     }
-
+    /**
+     * @Meth: updateStroAndSaveResultData
+     * @Description: 上传之后更新进销存、并插入到医保上传表
+     * 注意： resultList中的对象必须要有 id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id
+     * statusCode : 0 ： 未上传    1：采购/销售 上传  2：退货
+     * @Param: [resultList, hospCode, statusCode]
+     * @return: boolean
+     * @Author: zhangguorui
+     * @Date: 2021/11/5
+     */
+    private boolean updateStroAndSaveResultData(List<InsureGoodInfoDelete> resultList, String hospCode, String statusCode) {
+        if (!ListUtils.isEmpty(resultList)) {
+            // 过滤出进销存id
+            List<String> ids = resultList.stream().map(InsureGoodInfoDelete::getFixmedinsBchno).collect(Collectors.toList());
+            //查询已上传的商品
+            List<InsureGoodInfoDelete> fixmedinsBchnos = insureRecruitPurchaseDAO.queryStockUpBatch(ids);
+            //过滤出需要新增上传表的数据
+            resultList.removeIf(dto->fixmedinsBchnos.contains(dto.getFixmedinsBchno()));
+            // 更新进销存的上传状态
+            insureRecruitPurchaseDAO.updateStatus(ids, hospCode, statusCode);
+            // 插入上传表
+            insureRecruitPurchaseDAO.insertStockUploadBatch(resultList);
+        }
+        return true;
+    }
     /**
      * @Method getOrgCode
      * @Desrciption 获取新医保医疗机构 系统参数配置

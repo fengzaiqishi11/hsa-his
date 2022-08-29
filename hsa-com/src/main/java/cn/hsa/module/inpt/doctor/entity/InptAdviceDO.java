@@ -14,13 +14,13 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
- *@Package_name: cn.hsa.module.inpt.entity
- *@Class_name: InptAdviceDO
- *@Describe: 住院医嘱表
- *@Author: liuqi1
- *@Eamil: liuqi1@powersi.com.cn
- *@Date: 2020-09-01 19:46:53
- *@Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
+ * @Package_name: cn.hsa.module.inpt.entity
+ * @Class_name: InptAdviceDO
+ * @Describe: 住院医嘱表
+ * @Author: liuqi1
+ * @Eamil: liuqi1@powersi.com.cn
+ * @Date: 2020-09-01 19:46:53
+ * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
 @Data
 @AllArgsConstructor
@@ -373,7 +373,7 @@ public class InptAdviceDO extends PageDO implements Serializable {
     /**
      * 提交时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8" )
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date submitTime;
 
     /**
@@ -409,7 +409,7 @@ public class InptAdviceDO extends PageDO implements Serializable {
     /**
      * 取消时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8" )
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date cancelTime;
     /**
      * 用药类型
@@ -426,29 +426,62 @@ public class InptAdviceDO extends PageDO implements Serializable {
      */
     private String isInsureUpload;
 
-  // 临床路径项目明细ID
-  private String stageDetailItemId;
+    // 临床路径项目明细ID
+    private String stageDetailItemId;
 
-  private String clinicalPathStageId;
-  private String decoctionMethod;
+    private String clinicalPathStageId;
+    private String decoctionMethod;
     /**
      * 是否代办
      */
-  private String isAgent;
+    private String isAgent;
     /**
      * 代办人
      */
-  private String agentName;
+    private String agentName;
     /**
      * 代办人身份证
      */
-  private String agentCertNo;
+    private String agentCertNo;
     /**
      * 停嘱带教医生id
      */
-  private String stopTeachDoctorId;
+    private String stopTeachDoctorId;
     /**
      * 停嘱带教医生名称
      */
-  private String stopTeachDoctorName;
+    private String stopTeachDoctorName;
+
+    /**
+     * 医嘱核收核对人ID
+     */
+    private String checkSecondId;
+    /**
+     * 医嘱核收核对人姓名
+     */
+    private String checkSecondName;
+    /**
+     * 医嘱核收核对时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date checkSecondTime;
+
+    /**
+     * 停嘱医嘱核收核对人ID
+     */
+    private String stopCheckSecondId;
+    /**
+     * 停嘱医嘱核收核对人姓名
+     */
+    private String stopCheckSecondName;
+    /**
+     * 停嘱医嘱核收核对时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date stopCheckSecondTime;
+
+    /**
+     * 核对签名名称
+     */
+    private String isNewStatus;
 }

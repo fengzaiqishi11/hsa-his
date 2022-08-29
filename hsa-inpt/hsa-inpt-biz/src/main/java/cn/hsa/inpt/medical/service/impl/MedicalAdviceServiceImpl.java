@@ -85,4 +85,17 @@ public class MedicalAdviceServiceImpl extends HsafService implements MedicalAdvi
     public WrapperResponse<Boolean> longCost(Map map) {
         return WrapperResponse.success(medicalAdviceBO.modifyLongCost(MapUtils.get(map,"medicalAdviceDTO")));
     }
+    /**
+     * @Method: updateAdviceInChecked
+     * @Description: 修改医嘱信息，核收人，核对签名人，核收状态
+     * isChecked: 0：未核收，1：已核对，2：已核收未核对，3：核对退回
+     * @Param: [medicalAdviceDTO]
+     * @Author: pengbo
+     * @Date: 2022/08/24 16:25
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateAdviceInChecked(Map<String, Object> map) {
+        return WrapperResponse.success(medicalAdviceBO.updateAdviceInChecked(MapUtils.get(map,"medicalAdviceDTO")));
+    }
 }

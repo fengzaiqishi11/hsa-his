@@ -378,9 +378,17 @@
     <result property="itemName" column="item_name" jdbcType="VARCHAR"/>
     <result property="herbNum" column="herb_num" jdbcType="NUMERIC"/>
     <result property="remark" column="remark" jdbcType="VARCHAR"/>
-      <result property="useDays" column="use_days" jdbcType="INTEGER"/>
-      <result property="stopTeachDoctorName" column="stop_teach_doctor_name" jdbcType="VARCHAR"/>
-      <result property="stopTeachDoctorId" column="stop_teach_doctor_id" jdbcType="VARCHAR"/>
+    <result property="useDays" column="use_days" jdbcType="INTEGER"/>
+    <result property="stopTeachDoctorName" column="stop_teach_doctor_name" jdbcType="VARCHAR"/>
+    <result property="stopTeachDoctorId" column="stop_teach_doctor_id" jdbcType="VARCHAR"/>
+    <result property="checkSecondId" column="check_second_id" jdbcType="VARCHAR"/>
+    <result property="checkSecondName" column="check_second_name" jdbcType="VARCHAR"/>
+    <result property="checkSecondTime" column="check_second_time" jdbcType="TIMESTAMP"/>
+    <result property="stopCheckSecondId" column="stop_check_second_id" jdbcType="VARCHAR"/>
+    <result property="stopCheckSecondName" column="stop_check_second_name" jdbcType="VARCHAR"/>
+    <result property="stopCheckSecondTime" column="stop_check_second_time" jdbcType="TIMESTAMP"/>
+    <result property="isNewStatus" column="is_new_status" jdbcType="VARCHAR"/>
+
   </resultMap>
 
   <!--通过实体作为筛选条件查询医嘱信息-->
@@ -390,7 +398,8 @@
       speed_code, is_skin, is_positive, exec_id, exec_name, second_exec_id, second_exec_name, last_exec_time,
       check_id, check_name, check_time, stop_doctor_id, stop_doctor_name, stop_time, stop_check_id,
       stop_check_name, stop_check_time, is_long, crte_id, crte_name, crte_time,long_start_time,
-      cancel_id,cancel_name,cancel_time,skin_result_code
+      cancel_id,cancel_name,cancel_time,skin_result_code,check_second_id,check_second_name,
+      check_second_time,stop_check_second_id,stop_check_second_name,stop_check_second_time,is_new_status
       from inpt_advice where hosp_code = #{hospCode} and visit_id = #{visitId} and is_submit='1'
       <if test="ids1 != null and ids1 != ''">
         and find_in_set(id,#{ids1})
@@ -437,7 +446,9 @@
     (select d.name from base_rate d where d.id = a.rate_id and d.hosp_code = #{hospCode}) as rateName, bd.big_type_code,
     ba.is_stop_myself,
       ia.stop_teach_doctor_name,
-      ia.stop_teach_doctor_id
+      ia.stop_teach_doctor_id,
+      ia.check_second_name,
+      ia.stop_check_second_name
     from inpt_advice_print a
     join inpt_advice ia on ia.id = a.ia_id and ia.hosp_code = a.hosp_code
     left JOIN base_drug bd on ia.hosp_code = bd.hosp_code and ia.item_id = bd.id
@@ -570,7 +581,8 @@
     second_exec_name, last_exec_time, check_id, check_name, check_time, stop_doctor_id, stop_doctor_name,
     stop_time, stop_check_id, stop_check_name, stop_check_time, is_long, crte_id, crte_name, crte_time,
     is_in_print, is_stop_print, is_exec_print, is_skin_print, is_in_check_print, is_stop_check_print,
-    long_start_time,seq_no,is_valid,cancel_id,cancel_name,cancel_time)
+    long_start_time,seq_no,is_valid,cancel_id,cancel_name,cancel_time,check_second_id,check_second_name,
+    check_second_time,stop_check_second_id,stop_check_second_name,stop_check_second_time,is_new_status)
     values
     <foreach collection="list" item="item" index="index" separator=",">
       (#{item.id},#{item.hospCode}, #{item.visitId}, #{item.iaId}, #{item.orderNo}, #{item.groupNo}, #{item.groupSeqNo},
@@ -579,7 +591,8 @@
       #{item.checkId}, #{item.checkName}, #{item.checkTime}, #{item.stopDoctorId}, #{item.stopDoctorName},
       #{item.stopTime}, #{item.stopCheckId}, #{item.stopCheckName}, #{item.stopCheckTime}, #{item.isLong},
       #{item.crteId}, #{item.crteName}, #{item.crteTime}, '0', '0', '0', '0', '0', '0',#{item.longStartTime},
-      #{item.seqNo},#{item.isValid},#{item.cancelId},#{item.cancelName},#{item.cancelTime})
+      #{item.seqNo},#{item.isValid},#{item.cancelId},#{item.cancelName},#{item.cancelTime},
+       #{item.checkSecondId},#{item.checkSecondName},#{item.checkSecondTime},#{item.stopCheckSecondId},#{item.stopCheckSecondName},#{item.stopCheckSecondTime},#{item.isNewStatus})
     </foreach>
   </insert>
 

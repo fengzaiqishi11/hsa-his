@@ -6,6 +6,8 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
+import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
+import cn.hsa.module.base.bfc.entity.BaseFinanceClassifyDO;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO;
 import cn.hsa.module.base.profileFile.service.BaseProfileFileService;
@@ -954,6 +956,9 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         String visitId = SnowflakeUtils.getId();
         // 医院编码存进data页面入参中
         data.put("hospCode", hospCode);
+        data.put("registerNo",registerNo);
+        data.put("registerId",registerId);
+        data.put("visitId",visitId);
 
         //1. 校验同一个人同一个科室一天只能挂号一次
         if(!StringUtils.isEmpty(outptProfileFileDTO.getCertNo())) {
@@ -975,19 +980,16 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         }
 
         //2. 挂号表(outpt_register)数据处理，挂号数据
-        OutptRegisterDTO outptRegisterDTO = this.handeleOutptRegisterData(data, outptProfileFileDTO, registerId, registerNo, visitId, hospCode, crteId, crteName);
+        OutptRegisterDTO outptRegisterDTO = this.handeleOutptRegisterData(data, outptProfileFileDTO, hospCode,Constants.LYTJ.YYGH);
 
         //3. 就诊表(outpt_visit)数据处理，就诊记录
-        OutptVisitDTO outptVisitDTO = this.handeleOutptVisit(data, outptProfileFileDTO, hospCode, visitId, registerId, registerNo, crteId, crteName);
+        OutptVisitDTO outptVisitDTO = this.handeleOutptVisit(data, outptProfileFileDTO, hospCode, Constants.LYTJ.YYGH);
 
         //4. 挂号明细费用表(outpt_register_details)数据
         List<OutptRegisterDetailDto> outptRegisterDetailDtos = this.handeleOutptRegisterDetailData(outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
 
         //5. 分诊队列表数据(outpt_triage_visit)
         this.hendeleOutptTriageVisitData(outptVisitDTO, outptRegisterDTO);
-
-        //6. 根据是否结算参数判断是挂号结算还是门诊划价结算
-        //7.挂号结算表数据(outpt_register_settle)和结算支付表数据(outpt_register_pay)
 
         // 微信直接走挂号结算
         String settleId = this.handleOutptRegisterSettleAndPayData(data, outptClassifyCostDTOS, hospCode, registerId, visitId, crteId, crteName);
@@ -1335,21 +1337,17 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
      * @param data 页面入参
      * @param outptProfileFileDTO 个人档案信息dto
      * @param hospCode 医院编码
-     * @param visitId 就诊id
-     * @param registerId 挂号id
-     * @param registerNo 挂号单号
-     * @param crteId 创建人id
-     * @param crteName 创建人姓名
+     * @param type 类型
      * @return
      */
-    private OutptVisitDTO handeleOutptVisit(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, String hospCode, String visitId, String registerId, String registerNo, String crteId, String crteName) {
+    private OutptVisitDTO handeleOutptVisit(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, String hospCode, String type) {
         OutptVisitDTO outptVisitDTO = new OutptVisitDTO();
-        outptVisitDTO.setId(visitId); // 就诊id
+        outptVisitDTO.setId(MapUtils.get(data, "visitId")); // 就诊id
         outptVisitDTO.setHospCode(hospCode); //医院编码
         outptVisitDTO.setProfileId(outptProfileFileDTO.getId()); // 档案id
         outptVisitDTO.setOutProfile(outptProfileFileDTO.getOutProfile()); // 门诊档案号
-        outptVisitDTO.setRegisterId(registerId); // 挂号id
-        outptVisitDTO.setRegisterNo(registerNo); // 挂号单号
+        outptVisitDTO.setRegisterId(MapUtils.get(data, "registerId")); // 挂号id
+        outptVisitDTO.setRegisterNo(MapUtils.get(data, "registerNo")); // 挂号单号
         outptVisitDTO.setName(outptProfileFileDTO.getName()); // 姓名
         outptVisitDTO.setGenderCode(outptProfileFileDTO.getGenderCode()); // 性别
         outptVisitDTO.setAge(outptProfileFileDTO.getAge()); // 年龄
@@ -1369,13 +1367,19 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptVisitDTO.setDeptId(MapUtils.get(data, "deptId")); // 就诊科室id
         outptVisitDTO.setDeptName(MapUtils.get(data, "deptName")); // 就诊科室名称
         outptVisitDTO.setVisitTime(null); // 就诊时间
-        outptVisitDTO.setRemark("微信挂号就诊");
+        outptVisitDTO.setSourceTjCode(type); // 病人来源途径(LYTJ)
+        if(Constants.LYTJ.YYGH.equals(type)){
+            outptVisitDTO.setSourceTjRemark("微信预约挂号"); // 病人来源途径备注
+        } else if (Constants.LYTJ.HSSQ.equals(type)) {
+            outptVisitDTO.setSourceTjRemark("微信核酸申请"); // 病人来源途径备注
+        }
+        outptVisitDTO.setRemark(outptVisitDTO.getSourceTjRemark()); // 病人来源途径备注
         outptVisitDTO.setPym(PinYinUtils.toFirstPY(outptProfileFileDTO.getName())); // 拼音码
         outptVisitDTO.setWbm(WuBiUtils.getWBCode(outptProfileFileDTO.getName())); // 五笔码
         outptVisitDTO.setIsVisit(Constants.SF.F); // 是否就诊，0否
         outptVisitDTO.setIsFirstVisit(Constants.SF.F); // 是否复诊，0否
-        outptVisitDTO.setCrteId(crteId);
-        outptVisitDTO.setCrteName(crteName);
+        outptVisitDTO.setCrteId(MapUtils.get(data, "crteId"));
+        outptVisitDTO.setCrteName(MapUtils.get(data, "crteName"));
         outptVisitDTO.setCrteTime(DateUtils.getNow());
 
         log.debug("微信挂号支付插入【就诊表】数据：" + JSON.toJSONString(outptVisitDTO));
@@ -1431,20 +1435,16 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     /** 插入挂号表数据(outpt_register)
      * @param data 页面入参
      * @param outptProfileFileDTO 档案dto
-     * @param registerId 挂号id
-     * @param registerNo 挂号单号
-     * @param visitId 就诊id
      * @param hospCode 医院编码
-     * @param crteId 创建人id
-     * @param crteName 创建人姓名
+     * @param type 来源类型
      * @return
      */
-    private OutptRegisterDTO handeleOutptRegisterData(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, String registerId, String registerNo, String visitId, String hospCode, String crteId, String crteName) {
+    private OutptRegisterDTO handeleOutptRegisterData(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO,  String hospCode, String type) {
         OutptRegisterDTO outptRegisterDTO = new OutptRegisterDTO();
-        outptRegisterDTO.setId(registerId); // 挂号id
+        outptRegisterDTO.setId(MapUtils.get(data, "registerId")); // 挂号id
         outptRegisterDTO.setHospCode(hospCode); // 医院编码
-        outptRegisterDTO.setVisitId(visitId); // 就诊id
-        outptRegisterDTO.setRegisterNo(registerNo); // 挂号单号
+        outptRegisterDTO.setVisitId(MapUtils.get(data, "visitId")); // 就诊id
+        outptRegisterDTO.setRegisterNo(MapUtils.get(data, "registerNo")); // 挂号单号
         outptRegisterDTO.setName(outptProfileFileDTO.getName()); // 姓名
         outptRegisterDTO.setGenderCode(outptProfileFileDTO.getGenderCode()); // 性别
         outptRegisterDTO.setAge(outptProfileFileDTO.getAge()); // 年龄
@@ -1454,8 +1454,12 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptRegisterDTO.setPhone(outptProfileFileDTO.getPhone()); // 联系电话
         outptRegisterDTO.setSourceBzCode(Constants.LYBZ.WX); // 来源标志(LYBZ)，4微信
         outptRegisterDTO.setVisitCode(MapUtils.get(data, "visitCode")); // 就诊类别(JZLB)
-        outptRegisterDTO.setSourceTjCode(Constants.LYTJ.YYGH); // 病人来源途径(LYTJ)
-        outptRegisterDTO.setSourceTjRemark("微信预约挂号"); // 病人来源途径备注
+        outptRegisterDTO.setSourceTjCode(type); // 病人来源途径(LYTJ)
+        if(Constants.LYTJ.YYGH.equals(type)){
+            outptRegisterDTO.setSourceTjRemark("微信预约挂号"); // 病人来源途径备注
+        } else if (Constants.LYTJ.HSSQ.equals(type)) {
+            outptRegisterDTO.setSourceTjRemark("微信核酸申请"); // 病人来源途径备注
+        }
         outptRegisterDTO.setRegisterTime(DateUtils.getNow()); // 挂号时间
         outptRegisterDTO.setCfId(MapUtils.get(data, "cyId")); // 挂号类别id
         outptRegisterDTO.setCqId(MapUtils.get(data, "cqId")); // 坐诊班次id
@@ -1468,8 +1472,8 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptRegisterDTO.setIsCancel(Constants.SF.F); // 是否作废，0否
         outptRegisterDTO.setIsFirstVisit(Constants.SF.S); // 是否初诊
         outptRegisterDTO.setIsAdd(Constants.SF.F); // 是否加号，0否
-        outptRegisterDTO.setCrteId(crteId); // 创建人id
-        outptRegisterDTO.setCrteName(crteName); // 创建人姓名
+        outptRegisterDTO.setCrteId(MapUtils.get(data, "crteId")); // 创建人id
+        outptRegisterDTO.setCrteName(MapUtils.get(data, "crteName")); // 创建人姓名
         outptRegisterDTO.setCrteTime(DateUtils.getNow()); // 创建时间
 
         log.debug("微信挂号支付插入【挂号登记表】数据：" + JSON.toJSONString(outptRegisterDTO));
@@ -2542,12 +2546,73 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             PageHelper.startPage(pageNo,pageSize);
         }
         List<InptCostDTO> list = wxBasicInfoDAO.queryOneDayCostListRecordDetail(data);
+        InptVisitDTO inptVisitDTO = new InptVisitDTO();
+        inptVisitDTO.setHospCode(hospCode);
+        inptVisitDTO.setInNo(MapUtils.get(data, "inNo"));
+        inptVisitDTO = wxInptDAO.getInptVisitById(inptVisitDTO);
+
+        Map<String,List<InptCostDTO> > flLIst = new HashMap<>();
+        List<Map<String,Object>> bbb = new ArrayList<>();
+        Map<String,BigDecimal > flMap = new HashMap<>();
+        BigDecimal totalPrice = new BigDecimal(0);
+        Map<String,Object> aaa = null;
+        Map<String,Object> result = new HashMap<>();
+        result.put("costTime",MapUtils.get(data, "costStartTime"));
+        result.put("totalBalance",inptVisitDTO.getTotalBalance());
+        result.put("totalAdvance",inptVisitDTO.getTotalAdvance());
+        if(!ListUtils.isEmpty(list)){
+
+                //所有财务分类
+                List<BaseFinanceClassifyDTO> baseFinanceClassifyDTOList = wxBaseoDAO.queryBaseFinanceClassify(data);
+                Map<String,String> financeClassifyMap = baseFinanceClassifyDTOList.stream().collect(Collectors.toMap(BaseFinanceClassifyDTO::getId, BaseFinanceClassifyDO::getName));
+                String key = null;
+                for(InptCostDTO inptCostDTO:list){
+                    //计算日结总费用
+                    totalPrice = BigDecimalUtils.add(totalPrice,inptCostDTO.getAmountMoney());
+
+                    //判断异常的财务分类
+                    if (!financeClassifyMap.containsKey(inptCostDTO.getBfcId())){
+                        key = "qtfy-"+"其他费用";
+                    }else{
+                        key = inptCostDTO.getBfcId()+"-"+financeClassifyMap.get(inptCostDTO.getBfcId());
+                    }
+
+
+                    //分类费用
+                    if (!flLIst.containsKey(key)) {
+                        flLIst.put(key, new ArrayList<>());
+                    }
+                    flLIst.get(inptCostDTO.getBfcId()+"-"+inptCostDTO.getBfcName()).add(inptCostDTO);
+                    //分类总费用
+                    if (!flMap.containsKey(key)){
+                        flMap.put(key,new BigDecimal(0));
+                    }
+                    flMap.put(key,BigDecimalUtils.add(flMap.get(key),inptCostDTO.getAmountMoney()));
+                }
+
+               for (String k:flMap.keySet()){
+                   aaa = new HashMap<>();
+                   String [] ids = k.split("-");
+                   aaa.put("id",ids[0]);
+                   aaa.put("name",ids[1]);
+                   aaa.put("flTotalPrice",flMap.get(k));
+                   aaa.put("costList",flLIst.get(k));
+                   bbb.add(aaa);
+               }
+        }
+
+
+        result.put("totalPrice",totalPrice);
+        result.put("flList",bbb);
+
+
+
         if(ListUtils.isEmpty(list)) return WrapperResponse.error(500, "该就诊人在查询时间内未产生费用", null);
         // 返参加密
-        log.debug("微信小程序【住院病人日费用清单明细】返参加密前：" + JSON.toJSONString(PageDTO.of(list)));
+        log.debug("微信小程序【住院病人日费用清单明细】返参加密前：" + JSON.toJSONString(result));
         String res = null;
         try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(PageDTO.of(list)));
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result));
             log.debug("微信小程序【住院病人日费用清单明细】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【住院病人日费用清单明细】返参加密错误，请联系管理员！" + e.getMessage());
@@ -2589,13 +2654,29 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
 
     @Override
     public WrapperResponse<String> queryBaseDisease(Map<String, Object> map) {
-        List<BaseDiseaseDTO> list = wxBaseoDAO.queryBaseDisease(map);
+        String hospCode = MapUtils.get(map, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("未检测到医院信息，请核对医院信息！");
+        }
+        Map<String, Object> data = MapUtils.get(map, "data");
+        if (data == null) {
+            return WrapperResponse.error(500, "查询参数为空", null);
+        }
+        Integer pageNo = MapUtils.get(data, "pageNo");
+        Integer pageSize = MapUtils.get(data, "pageSize");
+        // 日费用清单明细查询
+        data.put("hospCode", hospCode);
+        if(pageNo != null && pageSize != null){
+            PageHelper.startPage(pageNo,pageSize);
+        }
+        data.put("hospCode",hospCode);
+        List<BaseDiseaseDTO> list = wxBaseoDAO.queryBaseDisease(data);
 
         // 返参加密
-        log.debug("微信小程序【查询所有疾病信息】返参加密前：" + JSON.toJSONString(list));
+        log.debug("微信小程序【查询所有疾病信息】返参加密前：" + JSON.toJSONString(PageDTO.of(list)));
         String res = null;
         try {
-            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(list));
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(PageDTO.of(list)));
             log.debug("微信小程序【查询所有疾病信息】返参加密后：" + res);
         } catch (UnsupportedEncodingException e) {
             throw new AppException("【查询所有疾病信息】返参加密错误，请联系管理员！" + e.getMessage());
@@ -2607,6 +2688,150 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     @Override
     public void removeLockByProfileId(Map<String, Object> map) {
          wxOutptDAO.removeLockByProfileId(map);
+    }
+
+    @Override
+    public WrapperResponse<String> hsjcApply(Map<String, Object> map) {
+
+        String hospCode = MapUtils.get(map, "hospCode");
+        if (StringUtils.isEmpty(hospCode)){
+            return WrapperResponse.error(500,"未检测到医院信息，请核对医院信息", null);
+        }
+        Map<String, Object> data = MapUtils.get(map, "data");
+        if (data == null) {
+            return WrapperResponse.error(500, "核算申请入参不能为空", null);
+        }
+
+        String profileId = MapUtils.get(data, "profileId");
+        if (StringUtils.isEmpty(profileId)){
+            return WrapperResponse.error(500, "请传入就诊人档案id标识", null);
+        }
+        String applyType = MapUtils.get(data, "applyType");
+        if (StringUtils.isEmpty(applyType)){
+            return WrapperResponse.error(500, "请选择申请类型", null);
+        }
+
+        String applyTime = MapUtils.get(data, "applyTime");
+        if (StringUtils.isEmpty(applyTime)){
+            return WrapperResponse.error(500, "请选择申请时间", null);
+        }
+
+        //调用档案服务，查询档案信息
+        OutptProfileFileDTO outptProfileFileDTO = this.getProfileById(hospCode, profileId);
+        if (outptProfileFileDTO == null){
+            return WrapperResponse.error(500, "未建档，请先建档！", null);
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("hospCode",hospCode);
+        paramMap.put("codeList",new String[]{"HSJC_NUM","HSJC_START","HSJC_END","HSJC_HC","HSJC_DC"});
+        Map<String, SysParameterDTO> parameterMaps = sysParameterService_consumer.getParameterByCodeList(paramMap).getData();
+        SysParameterDTO hsjcNum = parameterMaps.get("HSJC_NUM");
+        if (hsjcNum == null){
+            return WrapperResponse.error(500, "请先维护系统参数【HSJC_NUM】", null);
+        }
+        SysParameterDTO hsjcStart = parameterMaps.get("HSJC_START");
+        if (hsjcStart == null){
+            return WrapperResponse.error(500, "请先维护系统参数【HSJC_START】", null);
+        }
+        SysParameterDTO hsjcEnd = parameterMaps.get("HSJC_END");
+        if (hsjcEnd == null){
+            return WrapperResponse.error(500, "请先维护系统参数【HSJC_END】", null);
+        }
+        SysParameterDTO hsjcHc = parameterMaps.get("HSJC_HC");
+        if (hsjcHc == null){
+            return WrapperResponse.error(500, "请先维护系统参数【HSJC_HC】", null);
+        }
+        SysParameterDTO hsjcDc = parameterMaps.get("HSJC_DC");
+        if (hsjcDc == null){
+            return WrapperResponse.error(500, "请先维护系统参数【HSJC_DC】", null);
+        }
+
+
+        //票据规则生成【挂号单号】
+        String registerNo = this.getOrderNo(hospCode, "100");
+        // 挂号id
+        String registerId = SnowflakeUtils.getId();
+        // 就诊id
+        String visitId = SnowflakeUtils.getId();
+
+        data.put("registerNo",registerNo);
+        data.put("registerId",registerId);
+        data.put("visitId",visitId);
+
+        // 生成挂号表数据
+        OutptRegisterDTO outptRegisterDTO = this.handeleOutptRegisterData(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ);
+
+        // 生成就诊表数据
+        OutptVisitDTO outptVisitDTO = this.handeleOutptVisit(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ);
+
+
+        List<OutptPrescribeDTO> outptPrescribeDTOS = this.buildOutptPrescribeDTO(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ, parameterMaps);
+
+
+        //生成开处方数据
+        // 返参加密
+
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("outptRegisterDTO",outptRegisterDTO);
+        resultMap.put("outptVisitDTO",outptVisitDTO);
+
+        log.debug("微信小程序【查询所有疾病信息】返参加密前：" + JSON.toJSONString(resultMap));
+        String res = null;
+        try {
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(resultMap));
+            log.debug("微信小程序【查询所有疾病信息】返参加密后：" + res);
+        } catch (UnsupportedEncodingException e) {
+            throw new AppException("【查询所有疾病信息】返参加密错误，请联系管理员！" + e.getMessage());
+        }
+
+        return WrapperResponse.success(res);
+    }
+
+    private List<OutptPrescribeDTO> buildOutptPrescribeDTO(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, String hospCode, String hssq,Map<String, SysParameterDTO> parameterMaps) {
+        // "HSJC_NUM","HSJC_START","HSJC_END","HSJC_HC","HSJC_DC"
+        List<OutptPrescribeDTO> outptPrescribeDTOS = new ArrayList<>();
+
+        for (OutptPrescribeDTO outptPrescribeDTO : outptPrescribeDTOS) {
+            outptPrescribeDTO.setId("");//主键
+            outptPrescribeDTO.setHospCode("");//	医院编码
+            outptPrescribeDTO.setVisitId("");//	就诊ID
+            outptPrescribeDTO.setDiagnoseIds("");//	诊断ID集合（多个用逗号分开）
+            outptPrescribeDTO.setTcmDiseaseId("");//		中医诊断id
+            outptPrescribeDTO.setTcmDiseaseName("");//		中医诊断名称
+            outptPrescribeDTO.setTcmSyndromesId("");//		中医证候id
+            outptPrescribeDTO.setTcmSyndromesName("");//		中医证候名称
+            outptPrescribeDTO.setOrderNo("");//	处方单号
+            outptPrescribeDTO.setDoctorId("");//		开方医生ID
+            outptPrescribeDTO.setDoctorName("");//		开方医生名称
+            outptPrescribeDTO.setDeptId("");//		开方科室ID
+            outptPrescribeDTO.setDeptName("");//		开方科室名称
+            outptPrescribeDTO.setTypeCode("");//		处方类别代码（CFLB）
+            outptPrescribeDTO.setPrescribeTypeCode("");//	处方类型代码（CFLX）
+            outptPrescribeDTO.setSettleId("");//	结算ID
+            outptPrescribeDTO.setRemark("");//		备注
+            outptPrescribeDTO.setIsSettle("");//		是否结算（SF）
+            outptPrescribeDTO.setIsCancel("");//	是否作废（SF）
+            outptPrescribeDTO.setIsPrint("");//			是否打印（SF）
+            outptPrescribeDTO.setIsHerbHospital("");//		中草药是否本院煎药（SF）(执行次数)
+            outptPrescribeDTO.setHerbNum(new BigDecimal(0));//		中草药付（剂）数 (天数)
+            outptPrescribeDTO.setHerbUseCode("");//	中草药用法（ZYYF）
+            outptPrescribeDTO.setWeight(new BigDecimal(0));//	体重（儿科）
+            outptPrescribeDTO.setAgentName("");//	代办人姓名（精麻）
+            outptPrescribeDTO.setAgentCertNo("");//		代办人身份编号（精麻）
+            outptPrescribeDTO.setCancelId("");//		作废人ID
+            outptPrescribeDTO.setCancelName("");//		作废人
+            outptPrescribeDTO.setCancelDate(new Date());//		作废时间
+            outptPrescribeDTO.setCancelReason("");//	作废原因
+            outptPrescribeDTO.setCrteId("");//	创建人ID
+            outptPrescribeDTO.setCrteName("");//创建人姓名
+            outptPrescribeDTO.setCrteTime(new Date());//		创建时间（开方日期）
+            outptPrescribeDTO.setIsSubmit("");//		是否提交
+            outptPrescribeDTO.setSubmitId("");//		提交人ID
+            outptPrescribeDTO.setSubmitName("");//	提交人
+            outptPrescribeDTO.setSubmitTime(new Date());//	提交时间
+        }
+
+        return outptPrescribeDTOS;
     }
 
     //计算费用总金额，封装返回参数

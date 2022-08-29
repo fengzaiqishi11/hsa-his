@@ -1225,6 +1225,29 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     }
 
     /**
+     * @param medicalAdviceDTO
+     * @Method: updateAdviceInChecked
+     * @Description: 修改医嘱信息，核收人，核对签名人，核收状态
+     * isChecked: 0：未核收，1：已核对，2：已核收未核对，3：核对退回，4：
+     * @Param: [medicalAdviceDTO]
+     * @Author: pengbo
+     * @Date: 2022/08/24 16:25
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public Boolean updateAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO) {
+
+        if(medicalAdviceDTO.getKzIds() != null && medicalAdviceDTO.getKzIds().length>0 ){
+            inptAdviceDAO.updateNewAdviceInChecked(medicalAdviceDTO);
+        }
+        if(medicalAdviceDTO.getStopIds() != null && medicalAdviceDTO.getStopIds().length>0 ){
+            inptAdviceDAO.updateStopAdviceInChecked(medicalAdviceDTO);
+        }
+
+        return true;
+    }
+
+    /**
      * @Method: getCost
      * @Description:
      * 1.循环医嘱

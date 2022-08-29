@@ -747,7 +747,7 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
      */
     @Override
     public int insertDscgInfo(Map map) {
-      InsureEmrDscginfoDO insureEmrDscginfoDO = MapUtils.get(map,"insureEmrDieinfoDTO");
+      InsureEmrDscginfoDO insureEmrDscginfoDO = MapUtils.get(map,"insureEmrDscginfoDTO");
       insureEmrDscginfoDO.setUuid(SnowflakeUtils.getLongId());
       insureEmrDscginfoDO.setValiFlag(Constants.SF.S);
       insureEmrDscginfoDO.setSource("1");
@@ -758,6 +758,9 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
       }
       if (ObjectUtil.isEmpty(insureEmrDscginfoDO.getRecDoc())){
         insureEmrDscginfoDO.setRecDoc("-");
+      }
+      if (ObjectUtil.isEmpty(insureEmrDscginfoDO.getDscgDate())){
+        insureEmrDscginfoDO.setDscgDate(DateUtils.format(new Date(), DateUtils.Y_M_D));
       }
       return insureEmrDscginfoDAO.insertSelective(insureEmrDscginfoDO);
     }

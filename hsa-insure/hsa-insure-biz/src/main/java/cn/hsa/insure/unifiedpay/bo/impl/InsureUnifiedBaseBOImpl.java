@@ -1707,8 +1707,8 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
         String deptName = MapUtils.get(map, "hosp_dept_name");
         //start 2022-06-13 zhangjinping 注释的这行代码会报类转换异常问题
        // String startTime = Long.toString(MapUtils.get(map, "begntime"));
-        Long longTime = MapUtils.get(map, "begntime");
-        String dateSting = DateUtils.getDateStr(longTime,DateUtils.Y_M_DH_M_S);
+        String longTime = MapUtils.get(map, "begntime");
+        String dateSting = DateUtils.getDateStr(Long.parseLong(longTime),DateUtils.Y_M_DH_M_S);
         Date startTime = DateUtils.parse(dateSting,DateUtils.Y_M_DH_M_S);
         //end
         BaseDeptDTO deptDTO = new BaseDeptDTO();

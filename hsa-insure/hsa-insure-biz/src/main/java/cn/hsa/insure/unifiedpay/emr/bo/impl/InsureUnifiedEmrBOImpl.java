@@ -9,11 +9,14 @@ import cn.hsa.insure.enums.FunctionEnum;
 import cn.hsa.insure.unifiedpay.bo.impl.InsureItfBOImpl;
 import cn.hsa.insure.util.BaseReqUtil;
 import cn.hsa.insure.util.BaseReqUtilFactory;
+import cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO;
 import cn.hsa.module.emr.emrpatient.service.EmrPatientService;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.emr.bo.InsureUnifiedEmrBO;
 import cn.hsa.module.insure.emr.dao.InsureEmrAdminfoDAO;
+import cn.hsa.module.insure.emr.entity.InsureEmrDscginfoDO;
+import cn.hsa.module.insure.emr.entity.InsureEmrOprninfoDO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
@@ -25,6 +28,8 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.module.insure.emr.dao.*;
 import cn.hsa.module.insure.emr.dto.*;
 
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -34,6 +39,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -434,7 +440,474 @@ public class InsureUnifiedEmrBOImpl extends HsafBO implements InsureUnifiedEmrBO
         return insureEmrAdminfoDTO;
     }
 
+    /**
+     * 根究mdrerSn查询在院信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:29
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO
+     */
     @Override
+    public InsureEmrAdminfoDTO queryAdmInfoByMdtrtSn(String mdtrtSn) {
+      if(StringUtils.isEmpty(mdtrtSn)){
+        throw new AppException("传入的visitId就医流水号为空");
+      }
+      InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureEmrAdminfoDAO.queryInfoByMdtrtSn(mdtrtSn);
+      return insureEmrAdminfoDTO;
+    }
+
+    /**
+     * 根据就诊ID查询首次病程信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:07
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrCoursrinfoDTO
+     */
+    @Override
+    public InsureEmrCoursrinfoDTO queryCoursrInfoByMdtrtSn(String mdtrtSn) {
+      if(StringUtils.isEmpty(mdtrtSn)){
+        throw new AppException("传入的visitId就医流水号为空");
+      }
+      InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO = insureEmrCoursrinfoDAO.queryInfoByMdtrtSn(mdtrtSn);
+      return insureEmrCoursrinfoDTO;
+    }
+
+    /**
+     * 查询死亡记录信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 17:26
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDieinfoDTO
+     */
+    @Override
+    public InsureEmrDieinfoDTO queryDieInfoByMdtrtSn(String mdtrtSn) {
+      if(StringUtils.isEmpty(mdtrtSn)){
+        throw new AppException("传入的visitId就医流水号为空");
+      }
+      InsureEmrDieinfoDTO insureEmrDieinfoDTO = insureEmrDieinfoDAO.queryInfoByMdtrtSn(mdtrtSn);
+      return insureEmrDieinfoDTO;
+    }
+
+    /**
+     * 查询出院小结信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:34
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO
+     */
+    @Override
+    public InsureEmrDscginfoDTO queryDscgInfoByMdtrtSn(String mdtrtSn) {
+      if(StringUtils.isEmpty(mdtrtSn)){
+        throw new AppException("传入的visitId就医流水号为空");
+      }
+      InsureEmrDscginfoDTO insureEmrDscginfoDTO = insureEmrDscginfoDAO.queryInfoByMdtrtSn(mdtrtSn);
+      return insureEmrDscginfoDTO;
+    }
+
+    /**
+     * 保存电子病历手术信息
+     * @param templateId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:05
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrOprninfoDTO
+     */
+    @Override
+    public InsureEmrOprninfoDTO queryOprnInfoByTemplateId(String templateId) {
+      return insureEmrOprninfoDAO.queryInfoByTemplateId(templateId);
+    }
+
+    /**
+     * 根据病历编号查询抢救信息
+     * @param emrTemplateId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:50
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO
+     */
+    @Override
+    public InsureEmrRescinfoDTO queryRescInfoByTemplateId(String emrTemplateId) {
+      return insureEmrRescinfoDAO.queryInfoByTemplateId(emrTemplateId);
+    }
+
+  /**
+     * 根据MdtrtSn更新入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:36
+     * @return int
+     */
+    @Override
+    public int updateAdmSelectiveByMdtrtSn(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      ParamMap.put("emrTemplateId",emrPatientDTO.getId());
+      return insureEmrAdminfoDAO.updateSelectiveByMdtrtSn(ParamMap);
+    }
+
+    /**
+     * 根据mdtrtsn更新首次病程信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:09
+     * @return int
+     */
+    @Override
+    public int updateCoursrSelectiveByMdtrtSn(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      return insureEmrCoursrinfoDAO.updateSelectiveByMdtrtSn(ParamMap);
+    }
+
+    /**
+     * 更新死亡信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:38
+     * @return int
+     */
+    @Override
+    public int updateDieSelectiveByMdtrtSn(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      ParamMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      return insureEmrDieinfoDAO.updateDieSelective(ParamMap);
+    }
+
+    /**
+     * 更新出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:49
+     * @return int
+     */
+    @Override
+    public int updateDscgSelectiveByMdtrtSn(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      ParamMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      return insureEmrDscginfoDAO.updateDscgSelective(ParamMap);
+    }
+
+    /**
+     * 更新手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:25
+     * @return int
+     */
+    @Override
+    public int updateOprnSelectiveByTemplateId(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      ParamMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      ParamMap.put("templateId",emrPatientDTO.getId());
+      return insureEmrOprninfoDAO.updateOprnSelective(ParamMap);
+    }
+
+    @Override
+    public int updateRescSelectiveByTemplateId(Map map) {
+      EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+      Map<String, Object> resultMap = MapUtils.get(map, "resultMap");
+      Map ParamMap = MapUtil.toCamelCaseMap(resultMap);
+      ParamMap.put("visitId",emrPatientDTO.getVisitId());
+      ParamMap.put("hospCode",emrPatientDTO.getHospCode());
+      ParamMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      ParamMap.put("templateId",emrPatientDTO.getId());
+      return insureEmrRescinfoDAO.updateRescSelective(ParamMap);
+    }
+
+  /**
+     * 插入医保电子病历入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 15:05
+     * @return int
+     */
+    @Override
+    public int insertAdminfo(Map map) {
+      InsureEmrAdminfoDTO insureEmrAdminfoDTO = MapUtils.get(map,"insureEmrAdminfoDTO");
+      //数据完善
+      insureEmrAdminfoDTO.setUuid(SnowflakeUtils.getLongId());
+      insureEmrAdminfoDTO.setValiFlag(Constants.SF.S);
+      insureEmrAdminfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      return insureEmrAdminfoDAO.insert(insureEmrAdminfoDTO);
+    }
+
+    /**
+     * 插入医保电子病历首次病程记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:24
+     * @return int
+     */
+    @Override
+    public int insertCoursrinfo(Map map) {
+      InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO = MapUtils.get(map,"insureEmrCoursrinfoDTO");
+      //数据完善
+      insureEmrCoursrinfoDTO.setUuid(SnowflakeUtils.getLongId());
+      insureEmrCoursrinfoDTO.setValiFlag(Constants.SF.S);
+      insureEmrCoursrinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      return insureEmrCoursrinfoDAO.insert(insureEmrCoursrinfoDTO);
+    }
+
+    /**
+     * 插入医保电子病历死亡记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 8:57
+     * @return int
+     */
+    @Override
+    public int insertDieinfo(Map map) {
+      InsureEmrDieinfoDTO insureEmrDieinfoDTO = MapUtils.get(map,"insureEmrDieinfoDTO");
+      insureEmrDieinfoDTO.setUuid(SnowflakeUtils.getLongId());
+      insureEmrDieinfoDTO.setValiFlag(Constants.SF.S);
+      insureEmrDieinfoDTO.setSource("1");
+      insureEmrDieinfoDTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      //非空判断，数据表必填，但是未上传数据默认传值
+      //科室编码
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getDeptName())){
+        insureEmrDieinfoDTO.setDeptName("-");
+        insureEmrDieinfoDTO.setDept("-");
+      }
+      //病区
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getWardareaName())){
+        insureEmrDieinfoDTO.setWardareaName("-");
+      }
+      //病床号
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getBedno())){
+        insureEmrDieinfoDTO.setBedno("-");
+      }
+      //入院时间
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getAdmTime())){
+        insureEmrDieinfoDTO.setAdmTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      }
+      //入院诊断
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getAdmDise())){
+        insureEmrDieinfoDTO.setAdmDise("-");
+      }
+      //死亡时间
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getDieTime())){
+        insureEmrDieinfoDTO.setDieTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      }
+      //死亡直接原因
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getDieDrtRea())){
+        insureEmrDieinfoDTO.setDieDrtRea("-");
+        insureEmrDieinfoDTO.setDieDrtReaCode("-");
+      }
+      //死亡诊断
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getDieDiseName())){
+        insureEmrDieinfoDTO.setDieDiagCode("-");
+        insureEmrDieinfoDTO.setDieDiseName("-");
+      }
+      //家属是否同意解刨
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getAgreCorpDset())){
+        insureEmrDieinfoDTO.setAgreCorpDset("0");
+      }
+      //住院医生姓名
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getIpdrName())){
+        insureEmrDieinfoDTO.setIpdrName("-");
+      }
+      //主诊医生
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getChfdrName())){
+        insureEmrDieinfoDTO.setChfdrName("-");
+      }
+      //主任医生
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getChfpdrName())){
+        insureEmrDieinfoDTO.setChfpdrName("-");
+        insureEmrDieinfoDTO.setChfpdrCode("-");
+      }
+      //签字时间
+      if (ObjectUtil.isEmpty(insureEmrDieinfoDTO.getSignTime())){
+        insureEmrDieinfoDTO.setSignTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      }
+      return insureEmrDieinfoDAO.insert(insureEmrDieinfoDTO);
+    }
+
+    /**
+     * 插入出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 11:06
+     * @return int
+     */
+    @Override
+    public int insertDscgInfo(Map map) {
+      InsureEmrDscginfoDO insureEmrDscginfoDO = MapUtils.get(map,"insureEmrDieinfoDTO");
+      insureEmrDscginfoDO.setUuid(SnowflakeUtils.getLongId());
+      insureEmrDscginfoDO.setValiFlag(Constants.SF.S);
+      insureEmrDscginfoDO.setSource("1");
+      insureEmrDscginfoDO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      //数据表必填字段补充
+      if (ObjectUtil.isEmpty(insureEmrDscginfoDO.getCaty())){
+        insureEmrDscginfoDO.setCaty("-");
+      }
+      if (ObjectUtil.isEmpty(insureEmrDscginfoDO.getRecDoc())){
+        insureEmrDscginfoDO.setRecDoc("-");
+      }
+      return insureEmrDscginfoDAO.insertSelective(insureEmrDscginfoDO);
+    }
+
+    /**
+     * 插入手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:19
+     * @return int
+     */
+    @Override
+    public int insertOprnInfo(Map map) {
+      InsureEmrOprninfoDTO DTO = MapUtils.get(map,"insureEmrOprninfoDTO");
+      DTO.setUuid(SnowflakeUtils.getLongId());
+      DTO.setValiFlag(Constants.SF.S);
+      DTO.setSource("1");
+      DTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      DTO.setOprnSeq(String.valueOf(System.currentTimeMillis()));
+      //数据表必填字段补充
+      //手术申请单号
+      if (ObjectUtil.isEmpty(DTO.getOprnAppyId())){
+        DTO.setOprnAppyId("-");
+      }
+      //手术时间
+      if (ObjectUtil.isEmpty(DTO.getOprnTime())){
+        DTO.setOprnTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      }
+      //手术分类代码
+      if (ObjectUtil.isEmpty(DTO.getOprnTypeCode())){
+        DTO.setOprnTypeCode("-");
+        DTO.setOprnTypeName("-");
+      }
+      //术前是否发生院内感染
+      if (ObjectUtil.isEmpty(DTO.getBfpnInhospIfet())){
+        DTO.setBfpnInhospIfet("0");
+      }
+      //手术切口愈合等级代码
+      if (ObjectUtil.isEmpty(DTO.getSincHealLv())){
+        DTO.setSincHealLv("-");
+        DTO.setSincHealLvCode("-");
+      }
+      //手术操作代码
+      if (ObjectUtil.isEmpty(DTO.getOprnOprtName())){
+        DTO.setOprnOprtName("-");
+        DTO.setOprnOprtCode("-");
+      }
+      //手术级别代码
+      if (ObjectUtil.isEmpty(DTO.getOprnLvName())){
+        DTO.setOprnLvName("-");
+        DTO.setOprnLvCode("-");
+      }
+      //麻醉分级代码
+      if (ObjectUtil.isEmpty(DTO.getAnstLvName())){
+        DTO.setAnstLvName("-");
+        DTO.setAnstLvCode("-");
+      }
+      //手术开始时间
+      if (ObjectUtil.isEmpty(DTO.getOprnBegntime())){
+        DTO.setOprnBegntime(DateUtils.format(new Date(), DateUtils.YMDHMS));
+        DTO.setOprnEndtime(DateUtils.format(new Date(), DateUtils.YMDHMS));
+      }
+      //麻醉药物代码
+      if (ObjectUtil.isEmpty(DTO.getAnstMednCode())){
+        DTO.setAnstMednCode("-");
+      }
+      //是否择期手术
+      if (ObjectUtil.isEmpty(DTO.getOprnSelv())){
+        DTO.setOprnSelv("-");
+      }
+      //是否取消手术
+      if (ObjectUtil.isEmpty(DTO.getCancOprn())){
+        DTO.setCancOprn("-");
+      }
+      return insureEmrOprninfoDAO.insert(DTO);
+    }
+
+    @Override
+    public int insertRescInfo(Map map) {
+      InsureEmrRescinfoDTO DTO = MapUtils.get(map,"InsureEmrRescinfoDTO");
+      DTO.setUuid(SnowflakeUtils.getLongId());
+      DTO.setValiFlag(Constants.SF.S);
+      DTO.setSource("1");
+      DTO.setCreateTime(DateUtils.format(new Date(), DateUtils.Y_M_DH_M_S));
+      //数据表必填字段补充
+      //科室
+      if (ObjectUtil.isEmpty(DTO.getDept())){
+        DTO.setDept("-");
+        DTO.setDeptName("-");
+      }
+      //病区名称
+      if (ObjectUtil.isEmpty(DTO.getWardareaName())){
+        DTO.setWardareaName("-");
+      }
+      //床位号
+      if (ObjectUtil.isEmpty(DTO.getBedno())){
+        DTO.setBedno("-");
+      }
+      //疾病编码
+      if (ObjectUtil.isEmpty(DTO.getDiagCode())){
+        DTO.setDiagCode("-");
+        DTO.setDiagName("-");
+      }
+      //手术操作代码
+      if (ObjectUtil.isEmpty(DTO.getOprnOprtCode())){
+        DTO.setOprnOprtCode("-");
+        DTO.setOprnOprtName("-");
+      }
+      //介入物名称
+      if (ObjectUtil.isEmpty(DTO.getItvtName())){
+        DTO.setItvtName("-");
+      }
+      //操作次数
+      if (ObjectUtil.isEmpty(DTO.getOprtCnt())){
+        DTO.setOprtCnt(0);
+      }
+      //抢救开始时间
+      if (ObjectUtil.isEmpty(DTO.getRescBegntime())){
+        DTO.setRescBegntime(DateUtils.format(new Date(), DateUtils.Y_M_D));
+        DTO.setRescEndtime(DateUtils.format(new Date(), DateUtils.Y_M_D));
+      }
+      //检查/检验项目名称
+      if (ObjectUtil.isEmpty(DTO.getDiseItemName())){
+        DTO.setDiseItemName("-");
+      }
+      //检查/检验定量结果
+      if (ObjectUtil.isEmpty(DTO.getDiseCclsQunt())){
+        DTO.setDiseCclsQunt(new BigDecimal(0));
+      }
+      //检查/检验结果代码
+      if (ObjectUtil.isEmpty(DTO.getDiseCclsCode())){
+        DTO.setDiseCclsCode("-");
+      }
+      //参加抢救人员名单
+      if (ObjectUtil.isEmpty(DTO.getRescPsnList())){
+        DTO.setRescPsnList("-");
+      }
+      //专业技术职务类别代码
+      if (ObjectUtil.isEmpty(DTO.getProftechttlCode())){
+        DTO.setProftechttlCode("-");
+      }
+      //医师编号
+      if (ObjectUtil.isEmpty(DTO.getDocCode())){
+        DTO.setDocCode("-");
+        DTO.setDrName("-");
+      }
+      return insureEmrRescinfoDAO.insert(DTO);
+    }
+
+  @Override
     public void updateInsureUnifiedEmrSync(InsureEmrUnifiedDTO insureEmrUnifiedDTO) {
         InptVisitDTO inptVisitDTO = new InptVisitDTO();
         inptVisitDTO.setHospCode(insureEmrUnifiedDTO.getHospCode());

@@ -816,4 +816,25 @@
      where visit_id=#{visitId} and hosp_code =#{hospCode}
     </select>
 
+    <select id="queryHisEmrClassifyInfo" parameterType="java.util.Map" resultType="java.util.Map">
+    select ec.code as code ,ec.insure_type_code as insureTypeCode,ec.name as name,ec.up_code as upCode
+    ,ect.classify_code as classifyCode from emr_classify ec left join emr_classify_template ect on ec.code =
+    ect.classify_code
+    where ect.id = #{classifyTemplateId} and ect.hosp_code =#{hospCode} limit 1
+    </select>
+
+    <select id="queryInsureVisitEmrInfo" parameterType="java.util.Map" resultType="cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO">
+        select t.visit_id, t.medical_reg_no as mdtrtId, t.aac001 AS psnNo,t.visit_no as visitNo, c.aac003 as psnName, c.aac002 AS certno, c.aac004 as sex, c.aae140 as insutype, t.visit_icd_name as visitIcdName,
+    t.visit_time as visitTime, c.bka035 as psnType, c.bka035_name as psnTypeName, c.aka130 as medType,
+    c.aka130_name as medTypeName,
+    t.visit_drpt_id as deptCode,t.visit_drpt_name as deptName,t.visit_area_name as
+    wardareaName,t.visit_berth as bedno, t.visit_time as admTime, t.visit_icd_code as
+    admDise,t.medical_reg_no as mdtrtId
+    FROM
+    insure_individual_visit t
+    LEFT JOIN insure_individual_basic c ON c.hosp_code = t.hosp_code
+    AND c.id = t.mib_id
+    where t.visit_id = #{visitId}  limit 1
+    </select>
+
 </mapper>

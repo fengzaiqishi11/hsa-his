@@ -138,4 +138,152 @@ public interface InsureUnifiedEmrBO {
     List<InsureEmrDiseinfoDTO> queryInsureUnifiedEmrDiseinfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
 
     InsureEmrAdminfoDTO queryInsureUnifiedEmrAdminfo(InsureEmrUnifiedDTO insureEmrUnifiedDTO);
+
+    /**
+     * 根据就诊ID查询入院信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:28
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO
+     */
+    InsureEmrAdminfoDTO queryAdmInfoByMdtrtSn(String mdtrtSn);
+
+    /**
+     * 根据就诊ID查询首次病程信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:08
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrCoursrinfoDTO
+     */
+    InsureEmrCoursrinfoDTO queryCoursrInfoByMdtrtSn(String mdtrtSn);
+
+    /**
+     * 查询死亡记录信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 17:25
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDieinfoDTO
+     */
+    InsureEmrDieinfoDTO queryDieInfoByMdtrtSn(String mdtrtSn);
+
+    /**
+     * 查询出院小结信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:31
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO
+     */
+    InsureEmrDscginfoDTO queryDscgInfoByMdtrtSn(String mdtrtSn);
+
+    /**
+     * 保存电子病历手术信息
+     * @param emrTemplateId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:05
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrOprninfoDTO
+     */
+    InsureEmrOprninfoDTO queryOprnInfoByTemplateId(String emrTemplateId);
+
+    /**
+     * 根据病历编号查询抢救信息
+     * @param emrTemplateId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:50
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO
+     */
+    InsureEmrRescinfoDTO queryRescInfoByTemplateId(String emrTemplateId);
+
+    /**
+     * 根据MdtrtSn更新入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:35
+     * @return int
+     */
+    int updateAdmSelectiveByMdtrtSn(Map map);
+
+    /**
+     * 根据mdtrtsn更新首次病程信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:05
+     * @return int
+     */
+    int updateCoursrSelectiveByMdtrtSn(Map map);
+
+    /**
+     * 根据mdtrtsn更新死亡信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:38
+     * @return int
+     */
+    int updateDieSelectiveByMdtrtSn(Map map);
+
+    /**
+     * 更新出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:47
+     * @return int
+     */
+    int updateDscgSelectiveByMdtrtSn(Map map);
+
+    /**
+     * 更新手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:25
+     * @return int
+     */
+    int updateOprnSelectiveByTemplateId(Map map);
+
+    int updateRescSelectiveByTemplateId(Map map);
+
+    /**
+     * 插入医保电子病历入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 15:04
+     * @return void
+     */
+    int insertAdminfo(Map map);
+
+    /**
+     * 插入医保电子病历首次病程记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:23
+     * @return int
+     */
+    int insertCoursrinfo(Map map);
+
+    /**
+     * 插入医保电子病历死亡记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 8:49
+     * @return int
+     */
+    int insertDieinfo(Map map);
+
+    /**
+     * 插入出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:58
+     * @return int
+     */
+    int insertDscgInfo(Map map);
+
+    /**
+     * 插入手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:19
+     * @return int
+     */
+    int insertOprnInfo(Map map);
+
+    int insertRescInfo(Map map);
 }

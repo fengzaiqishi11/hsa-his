@@ -110,6 +110,12 @@
     where mdtrt_sn = #{mdtrtSn} and mdtrt_id = #{mdtrtId} and vali_flag = '1'
   </select>
 
+    <select id="queryInfoByMdtrtSn" resultType="cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO">
+        SELECT <include refid="Base_Column_List"/>
+        FROM insure_emr_dscginfo
+        where mdtrt_sn = #{mdtrtSn}  and vali_flag = '1'
+    </select>
+
     <select id="queryByUuid" resultType="cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO">
         SELECT <include refid="Base_Column_List"/>
         FROM insure_emr_dscginfo
@@ -386,6 +392,77 @@
     </set>
     where uuid = #{uuid}
   </update>
+
+    <update id="updateDscgSelective" parameterType="map" >
+        update insure_emr_dscginfo
+        <set >
+            <if test="uuid != null" >
+                uuid = #{uuid,jdbcType=BIGINT},
+            </if>
+            <if test="orgUuid != null" >
+                org_uuid = #{orgUuid,jdbcType=BIGINT},
+            </if>
+            <if test="mdtrtSn != null" >
+                mdtrt_sn = #{mdtrtSn,jdbcType=VARCHAR},
+            </if>
+            <if test="mdtrtId != null" >
+                mdtrt_id = #{mdtrtId,jdbcType=VARCHAR},
+            </if>
+            <if test="psnNo != null" >
+                psn_no = #{psnNo,jdbcType=VARCHAR},
+            </if>
+            <if test="dscgDate != null" >
+                dscg_date = #{dscgDate,jdbcType=DATE},
+            </if>
+            <if test="admDiagDscr != null" >
+                adm_diag_dscr = #{admDiagDscr,jdbcType=VARCHAR},
+            </if>
+            <if test="dscgDiseDscr != null" >
+                dscg_dise_dscr = #{dscgDiseDscr,jdbcType=VARCHAR},
+            </if>
+            <if test="admInfo != null" >
+                adm_info = #{admInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="trtProcRsltDscr != null" >
+                trt_proc_rslt_dscr = #{trtProcRsltDscr,jdbcType=VARCHAR},
+            </if>
+            <if test="dscgInfo != null" >
+                dscg_info = #{dscgInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="dscgDrord != null" >
+                dscg_drord = #{dscgDrord,jdbcType=VARCHAR},
+            </if>
+            <if test="caty != null" >
+                caty = #{caty,jdbcType=VARCHAR},
+            </if>
+            <if test="recDoc != null" >
+                rec_doc = #{recDoc,jdbcType=VARCHAR},
+            </if>
+            <if test="mainDrugName != null" >
+                main_drug_name = #{mainDrugName,jdbcType=VARCHAR},
+            </if>
+            <if test="othImpInfo != null" >
+                oth_imp_info = #{othImpInfo,jdbcType=VARCHAR},
+            </if>
+            <if test="valiFlag != null" >
+                vali_flag = #{valiFlag,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null" >
+                source = #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null" >
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null" >
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="hospCode != null" >
+                hosp_code = #{hospCode,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where mdtrt_sn = #{visitId}
+    </update>
+
   <update id="updateByExample" parameterType="map" >
     <!--
       WARNING - @mbggenerated

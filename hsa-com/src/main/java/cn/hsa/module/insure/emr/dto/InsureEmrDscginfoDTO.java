@@ -17,4 +17,8 @@ import lombok.Data;
 public class InsureEmrDscginfoDTO extends InsureEmrDscginfoDO implements Serializable {
 
 
+    /**
+     * 电子病历主键id
+     */
+    private String emrTemplateId;
 }

@@ -58,6 +58,15 @@ public interface InsureEmrOprninfoDAO {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    /**
+     * 更新手术信息根据模板id
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:25
+     * @return int
+     */
+    int updateOprnSelective(Map map);
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -83,4 +92,13 @@ public interface InsureEmrOprninfoDAO {
     void deleteByMap(Map<String, Object> map);
 
     void insertList(List<InsureEmrOprninfoDTO> operationInfoList);
+
+    /**
+     * 查询电子病历手术信息
+     * @param templateId
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:14
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrOprninfoDTO
+     */
+    InsureEmrOprninfoDTO  queryInfoByTemplateId(@Param("templateId")String templateId);
 }

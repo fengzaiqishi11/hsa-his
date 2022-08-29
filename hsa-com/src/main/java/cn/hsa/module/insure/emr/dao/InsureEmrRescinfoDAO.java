@@ -58,6 +58,8 @@ public interface InsureEmrRescinfoDAO {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    int updateRescSelective(Map map);
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -68,6 +70,8 @@ public interface InsureEmrRescinfoDAO {
      * @Return int
      **/
     List<InsureEmrRescinfoDTO> queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+
+    InsureEmrRescinfoDTO queryInfoByTemplateId(@Param("templateId")String templateId);
 
     /**
      * @Menthod queryByUuid()

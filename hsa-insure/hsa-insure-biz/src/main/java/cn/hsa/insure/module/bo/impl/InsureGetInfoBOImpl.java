@@ -4246,7 +4246,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
 
         if (!wmDiseList.contains(wmMainCode) && !hiPaymtd_tcm.equals(hiPaymtd)
-                && (ObjectUtil.isEmpty(tcmAdvPayFlag) || Constants.SF.F.equals(tcmAdvPayFlag))) {
+                && (ObjectUtil.isEmpty(tcmAdvPayFlag) || Constants.SF.S.equals(tcmAdvPayFlag))) {
             Map<String, Object> resultMap = new HashMap<>();
             resultMap.put("showTip","1");
             resultMap.put("message","中医主要诊断【"+tcmMainName+tcmMainCode+"】符合《中医优势住院病种分值表》，" +

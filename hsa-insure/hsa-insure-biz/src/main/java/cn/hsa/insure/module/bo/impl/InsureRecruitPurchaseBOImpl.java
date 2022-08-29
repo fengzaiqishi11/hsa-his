@@ -469,6 +469,45 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         return resultMap;
     }
 
+
+    /**
+     * @Description 海南8102接口医保调用
+     * @Author 产品三部-郭来
+     * @Date 2022-08-29 16:17
+     * @param hospCode
+     * @param insureRegCode
+     * @param functionCode
+     * @param paramMap
+     * @return java.util.Map<java.lang.String,java.lang.Object>
+     */
+    private Map<String, Object> commonInsure_8102(String hospCode, String insureRegCode, String functionCode, Map<String, Object> paramMap) {
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureRegCode);
+        insureConfigurationDTO.setIsValid(Constants.SF.S);
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("查询医保机构配置信息为空");
+        }
+
+        Map httpParam = new HashMap();
+        httpParam.put("infno", functionCode);  //交易编号
+        httpParam.put("insuplc_admdvs", insureConfigurationDTO.getRegCode()); //参保地医保区划分
+        httpParam.put("medins_code", insureConfigurationDTO.getOrgCode()); //定点医药机构编号
+        httpParam.put("insur_code", insureConfigurationDTO.getRegCode()); //医保中心编码
+        httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
+        httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        httpParam.put("input", paramMap);
+        String dataJson = JSONObject.toJSONString(httpParam);
+        logger.debug("海南招采接口【" + functionCode + "】入参:" + dataJson);
+        String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), dataJson);
+        logger.debug("海南招采接口【" + functionCode + "】回参:" + resultJson);
+        if (StringUtils.isEmpty(resultJson)) {
+            throw new AppException("无法访问统一支付平台");
+        }
+        Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
+        return resultMap;
+    }
     /**
      * @param map
      * @Method selectCommonInterfaceTest
@@ -500,20 +539,13 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public Map<String, Object> getToken(Map<String, Object> map) {
         String hospCode = MapUtils.get(map, "hospCode");
-        String orgCode = getOrgCode(map);
         String regCode = MapUtils.get(map, "regCode");
         Map<String, Object> paramMap = new HashMap<>();
-        String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
         String tokenValue = "";
-        if (redisUtils.hasKey(accessToken)) {
-            tokenValue = redisUtils.get(accessToken);
-        } else {
-            Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
-            Map<String, Object> outputMap = MapUtils.get(stringObjectMap, "output");
-            Map<String, Object> dataMap = MapUtils.get(outputMap, "data");
-            tokenValue = MapUtils.get(dataMap, "accessToken");
-            redisUtils.set(accessToken, tokenValue, 1800);
-      }
+        Map<String, Object> stringObjectMap = commonInsure_8102(hospCode, regCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+        Map<String, Object> outputMap = MapUtil.get(stringObjectMap, "output",Map.class);
+        Map<String, Object> dataMap = MapUtil.get(outputMap, "data",Map.class);
+        tokenValue = MapUtil.getStr(dataMap, "accessToken");
         map.put("accessToken", tokenValue);
         return map;
     }
@@ -584,17 +616,10 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     @Override
     public String getToken(String hospCode,String insureRegCode) {
         Map<String, Object> paramMap = new HashMap<>();
-        String accessToken = hospCode + Constant.UnifiedPay.ZC.UP_8102;
-        String tokenValue = "";
-        if (redisUtils.hasKey(accessToken)) {
-            tokenValue = redisUtils.get(accessToken);
-        } else {
-        Map<String, Object> stringObjectMap = commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
+        Map<String, Object> stringObjectMap = commonInsure_8102(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8102, paramMap);
         Map<String, Object> outputMap = MapUtil.get(stringObjectMap, "output",Map.class);
         Map<String, Object> dataMap = MapUtil.get(outputMap, "data",Map.class);
-        tokenValue = MapUtil.getStr(dataMap, "accessToken");
-        redisUtils.set(accessToken, tokenValue, 1800);
-        }
+        String tokenValue = MapUtil.getStr(dataMap, "accessToken");
         return tokenValue;
     }
 

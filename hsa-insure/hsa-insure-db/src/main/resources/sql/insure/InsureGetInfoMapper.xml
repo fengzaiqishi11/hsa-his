@@ -1924,7 +1924,7 @@
     </update>
     <update id="updateInsureGetInfo">
         update insure_setl_info
-        set settle_no =#{setlListId},stas_type = '0'
+        set settle_no =#{setlListId},stas_type = '0',uplod_error_messsge = null
         where insure_settle_id = #{insureSettleId}
           and hosp_code = #{hospCode}
           and visit_id = #{visitId}
@@ -2196,5 +2196,82 @@
             </if>
         </where>
     </select>
+
+    <select id="queryOutSetlePage" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
+        select * from (select iis.insure_reg_code AS insureRegCode,
+        iis.visit_id as visitId,
+        iis.medicine_org_code as medicineOrgCode,
+        iiv.medical_reg_no as medicalRegNo,
+        iiv.is_hospital as isHospital,
+        iiv.medical_reg_no AS mdtrtId,
+        iiv.insuplc_admdvs AS insuplc,
+        iiv.psn_idet_type ,
+        iiv.visit_time ,
+        iiv.visit_icd_code ,
+        iiv.visit_icd_name ,
+        iis.insureSettleId ,
+        iis.insureSettleId  as bizSn,
+        iis.settle_id settleId,
+        iis.settle_id,
+        iis.crte_time,
+        iis.total_price,
+        isi.uplod_error_messsge,
+        iis.insure_reg_code,
+        iib.aac003 AS psnName,
+        iib.aac004 AS gend,
+        iib.aae140 AS insutype,
+        ov.age,
+        ov.cert_no,
+        ov.phone,
+        (select bd.caty_code
+        from base_dept bd
+        where bd.id = ov.dept_id
+        and bd.hosp_code = hosp_code)      opspDiagCaty,
+        if(isi.id is null,'0',if(isi.settle_no is null,if(isi.uplod_error_messsge is not null,'2','1'),if(isi.stas_type = '1','4','3'))) as uplodStatus,
+        iis.aka130 as med_type
+        from insure_individual_settle iis
+        join insure_individual_visit iiv on iis.visit_id = iiv.visit_id and iis.hosp_code = iiv.hosp_code
+        and iis.medicalRegNo = iiv.medical_reg_no
+        join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code
+        left join outpt_visit ov on  iis.visit_id = ov.id and iis.hosp_code = ov.hosp_code
+        left join insure_setl_info isi on iis.insureSettleId = isi.insure_settle_id and iis.hosp_code = isi.hosp_code
+        and iis.visit_id = iiv.visit_id
+        where iis.state ='0' and iis.settle_state ='1' and iis.hosp_code =#{hospCode} and iis.insureSettleId is not null
+        and iis.is_hospital ='0' and iiv.aka130 = '14') a
+        <where>
+            <if test="keyword != null and keyword != ''">
+                and ( a.psnName like concat('%',#{keyword},'%')
+                or a.medicalRegNo like concat('%',#{keyword},'%')
+                or a.cert_no like concat('%',#{keyword},'%')
+                or a.phone like concat('%',#{keyword},'%')
+                )
+            </if>
+            <if test="uplodStatus != null and uplodStatus != ''">
+                and a.uplodStatus =#{uplodStatus}
+            </if>
+            <if test="startTime != null and startTime != ''">
+                and date(a.crte_time) &gt;= date(#{startTime})
+            </if>
+            <if test="endtime != null and endtime != ''">
+                and date(a.crte_time) &lt;= date(#{endtime})
+            </if>
+            <if test="insureRegCode != null and insureRegCode != ''">
+                and a.insure_reg_code =#{insureRegCode}
+            </if>
+            <if test="insutype != null and insutype != ''">
+                and a.insutype =#{insutype}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateUplodError">
+        <foreach collection="errorMapList" item="item" index="index" open="" close="" separator=";">
+            update insure_setl_info
+            <set>
+                uplod_error_messsge =#{item.errorInfo},
+            </set>
+            where  visit_id =#{item.visitId} and insure_settle_id = #{item.insureSettleId}
+        </foreach>
+    </update>
 
 </mapper>

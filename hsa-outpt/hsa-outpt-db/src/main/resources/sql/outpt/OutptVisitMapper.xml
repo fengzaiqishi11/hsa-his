@@ -273,11 +273,15 @@
         a.birthday, a.marry_code, a.nation_code, a.cert_code, a.cert_no, a.phone, a.now_address, a.visit_no, a.visit_code, a.patient_code,
         a.preferential_type_id, a.insure_code, a.insure_org_code, a.insure_no, a.insure_biz_code, a.insure_treat_code,
         a.insure_patient_id, a.insure_remark, a.doctor_id, a.doctor_name, a.dept_id, a.dept_name, a.visit_time, a.remark,
-        a.pym, a.wbm, a.is_visit, a.tran_in_code,  a.is_first_visit, a.crte_id, a.crte_name, a.crte_time, a.tran_in_code,
+        a.pym, a.wbm, a.is_visit, ifnull(a.tran_in_code,'0') tran_in_code,  a.is_first_visit, a.crte_id, a.crte_name, a.crte_time, a.tran_in_code,
         a.in_dept_id, ifnull(a.in_disease_id, d.disease_id) in_disease_id, a.in_remark, ifnull(c.name, e.name) inDiseaseName, a.advance_payment,
         a.source_tj_code, a.source_tj_remark,a.occupation_code,a.contact_name
         from outpt_visit a
         left join base_disease c on a.in_disease_id = c.id and a.hosp_code = c.hosp_code
+
+
+
+
         left join outpt_medical_record d on a.id = d.visit_id and a.hosp_code = d.hosp_code
         left join base_disease e on d.disease_id = e.id and d.hosp_code = e.hosp_code
         where a.hosp_code = #{hospCode}

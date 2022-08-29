@@ -2614,7 +2614,7 @@
         select
             '2' ywlx,
             ic.doctor_name,
-            ic.dept_id,
+             (select bdp.name from base_dept bdp where bdp.hosp_code = ic.hosp_code and bdp.id = ic.dept_id) dept_name,
             ic.crte_time,
             ic.item_name,
             ic.item_id,

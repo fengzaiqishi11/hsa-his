@@ -4286,7 +4286,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
     public List<Map> queryDrugCount(OutptPrescribeDTO outptPrescribeDTO) {
         List<Map> resultList = new ArrayList<>();
         /*身份证获取为空直接不做处理*/
-        if (Optional.ofNullable(outptPrescribeDTO.getCertNo()).isPresent()) {
+        if (StringUtils.isNotEmpty(outptPrescribeDTO.getCertNo())) {
             /*获取所有的精麻药品集合*/
             List<String> collect = outptPrescribeDTO.getOutptPrescribeDetailsDTOList().
                     stream().filter(outptPrescribeDetailsDTO -> Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) &&
@@ -4325,11 +4325,9 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
                 /*开药周期（几天内）*/
                 long prescribingCycle = Long.parseLong(outptVisitDTOS.get(0).getPrescribingCycle());
                 /*获取所开药时间的最大值*/
-                Optional<Date> max = outptVisitDTOS.stream()
-                        .map(OutptVisitDO::getCrteTime)
-                        .max((o1, o2) -> (int) (o1.getTime() - o2.getTime()));
+                Optional<OutptVisitDTO> maxTime = outptVisitDTOS.stream().max(Comparator.comparing(OutptVisitDTO::getCrteTime));
                 /*判断当前时间与最近开药时间*/
-                if(DateUtil.between(max.get(),DateUtils.getNow(), DateUnit.DAY) < prescribingCycle){
+                if(DateUtil.between(maxTime.get().getCrteTime(), DateUtils.getNow(), DateUnit.DAY) < prescribingCycle){
                     /*过滤最近开药时间大于设定时间*/
                     List<OutptVisitDTO> list = outptVisitDTOS.stream()
                             .filter(outptVisitDTO -> DateUtil.offsetDay(DateUtils.getNow(), ((int) prescribingCycle) * -1)

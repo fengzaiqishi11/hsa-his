@@ -534,4 +534,8 @@ public class InptVisitDTO extends InptVisitDO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String cyEndTime;
+
+    private String sortName;  // 出院时间排序规则 asc:升序  desc：降序
+    private String columnName;  // 排序名称
+    private String bedSortName;  // 床位号排序规则 asc:升序  desc：降序
 }

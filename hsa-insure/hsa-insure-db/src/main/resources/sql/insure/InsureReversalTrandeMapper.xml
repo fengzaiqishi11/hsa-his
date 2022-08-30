@@ -244,7 +244,7 @@
         ) A
         GROUP BY
         A.insutype,
-        <if test="insureRegCode != 369900 or insureRegCode != '360402'">
+        <if test="insureRegCode != 369900 and insureRegCode != '360402'">
             A.is_hospital,
         </if>
         A.clr_type,

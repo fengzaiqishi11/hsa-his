@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>hsa-his</artifactId>
+        <groupId>cn.hsa.his</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>cn.hsa.payment</groupId>
+    <artifactId>hsa-medical-payment</artifactId>
+    <version>1.0.0</version>
+    <modules>
+        <module>hsa-medical-payment-biz</module>
+        <module>hsa-medical-payment-db</module>
+        <module>hsa-medical-payment-generic</module>
+    </modules>
+    <name>hsa-medical-payment</name>
+    <packaging>pom</packaging>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--公共包依赖-->
+            <dependency>
+                <groupId>cn.hsa.com</groupId>
+                <artifactId>hsa-com</artifactId>
+                <version>1.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.ant</groupId>
+                        <artifactId>ant</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>com.github.albfernandez</groupId>
+                        <artifactId>javadbf</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.pdfbox</groupId>
+                        <artifactId>pdfbox</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.kafka</groupId>
+                        <artifactId>kafka-examples</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!--动态数据源-->
+            <dependency>
+                <groupId>cn.hsa.dynamic</groupId>
+                <artifactId>hsa-dynamic</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

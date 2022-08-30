@@ -4344,8 +4344,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择患者");
         }
         List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
-        if(mapList.size() > 50){
-            throw new AppException("选择的患者不能超过50条");
+        if(mapList.size() > 6){
+            throw new AppException("选择的患者不能超过6条");
         }
         List<Map<String, Object>> errorMapList = new ArrayList<>();
         for(Map<String, Object> map1 :mapList){
@@ -4389,8 +4389,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择患者");
         }
         List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
-        if(mapList.size() > 50){
-            throw new AppException("选择的患者不能超过50条");
+        if(mapList.size() > 6){
+            throw new AppException("选择的患者不能超过6条");
         }
         List<Map<String, Object>> errorMapList = new ArrayList<>();
         for(Map<String, Object> map1 :mapList){

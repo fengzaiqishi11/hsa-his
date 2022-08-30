@@ -1,0 +1,66 @@
+server:
+  servlet:
+    context-path: /hsa-medical-payment
+  port: 9024
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  main:
+    allow-bean-definition-overriding: true
+  application:
+    name: hsa-medical-payment
+  #springboot 接口第一次访问都很慢，因为dispatcherServlet不是一开始就加载的
+  mvc:
+    servlet:
+      load-on-startup: 1
+  cloud:
+    nacos:
+      config:
+        file-extension: properties
+        group: dev
+        enabled: false
+        encode: UTF-8
+        server-addr: ${mspring.cloud.nacos.config.server-addr}
+        username: ${mspring.cloud.nacos.config.username}
+        password: ${mspring.cloud.nacos.config.password}
+  boot:
+    admin:
+      client:
+        url: http://127.0.0.1:9020
+dubbo:
+  registry:
+    address: nacos://${mspring.cloud.nacos.config.server-addr}/?username=${mspring.cloud.nacos.config.username}&password=${mspring.cloud.nacos.config.password}
+  consumer:
+    timeout: 60000
+  application:
+    name: hsa-medical-payment
+  protocol:
+    name: dubbo
+    port: 29005
+    payload: 107374182
+  provider:
+    threads: 1000
+
+security:
+  oauth2:
+    client:
+      permits: /login**,/admin/VerifyUserPassword,/admin/getUser,/service/**,/swagger**
+# disable elasticsearch healthcheck
+info:
+  app:
+    name: hsa-medical-payment
+    version: 2.0.1
+    test: test
+management:
+  endpoints:
+    web:
+      base-path: /monitor
+      exposure:
+        include: info,health
+  endpoint:
+    health:
+      show-details: always
+  health:
+    elasticsearch:
+      enabled: false

@@ -113,6 +113,13 @@
         <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
         <result property="nationName" column="nation_name" jdbcType="VARCHAR"/>
         <result property="decoctionMethod" column="decoction_method" jdbcType="VARCHAR"/>
+        <result property="checkSecondId" column="check_second_id" jdbcType="VARCHAR"/>
+        <result property="checkSecondName" column="check_second_name" jdbcType="VARCHAR"/>
+        <result property="checkSecondTime" column="check_second_time" jdbcType="TIMESTAMP"/>
+        <result property="stopCheckSecondId" column="stop_check_second_id" jdbcType="VARCHAR"/>
+        <result property="stopCheckSecondName" column="stop_check_second_name" jdbcType="VARCHAR"/>
+        <result property="stopCheckSecondTime" column="stop_check_second_time" jdbcType="TIMESTAMP"/>
+        <result property="isNewStatus" column="is_new_status" jdbcType="VARCHAR"/>
     </resultMap>
 
     <resultMap type="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" id="InptVisitMap">
@@ -326,7 +333,9 @@
         ef.good_name skinDurgName, a.skin_phar_id, a.skin_unit_code, case when a.item_code = '1' then '2' when a.item_code = '2' then '3' when a.item_code = '4' and e.id is not null then '4'
         when a.item_code = '4' and e.id is null then '1' end yzmlType, a.yylx, b.technology_code, b.container_code, b.specimen_code,
         (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then d.nation_code   when a.item_code = '4' then b.union_nation_code else '' end) as nation_code,
-        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then d.nation_name  when a.item_code = '4' then b.union_nation_name else '' end) as nation_name
+        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then d.nation_name  when a.item_code = '4' then b.union_nation_name else '' end) as nation_name,
+        a.check_second_id,a.check_second_name,
+        a.check_second_time,a.stop_check_second_id,a.stop_check_second_name,a.stop_check_second_time,a.is_new_status
         from inpt_advice a
         left join base_advice b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '4'
         left join base_drug c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '1'
@@ -943,7 +952,13 @@
         (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
         (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
         (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then bm.nation_code else '' end) as nation_code,
-        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name
+        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name,
+        a.is_new_status as isNewStatus,
+        a.check_name as checkName,
+        a.check_second_name  as checkSecondName,
+        a.stop_doctor_name as stopDoctorName,
+        a.stop_check_name  as stopCheckName,
+        a.stop_check_second_name  as stopCheckSecondName
         from inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
         left join base_drug c on a.item_id=c.id and a.item_code='1' and c.hosp_code=a.hosp_code
         left join base_material bm on a.item_id=bm.id and a.item_code='2' and bm.hosp_code=a.hosp_code
@@ -972,6 +987,9 @@
         <if test="keyword != null and keyword != ''">
             and ( b.NAME LIKE CONCAT( '%', #{keyword}, '%' )
             OR b.bed_name LIKE CONCAT( '%', #{keyword}, '%' ))
+        </if>
+        <if test="isNewStatus!=null and isNewStatus!=''">
+            and a.is_new_status=#{isNewStatus}
         </if>
         order by a.crte_time, a.visit_id, a.baby_id, group_no, group_seq_no asc, a.long_start_time desc
     </select>
@@ -2518,4 +2536,44 @@
           and (a.cancel_id is null or a.cancel_id = '')
         ORDER BY a.long_start_time asc, a.group_no asc, a.group_seq_no asc
     </select>
+
+
+    <update id="updateNewAdviceInChecked" >
+        update
+            inpt_advice a
+        set
+            a.is_new_status = #{isNewStatus},
+            <if test="isNewStatus != '1' or isNewStatus != '4'">
+            a.check_id = #{checkId} ,
+            a.check_name = #{checkName},
+            a.check_time = #{checkTime},
+            </if>
+            a.check_second_id = #{checkSecondId} ,
+            a.check_second_name = #{checkSecondName},
+            a.check_second_time = #{checkSecondTime}
+        where a.id in
+            <foreach collection="kzIds" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </update>
+
+    <update id="updateStopAdviceInChecked" >
+        update
+            inpt_advice a
+        set
+            a.is_new_status = #{isNewStatus},
+            <if test="isNewStatus != '1' or isNewStatus != '4'">
+                a.stop_check_id =#{stopCheckId},
+                a.stop_check_name =#{stopCheckName},
+                a.stop_check_time =#{stopCheckTime},
+            </if>
+            a.stop_check_second_id =#{stopCheckSecondId},
+            a.stop_check_second_name =#{stopCheckSecondName},
+            a.stop_check_second_time =#{stopCheckSecondTime}
+        where a.id in
+            <foreach collection="stopIds" item="id" open="(" close=")" separator=",">
+                    #{id}
+            </foreach>
+
+    </update>
 </mapper>

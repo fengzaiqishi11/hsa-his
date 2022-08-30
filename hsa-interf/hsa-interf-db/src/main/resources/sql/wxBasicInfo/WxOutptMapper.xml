@@ -776,7 +776,7 @@
         (
             id, hosp_code, profile_id, out_profile, register_id, register_no, name, gender_code, age, age_unit_code,
             birthday, marry_code, nation_code, cert_code, cert_no, phone, visit_no, visit_code, patient_code,
-            preferential_type_id, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
+            preferential_type_id,source_tj_code,source_tj_remark, insure_code, insure_org_code, insure_no, insure_biz_code, insure_treat_code,
             insure_patient_id, insure_remark, doctor_id, doctor_name, dept_id, dept_name, visit_time, remark,
             pym, wbm, is_visit, tran_in_code, is_first_visit, crte_id, crte_name, crte_time
         )
@@ -784,7 +784,7 @@
             (
                 #{id}, #{hospCode}, #{profileId}, #{outProfile}, #{registerId}, #{registerNo}, #{name}, #{genderCode}, #{age}, #{ageUnitCode},
                 #{birthday}, #{marryCode}, #{nationCode}, #{certCode}, #{certNo}, #{phone}, #{visitNo}, #{visitCode}, #{patientCode},
-                #{preferentialTypeId}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
+                #{preferentialTypeId}, #{sourceTjCode}, #{sourceTjRemark}, #{insureCode}, #{insureOrgCode}, #{insureNo}, #{insureBizCode}, #{insureTreatCode},
                 #{insurePatientId}, #{insureRemark}, #{doctorId}, #{doctorName}, #{deptId}, #{deptName}, #{visitTime}, #{remark},
                 #{pym}, #{wbm}, #{isVisit}, #{tranInCode}, #{isFirstVisit}, #{crteId}, #{crteName}, #{crteTime}
             )

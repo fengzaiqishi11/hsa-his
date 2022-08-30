@@ -917,4 +917,7 @@ public interface InptAdviceDAO {
      * @Return:
      **/
     List<InptAdviceDTO> getDMAdviceByVisitId(InptVisitDTO inptVisitDTO);
+
+    void updateNewAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
+    void updateStopAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
 }

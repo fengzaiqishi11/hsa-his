@@ -548,7 +548,14 @@
         from
             base_disease a
         where
-            a.is_valid = '1'
+            a.hosp_code =#{hospCode}
+            and a.is_valid = '1'
         order by a.code
+    </select>
+
+
+
+    <select id="queryBaseFinanceClassify" resultType="cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO">
+        select id,code,name from base_finance_classify  where is_valid ='1'
     </select>
 </mapper>

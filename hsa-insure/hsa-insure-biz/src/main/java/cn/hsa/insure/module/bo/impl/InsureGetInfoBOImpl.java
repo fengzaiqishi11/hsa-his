@@ -4344,19 +4344,22 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择患者");
         }
         List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
-        if(mapList.size() > 6){
-            throw new AppException("选择的患者不能超过6条");
+        if(mapList.size() > 20){
+            throw new AppException("选择的患者不能超过20条");
         }
         List<Map<String, Object>> errorMapList = new ArrayList<>();
         for(Map<String, Object> map1 :mapList){
             map1.put("hospCode",map.get("hospCode"));
             Map<String, Object> setlMap = new HashMap<>();//结算清单信息
             Map<String, Object> errorMap = new HashMap<>();//错误信息
+            Object savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
             //同步信息并保存
             try{
                 setlMap = insertSetlInfo(map1);
                 setlMap.put("hospCode",map.get("hospCode"));
                 saveInsureSettleInfo(setlMap);
+                //设置回滚点
+                savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
             }catch (Exception e){
                 errorMap.put("visitId",map1.get("visitId"));
                 errorMap.put("medicalRegNo",map1.get("medicalRegNo"));
@@ -4365,7 +4368,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 errorMap.put("errorInfo",e.getMessage());
                 errorMapList.add(errorMap);
                 //报错需要手动回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
             }
         }
         Map<String, Object> resultMap = new HashMap<>();
@@ -4389,8 +4392,8 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择患者");
         }
         List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
-        if(mapList.size() > 6){
-            throw new AppException("选择的患者不能超过6条");
+        if(mapList.size() > 20){
+            throw new AppException("选择的患者不能超过20条");
         }
         List<Map<String, Object>> errorMapList = new ArrayList<>();
         for(Map<String, Object> map1 :mapList){

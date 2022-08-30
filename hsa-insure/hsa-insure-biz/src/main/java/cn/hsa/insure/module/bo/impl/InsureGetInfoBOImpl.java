@@ -778,7 +778,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());
+        dataMap.put("setl_id", MapUtils.get(map, "insureSettleId"));
         dataMap.put("stas_type", stasType);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("stastinfo", dataMap);

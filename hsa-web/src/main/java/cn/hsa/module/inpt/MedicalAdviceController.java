@@ -158,7 +158,7 @@ public class MedicalAdviceController extends BaseController {
     public WrapperResponse<Boolean> updateAdviceInChecked(@RequestBody MedicalAdviceDTO medicalAdviceDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
-
+        medicalAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map<String, Object> map = new HashMap<>();
         // 0：未核收，1：已核对，2：已核收未核对，3：核收拒绝，4：核对拒绝
         if("2".equals(medicalAdviceDTO.getIsNewStatus())){
@@ -262,7 +262,9 @@ public class MedicalAdviceController extends BaseController {
                 medicalAdviceDTO.setStopCheckSecondName(medicalAdviceDTO.getStopCheckSecondName());
                 medicalAdviceDTO.setStopCheckSecondTime(new Date());
             }
-
+            medicalAdviceDTO.setCheckId(sysUserDTO.getId());
+            medicalAdviceDTO.setCheckName(sysUserDTO.getName());
+            medicalAdviceDTO.setCheckTime(new Date());
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
            medicalAdviceService_consumer.acceptMedicalAdvices(map);

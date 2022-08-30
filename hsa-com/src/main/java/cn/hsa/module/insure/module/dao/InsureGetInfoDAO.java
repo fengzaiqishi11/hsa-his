@@ -909,4 +909,26 @@ public interface InsureGetInfoDAO {
      * @Return
      **/
     List<Map<String, Object>> queryAdmdvs(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询门特结算清单病人
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    List<InsureSettleInfoDTO> queryOutSetlePage(Map<String, Object> map);
+
+    /**
+     * @param
+     * @Method queryPage
+     * @Desrciption 查询门特结算清单病人
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    void updateUplodError(@Param("errorMapList")List<Map<String, Object>> errorMapList);
 }

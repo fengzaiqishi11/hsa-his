@@ -688,7 +688,6 @@ public class InsureStockManagerBoImpl extends HsafBO implements InsureStockManag
             dataMap.put("inv_chg_opter_name", insureInventoryStockUpdate.getInvChgOpterName());//库存变更经办人姓名
             dataMap.put("memo", "备注");//备注
             dataMap.put("trdn_flag", insureInventoryStockUpdate.getTrdnFlag());//拆零标志
-
             listMap.add(dataMap);
         }
         Map map2 = new HashMap();

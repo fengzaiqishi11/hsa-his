@@ -367,6 +367,62 @@ public class InsureGetInfoController extends BaseController {
         return insureGetInfoService_consumer.queryAdmdvs(map);
     }
 
+    /**
+     * @Method updateReadIdCard
+     * @Desrciption 查询门特结算清单病人
+     * @Param map
+     * @Author liuhuiming
+     * @Date   2022-08-11 10:11
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<>
+     **/
+    @GetMapping("/queryOutSetlePage")
+    public WrapperResponse<PageDTO> queryOutSetlePage(@RequestParam Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.queryOutSetlePage(map);
+    }
+
+    /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息:批量保存
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:49
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/saveBatchSettleInfo")
+    public WrapperResponse< Map<String, Object>> saveBatchSettleInfo(@RequestBody List<Map<String,Object>> mapList, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
+        map.put("mapList",mapList);
+        return insureGetInfoService_consumer.saveBatchSettleInfo(map);
+    }
+
+    /**
+     * @Method getSettleInfo
+     * @Desrciption 医疗保障基金结算清单信息:批量上传到医保
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:49
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/insertBatchSettleInfo")
+    public WrapperResponse<Map<String, Object>> insertBatchSettleInfo(@RequestBody List<Map<String,Object>> mapList, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map<String,Object> map = new HashMap<>();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
+        map.put("mapList",mapList);
+        return insureGetInfoService_consumer.insertBatchSettleInfo(map);
+    }
 
 
 

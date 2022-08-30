@@ -415,4 +415,6 @@ public interface WxBasicInfoBO {
     WrapperResponse<String> queryBaseDisease(Map<String, Object> map);
 
     void removeLockByProfileId(Map<String, Object> map);
+
+    WrapperResponse<String> hsjcApply(Map<String, Object> map);
 }

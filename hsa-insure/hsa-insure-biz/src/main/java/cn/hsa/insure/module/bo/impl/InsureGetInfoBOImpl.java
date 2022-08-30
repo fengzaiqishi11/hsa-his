@@ -52,6 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.util.CollectionUtils;
 
 
@@ -403,6 +404,19 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("acp_medins_name", settleInfoDTO.getAcpMedinsName()); // 拟接收机构名称 *******
         setlinfo.put("acp_medins_code", settleInfoDTO.getAcpMedinsName()); // 拟接收机构代码 ******
 
+        //根据参数判断是否需要自动生成发票
+        Map sysMap1 = new HashMap();
+        sysMap1.put("hospCode",MapUtils.get(map, "hospCode"));
+        sysMap1.put("code","IS_JUGE_INVOICE");
+        SysParameterDTO sysParameterDTO1 = sysParameterService_consumer.getParameterByCode(sysMap1).getData();
+        if(sysParameterDTO1 != null && Constant.UnifiedPay.ISMAN.F.equals(sysParameterDTO.getValue())){
+            if(StringUtils.isEmpty(settleInfoDTO.getBillCode())){
+                settleInfoDTO.setBillCode(SnowflakeUtils.getId().substring(0,6));
+            }
+            if(StringUtils.isEmpty(settleInfoDTO.getBillNo())){
+                settleInfoDTO.setBillNo(SnowflakeUtils.getId().substring(0,6));
+            }
+        }
         //判断票据代码不能为空
         if(StringUtils.isEmpty(settleInfoDTO.getBillCode())){
             throw new AppException("票据代码不能为空");
@@ -527,9 +541,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             if ("204".equals(diagType)) {
                 item.put("diag_type", "1");
             }
-            //【ID1003812】【广州科大】结算清单上传主诊断取西医主诊断
-            if (Constant.UnifiedPay.ISMAN.S.equals(isMain) && "2".equals(diagType)){
-                item.put("maindiag_flag", "0");
+            //根据参数判断，广州才需要处理中医
+            SysParameterDTO sysParameterDTO1 = insureGetInfoDAO.getParameterByCode(MapUtil.getStr(map,"hospCode"),"IS_MAIN_ZY");
+            if(sysParameterDTO1 != null && Constant.UnifiedPay.ISMAN.S.equals(sysParameterDTO1.getValue())){
+                //【ID1003812】【广州科大】结算清单上传主诊断取西医主诊断
+                if (Constant.UnifiedPay.ISMAN.S.equals(isMain) && "2".equals(diagType)){
+                    item.put("maindiag_flag", "0");
+                }
             }
             //中医诊断码值转换成医保的中医诊断类型码值  1:西医主要诊断 2:西医其它诊断 3: 中医主病诊断 4.中医主证诊断
             if ("2".equals(diagType)) {
@@ -760,7 +778,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         Map<String, Object> dataMap = new HashMap<>();
         dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
-        dataMap.put("setl_id", insureIndividualVisitDTO.getInsureSettleId());
+        dataMap.put("setl_id", MapUtils.get(map, "insureSettleId"));
         dataMap.put("stas_type", stasType);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("stastinfo", dataMap);
@@ -2998,6 +3016,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
 
                 });
                 List<InptDiagnoseDTO> zyDiagnoseList = xiCollect.stream().filter(dto->Constants.JBFL.ZLXT.equals(dto.getTypeCode())).collect(Collectors.toList());
+                xiCollect = xiCollect.stream().filter(dto->!Constants.JBFL.ZLXT.equals(dto.getTypeCode())).collect(Collectors.toList());
                 if(!ListUtils.isEmpty(zyDiagnoseList)){
                     zxCollect = zyDiagnoseList;
                 }
@@ -4154,12 +4173,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         Map<String, Object> sysMap = new HashMap<>();
         sysMap.put("hospCode",MapUtil.getStr(map,"hospCode"));
         sysMap.put("code","CHK_TCMDISE_MATCH");
-        WrapperResponse<SysParameterDTO> response = sysParameterService_consumer.getParameterByCode(sysMap);
-        if (WrapperResponse.SUCCESS != response.getCode()) {
-            throw new AppException(response.getMessage());
-        }
+        SysParameterDTO response = insureGetInfoDAO.getParameterByCode(MapUtil.getStr(map,"hospCode"),"CHK_TCMDISE_MATCH");
+//        if (WrapperResponse.SUCCESS != response.getCode()) {
+//            throw new AppException(response.getMessage());
+//        }
         //1.开关配置  1:开启   0：关闭
-        if (ObjectUtil.isEmpty(response.getData()) || !Constants.SF.S.equals(response.getData().getValue())) {
+        if (ObjectUtil.isEmpty(response) || !Constants.SF.S.equals(response.getValue())) {
             return new HashMap();
         }
         //非住院业务不校验
@@ -4284,5 +4303,133 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         List<Map<String, Object>> list = insureGetInfoDAO.queryAdmdvs(map);
         redisUtils.set(key,list);
         return list;
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 查询门特结算清单病人
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    @Override
+    public PageDTO queryOutSetlePage(Map<String, Object> map) {
+        int pageNo = Integer.parseInt(MapUtils.get(map, "pageNo") == null ? "1" : MapUtils.get(map, "pageNo"));
+        int pageSize = Integer.parseInt(MapUtils.get(map, "pageSize") == null ? "10" : MapUtils.get(map, "pageSize"));
+        PageHelper.startPage(pageNo, pageSize);
+        List<InsureSettleInfoDTO> list = insureGetInfoDAO.queryOutSetlePage(map);
+        //患者信息拼接
+        for(InsureSettleInfoDTO insureSettleInfoDTO:list){
+            //性别转义
+            String gendName = getSysCodeName((String) map.get("hospCode"),"XB",insureSettleInfoDTO.getGend());
+            //拼接信息
+            insureSettleInfoDTO.setNameGendAge(insureSettleInfoDTO.getPsnName()+"/"+gendName+"/"+String.valueOf(insureSettleInfoDTO.getAge())+"岁");
+        }
+        return PageDTO.of(list);
+
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 医疗保障基金结算清单信息 :批量保存
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> saveBatchSettleInfo(Map<String, Object> map) {
+        if(ObjectUtil.isEmpty(map.get("mapList"))){
+            throw new AppException("请选择患者");
+        }
+        List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
+        if(mapList.size() > 50){
+            throw new AppException("选择的患者不能超过50条");
+        }
+        List<Map<String, Object>> errorMapList = new ArrayList<>();
+        for(Map<String, Object> map1 :mapList){
+            map1.put("hospCode",map.get("hospCode"));
+            Map<String, Object> setlMap = new HashMap<>();//结算清单信息
+            Map<String, Object> errorMap = new HashMap<>();//错误信息
+            //同步信息并保存
+            try{
+                setlMap = insertSetlInfo(map1);
+                setlMap.put("hospCode",map.get("hospCode"));
+                saveInsureSettleInfo(setlMap);
+            }catch (Exception e){
+                errorMap.put("visitId",map1.get("visitId"));
+                errorMap.put("medicalRegNo",map1.get("medicalRegNo"));
+                errorMap.put("insureSettleId",map1.get("insureSettleId"));
+                errorMap.put("psnName",map1.get("psnName"));
+                errorMap.put("errorInfo",e.getMessage());
+                errorMapList.add(errorMap);
+                //报错需要手动回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            }
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("errorMapList",errorMapList);//错误集合
+        resultMap.put("error",errorMapList.size());//错误条数
+        resultMap.put("success",mapList.size()-errorMapList.size());//成功条数
+        return resultMap;
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 医疗保障基金结算清单信息 :批量上传
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> insertBatchSettleInfo(Map<String, Object> map) {
+        if(ObjectUtil.isEmpty(map.get("mapList"))){
+            throw new AppException("请选择患者");
+        }
+        List<Map<String, Object>> mapList = (List<Map<String, Object>>)map.get("mapList");
+        if(mapList.size() > 50){
+            throw new AppException("选择的患者不能超过50条");
+        }
+        List<Map<String, Object>> errorMapList = new ArrayList<>();
+        for(Map<String, Object> map1 :mapList){
+            map1.put("hospCode",map.get("hospCode"));
+            Map<String, Object> errorMap = new HashMap<>();//错误信息
+            Object savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
+            //上传医保
+            try{
+                insertSettleInfo(map1);
+                //设置回滚点
+                savePoint = TransactionAspectSupport.currentTransactionStatus().createSavepoint();
+            }catch (Exception e){
+                errorMap.put("visitId",map1.get("visitId"));
+                errorMap.put("psnName",map1.get("psnName"));
+                errorMap.put("medicalRegNo",map1.get("medicalRegNo"));
+                errorMap.put("insureSettleId",map1.get("insureSettleId"));
+                errorMap.put("errorInfo",e.getMessage());
+                errorMapList.add(errorMap);
+                //报错了需要回滚
+                TransactionAspectSupport.currentTransactionStatus().rollbackToSavepoint(savePoint);
+            }
+        }
+        //保存上传医保错误信息
+        if(!ListUtils.isEmpty(errorMapList)){
+            insureGetInfoDAO.updateUplodError(errorMapList);
+        }
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("errorMapList",errorMapList);//错误集合
+        resultMap.put("error",errorMapList.size());//错误条数
+        resultMap.put("success",mapList.size()-errorMapList.size());//成功条数
+        return resultMap;
+    }
+
+    //字典转义
+    private String getSysCodeName(String hospCode, String code, String value) {
+        Map map = new HashMap(2);
+        map.put("hospCode", hospCode);
+        map.put("code", code);
+        Map<String, String> dictMap = insureDictService_consumer.querySysCodeByCode(map).getData();
+        return MapUtils.isEmpty(dictMap) ? "" : dictMap.get(value);
     }
 }

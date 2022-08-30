@@ -152,4 +152,212 @@ public class InsureUnifiedEmrServiceImpl implements InsureUnifiedEmrService {
     public InsureEmrAdminfoDTO queryInsureUnifiedEmrAdminfo(Map map) {
         return insureUnifiedEmrBO.queryInsureUnifiedEmrAdminfo(MapUtils.get(map,"insureEmrUnifiedDTO"));
     }
+
+    /**
+     * 根据就诊ID查询入院信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:26
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrAdminfoDTO
+     */
+    @Override
+    public InsureEmrAdminfoDTO queryAdmInfoByMdtrtSn(Map paramMap) {
+      String mdtrtSn = MapUtils.get(paramMap,"mdtrtSn");
+      return insureUnifiedEmrBO.queryAdmInfoByMdtrtSn(mdtrtSn);
+    }
+
+    /**
+     * 根据就诊ID查询首次病程信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:05
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrCoursrinfoDTO
+     */
+    @Override
+    public InsureEmrCoursrinfoDTO queryCoursrInfoByMdtrtSn(Map paramMap) {
+      String mdtrtSn = MapUtils.get(paramMap,"mdtrtSn");
+      return insureUnifiedEmrBO.queryCoursrInfoByMdtrtSn(mdtrtSn);
+    }
+
+    /**
+     * 查询死亡记录信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 17:20
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDieinfoDTO
+     */
+    @Override
+    public InsureEmrDieinfoDTO queryDieInfoByMdtrtSn(Map paramMap) {
+      String mdtrtSn = MapUtils.get(paramMap,"mdtrtSn");
+      return insureUnifiedEmrBO.queryDieInfoByMdtrtSn(mdtrtSn);
+    }
+
+    /**
+     * 查询出院信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:30
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO
+     */
+    @Override
+    public InsureEmrDscginfoDTO queryDscgInfoByMdtrtSn(Map paramMap) {
+      String mdtrtSn = MapUtils.get(paramMap,"mdtrtSn");
+      return insureUnifiedEmrBO.queryDscgInfoByMdtrtSn(mdtrtSn);
+    }
+
+    /**
+     * 保存电子病历手术信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:01
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrOprninfoDTO
+     */
+    @Override
+    public InsureEmrOprninfoDTO queryOprnInfoByTemplateId(Map paramMap) {
+      String emrTemplateId = MapUtils.get(paramMap,"emrTemplateId");
+      return insureUnifiedEmrBO.queryOprnInfoByTemplateId(emrTemplateId);
+    }
+
+    /**
+     * 根据病历编号查询抢救信息
+     * @param paramMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:50
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrRescinfoDTO
+     */
+    @Override
+    public InsureEmrRescinfoDTO queryRescInfoByTemplateId(Map paramMap) {
+      String emrTemplateId = MapUtils.get(paramMap,"emrTemplateId");
+      return insureUnifiedEmrBO.queryRescInfoByTemplateId(emrTemplateId);
+    }
+
+  /**
+     * 根据MdtrtSn更新入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 14:34
+     * @return int
+     */
+    @Override
+    public int updateAdmSelectiveByMdtrtSn(Map map) {
+      return insureUnifiedEmrBO.updateAdmSelectiveByMdtrtSn(map);
+    }
+
+    /**
+     * 根据mdtrtsn更新首次病程信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:04
+     * @return int
+     */
+    @Override
+    public int updateCoursrSelectiveByMdtrtSn(Map map) {
+      return insureUnifiedEmrBO.updateCoursrSelectiveByMdtrtSn(map);
+    }
+
+    /**
+     * 根据mdtrtsn更新死亡信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 9:37
+     * @return int
+     */
+    @Override
+    public int updateDieSelectiveByMdtrtSn(Map map) {
+      return insureUnifiedEmrBO.updateDieSelectiveByMdtrtSn(map);
+    }
+
+    /**
+     *  更新出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:48
+     * @return int
+     */
+    @Override
+    public int updateDscgSelectiveByMdtrtSn(Map map) {
+      return insureUnifiedEmrBO.updateDscgSelectiveByMdtrtSn(map);
+    }
+
+    /**
+     * 更新手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 20:25
+     * @return int
+     */
+    @Override
+    public int updateOprnSelectiveByTemplateId(Map map) {
+      return insureUnifiedEmrBO.updateOprnSelectiveByTemplateId(map);
+    }
+
+    @Override
+    public int updateRescSelectiveByTemplateId(Map map) {
+      return insureUnifiedEmrBO.updateRescSelectiveByTemplateId(map);
+    }
+
+  /**
+     * 插入医保电子病历入院信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 15:03
+     * @return int
+     */
+    @Override
+    public int insertAdminfo(Map map) {
+      return insureUnifiedEmrBO.insertAdminfo(map);
+    }
+
+    /**
+     * 插入医保电子病历首次病程记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:23
+     * @return int
+     */
+    @Override
+    public int insertCoursrinfo(Map map) {
+      return insureUnifiedEmrBO.insertCoursrinfo(map);
+    }
+
+    /**
+     * 插入医保电子病历死亡记录
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 8:48
+     * @return int
+     */
+    @Override
+    public int insertDieinfo(Map map) {
+      return insureUnifiedEmrBO.insertDieinfo(map);
+    }
+
+    /**
+     * 插入出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:58
+     * @return int
+     */
+    @Override
+    public int insertDscgInfo(Map map) {
+      return insureUnifiedEmrBO.insertDscgInfo(map);
+    }
+
+    /**
+     * 插入手术信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:09
+     * @return int
+     */
+    @Override
+    public int insertOprnInfo(Map map) {
+      return insureUnifiedEmrBO.insertOprnInfo(map);
+    }
+
+    @Override
+    public int insertRescInfo(Map map) {
+      return insureUnifiedEmrBO.insertRescInfo(map);
+    }
 }

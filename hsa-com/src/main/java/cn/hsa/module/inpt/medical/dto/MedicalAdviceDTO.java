@@ -64,4 +64,27 @@ public class MedicalAdviceDTO extends InptAdviceDO implements Serializable {
      * 提前领药记录主键
      */
     private String advanceId;
+
+    /**
+     *核对签名ID
+     */
+    private String checkedId;
+    /**
+     * 核对签名名称
+     */
+    private String checkedName;
+
+    /**
+     * 核对签名名称
+     */
+    private String isMyself;
+    /**
+     * 停嘱
+     */
+    private String [] stopIds;
+    /**
+     * 开嘱
+     */
+    private String [] kzIds;
+
 }

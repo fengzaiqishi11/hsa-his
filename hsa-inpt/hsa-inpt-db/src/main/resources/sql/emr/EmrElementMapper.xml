@@ -336,4 +336,10 @@
         select id,emr_element_id,emr_element_code,emr_element_name,insure_emr_id,insure_emr_code,insure_emr_name,crte_id,crte_name,crte_time  from emr_element_match
     </select>
 
+    <select id="queryInsureEmrElementMatchInfo" parameterType="java.util.Map" resultMap="EmrElementMacthMap">
+        select
+        id,emr_element_id,emr_element_code,emr_element_name,insure_emr_id,insure_emr_code,insure_emr_name,crte_id,crte_name,crte_time  from emr_element_match
+        where insure_up_value = #{insureTypeCode} and hosp_code = #{hospCode}
+    </select>
+
 </mapper>

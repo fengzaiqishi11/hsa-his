@@ -37,6 +37,7 @@
         <result property="checkUnitCode" column="checkUnitCode" jdbcType="VARCHAR"/>
         <result property="checkPrice" column="checkPrice" jdbcType="VARCHAR"/>
         <result property="strockName" column="strockName" jdbcType="VARCHAR"/>
+        <result property="prodName" column="prodName" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- typeCode是区分材料和项目 itemTypeCode 是项目分类或材料分类代码， -->
@@ -414,181 +415,145 @@
     <!--查询和项目和材料和药品三合一-->
     <select id="queryItemAndMaterialAndDrugPage" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDetailDTO">
         SELECT
-	a.id AS itemId,
-	a.`name` AS itemName,
-	a.itemTypeCode,
-	a.type_code,
-	a.price,
-	a.unit_code,
-	a.CODE AS itemCode,
-	a.use_code,
-	a.spec,
-	a.out_dept_code,
-	a.in_dept_code,
-	a.hosp_code,
-	b.NAME AS inDeptName,
-	c.NAME AS outDeptName,
-	bfcId,
-	bfcName,
-	bigTypeCode,
-    dosage, dosageUnitCode, prepCode, pharId, inUnitCode, type,
-    stockNum,stockOccupy,splitNum
-FROM
-	(
-	SELECT
-		id,
-		`name`,
-		type_code AS itemTypeCode,
-		price,
-		unit_code,
-		spec,
-		out_dept_code,
-		in_dept_code,
-		hosp_code,
-		CODE,
-		'' AS use_code,
-		'3' AS type_code,
-		( SELECT d.id FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
-		( SELECT d.NAME FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
-        null as bigTypeCode,
-        null as dosage, null dosageUnitCode, null prepCode, null pharId, unit_code inUnitCode, '9' type,
-        null stockNum, null stockOccupy,null splitNum
-	FROM
-		base_item m
-	WHERE
-		is_valid = '1'
-		AND hosp_code = #{hospCode}
-        <if test="keyword != null and keyword != ''">
-            and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%')
+            A.itemId,
+            A.itemName,
+            A.itemTypeCode,
+            A.typeCode,
+            A.price,
+            A.unitCode,
+            A.itemCode,
+            A.useCode,
+            A.spec,
+            A.outDeptCode,
+            A.inDeptCode,
+            A.hospCode,
+            b.NAME AS inDeptName,
+            c.NAME AS outDeptName,
+            A.bfcId,
+            A.bfcName,
+            A.bigTypeCode,
+            A.dosage,
+            A.dosageUnitCode,
+            A.prepCode,
+            A.pharId,
+            A.inUnitCode,
+            A.type,
+            A.stockNum,
+            A.stockOccupy,
+            A.splitNum,
+            A.prodName
+        FROM
+            (
+            SELECT
+                m.id as itemId,
+                m.`name` as itemName,
+                m.type_code as itemTypeCode,
+                m.price as price,
+                m.unit_code as unitCode,
+                m.spec as spec,
+                m.out_dept_code as outDeptCode,
+                m.in_dept_code as inDeptCode,
+                m.hosp_code as hospCode,
+                m.CODE as itemCode,
+                '' AS useCode,
+                '3' AS typeCode,
+                ( SELECT d.id FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+                ( SELECT d.NAME FROM base_finance_classify d WHERE m.bfc_code = d.CODE AND m.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+                null as bigTypeCode, null as dosage, null dosageUnitCode, null prepCode, null pharId,
+                unit_code inUnitCode, '9' type, null stockNum, null stockOccupy,null splitNum,'' as prodName
+            FROM
+            base_item m
+            WHERE is_valid = '1' AND hosp_code = #{hospCode}
+            <if test="keyword != null and keyword != ''">
+                and (name like concat('%',#{keyword},'%') or name_pym like concat('%',#{keyword},'%') or name_wbm like concat('%',#{keyword},'%')
                 or abbr_pym like concat('%',#{keyword},'%') or abbr_wbm like concat('%',#{keyword},'%'))
-        </if>
-		UNION ALL
-
-	SELECT
-        l.id,
-        l.`name`,
-        l.type_code AS itemTypeCode,
-        l.split_price price,
-        l.split_unit_code unit_code,
-        l.spec,
-		'',
-		'',
-        l.hosp_code,
-        l.CODE,
-        l.use_code,
-		'2' AS type_code,
-		( SELECT d.id FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
-		( SELECT d.NAME FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
-        null as bigTypeCode,
-        null as dosage, null dosageUnitCode, null prepCode, b.clf pharId, l.split_unit_code inUnitCode, '2' type,
-        null stockNum, null stockOccupy,null splitNum
-	FROM
-		base_material l
-        left join(
-            select max(if(b.type_code = '1',c.id,'')) xyf, max(if(b.type_code = '2',c.id,'')) zcf,max(if(b.type_code = '3',c.id,'')) cyf,
-            max(if(b.type_code = '4',c.id,'')) clf, max(b.drugstore_code) drugstore_code
-            from base_dept a
-            join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
-            join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
-            where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
-        )b on 1 = 1
-	WHERE
-        l.is_valid = '1'
-		AND l.hosp_code = #{hospCode}
-        <if test="keyword != null and keyword != ''">
-            and  (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
-        </if>
-		UNION ALL
-
-        SELECT
-        a.id,
-        a.good_name AS `name`,
-        a.type_code AS itemTypeCode,
-        CASE WHEN a.in_unit_code = a.unit_code THEN a.price
-        WHEN a.in_unit_code = a.split_unit_code THEN
-        a.split_price
-        END price,
-        a.split_unit_code unit_code,
-        a.spec,
-        '',
-        '',
-        a.hosp_code,
-        a.`CODE`,
-        a.durg_code,
-        '1' AS type_code,
-        ( SELECT d.id FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
-        ( SELECT d.NAME FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
-        a.big_type_code AS bigTypeCode,
-        a.dosage,
-        a.dosage_unit_code dosageUnitCode,
-        a.prep_code prepCode,
-        CASE
-        WHEN a.big_type_code = '2' THEN b.cyf
-        WHEN a.big_type_code = '1' THEN b.zcf
-        WHEN a.big_type_code = '0' or a.big_type_code ='3' THEN b.xyf
-        END pharId,
-        a.in_unit_code inUnitCode,
-        CASE WHEN a.big_type_code = '2' THEN
-        '3' ELSE '1'
-        END type,
-        stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum
-        FROM
-        base_drug a
-        LEFT JOIN (
-        SELECT
-        max(
-        IF
-        ( b.type_code = '1', c.id, '0' )) xyf,
-        max(
-        IF
-        ( b.type_code = '2', c.id, '0' )) zcf,
-        max(
-        IF
-        ( b.type_code = '3', c.id, '0' )) cyf,
-        max(
-        IF
-        ( b.type_code = '4', c.id, '0' )) clf,
-        max( b.drugstore_code ) drugstore_code
-        FROM
-        base_dept a
-        JOIN base_dept_drugstore b ON a.CODE = b.dept_code
-        AND a.hosp_code = b.hosp_code
-        JOIN base_dept c ON b.drugstore_code = c.CODE
-        AND c.hosp_code = b.hosp_code
-        WHERE
-        a.hosp_code = #{hospCode}
-        AND a.id = #{loginDeptId}
-        AND a.is_valid = '1'
-        ) b ON 1 = 1
-        JOIN stro_stock stock ON (
-        CASE
-
-        WHEN a.big_type_code = '2' THEN
-        b.cyf
-        WHEN a.big_type_code = '1' THEN
-        b.zcf
-        WHEN a.big_type_code = '0' or a.big_type_code = '3' THEN
-        b.xyf
-        END
-        ) = stock.biz_id
-        AND a.id = stock.item_id
-        AND a.hosp_code = stock.hosp_code
-        WHERE
-        a.hosp_code = #{hospCode}
-        AND a.is_valid = '1'
-        AND ( stock.num - ifnull( stock.stock_occupy, 0 )/ stock.split_ratio ) > 0
-        <if test="keyword != null and keyword != ''">
-            and (usual_name like concat('%',#{keyword},'%') or usual_pym like concat('%',#{keyword},'%') or usual_wbm like concat('%',#{keyword},'%')
-                or good_name like concat('%',#{keyword},'%') or good_pym like concat('%',#{keyword},'%') or good_wbm like concat('%',#{keyword},'%'))
-        </if>
-	) a
-	LEFT JOIN base_dept b ON a.in_dept_code = b.`code`
-	AND a.hosp_code = b.hosp_code
-	LEFT JOIN base_dept c ON a.out_dept_code = c.`code`
-	AND a.hosp_code = c.hosp_code
-WHERE
-	a.hosp_code = #{hospCode}
-
+            </if>
+            UNION ALL
+            SELECT
+                l.id as itemId,
+                l.`name` as itemName,
+                l.type_code AS itemTypeCode,
+                l.split_price as price,
+                l.split_unit_code as unitCode,
+                l.spec as spec,
+                '' as outDeptCode,
+                '' as inDeptCode,
+                l.hosp_code as hospCode,
+                l.CODE as itemCode,
+                l.use_code as useCode,
+                '2' as typeCode,
+                ( SELECT d.id FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+                ( SELECT d.NAME FROM base_finance_classify d WHERE l.bfc_code = d.CODE AND l.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+                null as bigTypeCode,null as dosage, null dosageUnitCode, null prepCode, b.clf pharId,
+                l.split_unit_code inUnitCode, '2' type, null stockNum, null stockOccupy,null splitNum,
+                (select bp.name from base_product bp where bp.code = l.prod_code and bp.hosp_code = l.hosp_code limit 1) as prodName
+            FROM
+            base_material l
+            left join(select max(if(b.type_code = '1',c.id,'')) xyf, max(if(b.type_code = '2',c.id,'')) zcf,max(if(b.type_code = '3',c.id,'')) cyf,
+                max(if(b.type_code = '4',c.id,'')) clf, max(b.drugstore_code) drugstore_code
+                from base_dept a
+                join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+                join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+                where a.id =#{loginDeptId} and a.hosp_code = #{hospCode}
+                )b on 1 = 1
+            WHERE
+            l.is_valid = '1'
+            AND l.hosp_code = #{hospCode}
+            <if test="keyword != null and keyword != ''">
+                and  (name like concat('%',#{keyword},'%') or pym like concat('%',#{keyword},'%') or wbm like concat('%',#{keyword},'%'))
+            </if>
+            UNION ALL
+            SELECT
+                a.id as itemId,
+                a.good_name AS itemName,
+                a.type_code AS itemTypeCode,
+                CASE
+                WHEN a.in_unit_code = a.unit_code THEN a.price
+                WHEN a.in_unit_code = a.split_unit_code THEN a.split_price
+                END as price,
+                a.split_unit_code as unitCode,
+                a.spec as spec,
+                '' as outDeptCode,
+                '' as inDeptCode,
+                a.hosp_code as hospCode,
+                a.`CODE` as itemCode,
+                a.usage_code as useCode,
+                '1' as typeCode,
+                ( SELECT d.id FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcId,
+                ( SELECT d.NAME FROM base_finance_classify d WHERE a.bfc_code = d.CODE AND a.hosp_code = d.hosp_code LIMIT 1 ) bfcName,
+                a.big_type_code AS bigTypeCode,a.dosage, a.dosage_unit_code dosageUnitCode,a.prep_code prepCode,
+                CASE
+                WHEN a.big_type_code = '2' THEN b.cyf
+                WHEN a.big_type_code = '1' THEN b.zcf
+                WHEN a.big_type_code = '0' or a.big_type_code ='3' THEN b.xyf
+                END pharId,
+                a.in_unit_code as inUnitCode,
+                CASE
+                WHEN a.big_type_code = '2' THEN '3' ELSE '1'
+                END type,
+                stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num as splitNum,
+                (select bp.name from base_product bp where bp.code = a.prod_code and bp.hosp_code = a.hosp_code limit 1) as prodName
+            FROM base_drug a
+            LEFT JOIN (
+                SELECT max(IF( b.type_code = '1', c.id, '0' )) xyf,max(IF( b.type_code = '2', c.id, '0' )) zcf,
+                    max(IF( b.type_code = '3', c.id, '0' )) cyf,max(IF( b.type_code = '4', c.id, '0' )) clf,
+                    max( b.drugstore_code ) drugstore_code
+                FROM base_dept a
+                JOIN base_dept_drugstore b ON a.CODE = b.dept_code AND a.hosp_code = b.hosp_code
+                JOIN base_dept c ON b.drugstore_code = c.CODE AND c.hosp_code = b.hosp_code
+                WHERE a.hosp_code = #{hospCode} AND a.id = #{loginDeptId} AND a.is_valid = '1' ) b ON 1 = 1
+            JOIN stro_stock stock ON ( CASE WHEN a.big_type_code = '2' THEN b.cyf WHEN a.big_type_code = '1' THEN b.zcf
+                WHEN a.big_type_code = '0' or a.big_type_code = '3' THEN b.xyf END) = stock.biz_id
+                AND a.id = stock.item_id AND a.hosp_code = stock.hosp_code
+            WHERE a.hosp_code = #{hospCode} AND a.is_valid = '1' AND ( stock.num - ifnull( stock.stock_occupy, 0 )/ stock.split_ratio ) > 0
+                <if test="keyword != null and keyword != ''">
+                    and (usual_name like concat('%',#{keyword},'%') or usual_pym like concat('%',#{keyword},'%') or usual_wbm like concat('%',#{keyword},'%')
+                    or good_name like concat('%',#{keyword},'%') or good_pym like concat('%',#{keyword},'%') or good_wbm like concat('%',#{keyword},'%'))
+                </if>
+            ) A
+        LEFT JOIN base_dept b ON A.inDeptCode = b.`code`  AND A.hospCode = b.hosp_code
+        LEFT JOIN base_dept c ON A.outDeptCode = c.`code` AND A.hospCode = c.hosp_code
+        WHERE  A.hospCode = #{hospCode}
     </select>
 
     <!--新增所有列-->

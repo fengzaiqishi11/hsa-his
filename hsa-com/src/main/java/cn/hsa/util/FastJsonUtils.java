@@ -8,9 +8,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.springframework.cglib.beans.BeanMap;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * FastJson工具类，为了在代码中序列化和反序列化时应用JSONField注解
@@ -53,6 +51,7 @@ public class FastJsonUtils {
         //JavaBean序列化为json字符串
         return JSONUtil.toBean(toJson(object), Map.class);
     }
+
     /**
      * @Author gory
      * @Description bean 转map

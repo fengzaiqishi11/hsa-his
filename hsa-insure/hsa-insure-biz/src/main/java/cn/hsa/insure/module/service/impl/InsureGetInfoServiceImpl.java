@@ -263,4 +263,18 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
         return WrapperResponse.success(insureGetInfoBO.queryAdmdvs(map));
     }
 
+    @Override
+    public WrapperResponse<PageDTO> queryOutSetlePage(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.queryOutSetlePage(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> insertBatchSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.insertBatchSettleInfo(map));
+    }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> saveBatchSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.saveBatchSettleInfo(map));
+    }
 }

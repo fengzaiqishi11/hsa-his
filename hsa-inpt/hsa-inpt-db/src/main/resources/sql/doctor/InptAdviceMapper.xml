@@ -532,7 +532,7 @@
             stop_time = #{stopTime},
             stop_teach_doctor_id = #{stopTeachDoctorId},
             stop_teach_doctor_name = #{stopTeachDoctorName},
-            is_new_status = null
+            is_new_status = '0'
         where hosp_code = #{hospCode}
         and id in
          <foreach collection="iatIdList" item="item" open="(" separator="," close=")">

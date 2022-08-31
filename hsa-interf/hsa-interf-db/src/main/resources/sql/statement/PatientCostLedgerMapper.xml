@@ -1832,12 +1832,20 @@
             b.dept_id,
             d.name as dept_name,
             b.reality_price,
-            b.total_num AS num
+            b.total_num AS num,
+            (case
+            when b.item_code = '1' then (SELECT name from base_product bp where bp.hosp_code = bd2.hosp_code and bp.code = bd2.prod_code)
+            when b.item_code = '2' then (SELECT name from base_product bp where bp.hosp_code = bm2.hosp_code and bp.code = bm2.prod_code)
+            when b.item_code = '3' then null
+            when b.item_code = '4' then null
+            END ) as prodName -- 生产厂商名称
             FROM
             inpt_cost b join inpt_visit a on a.id = b.visit_id  AND a.hosp_code = b.hosp_code
             left join inpt_settle c  on  b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            left join base_drug bd2 on bd2.id = b.item_id and bd2.hosp_code = b.hosp_code
+            left join base_material bm2 on bm2.id = b.item_id and bm2.hosp_code = b.hosp_code
             WHERE 1=1
             /*开始日期*/
             <if test="startDate != null and startDate != ''">
@@ -1921,11 +1929,19 @@
             b.dept_id,
             d.name as dept_name,
             b.reality_price ,
-            b.total_num AS num
+            b.total_num AS num,
+            (case
+            when b.item_code = '1' then (SELECT name from base_product bp where bp.hosp_code = bd2.hosp_code and bp.code = bd2.prod_code)
+            when b.item_code = '2' then (SELECT name from base_product bp where bp.hosp_code = bm2.hosp_code and bp.code = bm2.prod_code)
+            when b.item_code = '3' then null
+            when b.item_code = '4' then null
+            END ) as prodName -- 生产厂商名称
             FROM outpt_cost b join outpt_visit a  on a.id = b.visit_id AND a.hosp_code = b.hosp_code and b.settle_code = '2'
             left join outpt_settle c  on b.settle_id = c.id AND b.hosp_code = c.hosp_code
             join base_dept d  on  b.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            left join base_drug bd2 on bd2.id = b.item_id and bd2.hosp_code = b.hosp_code
+            left join base_material bm2 on bm2.id = b.item_id and bm2.hosp_code = b.hosp_code
             WHERE 1=1
             /*开始日期*/
             <if test="startDate != null and startDate != ''">
@@ -1989,12 +2005,20 @@
             a.dept_id,
             d.name as dept_name,
             b.reality_price,
-            b.num AS num
+            b.num AS num,
+            (case
+            when b.item_code = '1' then (SELECT name from base_product bp where bp.hosp_code = bd2.hosp_code and bp.code = bd2.prod_code)
+            when b.item_code = '2' then (SELECT name from base_product bp where bp.hosp_code = bm2.hosp_code and bp.code = bm2.prod_code)
+            when b.item_code = '3' then null
+            when b.item_code = '4' then null
+            END ) as prodName -- 生产厂商名称
             FROM
             outpt_register_detail b join outpt_visit a   on  a.id = b.visit_id  AND a.hosp_code = b.hosp_code
             left join outpt_register_settle c on b.register_id = c.register_id  AND b.hosp_code = c.hosp_code and b.status_code = c.status_code
             join base_dept d  on  a.dept_id = d.id AND b.hosp_code = d.hosp_code
             join base_finance_classify e  on  b.bfc_id = e.id AND b.hosp_code = e.hosp_code
+            left join base_drug bd2 on bd2.id = b.item_id and bd2.hosp_code = b.hosp_code
+            left join base_material bm2 on bm2.id = b.item_id and bm2.hosp_code = b.hosp_code
             where 1=1
             /*开始日期*/
             <if test="startDate != null and startDate != ''">
@@ -2055,7 +2079,8 @@
         t.visit_id,
         t.dept_id,
         sum( t.reality_price ) AS reality_price,
-        sum( t.num ) AS num
+        sum( t.num ) AS num,
+        t.prodName -- 生产厂商名称
         from (
         <include refid="MzZyItemPatientSql"/>
         ) t
@@ -6110,7 +6135,8 @@
         SELECT
             id as item_id,
             IFNULL( usual_name, good_name ) AS item_name, code as itemCode,
-            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode,
+            (select name from base_product bp where bp.code = prod_code limit 1) as productName -- 生厂厂商名称
         FROM base_drug
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -6122,7 +6148,8 @@
         SELECT
             id as item_id,
             name as item_name, code as itemCode,
-            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode
+            spec, price, unit_code as unitCode, split_ratio as splitRatio, split_unit_code as splitUnitCode,
+            (select name from base_product bp where bp.code = prod_code limit 1) as productName -- 生厂厂商名称
         FROM base_material
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'
@@ -6133,7 +6160,8 @@
         SELECT
             id as item_id,
             IFNULL( name, other_name ) AS item_name, code as itemCode,
-            spec, price, unit_code as unitCode, '' as splitRatio, '' as splitUnitCode
+            spec, price, unit_code as unitCode, '' as splitRatio, '' as splitUnitCode,
+            null as productName
         FROM base_item
         WHERE hosp_code = #{hospCode}
           AND is_valid = '1'

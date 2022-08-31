@@ -37,7 +37,8 @@
 <!--                        <module>hsa-cron</module>-->
 <!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
         <module>hsa-cron/xxl-job-executor</module>
-<!--        <module>hsa-dynamic</module>-->
+        <module>hsa-medical-payment</module>
+        <!--        <module>hsa-dynamic</module>-->
     </modules>
 
     <!--spring boot默认推荐的组件及版本-->

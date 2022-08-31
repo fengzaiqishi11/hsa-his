@@ -671,35 +671,43 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
 
         //------------- 4.封装参数 调用接口上传 begin --------
         // 封装调用参数
-        Map<String, Object> httpParam = new HashMap<String, Object>();
+        Map<String, Object> httpParam = new LinkedHashMap<>();
         // 必填参数 accessToken
         httpParam.put("accessToken", token);
         // 调医保接口 获得医保返回的库存列表 医保编号为
         Map<String, Object> resultMap = new HashMap<>();
-        String certId = MapUtils.getEmptyErr(map, "certId", "上传人ID不能为空！");
+        String certId = MapUtil.getStr(map, "crteId");
         List<InsureInventoryStockUpdate> listInsureInventoryStockUpdate = MapUtils.getEmptyErr(map, "listInsureInventoryStockUpdate", "未获取到需要上传的数据！");
         if (!ListUtils.isEmpty(listInsureInventoryStockUpdate)) {
             listInsureInventoryStockUpdate = JSONObject.parseArray(JSONObject.toJSONString(listInsureInventoryStockUpdate), InsureInventoryStockUpdate.class);
         }
         List<Map<String, Object>> listMap = new ArrayList<>();
         Map<String, Object> dataMap = null;
-        Map<String, Object> inputData = new HashMap<>();
+        Map<String, Object> inputData = new LinkedHashMap<>();
         for (InsureInventoryStockUpdate insureInventoryStockUpdate : listInsureInventoryStockUpdate) {
-            dataMap = new HashMap<String, Object>();
-            dataMap.put("prodCode", insureInventoryStockUpdate.getInsureItemCode());//,insureInventoryStockUpdate.getMedListCodg())	;//产品唯一编码
-            dataMap.put("invChgType", insureInventoryStockUpdate.getInvChgType());//库存变更类型
+            if(ObjectUtil.isEmpty(insureInventoryStockUpdate.getPric())||
+                    new BigDecimal(insureInventoryStockUpdate.getPric()).doubleValue()<0){
+                throw new AppException("商品价格不能为空或商品价格不能小于0，请核对上传数据"+"，商品编码为【"+insureInventoryStockUpdate.getFixmedinsHilistId()+"】");
+            }
+            if(ObjectUtil.isEmpty(insureInventoryStockUpdate.getCnt())||
+                    new BigDecimal(insureInventoryStockUpdate.getCnt()).doubleValue()<0){
+                throw new AppException("商品数量不能为空或商品数量不能小于0，请核对上传数据"+"，商品编码为【"+insureInventoryStockUpdate.getFixmedinsHilistId()+"】");
+            }
+            dataMap = new LinkedHashMap<>();
+            dataMap.put("prodCode", insureInventoryStockUpdate.getFixmedinsHilistId());//,insureInventoryStockUpdate.getMedListCodg())	;//产品唯一编码
             dataMap.put("fixmedinsHilistId", insureInventoryStockUpdate.getFixmedinsHilistId());//定点医药机构目录编号
             dataMap.put("fixmedinsHilistName", insureInventoryStockUpdate.getFixmedinsHilistName());//定点医药机构目录名称
-            dataMap.put("fixmedinsBchno", insureInventoryStockUpdate.getFixmedinsBchno());//定点医药机构批次流水号
-            dataMap.put("pric", insureInventoryStockUpdate.getPric());//单价
-            dataMap.put("invCnt", insureInventoryStockUpdate.getCnt());//数量
             dataMap.put("rxFlag", insureInventoryStockUpdate.getRxFlag());//处方药标志
             dataMap.put("invdate", insureInventoryStockUpdate.getInvChgTime());//库存变更时间
-            dataMap.put("memo", insureInventoryStockUpdate.getMemo());//备注
+            dataMap.put("manuLotnum",insureInventoryStockUpdate.getFixmedinsBchno());
+            dataMap.put("fixmedinsBchno", insureInventoryStockUpdate.getFixmedinsBchno());//定点医药机构批次流水号
+            dataMap.put("manuDate","");
+            dataMap.put("expyEnd","");
+            dataMap.put("memo", "");//备注
+            dataMap.put("invChgType", insureInventoryStockUpdate.getInvChgType());//库存变更类型
+            dataMap.put("pric",new BigDecimal(insureInventoryStockUpdate.getPric()).doubleValue());//单价
+            dataMap.put("invCnt", new BigDecimal(insureInventoryStockUpdate.getCnt()).doubleValue());//数量
             dataMap.put("trdnFlag", insureInventoryStockUpdate.getTrdnFlag());//拆零标志
-            dataMap.put("manuLotnum","");
-            dataMap.put(" manuDate","");
-            dataMap.put(" expyEnd","");
             listMap.add(dataMap);
         }
         if (listMap.size() > 100){

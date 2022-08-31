@@ -100,4 +100,8 @@ public class BaseAdviceDetailDTO extends BaseAdviceDetailDO implements Serializa
      * 库房名称
      */
     private String strockName;
+    /**
+     * 生产厂商名称
+     */
+    private String prodName;
 }

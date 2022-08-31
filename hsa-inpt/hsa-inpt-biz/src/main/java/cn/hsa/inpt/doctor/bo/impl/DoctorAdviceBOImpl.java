@@ -528,7 +528,7 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
                     throw new AppException(inptAdviceDTO.getItemName() + ":库存不足");
                 }
-                
+
             }
         }
     }
@@ -1811,5 +1811,16 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
 //            resultList.add(adviceZYDTO);
         }
         return resultList;
+    }
+
+    @Override
+    public void checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO) {
+            if (ListUtils.isEmpty(medicalAdviceDTO.getIds())){
+            throw new RuntimeException("未获取到相关医嘱信息");
+            }
+            List<InptAdviceDTO>  list =  inptAdviceDAO.checkFirstAndSecoundIsSame(medicalAdviceDTO);
+            if (!ListUtils.isEmpty(list)){
+              throw new RuntimeException("【核收人】与【核对人】不能相同，请检查!");
+            }
     }
 }

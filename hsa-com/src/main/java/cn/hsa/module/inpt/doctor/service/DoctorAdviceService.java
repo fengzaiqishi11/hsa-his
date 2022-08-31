@@ -272,4 +272,6 @@ public interface DoctorAdviceService {
      **/
     @GetMapping("/service/inpt/doctorAdviceController/getCFAdviceByVisitId")
     WrapperResponse<List<InptAdviceDTO>> getCFAdviceByVisitId(Map map);
+
+    void checkFirstAndSecoundIsSame(Map<String, Object> map);
 }

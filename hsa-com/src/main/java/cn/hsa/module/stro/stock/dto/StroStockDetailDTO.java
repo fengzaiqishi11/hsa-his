@@ -123,4 +123,24 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
     private String sfdeptFilter;
     private String nationCode;
     private String nationName;
+    /**
+     * 总库存数
+     */
+    private BigDecimal totalNum;
+    /**
+     * 总库存拆零数量
+     */
+    private BigDecimal totalSplitNum;
+    /**
+     * 失效数量
+     */
+    private BigDecimal expiryNum;
+
+    /**
+     * 失效拆零数量
+     */
+    private BigDecimal expirySplitNum;
+
+    private BigDecimal stock_occupy;
+
 }

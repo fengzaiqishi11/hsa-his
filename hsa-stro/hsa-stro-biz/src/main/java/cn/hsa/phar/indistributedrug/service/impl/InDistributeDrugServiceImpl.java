@@ -10,6 +10,7 @@ import cn.hsa.module.phar.pharindistributedrug.bo.InDistributeDrugBO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharindistributedrug.service.InDistributeDrugService;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -115,7 +116,7 @@ public class InDistributeDrugServiceImpl extends HsafService implements InDistri
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
-    public WrapperResponse<Boolean> inDispense(Map map) {
+    public WrapperResponse<List<StroStockDetailDTO>> inDispense(Map map) {
         return WrapperResponse.success(inDistributeDrugBO.updateInDispense(MapUtils.get(map,"pharInReceiveDTO")));
     }
 

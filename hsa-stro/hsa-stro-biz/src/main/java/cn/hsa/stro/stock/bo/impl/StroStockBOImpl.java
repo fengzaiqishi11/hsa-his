@@ -1748,5 +1748,35 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         PageDTO pageDTO = PageDTO.of(list);
         return pageDTO;
     }
+    /**
+     * @Author gory
+     * @Description 查询出过期 或者库存不足的药
+     * @Date 2022/8/31 16:38
+     * @Param [stringObjectMap]
+     **/
+    @Override
+    public List<StroStockDetailDTO> getStroStockDetailIfNumShortage(Map map) {
+        if(MapUtils.isEmpty(map)) {
+            throw new AppException("参数为空");
+        }
+        //校验参数
+        if(cn.hsa.util.StringUtils.isEmpty(MapUtils.getString(map, "itemId"))) {
+            throw new AppException("项目ID不能为空");
+        }
+        if(cn.hsa.util.StringUtils.isEmpty(MapUtils.getString(map, "itemCode"))) {
+            throw new AppException("项目编码不能为空");
+        }
+        if(cn.hsa.util.StringUtils.isEmpty(MapUtils.getString(map, "bizId"))) {
+            throw new AppException("库房ID不能为空");
+        }
+        if(cn.hsa.util.StringUtils.isEmpty(MapUtils.getString(map, "hospCode"))) {
+            throw new AppException("医院编码不能为空");
+        }
+        if(cn.hsa.util.StringUtils.isEmpty(MapUtils.getString(map, "stockNum"))) {
+            throw new AppException("数量不能为空");
+        }
+
+        return stroStockDao.getStroStockDetailIfNumShortage(map);
+    }
 
 }

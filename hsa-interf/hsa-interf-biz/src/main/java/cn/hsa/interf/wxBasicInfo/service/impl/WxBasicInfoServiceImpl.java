@@ -543,8 +543,8 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
      * @param map
      */
     @Override
-    public WrapperResponse<String> hsjcApply(Map<String, Object> map) {
-        return  wxBasicInfoBO.hsjcApply(map);
+    public WrapperResponse<String> saveHsjcApply(Map<String, Object> map) {
+        return  wxBasicInfoBO.saveHsjcApply(map);
     }
 
     @Override

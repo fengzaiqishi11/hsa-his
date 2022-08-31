@@ -447,7 +447,7 @@ public interface WxBasicInfoService  {
      * 核酸检验申请
      */
     @PostMapping("/service/interf/wxBasicInfo/hsjcApply")
-    WrapperResponse<String> hsjcApply(Map<String, Object> map);
+    WrapperResponse<String> saveHsjcApply(Map<String, Object> map);
     @PostMapping("/service/interf/wxBasicInfo/queryBaseDisease")
     WrapperResponse<String> queryBaseDisease(Map<String, Object> map);
 }

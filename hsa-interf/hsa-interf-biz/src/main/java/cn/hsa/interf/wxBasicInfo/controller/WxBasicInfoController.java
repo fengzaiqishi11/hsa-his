@@ -1102,7 +1102,7 @@ public class WxBasicInfoController {
      * 核酸检验申请
      */
     @PostMapping("/hsjcApply")
-    public WrapperResponse<String> hsjcApply(@RequestBody Map<String, Object> paramMap) {
+    public WrapperResponse<String> saveHsjcApply(@RequestBody Map<String, Object> paramMap) {
         String hospCode = MapUtils.get(paramMap, "hospCode");
         if (StringUtils.isEmpty(hospCode)) {
             throw new AppException("入参错误，请传入医院编码！");
@@ -1121,7 +1121,7 @@ public class WxBasicInfoController {
         if (StringUtils.isNotEmpty(data)) {
             map.put("data", JSON.parse(data));
         }
-        return wxBasicInfoService_consumer.hsjcApply(map);
+        return wxBasicInfoService_consumer.saveHsjcApply(map);
     }
 
 }

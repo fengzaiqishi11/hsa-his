@@ -274,4 +274,26 @@ public class MedicalAdviceController extends BaseController {
 
         return medicalAdviceService_consumer.updateAdviceInChecked(map);
     }
+
+
+    /**
+     * @Method: getMedicalAdvices
+     * @Description: 根据条件查询医嘱列表
+     * @Param: [medicalAdviceDTO]
+     * @Author: youxianlin
+     * @Email: 254580179@qq.com
+     * @Date: 2020/9/24 16:23
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @GetMapping(value = "/getMedicalAdvicesNew")
+    public WrapperResponse<PageDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
+        medicalAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("medicalAdviceDTO", medicalAdviceDTO);
+        return medicalAdviceService_consumer.getMedicalAdvicesNew(map);
+    }
+
 }

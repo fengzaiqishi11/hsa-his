@@ -558,4 +558,9 @@
     <select id="queryBaseFinanceClassify" resultType="cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO">
         select id,code,name from base_finance_classify  where is_valid ='1'
     </select>
+
+    <select id="getBaseAdviceByCode" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
+        select id,code,name from base_advice  where is_valid ='1' and hosp_code =#{hospCode} and code =#{code}
+    </select>
+
 </mapper>

@@ -71,4 +71,6 @@ public interface MedicalAdviceBO {
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     Boolean updateAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
+
+    PageDTO getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO);
 }

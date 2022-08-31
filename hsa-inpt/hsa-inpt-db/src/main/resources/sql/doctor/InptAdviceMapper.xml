@@ -1571,8 +1571,9 @@
         teach_doctor_name = #{teachDoctorName},
         submit_id = #{submitId},
         submit_name = #{submitName},
-        submit_time = now()
-         where hosp_code = #{hospCode}
+        submit_time = now(),
+        is_new_status = '0'
+        where hosp_code = #{hospCode}
         and find_in_set(id,#{ids}) and ifnull(is_submit, '0') = '0'
     </update>
 
@@ -2577,4 +2578,57 @@
             </foreach>
 
     </update>
+
+    <!--获取未核收医嘱列表-->
+    <select id="getMedicalAdvicesNew" resultType="cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO">
+        select a.id,a.visit_id visitId, a.baby_id babyId,a.type_code typeCode,a.group_no groupNo,b.name visitName,b.age visitAge,
+        b.gender_code visitSex,b.cert_no visitCardNo,a.spec,a.dosage,a.dosage_unit_code as dosageUnitCode,a.num,a.unit_code as unitCode,a.crte_name as crteName,a.use_code useCode,a.stop_time AS stopTime,a.end_exec_num AS endExecNum,
+        a.usage_code usageCode,a.rate_id rateId,a.use_days useDays,a.remark,
+        a.total_num totalNum,a.total_num_unit_code totalNumUnitCode,a.speed_code speedCode,a.is_long isLong,a.is_stop isStop,a.is_reject isReject,a.is_check isCheck,
+        a.price,a.total_price totalPrice,a.long_start_time longStartTime,a.content content,a.start_exec_num startExecNum,
+        IF(
+        a.baby_id ,
+        CONCAT(ib.name, '/', (ifnull((case ib.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
+        concat(b.NAME,'/', (ifnull((case b.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')),'/', b.age,(ifnull((case b.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end), '岁' )))
+        ) as visitInfo,
+        (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
+        (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
+        (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
+        (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then bm.nation_code else '' end) as nation_code,
+        (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name,
+        ifnull(a.is_new_status,'1') as isNewStatus,
+        a.check_name as checkName,
+        a.check_second_name  as checkSecondName,
+        a.stop_doctor_name as stopDoctorName,
+        a.stop_check_name  as stopCheckName,
+        a.stop_check_second_name  as stopCheckSecondName
+        from inpt_advice a join inpt_visit b on a.visit_id=b.id and a.hosp_code = b.hosp_code
+        left join base_drug c on a.item_id=c.id and a.item_code='1' and c.hosp_code=a.hosp_code
+        left join base_material bm on a.item_id=bm.id and a.item_code='2' and bm.hosp_code=a.hosp_code
+        left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
+        where a.is_submit='1' and a.hosp_code=#{hospCode}
+        <!--核收拒绝的不用查出来-->
+        <if test="isNewStatus!=null and isNewStatus!='' and isNewStatus!='3'">
+            and a.is_new_status=#{isNewStatus}
+        </if>
+        <if test="isLong!=null and isLong!=2">
+            and a.is_long=#{isLong}
+        </if>
+        <if test="isStop!=null and isStop!=2">
+            and a.is_stop=#{isStop}
+        </if>
+        <if test="deptId!=null and deptId!=''">
+            and a.dept_id=#{deptId}
+        </if>
+        <if test="visitId!=null and visitId!=''">
+            and b.id=#{visitId}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and ( b.NAME LIKE CONCAT( '%', #{keyword}, '%' )
+            OR b.bed_name LIKE CONCAT( '%', #{keyword}, '%' ))
+        </if>
+        order by a.crte_time, a.visit_id, a.baby_id, group_no, group_seq_no asc, a.long_start_time desc
+    </select>
+
+
 </mapper>

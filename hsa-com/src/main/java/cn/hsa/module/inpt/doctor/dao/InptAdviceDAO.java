@@ -920,4 +920,6 @@ public interface InptAdviceDAO {
 
     void updateNewAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
     void updateStopAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
+
+    List<MedicalAdviceDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO);
 }

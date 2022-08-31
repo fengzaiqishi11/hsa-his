@@ -5,6 +5,7 @@ import cn.hsa.base.TreeMenuNode;
 import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.base.bfc.entity.BaseFinanceClassifyDO;
@@ -1376,7 +1377,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         outptVisitDTO.setRemark(outptVisitDTO.getSourceTjRemark()); // 病人来源途径备注
         outptVisitDTO.setPym(PinYinUtils.toFirstPY(outptProfileFileDTO.getName())); // 拼音码
         outptVisitDTO.setWbm(WuBiUtils.getWBCode(outptProfileFileDTO.getName())); // 五笔码
-        outptVisitDTO.setIsVisit(Constants.SF.F); // 是否就诊，0否
+        outptVisitDTO.setIsVisit(Constants.SF.S); // 是否就诊，0否
         outptVisitDTO.setIsFirstVisit(Constants.SF.F); // 是否复诊，0否
         outptVisitDTO.setCrteId(MapUtils.get(data, "crteId"));
         outptVisitDTO.setCrteName(MapUtils.get(data, "crteName"));
@@ -2692,7 +2693,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
     }
 
     @Override
-    public WrapperResponse<String> hsjcApply(Map<String, Object> map) {
+    public WrapperResponse<String> saveHsjcApply(Map<String, Object> map) {
 
         String hospCode = MapUtils.get(map, "hospCode");
         if (StringUtils.isEmpty(hospCode)){
@@ -2702,7 +2703,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         if (data == null) {
             return WrapperResponse.error(500, "核算申请入参不能为空", null);
         }
-
+        data.put("hospCode",hospCode);
         String profileId = MapUtils.get(data, "profileId");
         if (StringUtils.isEmpty(profileId)){
             return WrapperResponse.error(500, "请传入就诊人档案id标识", null);
@@ -2747,6 +2748,25 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
             return WrapperResponse.error(500, "请先维护系统参数【HSJC_DC】", null);
         }
 
+        //判断当前档案下  是否当天存在有效的核算申请
+        int num =   wxOutptDAO.getHsjcsqByApplyTime(data);
+        if (num >= Integer.valueOf(hsjcNum.getValue())){
+            return WrapperResponse.error(500, "核酸检测申请已超过限额数量【"+hsjcNum.getValue()+"】,不能预约！", null);
+        }
+
+        //判断当前档案下  是否当天存在有效的核算申请
+        Date  startTime =  DateUtils.parse(applyTime+" "+hsjcStart.getValue()+":00",DateUtils.Y_M_DH_M_S);
+        Date  endTime =  DateUtils.parse(applyTime+" "+hsjcEnd.getValue()+":00",DateUtils.Y_M_DH_M_S);
+
+        if (!DateUtils.betweenDate(startTime,endTime)){
+            return WrapperResponse.error(500, "核酸检测申请已超过【"+hsjcStart.getValue()+"-"+hsjcEnd.getValue()+"】,不能预约！", null);
+        }
+
+        //判断当前档案下  是否当天存在有效的核算申请
+        OutptVisitDTO outptVisitDTO =   wxOutptDAO.getHsjcsqByProfileId(data);
+        if (outptVisitDTO != null){
+            return WrapperResponse.error(500, "您今天已经预约过核酸检测申请,不能重复预约！", null);
+        }
 
         //票据规则生成【挂号单号】
         String registerNo = this.getOrderNo(hospCode, "100");
@@ -2763,10 +2783,10 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         OutptRegisterDTO outptRegisterDTO = this.handeleOutptRegisterData(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ);
 
         // 生成就诊表数据
-        OutptVisitDTO outptVisitDTO = this.handeleOutptVisit(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ);
+        outptVisitDTO = this.handeleOutptVisit(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ);
 
 
-        List<OutptPrescribeDTO> outptPrescribeDTOS = this.buildOutptPrescribeDTO(data, outptProfileFileDTO, hospCode,Constants.LYTJ.HSSQ, parameterMaps);
+        OutptPrescribeDTO outptPrescribeDTO = this.buildOutptPrescribeDTO(data, outptProfileFileDTO, outptVisitDTO,Constants.LYTJ.HSSQ, parameterMaps);
 
 
         //生成开处方数据
@@ -2775,6 +2795,7 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put("outptRegisterDTO",outptRegisterDTO);
         resultMap.put("outptVisitDTO",outptVisitDTO);
+        resultMap.put("outptPrescribeDTO",outptPrescribeDTO);
 
         log.debug("微信小程序【查询所有疾病信息】返参加密前：" + JSON.toJSONString(resultMap));
         String res = null;
@@ -2788,51 +2809,119 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         return WrapperResponse.success(res);
     }
 
-    private List<OutptPrescribeDTO> buildOutptPrescribeDTO(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, String hospCode, String hssq,Map<String, SysParameterDTO> parameterMaps) {
+    private OutptPrescribeDTO buildOutptPrescribeDTO(Map<String, Object> data, OutptProfileFileDTO outptProfileFileDTO, OutptVisitDTO outptVisitDTO, String hssq,Map<String, SysParameterDTO> parameterMaps) {
         // "HSJC_NUM","HSJC_START","HSJC_END","HSJC_HC","HSJC_DC"
-        List<OutptPrescribeDTO> outptPrescribeDTOS = new ArrayList<>();
-
-        for (OutptPrescribeDTO outptPrescribeDTO : outptPrescribeDTOS) {
-            outptPrescribeDTO.setId("");//主键
-            outptPrescribeDTO.setHospCode("");//	医院编码
-            outptPrescribeDTO.setVisitId("");//	就诊ID
-            outptPrescribeDTO.setDiagnoseIds("");//	诊断ID集合（多个用逗号分开）
-            outptPrescribeDTO.setTcmDiseaseId("");//		中医诊断id
-            outptPrescribeDTO.setTcmDiseaseName("");//		中医诊断名称
-            outptPrescribeDTO.setTcmSyndromesId("");//		中医证候id
-            outptPrescribeDTO.setTcmSyndromesName("");//		中医证候名称
-            outptPrescribeDTO.setOrderNo("");//	处方单号
-            outptPrescribeDTO.setDoctorId("");//		开方医生ID
-            outptPrescribeDTO.setDoctorName("");//		开方医生名称
-            outptPrescribeDTO.setDeptId("");//		开方科室ID
-            outptPrescribeDTO.setDeptName("");//		开方科室名称
-            outptPrescribeDTO.setTypeCode("");//		处方类别代码（CFLB）
-            outptPrescribeDTO.setPrescribeTypeCode("");//	处方类型代码（CFLX）
-            outptPrescribeDTO.setSettleId("");//	结算ID
-            outptPrescribeDTO.setRemark("");//		备注
-            outptPrescribeDTO.setIsSettle("");//		是否结算（SF）
-            outptPrescribeDTO.setIsCancel("");//	是否作废（SF）
-            outptPrescribeDTO.setIsPrint("");//			是否打印（SF）
-            outptPrescribeDTO.setIsHerbHospital("");//		中草药是否本院煎药（SF）(执行次数)
+            OutptPrescribeDTO outptPrescribeDTO = new OutptPrescribeDTO();
+            outptPrescribeDTO.setId(SnowflakeUtils.getId());//主键
+            outptPrescribeDTO.setHospCode(outptVisitDTO.getHospCode());//	医院编码
+            outptPrescribeDTO.setVisitId(outptVisitDTO.getVisitId());//	就诊ID
+            //outptPrescribeDTO.setDiagnoseIds("");//	诊断ID集合（多个用逗号分开）
+            //outptPrescribeDTO.setTcmDiseaseId("");//		中医诊断id
+            //outptPrescribeDTO.setTcmDiseaseName("");//		中医诊断名称
+            //outptPrescribeDTO.setTcmSyndromesId("");//		中医证候id
+            //outptPrescribeDTO.setTcmSyndromesName("");//		中医证候名称
+            outptPrescribeDTO.setOrderNo(this.getOrderNo(outptPrescribeDTO.getHospCode(), Constants.ORDERRULE.CFDH));//	处方单号
+            outptPrescribeDTO.setDoctorId("WX");//		开方医生ID
+            outptPrescribeDTO.setDoctorName("微信核酸检测");//		开方医生名称
+            outptPrescribeDTO.setDeptId("WX");//		开方科室ID
+            outptPrescribeDTO.setDeptName("微信核酸检测");//		开方科室名称
+            outptPrescribeDTO.setTypeCode(Constants.CFLB.LIS);//		处方类别代码（CFLB）
+            outptPrescribeDTO.setPrescribeTypeCode(Constants.CFLX.PT);//	处方类型代码（CFLX）
+            //outptPrescribeDTO.setSettleId("");//	结算ID
+            outptPrescribeDTO.setRemark("核酸检测申请");//		备注
+            outptPrescribeDTO.setIsSettle(Constants.SF.F);//		是否结算（SF）
+            outptPrescribeDTO.setIsCancel(Constants.SF.F);//	是否作废（SF）
+            outptPrescribeDTO.setIsPrint(Constants.SF.F);//			是否打印（SF）
+            //outptPrescribeDTO.setIsHerbHospital("");//		中草药是否本院煎药（SF）(执行次数)
             outptPrescribeDTO.setHerbNum(new BigDecimal(0));//		中草药付（剂）数 (天数)
-            outptPrescribeDTO.setHerbUseCode("");//	中草药用法（ZYYF）
-            outptPrescribeDTO.setWeight(new BigDecimal(0));//	体重（儿科）
-            outptPrescribeDTO.setAgentName("");//	代办人姓名（精麻）
-            outptPrescribeDTO.setAgentCertNo("");//		代办人身份编号（精麻）
-            outptPrescribeDTO.setCancelId("");//		作废人ID
-            outptPrescribeDTO.setCancelName("");//		作废人
-            outptPrescribeDTO.setCancelDate(new Date());//		作废时间
-            outptPrescribeDTO.setCancelReason("");//	作废原因
-            outptPrescribeDTO.setCrteId("");//	创建人ID
-            outptPrescribeDTO.setCrteName("");//创建人姓名
+            //outptPrescribeDTO.setHerbUseCode("");//	中草药用法（ZYYF）
+            //outptPrescribeDTO.setWeight(new BigDecimal(0));//	体重（儿科）
+            //outptPrescribeDTO.setAgentName("");//	代办人姓名（精麻）
+            //outptPrescribeDTO.setAgentCertNo("");//		代办人身份编号（精麻）
+            //outptPrescribeDTO.setCancelId("");//		作废人ID
+            //outptPrescribeDTO.setCancelName("");//		作废人
+            //outptPrescribeDTO.setCancelDate(new Date());//		作废时间
+            //outptPrescribeDTO.setCancelReason("");//	作废原因
+            outptPrescribeDTO.setCrteId("-1");//	创建人ID
+            outptPrescribeDTO.setCrteName("微信");//创建人姓名
             outptPrescribeDTO.setCrteTime(new Date());//		创建时间（开方日期）
-            outptPrescribeDTO.setIsSubmit("");//		是否提交
-            outptPrescribeDTO.setSubmitId("");//		提交人ID
-            outptPrescribeDTO.setSubmitName("");//	提交人
+            outptPrescribeDTO.setIsSubmit(Constants.SF.S);//		是否提交
+            outptPrescribeDTO.setSubmitId("-1");//		提交人ID
+            outptPrescribeDTO.setSubmitName("微信");//	提交人
             outptPrescribeDTO.setSubmitTime(new Date());//	提交时间
-        }
 
-        return outptPrescribeDTOS;
+            // 0单采，1混采（这里维护的必须是医嘱目录，因为核酸检测的属于lis项目）
+            String applyType = MapUtils.get(data,"applyType");
+            String code ="";
+            if("0".equals(applyType)){
+                SysParameterDTO sysParameterDTO = parameterMaps.get("HSJC_DC");
+                code = sysParameterDTO.getValue();
+            }else{
+                SysParameterDTO sysParameterDTO = parameterMaps.get("HSJC_HC");
+                code = sysParameterDTO.getValue();
+            }
+            data.put("code",code);
+            BaseAdviceDTO baseAdviceDTO = wxBaseoDAO.getBaseAdviceByCode(data);
+            if(baseAdviceDTO == null){
+                throw new AppException("未获取到核酸检测检查项目！");
+            }
+
+            if(Constants.SF.F.equals(baseAdviceDTO.getIsValid())){
+                throw new AppException("【"+baseAdviceDTO.getName()+"】项目为无效不可用");
+            }
+
+            OutptPrescribeDetailsDTO outptPrescribeDetailsDTO = new OutptPrescribeDetailsDTO();
+            //outptPrescribeDetailsDTO
+//        outptPrescribeDetailsDTO.setid() ;  //主键
+//        outptPrescribeDetailsDTO.sethosp_code()  ;  //医院编码
+//        outptPrescribeDetailsDTO.setop_id()  ;  //处方ID
+//        outptPrescribeDetailsDTO.setvisit_id()  ;  //就诊ID
+//        outptPrescribeDetailsDTO.setopt_id()  ;  //处方模板ID
+//        outptPrescribeDetailsDTO.setoptd_group_no()  ;  //处方模板内组号
+//        outptPrescribeDetailsDTO.setoptd_group_seq_no()  ;  //处方模板组内序号
+//        outptPrescribeDetailsDTO.setoptd_id()  ;  //处方模板明细ID
+//        outptPrescribeDetailsDTO.setgroup_no()  ;  //处方组号
+//        outptPrescribeDetailsDTO.setgroup_seq_no()  ;  //处方组内序号
+//        outptPrescribeDetailsDTO.setitem_code()  ;  //项目类型代码（XMLB）
+//        outptPrescribeDetailsDTO.setitem_id()  ;  //项目ID（药品、项目、材料、医嘱目录）
+//        outptPrescribeDetailsDTO.setitem_name()  ;  //
+//        outptPrescribeDetailsDTO.setprice()  ;  //单价
+//        outptPrescribeDetailsDTO.settotal_price()  ;  //总金额
+//        outptPrescribeDetailsDTO.setspec()  ;  //规格
+//        outptPrescribeDetailsDTO.setprep_code()  ;  //剂型代码（JXFL）
+//        outptPrescribeDetailsDTO.setdosage()  ;  //剂量
+//        outptPrescribeDetailsDTO.setdosage_unit_code()  ;  //剂量单位代码（JLDW）
+//        outptPrescribeDetailsDTO.setusage_code()  ;  //用法代码（YF）
+//        outptPrescribeDetailsDTO.setrate_id()  ;  //频率ID
+//        outptPrescribeDetailsDTO.setspeed_code()  ;  //速度代码（SD）
+//        outptPrescribeDetailsDTO.setuse_days()  ;  //用药天数
+//        outptPrescribeDetailsDTO.setnum()  ;  //数量
+//        outptPrescribeDetailsDTO.setnum_unit_code()  ;  //数量单位（DW）
+//        outptPrescribeDetailsDTO.settotal_num()  ;  //总数量（数量*频率*用药天数）
+//        outptPrescribeDetailsDTO.setherb_note_code()  ;  //中草药脚注代码（ZYJZ）（中药调剂方法）
+//        outptPrescribeDetailsDTO.setis_skin()  ;  //是否皮试（SF）
+//        outptPrescribeDetailsDTO.setis_positive()  ;  //是否阳性（SF）
+//        outptPrescribeDetailsDTO.setcontent()  ;  //处方内容
+//        outptPrescribeDetailsDTO.setphar_id()  ;  //领药药房ID
+//        outptPrescribeDetailsDTO.setbfc_id()  ;  //财务分类ID
+//        outptPrescribeDetailsDTO.setuse_code()  ;  //用药性质代码（YYXZ）
+//        outptPrescribeDetailsDTO.setexec_dept_id()  ;  //执行科室ID
+//        outptPrescribeDetailsDTO.setexec_date()  ;  //执行时间
+//        outptPrescribeDetailsDTO.setexec_id()  ;  //执行人ID
+//        outptPrescribeDetailsDTO.setexec_name()  ;  //执行人姓名
+//        outptPrescribeDetailsDTO.setexec_num()  ;  //本院执行次数
+//        outptPrescribeDetailsDTO.settechnology_no()  ;  //医技申请单号
+//        outptPrescribeDetailsDTO.setskin_durg_id()  ;  //皮试药品ID
+//        outptPrescribeDetailsDTO.setskin_phar_id()  ;  //皮试药品药房ID
+//        outptPrescribeDetailsDTO.setskin_unit_code()  ;  //皮试药品单位代码（DW）
+//        outptPrescribeDetailsDTO.setprescribe_prefix()  ;  //处方前缀
+//        outptPrescribeDetailsDTO.setprescribe_suffix()  ;  //处方后缀
+//        outptPrescribeDetailsDTO.setremark()  ;  //备注
+//        decoction_method()  ;  //煎药方式
+
+
+
+        return outptPrescribeDTO;
     }
 
     //计算费用总金额，封装返回参数

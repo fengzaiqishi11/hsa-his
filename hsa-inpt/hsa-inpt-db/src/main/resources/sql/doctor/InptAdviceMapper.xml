@@ -2544,15 +2544,20 @@
         update
             inpt_advice a
         set
-            a.is_new_status = #{isNewStatus},
-            <if test="isNewStatus != '1' or isNewStatus != '4'">
+            <if test="isNewStatus == '2'.toString() or isNewStatus == '3'.toString() ">
             a.check_id = #{checkId} ,
             a.check_name = #{checkName},
             a.check_time = #{checkTime},
+            a.check_second_id = null,
+            a.check_second_name = null,
+            a.check_second_time = null,
             </if>
+            <if test="isNewStatus == '1'.toString() or isNewStatus == '4'.toString() ">
             a.check_second_id = #{checkSecondId} ,
             a.check_second_name = #{checkSecondName},
-            a.check_second_time = #{checkSecondTime}
+            a.check_second_time = #{checkSecondTime},
+            </if>
+            a.is_new_status = #{isNewStatus}
         where a.id in
             <foreach collection="kzIds" item="id" open="(" close=")" separator=",">
                 #{id}
@@ -2563,15 +2568,20 @@
         update
             inpt_advice a
         set
-            a.is_new_status = #{isNewStatus},
-            <if test="isNewStatus != '1' or isNewStatus != '4'">
+            <if test="isNewStatus == '2'.toString()  or isNewStatus == '3'.toString() ">
                 a.stop_check_id =#{stopCheckId},
                 a.stop_check_name =#{stopCheckName},
                 a.stop_check_time =#{stopCheckTime},
+                a.stop_check_second_id = null,
+                a.stop_check_second_name = null,
+                a.stop_check_second_time = null,
             </if>
-            a.stop_check_second_id =#{stopCheckSecondId},
-            a.stop_check_second_name =#{stopCheckSecondName},
-            a.stop_check_second_time =#{stopCheckSecondTime}
+            <if test="isNewStatus == '1'.toString()  or isNewStatus == '4'.toString() ">
+                a.stop_check_second_id =#{stopCheckSecondId},
+                a.stop_check_second_name =#{stopCheckSecondName},
+                a.stop_check_second_time =#{stopCheckSecondTime},
+            </if>
+            a.is_new_status = #{isNewStatus}
         where a.id in
             <foreach collection="stopIds" item="id" open="(" close=")" separator=",">
                     #{id}
@@ -2629,6 +2639,20 @@
             OR b.bed_name LIKE CONCAT( '%', #{keyword}, '%' ))
         </if>
         order by a.crte_time, a.visit_id, a.baby_id, group_no, group_seq_no asc, a.long_start_time desc
+    </select>
+
+    <select id="checkFirstAndSecoundIsSame" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+            *
+        from
+            inpt_advice ia
+        where
+            id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+            and ((check_id = #{checkSecondId})
+            or (stop_check_id = #{stopCheckSecondId}))
     </select>
 
 

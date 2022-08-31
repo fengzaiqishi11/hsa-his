@@ -922,4 +922,6 @@ public interface InptAdviceDAO {
     void updateStopAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO);
 
     List<MedicalAdviceDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO);
+
+    List<InptAdviceDTO> checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO);
 }

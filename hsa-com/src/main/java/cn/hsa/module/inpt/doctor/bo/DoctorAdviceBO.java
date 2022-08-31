@@ -3,6 +3,7 @@ package cn.hsa.module.inpt.doctor.bo;
 import cn.hsa.base.PageDTO;
 import cn.hsa.module.center.message.dto.MessageInfoDTO;
 import cn.hsa.module.inpt.doctor.dto.*;
+import cn.hsa.module.inpt.medical.dto.MedicalAdviceDTO;
 import cn.hsa.module.insure.module.dto.InsureItemMatchDTO;
 
 import java.util.List;
@@ -248,4 +249,6 @@ public interface DoctorAdviceBO {
      * @Return:
      **/
     List<InptAdviceDTO> getCFAdviceByVisitId(InptVisitDTO inptVisitDTO);
+
+    void checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO);
 }

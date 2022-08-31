@@ -73,4 +73,5 @@ public class InsureIndividualSettleDTO extends InsureIndividualSettleDO implemen
         private BigDecimal totalAdvance; // 预交金
         private BigDecimal settleTakePrice; // 结算补收
         private BigDecimal settleBackPrice; // 结算退款
+        private BigDecimal insuplcAdmdvs; // 参保地区划
 }

@@ -2607,6 +2607,7 @@
         left join base_material bm on a.item_id=bm.id and a.item_code='2' and bm.hosp_code=a.hosp_code
         left join inpt_baby ib on a.baby_id = ib.id and a.hosp_code = ib.hosp_code
         where a.is_submit='1' and a.hosp_code=#{hospCode}
+        and b.status_code='2'
         <!--核收拒绝的不用查出来-->
         <if test="isNewStatus!=null and isNewStatus!='' and isNewStatus!='3'">
             and a.is_new_status=#{isNewStatus}

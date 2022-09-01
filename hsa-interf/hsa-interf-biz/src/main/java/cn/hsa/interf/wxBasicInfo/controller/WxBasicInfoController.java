@@ -1071,4 +1071,57 @@ public class WxBasicInfoController {
         return wxBasicInfoService_consumer.querySevenQueueDoctor(map);
     }
 
+
+    /**
+     * 基础信息疾病查询
+     */
+    @PostMapping("/queryBaseDisease")
+    public WrapperResponse<String> queryBaseDisease(@RequestBody Map<String, Object> paramMap) {
+        String hospCode = MapUtils.get(paramMap, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("入参错误，请传入医院编码！");
+        }
+
+        String data = null;
+        try {
+            log.debug("微信小程序【基础信息疾病查询】入参解密前：" + MapUtils.get(paramMap, "data"));
+            data = AsymmetricEncryption.pubdecrypt(MapUtils.get(paramMap, "data"));
+            log.debug("微信小程序【基础信息疾病查询】入参解密后：" + JSON.parse(data));
+        } catch (Exception e) {
+            throw new AppException("【基础信息疾病查询】入参错误，请联系管理员！" + e.getMessage());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        if (StringUtils.isNotEmpty(data)) {
+            map.put("data", JSON.parse(data));
+        }
+        return wxBasicInfoService_consumer.queryBaseDisease(map);
+    }
+
+    /**
+     * 核酸检验申请
+     */
+    @PostMapping("/hsjcApply")
+    public WrapperResponse<String> saveHsjcApply(@RequestBody Map<String, Object> paramMap) {
+        String hospCode = MapUtils.get(paramMap, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("入参错误，请传入医院编码！");
+        }
+
+        String data = null;
+        try {
+            log.debug("微信小程序【核酸检验申请】入参解密前：" + MapUtils.get(paramMap, "data"));
+            data = AsymmetricEncryption.pubdecrypt(MapUtils.get(paramMap, "data"));
+            log.debug("微信小程序【核酸检验申请】入参解密后：" + JSON.parse(data));
+        } catch (Exception e) {
+            throw new AppException("【核酸检验申请】入参错误，请联系管理员！" + e.getMessage());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        if (StringUtils.isNotEmpty(data)) {
+            map.put("data", JSON.parse(data));
+        }
+        return wxBasicInfoService_consumer.saveHsjcApply(map);
+    }
+
 }

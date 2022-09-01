@@ -12,6 +12,7 @@ import cn.hsa.module.emr.emrpatientrecord.dto.EmrPatientRecordDTO;
 import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
@@ -408,4 +409,22 @@ public interface EmrPatientDAO {
 	 * @Return
 	 */
 	String getConsultationId(EmrPatientDTO emrPatientDTO);
+
+	/**
+	 * 根据模板ID获取模板信息
+	 * @param selectMap
+	 * @Author 医保开发二部-湛康
+	 * @Date 2022-08-18 15:12
+	 * @return java.util.Map<java.lang.String,java.lang.Object>
+	 */
+  Map<String,Object> queryHisEmrClassifyInfo(Map<String, String> selectMap);
+
+  /**
+   * 查找医保就诊信息
+   * @param selectMap
+   * @Author 医保开发二部-湛康
+   * @Date 2022-08-23 17:27
+   * @return java.util.List<cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO>
+   */
+  InsureEmrUnifiedDTO queryInsureVisitEmrInfo(Map<String, String> selectMap);
 }

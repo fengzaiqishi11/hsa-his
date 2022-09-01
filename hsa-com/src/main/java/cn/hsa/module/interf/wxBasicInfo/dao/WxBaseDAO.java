@@ -1,7 +1,9 @@
 package cn.hsa.module.interf.wxBasicInfo.dao;
 
 import cn.hsa.base.TreeMenuNode;
+import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
+import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
 import cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
@@ -94,4 +96,17 @@ public interface WxBaseDAO {
     List<BasePreferentialTypeDTO> queryPreferentialTypeList(String hospCode);
 
     List<BaseDiseaseDTO> queryBaseDisease(Map<String, Object> map);
+
+    /**
+     * 查询财务分类
+     * @param data
+     * @return
+     */
+    List<BaseFinanceClassifyDTO> queryBaseFinanceClassify(Map<String, Object> data);
+
+    /**
+     * 根据编码查询对于的医嘱目录
+     * @param data
+     */
+    BaseAdviceDTO getBaseAdviceByCode(Map<String, Object> data);
 }

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>hsa-medical-payment-biz</artifactId>
+    <version>1.0.0</version>
+    <name>hsa-medical-payment-biz</name>
+
+    <parent>
+        <artifactId>hsa-medical-payment</artifactId>
+        <groupId>cn.hsa.payment</groupId>
+        <version>1.0.0</version>
+    </parent>
+
+    <!--依赖的scope为provider，即其由适配层决定是否提供-->
+    <dependencies>
+        <!--接口依赖-->
+        <!--hsa-biz打包不需将hsa-db打包依赖进来-->
+        <dependency>
+            <groupId>cn.hsa.inpt</groupId>
+            <artifactId>hsa-inpt-db</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--核心实现-->
+        <dependency>
+            <groupId>cn.hsa.hsaf.core</groupId>
+            <artifactId>hsaf-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!--公共包依赖-->
+        <dependency>
+            <groupId>cn.hsa.com</groupId>
+            <artifactId>hsa-com</artifactId>
+        </dependency>
+
+        <!--动态数据源-->
+        <dependency>
+            <groupId>cn.hsa.dynamic</groupId>
+            <artifactId>hsa-dynamic</artifactId>
+        </dependency>
+
+        <!--MVC框架-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Spring Cloud 依赖引入,兼容原Property热更新-->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>Hoxton.SR10</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+
+        <!--数据库访问 开始-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.zaxxer</groupId>
+                    <artifactId>HikariCP</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+        </dependency>
+        <!--数据库访问 结束-->
+
+        <!--分布式缓存-->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--工具类-->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+        <!--Rest接口文档(注解支持)-->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--测试相关-->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

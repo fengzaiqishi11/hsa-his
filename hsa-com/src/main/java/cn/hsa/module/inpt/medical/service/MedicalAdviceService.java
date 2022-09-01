@@ -67,4 +67,17 @@ public interface MedicalAdviceService {
      **/
     @PostMapping("/service/inpt/medical/longCost")
     WrapperResponse<Boolean> longCost(Map map);
+    /**
+     * @Method: updateAdviceInChecked
+     * @Description: 修改医嘱信息，核收人，核对签名人，核收状态
+     * isChecked: 0：未核收，1：已核对，2：已核收未核对，3：核对退回，4：
+     * @Param: [medicalAdviceDTO]
+     * @Author: pengbo
+     * @Date: 2022/08/24 16:25
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @PostMapping("/service/inpt/medical/updateAdviceInChecked")
+    WrapperResponse<Boolean> updateAdviceInChecked(Map<String, Object> map);
+
+    WrapperResponse<PageDTO> getMedicalAdvicesNew(Map<String, Object> map);
 }

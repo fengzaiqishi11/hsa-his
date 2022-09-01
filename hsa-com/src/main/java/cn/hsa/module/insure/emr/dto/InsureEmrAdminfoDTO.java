@@ -22,5 +22,15 @@ public class InsureEmrAdminfoDTO extends InsureEmrAdminfoDO implements Serializa
      */
     private String visitId;
 
+    /**
+     * 就医流水号,院内唯一号
+     */
+    private String mdtrtSn;
+
+    /**
+     * 电子病历控件id
+     */
+    private String emrTemplateId;
+
 
 }

@@ -1,6 +1,7 @@
 package cn.hsa.module.insure.emr.dao;
 
 import cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO;
+import cn.hsa.module.insure.emr.entity.InsureEmrDscginfoDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -38,6 +39,16 @@ public interface InsureEmrDscginfoDAO {
     int insert(InsureEmrDscginfoDTO insureEmrDscginfoDTO);
 
     /**
+     * 插入出院小结
+     * @param insureEmrDscginfoDO
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 11:05
+     * @return int
+     */
+    int insertSelective(InsureEmrDscginfoDO insureEmrDscginfoDO);
+
+
+  /**
      * @Menthod delete()
      * @Desrciption 删除
      * @Param
@@ -58,6 +69,15 @@ public interface InsureEmrDscginfoDAO {
      * @Return int
      **/
     int updateSelective(Map map);
+
+    /**
+     * 更新出院小结信息
+     * @param map
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:51
+     * @return int
+     */
+    int updateDscgSelective(Map map);
     /**
      * @Menthod queryById()
      * @Desrciption 查询单条
@@ -68,6 +88,15 @@ public interface InsureEmrDscginfoDAO {
      * @Return int
      **/
     List<InsureEmrDscginfoDTO> queryByMdtrtSn(@Param("mdtrtSn")String mdtrtSn, @Param("mdtrtId")String mdtrtId);
+
+    /**
+     * 查询出院小结信息
+     * @param mdtrtSn
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:37
+     * @return cn.hsa.module.insure.emr.dto.InsureEmrDscginfoDTO
+     */
+    InsureEmrDscginfoDTO queryInfoByMdtrtSn(@Param("mdtrtSn")String mdtrtSn);
 
     /**
      * @Menthod queryByUuid()
@@ -83,4 +112,5 @@ public interface InsureEmrDscginfoDAO {
     void deleteByMap(Map<String, Object> map);
 
     void insertList(List<InsureEmrDscginfoDTO> dscgoInfoList);
+
 }

@@ -231,7 +231,12 @@
             *
         from inpt_visit
         where hosp_code = #{hospCode}
-          and id = #{id}
+        <if test="id != null and id != ''">
+            and id = #{id}
+        </if>
+        <if test="inNo != null and inNo != ''">
+            and in_no = #{inNo}
+        </if>
     </select>
 
     <!--根据visitId查询出所有状态为0正常的预交金记录-->

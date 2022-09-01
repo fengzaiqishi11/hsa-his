@@ -188,6 +188,22 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     }
 
     /**
+     * @Method: getMedicalAdvicesNew
+     * @Description: 获取未核收医嘱列表
+     * @Param: [medicalAdviceDTO]
+     * @Author: youxianlin
+     * @Email: 254580179@qq.com
+     * @Date: 2020/9/9 11:19
+     * @Return: cn.hsa.base.PageDTO
+     **/
+    @Override
+    public PageDTO getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO) {
+        //设置分页参数
+        PageHelper.startPage(medicalAdviceDTO.getPageNo(),medicalAdviceDTO.getPageSize());
+
+        return PageDTO.of(inptAdviceDAO.getMedicalAdvicesNew(medicalAdviceDTO));
+    }
+    /**
      * @Method: modifyMedicalAdvices
      * @Description: 医嘱拒收  更新医嘱表is_reject,reject_remark
      * @Param: [ids]
@@ -289,15 +305,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
                 //停嘱
                 if (Constants.SF.S.equals(inptAdviceDTO.getIsStop())) {
                     inptAdviceDTO.setIsStopCheck("1");
-                    inptAdviceDTO.setStopCheckId(medicalAdviceDTO.getCheckId());
-                    inptAdviceDTO.setStopCheckName(medicalAdviceDTO.getCheckName());
-                    inptAdviceDTO.setStopCheckTime(medicalAdviceDTO.getCheckTime());
+                    inptAdviceDTO.setStopCheckId(StringUtils.isEmpty(inptAdviceDTO.getStopCheckId())?medicalAdviceDTO.getCheckId():inptAdviceDTO.getStopCheckId());
+                    inptAdviceDTO.setStopCheckName(StringUtils.isEmpty(inptAdviceDTO.getStopCheckName())?medicalAdviceDTO.getCheckName():inptAdviceDTO.getStopCheckName());
+                    inptAdviceDTO.setStopCheckTime(inptAdviceDTO.getStopCheckTime() == null?medicalAdviceDTO.getCheckTime():inptAdviceDTO.getStopCheckTime());
                     stopAdviceList.add(inptAdviceDTO);
                 }else{
                     inptAdviceDTO.setIsCheck("1");
-                    inptAdviceDTO.setCheckId(medicalAdviceDTO.getCheckId());
-                    inptAdviceDTO.setCheckName(medicalAdviceDTO.getCheckName());
-                    inptAdviceDTO.setCheckTime(medicalAdviceDTO.getCheckTime());
+                    inptAdviceDTO.setCheckId(StringUtils.isEmpty(inptAdviceDTO.getCheckId())?medicalAdviceDTO.getCheckId():inptAdviceDTO.getCheckId());
+                    inptAdviceDTO.setCheckName(StringUtils.isEmpty(inptAdviceDTO.getCheckName())?medicalAdviceDTO.getCheckName():inptAdviceDTO.getCheckName());
+                    inptAdviceDTO.setCheckTime(inptAdviceDTO.getCheckTime() == null?medicalAdviceDTO.getCheckTime():inptAdviceDTO.getCheckTime());
                 }
             }
 
@@ -1221,6 +1237,29 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             backCostMap.put("inptCostDTOs", tfInptCostDTOList);
             backCostByInputBO.saveBackCostWithInpt(backCostMap);
         }
+        return true;
+    }
+
+    /**
+     * @param medicalAdviceDTO
+     * @Method: updateAdviceInChecked
+     * @Description: 修改医嘱信息，核收人，核对签名人，核收状态
+     * isChecked: 0：未核收，1：已核对，2：已核收未核对，3：核对退回，4：
+     * @Param: [medicalAdviceDTO]
+     * @Author: pengbo
+     * @Date: 2022/08/24 16:25
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     */
+    @Override
+    public Boolean updateAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO) {
+
+        if(medicalAdviceDTO.getKzIds() != null && medicalAdviceDTO.getKzIds().length>0 ){
+            inptAdviceDAO.updateNewAdviceInChecked(medicalAdviceDTO);
+        }
+        if(medicalAdviceDTO.getStopIds() != null && medicalAdviceDTO.getStopIds().length>0 ){
+            inptAdviceDAO.updateStopAdviceInChecked(medicalAdviceDTO);
+        }
+
         return true;
     }
 

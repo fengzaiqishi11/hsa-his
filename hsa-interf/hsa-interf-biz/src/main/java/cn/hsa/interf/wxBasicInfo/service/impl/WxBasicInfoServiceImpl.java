@@ -537,4 +537,19 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
         wxBasicInfoBO.removeLockByProfileId(map);
     }
 
+    /**
+     * 核酸检验申请
+     *
+     * @param map
+     */
+    @Override
+    public WrapperResponse<String> saveHsjcApply(Map<String, Object> map) {
+        return  wxBasicInfoBO.saveHsjcApply(map);
+    }
+
+    @Override
+    public WrapperResponse<String> queryBaseDisease(Map<String, Object> map) {
+        return wxBasicInfoBO.queryBaseDisease(map);
+    }
+
 }

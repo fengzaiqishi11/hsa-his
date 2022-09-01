@@ -600,4 +600,52 @@ public class SysUserController extends BaseController {
 
     }
 
+
+    /**
+     * @Description:根据code和密码校验用户
+     * @Param: [sysUserDTO, req, res]
+     * @return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     * @Author: zhangxuan
+     * @Date: 2022-08-25
+     */
+    @PostMapping( value = "/checkedUserByCodeAndPassword")
+    public WrapperResponse<SysUserDTO> checkedUserByCodeAndPassword(@RequestBody  SysUserDTO sysUserDTO, HttpServletRequest req, HttpServletResponse res){
+
+        SysUserDTO sysUserDTOSession = getSession(req, res);
+        sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
+
+        // 校验用户信息
+        if (StringUtils.isEmpty(sysUserDTO.getCode()) || StringUtils.isEmpty(sysUserDTO.getPassword())) {
+            throw new AppException("请填写正确的账号或密码！");
+        }
+
+        String password = sysUserDTO.getPassword();
+        // 获取用户信息
+        Map paramMap = new HashMap<>();
+        paramMap.put("hospCode", sysUserDTOSession.getHospCode());
+        paramMap.put("userCode", sysUserDTO.getCode());
+        sysUserDTO = getData(sysUserService_consumer.getByCode(paramMap));
+        // 校验用户信息
+        if (sysUserDTO == null) {
+            throw new AppException("当前账号不存在！");
+        }
+
+        // 是否停用
+        if ("1".equals(sysUserDTO.getStatusCode())) {
+            throw new AppException("当前账号已被停用！");
+        }
+
+        // 是否锁定
+        if ("2".equals(sysUserDTO.getStatusCode())) {
+            throw new AppException("当前账号已被锁定！");
+        }
+
+        // 账号或密码错误
+        if (!MD5Utils.verifyMd5AndSha(password, sysUserDTO.getPassword())) {
+            throw new AppException("当前账号密码不对！");
+        }
+
+        return WrapperResponse.success(sysUserDTO);
+
+    }
 }

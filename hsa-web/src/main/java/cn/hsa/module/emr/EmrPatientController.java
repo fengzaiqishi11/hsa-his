@@ -302,7 +302,7 @@ public class EmrPatientController extends BaseController {
 				inptVisitDTO.setColumnName("outTime");
 			}
 			if (StringUtils.isEmpty(inptVisitDTO.getSortName())) {
-				inptVisitDTO.setSortName("asc");
+				inptVisitDTO.setSortName("desc");
 			}
 /*			//新增当前登录医生过滤条件 -caoliang 2021/6/17
 			inptVisitDTO.setDoctorName(userName);*/
@@ -330,7 +330,7 @@ public class EmrPatientController extends BaseController {
 			inptVisitDTO.setColumnName("outTime");
 		}
 		if (StringUtils.isEmpty(inptVisitDTO.getSortName())) {
-			inptVisitDTO.setSortName("asc");
+			inptVisitDTO.setSortName("desc");
 		}
 		Map map = new HashMap();
 		map.put("hospCode", sysUserDTO.getHospCode());

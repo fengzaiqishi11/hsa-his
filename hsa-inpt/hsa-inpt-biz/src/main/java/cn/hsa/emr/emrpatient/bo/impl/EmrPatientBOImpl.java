@@ -28,6 +28,11 @@ import cn.hsa.module.emr.emrquality.dto.EmrQualityDataRulesDTO;
 import cn.hsa.module.inpt.doctor.dao.InptVisitDAO;
 import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
+import cn.hsa.module.insure.emr.dao.InsureEmrAdminfoDAO;
+import cn.hsa.module.insure.emr.dto.*;
+import cn.hsa.module.insure.emr.entity.InsureEmrDscginfoDO;
+import cn.hsa.module.insure.emr.entity.InsureEmrOprninfoDO;
+import cn.hsa.module.insure.emr.service.InsureUnifiedEmrService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedEmrUploadService;
 import cn.hsa.module.oper.operInforecord.dto.OperInfoRecordDTO;
 import cn.hsa.module.oper.operInforecord.entity.OperInfoRecordDO;
@@ -36,6 +41,7 @@ import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +100,9 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 
     @Resource
     RedisUtils redisUtils;
+
+    @Resource
+    private InsureUnifiedEmrService insureUnifiedEmrService_comsumer;
 
     /**
      * @Description: 1、新建病人病历，获取能够使用的病历模板;  前提是病人病历没有归档
@@ -460,8 +469,17 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         emrPatientHtmlDTO.setHtml(buff);
         emrPatientHtmlDAO.insertEmrPatientHtml(emrPatientHtmlDTO);
 
+        //保存元素到医保电子病历相关表
+        Map<String, Object> sysMap = new HashMap<>();
+        map.put("hospCode", emrPatientDTO.getHospCode());
+        map.put("code", "INSURE_EMR_SWITCH");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(map).getData();
+        if (ObjectUtil.isNotEmpty(sys) && "1".equals(sys.getValue())){
+          saveInsureEmrData(emrPatientDTO);
+        }
         return true;
     }
+
 
     // 检验数据是否有符合规则  20210929 liuliyun
     public void checkEmrDataIsValid(EmrPatientDTO emrPatientDTO, String json) {
@@ -1243,6 +1261,78 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         return insureEmrNodeInfoMessage;
     }
 
+    /**
+     * 保存元素到医保电子病历相关表
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-18 15:02
+     * @return void
+     */
+    private void saveInsureEmrData(EmrPatientDTO emrPatientDTO){
+      Map<String, String> selectMap = new HashMap<>();
+      selectMap.put("hospCode", emrPatientDTO.getHospCode());
+      selectMap.put("classifyTemplateId", emrPatientDTO.getClassifyTemplateId());
+      Map<String, Object> emrClassifyMap = emrPatientDAO.queryHisEmrClassifyInfo(selectMap);
+
+      //入参
+      Map<String, Object> resultMap = new HashMap<>();
+      //病历文档节点
+      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+        throw new AppException("请先在病历文档分类中维护对应的医保节点!");
+      }
+      String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
+
+      Map<String, Object> param = new HashMap<>();
+      param.put("insureTypeCode",insureTypeCode);
+      param.put("hospCode",emrPatientDTO.getHospCode());
+      // 查询出元素内容的匹配数据
+      List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfo(param);
+      if (ListUtils.isEmpty(emrMatchList)) {
+        throw new AppException("元素匹配医保内容信息为空,请先匹配");
+      }
+      Map nrMap = emrPatientDTO.getNrMap();
+      // 寻找与医保关联匹配的字段信息
+      for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
+        // his的电子病历元素
+        String hisEmrCode = emrElementMatchDO.getEmrElementCode();
+        // 对应的医保节点字段
+        String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
+        // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
+        if (nrMap.containsKey(hisEmrCode)) {
+          //去除html样式
+          String emrValue = delHTMLTag(nrMap.get(hisEmrCode).toString());
+          resultMap.put(insureEmrCode, emrValue);
+        }
+      }
+
+      //获取医保就诊信息
+      Map<String, String> map1 = new HashMap<>();
+      map1.put("visitId",emrPatientDTO.getVisitId());
+      InsureEmrUnifiedDTO insureEmrUnifiedDTO = emrPatientDAO.queryInsureVisitEmrInfo(map1);
+      if (ObjectUtil.isNotEmpty(insureEmrUnifiedDTO)){
+        resultMap.put("mdtrt_id",insureEmrUnifiedDTO.getMdtrtId());
+      }
+      //保存进对应的医保电子病历表
+      //入院记录
+      if (insureTypeCode.equals(Constants.BLLX.YYJL)){
+        saveInsureAdminfo(emrPatientDTO,resultMap);
+      //首次病程记录
+      }else if(insureTypeCode.equals(Constants.BLLX.BCJL)){
+        saveCoursrinfo(emrPatientDTO,resultMap);
+        //死亡记录
+      }else if(insureTypeCode.equals(Constants.BLLX.SWJL)){
+        saveDieInfo(emrPatientDTO,resultMap);
+        //出院小结
+      }else if(insureTypeCode.equals(Constants.BLLX.CYXJ)){
+        saveDscginfo(emrPatientDTO,resultMap);
+        //手术记录
+      }else if(insureTypeCode.equals(Constants.BLLX.SSJL)){
+        saveOprnInfo(emrPatientDTO,resultMap);
+        //病情抢救
+      }else if(insureTypeCode.equals(Constants.BLLX.BQQJ)){
+        saveRescinfo(emrPatientDTO,resultMap);
+      }
+    }
+
     private Map<String, Object> setHisEmrJosnInfo(InptVisitDTO inptVisit) {
         Map<String, String> selectMap = new HashMap<>();
         selectMap.put("hospCode", inptVisit.getHospCode());
@@ -1351,6 +1441,203 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
         insureEmrInfo.put("dscginfo", emrOutReList);
 
         return insureEmrInfo;
+    }
+
+    /**
+     * 保存抢救信息
+     * @param emrPatientDTO
+     * @param resultMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-24 9:32
+     * @return void
+     */
+    private void saveRescinfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("emrTemplateId",emrPatientDTO.getId());
+      InsureEmrRescinfoDTO insureEmrRescinfoDTO =
+          insureUnifiedEmrService_comsumer.queryRescInfoByTemplateId(paramMap);
+      //已有对应模板id的抢救信息，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(insureEmrRescinfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateRescSelectiveByTemplateId(map);
+      }else{
+        InsureEmrRescinfoDTO InsureEmrRescinfoDTO = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrRescinfoDTO.class);
+        InsureEmrRescinfoDTO.setMdtrtSn(emrPatientDTO.getVisitId());
+        InsureEmrRescinfoDTO.setHospCode(emrPatientDTO.getHospCode());
+        Map<String, Object> map = new HashMap<>();
+        map.put("InsureEmrRescinfoDTO",InsureEmrRescinfoDTO);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertRescInfo(map);
+      }
+    }
+
+    /**
+     * 保存电子病历手术信息
+     * @param emrPatientDTO
+     * @param resultMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 19:54
+     * @return void
+     */
+    private void saveOprnInfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("emrTemplateId",emrPatientDTO.getId());
+      InsureEmrOprninfoDTO InsureEmrOprninfoDTO =
+          insureUnifiedEmrService_comsumer.queryOprnInfoByTemplateId(paramMap);
+      //已有对应模板id的手术信息，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(InsureEmrOprninfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateOprnSelectiveByTemplateId(map);
+      }else{
+        InsureEmrOprninfoDTO oprn = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrOprninfoDTO.class);
+        oprn.setMdtrtSn(emrPatientDTO.getVisitId());
+        oprn.setHospCode(emrPatientDTO.getHospCode());
+        oprn.setEmrTemplateId(emrPatientDTO.getId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureEmrOprninfoDTO",oprn);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertOprnInfo(map);
+      }
+    }
+
+    /**
+     * 保存电子病历出院小结信息
+     * @param emrPatientDTO
+     * @param resultMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-23 10:23
+     * @return void
+     */
+    private void saveDscginfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      InsureEmrDscginfoDTO insureEmrDscginfoDTO = insureUnifiedEmrService_comsumer.queryDscgInfoByMdtrtSn(paramMap);
+      //已有出院小结信息记录，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(insureEmrDscginfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateDscgSelectiveByMdtrtSn(map);
+      }else{
+        InsureEmrDscginfoDTO dto = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrDscginfoDTO.class);
+        dto.setMdtrtSn(emrPatientDTO.getVisitId());
+        dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureEmrDscginfoDTO",dto);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertDscgInfo(map);
+      }
+    }
+    /**
+     * 保存电子病历死亡信息
+     * @param emrPatientDTO
+     * @param resultMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 16:56
+     * @return void
+     */
+    private void saveDieInfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      InsureEmrDieinfoDTO insureEmrDieinfoDTO =
+          insureUnifiedEmrService_comsumer.queryDieInfoByMdtrtSn(paramMap);
+      //已有死亡记录信息记录，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(insureEmrDieinfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateDieSelectiveByMdtrtSn(map);
+      }else{
+        InsureEmrDieinfoDTO dto = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrDieinfoDTO.class);
+        dto.setMdtrtSn(emrPatientDTO.getVisitId());
+        dto.setHospCode(emrPatientDTO.getHospCode());
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureEmrDieinfoDTO",dto);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertDieinfo(map);
+      }
+    }
+
+    /**
+     * 保存电子病历医保首次病程信息
+     * @param emrPatientDTO
+     * @param resultMap
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 15:47
+     * @return void
+     */
+    private void saveCoursrinfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      InsureEmrCoursrinfoDTO insureEmrCoursrinfoDTO =
+          insureUnifiedEmrService_comsumer.queryCoursrInfoByMdtrtSn(paramMap);
+      //已有首次病程记录，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(insureEmrCoursrinfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateCoursrSelectiveByMdtrtSn(map);
+      }else{
+        InsureEmrCoursrinfoDTO dto = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrCoursrinfoDTO.class);
+        dto.setMdtrtSn(emrPatientDTO.getVisitId());
+        dto.setHospCode(emrPatientDTO.getHospCode());
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureEmrCoursrinfoDTO",dto);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertCoursrinfo(map);
+      }
+    }
+
+    /**
+     * 保存电子病历医保入院信息表
+     * @Author 医保开发二部-湛康
+     * @Date 2022-08-22 11:47
+     * @return void
+     */
+    private void saveInsureAdminfo(EmrPatientDTO emrPatientDTO,Map<String, Object> resultMap){
+      //查询是否已经有了入院记录
+      Map paramMap = new HashMap();
+      paramMap.put("hospCode",emrPatientDTO.getHospCode());
+      paramMap.put("mdtrtSn",emrPatientDTO.getVisitId());
+      InsureEmrAdminfoDTO insureEmrAdminfoDTO = insureUnifiedEmrService_comsumer.queryAdmInfoByMdtrtSn(paramMap);
+      // 已有入院记录，则更新，没有则插入
+      if (ObjectUtil.isNotEmpty(insureEmrAdminfoDTO)){
+        Map<String, Object> map = new HashMap<>();
+        map.put("emrPatientDTO",emrPatientDTO);
+        map.put("resultMap",resultMap);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.updateAdmSelectiveByMdtrtSn(map);
+      }else{
+        InsureEmrAdminfoDTO dto = FastJsonUtils.fromJson(FastJsonUtils.toJson(resultMap),
+            InsureEmrAdminfoDTO.class);
+        dto.setVisitId(emrPatientDTO.getVisitId());
+        dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("insureEmrAdminfoDTO",dto);
+        map.put("hospCode",emrPatientDTO.getHospCode());
+        insureUnifiedEmrService_comsumer.insertAdminfo(map);
+      }
     }
 
     public static String delHTMLTag(String htmlStr) {

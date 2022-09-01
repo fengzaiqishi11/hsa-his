@@ -387,4 +387,34 @@ public class InsureSettleInfoDTO extends InsureIndividualSettleDO {
      */
     private String conDetailAddress;
 
+    /**
+     * 结算清单上传状态
+     */
+    private String uplodStatus;
+
+    /**
+     * 特殊人员类型
+     */
+    private String psnIdetType;
+
+    /**
+     * 病种编码
+     */
+    private String visitIcdCode;
+
+    /**
+     * 病种名称
+     */
+    private String visitIcdName;
+
+    /**
+     * 上传错误信息
+     */
+    private String uplodErrorMesssge;
+
+    /**
+     * 患者信息
+     */
+    private String nameGendAge;
+
 }

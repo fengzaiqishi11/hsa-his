@@ -214,4 +214,37 @@ public class InptAdvicePrintDO extends PageDO implements Serializable {
    * 皮试结果
    */
   private String skinResultCode;
+
+  /**
+   * 医嘱核收核对人ID
+   */
+  private String checkSecondId;
+  /**
+   * 医嘱核收核对人姓名
+   */
+  private String checkSecondName;
+  /**
+   * 医嘱核收核对时间
+   */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+  private Date checkSecondTime;
+
+  /**
+   * 停嘱医嘱核收核对人ID
+   */
+  private String stopCheckSecondId;
+  /**
+   * 停嘱医嘱核收核对人姓名
+   */
+  private String stopCheckSecondName;
+  /**
+   * 停嘱医嘱核收核对时间
+   */
+  @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+  private Date stopCheckSecondTime;
+
+  /**
+   * 核对签名名称
+   */
+  private String isNewStatus;
 }

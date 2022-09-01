@@ -443,4 +443,11 @@ public interface WxBasicInfoService  {
      */
     @PostMapping("/service/interf/wxBasicInfo/querySevenQueueDoctor")
     void removeLockByProfileId(Map<String, Object> map);
+    /**
+     * 核酸检验申请
+     */
+    @PostMapping("/service/interf/wxBasicInfo/hsjcApply")
+    WrapperResponse<String> saveHsjcApply(Map<String, Object> map);
+    @PostMapping("/service/interf/wxBasicInfo/queryBaseDisease")
+    WrapperResponse<String> queryBaseDisease(Map<String, Object> map);
 }

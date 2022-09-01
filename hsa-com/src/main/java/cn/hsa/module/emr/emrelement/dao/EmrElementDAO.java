@@ -235,4 +235,13 @@ public interface EmrElementDAO {
   int selectInsureEmrUpCode(EmrElementMatchDO emrElementMatchDO);
 
   List<EmrElementMatchDO> queryInsureEmrElementMatchInfoAll();
+
+  /**
+   * 查询出元素内容的匹配数据
+   * @param classifyCode
+   * @Author 医保开发二部-湛康
+   * @Date 2022-08-19 15:49
+   * @return java.util.List<cn.hsa.module.emr.emrelement.entity.EmrElementMatchDO>
+   */
+  List<EmrElementMatchDO> queryInsureEmrElementMatchInfo(Map<String, Object> param);
 }

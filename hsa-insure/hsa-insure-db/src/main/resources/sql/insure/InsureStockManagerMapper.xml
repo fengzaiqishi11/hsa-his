@@ -397,6 +397,7 @@
         AND c.is_match = '1' /*医保项目已匹配*/
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
+        and a.item_code ='1'
         and (si.upload_insure = '0' or si.upload_insure is null)
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
@@ -475,6 +476,7 @@
         and c.is_trans = '1' /*医保项目已传输*/
         and c.is_valid = '1' /*医保项目有效*/
         AND si.outin_code in ('27','28') /*住院发药，住院退药*/
+        and a.item_code ='1'
         and (si.upload_insure = '0' or si.upload_insure is null)
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
@@ -551,6 +553,7 @@
         AND c.is_match = '1' /*医保项目已匹配*/
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
+        and a.item_code ='2'
         and (si.upload_insure = '0' or si.upload_insure is null)
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%')
@@ -622,6 +625,7 @@
         and c.is_trans = '1' /*医保项目已传输*/
         and c.is_valid = '1' /*医保项目有效*/
         AND si.outin_code in ('27','28') /*住院发药，住院退药*/
+        and a.item_code ='2'
         and (si.upload_insure = '0' or si.upload_insure is null)
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
@@ -814,6 +818,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and a.item_code ='1'
         and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
@@ -882,6 +887,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and a.item_code ='1'
         and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%') or b.good_pym like concat('%',#{keyword},'%')
@@ -945,6 +951,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and a.item_code ='2'
         and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%')
@@ -1006,6 +1013,7 @@
         AND c.is_trans = '1' /*医保项目已传输*/
         AND c.is_valid = '1' /*医保项目有效*/
         and si.upload_insure = '1'
+        and a.item_code ='2'
         and si.id in (select fixmedins_bchno from insure_stock_upload where inv_data_type = '4')
         <if test="keyword != null and keyword != ''">
             and (c.insure_item_name like concat('%',#{keyword},'%')

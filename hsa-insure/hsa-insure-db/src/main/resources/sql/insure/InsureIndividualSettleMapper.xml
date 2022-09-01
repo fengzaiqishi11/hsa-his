@@ -222,7 +222,8 @@
         iv.in_time,
         iv.out_time,
         iib.bka035,
-        iib.bka035_name
+        iib.bka035_name,
+        iiv.insuplc_admdvs as insuplcAdmdvs
         from insure_individual_settle iic
         left join insure_individual_visit iiv on iic.visit_id = iiv.visit_id and iic.hosp_code = iiv.hosp_code
         join insure_individual_basic iib on iiv.mib_id = iib.id and iiv.hosp_code = iib.hosp_code

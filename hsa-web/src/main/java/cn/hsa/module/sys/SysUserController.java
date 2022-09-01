@@ -614,6 +614,11 @@ public class SysUserController extends BaseController {
         SysUserDTO sysUserDTOSession = getSession(req, res);
         sysUserDTO.setHospCode(sysUserDTOSession.getHospCode());
 
+        // 校验用户信息
+        if (StringUtils.isEmpty(sysUserDTO.getCode()) || StringUtils.isEmpty(sysUserDTO.getPassword())) {
+            throw new AppException("请填写正确的账号或密码！");
+        }
+
         String password = sysUserDTO.getPassword();
         // 获取用户信息
         Map paramMap = new HashMap<>();

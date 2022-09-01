@@ -78,4 +78,6 @@ public interface MedicalAdviceService {
      **/
     @PostMapping("/service/inpt/medical/updateAdviceInChecked")
     WrapperResponse<Boolean> updateAdviceInChecked(Map<String, Object> map);
+
+    WrapperResponse<PageDTO> getMedicalAdvicesNew(Map<String, Object> map);
 }

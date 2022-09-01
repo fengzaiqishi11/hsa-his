@@ -120,6 +120,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      */
     @Override
     public void UP_2203(Map<String, Object> unifiedPayMap) {
+        log.info("======调用医保门诊就诊信息上传接口UP_2203开始======");
         String hospCode = MapUtils.get(unifiedPayMap, "hospCode");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(unifiedPayMap);
 
@@ -1013,6 +1014,7 @@ public class InsureUnifiedPayOutptBOImpl extends HsafBO implements InsureUnified
      **/
     @Override
     public InsureIndividualVisitDTO UP_2201(Map<String, Object> map) {
+        log.info("======调用医保门诊挂号接口UP_2201开始======");
         String hospCode = MapUtils.get(map, "hospCode");
         String visitId = MapUtils.get(map, "visitId");
         InsureIndividualVisitDTO insureIndividualVisitDTO = commonGetVisitInfo(map);

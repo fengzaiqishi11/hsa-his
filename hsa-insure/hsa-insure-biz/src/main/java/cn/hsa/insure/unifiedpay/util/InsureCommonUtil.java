@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dto.InsureInterfaceParamDTO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
+import cn.hsa.util.HygeiaUtil;
 import cn.hsa.util.MapUtils;
 import cn.hsa.util.StringUtils;
 import cn.hutool.core.util.ObjectUtil;
@@ -43,7 +44,9 @@ public class InsureCommonUtil {
             insureConfigurationDTO.setRegCode(map.get("configRegCode").toString());
         }
         insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
-
+        if (ObjectUtil.isEmpty(insureConfigurationDTO)) {
+            throw new AppException("未查询到对应的医保配置信息！");
+        }
         String msgId = StringUtils.createMsgId(insureConfigurationDTO.getOrgCode());
 
         // 交易编号

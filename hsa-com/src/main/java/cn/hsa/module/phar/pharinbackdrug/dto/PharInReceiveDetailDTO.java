@@ -37,4 +37,8 @@ public class PharInReceiveDetailDTO extends PharInReceiveDetailDO implements Ser
     private String flag;
 
     private String adviceDosage;
+    /**
+     * 货架号排序
+     */
+    private String locationNo;
 }

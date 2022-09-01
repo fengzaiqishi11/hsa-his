@@ -635,7 +635,9 @@
         bp.name as productName,
         b.spec,
         (select f.name from base_rate f where f.id = e.rate_id) as rateName,
-        if(e.is_long = '1','临时','长期') as adviceType -- 医嘱类型
+        if(e.is_long = '1','临时','长期') as adviceType, -- 医嘱类型
+        ifnull((select location_no
+                from stro_stock where item_id= a.item_id and item_code= a.item_code and biz_id=a.phar_id and hosp_code=a.hosp_code),0) locationNo
         from phar_in_wait_receive a
         left join base_drug b on a.item_id = b.id
         left join base_product bp on b.prod_code = bp.code

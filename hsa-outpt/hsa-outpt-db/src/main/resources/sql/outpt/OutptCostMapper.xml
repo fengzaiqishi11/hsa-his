@@ -259,6 +259,7 @@
         <result property="settleNo" column="settleNo" jdbcType="VARCHAR"/>
         <result property="medicalRegNo" column="medicalRegNo" jdbcType="VARCHAR"/>
         <result property="opIdList" column="opIds" jdbcType="VARCHAR"/>
+        <result property="isBackReentry" column="isBackReentry" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!-- 表所有字段 -->
@@ -554,7 +555,8 @@
         crte_name,
         crte_time,
         distribute_all_detail_id,
-        one_dist_cost_id
+        one_dist_cost_id,
+        is_back_reentry
         ) values
         <foreach collection="list" separator="," item="item">
             (
@@ -611,7 +613,8 @@
             #{item.crteName,jdbcType=VARCHAR},
             #{item.crteTime,jdbcType=TIMESTAMP},
             #{item.distributeAllDetailId,jdbcType=VARCHAR},
-            #{item.oneDistCostId,jdbcType=VARCHAR}
+            #{item.oneDistCostId,jdbcType=VARCHAR},
+            #{item.isBackReentry,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>
@@ -1262,7 +1265,16 @@
         v.crte_name,
         v.crte_time,
         iiv.medical_reg_no as medicalRegNo,
-        iiv.is_ecqr as isEcqr
+        iiv.is_ecqr as isEcqr,
+        ifnull((SELECT
+        max(oc.is_back_reentry) as isBackReentry
+        from outpt_cost oc
+        WHERE
+        oc.`id` IS NOT NULL
+        AND oc.hosp_code = #{hospCode}
+        AND oc.visit_id = v.id
+        AND oc.settle_code IN('0','1')
+        AND oc.status_code = '0'),'0') as isBackReentry
         FROM
         outpt_visit v left join insure_individual_visit iiv on iiv.hosp_code = v.hosp_code and iiv.visit_id = v.id
         WHERE
@@ -3689,4 +3701,17 @@
             #{item.id}
         </foreach>
     </update>
+
+    <!-- 获取医保病人是否退部分再收标识 -->
+    <select id="queryInsurePatientReentryCost" resultType="java.util.Map" parameterType="java.util.Map">
+        SELECT
+        max(oc.is_back_reentry) as isBackReentry
+        from outpt_cost oc
+        WHERE
+        oc.`id` IS NOT NULL
+        AND oc.hosp_code = #{hospCode}
+        AND oc.visit_id = #{visitId}
+        AND oc.settle_code IN('0','1')
+        AND oc.status_code = '0'
+    </select>
 </mapper>

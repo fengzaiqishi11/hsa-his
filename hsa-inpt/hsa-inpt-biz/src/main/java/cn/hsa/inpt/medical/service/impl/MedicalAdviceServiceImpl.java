@@ -98,4 +98,9 @@ public class MedicalAdviceServiceImpl extends HsafService implements MedicalAdvi
     public WrapperResponse<Boolean> updateAdviceInChecked(Map<String, Object> map) {
         return WrapperResponse.success(medicalAdviceBO.updateAdviceInChecked(MapUtils.get(map,"medicalAdviceDTO")));
     }
+
+    @Override
+    public WrapperResponse<PageDTO> getMedicalAdvicesNew(Map<String, Object> map) {
+        return WrapperResponse.success(medicalAdviceBO.getMedicalAdvicesNew(MapUtils.get(map,"medicalAdviceDTO")));
+    }
 }

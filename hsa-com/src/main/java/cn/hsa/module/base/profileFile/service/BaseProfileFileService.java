@@ -109,4 +109,16 @@ public interface BaseProfileFileService {
      **/
     @GetMapping("/service/base/baseProfileFile/deleProfileFile")
     WrapperResponse<Boolean> deleteProfileFile(Map map);
+
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption  新增修改档案时判断身份证是否重复
+     * @Param [outptProfileFileDTO]
+     * @Author liuliyun
+     * @Date   2022/09/02 9:54
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @GetMapping("/service/base/baseProfileFile/queryCertNoIsExist")
+    WrapperResponse<Boolean> queryCertNoIsExist(Map map);
 }

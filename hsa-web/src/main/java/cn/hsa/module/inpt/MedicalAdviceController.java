@@ -158,8 +158,9 @@ public class MedicalAdviceController extends BaseController {
     public WrapperResponse<Boolean> updateAdviceInChecked(@RequestBody MedicalAdviceDTO medicalAdviceDTO, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
-
+        medicalAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
         Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
         // 0：未核收，1：已核对，2：已核收未核对，3：核收拒绝，4：核对拒绝
         if("2".equals(medicalAdviceDTO.getIsNewStatus())){
             /**
@@ -167,27 +168,20 @@ public class MedicalAdviceController extends BaseController {
              * 1.开嘱核收：都不为空,
              * 2.停嘱核收：都不为空
              */
-            medicalAdviceDTO.setCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setCheckTime(new Date());
-
-            medicalAdviceDTO.setStopCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setStopCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setStopCheckTime(new Date());
             if("0".equals(medicalAdviceDTO.getIsMyself())){
-                medicalAdviceDTO.setCheckSecondId(sysUserDTO.getId());
-                medicalAdviceDTO.setCheckSecondName(sysUserDTO.getName());
-                medicalAdviceDTO.setCheckSecondTime(new Date());
-                medicalAdviceDTO.setStopCheckSecondId(sysUserDTO.getId());
-                medicalAdviceDTO.setStopCheckSecondName(sysUserDTO.getName());
-                medicalAdviceDTO.setStopCheckSecondTime(new Date());
+                medicalAdviceDTO.setCheckId(sysUserDTO.getId());
+                medicalAdviceDTO.setCheckName(sysUserDTO.getName());
+                medicalAdviceDTO.setCheckTime(new Date());
+                medicalAdviceDTO.setStopCheckId(sysUserDTO.getId());
+                medicalAdviceDTO.setStopCheckName(sysUserDTO.getName());
+                medicalAdviceDTO.setStopCheckTime(new Date());
             }else{
-                medicalAdviceDTO.setCheckSecondId(medicalAdviceDTO.getCheckSecondId());
-                medicalAdviceDTO.setCheckSecondName(medicalAdviceDTO.getCheckSecondName());
-                medicalAdviceDTO.setCheckSecondTime(new Date());
-                medicalAdviceDTO.setStopCheckSecondId(medicalAdviceDTO.getStopCheckSecondId());
-                medicalAdviceDTO.setStopCheckSecondName(medicalAdviceDTO.getStopCheckSecondName());
-                medicalAdviceDTO.setStopCheckSecondTime(new Date());
+                medicalAdviceDTO.setCheckId(medicalAdviceDTO.getCheckId());
+                medicalAdviceDTO.setCheckName(medicalAdviceDTO.getCheckName());
+                medicalAdviceDTO.setCheckTime(new Date());
+                medicalAdviceDTO.setStopCheckId(medicalAdviceDTO.getStopCheckId());
+                medicalAdviceDTO.setStopCheckName(medicalAdviceDTO.getStopCheckName());
+                medicalAdviceDTO.setStopCheckTime(new Date());
             }
 
         }else if ("3".equals(medicalAdviceDTO.getIsNewStatus())){
@@ -196,19 +190,21 @@ public class MedicalAdviceController extends BaseController {
              * 1.开嘱拒收：核收时间，核收人不为空，其他为空
              * 2.停嘱拒收：停嘱核收时间，停嘱核收人不为空，其他为空
              */
-            medicalAdviceDTO.setCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setCheckTime(new Date());
-            medicalAdviceDTO.setCheckSecondId(null);
-            medicalAdviceDTO.setCheckSecondName(null);
-            medicalAdviceDTO.setCheckSecondTime(null);
-
-            medicalAdviceDTO.setStopCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setStopCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setStopCheckTime(new Date());
-            medicalAdviceDTO.setStopCheckSecondId(null);
-            medicalAdviceDTO.setStopCheckSecondName(null);
-            medicalAdviceDTO.setStopCheckSecondTime(null);
+            if("0".equals(medicalAdviceDTO.getIsMyself())){
+                medicalAdviceDTO.setCheckId(sysUserDTO.getId());
+                medicalAdviceDTO.setCheckName(sysUserDTO.getName());
+                medicalAdviceDTO.setCheckTime(new Date());
+                medicalAdviceDTO.setStopCheckId(sysUserDTO.getId());
+                medicalAdviceDTO.setStopCheckName(sysUserDTO.getName());
+                medicalAdviceDTO.setStopCheckTime(new Date());
+            }else{
+                medicalAdviceDTO.setCheckId(medicalAdviceDTO.getCheckId());
+                medicalAdviceDTO.setCheckName(medicalAdviceDTO.getCheckName());
+                medicalAdviceDTO.setCheckTime(new Date());
+                medicalAdviceDTO.setStopCheckId(medicalAdviceDTO.getStopCheckId());
+                medicalAdviceDTO.setStopCheckName(medicalAdviceDTO.getStopCheckName());
+                medicalAdviceDTO.setStopCheckTime(new Date());
+            }
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
             medicalAdviceService_consumer.refuseMedicalAdvices(map);
@@ -219,12 +215,6 @@ public class MedicalAdviceController extends BaseController {
              * 1.开嘱核收：都不为空,但是不需要改变核收人
              * 2.停嘱核收：都不为空,但是不需要改变停嘱核收人
              */
-            medicalAdviceDTO.setCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setCheckTime(new Date());
-            medicalAdviceDTO.setStopCheckId(sysUserDTO.getId());
-            medicalAdviceDTO.setStopCheckName(sysUserDTO.getName());
-            medicalAdviceDTO.setStopCheckTime(new Date());
 
             if("0".equals(medicalAdviceDTO.getIsMyself())){
                 medicalAdviceDTO.setCheckSecondId(sysUserDTO.getId());
@@ -241,6 +231,11 @@ public class MedicalAdviceController extends BaseController {
                 medicalAdviceDTO.setStopCheckSecondName(medicalAdviceDTO.getStopCheckSecondName());
                 medicalAdviceDTO.setStopCheckSecondTime(new Date());
             }
+            map.put("hospCode", sysUserDTO.getHospCode());
+            map.put("medicalAdviceDTO", medicalAdviceDTO);
+            //纯校验，有问题就报错
+            doctorAdviceService_consumer.checkFirstAndSecoundIsSame(map);
+
         } else if ("1".equals(medicalAdviceDTO.getIsNewStatus())) {
             /**
              * 1.核对
@@ -262,14 +257,41 @@ public class MedicalAdviceController extends BaseController {
                 medicalAdviceDTO.setStopCheckSecondName(medicalAdviceDTO.getStopCheckSecondName());
                 medicalAdviceDTO.setStopCheckSecondTime(new Date());
             }
-
+            medicalAdviceDTO.setCheckId(medicalAdviceDTO.getCheckSecondId());
+            medicalAdviceDTO.setCheckName(medicalAdviceDTO.getCheckSecondName());
+            medicalAdviceDTO.setCheckTime(medicalAdviceDTO.getCheckSecondTime());
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
-           medicalAdviceService_consumer.acceptMedicalAdvices(map);
+            //纯校验，有问题就报错
+            doctorAdviceService_consumer.checkFirstAndSecoundIsSame(map);
+
+            medicalAdviceService_consumer.acceptMedicalAdvices(map);
         }
         map.put("hospCode", sysUserDTO.getHospCode());
         map.put("medicalAdviceDTO", medicalAdviceDTO);
 
         return medicalAdviceService_consumer.updateAdviceInChecked(map);
     }
+
+
+    /**
+     * @Method: getMedicalAdvices
+     * @Description: 根据条件查询医嘱列表
+     * @Param: [medicalAdviceDTO]
+     * @Author: youxianlin
+     * @Email: 254580179@qq.com
+     * @Date: 2020/9/24 16:23
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.base.PageDTO>
+     **/
+    @GetMapping(value = "/getMedicalAdvicesNew")
+    public WrapperResponse<PageDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO, HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        medicalAdviceDTO.setHospCode(sysUserDTO.getHospCode());
+        medicalAdviceDTO.setDeptId(sysUserDTO.getLoginBaseDeptDTO().getId());
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("medicalAdviceDTO", medicalAdviceDTO);
+        return medicalAdviceService_consumer.getMedicalAdvicesNew(map);
+    }
+
 }

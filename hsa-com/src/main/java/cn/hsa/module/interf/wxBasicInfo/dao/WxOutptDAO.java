@@ -337,4 +337,18 @@ public interface WxOutptDAO {
     void removeLockByProfileId(Map<String, Object> map);
 
     List<String> getCountData(Map<String, Object> map);
+
+    /**
+     * 查询是否存在某个档案下当前日期有有效的核酸检测申请数据
+     * @param data
+     * @return
+     */
+    OutptVisitDTO getHsjcsqByProfileId(Map<String, Object> data);
+
+    /**
+     * 查询当前日期有有效的核酸检测申请总数
+     * @param data
+     * @return
+     */
+    int getHsjcsqByApplyTime(Map<String, Object> data);
 }

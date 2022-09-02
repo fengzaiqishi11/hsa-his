@@ -1224,4 +1224,23 @@
           and a.type_code in ('1', '2')
     </select>
 
+
+    <select id="getHsjcsqByProfileId" resultType="cn.hsa.module.outpt.visit.dto.OutptVisitDTO">
+        select * from outpt_visit
+                 where
+                     hosp_code =#{hospCode}
+                 and source_tj_code = #{SourceTjCode}
+                 and profile_id = #{profileId}
+                 and date(visit_time) =date(#{applyTime})
+    </select>
+
+
+    <select id="getHsjcsqByApplyTime" resultType="int">
+        select count(1) from outpt_visit
+        where
+            hosp_code =#{hospCode}
+          and source_tj_code = #{SourceTjCode}
+          and date(visit_time) =date(#{applyTime})
+    </select>
+
 </mapper>

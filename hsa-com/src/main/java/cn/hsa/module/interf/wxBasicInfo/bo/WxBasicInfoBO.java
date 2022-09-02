@@ -416,5 +416,5 @@ public interface WxBasicInfoBO {
 
     void removeLockByProfileId(Map<String, Object> map);
 
-    WrapperResponse<String> hsjcApply(Map<String, Object> map);
+    WrapperResponse<String> saveHsjcApply(Map<String, Object> map);
 }

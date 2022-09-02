@@ -346,4 +346,9 @@ public class DoctorAdviceServiceImpl extends HsafService implements DoctorAdvice
     public WrapperResponse<List<InptAdviceDTO>> getCFAdviceByVisitId(Map map) {
         return WrapperResponse.success(doctorAdviceBO.getCFAdviceByVisitId(MapUtils.get(map, "inptVisitDTO")));
     }
+
+    @Override
+    public void checkFirstAndSecoundIsSame(Map<String, Object> map) {
+        doctorAdviceBO.checkFirstAndSecoundIsSame(MapUtils.get(map, "medicalAdviceDTO"));
+    }
 }

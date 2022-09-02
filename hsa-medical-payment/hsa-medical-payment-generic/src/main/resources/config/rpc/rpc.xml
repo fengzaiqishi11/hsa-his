@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/mvc
+       http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+    <!-- 该文件需要项目自行引入-->
+    <bean id="rpcDubboServiceContextAspect" class="cn.hsa.hsaf.generic.rpc.RpcDubboServiceContextAspect"/>
+
+    <aop:config>
+        <!-- 配置切点表达式 -->
+        <aop:pointcut id="pointcut" expression="execution(* cn.hsa..*service.*Service.*(..))"/>
+        <aop:aspect ref="rpcDubboServiceContextAspect" order="9999">
+            <aop:before method="beforeInvokingSetContext" pointcut-ref="pointcut"/>
+        </aop:aspect>
+    </aop:config>
+
+    <!-- 接受端 -->
+    <bean id="restHsfServiceInterceptor" class="cn.hsa.hsaf.generic.rpc.UserContextHttpInterceptor"/>
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <ref bean="restHsfServiceInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

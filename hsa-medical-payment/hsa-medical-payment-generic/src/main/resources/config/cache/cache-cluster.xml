@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置-->
+    <bean id="distributedJedisPoolConfig" class="redis.clients.jedis.JedisPoolConfig">
+        <!-- 最小空闲数 -->
+        <property name="minIdle" value="4"/>
+
+        <!-- 最大空闲数 -->
+        <property name="maxIdle" value="16"/>
+
+        <!-- 最大连接数 -->
+        <property name="maxTotal" value="256"/>
+
+        <!-- 最大等待时间 单位毫秒（ms） -->
+        <property name="maxWaitMillis" value="60000"/>
+
+        <!-- 删除间隔 -->
+        <property name="timeBetweenEvictionRunsMillis" value="-1"/>
+
+        <!-- 使用连接时测试连接是否可用 -->
+        <property name="testOnBorrow" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="testOnCreate" value="true"/>
+    </bean>
+    <!-- 多个单机与多个集群 可同时共存,deployType 参数值为1:单机模式,2:集群模式 -->
+    <bean id="cacheManager" class="cn.hsa.hsaf.cache.redis.HsafRedisCacheManager">
+        <property name="cacheAdapters">
+            <set>
+                <bean class="cn.hsa.hsaf.cache.redis.HsafCacheAdapter">
+                    <property name="deployType" value="2"/>
+                    <property name="cacheName" value="${cache.cluster0.cacheName}"/>
+                    <property name="clusterNodes" value="${cache.cluster0.nodes}"/>
+                    <property name="password" value="${cache.cluster0.password}"/>
+                    <property name="jedisConfig" ref="distributedJedisPoolConfig"/>
+                </bean>
+
+                <!-- 第二个节点(可以是单机，也可以是集群,多个单机与集群可以混合使用)
+                <bean class="cn.hsa.hsaf.cache.redis.HsafCacheAdapter">
+                    <property name="deployType" value="1"/>
+                    <property name="cacheName" value="${cache.node1.cacheName}"/>
+                    <property name="clusterNodes" value="${cache.node1.nodes}"/>
+                    <property name="password" value="${cache.node1.password}"/>
+                    <property name="maxRedirects" value="5"/>
+                    <property name="jedisConfig" ref="distributedJedisPoolConfig"/>
+                </bean>
+                -->
+            </set>
+        </property>
+    </bean>
+
+    <!--集群版配置 for redisTemplate -->
+    <bean id="jedisClusterConnectionFactory"
+          class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory" primary="true">
+        <constructor-arg index="0">
+            <bean class="cn.hsa.hsaf.cache.redis.HsafRedisClusterConfiguration">
+                <constructor-arg name="clusterNodes" value="${cache.cluster0.nodes}"/>
+                <property name="maxRedirects" value="3"/>
+                <property name="password">
+                    <bean class="org.springframework.data.redis.connection.RedisPassword">
+                        <constructor-arg name="thePassword" value="${cache.cluster0.password}"/>
+                    </bean>
+                </property>
+            </bean>
+        </constructor-arg>
+        <constructor-arg index="1" ref="distributedJedisPoolConfig"/>
+    </bean>
+
+    <!-- connectionFactory:可引用单机版，也可引用集群版-->
+    <bean id="hsafRedisTemplate" class="org.springframework.data.redis.core.RedisTemplate" primary="true">
+        <property name="connectionFactory" ref="jedisClusterConnectionFactory"/>
+        <property name="keySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="valueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+        <property name="hashKeySerializer">
+            <bean class="org.springframework.data.redis.serializer.StringRedisSerializer"/>
+        </property>
+        <property name="hashValueSerializer">
+            <bean class="org.springframework.data.redis.serializer.JdkSerializationRedisSerializer"/>
+        </property>
+    </bean>
+</beans>

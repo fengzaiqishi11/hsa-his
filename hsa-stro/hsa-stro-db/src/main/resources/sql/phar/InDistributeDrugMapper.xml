@@ -241,6 +241,7 @@
         ifnull((select num from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockNum,
         (select unit_code from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code) stockUnionCode,
         ifnull((select stock_occupy from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) stockOccupy,
+        ifnull((select location_no from stro_stock where item_id=c.itemId and item_code=c.itemCode and biz_id=c.phar_id and hosp_code=c.hosp_code),0) locationNo,
         total * price as totalPrice
         from (
             select a.item_code itemCode,a.item_id itemId,a.item_name itemName,a.spec,a.price,a.unit_code unitCode,b.phar_id,a.split_ratio splitRatio,
@@ -262,7 +263,7 @@
             and a.receive_id=#{receiveId}
         </if>
             group by a.item_code,a.item_id,a.item_name,a.spec,a.price,a.unit_code,b.phar_id,a.hosp_code,a.split_unit_code,a.split_ratio,a.dosage_unit_code
-        ) c order by totalPrice
+        ) c order by locationNo ASC,itemName ASC
     </select>
 
     <!--根据领药申请ID获取明细数据-->

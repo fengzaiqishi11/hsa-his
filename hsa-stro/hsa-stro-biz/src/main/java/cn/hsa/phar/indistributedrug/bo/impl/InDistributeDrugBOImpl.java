@@ -180,7 +180,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
      * @Return: java.lang.Boolean
      **/
     @Override
-    public Boolean updateInDispense(PharInReceiveDTO pharInReceiveDTO) {
+    public List<StroStockDetailDTO> updateInDispense(PharInReceiveDTO pharInReceiveDTO) {
 
         String redisKey = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYPY").
                 append(pharInReceiveDTO.getId()).append(Constants.INPT_DISPENSE_REDIS_KEY).toString();
@@ -244,13 +244,19 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
                 }
             }
 
+            List<StroStockDetailDTO> resultList = new LinkedList<>();
             //判断库存
             if (kcjyMap!=null && kcjyMap.size()>0) {
                 for (String key:kcjyMap.keySet()) {
-                    if(!stroStockBO.getStroStock(kcjyMap.get(key))){
-                        throw new RuntimeException(kcjyMap.get(key).get("itemName")+"库存不足，可以取消预配药该药品再继续配药");
+                    List<StroStockDetailDTO> stockDetailDTOList = new ArrayList<>();
+                    stockDetailDTOList = stroStockBO.getStroStockDetailIfNumShortage(kcjyMap.get(key));
+                    if (!ListUtils.isEmpty(stockDetailDTOList)){
+                        resultList.addAll(stockDetailDTOList);
                     }
                 }
+            }
+            if (!ListUtils.isEmpty(resultList)){
+                return resultList;
             }
 
             //占用库存
@@ -263,13 +269,13 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
 
             //更新住院待领表 配药信息
             inDistributeDrugDAO.updateInWaitReceiveAssign(pharInReceiveDetailDOList);
+            return resultList;
         } catch (AppException e) {
             log.error("配药失败",e.getMessage());
             throw new AppException(e.getMessage());
         }finally {
             redisUtils.del(redisKey);
         }
-        return true;
     }
 
     /**

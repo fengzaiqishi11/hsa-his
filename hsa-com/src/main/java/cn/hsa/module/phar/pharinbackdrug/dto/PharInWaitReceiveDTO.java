@@ -111,4 +111,8 @@ public class PharInWaitReceiveDTO extends PharInWaitReceiveDO implements Seriali
      * 入参例如："0,1"
      */
     private String isLong;
+    /**
+     * 货架号排序
+     */
+    private String locationNo;
 }

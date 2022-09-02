@@ -6,6 +6,7 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -94,7 +95,7 @@ public interface InDistributeDrugService {
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @PostMapping("/service/stro/inDistributeDrug/inDispense")
-    WrapperResponse<Boolean> inDispense(Map map);
+    WrapperResponse<List<StroStockDetailDTO>> inDispense(Map map);
 
     /**
      * @Method: cancelInDispense

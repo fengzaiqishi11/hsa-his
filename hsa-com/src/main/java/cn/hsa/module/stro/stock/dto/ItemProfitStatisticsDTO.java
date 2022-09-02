@@ -96,5 +96,17 @@ public class ItemProfitStatisticsDTO extends StroStockDetailDO implements Serial
      * 编码
      */
     private String code;
+    /**
+     * 零售单价单位
+     */
+    private String sellUnitCode;
+    /**
+     * 零售拆零单价
+     */
+    private BigDecimal sellSplitPrice;
+    /**
+     * 零售拆零单价单位
+     */
+    private String sellSplitUnitCode;
 
 }

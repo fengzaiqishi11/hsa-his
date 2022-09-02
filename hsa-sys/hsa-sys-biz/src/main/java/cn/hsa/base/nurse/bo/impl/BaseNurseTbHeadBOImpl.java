@@ -170,7 +170,7 @@ public class BaseNurseTbHeadBOImpl extends HsafBO implements BaseNurseTbHeadBO {
         BaseNurseTbHeadDTO baseNurseTbHeadDTO = (BaseNurseTbHeadDTO) map.get("baseNurseTbHeadDTO");
         //当数据来源方式为护士人员信息时，设置护士人员sql语句值到资源值中
         if ("2".equals(baseNurseTbHeadDTO.getSourceCode())) {
-            String sql = "select id,code,name from sys_user where is_in_job = '1' and work_type_code like '20%' and hosp_code = '?'";
+            String sql = "select id,code,name from sys_user where is_in_job = '1' and status_code = '0' and work_type_code like '20%' and hosp_code = '?'";
             baseNurseTbHeadDTO.setSourceValue(sql);
         }
         try {

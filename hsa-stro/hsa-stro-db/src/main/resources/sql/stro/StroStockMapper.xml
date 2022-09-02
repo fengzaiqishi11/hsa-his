@@ -831,7 +831,7 @@
   </select>
     <select id="getStroStockDetailIfNumShortage" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
         select a.item_name,a.num as totalNum,a.split_num as totalSplitNum,
-        c.num as expiryNum,c.split_num as expirySplitNum,c.batch_no,c.expiry_date,a.stock_occupy,
+        c.num as expiryNum,c.split_num as expirySplitNum,c.batch_no,c.expiry_date,a.stock_occupy AS stockOccupy,
         case  a.item_code when '1' then bd.code  when  '2' then bm.code  end code,
         case  a.item_code when '1' then bd.prod_code  when  '2' then bm.prod_code  end prod_code
         from stro_stock a

@@ -141,6 +141,6 @@ public class StroStockDetailDTO extends StroStockDetailDO implements Serializabl
      */
     private BigDecimal expirySplitNum;
 
-    private BigDecimal stock_occupy;
+    private BigDecimal stockOccupy;
 
 }

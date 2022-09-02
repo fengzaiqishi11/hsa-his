@@ -138,6 +138,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
     public synchronized WrapperResponse updateOutptOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDTO> tkOutptPayDTOList) {
         // TODO 必要入参获取 [就诊ID：visitId , 医院编码：hospCode , 结算ID：settleId , 费用列表信息：allCostDTOList]
         Map selectMap = new HashMap<>();
+        boolean isInsurePaitentPartBack = false;
         String visitId = outptSettleDTO.getVisitId();
         String hospCode = outptSettleDTO.getHospCode();
         String settleId = outptSettleDTO.getId();
@@ -161,6 +162,11 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         // TODO 基本异常情况判断 - 获取原始结算数据
         OutptSettleDTO oldOutptSettleDTO = outptSettleDAO.selectByPrimaryKey(settleId);
+        // 获取要退费的病人类型
+        if (StringUtils.isEmpty(oldOutptSettleDTO.getPatientCode())){
+            oldOutptSettleDTO.setPatientCode("0");
+        }
+        Integer patientCode = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
         if (oldOutptSettleDTO == null) {
             throw new AppException("退费失败：未找到结算信息");
         }
@@ -182,7 +188,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
             // 部分退: 获取未退项目
             if (compNum == 1) {
-                costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName));
+                costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName,patientCode));
                 BigDecimal rePrice = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(), outptCostDTO.getTotalNum());
                 moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(rePrice, lastNum));
             } else { // 全退的记录下来，关于医技的需要更新状态（已退费）
@@ -534,7 +540,10 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
             if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
                 phyIsCallBack(allCostDTOList);
             }
-            return WrapperResponse.success(true);
+            Map insurePaitentInfo = new HashMap();
+            insurePaitentInfo.put("outptVisit", outpt); // 返回病人信息
+            insurePaitentInfo.put("isInsurePaitentPartBack", isInsurePaitentPartBack); // 是否医保病人部分退费
+            return WrapperResponse.success(insurePaitentInfo);
         }
 
         //判断是否是移动支付，是移动支付退款则推送退款申请 todo 并且这一笔结算是移动支付
@@ -795,12 +804,23 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
         outptTmakePriceFormService_consumer.saveOutptSettleByTf(chargeParams);
         }
+        /***********start 医保病人退部分费用标识**********/
+        if (!ListUtils.isEmpty(costDTOList) && patientCodeValue > 0) {
+            isInsurePaitentPartBack = true;
+        } else {
+            isInsurePaitentPartBack = false;
+        }
+        Map insurePaitentInfo = new HashMap();
+        insurePaitentInfo.put("outptVisit", outpt); // 返回病人信息
+        insurePaitentInfo.put("isInsurePaitentPartBack", isInsurePaitentPartBack); // 是否医保病人部分退费
+        /***********End 医保病人退部分费用标识*********/
+
        /***********End*****************非医保病人自动收费************************************/
         // 体检回调
         if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
             phyIsCallBack(allCostDTOList);
         }
-        return WrapperResponse.success(true);
+        return WrapperResponse.success(insurePaitentInfo);
     }
 
     /**
@@ -1540,7 +1560,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
      * @Date 2020/9/07 09:15
      * @Return OutptCostDTO
      */
-    private OutptCostDTO getLastFeeList(OutptCostDTO outptCostDTO, BigDecimal lastNum,String crteId,String crteName) {
+    private OutptCostDTO getLastFeeList(OutptCostDTO outptCostDTO, BigDecimal lastNum,String crteId,String crteName,Integer patientCode) {
         OutptCostDTO costDto = new OutptCostDTO();
         BeanUtils.copyProperties(outptCostDTO, costDto);
 
@@ -1581,7 +1601,13 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         costDto.setCrteId(crteId);
         costDto.setCrteName(crteName);
         costDto.setCrteTime(DateUtils.getNow());
-
+        /*医保病人部分退费标识 start lly 2022-08-31*/
+        if (patientCode!=null&&patientCode>0) {
+            costDto.setIsBackReentry(Constants.SF.S);
+        }else {
+            costDto.setIsBackReentry(Constants.SF.F);
+        }
+        /*医保病人部分退费标识 end lly 2022-08-31*/
         // 官红强 部分退费重新收取部分需要记录原费用ID
 		costDto.setOldCostId(outptCostDTO.getId());
         return costDto;

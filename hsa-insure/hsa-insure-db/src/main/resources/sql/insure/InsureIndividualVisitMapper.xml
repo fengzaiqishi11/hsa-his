@@ -841,6 +841,13 @@
         update insure_individual_visit set medical_reg_no =#{medicalRegNo}
         where hosp_code =#{hospCode} and visit_id =#{visitId}
     </update>
+    <update id="updateInsureMedicalRegNoGS"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        update insure_individual_visit
+        set medical_reg_no =#{medicalRegNo}
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
         DELETE

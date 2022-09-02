@@ -483,6 +483,9 @@ public interface InsureIndividualVisitDAO {
     **/
     int updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
 
+
+    int updateInsureMedicalRegNoGS(InsureIndividualVisitDTO responseData);
+
     InptVisitDTO selectInptVisit(Map<String, Object> map);
 
     /**

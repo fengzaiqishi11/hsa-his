@@ -165,4 +165,25 @@ public class BaseProfileFileController extends BaseController {
         map.put("id",id);
         return baseProfileFileService_consumer.deleteProfileFile(map);
     }
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption  新增修改档案时判断身份证是否重复
+     * @Param [outptProfileFileDTO]
+     * @Author liuliyun
+     * @Date   2022/09/02 9:54
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
+     **/
+    @GetMapping("/queryCertNoIsExist")
+    public WrapperResponse<Boolean> queryCertNoIsExist(OutptProfileFileDTO outptProfileFileDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        if (StringUtils.isEmpty(outptProfileFileDTO.getCertNo())){
+            throw new RuntimeException("未检查到证件号");
+        }
+        outptProfileFileDTO.setHospCode(sysUserDTO.getHospCode());
+        Map map = new HashMap();
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("outptProfileFileDTO", outptProfileFileDTO);
+        return baseProfileFileService_consumer.queryCertNoIsExist(map);
+    }
 }

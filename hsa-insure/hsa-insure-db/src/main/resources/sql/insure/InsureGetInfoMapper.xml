@@ -1076,7 +1076,7 @@
                moi.oper_disease_name          as oprnOprtName,
                moi.oper_disease_icd9,
                moi.oper_time                  as oprnOprtDate,
-               ''                             as anst_way,
+               moi.ana_code                      as anst_way,
                (select prac_certi_no
                 from sys_user su
                 where su.hosp_code = #{hospCode}
@@ -2097,7 +2097,7 @@
 	    idm.oper_nation_name as oprnOprtName,
 	    moi.oper_disease_icd9,
 	    moi.oper_time as oprnOprtDate,
-	    '' as anst_way,
+	    moi.ana_code as anst_way,
 	    (
 	    select
 		prac_certi_no
@@ -2273,5 +2273,11 @@
             where  visit_id =#{item.visitId} and insure_settle_id = #{item.insureSettleId}
         </foreach>
     </update>
+    
+    <select id="queryAnstMtd" resultType="cn.hsa.module.insure.module.dto.InsureDictDTO">
+        SELECT id, hosp_code, insure_reg_code, code, name, value, remark,
+               crte_id, crte_name, crte_time, ext01, ext02, ext03,
+               medicine_org_code FROM insure_dict where hosp_code = #{hospCode}AND code = #{code}
+    </select>
 
 </mapper>

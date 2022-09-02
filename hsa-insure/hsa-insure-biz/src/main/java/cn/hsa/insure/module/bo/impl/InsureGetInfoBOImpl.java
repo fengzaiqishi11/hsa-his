@@ -3047,6 +3047,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             diseaseCount = zxCollect.size()+xiCollect.size();
             map.put("mrisType",Constant.UnifiedPay.MRISTYPE.ZY);
         }
+        //如果西医没有主诊断，填充一条空的
+        int isMain = 0;
+        for (int i = 0; i < xiCollect.size(); i++) {
+            if (Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())) {
+                isMain++;
+            }
+        }
+        if(isMain == 0){
+            InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
+            inptDiagnoseDTO.setIsMain(Constant.UnifiedPay.ISMAN.S);
+            inptDiagnoseDTO.setDiseaseCode("");
+            inptDiagnoseDTO.setDiseaseName("");
+            inptDiagnoseDTO.setAdmCondType("");
+            inptDiagnoseDTO.setId("");
+            inptDiagnoseDTO.setVisitId("");
+            inptDiagnoseDTO.setHospCode("");
+            xiCollect.add(0,inptDiagnoseDTO);
+        }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
         List<InptDiagnoseDTO> zxCollect2 = new ArrayList<>();
@@ -3265,7 +3283,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             insureGetInfoDAO.deleteOperInfo(map);
             if (!ListUtils.isEmpty(opernInfoList)) {
                 opernInfoList.get(0).put("oprnOprtType", "1");
+                //判断麻醉方式是否在医保码表范围
+                map.put("code","ANST_MTD_CODE");
+                List<InsureDictDTO> insureDictDTOList = insureGetInfoDAO.queryAnstMtd(map);
                 opernInfoList.stream().forEach(item -> {
+                    if(ObjectUtil.isNotEmpty(item.get("anstWay"))){
+                        int i = 0;
+                        if(!ListUtils.isEmpty(insureDictDTOList)){
+                            for(InsureDictDTO insureDictDTO:insureDictDTOList){
+                                if(insureDictDTO.getValue().equals(item.get("anstWay"))){
+                                    i++;
+                                    break;
+                                }
+                            }
+                            if(i == 0){
+                                throw new AppException(item.get("oprnOprtName")+"的麻醉方式名称:"+getSysCodeName((String) map.get("hospCode"),"MZFS",(String)item.get("anstWay"))+
+                                        ",麻醉方式码值为:"+item.get("anstWay")+"不在医保码表范围内,请重新选择");
+                            }
+                        }
+                    }
                     Object oprnOprtStartTime = MapUtils.get(item, "oprnOprtStartTime");
                     if (oprnOprtStartTime != null) {
                         item.put("oprnOprtStartTime", DateUtils.getNumerToStringDate(oprnOprtStartTime)); // 手术开始时间

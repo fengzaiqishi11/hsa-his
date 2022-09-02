@@ -931,4 +931,15 @@ public interface InsureGetInfoDAO {
      * @Return
      */
     void updateUplodError(@Param("errorMapList")List<Map<String, Object>> errorMapList);
+
+    /**
+     * @Method updateInsureGetInfo
+     * @Desrciption  查询麻醉方式
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 20:54
+     * @Return
+     **/
+    List<InsureDictDTO> queryAnstMtd(Map<String, Object> map);
 }

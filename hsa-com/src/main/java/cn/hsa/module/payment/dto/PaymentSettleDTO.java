@@ -17,11 +17,14 @@ import java.io.Serializable;
  *@Date: 2020/8/2 8:30
  *@Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(callSuper = true)
 public class  PaymentSettleDTO extends PaymentSettleDO implements Serializable {
     private static final long serialVersionUID = 8482163899015207131L;
-
+    private String startTime;
+    private String endTime;
+    private String keyword;
 }

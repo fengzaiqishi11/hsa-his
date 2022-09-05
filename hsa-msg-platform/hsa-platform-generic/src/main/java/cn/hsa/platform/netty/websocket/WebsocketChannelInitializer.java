@@ -1,7 +1,6 @@
 package cn.hsa.platform.netty.websocket;
 
 import cn.hsa.platform.netty.websocket.handler.ChannelAuthHandler;
-import cn.hsa.platform.netty.websocket.handler.ChannelPingHandler;
 import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
@@ -26,7 +25,7 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
 
     private ChannelAuthHandler channelAuthHandler;
 
-    private ChannelPingHandler channelPingHandler;
+//    private ChannelPingHandler channelPingHandler;
 
     @Value("${websocket.url}")
     private String websocketUrl;
@@ -39,10 +38,10 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
     public void setChannelAuthHandler(ChannelAuthHandler authHandler){
         this.channelAuthHandler = authHandler;
     }
-   @Autowired
-    public void setChannelPingHandler(ChannelPingHandler channelPingHandler){
-        this.channelPingHandler = channelPingHandler;
-    }
+//   @Autowired
+//    public void setChannelPingHandler(ChannelPingHandler channelPingHandler){
+//        this.channelPingHandler = channelPingHandler;
+//    }
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
 
@@ -60,7 +59,7 @@ public class WebsocketChannelInitializer extends ChannelInitializer<SocketChanne
         pipeline.addLast(new HttpObjectAggregator(8192));
         // 鉴权handler必须加在WebSocket协议处理器之前否则当协议切换后该handler不会触发
         pipeline.addLast(channelAuthHandler);
-        pipeline.addLast(channelPingHandler);
+//        pipeline.addLast(channelPingHandler);
         /* 说明
           1. 对应websocket ，它的数据是以 帧(frame) 形式传递
           2. 可以看到WebSocketFrame 下面有六个子类

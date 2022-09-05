@@ -618,6 +618,9 @@
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
         case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
         case when B.item_code = '1' then bd.code else bm.code end code, /*编码*/
+        case when B.item_code = '1' then bd.unit_code else bm.unit_code end sellUnitCode,
+        case when B.item_code = '1' then bd.split_price else bm.split_price end sellSplitPrice, /*零售拆零单价*/
+        case when B.item_code = '1' then bd.split_unit_code else bm.split_unit_code end sellSplitUnitCode,
         B.item_id as itemId,/*项目id*/
         B.item_name as itemName,/*项目名称*/
         sum(ifnull(B.total_num,0)) as sellCount/*数量*/
@@ -671,7 +674,7 @@
         * bm.avg_buy_price) end buyPriceAll,/*购进总金额*/
         case when B.item_code = '1' then bd.avg_buy_price else bm.avg_buy_price end buyPrice, /*平均购进价*/
         case when B.item_code = '1' then bd.price else bm.price end sellPrice, /*零售单价*/
-        case when B.item_code = '1' then bd.unitCode else bm.unitCode end sellUnitCode,
+        case when B.item_code = '1' then bd.unit_code else bm.unit_code end sellUnitCode,
         case when B.item_code = '1' then bd.split_price else bm.split_price end sellSplitPrice, /*零售拆零单价*/
         case when B.item_code = '1' then bd.split_unit_code else bm.split_unit_code end sellSplitUnitCode,
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
@@ -731,6 +734,9 @@
         case when B.item_code = '1' then bd.split_ratio else bm.split_ratio end splitRatio, /*拆分比*/
         case when B.item_code = '1' then bd.spec else bm.spec end itemSpec, /*规格*/
         case when B.item_code = '1' then bd.code else bm.code end code, /*编码*/
+        case when B.item_code = '1' then bd.unit_code else bm.unit_code end sellUnitCode,
+        case when B.item_code = '1' then bd.split_price else bm.split_price end sellSplitPrice, /*零售拆零单价*/
+        case when B.item_code = '1' then bd.split_unit_code else bm.split_unit_code end sellSplitUnitCode,
         B.item_id as itemId,/*项目id*/
         B.item_name as itemName,/*项目名称*/
         sum(ifnull(B.total_num,0)) as sellCount/*数量*/

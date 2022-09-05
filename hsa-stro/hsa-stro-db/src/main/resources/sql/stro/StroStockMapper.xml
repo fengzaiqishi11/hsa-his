@@ -829,8 +829,25 @@
        from stro_stock_time
        where hosp_code = #{hospCode} and stock_time = #{stockTime}
   </select>
+    <select id="getStroStockDetailIfNumShortage" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        select a.item_name,a.num as totalNum,a.split_num as totalSplitNum,
+        c.num as expiryNum,c.split_num as expirySplitNum,c.batch_no,c.expiry_date,a.stock_occupy AS stockOccupy,
+        case  a.item_code when '1' then bd.code  when  '2' then bm.code  end code,
+        case  a.item_code when '1' then bd.prod_code  when  '2' then bm.prod_code  end prod_code
+        from stro_stock a
+        left join
+        (select sum(split_num) stroNum,item_id,biz_id,item_code,hosp_code,expiry_date
+        from stro_stock_detail where hosp_code = #{hospCode} and biz_id = #{bizId}
+        and date(expiry_date) &lt; date(now())  and item_id= #{itemId}  group by item_id) b on a.item_id = b.item_id
+        left join stro_stock_detail c on c.item_id = a.item_id and  c.hosp_code = a.hosp_code and
+        c.biz_id = a.biz_id and date(c.expiry_date) &lt; date(now()) and c.num > 0
+        left join base_drug bd on bd.id = a.item_id
+        left join base_material bm on bm.id = a.id
+        where ifnull((a.split_num-ifnull(a.stock_occupy,0)-ifnull(b.stroNum,0) - #{stockNum} ),0) &lt; 0
+        and a.item_id = #{itemId} and a.biz_id = #{bizId}
+    </select>
 
-   <insert id="insertStockTime" parameterType="java.util.List">
+    <insert id="insertStockTime" parameterType="java.util.List">
      insert into stro_stock_time(id, hosp_code, biz_id, location_no, item_code, item_id, item_name, spec, prep_code,
       num, unit_code, buy_price_all, sell_price_all,split_ratio,split_num, split_price, split_unit_code,
       stock_max, stock_min, stock_occupy,stock_time,crte_time)

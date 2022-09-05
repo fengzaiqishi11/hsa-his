@@ -243,4 +243,6 @@ public interface OutptVisitDAO {
     OutptVisitDTO queryInptVisitInfo(OutptVisitDTO outptVisitDTO);
 
     InsureIndividualVisitDTO queryInsureVisitInfo(OutptVisitDTO outptVisitDTO);
+
+    OutptVisitDTO queryByID(OutptVisitDTO outptVisitDTO);
 }

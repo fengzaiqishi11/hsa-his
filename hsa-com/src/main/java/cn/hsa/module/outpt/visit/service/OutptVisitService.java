@@ -127,4 +127,14 @@ public interface OutptVisitService {
     WrapperResponse<OutptVisitDTO> queryInptVisitInfo(Map map);
 
     WrapperResponse<InsureIndividualVisitDTO> queryInsureVisitInfo(Map map);
+    /**
+     * @param map
+     * @Menthod: queryPrescriptionAllowed
+     * @Desrciption: 获取病人是否在允许的开方时间内
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-09-1 08:51
+     * @Return: Boolean
+     */
+    WrapperResponse<Boolean> queryPrescriptionAllowed(Map map);
 }

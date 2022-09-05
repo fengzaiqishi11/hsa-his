@@ -119,4 +119,14 @@ public interface OutptVisitBO {
 
     OutptVisitDTO queryInptVisitInfo(OutptVisitDTO outptVisitDTO);
     InsureIndividualVisitDTO queryInsureVisitInfo(OutptVisitDTO outptVisitDTO);
+    /**
+     * @param outptVisitDTO
+     * @Menthod: queryPrescriptionAllowed
+     * @Desrciption: 获取病人是否在允许的开方时间内
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-09-1 08:51
+     * @Return: Boolean
+     */
+    Boolean queryPrescriptionAllowed(OutptVisitDTO outptVisitDTO);
 }

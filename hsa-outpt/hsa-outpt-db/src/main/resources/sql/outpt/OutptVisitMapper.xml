@@ -1024,4 +1024,55 @@
           and iv.cert_no =#{certNo}
             order by iv.crte_time desc limit 1
     </select>
+
+    <select id="queryByID" resultMap="OutptVisitResultMap">
+        SELECT
+            id,
+            hosp_code,
+            profile_id,
+            out_profile,
+            register_id,
+            register_no,
+            NAME,
+            gender_code,
+            age,
+            age_unit_code,
+            birthday,
+            marry_code,
+            nation_code,
+            cert_code,
+            cert_no,
+            phone,
+            visit_no,
+            visit_code,
+            patient_code,
+            preferential_type_id,
+            insure_code,
+            insure_org_code,
+            insure_no,
+            insure_biz_code,
+            insure_treat_code,
+            insure_patient_id,
+            insure_remark,
+            doctor_id,
+            doctor_name,
+            dept_id,
+            dept_name,
+            visit_time,
+            remark,
+            pym,
+            wbm,
+            ifnull(is_visit,'0') is_visit,
+            tran_in_code,
+            is_first_visit,
+            crte_id,
+            crte_name,
+            cplt_flag,
+            crte_time
+        FROM
+            outpt_visit
+        where
+            hosp_code = #{hospCode}
+          AND id = #{id}
+    </select>
 </mapper>

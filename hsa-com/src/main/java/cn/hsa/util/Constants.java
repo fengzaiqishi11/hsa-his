@@ -76,7 +76,8 @@ public interface Constants {
         public static final String ZCGH = "1"; // 正常挂号
         public static final String YYGH = "2"; // 预约挂号
         public static final String ZZJGH = "3"; // 自助机挂号
-        public static final String HSSQ = "4"; // 核酸申请
+        public static final String HSSQ_DC = "4"; // 核酸申请-单采
+        public static final String HSSQ_HC = "5"; // 核酸申请-混采
 
     }
 

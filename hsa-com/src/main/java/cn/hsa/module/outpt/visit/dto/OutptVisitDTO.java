@@ -160,6 +160,10 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
     private String usageCode;
     //优化后金额
     private BigDecimal realityPrice;
+    //总金额
+    private BigDecimal totalPrice;
+    //优惠金额
+    private BigDecimal preferentialPrice;
 
     // 自定义优惠  优惠类型
     private String customYhlx;

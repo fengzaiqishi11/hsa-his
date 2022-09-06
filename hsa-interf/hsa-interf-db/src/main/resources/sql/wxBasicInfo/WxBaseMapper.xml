@@ -162,6 +162,50 @@
         <result column="one_settle_id" property="oneSettleId" jdbcType="VARCHAR" />
     </resultMap>
 
+    <resultMap type="cn.hsa.module.base.bi.dto.BaseItemDTO" id="BaseItemMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="nationCode" column="nation_code" jdbcType="VARCHAR"/>
+        <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
+        <result property="bfcCode" column="bfc_code" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="abbr" column="abbr" jdbcType="VARCHAR"/>
+        <result property="spec" column="spec" jdbcType="VARCHAR"/>
+        <result property="price" column="price" jdbcType="NUMERIC"/>
+        <result property="onePrice" column="one_price" jdbcType="NUMERIC"/>
+        <result property="twoPrice" column="two_price" jdbcType="NUMERIC"/>
+        <result property="threePrice" column="three_price" jdbcType="NUMERIC"/>
+        <result property="unitCode" column="unit_code" jdbcType="VARCHAR"/>
+        <result property="intension" column="intension" jdbcType="VARCHAR"/>
+        <result property="prompt" column="prompt" jdbcType="VARCHAR"/>
+        <result property="except" column="except" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="isOut" column="is_out" jdbcType="VARCHAR"/>
+        <result property="isIn" column="is_in" jdbcType="VARCHAR"/>
+        <result property="isCg" column="is_cg" jdbcType="VARCHAR"/>
+        <result property="isMs" column="is_ms" jdbcType="VARCHAR"/>
+        <result property="isSuppCurtain" column="is_supp_curtain" jdbcType="VARCHAR"/>
+        <result property="outDeptCode" column="out_dept_code" jdbcType="VARCHAR"/>
+        <result property="inDeptCode" column="in_dept_code" jdbcType="VARCHAR"/>
+        <result property="namePym" column="name_pym" jdbcType="VARCHAR"/>
+        <result property="nameWbm" column="name_wbm" jdbcType="VARCHAR"/>
+        <result property="abbrPym" column="abbr_pym" jdbcType="VARCHAR"/>
+        <result property="abbrWbm" column="abbr_wbm" jdbcType="VARCHAR"/>
+        <result property="isValid" column="is_valid" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="outDeptName" column="outDeptName" jdbcType="VARCHAR"/>
+        <result property="inDeptName" column="inDeptName" jdbcType="VARCHAR"/>
+        <result property="bfcId" column="bfcId" jdbcType="VARCHAR"/>
+        <result property="num" column="num" jdbcType="VARCHAR"/>
+        <result property="yzlb" column="yzlb" jdbcType="VARCHAR"/>
+        <result property="isCost" column="isCost" jdbcType="VARCHAR"/>
+        <result property="useCode" column="use_code" jdbcType="VARCHAR"/>
+        <result property="pharId" column="pharId" jdbcType="VARCHAR"/>
+
+    </resultMap>
     <!-- 表所有字段 -->
     <sql id="Base_Column_List">
         id,
@@ -560,7 +604,43 @@
     </select>
 
     <select id="getBaseAdviceByCode" resultType="cn.hsa.module.base.ba.dto.BaseAdviceDTO">
-        select id,code,name from base_advice  where is_valid ='1' and hosp_code =#{hospCode} and code =#{code}
+        select
+            a.*,
+            b.name  as deptName,
+            b.id  as deptId,
+            c.id  as outDeptId,
+            c.name  as outDeptName
+        from
+            base_advice a
+                left join base_dept b  on a.dept_code = b.code  and a.hosp_code  = b.hosp_code
+                left join base_dept c  on a.out_dept_code  = c.code  and a.hosp_code  = c.hosp_code
+        where
+            a.is_valid = '1'
+          and a.hosp_code =#{hospCode}
+          and a.code =#{code}
+    </select>
+
+    <!-- 获取医嘱信息 -->
+    <select id="getAdviceDetailById" resultMap="BaseItemMap" parameterType="cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO">
+        select if(b.type_code = '3', c.id, e.id) id, if(b.type_code = '3', c.name, e.name) name, if(b.type_code = '3', c.spec, e.spec) spec,
+               if(b.type_code = '3', c.price, e.price) price,if(b.type_code = '3', d.id, f.id)  bfcId, b.num, a.type_code yzlb,
+               a.is_cost isCost, b.type_code, b.unit_code, b.use_code,case when b.type_code = '2' then bb.clf end pharId
+        from base_advice a
+                 join base_advice_detail b on a.code = b.advice_code and a.hosp_code = b.hosp_code
+                 left join base_item c on b.item_code = c.code and b.hosp_code = c.hosp_code and b.type_code = '3'
+                 left join base_finance_classify d on c.bfc_code = d.code and b.hosp_code = d.hosp_code
+                 left join base_material e on b.item_code = e.code and b.hosp_code = e.hosp_code and b.type_code = '2'
+                 left join base_finance_classify f on e.bfc_code = f.code and e.hosp_code = f.hosp_code
+                 left join(
+            select max(if(b.type_code = '1',c.id,'0')) xyf, max(if(b.type_code = '2',c.id,'0')) zyf,max(if(b.type_code =
+                                                                                                           '3',c.id,'0')) cyf,
+                   max(if(b.type_code = '4',c.id,'0')) clf, max(b.drugstore_code) drugstore_code
+            from base_dept a
+                     join base_dept_drugstore b on a.code = b.dept_code and a.hosp_code = b.hosp_code
+                     join base_dept c on b.drugstore_code = c.code and c.hosp_code = b.hosp_code
+            where a.id =#{loginDeptId} and a.hosp_code = #{hospCode} and b.type_code = '4'
+        )bb on 1 = 1
+        where (a.id = #{itemId} or a.code = #{itemId} ) and a.hosp_code = #{hospCode} and a.is_valid = '1'
     </select>
 
 </mapper>

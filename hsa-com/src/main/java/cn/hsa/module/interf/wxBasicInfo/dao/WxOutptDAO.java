@@ -8,6 +8,7 @@ import cn.hsa.module.inpt.advancepay.dto.InptAdvancePayDTO;
 import cn.hsa.module.inpt.doctor.dto.InptCostDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.medic.apply.dto.MedicalApplyDTO;
+import cn.hsa.module.medic.apply.dto.MedicalApplyDetailDTO;
 import cn.hsa.module.medic.result.dto.MedicalResultDTO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
@@ -16,6 +17,7 @@ import cn.hsa.module.outpt.outptclassify.dto.OutptClassifyDTO;
 import cn.hsa.module.outpt.outptclassifyclasses.dto.OutptClassifyClassesDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
+import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsExtDTO;
 import cn.hsa.module.outpt.queue.dto.OutptClassesQueueDto;
 import cn.hsa.module.outpt.queue.dto.OutptDoctorQueueDto;
 import cn.hsa.module.outpt.register.dto.*;
@@ -343,7 +345,7 @@ public interface WxOutptDAO {
      * @param data
      * @return
      */
-    OutptVisitDTO getHsjcsqByProfileId(Map<String, Object> data);
+    List<OutptVisitDTO> getHsjcsqByProfileId(Map<String, Object> data);
 
     /**
      * 查询当前日期有有效的核酸检测申请总数
@@ -351,4 +353,16 @@ public interface WxOutptDAO {
      * @return
      */
     int getHsjcsqByApplyTime(Map<String, Object> data);
+
+    void insertPrescribe(OutptPrescribeDTO outptPrescribeDTO);
+
+    void insertPrescribeDetail(List<OutptPrescribeDetailsDTO> outptPrescribeDetailsDTOList);
+
+    void insertPrescribeDetailExt(List<OutptPrescribeDetailsExtDTO> outptPrescribeDetailsExtDTOList);
+
+    void insertMedicalApply(List<MedicalApplyDTO> medicalApplyDTOList);
+
+    void insertMedicalApplyDetail(List<MedicalApplyDetailDTO> medicalApplyDetailDTOList);
+
+    void batchInsert(List<OutptCostDTO> outptCostDTOList);
 }

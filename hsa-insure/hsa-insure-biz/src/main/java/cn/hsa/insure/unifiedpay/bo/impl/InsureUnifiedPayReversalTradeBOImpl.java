@@ -718,7 +718,9 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
                 insureIndividualVisitDTO.setInsureSettleId(null);
             }
             if (!jxSettle) {
-                sumInfoMapList = insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
+                //sumInfoMapList = insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
+                Map<String, Object> sumInfoMap = insureUnifiedBaseService.queryPatientSumInfo(map).getData();
+                sumInfoMapList = MapUtils.get(sumInfoMap, "resultDataMap");
             }
         }
 

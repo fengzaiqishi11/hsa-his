@@ -234,4 +234,12 @@ public interface InsureGetInfoBO {
      * @Param [map]
      **/
     Map<String, Object> insertBatchSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 结算清单地址历史数据处理
+     * @Date 2022/6/6 16:00
+     * @Param [map]
+     **/
+    Map<String, Object> updateHistoricalData(Map<String, Object> map);
 }

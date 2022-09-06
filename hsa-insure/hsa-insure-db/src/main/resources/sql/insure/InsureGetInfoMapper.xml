@@ -2280,4 +2280,48 @@
                medicine_org_code FROM insure_dict where hosp_code = #{hospCode}AND code = #{code}
     </select>
 
+    <select id="queryAllSetlInfo" resultType="cn.hsa.module.insure.module.dto.InsureSettleInfoDTO">
+        select *
+        from insure_setl_info
+        where city is null and county is null and  province is null
+        <if test="currAddr !=null and currAddr != ''">
+                and currAddr is not null
+        </if>
+        <if test="conerAddr !=null and conerAddr != ''">
+                and conerAddr is not null
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and date(setl_en_date) &gt;= date(#{startTime})
+        </if>
+        <if test="endtime != null and endtime != ''">
+            and date(setl_en_date) &lt;= date(#{endtime})
+        </if>
+    </select>
+
+    <select id="queryAllAdmdvs" resultType="java.util.Map">
+        select admdvs_code as admdvsCode, admdvs_name as admdvsName, up_admdvs_code as upAdmdvsCode
+        from insure_admdvs
+        <where>
+            <if test="upAdmdvsCode !=null and upAdmdvsCode != ''">
+                and up_admdvs_code = #{upAdmdvsCode}
+            </if>
+            <if test="admdvsCode !=null and admdvsCode != ''">
+                and admdvs_code = #{admdvsCode}
+            </if>
+            <if test="admdvsLv !=null and admdvsLv != ''">
+                and admdvs_level = #{admdvsLv}
+            </if>
+        </where>
+    </select>
+
+    <update id="updateAddr">
+        <foreach collection="setlList" item="item" index="index" open="" close="" separator=";">
+            update insure_setl_info
+            <set>
+                city = #{item.city},county = #{item.county}, province = #{item.province},con_county =#{item.conCounty},con_city =#{item.conCity},con_province = #{item.conProvince}
+            </set>
+            where  visit_id =#{item.visitId} and insure_settle_id = #{item.insureSettleId}
+        </foreach>
+    </update>
+
 </mapper>

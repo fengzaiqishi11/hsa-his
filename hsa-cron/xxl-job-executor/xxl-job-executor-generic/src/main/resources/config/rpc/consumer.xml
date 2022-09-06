@@ -48,4 +48,6 @@
     <dubbo:reference id="extractStroInvoicingService_consumer" interface="cn.hsa.module.interf.extract.service.ExtractStroInvoicingService" check="false" retries="0"/>
     <!-- 中心端授权 -->
     <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
+    <!--医保服务-->
+    <dubbo:reference id="insureGetInfoService_consumer" interface="cn.hsa.module.insure.module.service.InsureGetInfoService" retries="0" check="false" timeout="1200000" />
 </beans>

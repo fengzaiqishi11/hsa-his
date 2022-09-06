@@ -25,6 +25,7 @@ import cn.hsa.module.insure.outpt.bo.InsureUnifiedPayRestBO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -1688,11 +1689,14 @@ public class InsureUnifiedPayRestBOImpl extends HsafBO implements InsureUnifiedP
             throw new AppException("无法访问医保统一支付平台");
         }
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson);
-        if ("999".equals(MapUtils.get(resultMap, "code"))) {
-            throw new AppException((String) resultMap.get("msg"));
+        if ("999".equals(MapUtil.getStr(resultMap, "code"))) {
+            throw new AppException("目录下载失败！统一支付平台返回错误为："+MapUtil.getStr(resultMap,"msg"));
         }
-        if (!"0".equals(MapUtils.get(resultMap, "infcode"))) {
-            throw new AppException((String) resultMap.get("err_msg"));
+        if ("-1".equals(MapUtil.getStr(resultMap, "code"))) {
+            throw new AppException("目录下载失败！统一支付平台返回错误为："+MapUtil.getStr(resultMap,"message"));
+        }
+        if (!"0".equals(MapUtil.getStr(resultMap, "infcode"))) {
+            throw new AppException("目录下载失败！统一支付平台返回错误为："+MapUtil.getStr(resultMap,"err_msg"));
         }
         Map<String, Object> outptMap = (Map<String, Object>) resultMap.get("output");
         Object obj = outptMap.get("data");

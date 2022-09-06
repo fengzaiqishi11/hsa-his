@@ -338,7 +338,7 @@
     <!--更新费用表上传状态-->
     <update id="updateCostIsUpload" parameterType="java.util.Map">
         update outpt_cost
-        set is_upload = '1'
+        set is_upload = #{isUpload}
         where hosp_code = #{hospCode}
          and id in
         <foreach collection="ids" open="(" close=")" item="id" separator=",">

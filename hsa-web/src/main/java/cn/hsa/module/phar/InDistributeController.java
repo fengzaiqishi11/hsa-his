@@ -9,6 +9,7 @@ import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO;
 import cn.hsa.module.phar.pharindistributedrug.service.InDistributeDrugService;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
@@ -152,7 +153,7 @@ public class InDistributeController  extends BaseController {
      **/
     @PostMapping("/inDispense")
     @NoRepeatSubmit
-    public WrapperResponse<Boolean> inDispense(@RequestBody PharInReceiveDTO pharInReceiveDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<List<StroStockDetailDTO>> inDispense(@RequestBody PharInReceiveDTO pharInReceiveDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         //配药信息
         pharInReceiveDTO.setHospCode(sysUserDTO.getHospCode());

@@ -346,4 +346,22 @@ public class BaseProfileFileBOImpl extends HsafBO implements BaseProfileFileBO {
         return baseProfileFileDAO.deleteProfileFile(map);
     }
 
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption 校验新增修改档案时，身份证号是否重复
+     * @Param outptProfileFileDTO
+     * @Author liuliyun
+     * @Date   2022/09/02 9:43
+     * @Return Boolean
+     **/
+    @Override
+    public Boolean queryCertNoIsExist(OutptProfileFileDTO outptProfileFileDTO) {
+        List<OutptProfileFileDTO> outptProfileFileDTOS = baseProfileFileDAO.queryCertNoIsExist(outptProfileFileDTO);
+        if (outptProfileFileDTOS!=null&&outptProfileFileDTOS.size()>0){
+            throw new AppException("身份证号重复，请重新输入");
+        }
+        return true;
+    }
+
 }

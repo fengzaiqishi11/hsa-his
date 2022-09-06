@@ -6,6 +6,7 @@ import cn.hsa.module.phar.pharinbackdrug.dto.PharInDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -84,7 +85,7 @@ public interface OutDistributeDrugBO {
      * @Date: 2020/9/3 10:59
      * @Return: java.lang.Boolean
      **/
-    Boolean updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO);
+    List<StroStockDetailDTO> updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO);
 
     /**
      * @Method: updateOutEnabelDispense

@@ -135,4 +135,14 @@ public interface BaseProfileFileDAO {
     String queryPatient(@Param("profileId") String profileId,@Param("certNo") String certNo);
 
     OutptProfileFileDTO queryProfileFile(String profileId);
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption 校验新增修改档案时，身份证号是否重复
+     * @Param outptProfileFileDTO
+     * @Author liuliyun
+     * @Date   2022/09/02 9:43
+     * @Return List<OutptProfileFileDTO>
+     **/
+    List<OutptProfileFileDTO> queryCertNoIsExist(OutptProfileFileDTO outptProfileFileDTO);
 }

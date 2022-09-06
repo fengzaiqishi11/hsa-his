@@ -35,7 +35,7 @@
         <module>hsa-report</module>
         <!--         定时任务子系统-->
 <!--                        <module>hsa-cron</module>-->
-<!--                        &lt;!&ndash; 定时任务子系统执行器 &ndash;&gt;-->
+                        <!-- 定时任务子系统执行器 -->
         <module>hsa-cron/xxl-job-executor</module>
         <module>hsa-medical-payment</module>
         <!--        <module>hsa-dynamic</module>-->

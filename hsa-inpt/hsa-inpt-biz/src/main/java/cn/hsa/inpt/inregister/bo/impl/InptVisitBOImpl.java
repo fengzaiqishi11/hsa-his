@@ -642,8 +642,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         Integer count = insureIndividualVisitService_consumer.selectHalfVisit(insureParam).getData();
         if (count == null || count < 1) {
             inptVisitDTO.setPatientCode(Constants.BRLX.PTBR);
-            inptVisitDAO.updateInptVisit(inptVisitDTO);
         }
+        // 取消登记需要把医疗类别置空
+        inptVisitDTO.setInsureBizCode("");
+        inptVisitDAO.updateInptVisit(inptVisitDTO);
         return true;
     }
 

@@ -9,14 +9,24 @@ import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.visit.bo.OutptVisitBO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
+import cn.hsa.module.sys.parameter.service.SysParameterService;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
+import cn.hutool.core.date.DateUtil;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.annotation.Resource;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @Package_name: cn.hsa.outpt.outptvisit.bo.impl
@@ -35,7 +45,11 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
      */
     @Resource
     private OutptVisitDAO outptVisitDAO;
-
+    /**
+     *参数获取服务
+     */
+    @Resource
+    private SysParameterService sysParameterService_consumer;
     /**
      * @Method queryVisitRecords
      * @Desrciption
@@ -183,5 +197,50 @@ public class OutptVisitBOImpl extends HsafBO implements OutptVisitBO {
         return outptVisitDAO.selectOutptSettleById(map);
     }
 
+    /**
+     * @param outptVisitDTO
+     * @Menthod: queryPrescriptionAllowed
+     * @Desrciption: 获取病人是否在允许的开方时间内
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-09-1 08:51
+     * @Return: Boolean
+     */
+    @Override
+    public Boolean queryPrescriptionAllowed(OutptVisitDTO outptVisitDTO) {
+        boolean flag = true;
+        /*参数控制*/
+        flag = queryCheckParam(sysParameterDTO -> (null == sysParameterDTO || Constants.SF.F.equals(sysParameterDTO.getValue())),
+                        (map) -> sysParameterService_consumer.getParameterByCode(map).getData(),
+                        outptVisitDTO.getHospCode());
+        /*校验确认sysParameterDTO的值，为空或者值为0直接返回*/
+        if (flag){
+            return true;
+        }
+        /*获取数据*/
+        OutptVisitDTO finalOutptVisitDTO = outptVisitDAO.queryByID(outptVisitDTO);
+        /*校验数据*/
+        Assert.notNull(finalOutptVisitDTO,()-> "获取患者" + outptVisitDTO.getName() + "就诊数据为空！");
+        /*校验是否就诊与是否允许在就诊时间当天开方*/
+        Predicate<OutptVisitDTO> visitDTOPredicate = ((Predicate<OutptVisitDTO>) outptVisitDTO1 -> Constants.SF.F.equals(outptVisitDTO1.getIsVisit()))
+                .or(outptVisitDTO2 -> {
+                    if(DateUtil.today().equals(DateUtils.format(outptVisitDTO2.getCrteTime(), DateUtils.Y_M_D))){
+                        return true;
+                    }
+                    return false;});
+         flag = visitDTOPredicate.test(finalOutptVisitDTO);
+        return flag;
+    }
+
+    /**
+     *参数控制
+     */
+    public boolean queryCheckParam(Predicate<SysParameterDTO> predicate,Function<Map,SysParameterDTO> function,String hospCode){
+        Map map = new HashMap();
+        map.put("hospCode", hospCode);
+        map.put("code", "IS_PRESC_ALLOWED");
+        SysParameterDTO apply = function.apply(map);
+        return predicate.test(apply);
+    }
 
 }

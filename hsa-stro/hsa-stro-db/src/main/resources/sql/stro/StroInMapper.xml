@@ -665,6 +665,8 @@
     a.prod_code,b.audit_time,b.crte_time,
     (select p.name from base_product p where p.hosp_code = #{hospCode} and a.prod_code = p.code) as prodName,
     case when a.item_code='1' then bd.code when a.item_code='2' then bm.code end code,
+    case when a.item_code='1' then  (select scd.name from sys_code_detail scd where scd.c_code ='JXFL' and bd.prep_code = scd.value and scd.hosp_code = #{hospCode})
+    when a.item_code='2' then '' end prep_name, -- 剂型名称
     case when a.item_code='2' then bm.model end model,
     b.acceptance_status as acceptanceStatus,
     b.acceptance_name as acceptanceName,

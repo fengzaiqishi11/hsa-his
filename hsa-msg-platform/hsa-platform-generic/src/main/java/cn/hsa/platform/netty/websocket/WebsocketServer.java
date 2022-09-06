@@ -21,13 +21,18 @@ import javax.annotation.Resource;
  */
 @Slf4j
 @Component
-public class WebsocketInitialization {
+public class WebsocketServer {
     @Resource
     private WebsocketChannelInitializer websocketChannelInitializer;
 
     @Value("${websocket.port}")
     private Integer port;
 
+    /**
+     *  websocket 服务端初始化方法
+     * @Author: luonianxin
+     * @throws InterruptedException
+     */
     @Async
     public void init() throws InterruptedException {
 

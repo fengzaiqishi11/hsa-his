@@ -919,7 +919,7 @@
       join emr_patient b on  b.visit_id=a.id and a.hosp_code =b.hosp_code
       JOIN emr_classify_template et on b.classify_template_id = et.id and b.dept_id =et.dept_id and et.hosp_code =#{hospCode}
       join emr_patient_html c on b.patient_html_id = c.id and c.hosp_code =#{hospCode}
-      join emr_classify d on et.classify_code=d.code and et.dept_id = d.dept_id and  d.hosp_code =#{hospCode} and d.isValid='1'
+      join emr_classify d on et.classify_code=d.code and et.dept_id = d.dept_id and  d.hosp_code =#{hospCode} and d.is_valid='1'
       where c.crte_time &gt;= date(#{startTime})
       and c.crte_time &lt; date(#{endTime})
       and a.hosp_code =#{hospCode}
@@ -1138,8 +1138,8 @@
     a.crte_name as modifytname
     from
 	inpt_bed_change a
-    join base_bed b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code and b.isValid='1'
-    join base_bed_item c on	b.hosp_code =c.hosp_code and b.code = c.bed_code and c.isValid='1'
+    join base_bed b on a.visit_id = b.visit_id and a.hosp_code = b.hosp_code and b.is_valid='1'
+    join base_bed_item c on	b.hosp_code =c.hosp_code and b.code = c.bed_code and c.is_valid='1'
     left join base_item d on c.hosp_code = d.hosp_code and c.item_code = d.code and d.is_valid ='1'
     where a.change_code ='0'
     and d.type_code ='1109'

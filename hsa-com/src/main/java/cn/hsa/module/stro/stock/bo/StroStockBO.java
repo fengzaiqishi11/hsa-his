@@ -245,4 +245,11 @@ public interface StroStockBO {
      * @return
      */
     PageDTO queryDrugAndMaterialProfit(ItemProfitStatisticsDTO itemProfitStatisticsDTO);
+    /**
+     * @Author gory
+     * @Description 查询出库存不足 或者 过期的药品
+     * @Date 2022/8/31 16:36
+     * @Param [stringObjectMap]
+     **/
+    List<StroStockDetailDTO> getStroStockDetailIfNumShortage(Map map);
 }

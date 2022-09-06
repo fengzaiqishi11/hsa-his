@@ -12,6 +12,7 @@ import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.service.OutDistributeDrugService;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 import cn.hsa.util.Constants;
 import cn.hsa.util.DateUtils;
@@ -160,7 +161,7 @@ public class OutDistributeController extends BaseController {
      **/
     @PostMapping("/outDispense")
     @NoRepeatSubmit
-    public WrapperResponse<Boolean> outDispense(@RequestBody PharOutReceiveDTO pharOutReceiveDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<List<StroStockDetailDTO>> outDispense(@RequestBody PharOutReceiveDTO pharOutReceiveDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         //配药人信息
         pharOutReceiveDTO.setHospCode(sysUserDTO.getHospCode());

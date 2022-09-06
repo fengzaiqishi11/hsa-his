@@ -74,6 +74,12 @@ public class ExtraConsumptionBOImpl implements ExtractConsumptionBO {
         return PageDTO.ofByManual(resultList,extractConsumptionDTO.getPageNo(),extractConsumptionDTO.getPageSize());
     }
 
+    /**
+     * @Author gory
+     * @Description 新药房药库实时进销存
+     * @Date 2022/9/2 9:07
+     * @Param [extractStroInvoicingDetailDTO]
+     **/
     @Override
     public PageDTO extractStroInvoicingDetailDTO(ExtractStroInvoicingDetailDTO extractStroInvoicingDetailDTO) {
 

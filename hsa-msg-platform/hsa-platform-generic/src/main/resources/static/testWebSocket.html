@@ -7,15 +7,35 @@
 <body>
 <script>
     var socket;
+    var msg = '{"hospCode":"1000001","unionId": "1008611","deptId":"","msgId":"","type":"4"}';
+    var serverTimeoutObj;
     //判断当前浏览器是否支持websocket
     if(window.WebSocket) {
-        socket = new WebSocket("ws://localhost:7000/msg/1290816158941450241/ZTQ5MmFiMDYtYTg2OS00MzM0LTgzNWEtNDY0ZmUyMmI3ZTFh");
+        initWebSocketSys("xxx");
+    } else {
+        alert("当前浏览器不支持websocket")
+    }
+
+    //发送消息到服务器
+    function send(websocketMessage) {
+        if(!window.socket) { //先判断socket是否创建好
+            return;
+        }
+        if(socket.readyState === WebSocket.OPEN) {
+            //通过socket 发送消息
+            socket.send(websocketMessage)
+        } else {
+            alert("连接没有开启");
+        }
+    }
+    function  initWebSocketSys(address) {
+        console.log('初始化initWebSocketSys', address)
+        socket = new WebSocket("ws://localhost:7000/msg/1290816158941450241/OTY4YzQzYWMtZTNmMy00NmYyLWE2YmMtNDU1MTI2MDhlMjMx");
         //相当于channelReado, ev 收到服务器端回送的消息
         socket.onmessage = function (ev) {
             var rt = document.getElementById("responseText");
             rt.value = rt.value + "\n" + ev.data;
         }
-
         //相当于连接开启(感知到连接开启)
         socket.onopen = function (ev) {
             var rt = document.getElementById("responseText");
@@ -28,22 +48,30 @@
             var rt = document.getElementById("responseText");
             rt.value = rt.value + "\n" + "连接关闭了.."
         }
-    } else {
-        alert("当前浏览器不支持websocket")
+    }
+    function start() {
+         serverTimeoutObj = setTimeout(function () {
+            if (socket.readyState === 1) {
+                console.log('连接状态，发送消息保持连接')
+                websocketsendSys(socket,self.msg)
+                reset() // 如果获取到消息，说明连接是正常的，重置心跳检测
+                start() // 如果获取到消息，说明连接是正常的，重置心跳检测
+            } else {
+                console.log('断开状态，尝试重连')
+                self.initWebSocketSys("self.msgUrl")
+            }
+        }, 500);
+    }
+    function websocketsendSys(msocket,data){
+        msocket.send(data);
+    }
+    function reset(){
+        if (this.serverTimeoutObj) {
+            clearTimeout(this.serverTimeoutObj)
+        }
     }
 
-    //发送消息到服务器
-    function send(websocketMessage) {
-        if(!window.socket) { //先判断socket是否创建好
-            return;
-        }
-        if(socket.readyState == WebSocket.OPEN) {
-            //通过socket 发送消息
-            socket.send(websocketMessage)
-        } else {
-            alert("连接没有开启");
-        }
-    }
+
 </script>
 <form onsubmit="return false">
     <textarea name="websocketMessage" style="height: 300px; width: 300px"></textarea>

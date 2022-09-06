@@ -306,5 +306,6 @@ public class OutptVisitDTO extends OutptVisitDO implements Serializable {
      */
     private String numOfPrescAllowed;
     private String phCode;
+    private String isBackReentry; // 是否医保病人退部分再收
 
 }

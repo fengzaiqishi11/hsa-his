@@ -702,4 +702,13 @@ public interface OutptCostDAO {
      * @Param [outptCostDTO]
      **/
     String queryOneCostId(OutptCostDTO outptCostDTO);
+
+    /**
+     * 查询医保病人是否部分退费再收
+     * @param param
+     * @Author liuliyun
+     * @Date 2022-05-24 10:05
+     * @return void
+     */
+    Map queryInsurePatientReentryCost(Map param);
 }

@@ -931,4 +931,50 @@ public interface InsureGetInfoDAO {
      * @Return
      */
     void updateUplodError(@Param("errorMapList")List<Map<String, Object>> errorMapList);
+
+    /**
+     * @Method updateInsureGetInfo
+     * @Desrciption  查询麻醉方式
+     * @Param
+     *
+     * @Author fuhui
+     * @Date   2021/11/3 20:54
+     * @Return
+     **/
+    List<InsureDictDTO> queryAnstMtd(Map<String, Object> map);
+
+
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询所有结算清单数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    List<InsureSettleInfoDTO> queryAllSetlInfo(Map<String, Object> map);
+
+
+    /**
+     * @param map
+     * @Method queryPage
+     * @Desrciption 查询医保区划
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    List<Map<String, Object>> queryAllAdmdvs(Map<String, Object> map);
+
+    /**
+     * @param
+     * @Method queryPage
+     * @Desrciption 更新历史数据
+     * @Param
+     * @Author fuhui
+     * @Date 2021/11/9 15:29
+     * @Return
+     */
+    void updateAddr(@Param("setlList")List<InsureSettleInfoDTO> setlList);
 }

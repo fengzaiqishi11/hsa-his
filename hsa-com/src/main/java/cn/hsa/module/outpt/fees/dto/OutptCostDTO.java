@@ -197,4 +197,6 @@ public class OutptCostDTO extends OutptCostDO implements Serializable {
     private String hospItemCode;
     // 个人账户支付
     private BigDecimal personalPrice;
+
+    private String isBackReentry; // 是否医保退费重收标识
 }

@@ -10,9 +10,7 @@ import cn.hsa.module.outpt.visit.service.OutptVisitService;
 import cn.hsa.module.sys.user.dto.SysUserDTO;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -93,5 +91,23 @@ public class OutptVisitController extends BaseController {
         map.put("hospCode", userDTO.getHospCode());
         map.put("outptVisitDTO", outptVisitDTO);
         return outptVisitService_consumer.queryInsureVisitInfo(map);
+    }
+    /**
+     * @param outptVisitDTO
+     * @Menthod: queryPrescriptionAllowed
+     * @Desrciption: 获取病人是否在允许的开方时间内
+     * @Author: yuelong.chen
+     * @Email: yuelong.chen@powersi.com.cn
+     * @Date: 2022-09-1 08:51
+     * @Return: Boolean
+     */
+    @PostMapping("/queryPrescriptionAllowed")
+    public WrapperResponse<Boolean> queryPrescriptionAllowed(@RequestBody OutptVisitDTO outptVisitDTO, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        outptVisitDTO.setHospCode(sysUserDTO.getHospCode());
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("outptVisitDTO",outptVisitDTO);
+        return outptVisitService_consumer.queryPrescriptionAllowed(map);
     }
 }

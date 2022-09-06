@@ -142,7 +142,7 @@
             '' as SZBWLSH,
             bd.usual_name as YPMC,
             bd.good_name as YPSPMC,
-            (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code and bp.isValid = '1') as SCQY,
+            (select bp.name from base_product bp where bd.hosp_code = bp.hosp_code and bd.prod_code = bp.code and bp.is_valid = '1') as SCQY,
             bd.spec as GG,
             TRUNCATE(sum(ss.num),3) as BZSL,
             ss.unit_code as DW,
@@ -736,7 +736,7 @@
             (case when pird.item_code = '1' then bd.usual_name  when pird.item_code = '2' then bm.name  when pird.item_code = '3' then bi.name  else '' end)as wzmc,
             '' as wzlxbm,
             '' as wzlxmc,
-            (select value from sys_parameter sp where sp.hosp_code= pird.hosp_code and sp.code = 'JG_NAME' and sp.isValid = '1') as jgmc,
+            (select value from sys_parameter sp where sp.hosp_code= pird.hosp_code and sp.code = 'JG_NAME' and sp.is_valid = '1') as jgmc,
             bd3.code  as lqksbm,
             bd3.name  as lqksmc,
             pird.num as lqsl,
@@ -766,8 +766,8 @@
             left join base_item bi     on pird .hosp_code  = bi.hosp_code  and bi.id  = pird.item_id
             left join base_dept bd2    on pir .hosp_code  = bd2.hosp_code  and bd2.id  = pir.phar_id
             left join base_dept bd3    on pir .hosp_code  = bd3.hosp_code  and bd3.id  = pir.dept_id
-            left join base_product bp1 on bp1.hosp_code= bd.hosp_code and bp1.code = bd.prod_code and bp1.isValid = '1'
-            left join base_product bp2 on bp2.hosp_code= bm.hosp_code and bp2.code = bm.prod_code and bp2.isValid = '1'
+            left join base_product bp1 on bp1.hosp_code= bd.hosp_code and bp1.code = bd.prod_code and bp1.is_valid = '1'
+            left join base_product bp2 on bp2.hosp_code= bm.hosp_code and bp2.code = bm.prod_code and bp2.is_valid = '1'
         ) a where a.jgbm = #{hospCode}
         <if test="startTime != null and startTime != ''">
             and date(a.lqsj) &gt;= date(#{startTime})

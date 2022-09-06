@@ -127,4 +127,17 @@ public class BaseProfileFileServiceImpl extends HsafService implements BaseProfi
     public WrapperResponse<Boolean> deleteProfileFile(Map map) {
         return WrapperResponse.success(baseProfileFileBO.deleteProfileFile(map));
     }
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption  新增修改档案时判断身份证是否重复
+     * @Param [outptProfileFileDTO]
+     * @Author liuliyun
+     * @Date   2022/09/02 9:54
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>s
+     **/
+    @Override
+    public WrapperResponse<Boolean> queryCertNoIsExist(Map map) {
+        return WrapperResponse.success(baseProfileFileBO.queryCertNoIsExist(MapUtils.get(map, "outptProfileFileDTO")));
+    }
 }

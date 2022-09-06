@@ -86,4 +86,14 @@ public interface BaseProfileFileBO {
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     Boolean deleteProfileFile(Map map);
+
+    /**
+     * @Method queryCertNoIsExist
+     * @Desrciption 校验新增修改档案时，身份证号是否重复
+     * @Param outptProfileFileDTO
+     * @Author liuliyun
+     * @Date   2022/09/02 9:43
+     * @Return Boolean
+     **/
+    Boolean queryCertNoIsExist(OutptProfileFileDTO outptProfileFileDTO);
 }

@@ -1388,5 +1388,7 @@ public interface Constants {
         public static final String DRG = "2"; // 默认值
         public static final String DRGDIP = "3"; // 默认值
         public static final String HQMS = "4"; // HQMS
+        public static final String ZJZF_HJSF="5"; // 诊间支付（划价收费：患者付款码被扫）
+        public static final String ZJZF_CFZF="6"; // 诊间支付（处方：扫描处方二维码）
     }
 }

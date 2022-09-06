@@ -1,11 +1,9 @@
 package cn.hsa.platform;
 
-import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ImportResource;
-import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  *    消息发送平台启动类
@@ -15,7 +13,6 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @ImportResource("classpath*:config/spring.xml")
 @MapperScan(basePackages={"cn.hsa.platform.dao"})
 @SpringBootApplication(scanBasePackages = {"cn.hsa"})
-@EnableEncryptableProperties
 public class HsaPlatformGenericApplication {
 
      /**

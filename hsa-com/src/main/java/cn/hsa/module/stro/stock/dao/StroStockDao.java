@@ -296,4 +296,6 @@ public interface StroStockDao {
     * @Return int
     **/
     int insertStockTime(@Param("list") List<StroStockDTO> stroStockDTOS);
+
+    List<StroStockDetailDTO> getStroStockDetailIfNumShortage(Map map);
 }

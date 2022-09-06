@@ -187,7 +187,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
      * @Return: java.lang.Boolean
      **/
     @Override
-    public Boolean updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO) {
+    public List<StroStockDetailDTO> updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO) {
         try {
             //校验必填信息
             if(StringUtils.isEmpty(pharOutReceiveDTO.getId())){
@@ -237,15 +237,20 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
                     kcjyMap.put(detailDO.getItemId(), map1);
                 }
             }
+            List<StroStockDetailDTO> resultList = new LinkedList<>();
             //判断库存
             if (kcjyMap!=null && kcjyMap.size()>0) {
                 for (String key:kcjyMap.keySet()) {
-                    if(!stroStockBO.getStroStock(kcjyMap.get(key))){
-                        throw new RuntimeException(kcjyMap.get(key).get("itemName")+"库存不足");
+                    List<StroStockDetailDTO> stockDetailDTOList = new ArrayList<>();
+                    stockDetailDTOList = stroStockBO.getStroStockDetailIfNumShortage(kcjyMap.get(key));
+                    if (!ListUtils.isEmpty(stockDetailDTOList)){
+                        resultList.addAll(stockDetailDTOList);
                     }
                 }
             }
-
+            if (!ListUtils.isEmpty(resultList)){
+                return resultList;
+            }
             //占用库存
             if (!ListUtils.isEmpty(list)) {
                 stroStockBO.updateStockOccupy(list);
@@ -253,10 +258,10 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
 
             //配药
             outDistributeDrugDAO.updateReceive(pharOutReceiveDTO);
+            return resultList;
         } catch (AppException e) {
             throw new AppException(e.getMessage());
         }
-        return true;
     }
 
     /**

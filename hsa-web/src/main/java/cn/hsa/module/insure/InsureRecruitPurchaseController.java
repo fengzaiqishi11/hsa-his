@@ -164,6 +164,7 @@ public class InsureRecruitPurchaseController extends BaseController {
     public WrapperResponse<Boolean> addDrugSells(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureRecruitPurchaseService_consumer.addDrugSells(map);
     }
     /**
@@ -194,6 +195,7 @@ public class InsureRecruitPurchaseController extends BaseController {
     public WrapperResponse<Boolean> deleteDrugSells(@RequestBody Map<String, Object> map, HttpServletRequest req, HttpServletResponse res) {
         SysUserDTO sysUserDTO = getSession(req, res);
         map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("certId", sysUserDTO.getId());
         return insureRecruitPurchaseService_consumer.deleteDrugSells(map);
     }
     /**

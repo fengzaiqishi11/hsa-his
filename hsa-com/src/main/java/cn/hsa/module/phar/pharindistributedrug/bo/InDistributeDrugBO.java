@@ -5,6 +5,7 @@ import cn.hsa.module.inpt.doctor.dto.InptAdviceDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -83,7 +84,7 @@ public interface InDistributeDrugBO {
      * @Date: 2020/9/10 15:54
      * @Return: java.lang.Boolean
      **/
-    Boolean updateInDispense(PharInReceiveDTO pharInReceiveDTO);
+    List<StroStockDetailDTO> updateInDispense(PharInReceiveDTO pharInReceiveDTO);
 
     /**
      * @Method: cancelInDispense

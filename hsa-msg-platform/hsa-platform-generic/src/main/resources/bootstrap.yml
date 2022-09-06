@@ -15,9 +15,11 @@ spring:
       config:
         file-extension: properties
         group: dev
-        enabled: false
+        enabled: true
         encode: UTF-8
-        server-addr: 127.0.0.1:8848
+        server-addr: ${mspring.cloud.nacos.config.server-addr}
+        username: ${mspring.cloud.nacos.config.username}
+        password: ${mspring.cloud.nacos.config.password}
   # kafka相关的信息配置 TODO
   kafka:
     bootstrap-servers:

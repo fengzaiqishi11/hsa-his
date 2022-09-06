@@ -714,7 +714,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Boolean deleteSettleInfo(Map<String, Object> map) {
         InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
-        if (insureSettleInfoDTO != null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
+        if (insureSettleInfoDTO != null && StringUtils.isNotEmpty(insureSettleInfoDTO.getSettleNo())) {
             throw new AppException("该结算清单信息已经上传至医保,不能重置内容");
         }
         // 重置setleinfo主节点信息

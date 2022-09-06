@@ -861,6 +861,12 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         inptVisitDTO.setInsureTreatCode(insureIndividualBasicDTO.getBka006());
         inptVisitDTO.setInsurePatientId(baseId);
         inptVisitDTO.setInsureRemark(insureIndividualBasicDTO.getRemark());
+        // 防止异步修改数据库，这里把异步能修改的重新把数据库里的数据对其赋值
+        inptVisitDTO.setBedName(inptVisitDto.getBedName());
+        inptVisitDTO.setBedId(inptVisitDto.getBedId());
+        inptVisitDTO.setInDeptCode(inptVisitDto.getInDeptCode());
+        inptVisitDTO.setInDeptId(inptVisitDto.getInDeptId());
+        inptVisitDTO.setInDeptName(inptVisitDto.getInDeptName());
         inptVisitDAO.updateInptVisit(inptVisitDTO);
 
         // TODO 封装医保入院登记入参

@@ -1032,9 +1032,11 @@
 		select
 		CONCAT(
 		iv.name,'/',
-		IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end),'-'),'/',
+		IFNULL((case iv.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别'
+		else '' end),'-'),'/',
 		IFNULL(iv.age,'-'),
-		IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else '' end),'')
+		IFNULL((case iv.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '天' else
+		'' end),'')
 		) AS keyword,
 		iv.id,
 		iv.hosp_code,
@@ -1111,6 +1113,7 @@
 		iv.insure_org_code,
 		iv.insure_no,
 		iv.insure_biz_code,
+		(select name from insure_dict where code = 'med_type' and value = iv.insure_biz_code and hosp_code = #{hospCode} and insure_reg_code = iv.insure_org_code ) as insureBizName,
 		iv.insure_treat_code,
 		iv.insure_patient_id,
 		iv.insure_remark,
@@ -1120,8 +1123,8 @@
 		iv.crte_id,
 		iv.crte_name,
 		iv.crte_time,
-        iiv.mdtrt_cert_type,
-        iiv.mdtrt_cert_no,
+		iiv.mdtrt_cert_type,
+		iiv.mdtrt_cert_no,
 		iiv.medical_reg_no
 		from
 		inpt_visit iv

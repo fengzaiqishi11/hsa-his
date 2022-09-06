@@ -18,4 +18,7 @@
     <dubbo:reference id="sysParameterService_consumer" interface="cn.hsa.module.sys.parameter.service.SysParameterService" check="false"/>
     <!-- 中心端授权 -->
     <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
+    <!-- 医保登记 -->
+    <dubbo:reference id="insureIndividualVisitService_consumer" interface="cn.hsa.module.insure.module.service.InsureIndividualVisitService" check="false"/>
+
 </beans>

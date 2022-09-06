@@ -515,5 +515,7 @@ public interface InsureIndividualVisitDAO {
     List<OutptDiagnoseDTO> getOutptDiagnose(OutptPrescribeDTO inPut);
 
     OutptVisitDTO selectOutptVisitById(HashMap<String, Object> map);
+
+    List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap);
 }
 

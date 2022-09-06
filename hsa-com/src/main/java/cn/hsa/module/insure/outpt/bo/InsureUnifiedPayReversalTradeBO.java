@@ -188,5 +188,13 @@ public interface InsureUnifiedPayReversalTradeBO {
      * @Return
      **/
     Map<String,Object> queryDeclareInfosPrint(Map<String, Object> paraMap);
-
+    /**
+     * @param map
+     * @Method queryDeclareInfosPage
+     * @Desrciption 清算申报报表明细打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    Map<String,Object> queryDeclareInfosPrint1(Map map);
 }

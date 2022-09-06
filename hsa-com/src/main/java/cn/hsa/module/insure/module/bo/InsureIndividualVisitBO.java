@@ -186,5 +186,10 @@ public interface InsureIndividualVisitBO {
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
     InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam);
-
+    /***
+     * 根据visitId集合查询医保登记信息
+     * @param paramMap
+     * @return
+     */
+    List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap);
 }

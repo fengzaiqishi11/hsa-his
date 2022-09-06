@@ -1230,6 +1230,60 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         return resultMap;
     }
+    /**
+     * @param paraMap
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报明细报表打印
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryDeclareInfosPrint1(Map paraMap) {
+        List<Map<String,Object>> resultList = new ArrayList<>();
+        Map<String, Object> resultMap = new HashMap<>();
+
+        String declaraType = MapUtils.get(paraMap, "declaraType");
+        switch (declaraType) {
+            case Constants.SBLX.CZJM_ZY: // 城镇职工（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CZZG);
+                resultList = insureReversalTradeDAO.queryDeclareInfos1(paraMap);
+                break;
+            case Constants.SBLX.CXJM_ZY: // 城乡居民
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.F);
+                resultList = insureReversalTradeDAO.queryDeclareInfos1(paraMap);
+                break;
+            case Constants.SBLX.LX_ZY: // 离休（住院）
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.LX);
+                resultList = insureReversalTradeDAO.queryDeclareInfos1(paraMap);
+                break;
+            case Constants.SBLX.YZS: // 一站式 queryYZSSumDeclareInfosPage
+                paraMap.put("insutype", Constant.UnifiedPay.XZLX.CXJM);
+                paraMap.put("isValidOneSettle",Constants.SF.S);
+                resultList = insureReversalTradeDAO.queryYZSDeclareInfosPage(paraMap);
+            default:
+                break;
+
+        }
+        InsureConfigurationDTO insureConfInfo = queryInsureIndividualConfig(paraMap);
+        if(resultList !=null && resultList.size() > 0){
+            //增加序号
+            int index =1;
+            for(Map map:resultList){
+                map.put("index",index);
+                index++;
+
+                map.put("hospName",insureConfInfo.getHospName());
+            }
+        }
+        resultMap.put("result",resultList);
+
+
+        resultMap.put("baseInfo", JSONObject.parseObject(JSON.toJSONString(insureConfInfo)));
+
+        return resultMap;
+    }
 
     /**
      * @Method handlerFeeFund

@@ -184,4 +184,12 @@ public interface InsureDictService {
     WrapperResponse<Map<String, String>> querySysCodeByCode(Map map);
 
 
+    /***
+     * 根据code查询字典值
+     * @param map
+     * @return
+     */
+    WrapperResponse<Map<String, List<Map<String,Object>>>> querySysCodeByCodeList(Map map);
+
+    WrapperResponse<Map<String, String>> queryInsuplcAdmdvs(Map<String, Object> amdvsMap);
 }

@@ -357,7 +357,7 @@
         a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
         a.crte_time, a.now_address as nowAddress,ifnull(a.tran_in_code,'0') as tranInCode,
         otv.triage_start_code as triageStatusCode,
-        otv.is_call as isCanCall,
+        otv.is_call as isCanCall,a.is_submit as isSubmit,
         case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
         from outpt_visit a
         left join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
@@ -561,6 +561,7 @@
                                doctor_name = #{doctorName},
                                dept_id = #{deptId},
                                dept_name = #{deptName},
+                               is_submit = '1',
                                visit_time = now()
         where id = #{id} and hosp_code = #{hospCode}
     </update>
@@ -2646,5 +2647,17 @@
                 #{item}
             </foreach>
         </if>
+    </select>
+
+    <update id="updateVisitCFSubmit">
+        update outpt_visit set is_submit = #{statusCode} where hosp_code = #{hospCode} and id = #{visitId}
+    </update>
+
+    <select id="getUnsubmitPrescribeCount" resultType="int">
+        select  count(*) num  from  outpt_prescribe op where op.hosp_code = #{hospCode}  and op.visit_id  = #{visitId} and op.is_submit ='0'
+    </select>
+
+    <select id="getPrescribeCount" resultType="int">
+        select  count(*) num  from  outpt_prescribe op where op.hosp_code = #{hospCode}  and op.visit_id  = #{visitId}
     </select>
 </mapper>

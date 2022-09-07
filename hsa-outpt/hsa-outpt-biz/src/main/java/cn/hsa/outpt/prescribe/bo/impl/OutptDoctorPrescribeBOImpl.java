@@ -1418,6 +1418,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         else {
             yxq = MapUtils.getVI(mapParameter, "MZCF_YXTS_PT", 3);
             yxq= yxq==0?3:yxq;
+
+
         }
 
         // 处方有效期
@@ -1465,7 +1467,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             //重新生成动态费用
             this.buildDtfy(outptPrescribeDTO);
         }
-
+        this.updateVisitCFSubmit(outptPrescribeDTO.getVisitId(),outptPrescribeDTO.getHospCode(),Constants.CFTJZT.DELETE_PRESC);
         return true;
     }
 
@@ -3922,6 +3924,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         this.buildDtfy(outptPrescribeDTO);
         //重新计算动态采血费
         this.buildMedicApplyCost(outptPrescribeDTO);
+        this.updateVisitCFSubmit(outptPrescribeDTO.getVisitId(),outptPrescribeDTO.getHospCode(),Constants.CFTJZT.SUBMIT_PRESC);
         return true;
     }
 
@@ -3980,6 +3983,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         this.buildDtfy(outptPrescribeDTO);
         //重新计算动态采血费
         this.buildMedicApplyCost(outptPrescribeDTO);
+        this.updateVisitCFSubmit(outptPrescribeDTO.getVisitId(),outptPrescribeDTO.getHospCode(),Constants.CFTJZT.SUBMIT_PRESC);
         return true;
     }
 
@@ -3997,6 +4001,7 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             throw new AppException("处方已结算，不能取消提交");
         }
         outptDoctorPrescribeDAO.updateIsCanPrescribeSubmit(outptPrescribeDTO);
+        this.updateVisitCFSubmit(outptPrescribeDTO.getVisitId(),outptPrescribeDTO.getHospCode(),Constants.CFTJZT.UNSUBMIT_PRESC);
         return true;
     }
 
@@ -4343,7 +4348,43 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
             }
         });
     }
-
+    /**
+     * 更新患者是否有未提交的处方
+     * @param
+     * @return
+     */
+    public void updateVisitCFSubmit(String visitid, String hospCode, String key){
+        switch (key){
+            /*保存处方，直接更新状态,直接写在savePrescribe中，不调用此方法*/
+            case Constants.CFTJZT.SAVE_PRESC :
+            /*取消提交，直接更新状态*/
+            case Constants.CFTJZT.UNSUBMIT_PRESC:
+                outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.EXIST_UNSUBMIT_PRESC);
+                break;
+            /*提交处方，先查询后更新*/
+            case Constants.CFTJZT.SUBMIT_PRESC:
+                if(0 < outptDoctorPrescribeDAO.getUnsubmitPrescribeCount(visitid,hospCode)){
+                    outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.EXIST_UNSUBMIT_PRESC);
+                }else {
+                    outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.ALL_SUBMIT_PRESC);
+                }
+                break;
+            /*删除处方，先查询后更新*/
+            case Constants.CFTJZT.DELETE_PRESC:
+                if (0 < outptDoctorPrescribeDAO.getPrescribeCount(visitid,hospCode)){
+                    if(0 < outptDoctorPrescribeDAO.getUnsubmitPrescribeCount(visitid,hospCode)){
+                        outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.EXIST_UNSUBMIT_PRESC);
+                    }else {
+                        outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.ALL_SUBMIT_PRESC);
+                    }
+                }else {
+                    outptDoctorPrescribeDAO.updateVisitCFSubmit(visitid,hospCode,Constants.IS_SUBMIT.NO_PRESC);
+                }
+                break;
+            default:
+                break;
+        }
+    }
     /**
      * 根据系统参数获取限制用药的默认医保机构编码
      * @param hospCode

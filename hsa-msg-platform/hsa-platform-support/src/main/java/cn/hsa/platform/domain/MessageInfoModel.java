@@ -41,7 +41,7 @@ public class MessageInfoModel  implements Serializable {
 	 */
 	private String visitId;
 	/**
-	 * 科室id
+	 * 科室id, 多个科室使用逗号分割
 	 */
 	private String deptId;
 	/**
@@ -73,7 +73,7 @@ public class MessageInfoModel  implements Serializable {
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private Date endTime;
 	/**
-	 * 间隔时间
+	 * 间隔时间 单位：分钟
 	 */
 	private int intervalTime;
 	/**

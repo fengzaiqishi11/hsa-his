@@ -46,7 +46,7 @@ public class MessagePublishedListener implements ApplicationListener<MessagePubl
     @Async
     @Override
     public void onApplicationEvent(MessagePublishEvent event) {
-
+        log.info("线程 {} ,处理消息发布事件, 传播的消息是：{}",Thread.currentThread().getName(),event.getPublishedEventJsonObj());
         MessageInfoModel messageInfoModel = JSON.parseObject(event.getPublishedEventJsonObj(),MessageInfoModel.class);
         String hospCode = messageInfoModel.getHospCode();
         String hashKey = messageInfoModel.getId();

@@ -714,7 +714,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
     @Override
     public Boolean deleteSettleInfo(Map<String, Object> map) {
         InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
-        if (insureSettleInfoDTO != null && StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
+        if (insureSettleInfoDTO != null && StringUtils.isNotEmpty(insureSettleInfoDTO.getSettleNo())) {
             throw new AppException("该结算清单信息已经上传至医保,不能重置内容");
         }
         // 重置setleinfo主节点信息
@@ -3047,6 +3047,24 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             diseaseCount = zxCollect.size()+xiCollect.size();
             map.put("mrisType",Constant.UnifiedPay.MRISTYPE.ZY);
         }
+        //如果西医没有主诊断，填充一条空的
+        int isMain = 0;
+        for (int i = 0; i < xiCollect.size(); i++) {
+            if (Constant.UnifiedPay.ISMAN.S.equals(xiCollect.get(i).getIsMain())) {
+                isMain++;
+            }
+        }
+        if(isMain == 0){
+            InptDiagnoseDTO inptDiagnoseDTO = new InptDiagnoseDTO();
+            inptDiagnoseDTO.setIsMain(Constant.UnifiedPay.ISMAN.S);
+            inptDiagnoseDTO.setDiseaseCode("");
+            inptDiagnoseDTO.setDiseaseName("");
+            inptDiagnoseDTO.setAdmCondType("");
+            inptDiagnoseDTO.setId("");
+            inptDiagnoseDTO.setVisitId("");
+            inptDiagnoseDTO.setHospCode("");
+            xiCollect.add(0,inptDiagnoseDTO);
+        }
         //排序
         List<InptDiagnoseDTO> zxCollect1 = new ArrayList<>();
         List<InptDiagnoseDTO> zxCollect2 = new ArrayList<>();
@@ -3265,7 +3283,25 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             insureGetInfoDAO.deleteOperInfo(map);
             if (!ListUtils.isEmpty(opernInfoList)) {
                 opernInfoList.get(0).put("oprnOprtType", "1");
+                //判断麻醉方式是否在医保码表范围
+                map.put("code","ANST_MTD_CODE");
+                List<InsureDictDTO> insureDictDTOList = insureGetInfoDAO.queryAnstMtd(map);
                 opernInfoList.stream().forEach(item -> {
+                    if(ObjectUtil.isNotEmpty(item.get("anstWay"))){
+                        int i = 0;
+                        if(!ListUtils.isEmpty(insureDictDTOList)){
+                            for(InsureDictDTO insureDictDTO:insureDictDTOList){
+                                if(insureDictDTO.getValue().equals(item.get("anstWay"))){
+                                    i++;
+                                    break;
+                                }
+                            }
+                            if(i == 0){
+                                throw new AppException(item.get("oprnOprtName")+"的麻醉方式名称:"+getSysCodeName((String) map.get("hospCode"),"MZFS",(String)item.get("anstWay"))+
+                                        ",麻醉方式码值为:"+item.get("anstWay")+"不在医保码表范围内,请重新选择");
+                            }
+                        }
+                    }
                     Object oprnOprtStartTime = MapUtils.get(item, "oprnOprtStartTime");
                     if (oprnOprtStartTime != null) {
                         item.put("oprnOprtStartTime", DateUtils.getNumerToStringDate(oprnOprtStartTime)); // 手术开始时间
@@ -4425,6 +4461,123 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         resultMap.put("error",errorMapList.size());//错误条数
         resultMap.put("success",mapList.size()-errorMapList.size());//成功条数
         return resultMap;
+    }
+
+    /**
+     * @Method selectItemInfo
+     * @Desrciption 结算清单地址历史数据处理
+     * @Param
+     * @Author liuhuiming
+     * @Date 2021/11/3 15:13
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> updateHistoricalData(Map<String, Object> map) {
+        if(ObjectUtil.isEmpty(map.get("insureRegCode"))){
+            throw new AppException("请选择医保机构");
+        }
+        String insureRegCode = (String) map.get("insureRegCode");
+        if("00".equals(insureRegCode.substring(insureRegCode.length()-2,insureRegCode.length()))){
+            throw new AppException("请选择第三级医保机构");
+        }
+        String city = null;//市级
+        String province = null;//省级
+        String upAdmdvscCode = null;//市级编码
+        Map<String, Object> admdvscMap = new HashMap<>();
+        List<Map<String, Object>> upAdmdvscList = new ArrayList<>();
+        //查询县级
+        admdvscMap.put("admdvsCode", insureRegCode);
+        upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+        if(!ListUtils.isEmpty(upAdmdvscList)){
+            upAdmdvscCode = (String) upAdmdvscList.get(0).get("upAdmdvsCode");
+            //查询市级
+            admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
+            upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+            if(!ListUtils.isEmpty(upAdmdvscList)){
+                city = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                //查询省级
+                admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
+                upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+                if(!ListUtils.isEmpty(upAdmdvscList)){
+                    province = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                }
+            }
+        }
+        List<InsureSettleInfoDTO> setlList = insureGetInfoDAO.queryAllSetlInfo(map);
+        int t = setlList.size();
+        int s = 0;
+        //从县级查起
+        if(StringUtils.isNotEmpty(city)){
+            map.put("upAdmdvsCode",upAdmdvscCode);
+            List<Map<String, Object>> admdvsList = insureGetInfoDAO.queryAllAdmdvs(map);
+            upAdmdvscList = admdvsList;
+            for(Map<String, Object> admdvs:admdvsList){
+                String admdvsName = (String) admdvs.get("admdvsName");
+                String admdvsCode = (String) admdvs.get("admdvsCode");
+                for(InsureSettleInfoDTO insureSettleInfoDTO:setlList){
+                    //以联系人地址为准
+                    if(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)>=0){
+                        //县级
+                        insureSettleInfoDTO.setCounty(admdvsCode + "," + admdvsName);
+                        insureSettleInfoDTO.setConCounty(admdvsCode + "," + admdvsName);
+                        //市级
+                        insureSettleInfoDTO.setCity(city);
+                        insureSettleInfoDTO.setConCity(city);
+                        //省级
+                        insureSettleInfoDTO.setProvince(province);
+                        insureSettleInfoDTO.setConProvince(province);
+                    }
+
+                }
+            }
+            //更新历史数据
+            insureGetInfoDAO.updateAddr(setlList);
+            //从镇查起
+            setlList = insureGetInfoDAO.queryAllSetlInfo(map);
+            Map<String, Object> admdvssMap = new HashMap<>();
+            List<Map<String, Object>> admdvscList = new ArrayList<>();
+            for (Map<String, Object> admdvs : upAdmdvscList) {
+                admdvssMap.put("admdvsLv", "4");
+                admdvssMap.put("upAdmdvsCode", admdvs.get("admdvsCode"));
+                admdvscList.addAll(insureGetInfoDAO.queryAllAdmdvs(admdvssMap));
+            }
+            //以联系人地址为准
+            for (Map<String, Object> admdvs : admdvscList) {
+                String admdvsName = (String) admdvs.get("admdvsName");
+                String upAdmdvsCode = (String) admdvs.get("upAdmdvsCode");
+                Map<String, Object> admdvsMap = new HashMap<>();
+                List<Map<String, Object>> upAdmdvsList = new ArrayList<>();
+                for (InsureSettleInfoDTO insureSettleInfoDTO : setlList) {
+                    //以联系人地址为准
+                    if (insureSettleInfoDTO.getConerAddr().indexOf(admdvsName.substring(0, admdvsName.length() - 1)) >= 0) {
+                        //查询县级
+                        admdvsMap.put("admdvsCode", upAdmdvsCode);
+                        upAdmdvsList = insureGetInfoDAO.queryAllAdmdvs(admdvsMap);
+                        if (!ListUtils.isEmpty(upAdmdvsList)) {
+                            insureSettleInfoDTO.setCounty(upAdmdvsList.get(0).get("admdvsCode") + "," + upAdmdvsList.get(0).get("admdvsName"));
+                            insureSettleInfoDTO.setConCounty(upAdmdvsList.get(0).get("admdvsCode") + "," + upAdmdvsList.get(0).get("admdvsName"));
+                            //市级
+                            insureSettleInfoDTO.setCity(city);
+                            insureSettleInfoDTO.setConCity(city);
+                            //省级
+                            insureSettleInfoDTO.setProvince(province);
+                            insureSettleInfoDTO.setConProvince(province);
+                        }
+                    }
+                }
+            }
+            //更新历史数据
+            insureGetInfoDAO.updateAddr(setlList);
+            //查询剩余数量
+            setlList = insureGetInfoDAO.queryAllSetlInfo(map);
+            int e = setlList.size();
+            s = t - e;
+            map.put("failList",setlList);
+            map.put("total",t);
+            map.put("success",s);
+            map.put("fail",e);
+        }
+        return map;
     }
 
     //字典转义

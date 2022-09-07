@@ -12,6 +12,7 @@ import cn.hsa.module.insure.module.dao.InsureRecruitPurchaseDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureRecruitPurchaseDTO;
 import cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete;
+import cn.hsa.module.insure.stock.entity.InsureGoodSell;
 import cn.hsa.module.insure.stock.entity.InsureInventoryStockUpdate;
 import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
@@ -347,7 +348,21 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         }
 
         // 费用ids，用于更新上传状态
-        return this.updateCostIsUpload(dataList) > 0;
+        this.updateCostIsUpload(dataList,Constants.SF.S);
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (Map<String, Object> dataMap : dataList) {
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(MapUtil.getStr(dataMap,"fixmedinsBchno"));
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
+            insureGoodInfoDelete.setInsureType(insureRegCode);
+            insureGoodInfoDelete.setInvDataType("4");
+            insureGoodInfoDelete.setCertId(MapUtil.getStr(dataMap,"certId"));
+            listData.add(insureGoodInfoDelete);
+        }
+        return this.updateStroAndSaveResultData(listData, hospCode, "1");
     }
 
 
@@ -395,7 +410,21 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
             resultMap = this.commonInsureUnified(hospCode, insureRegCode, Constant.UnifiedPay.ZC.UP_8510, data);
         }
         // 费用ids，用于更新上传状态
-        return this.updateCostIsUpload(dataList) > 0;
+        this.updateCostIsUpload(dataList,Constants.SF.F);
+
+        List<InsureGoodInfoDelete> listData = new ArrayList<>();
+        for (Map<String, Object> dataMap : dataList) {
+            InsureGoodInfoDelete insureGoodInfoDelete = new InsureGoodInfoDelete();
+            insureGoodInfoDelete.setId(SnowflakeUtils.getId());
+            insureGoodInfoDelete.setFixmedinsBchno(MapUtil.getStr(dataMap,"fixmedinsBchno"));
+            insureGoodInfoDelete.setHospCode(hospCode);
+            insureGoodInfoDelete.setUploadTime(DateUtils.getNow());
+            insureGoodInfoDelete.setInsureType(insureRegCode);
+            insureGoodInfoDelete.setInvDataType("4");
+            insureGoodInfoDelete.setCertId(MapUtil.getStr(dataMap,"certId"));
+            listData.add(insureGoodInfoDelete);
+        }
+        return this.updateStroAndSaveResultData(listData, hospCode, "0");
     }
 
     // 获取医保配置信息
@@ -408,7 +437,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
     }
 
     // 更新门诊/住院费用表上传标志
-    private int updateCostIsUpload(List<Map<String, Object>> dataList) {
+    private int updateCostIsUpload(List<Map<String, Object>> dataList,String isUpload) {
         Map<String, Object> map = new HashMap<>();
         // 费用ids，用于更新上传状态
         List<String> ids = dataList.stream().map(map1 -> (String) MapUtils.get(map1, "id")).collect(Collectors.toList());
@@ -417,6 +446,7 @@ public class InsureRecruitPurchaseBOImpl extends HsafBO implements InsureRecruit
         if (!ListUtils.isEmpty(ids)) {
             map.put("ids", ids);
             map.put("hospCode",MapUtils.get(dataList.get(0),"hospCode"));
+            map.put("isUpload",isUpload);
             num = insureRecruitPurchaseDAO.updateCostIsUpload(map);
         }
         return num;

@@ -363,7 +363,7 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
                     insureUnifiedPayOutptService.UP_2203(paramMap);
                 }
             } catch (Exception e) {
-                log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage());
+                log.error("就诊id:"+visitId+"门诊登记调医保接口失败！"+e.getMessage(),e.getStackTrace());
                 if (ObjectUtil.isNotEmpty(responseData)
                         && ObjectUtil.isNotEmpty(responseData.getMedicalRegNo())
                         && ObjectUtil.isNotEmpty(responseData.getVisitNo())) {

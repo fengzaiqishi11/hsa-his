@@ -277,4 +277,9 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     public WrapperResponse<Map<String, Object>> saveBatchSettleInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.saveBatchSettleInfo(map));
     }
+
+    @Override
+    public WrapperResponse<Map<String, Object>> updateHistoricalData(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.updateHistoricalData(map));
+    }
 }

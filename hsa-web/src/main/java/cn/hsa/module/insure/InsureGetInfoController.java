@@ -424,6 +424,25 @@ public class InsureGetInfoController extends BaseController {
         return insureGetInfoService_consumer.insertBatchSettleInfo(map);
     }
 
+    /**
+     * @Method getSettleInfo
+     * @Desrciption 结算清单地址历史数据处理
+     * @Param
+     * [insureSettleInfoDTO]
+     * @Author zhangxuan
+     * @Date   2021-04-11 22:49
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse<java.util.Map>
+     **/
+    @PostMapping("/updateHistoricalData")
+    public WrapperResponse<Map<String, Object>> updateHistoricalData(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        map.put("crteId",sysUserDTO.getCrteId());
+        map.put("crteName",sysUserDTO.getCrteName());
+        map.put("crteTime", DateUtils.getNow());
+        return insureGetInfoService_consumer.updateHistoricalData(map);
+    }
+
 
 
 

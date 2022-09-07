@@ -1268,6 +1268,7 @@ public class MrisHomeBOImpl extends HsafBO implements MrisHomeBO {
         }
 
         map.put("id", insureIndividualVisitDTO.getMibId());
+        map.put("insuplcAdmdvs", insureIndividualVisitDTO.getInsuplcAdmdvs());
         InsureIndividualBasicDTO insureIndividualBasicDTO = mrisHomeDAO.getInsureIndividualBasic(map);
         if (insureIndividualBasicDTO == null) {
             throw new AppException("上传失败:未获取医保个人信息");

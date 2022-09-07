@@ -52,5 +52,7 @@ public class BaseAdviceDTO extends BaseAdviceDO implements Serializable {
 
     private String visitId ;
 
+    private String deptName ;
+    private String deptId ;
 
 }

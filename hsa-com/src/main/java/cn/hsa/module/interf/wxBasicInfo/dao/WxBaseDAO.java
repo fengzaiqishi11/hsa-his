@@ -4,6 +4,7 @@ import cn.hsa.base.TreeMenuNode;
 import cn.hsa.module.base.ba.dto.BaseAdviceDTO;
 import cn.hsa.module.base.bd.dto.BaseDiseaseDTO;
 import cn.hsa.module.base.bfc.dto.BaseFinanceClassifyDTO;
+import cn.hsa.module.base.bi.dto.BaseItemDTO;
 import cn.hsa.module.base.bpft.dto.BasePreferentialTypeDTO;
 import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.center.outptprofilefile.dto.OutptProfileFileDTO;
@@ -109,4 +110,6 @@ public interface WxBaseDAO {
      * @param data
      */
     BaseAdviceDTO getBaseAdviceByCode(Map<String, Object> data);
+
+    List<BaseItemDTO> getAdviceDetailById(OutptPrescribeDetailsDTO outptPrescribeDetails);
 }

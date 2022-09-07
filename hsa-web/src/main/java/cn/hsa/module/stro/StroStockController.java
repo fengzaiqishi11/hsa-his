@@ -365,4 +365,17 @@ public class StroStockController extends BaseController {
         map.put("itemProfitStatisticsDTO",itemProfitStatisticsDTO);
         return stroStockService_consumer.queryDrugAndMaterialProfit(map);
     }
+    /**
+     * @Author gory
+     * @Description 同步过期数量
+     * @Date 2022/9/7 9:30
+     * @Param [req, res]
+     **/
+    @PostMapping("/updateOccupyByExpire")
+    public WrapperResponse<Boolean> updateOccupyByExpire(HttpServletRequest req, HttpServletResponse res) {
+        SysUserDTO sysUserDTO = getSession(req, res);
+        Map map = new HashMap();
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return stroStockService_consumer.updateOccupyByExpire(map);
+    }
 }

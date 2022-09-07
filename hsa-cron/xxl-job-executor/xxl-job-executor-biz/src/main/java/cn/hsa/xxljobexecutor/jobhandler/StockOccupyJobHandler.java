@@ -60,7 +60,7 @@ public class StockOccupyJobHandler extends IJobHandler {
         for(CenterHospitalDTO centerHospitalDTO : centerHospitalDTOList){
             Map map =new HashMap<>();
             map.put("hospCode",centerHospitalDTO.getCode());
-            stroStockService_consumer.updateOccupy(map);
+            stroStockService_consumer.updateOccupyByExpire(map);
         }
         return SUCCESS;
     }

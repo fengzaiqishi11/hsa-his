@@ -204,4 +204,6 @@ public class BaseDrugDTO extends BaseDrugDO implements Serializable {
     private String outptUseCode;
 
     private String gbNationName;
+    // 过期数量
+    private String expireStockOccupy;
 }

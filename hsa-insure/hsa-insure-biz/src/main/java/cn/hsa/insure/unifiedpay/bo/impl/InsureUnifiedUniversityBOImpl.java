@@ -4,6 +4,7 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.InsureUnifiedCommonUtil;
+import cn.hsa.module.base.dept.dto.BaseDeptDTO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualVisitDAO;
@@ -25,6 +26,8 @@ import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.outpt.visit.service.OutptVisitService;
 
 import cn.hsa.util.*;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -109,6 +112,14 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
     public Boolean insertUniversityInsure(Map<String, Object> map) {
         String hospCode = MapUtils.get(map,"hospCode");
         String regCode = MapUtils.get(map,"regCode");
+        String mdtrtCertType = MapUtils.get(map,"mdtrtCertType");//就诊凭证类型
+        String mdtrtCertNo = MapUtils.get(map,"mdtrtCertNo");//就诊凭证号码
+        String cardSn = MapUtils.get(map,"cardSn");//卡识别码
+        if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+            if (StringUtils.isEmpty(cardSn)) {
+                throw new AppException("就诊凭证类型为社保卡时，卡识别码【cardSn】不能为空！");
+            }
+        }
         // 验证医保机构信息
         InsureConfigurationDTO insureInsureConfiguration = insureUnifiedCommonUtil.getInsureInsureConfiguration(hospCode, regCode);
         // 效验是否存在异常结算异常数据（医保单边账）
@@ -130,9 +141,10 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
             return false;
         }
         // 默认通过身份证号  身份证类型进行医保登记
-        map.put("certNo",outptVisitDTO.getCertNo()); // 证件号码
-        map.put("certCode",outptVisitDTO.getCertCode()); // 证件类型
+        map.put("certNo",mdtrtCertNo); // 证件号码
+        map.put("certCode",mdtrtCertType); // 证件类型
         map.put("visitNo",outptVisitDTO.getVisitNo()); // 就医登记号
+        map.put("cardSn",cardSn); // 就医登记号
         // 获取医保人员信息
         Map<String,Object> patientInfoMap =  getInsurePatientInfo(map);
         // 获取人员信息以后需要将数据回写到basic表中
@@ -392,8 +404,15 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         dataMap.put("psn_no", MapUtils.get(map,"psnNo"));   // 人员编号
         dataMap.put("insutype", MapUtils.get(map,"aae140"));  // 险种类型
         dataMap.put("begntime", outptVisitDTO.getVisitTime()); // 开始时间
-        dataMap.put("mdtrt_cert_type", "02"); // 就诊凭证类型
-        dataMap.put("mdtrt_cert_no", outptVisitDTO.getCertNo());  // 就诊凭证编号
+        // 就诊凭证类型
+        String mdtrtCertType = MapUtil.getStr(map, "certCode");
+        if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+            dataMap.put("mdtrt_cert_type",Constant.UnifiedPay.CKLX.YDSBK);
+        }else {
+            dataMap.put("mdtrt_cert_type",mdtrtCertType);
+        }
+        dataMap.put("mdtrt_cert_no", MapUtil.getStr(map,"certNo"));  // 就诊凭证编号
+        dataMap.put("card_sn", MapUtil.getStr(map,"cardSn"));  // 卡识别码
         dataMap.put("ipt_otp_no", outptVisitDTO.getVisitNo()); // 住院/门诊号
         String pracCertiNo = outptVisitDTO.getPracCertiNo();
         String doctorName = outptVisitDTO.getDoctorName();
@@ -407,7 +426,7 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         dataMap.put("dr_name",doctorName); // 医师姓名
         dataMap.put("dept_code", outptVisitDTO.getDeptId()); // 科室编码
         dataMap.put("dept_name",outptVisitDTO.getDeptName()); // 科室名称
-        dataMap.put("caty", outptVisitDTO.getCaty()); // 科别
+        dataMap.put("caty", ObjectUtil.isEmpty(outptVisitDTO.getCaty())?"01":outptVisitDTO.getCaty()); // 科别
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("data", dataMap);
         map.put("isHospital","0");
@@ -622,8 +641,16 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         // 入参，患者信息
         Map<String, Object> patientDataMap = new HashMap<>();
         patientDataMap.put("psn_no", insureIndividualVisitDTO.getAac001()); // 人员编号
+        // 就诊凭证类型
+        String mdtrtCertType = MapUtil.getStr(map, "certCode");
+        if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+            patientDataMap.put("mdtrt_cert_type",Constant.UnifiedPay.CKLX.YDSBK);
+        }else {
+            patientDataMap.put("mdtrt_cert_type",mdtrtCertType);
+        }
         patientDataMap.put("mdtrt_cert_type", insureIndividualVisitDTO.getMdtrtCertType()); //  就诊凭证类型
         patientDataMap.put("mdtrt_cert_no", insureIndividualVisitDTO.getMdtrtCertNo()); //  就诊凭证编号
+        patientDataMap.put("card_sn", MapUtil.getStr(map,"cardSn")); //  卡识别码
         patientDataMap.put("med_type", insureIndividualVisitDTO.getAka130()); //  医疗类别
         patientDataMap.put("medfee_sumamt", bigFee);// 医疗费总额
         patientDataMap.put("psn_setlway", Constants.JSFS.PTJS); //  个人结算方式
@@ -1213,8 +1240,8 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
         data.setAccessoryDiagnosisCode(null); // 副诊断编码
         data.setAccessoryDiagnosisName(null); // 副诊断名称
         data.setInsuplcAdmdvs(MapUtils.get(map,"insuplcAdmdvs")); // 参保地医保区划
-        data.setMdtrtCertType("02"); // 就诊凭证类型
-        data.setMdtrtCertNo(outptVisitDTO.getCertNo()); // 就诊凭证编号
+        data.setMdtrtCertType(MapUtil.getStr(map,"certCode")); // 就诊凭证类型
+        data.setMdtrtCertNo(MapUtil.getStr(map,"certNo")); // 就诊凭证编号
         data.setOmsgid(""); // 交易信息(原交易)中的msgid,发送方报文ID
         data.setOinfno("2201"); // 交易信息(原交易)中的infno
         data.setPretFlag(null);
@@ -1253,10 +1280,21 @@ public class InsureUnifiedUniversityBOImpl extends HsafBO implements InsureUnifi
     private Map<String, Object> getInsurePatientInfo(Map<String, Object> map) {
         String hospCode = MapUtils.get(map,"hospCode");
         String regCode = MapUtils.get(map,"regCode");
+        String mdtrtCertType = MapUtil.getStr(map, "certCode");
         Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put("mdtrt_cert_type", Constant.UnifiedPay.CKLX.SFZ);
+
+        if (Constant.UnifiedPay.CKLX.YDSBK.equals(mdtrtCertType) || Constant.UnifiedPay.CKLX.BDSBK.equals(mdtrtCertType)) {
+            dataMap.put("mdtrt_cert_type",Constant.UnifiedPay.CKLX.YDSBK);
+        }else {
+            dataMap.put("mdtrt_cert_type",mdtrtCertType);
+        }
         dataMap.put("mdtrt_cert_no", MapUtils.get(map,"certNo"));
-        dataMap.put("medins_code", "");
+        dataMap.put("card_sn", MapUtil.getStr(map,"cardSn"));
+        dataMap.put("psn_cert_type", MapUtil.getStr(map,"psnCertType"));
+        dataMap.put("certno", MapUtil.getStr(map,"certno"));
+        dataMap.put("psn_name", MapUtil.getStr(map,"psnName"));
+        dataMap.put("orgin_card_info", MapUtil.getStr(map,"outInfo"));
+        dataMap.put("sign", MapUtil.getStr(map,"sign"));
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("data", dataMap);
         map.put("msgName","人员信息获取");

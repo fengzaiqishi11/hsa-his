@@ -245,4 +245,12 @@ public interface InsureGetInfoService {
      * @Param [map]
      **/
     WrapperResponse<Map<String, Object>> insertBatchSettleInfo(Map<String, Object> map);
+
+    /**
+     * @Author gory
+     * @Description 结算清单地址历史数据处理
+     * @Date 2022/6/6 15:58
+     * @Param [map]
+     **/
+    WrapperResponse<Map<String, Object>> updateHistoricalData(Map<String, Object> map);
 }

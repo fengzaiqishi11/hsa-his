@@ -1229,7 +1229,7 @@
         select * from outpt_visit
                  where
                      hosp_code =#{hospCode}
-                 and source_tj_code = #{SourceTjCode}
+                 and source_tj_code in ('4','5')
                  and profile_id = #{profileId}
                  and date(visit_time) =date(#{applyTime})
     </select>
@@ -1239,8 +1239,346 @@
         select count(1) from outpt_visit
         where
             hosp_code =#{hospCode}
-          and source_tj_code = #{SourceTjCode}
+          and source_tj_code = #{applyType}
           and date(visit_time) =date(#{applyTime})
     </select>
+
+    <!-- 添加处方医技申请 -->
+    <insert id="insertMedicalApply" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into medic_apply(
+        id, hosp_code, apply_no, type_code, visit_id, cost_id, in_no, order_no, is_inpt, dept_id, dept_name, doctor_id, doctor_name,
+        apply_time, imp_dept_id, bar_code, print_time, print_times, rporter, is_allergy, result_id,is_positive, document_sta,
+        opd_id, content, medic_type, is_merge, merge_id, remark, report_time, crte_id, crte_name, crte_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.applyNo},
+            #{item.typeCode},
+            #{item.visitId},
+            #{item.costId},
+            #{item.inNo},
+            #{item.orderNo},
+            #{item.isInpt},
+            #{item.deptId},
+            #{item.deptName},
+            #{item.doctorId},
+            #{item.doctorName},
+            #{item.applyTime},
+            #{item.impDeptId},
+            #{item.barCode},
+            #{item.printTime},
+            #{item.printTimes},
+            #{item.rporter},
+            #{item.isAllergy},
+            #{item.resultId},
+            #{item.isPositive},
+            #{item.documentSta},
+            #{item.opdId},
+            #{item.content},
+            #{item.medicType},
+            #{item.isMerge},
+            #{item.mergeId},
+            #{item.remark},
+            #{item.reportTime},
+            #{item.crteId},
+            #{item.crteName},
+            #{item.crteTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 添加处方医技申请 -->
+    <insert id="insertMedicalApplyDetail" parameterType="java.util.List" useGeneratedKeys="false">
+        insert medic_apply_detail(
+        id, hosp_code, apply_id, visit_id, opd_id, advice_code, dept_id, order_no, content, remark, blob_id
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.applyId},
+            #{item.visitId},
+            #{item.opdId},
+            #{item.adviceCode},
+            #{item.deptId},
+            #{item.orderNo},
+            #{item.content},
+            #{item.remark},
+            #{item.blobId}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- 新增处方信息-->
+    <insert id="insertPrescribe" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into outpt_prescribe(
+            id, hosp_code, visit_id, diagnose_ids,tcm_disease_id,tcm_disease_name,tcm_syndromes_id,tcm_syndromes_name, order_no, doctor_id, doctor_name, dept_id, dept_name,
+            type_code, prescribe_type_code, settle_id, remark, is_herb_hospital, herb_num, herb_use_code,
+            weight, agent_name, agent_cert_no, crte_id, crte_name, crte_time, is_settle, is_cancel, is_print, is_submit
+        )
+        values
+            (
+                #{id},
+                #{hospCode},
+                #{visitId},
+                #{diagnoseIds},
+                #{tcmDiseaseId},
+                #{tcmDiseaseName},
+                #{tcmSyndromesId},
+                #{tcmSyndromesName},
+                #{orderNo},
+                #{doctorId},
+                #{doctorName},
+                #{deptId},
+                #{deptName},
+                #{typeCode},
+                #{prescribeTypeCode},
+                #{settleId},
+                #{remark},
+                #{isHerbHospital},
+                #{herbNum},
+                #{herbUseCode},
+                #{weight},
+                #{agentName},
+                #{agentCertNo},
+                #{crteId},
+                #{crteName},
+                #{crteTime},
+                #{isSettle},
+                #{isCancel},
+                #{isPrint},
+                #{isSubmit}
+            )
+    </insert>
+
+
+    <!-- 新增处方明细数据 -->
+    <insert id="insertPrescribeDetail" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into outpt_prescribe_detail(
+        id, hosp_code, op_id, visit_id, opt_id, optd_group_no, optd_group_seq_no, optd_id, group_no,
+        group_seq_no, item_code, item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, speed_code, use_days, num, num_unit_code, total_num, herb_note_code, is_skin, is_positive, content,
+        phar_id, bfc_id, use_code, exec_dept_id, exec_date,exec_id, exec_name, exec_num, technology_no, skin_durg_id, skin_phar_id,
+        skin_unit_code, prescribe_prefix, prescribe_suffix, remark,decoction_method
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.opId},
+            #{item.visitId},
+            #{item.optId},
+            #{item.optdGroupNo},
+            #{item.optdGroupSeqNo},
+            #{item.optdId},
+            #{item.groupNo},
+            #{item.groupSeqNo},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.price},
+            #{item.totalPrice},
+            #{item.spec},
+            #{item.prepCode},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.usageCode},
+            #{item.rateId},
+            #{item.speedCode},
+            #{item.useDays},
+            #{item.num},
+            #{item.numUnitCode},
+            #{item.totalNum},
+            #{item.herbNoteCode},
+            #{item.isSkin},
+            #{item.isPositive},
+            #{item.content},
+            #{item.pharId},
+            #{item.bfcId},
+            #{item.useCode},
+            #{item.execDeptId},
+            #{item.execDate},
+            #{item.execId},
+            #{item.execName},
+            #{item.execNum},
+            #{item.technologyNo},
+            #{item.skinDurgId},
+            #{item.skinPharId},
+            #{item.skinUnitCode},
+            #{item.prescribePrefix},
+            #{item.prescribeSuffix},
+            #{item.remark},
+            #{item.decoctionMethod}
+            )
+        </foreach>
+    </insert>
+
+
+    <!-- 新增处方明细项目明细 -->
+    <insert id="insertPrescribeDetailExt" parameterType="java.util.List" useGeneratedKeys="false">
+        insert into outpt_prescribe_detail_ext(
+        id, hosp_code, op_id, visit_id, opd_id, group_no, group_seq_no, advice_id, self_ratio,
+        item_code,item_id, item_name, price, total_price, spec, prep_code, dosage, dosage_unit_code, usage_code,
+        rate_id, use_days, num, num_unit_code, total_num,  content, phar_id, use_code
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.opId},
+            #{item.visitId},
+            #{item.opdId},
+            #{item.groupNo},
+            #{item.groupSeqNo},
+            #{item.adviceId},
+            #{item.selfRatio},
+            #{item.itemCode},
+            #{item.itemId},
+            #{item.itemName},
+            #{item.price},
+            #{item.totalPrice},
+            #{item.spec},
+            #{item.prepCode},
+            #{item.dosage},
+            #{item.dosageUnitCode},
+            #{item.usageCode},
+            #{item.rateId},
+            #{item.useDays},
+            #{item.num},
+            #{item.numUnitCode},
+            #{item.totalNum},
+            #{item.content},
+            #{item.pharId},
+            #{item.useCode}
+            )
+        </foreach>
+    </insert>
+
+
+    <insert id="batchInsert" parameterType="java.util.List" >
+        insert into
+        outpt_cost
+        (
+        id,
+        hosp_code,
+        visit_id,
+        op_id,
+        opd_id,
+        ope_id,
+        source_code,
+        source_id,
+        old_cost_id,
+        source_dept_id,
+        bfc_id,
+        item_code,
+        item_id,
+        item_name,
+        price,
+        num,
+        spec,
+        prep_code,
+        dosage,
+        dosage_unit_code,
+        usage_code,
+        rate_id,
+        use_days,
+        num_unit_code,
+        total_num,
+        herb_note_code,
+        use_code,
+        herb_num,
+        total_price,
+        preferential_price,
+        reality_price,
+        status_code,
+        phar_id,
+        is_dist,
+        back_num,
+        settle_id,
+        settle_code,
+        one_settle_id,
+        self_ratio,
+        is_technology_ok,
+        technology_ok_id,
+        technology_ok_name,
+        technology_ok_time,
+        avg_buy_price,
+        avg_sell_price,
+        doctor_id,
+        doctor_name,
+        dept_id,
+        exec_dept_id,
+        crte_id,
+        crte_name,
+        crte_time,
+        distribute_all_detail_id,
+        one_dist_cost_id
+        ) values
+        <foreach collection="list" separator="," item="item">
+            (
+            #{item.id,jdbcType=VARCHAR},
+            #{item.hospCode,jdbcType=VARCHAR},
+            #{item.visitId,jdbcType=VARCHAR},
+            #{item.opId,jdbcType=VARCHAR},
+            #{item.opdId,jdbcType=VARCHAR},
+            #{item.opeId,jdbcType=VARCHAR},
+            #{item.sourceCode,jdbcType=VARCHAR},
+            #{item.sourceId,jdbcType=VARCHAR},
+            #{item.oldCostId,jdbcType=VARCHAR},
+            #{item.sourceDeptId,jdbcType=VARCHAR},
+            #{item.bfcId,jdbcType=VARCHAR},
+            #{item.itemCode,jdbcType=VARCHAR},
+            #{item.itemId,jdbcType=VARCHAR},
+            #{item.itemName,jdbcType=VARCHAR},
+            #{item.price,jdbcType=DECIMAL},
+            #{item.num,jdbcType=DECIMAL},
+            #{item.spec,jdbcType=VARCHAR},
+            #{item.prepCode,jdbcType=VARCHAR},
+            #{item.dosage,jdbcType=DECIMAL},
+            #{item.dosageUnitCode,jdbcType=VARCHAR},
+            #{item.usageCode,jdbcType=VARCHAR},
+            #{item.rateId,jdbcType=VARCHAR},
+            #{item.useDays,jdbcType=INTEGER},
+            #{item.numUnitCode,jdbcType=VARCHAR},
+            #{item.totalNum,jdbcType=DECIMAL},
+            #{item.herbNoteCode,jdbcType=VARCHAR},
+            #{item.useCode,jdbcType=VARCHAR},
+            #{item.herbNum,jdbcType=DECIMAL},
+            #{item.totalPrice,jdbcType=DECIMAL},
+            #{item.preferentialPrice,jdbcType=DECIMAL},
+            #{item.realityPrice,jdbcType=DECIMAL},
+            #{item.statusCode,jdbcType=VARCHAR},
+            #{item.pharId,jdbcType=VARCHAR},
+            #{item.isDist,jdbcType=VARCHAR},
+            #{item.backNum,jdbcType=DECIMAL},
+            #{item.settleId,jdbcType=VARCHAR},
+            #{item.settleCode,jdbcType=VARCHAR},
+            #{item.oneSettleId,jdbcType=VARCHAR},
+            #{item.selfRatio,jdbcType=DECIMAL},
+            #{item.isTechnologyOk,jdbcType=VARCHAR},
+            #{item.technologyOkId,jdbcType=VARCHAR},
+            #{item.technologyOkName,jdbcType=VARCHAR},
+            #{item.technologyOkTime,jdbcType=TIMESTAMP},
+            #{item.avgBuyPrice,jdbcType=DECIMAL},
+            #{item.avgSellPrice,jdbcType=DECIMAL},
+            #{item.doctorId,jdbcType=VARCHAR},
+            #{item.doctorName,jdbcType=VARCHAR},
+            #{item.deptId,jdbcType=VARCHAR},
+            #{item.execDeptId,jdbcType=VARCHAR},
+            #{item.crteId,jdbcType=VARCHAR},
+            #{item.crteName,jdbcType=VARCHAR},
+            #{item.crteTime,jdbcType=TIMESTAMP},
+            #{item.distributeAllDetailId,jdbcType=VARCHAR},
+            #{item.oneDistCostId,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
 
 </mapper>

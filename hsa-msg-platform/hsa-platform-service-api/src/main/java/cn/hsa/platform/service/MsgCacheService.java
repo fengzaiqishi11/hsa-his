@@ -15,18 +15,25 @@ import java.util.Map;
 public interface MsgCacheService {
 
     /**
-     *  从缓存获取消息数据
+     *  从缓存获取部门消息推送数据
      * @param infoModel 查询参数
      * @return java.util.List  消息列表
      */
-    List<MessageInfoModel> getMessageInfoFromCacheByType(MessageInfoModel infoModel);
+    List<MessageInfoModel> getDeptMessageInfoFromCacheByType(MessageInfoModel infoModel);
 
     /**
      * 查询推送个人消息列表
      * @param infoModel 查询参数
      * @return
      */
-    List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel infoModel);
+    List<MessageInfoModel> getPersonalMessageInfoFromCacheByType(MessageInfoModel infoModel);
+
+    /**
+     *  查询自己未读消息列表(包括可是消息与个人消息)
+     * @param infoModel 查询参数
+     * @return
+     */
+    List<MessageInfoModel> getUnReadMessageInfoListFromCache(MessageInfoModel infoModel);
 
     /**
      *  批量获取hash结构中的value值

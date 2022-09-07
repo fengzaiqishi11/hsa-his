@@ -29,7 +29,7 @@ public class MessageInfoServiceImpl implements MessageInfoService {
     @Override
     public List<MessageInfoModel> getMessageInfoList(MessageInfoModel infoModel) {
         if (infoModel!=null) {
-            return cacheService.getMessageInfoFromCacheByType(infoModel);
+            return cacheService.getDeptMessageInfoFromCacheByType(infoModel);
         }
         return new ArrayList<>();
     }
@@ -46,6 +46,7 @@ public class MessageInfoServiceImpl implements MessageInfoService {
 
             String hospCode = messageInfoModels.get(0).getHospCode();
             count = messageInfoDao.updateMssageInfoBatchByMsgId(messageInfoModels);
+            // 更新缓存数据
             List<Object> messageInfos = cacheService.hMultiGet(hospCode,ids);
             Map<String,Object> messageInfoFromCache = new HashMap<>();
             for (Object model : messageInfos){
@@ -82,8 +83,7 @@ public class MessageInfoServiceImpl implements MessageInfoService {
     @Override
     public List<MessageInfoModel> getDeptMessageInfoList(MessageInfoModel infoModel) {
         if (infoModel!=null) {
-            List<MessageInfoModel> messageInfoModels = messageInfoDao.queryMessageInfoByType(infoModel);
-            return messageInfoModels;
+            return cacheService.getDeptMessageInfoFromCacheByType(infoModel);
         }
         return new ArrayList<>();
     }
@@ -98,7 +98,7 @@ public class MessageInfoServiceImpl implements MessageInfoService {
     @Override
     public List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel infoModel) {
         if (infoModel!=null) {
-            return cacheService.queryPersonalMessageInfoByType(infoModel);
+            return cacheService.getPersonalMessageInfoFromCacheByType(infoModel);
         }
         return new ArrayList<>();
     }
@@ -117,6 +117,7 @@ public class MessageInfoServiceImpl implements MessageInfoService {
         String msgModelJSONStr = cacheService.hget(hospCode,id);
         MessageInfoModel msgModel = JSON.parseObject(msgModelJSONStr,MessageInfoModel.class);
         msgModel.setStatusCode(statusCode);
+        msgModel.setLastTime(new Date());
         cacheService.hset(hospCode,id,msgModel);
         return affectRows;
     }

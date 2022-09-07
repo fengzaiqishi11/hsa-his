@@ -1786,8 +1786,11 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
      **/
     @Override
     public Boolean updateOccupyByExpire(String hospCode) {
-
-        return stroStockDao.updateOccupyByExpire(hospCode);
+        try {
+            stroStockDao.updateOccupyByExpire(hospCode);
+        }catch (Exception e){
+        }
+        return true;
     }
 
 }

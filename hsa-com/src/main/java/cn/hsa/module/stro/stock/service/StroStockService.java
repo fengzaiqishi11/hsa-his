@@ -233,5 +233,6 @@ public interface StroStockService {
     @GetMapping("/service/web/stro/cxstrostock/queryDrugAndMaterialProfit")
     WrapperResponse<PageDTO> queryDrugAndMaterialProfit(Map map);
 
-    WrapperResponse<Boolean>  updateOccupyByExpire(Map map);
+    @PostMapping("/service/web/stro/stroStock/updateOccupyByExpire")
+    WrapperResponse<Boolean>  updateOccupyByExpire(Map<String,Object> map);
 }

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.payment.dao.PaymentExecuteLogDAO">
+
+    <resultMap type="cn.hsa.module.payment.entity.PaymentExecuteLogDO" id="PaymentExecuteLogMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="msgId" column="msg_id" jdbcType="VARCHAR"/>
+        <result property="msgInfo" column="msg_info" jdbcType="VARCHAR"/>
+        <result property="msgName" column="msg_name" jdbcType="VARCHAR"/>
+        <result property="inParams" column="in_params" jdbcType="VARCHAR"/>
+        <result property="outParams" column="out_params" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="errorMsg" column="error_msg" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PaymentExecuteLogMap">
+        select
+          id, hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params, code, crte_id, crte_name, crte_time, error_msg, status
+        from payment_execute_log
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PaymentExecuteLogMap">
+        select
+        id, hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params, code, crte_id, crte_name, crte_time,
+        error_msg, status
+        from payment_execute_log
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="msgId != null and msgId != ''">
+                and msg_id = #{msgId}
+            </if>
+            <if test="msgInfo != null and msgInfo != ''">
+                and msg_info = #{msgInfo}
+            </if>
+            <if test="msgName != null and msgName != ''">
+                and msg_name = #{msgName}
+            </if>
+            <if test="inParams != null and inParams != ''">
+                and in_params = #{inParams}
+            </if>
+            <if test="outParams != null and outParams != ''">
+                and out_params = #{outParams}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="errorMsg != null and errorMsg != ''">
+                and error_msg = #{errorMsg}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from payment_execute_log
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="msgId != null and msgId != ''">
+                and msg_id = #{msgId}
+            </if>
+            <if test="msgInfo != null and msgInfo != ''">
+                and msg_info = #{msgInfo}
+            </if>
+            <if test="msgName != null and msgName != ''">
+                and msg_name = #{msgName}
+            </if>
+            <if test="inParams != null and inParams != ''">
+                and in_params = #{inParams}
+            </if>
+            <if test="outParams != null and outParams != ''">
+                and out_params = #{outParams}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="errorMsg != null and errorMsg != ''">
+                and error_msg = #{errorMsg}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_execute_log(hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params, code, crte_id, crte_name, crte_time, error_msg, status)
+        values (#{hospCode}, #{visitId}, #{msgId}, #{msgInfo}, #{msgName}, #{inParams}, #{outParams}, #{code}, #{crteId}, #{crteName}, #{crteTime}, #{errorMsg}, #{status})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_execute_log(hosp_code, visit_id, msg_id, msg_info, msg_name, in_params, out_params, code,
+        crte_id, crte_name, crte_time, error_msg, status)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.hospCode}, #{entity.visitId}, #{entity.msgId}, #{entity.msgInfo}, #{entity.msgName},
+            #{entity.inParams}, #{entity.outParams}, #{entity.code}, #{entity.crteId}, #{entity.crteName},
+            #{entity.crteTime}, #{entity.errorMsg}, #{entity.status})
+        </foreach>
+    </insert>
+
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update payment_execute_log
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="msgId != null and msgId != ''">
+                msg_id = #{msgId},
+            </if>
+            <if test="msgInfo != null and msgInfo != ''">
+                msg_info = #{msgInfo},
+            </if>
+            <if test="msgName != null and msgName != ''">
+                msg_name = #{msgName},
+            </if>
+            <if test="inParams != null and inParams != ''">
+                in_params = #{inParams},
+            </if>
+            <if test="outParams != null and outParams != ''">
+                out_params = #{outParams},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="errorMsg != null and errorMsg != ''">
+                error_msg = #{errorMsg},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from payment_execute_log where id = #{id}
+    </delete>
+
+</mapper>
+

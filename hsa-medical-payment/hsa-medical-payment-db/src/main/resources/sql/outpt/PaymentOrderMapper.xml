@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.payment.dao.PaymentOrderDAO">
+
+    <resultMap type="cn.hsa.module.payment.entity.PaymentOrderDO" id="PaymentOrderMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="paymentSettleId" column="payment_settle_id" jdbcType="VARCHAR"/>
+        <result property="paymentSettleType" column="payment_settle_type" jdbcType="VARCHAR"/>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="paymentPrice" column="payment_price" jdbcType="NUMERIC"/>
+        <result property="payCode" column="pay_code" jdbcType="VARCHAR"/>
+        <result property="stateCode" column="state_code" jdbcType="VARCHAR"/>
+        <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+        <result property="omsgid" column="omsgid" jdbcType="VARCHAR"/>
+        <result property="oinfno" column="oinfno" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="invalidTime" column="invalid_time" jdbcType="INTEGER"/>
+        <result property="updateId" column="update_id" jdbcType="VARCHAR"/>
+        <result property="updateName" column="update_name" jdbcType="VARCHAR"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PaymentOrderMap">
+        select
+          id, hosp_code, visit_id, settle_id, payment_settle_id, payment_settle_type, visit_no, total_price, payment_price, pay_code, state_code, settle_code, omsgid, oinfno, remark, invalid_time, update_id, update_name, update_time, crte_id, crte_name, crte_time
+        from payment_order
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllPaymentOrderInfo" resultMap="PaymentOrderMap">
+        select
+        id, hosp_code, visit_id, settle_id, payment_settle_id, payment_settle_type, visit_no, total_price,
+        payment_price, pay_code, state_code, settle_code, omsgid, oinfno, remark, invalid_time, update_id, update_name,
+        update_time, crte_id, crte_name, crte_time
+        from payment_order
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and settle_id = #{settleId}
+            </if>
+            <if test="paymentSettleId != null and paymentSettleId != ''">
+                and payment_settle_id = #{paymentSettleId}
+            </if>
+            <if test="paymentSettleType != null and paymentSettleType != ''">
+                and payment_settle_type = #{paymentSettleType}
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                and visit_no = #{visitNo}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="paymentPrice != null">
+                and payment_price = #{paymentPrice}
+            </if>
+            <if test="payCode != null and payCode != ''">
+                and pay_code = #{payCode}
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+                and state_code = #{stateCode}
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                and settle_code = #{settleCode}
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                and omsgid = #{omsgid}
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                and oinfno = #{oinfno}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="invalidTime != null">
+                and invalid_time = #{invalidTime}
+            </if>
+            <if test="updateId != null and updateId != ''">
+                and update_id = #{updateId}
+            </if>
+            <if test="updateName != null and updateName != ''">
+                and update_name = #{updateName}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_order(hosp_code, visit_id, settle_id, payment_settle_id, payment_settle_type, visit_no, total_price, payment_price, pay_code, state_code, settle_code, omsgid, oinfno, remark, invalid_time, update_id, update_name, update_time, crte_id, crte_name, crte_time)
+        values (#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{paymentSettleType}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{stateCode}, #{settleCode}, #{omsgid}, #{oinfno}, #{remark}, #{invalidTime}, #{updateId}, #{updateName}, #{updateTime}, #{crteId}, #{crteName}, #{crteTime})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_order(hosp_code, visit_id, settle_id, payment_settle_id, payment_settle_type, visit_no,
+        total_price, payment_price, pay_code, state_code, settle_code, omsgid, oinfno, remark, invalid_time, update_id,
+        update_name, update_time, crte_id, crte_name, crte_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId},
+            #{entity.paymentSettleType}, #{entity.visitNo}, #{entity.totalPrice}, #{entity.paymentPrice},
+            #{entity.payCode}, #{entity.stateCode}, #{entity.settleCode}, #{entity.omsgid}, #{entity.oinfno},
+            #{entity.remark}, #{entity.invalidTime}, #{entity.updateId}, #{entity.updateName}, #{entity.updateTime},
+            #{entity.crteId}, #{entity.crteName}, #{entity.crteTime})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update payment_order
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId},
+            </if>
+            <if test="paymentSettleId != null and paymentSettleId != ''">
+                payment_settle_id = #{paymentSettleId},
+            </if>
+            <if test="paymentSettleType != null and paymentSettleType != ''">
+                payment_settle_type = #{paymentSettleType},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="paymentPrice != null">
+                payment_price = #{paymentPrice},
+            </if>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+                state_code = #{stateCode},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code = #{settleCode},
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                omsgid = #{omsgid},
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                oinfno = #{oinfno},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="invalidTime != null">
+                invalid_time = #{invalidTime},
+            </if>
+            <if test="updateId != null and updateId != ''">
+                update_id = #{updateId},
+            </if>
+            <if test="updateName != null and updateName != ''">
+                update_name = #{updateName},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from payment_order where id = #{id}
+    </delete>
+
+    <!--修改单个诊间支付订单信息-->
+    <update id="updatePaymentOrder" parameterType="cn.hsa.module.payment.entity.PaymentOrderDO">
+        update payment_order
+        <set>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="paymentPrice != null">
+                payment_price = #{paymentPrice},
+            </if>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code = #{settleCode},
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                omsgid = #{omsgid},
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                oinfno = #{oinfno},
+            </if>
+            <if test="updateId != null and updateId != ''">
+                update_id = #{updateId},
+            </if>
+            <if test="updateName != null and updateName != ''">
+                update_name = #{updateName},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where hosp_code = #{hospCode} and visit_id =#{visitId} and settle_id =#{settleId}
+    </update>
+
+</mapper>
+

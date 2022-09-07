@@ -1,6 +1,6 @@
 package cn.hsa.platform.listener;
 
-import cn.hsa.platform.netty.websocket.WebsocketInitialization;
+import cn.hsa.platform.netty.websocket.WebsocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ansi.AnsiColor;
@@ -25,7 +25,7 @@ public class ApplicationStartedListener implements ApplicationListener<Applicati
     Logger log = LoggerFactory.getLogger(ApplicationStartedListener.class);
 
     @Resource
-    private WebsocketInitialization websocketInitialization;
+    private WebsocketServer websocketInitialization;
 
 
     /**

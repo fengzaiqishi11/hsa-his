@@ -910,14 +910,15 @@
         <result property="execTime" column="exec_time" jdbcType="TIMESTAMP"/>
         <result property="planExecTime" column="plan_exec_time" jdbcType="TIMESTAMP"/>
         <result property="secondExecName" column="second_exec_name" jdbcType="VARCHAR"/>
-        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="endExecNum" column="end_exec_num" jdbcType="DECIMAL"/>
     </resultMap>
     <select id="queryAdvice" resultMap="InptVisitMap">
         select ia.crte_time,ia.stop_time,ia.content,ia.crte_name ,ia.check_name,ia.sign_code,ia.is_long,
                iv.name,iv.gender_code,iv.in_no,iv.bed_name,
                (select bd.name from base_dept bd where bd.id= iv.in_ward_id and bd.hosp_code = iv.hosp_code) as
                    wardName,iv.in_ward_id,
-               iae.sign_code as exeSignCode,iae.plan_exec_time,iae.exec_time,iae.exec_name,iae.second_exec_name
+               iae.sign_code as exeSignCode,iae.plan_exec_time,iae.exec_time,iae.exec_name,iae.second_exec_name,
+        ia.end_exec_num
         from inpt_advice ia
                  left join inpt_advice_exec iae on ia.id = iae.advice_id and ia.hosp_code = iae.hosp_code
                  left join inpt_visit iv on ia.visit_id=iv.id and iv.hosp_code= ia.hosp_code

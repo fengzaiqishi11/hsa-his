@@ -8,6 +8,7 @@ import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.bo.OutDistributeDrugBO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.service.OutDistributeDrugService;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,7 @@ public class OutDistributeDrugServiceImpl extends HsafService implements OutDist
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
-    public WrapperResponse<Boolean> outDispense(Map map) {
+    public WrapperResponse<List<StroStockDetailDTO>> outDispense(Map map) {
         return WrapperResponse.success(outDistributeDrugBO.updateOutDispense(MapUtils.get(map,"pharOutReceiveDTO")));
     }
 

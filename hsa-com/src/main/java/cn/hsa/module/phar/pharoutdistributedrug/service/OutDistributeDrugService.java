@@ -4,6 +4,7 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,7 +93,7 @@ public interface OutDistributeDrugService {
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @PostMapping("/service/stro/outDistribute/dispense")
-    WrapperResponse<Boolean> outDispense(Map map);
+    WrapperResponse<List<StroStockDetailDTO>> outDispense(Map map);
 
     /**
      * @Method: outEnableDispense

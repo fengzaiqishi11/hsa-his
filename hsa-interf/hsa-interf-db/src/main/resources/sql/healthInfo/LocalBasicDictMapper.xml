@@ -18,7 +18,7 @@
             bd.person_name as fzr, -- 负责人
             bd.phone as lxdh -- 联系电话
         from base_dept bd
-                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code = #{hospCode} and sp.isValid='1'
+                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code = #{hospCode} and sp.is_valid='1'
                  left join healthinfo_base_code hbc on hbc.c_code='CX02.01.012' and hbc.cm_value = bd.is_valid
         where bd.hosp_code = #{hospCode}
           and bd.code is not null
@@ -56,7 +56,7 @@
             hbcxl.c_value as whcddm, -- 文化程度代码
             hbcxl.c_meaning as whcdmc -- 文化程度名称
         from sys_user su
-             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code=#{hospCode} and sp.is_valid='1'
              left join healthinfo_base_code hbcxb on hbcxb.c_code='GB/T 2261.1-2003' and hbcxb.cm_value = su.gender_code
              left join healthinfo_base_code hbczc on hbczc.c_code='GB/T 8561-2001' and hbczc.cm_value = su.work_type_code
              left join healthinfo_base_code hbcxl on hbcxl.c_code='GB/T 4658-2006'
@@ -118,21 +118,21 @@
             '' as sfzcyzsj, -- 是否中成药注射剂
             bd.proton_pump as sfzzbyzj -- 是否质子泵抑制剂
         from base_drug bd
-             left join sys_parameter sp on sp.code =#{sysParameter} and sp.hosp_code=#{hospCode} and sp.isValid='1'
+             left join sys_parameter sp on sp.code =#{sysParameter} and sp.hosp_code=#{hospCode} and sp.is_valid='1'
              left join sys_code_detail jxfl
-                       on jxfl.c_code ='JXFL' and jxfl.value = bd.prep_code and jxfl.hosp_code = #{hospCode} and jxfl.isValid='1'
+                       on jxfl.c_code ='JXFL' and jxfl.value = bd.prep_code and jxfl.hosp_code = #{hospCode} and jxfl.is_valid='1'
              left join sys_code_detail yf
-                       on yf.c_code ='YF' and yf.value = bd.usage_code and yf.hosp_code = #{hospCode} and yf.isValid='1'
+                       on yf.c_code ='YF' and yf.value = bd.usage_code and yf.hosp_code = #{hospCode} and yf.is_valid='1'
              left join sys_code_detail jy
-                       on jy.c_code ='jy' and jy.value = bd.basic_code and jy.hosp_code = #{hospCode} and jy.isValid='1'
+                       on jy.c_code ='jy' and jy.value = bd.basic_code and jy.hosp_code = #{hospCode} and jy.is_valid='1'
              left join sys_code_detail ypdl
-                       on ypdl.c_code ='YPDL' and ypdl.value = bd.big_type_code and ypdl.hosp_code = #{hospCode} and ypdl.isValid='1'
+                       on ypdl.c_code ='YPDL' and ypdl.value = bd.big_type_code and ypdl.hosp_code = #{hospCode} and ypdl.is_valid='1'
              left join sys_code_detail kjypjb
-                       on kjypjb.c_code ='KJYPJB' and kjypjb.value = bd.antibacterial_code and kjypjb.hosp_code = #{hospCode} and kjypjb.isValid='1'
+                       on kjypjb.c_code ='KJYPJB' and kjypjb.value = bd.antibacterial_code and kjypjb.hosp_code = #{hospCode} and kjypjb.is_valid='1'
              left join sys_code_detail dmtx
-                       on dmtx.c_code ='DMTX' and dmtx.value = bd.ph_code and dmtx.hosp_code = #{hospCode} and dmtx.isValid='1'
+                       on dmtx.c_code ='DMTX' and dmtx.value = bd.ph_code and dmtx.hosp_code = #{hospCode} and dmtx.is_valid='1'
              left join sys_code_detail ypfl
-                       on ypfl.c_code ='YPFL' and ypfl.value = bd.type_code and ypfl.hosp_code = #{hospCode} and ypfl.isValid='1'
+                       on ypfl.c_code ='YPFL' and ypfl.value = bd.type_code and ypfl.hosp_code = #{hospCode} and ypfl.is_valid='1'
              left join base_product bp on bp.code = bd.prod_code and bp.hosp_code =#{hospCode}
         where
             bd.hosp_code =#{hospCode}
@@ -163,11 +163,11 @@
             '' as sbjbm, -- 省标准编码
             bi.is_valid as yxbz -- 是否有效
         from base_item bi
-             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode} and sp.isValid='1'
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode} and sp.is_valid='1'
              left join sys_code_detail xmfl
-               on xmfl.c_code = 'XMFL' and xmfl.value = bi.unit_code and xmfl.hosp_code =#{hospCode} and xmfl.isValid='1'
+               on xmfl.c_code = 'XMFL' and xmfl.value = bi.unit_code and xmfl.hosp_code =#{hospCode} and xmfl.is_valid='1'
              left join sys_code_detail dw
-               on dw.c_code = 'DW' and dw.value = bi.unit_code and dw.hosp_code =#{hospCode} and dw.isValid='1'
+               on dw.c_code = 'DW' and dw.value = bi.unit_code and dw.hosp_code =#{hospCode} and dw.is_valid='1'
         where
             bi.hosp_code =#{hospCode}
             and bi.code is not null
@@ -197,9 +197,9 @@
             '' as xnhbjbm, -- 新农合标准编码
             bd.is_valid as sfyxbz -- 是否有效标志
         from base_disease bd
-             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode} and sp.isValid='1'
+             left join sys_parameter sp on sp.code=#{sysParameter} and sp.hosp_code =#{hospCode} and sp.is_valid='1'
              left join sys_code_detail jbfl
-               on jbfl.c_code='JBFL' and jbfl.value = bd.type_code and jbfl.hosp_code=#{hospCode} and jbfl.isValid='1'
+               on jbfl.c_code='JBFL' and jbfl.value = bd.type_code and jbfl.hosp_code=#{hospCode} and jbfl.is_valid='1'
         where
             bd.hosp_code =#{hospCode}
             and bd.code is not null
@@ -230,9 +230,9 @@
             '' as sfgzhc, -- 是否高值耗材
             bm.model as dyqxbm -- 对应器械编码
         from base_material bm
-                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code =#{hospCode} and sp.isValid='1'
-                 left join sys_code_detail dw on dw.c_code = bm.unit_code and dw.hosp_code =#{hospCode} and dw.isValid='1'
-                 left join base_product bp on bp.code = bm.prod_code and bp.hosp_code =#{hospCode} and bp.isValid='1'
+                 left join sys_parameter sp on sp.code = #{sysParameter} and sp.hosp_code =#{hospCode} and sp.is_valid='1'
+                 left join sys_code_detail dw on dw.c_code = bm.unit_code and dw.hosp_code =#{hospCode} and dw.is_valid='1'
+                 left join base_product bp on bp.code = bm.prod_code and bp.hosp_code =#{hospCode} and bp.is_valid='1'
         where
             bm.hosp_code =#{hospCode}
             and bm.code is not null

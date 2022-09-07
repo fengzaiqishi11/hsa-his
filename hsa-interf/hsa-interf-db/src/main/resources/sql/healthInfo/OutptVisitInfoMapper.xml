@@ -157,7 +157,7 @@
     a.crte_name as MODIFYTNAME
     from outpt_visit a
     left join outpt_diagnose od on a.id= od.visit_id and a.hosp_code = od.hosp_code and od.is_main ='1'
-    left join sys_code_detail ss on a.patient_code =ss.value and ss.hosp_code = a.hosp_code and ss.c_code ='BRLX' and ss.isValid='1'
+    left join sys_code_detail ss on a.patient_code =ss.value and ss.hosp_code = a.hosp_code and ss.c_code ='BRLX' and ss.is_valid='1'
     where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
     order by a.crte_time asc
 	</select>
@@ -205,7 +205,7 @@
         from outpt_prescribe a
             left join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
             left join outpt_prescribe_detail opd on opd.op_id=a.id and opd.hosp_code =a.hosp_code
-            left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX' and ss.isValid='1'
+            left join sys_code_detail ss on b.patient_code =ss.value and ss.hosp_code = b.hosp_code and ss.c_code ='BRLX' and ss.is_valid='1'
         where a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt;= date(#{endTime}) and a.hosp_code =#{hospCode}
         group by a.id
         order by a.crte_time asc

@@ -924,4 +924,7 @@ public interface InptAdviceDAO {
     List<MedicalAdviceDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO);
 
     List<InptAdviceDTO> checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO);
+
+    List<Map<String, Object>> checkStock2(InptAdviceDTO inptAdviceDTO);
+
 }

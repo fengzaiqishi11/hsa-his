@@ -1155,7 +1155,8 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
         if ((Constants.YYXZ.CG.equals(outptPrescribeDetailsDTO.getUseCode()) || Constants.YYXZ.CYDY.equals(outptPrescribeDetailsDTO.getUseCode()))
                 && (Constants.XMLB.YP.equals(outptPrescribeDetailsDTO.getItemCode()) || Constants.XMLB.CL.equals(outptPrescribeDetailsDTO.getItemCode()))) {
             if ((ListUtils.isEmpty(outptDoctorPrescribeDAO.checkStock(outptPrescribeDetailsDTO)))){
-                throw new AppException(outptPrescribeDetailsDTO.getItemName() + ":库存不足或在过去的24小时内已经开处方占用了库存，且还未配药（未配药不会扣除库存）,");
+                throw new AppException(outptPrescribeDetailsDTO.getItemName()
+                        + ":库存不足，请检查过期药品数");
             }
         }
 

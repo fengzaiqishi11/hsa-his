@@ -232,4 +232,6 @@ public interface StroStockService {
      */
     @GetMapping("/service/web/stro/cxstrostock/queryDrugAndMaterialProfit")
     WrapperResponse<PageDTO> queryDrugAndMaterialProfit(Map map);
+
+    WrapperResponse<Boolean>  updateOccupyByExpire(Map map);
 }

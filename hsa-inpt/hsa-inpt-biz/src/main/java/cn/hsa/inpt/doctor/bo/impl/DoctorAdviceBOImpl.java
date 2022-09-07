@@ -525,8 +525,8 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 String wjsykc = this.getSysParameter(inptAdviceDTO.getHospCode() , "MZYS_CF_WJSFYKC");
                 inptAdviceDTO.setWjsykc(wjsykc);
                 //判断库存
-                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
-                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足");
+                if (ListUtils.isEmpty(inptAdviceDAO.checkStock2(inptAdviceDTO))) {
+                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足,请检查药品过期数量");
                 }
 
             }

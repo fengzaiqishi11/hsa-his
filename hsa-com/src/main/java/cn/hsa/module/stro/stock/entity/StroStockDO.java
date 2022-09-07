@@ -62,4 +62,6 @@ public class StroStockDO extends PageDO implements Serializable {
     private BigDecimal splitRatio;
     // 是否上传到医保
     private String isUploadToInsure;
+    // 过期占存数量
+    private BigDecimal expireStockOccupy;
 }

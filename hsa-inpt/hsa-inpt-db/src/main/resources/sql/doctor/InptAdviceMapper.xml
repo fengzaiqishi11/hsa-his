@@ -2606,7 +2606,10 @@
         (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
         (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then bm.nation_code else '' end) as nation_code,
         (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name,
-        ifnull(a.is_new_status,'1') as isNewStatus,
+        (case
+        when (a.is_check = '1' and a.is_stop = '0') then '1'
+        when (a.is_stop_check = '1' and a.is_stop = '1') then '1'
+        else a.is_new_status end ) as isNewStatus,
         a.check_name as checkName,
         a.check_second_name  as checkSecondName,
         a.stop_doctor_name as stopDoctorName,

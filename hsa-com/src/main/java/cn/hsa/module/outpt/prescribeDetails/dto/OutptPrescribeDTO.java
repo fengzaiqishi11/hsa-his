@@ -105,5 +105,10 @@ public class OutptPrescribeDTO extends OutptPrescribeDO {
     private String decoctionMethod;//煎药方式
     private Integer age; // 年龄
     private String certNo; // 年龄
+
+
+    private String itemName  ;  //申请项目
+    private String execDeptId  ;  //执行科室ID
+    private String execDeptName;  //执行科室ID
 }
 

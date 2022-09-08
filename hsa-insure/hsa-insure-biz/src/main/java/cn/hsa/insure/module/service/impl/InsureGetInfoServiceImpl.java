@@ -282,4 +282,19 @@ public class InsureGetInfoServiceImpl extends HsafService implements InsureGetIn
     public WrapperResponse<Map<String, Object>> updateHistoricalData(Map<String, Object> map) {
         return WrapperResponse.success(insureGetInfoBO.updateHistoricalData(map));
     }
+
+    /**
+     * @Method queryInsureSettleInfo
+     * @Desrciption  医疗保障结算清单信息医保信息查询
+     *
+     * @Param
+     *
+     * @Author liuhuiming
+     * @Date   2022/04/22 13:58
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryInsureSettleInfo(Map<String, Object> map) {
+        return WrapperResponse.success(insureGetInfoBO.queryInsureSettleInfo(map));
+    }
 }

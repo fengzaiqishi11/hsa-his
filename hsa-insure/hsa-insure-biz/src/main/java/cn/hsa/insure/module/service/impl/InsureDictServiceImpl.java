@@ -241,4 +241,24 @@ public class InsureDictServiceImpl extends HsafService implements InsureDictServ
         return WrapperResponse.success(insureDictBO.querySysCodeByCode(map));
     }
 
+    /***
+     * 根据code查询字典值
+     * @param map
+     * @return
+     */
+    @Override
+    public WrapperResponse<Map<String, List<Map<String,Object>>>> querySysCodeByCodeList(Map map) {
+        return WrapperResponse.success(insureDictBO.querySysCodeByCodeList(map));
+    }
+
+    /***
+     * 查询医保区划
+     * @param amdvsMap
+     * @return
+     */
+    @Override
+    public WrapperResponse<Map<String, String>> queryInsuplcAdmdvs(Map<String, Object> amdvsMap) {
+        return WrapperResponse.success(insureDictBO.queryInsuplcAdmdvs(amdvsMap));
+    }
+
 }

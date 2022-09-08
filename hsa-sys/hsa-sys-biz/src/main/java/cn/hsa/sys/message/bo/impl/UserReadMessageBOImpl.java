@@ -12,6 +12,7 @@ import cn.hsa.module.sys.message.dao.UserReadMessageDAO;
 import cn.hsa.module.sys.message.dto.UserReadMessageDTO;
 import cn.hsa.util.Constants;
 
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -51,7 +52,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
     @Override
     public PageDTO queryMessageInfos(UserReadMessageDTO userReadMessageDTO) {
         // 获取系统中的消息推送
-        Map map = new HashMap<>();
+        Map<String,Object> map = new HashMap<>();
         MessageInfoDTO messageInfoDTO = new MessageInfoDTO();
         messageInfoDTO.setPageNo(userReadMessageDTO.getPageNo());
         messageInfoDTO.setPageSize(userReadMessageDTO.getPageSize());
@@ -59,7 +60,8 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
         map.put("messageInfoDTO",messageInfoDTO);
         WrapperResponse<List<MessageInfoDTO>>  data = messageInfoService_consumer.queryMessageInfos(map);
         if (null == data){
-            new AppException("未查询到系统消息");
+            log.warn("未查询到系统消息,入参：{}", JSON.toJSONString(userReadMessageDTO));
+            return PageDTO.of(new ArrayList<Object>());
         }
         List<MessageInfoDTO> messageInfoDTOList = data.getData();
         List<UserReadMessageDTO> resultList = new ArrayList<>();
@@ -71,7 +73,7 @@ public class UserReadMessageBOImpl implements UserReadMessageBO {
             readMessageDTO.setMessageInfoDTO(messageInfo);
             readMessageDTO.setMessageStatus(Constants.SF.F);
             readMessageDTO.setMessageType(Constants.MESSAGETYPE.SYSTEMMESSAGE);
-            readMessageDTO.setMessageTime(messageInfo.getCrteTime());
+            readMessageDTO.setMessageTime(messageInfo.getCrteTime()==null ? new Date():messageInfo.getCrteTime());
             String bloomKey = userReadMessageDTO.getHospCode()+':'+userReadMessageDTO.getUserId()+':'+ messageInfo.getId();
             if(redisBloomFilter.includeByHashContainer(bloomKey,1)){
                 readMessageDTO.setMessageStatus(Constants.SF.S);

@@ -30,7 +30,7 @@
         <result property="crteTime" column="crteTime" jdbcType="TIMESTAMP"/>
         <result property="typeCode" column="type_code" jdbcType="VARCHAR"/>
         <result property="bigTypeCode" column="big_type_code" jdbcType="VARCHAR"/>
-
+        <result property="expireStockOccupy" column="expire_stock_occupy" jdbcType="DECIMAL"/>
     </resultMap>
 
 
@@ -65,7 +65,8 @@
         ssd.expiry_date,
         ifnull(b.nation_code, '') as insureItemCode,
         ifnull(b.nation_name,  b.good_name) as insureItemName,
-        b.type_code,b.big_type_code
+        b.type_code,b.big_type_code,
+        ifnull(a.expire_stock_occupy,0) as expire_stock_occupy
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -173,7 +174,8 @@
         ssd.expiry_date,
         ifnull(b.nation_code, '') as insureItemCode,
         ifnull(b.nation_name,  b.name) as insureItemName,
-        b.type_code
+        b.type_code,
+        ifnull(a.expire_stock_occupy,0) as expire_stock_occupy
         from stro_stock a
         JOIN base_material b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -272,7 +274,8 @@
         ifnull(b.nation_code, '') as insureItemCode,
         ifnull(b.nation_name,  b.good_name) as insureItemName,
         b.type_code,
-        b.big_type_code
+        b.big_type_code,
+        a.expire_stock_occupy
         from stro_stock a
         JOIN base_drug b on a.item_id = b.id and a.hosp_code=b.hosp_code
         left join stro_stock_detail ssd on ssd.item_id = a.item_id and a.hosp_code= ssd.hosp_code
@@ -681,7 +684,13 @@
                 ifnull(sum(sell_price_all),0) sell_price_all
                 from stro_stock_detail
                 where hosp_code=#{item.hospCode} and biz_id=#{item.bizId} and item_code=#{item.itemCode} and item_id=#{item.itemId}
-            ) b set a.num=b.num,a.split_num=b.split_num,a.buy_price_all=b.buy_price_all,a.sell_price_all=b.sell_price_all
+            ) b,(
+            select ifnull(sum(split_num),0)  as expireStockOccupy
+            from stro_stock_detail
+            where hosp_code=#{item.hospCode} and biz_id=#{item.bizId} and item_code=#{item.itemCode} and item_id=#{item.itemId}
+                and expiry_date &lt; now()
+            ) c
+            set a.num=b.num,a.split_num=b.split_num,a.buy_price_all=b.buy_price_all,a.sell_price_all=b.sell_price_all,a.expire_stock_occupy = c.expireStockOccupy
             where hosp_code=#{item.hospCode} and biz_id=#{item.bizId} and item_code=#{item.itemCode} and item_id=#{item.itemId}
         </foreach>
     </update>
@@ -693,6 +702,16 @@
                 biz_id=#{item.bizId}
             </foreach>
         </update>
+
+    <update id="updateOccupyByExpire">
+        update stro_stock a,(
+        select biz_id as bizId,item_id as itemId,ifnull(sum(split_num),0) expireStockOccupy
+        from stro_stock_detail
+        where hosp_code=#{hospCode} and expiry_date &lt; now() and num >0 group by item_id,biz_id
+        ) c
+        set a.expire_stock_occupy = c.expireStockOccupy
+        where a.hosp_code=#{hospCode} and a.biz_id=c.bizId and a.item_id=c.itemId
+    </update>
 
     <insert id="insertStroStock" parameterType="java.util.List">
       insert into stro_in_record(id,hosp_code, item_id, item_code, num, buy_price, sell_price, stock_id, stock_detail_id,crte_time)

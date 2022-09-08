@@ -4,7 +4,6 @@ import cn.hsa.platform.domain.MessageInfoModel;
 import cn.hsa.platform.dto.ImContentModel;
 import cn.hsa.platform.netty.websocket.handler.HsaPlatformWebSocketHandler;
 import cn.hsa.platform.service.MessageInfoService;
-import cn.hsa.platform.util.Constants;
 import com.alibaba.fastjson.JSON;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -12,7 +11,6 @@ import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,20 +88,6 @@ public class WebsocketRunnable implements Runnable {
                     });
                 }
             }
-//        List<MessageInfoModel> messageInfoModels =messageInfoDao.queryMessageInfoByType(param);
-//        // 查询系统消息
-//        List<MessageInfoModel> sysMessageInfoList = messageInfoDao.querySysMessageInfoList(param);
-//        messageInfoModels.addAll(sysMessageInfoList);
-//        if (messageInfoModels!=null&&messageInfoModels.size()>0){
-//            List<String> ids =new ArrayList<>();
-//            for (MessageInfoModel msg:messageInfoModels){
-//                ids.add(msg.getId());
-//                msg.setCount(msg.getCount()+1); // 发送次数+1
-//            }
-//            if (ids!=null &&ids.size()>0){
-//                messageInfoDao.updateMssageInfoBatchByMsgId(messageInfoModels);
-//            }
-//        }
 
     }
 

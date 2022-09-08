@@ -329,4 +329,23 @@ class InsureDictBOImpl extends HsafBO implements InsureDictBO {
         List<Map<String, Object>> mapList = insureDictDAO.querySysCodeByCode(MapUtils.get(map, "hospCode"), MapUtils.get(map, "code"));
         return mapList.stream().collect(Collectors.toMap(s -> s.get("value").toString(), s -> s.get("name").toString(), (s1, s2) -> s1));
     }
+
+    @Override
+    public Map<String, List<Map<String,Object>>> querySysCodeByCodeList(Map map) {
+        List<Map<String, Object>> mapList = insureDictDAO.querySysCodeByCodeList(MapUtils.get(map, "hospCode"),MapUtils.get(map,"insureRegCode"), MapUtils.get(map, "list"));
+        /*return mapList.stream().collect(Collectors.toMap(s -> s.get("value").toString(), s -> s.get("name").toString(), (s1, s2) -> s1));*/
+        Map<String, List<Map<String,Object>>> temp= mapList.stream().collect(
+                Collectors.groupingBy(
+                        s -> s.get("code").toString()
+                ));
+        return temp;
+    }
+
+    @Override
+    public Map<String, String> queryInsuplcAdmdvs(Map<String, Object> amdvsMap) {
+        List<Map<String, Object>> mapList = insureDictDAO.queryInsuplcAdmdvs(MapUtils.get(amdvsMap, "hospCode"), MapUtils.get(amdvsMap, "list"));
+        return mapList.stream().collect(Collectors.toMap(s -> s.get("admdvs_code").toString(), s -> s.get("admdvs_name").toString(), (s1, s2) -> s1));
+    }
+
+
 }

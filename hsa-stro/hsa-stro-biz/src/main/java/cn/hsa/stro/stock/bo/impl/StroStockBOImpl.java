@@ -596,7 +596,7 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
 
     /**
      * @Method: checkStock
-     * @Description: 根据库存明细表更新库存主表数量
+     * @Description: 根据库存明细表更新库存主表数量，更新过期数量
      * @Param: [map]
      * @Author: youxianlin
      * @Email: 254580179@qq.com
@@ -1777,6 +1777,20 @@ public class StroStockBOImpl extends HsafBO implements StroStockBO {
         }
 
         return stroStockDao.getStroStockDetailIfNumShortage(map);
+    }
+    /**
+     * @Author gory
+     * @Description 同步过期数量
+     * @Date 2022/9/7 9:09
+     * @Param [hospCode]
+     **/
+    @Override
+    public Boolean updateOccupyByExpire(String hospCode) {
+        try {
+            stroStockDao.updateOccupyByExpire(hospCode);
+        }catch (Exception e){
+        }
+        return true;
     }
 
 }

@@ -186,4 +186,7 @@ public interface InsureDictDAO {
      */
     List<Map<String, Object>> querySysCodeByCode(@Param("hospCode") String hospCode, @Param("code") String code);
 
+    List<Map<String, Object>> querySysCodeByCodeList(String hospCode,String insureRegCode, List list);
+
+    List<Map<String, Object>> queryInsuplcAdmdvs(String hospCode, List list);
 }

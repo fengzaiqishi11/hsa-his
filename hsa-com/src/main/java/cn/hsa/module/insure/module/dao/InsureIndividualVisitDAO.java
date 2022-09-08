@@ -483,6 +483,9 @@ public interface InsureIndividualVisitDAO {
     **/
     int updateInsureMedicalRegNo(InsureIndividualVisitDTO responseData);
 
+
+    int updateInsureMedicalRegNoGS(InsureIndividualVisitDTO responseData);
+
     InptVisitDTO selectInptVisit(Map<String, Object> map);
 
     /**
@@ -515,5 +518,7 @@ public interface InsureIndividualVisitDAO {
     List<OutptDiagnoseDTO> getOutptDiagnose(OutptPrescribeDTO inPut);
 
     OutptVisitDTO selectOutptVisitById(HashMap<String, Object> map);
+
+    List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap);
 }
 

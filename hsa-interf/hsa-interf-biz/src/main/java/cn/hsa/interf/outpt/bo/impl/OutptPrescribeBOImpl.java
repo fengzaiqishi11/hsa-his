@@ -375,8 +375,8 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
         outptVisitDTO.setRemark("云净透析");
         //新增
         if(StringUtils.isEmpty(outptVisitDTO.getId()) || outptVisitDTO.getId().equals("0")){
-            OutptProfileFileExtendDTO outptProfileFileExtendDTO = this.getFprFileId(outptVisitDTO);
-            outptVisitDTO.setOutProfile(outptProfileFileExtendDTO.getOutProfile());
+            OutptProfileFileDTO outptProfileFileDTO = this.getProfileFileDTO(outptVisitDTO);  // 调用本地建档接口建档
+            outptVisitDTO.setOutProfile(outptProfileFileDTO.getOutProfile());
         }else{
             //修改档案信息
             outptPrescribeDao.updateProfileFile(outptVisitDTO);
@@ -1093,5 +1093,56 @@ public class OutptPrescribeBOImpl extends HsafBO implements OutptPrescribeBO {
 //        System.out.println((aaaa));
 //    }
 
+    // 新增档案
+    private OutptProfileFileDTO getProfileFileDTO(OutptVisitDTO outptVisitDTO) {
+        // 档案表
+        OutptProfileFileDTO pf = new OutptProfileFileDTO();
+        pf.setType("2");
+        pf.setName(outptVisitDTO.getName());
+        pf.setHospCode(outptVisitDTO.getHospCode());
+        pf.setId(outptVisitDTO.getProfileId());
+        pf.setGenderCode(outptVisitDTO.getGenderCode());
+        pf.setAge(outptVisitDTO.getAge());
+        pf.setAgeUnitCode(outptVisitDTO.getAgeUnitCode());
+        pf.setBirthday(outptVisitDTO.getBirthday());
+        pf.setNationCode(outptVisitDTO.getNationCode());
+        pf.setMarryCode(outptVisitDTO.getMarryCode());
+        pf.setPhone(outptVisitDTO.getPhone());
+        pf.setName(outptVisitDTO.getName());
+        pf.setCertNo(outptVisitDTO.getCertNo());
+        pf.setCertCode(StringUtils.isEmpty(outptVisitDTO.getCertCode()) ? Constants.ZJLB.JMSFZ : outptVisitDTO.getCertCode());
+        pf.setNationalityCation(outptVisitDTO.getNationalityCation());
+        pf.setOccupationCode(outptVisitDTO.getOccupationCode());
+        pf.setEducationCode(outptVisitDTO.getEducationCode());
+        pf.setContactRelaCode(outptVisitDTO.getContactRelaCode());
+        pf.setContactName(outptVisitDTO.getContactName());
+        pf.setContactPhone(outptVisitDTO.getContactPhone());
+        pf.setContactAddress(outptVisitDTO.getContactAddress());
+        pf.setCrteId(outptVisitDTO.getCrteId());
+        pf.setCrteName(outptVisitDTO.getCrteName());
+        pf.setCrteTime(DateUtils.getNow());
+        pf.setContactAddress(outptVisitDTO.getContactAddress());
+        pf.setPatientCode(outptVisitDTO.getPatientCode());
+        pf.setPreferentialTypeId(outptVisitDTO.getPreferentialTypeId());
+//        WrapperResponse<OutptProfileFileExtendDTO> wr = outptProfileFileService_consumer.save(pf);
+
+        //调用本地建档服务
+        log.debug("云净接口调用本地建档服务开始：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+        Map localMap = new HashMap();
+        localMap.put("hospCode", outptVisitDTO.getHospCode());
+        localMap.put("outptProfileFileDTO", pf);
+        WrapperResponse<OutptProfileFileDTO> wr = baseProfileFileService_consumer.save(localMap);
+
+        log.debug("云净接口调用本地建档服务结束：" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+
+        if (wr.getCode() != 0) {
+            throw new AppException(wr.getMessage());
+        }
+        OutptProfileFileDTO outptProfileFileDTO = wr.getData();
+        if (outptProfileFileDTO == null) {
+            throw new AppException("获取档案返回信息失败，请联系管理员");
+        }
+        return outptProfileFileDTO;
+    }
 
 }

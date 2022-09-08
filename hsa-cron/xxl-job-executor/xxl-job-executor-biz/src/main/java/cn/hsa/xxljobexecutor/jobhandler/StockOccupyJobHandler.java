@@ -9,6 +9,7 @@ import cn.hsa.util.DateUtils;
 import cn.hsa.util.ListUtils;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import com.xxl.job.core.handler.annotation.JobHandler;
 import com.xxl.job.core.log.XxlJobLogger;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * @Date:2020/11/29 11:07
  * @Company: 创智和宇
  **/
-@com.xxl.job.core.handler.annotation.JobHandler(value="stockOccupyJob")
+@JobHandler(value = "stockOccupyJob")
 @Component
 public class StockOccupyJobHandler extends IJobHandler {
 
@@ -54,13 +55,20 @@ public class StockOccupyJobHandler extends IJobHandler {
     public ReturnT<String> execute(String params) throws Exception {
         XxlJobLogger.log("库存过期占用库存定时任务");
         List<CenterHospitalDTO> centerHospitalDTOList = queryValidCenterHospital();
-        if(ListUtils.isEmpty(centerHospitalDTOList)){
+        if (ListUtils.isEmpty(centerHospitalDTOList)) {
             return FAIL;
         }
-        for(CenterHospitalDTO centerHospitalDTO : centerHospitalDTOList){
-            Map map =new HashMap<>();
-            map.put("hospCode",centerHospitalDTO.getCode());
-            stroStockService_consumer.updateOccupy(map);
+        for (CenterHospitalDTO centerHospitalDTO : centerHospitalDTOList) {
+            try {
+                Map map = new HashMap<>();
+                map.put("hospCode", centerHospitalDTO.getCode());
+                stroStockService_consumer.updateOccupyByExpire(map);
+            } catch (Exception e) {
+                e.printStackTrace();
+                XxlJobLogger.log("[" + centerHospitalDTO.getCode() + "]" + e.getMessage());
+            } finally {
+                XxlJobLogger.log("====================[" + centerHospitalDTO.getCode() + "]进销存同步结束:" + DateUtils.format("yyyy-MM-dd HH:mm:ss"));
+            }
         }
         return SUCCESS;
     }
@@ -70,7 +78,7 @@ public class StockOccupyJobHandler extends IJobHandler {
         dto.setIsValid(Constants.SF.S);
         WrapperResponse<List<CenterHospitalDTO>> wr = centerHospitalService_consumer.queryAll(dto);
         if (wr.getCode() != 0) {
-            XxlJobLogger.log("库存过期定时任务执行失败：" + wr.getMessage());
+            XxlJobLogger.log("库存过期占用库存定时任务：" + wr.getMessage());
         }
         return wr.getData().stream().filter(centerHospitalDTO -> DateUtils.betweenDate(centerHospitalDTO.getStartDate(), centerHospitalDTO.getEndDate(), DateUtils.getNow())).collect(Collectors.toList());
     }

@@ -11,10 +11,14 @@ public interface MessageInfoService {
 
     int updateMessageInfoList(List<MessageInfoModel> messageInfoModels);
 
+    /**
+     *  更新消息状态
+     * @param msgInfoModel 更新参数
+     * @return
+     */
+    int updateMessageInfoById(MessageInfoModel msgInfoModel);
     List<MessageInfoModel> getUnReadMsgList(MessageInfoModel infoModel);
 
-    // 获取系统消息
-    List<MessageInfoModel> getSysMessageInfoList(MessageInfoModel infoModel);
 
     // 获取科室消息
     List<MessageInfoModel> getDeptMessageInfoList(MessageInfoModel infoModel);

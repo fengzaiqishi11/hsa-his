@@ -7,10 +7,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisPassword;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.DefaultLettucePool;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.connection.lettuce.LettucePool;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -58,6 +57,20 @@ public class CacheConfig {
         redisTemplate.setHashValueSerializer(hashValueSerializer);
         redisTemplate.setConnectionFactory(connectionFactory);
 
+        return redisTemplate;
+    }
+    @Bean
+    public RedisTemplate<String,String> stringRedisTemplate(@Autowired RedisConnectionFactory connectionFactory){
+        RedisTemplate<String,String> redisTemplate = new StringRedisTemplate();
+        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        RedisSerializer valueSerializer = new StringRedisSerializer();
+        StringRedisSerializer hashKeySerializer = new StringRedisSerializer();
+        RedisSerializer hashValueSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(keySerializer);
+        redisTemplate.setValueSerializer(valueSerializer);
+        redisTemplate.setHashKeySerializer(hashKeySerializer);
+        redisTemplate.setHashValueSerializer(hashValueSerializer);
+        redisTemplate.setConnectionFactory(connectionFactory);
         return redisTemplate;
     }
 }

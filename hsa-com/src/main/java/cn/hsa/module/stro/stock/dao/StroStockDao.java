@@ -298,4 +298,11 @@ public interface StroStockDao {
     int insertStockTime(@Param("list") List<StroStockDTO> stroStockDTOS);
 
     List<StroStockDetailDTO> getStroStockDetailIfNumShortage(Map map);
+    /**
+     * @Author gory
+     * @Description 同步过期数量
+     * @Date 2022/9/7 9:10
+     * @Param [hospCode]
+     **/
+    Boolean updateOccupyByExpire(String hospCode);
 }

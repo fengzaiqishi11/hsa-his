@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.payment.dao.PaymentSettleDAO">
+
+    <resultMap type="cn.hsa.module.payment.entity.PaymentSettleDO" id="PaymentSettleMap">
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="hospCode" column="hosp_code" jdbcType="VARCHAR"/>
+        <result property="visitId" column="visit_id" jdbcType="VARCHAR"/>
+        <result property="settleId" column="settle_id" jdbcType="VARCHAR"/>
+        <result property="paymentSettleId" column="payment_settle_id" jdbcType="VARCHAR"/>
+        <result property="visitNo" column="visit_no" jdbcType="VARCHAR"/>
+        <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
+        <result property="paymentPrice" column="payment_price" jdbcType="NUMERIC"/>
+        <result property="payCode" column="pay_code" jdbcType="VARCHAR"/>
+        <result property="stateCode" column="state_code" jdbcType="VARCHAR"/>
+        <result property="omsgid" column="omsgid" jdbcType="VARCHAR"/>
+        <result property="oinfno" column="oinfno" jdbcType="VARCHAR"/>
+        <result property="remark" column="remark" jdbcType="VARCHAR"/>
+        <result property="crteId" column="crte_id" jdbcType="VARCHAR"/>
+        <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
+        <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
+        <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PaymentSettleMap">
+        select
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code
+        from payment_settle
+        where id = #{id}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllPaymentSettle" resultMap="PaymentSettleMap">
+        select
+        id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code,
+        state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code
+        from payment_settle
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and settle_id = #{settleId}
+            </if>
+            <if test="paymentSettleId != null and paymentSettleId != ''">
+                and payment_settle_id = #{paymentSettleId}
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                and visit_no = #{visitNo}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="paymentPrice != null">
+                and payment_price = #{paymentPrice}
+            </if>
+            <if test="payCode != null and payCode != ''">
+                and pay_code = #{payCode}
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+                and state_code = #{stateCode}
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                and omsgid = #{omsgid}
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                and oinfno = #{oinfno}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                and settle_code = #{settleCode}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from payment_settle
+        <where>
+            <if test="id != null and id != ''">
+                and id = #{id}
+            </if>
+            <if test="hospCode != null and hospCode != ''">
+                and hosp_code = #{hospCode}
+            </if>
+            <if test="visitId != null and visitId != ''">
+                and visit_id = #{visitId}
+            </if>
+            <if test="settleId != null and settleId != ''">
+                and settle_id = #{settleId}
+            </if>
+            <if test="paymentSettleId != null and paymentSettleId != ''">
+                and payment_settle_id = #{paymentSettleId}
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                and visit_no = #{visitNo}
+            </if>
+            <if test="totalPrice != null">
+                and total_price = #{totalPrice}
+            </if>
+            <if test="paymentPrice != null">
+                and payment_price = #{paymentPrice}
+            </if>
+            <if test="payCode != null and payCode != ''">
+                and pay_code = #{payCode}
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+                and state_code = #{stateCode}
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                and omsgid = #{omsgid}
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                and oinfno = #{oinfno}
+            </if>
+            <if test="remark != null and remark != ''">
+                and remark = #{remark}
+            </if>
+            <if test="crteId != null and crteId != ''">
+                and crte_id = #{crteId}
+            </if>
+            <if test="crteName != null and crteName != ''">
+                and crte_name = #{crteName}
+            </if>
+            <if test="crteTime != null">
+                and crte_time = #{crteTime}
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                and settle_code = #{settleCode}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code)
+        values (#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{stateCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price,
+        payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId}, #{entity.visitNo},
+            #{entity.totalPrice}, #{entity.paymentPrice}, #{entity.payCode}, #{entity.stateCode}, #{entity.omsgid},
+            #{entity.oinfno}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime},
+            #{entity.settleCode})
+        </foreach>
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update payment_settle
+        <set>
+            <if test="hospCode != null and hospCode != ''">
+                hosp_code = #{hospCode},
+            </if>
+            <if test="visitId != null and visitId != ''">
+                visit_id = #{visitId},
+            </if>
+            <if test="settleId != null and settleId != ''">
+                settle_id = #{settleId},
+            </if>
+            <if test="paymentSettleId != null and paymentSettleId != ''">
+                payment_settle_id = #{paymentSettleId},
+            </if>
+            <if test="visitNo != null and visitNo != ''">
+                visit_no = #{visitNo},
+            </if>
+            <if test="totalPrice != null">
+                total_price = #{totalPrice},
+            </if>
+            <if test="paymentPrice != null">
+                payment_price = #{paymentPrice},
+            </if>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+                state_code = #{stateCode},
+            </if>
+            <if test="omsgid != null and omsgid != ''">
+                omsgid = #{omsgid},
+            </if>
+            <if test="oinfno != null and oinfno != ''">
+                oinfno = #{oinfno},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark = #{remark},
+            </if>
+            <if test="crteId != null and crteId != ''">
+                crte_id = #{crteId},
+            </if>
+            <if test="crteName != null and crteName != ''">
+                crte_name = #{crteName},
+            </if>
+            <if test="crteTime != null">
+                crte_time = #{crteTime},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code = #{settleCode},
+            </if>
+        </set>
+        where hosp_code =#{hospCode}
+        and settle_id =#{settleId}
+        and visit_id =#{visitId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from payment_settle where id = #{id}
+    </delete>
+        <!--根据就诊id 医院编码 结算id查询诊间支付结算信息-->
+    <select id="quyeryPaymentInfoByCondition" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultMap="PaymentSettleMap">
+        select
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time
+        from payment_settle
+        where hosp_code =#{hospCode}
+        and settle_id =#{settleId}
+        and visit_id =#{visitId}
+        and state_code ='1'
+    </select>
+
+</mapper>
+

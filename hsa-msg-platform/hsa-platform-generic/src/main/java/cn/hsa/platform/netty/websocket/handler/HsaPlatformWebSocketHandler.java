@@ -13,6 +13,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -78,7 +79,10 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) throws Exception {
         try {
             String msa = msg.text();
-            if(PING_MSG.equalsIgnoreCase(msa)) return;
+            if(PING_MSG.equalsIgnoreCase(msa)) {
+                ctx.channel().writeAndFlush(new PongWebSocketFrame().retain());
+                return;
+            }
             //接受客户端发送的消息
             ImContentModel messageRequest = JSON.parseObject(msg.text(), ImContentModel.class);
 
@@ -95,7 +99,7 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
                 channelMap.put(key, ctx.channel());
 
                 //使用channel中的任务队列，做周期循环推送客户端消息，解决问题二和问题五
-                future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 10, TimeUnit.SECONDS);
+                future = ctx.channel().eventLoop().scheduleAtFixedRate(new WebsocketRunnable(ctx, messageRequest,messageInfoService), 0, 120, TimeUnit.SECONDS);
 
                 //存储每个channel中的future，保证每个channel中有一个定时任务在执行
                 futureMap.put(key, future);
@@ -108,12 +112,12 @@ public class HsaPlatformWebSocketHandler extends SimpleChannelInboundHandler<Tex
                 //每次客户端和服务的主动通信，和服务端周期向客户端推送消息互不影响
                 // 主动通信业务在此处填写
                 if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_HQ.equals(messageRequest.getType())) {
-                    List<MessageInfoModel> messageInfoModels = null;//messageInfoService.getMessageInfoList(getParam(messageRequest));
+                    List<MessageInfoModel> messageInfoModels = messageInfoService.getMessageInfoList(getParam(messageRequest));
                     ctx.channel().writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageInfoModels)));
                     log.info("active processing business : channel Id is {}, params is {}, resultList is :{}",key,msa,JSON.toJSONString(messageInfoModels));
-//                    messageInfoService.updateMessageInfoList(messageInfoModels);
+                    messageInfoService.updateMessageInfoList(messageInfoModels);
                 }else if (messageRequest.getType()!=null && Constants.MSG_TYPE.MSG_YD.equals(messageRequest.getType())){
-                       messageInfoDao.updateMssageInfoById(getParam(messageRequest));
+                    messageInfoService.updateMessageInfoById(getParam(messageRequest));
                 }
             }
 

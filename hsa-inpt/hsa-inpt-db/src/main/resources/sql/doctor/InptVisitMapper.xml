@@ -769,7 +769,7 @@
 			<if test="insureNo != null and insureNo != ''">
 				insure_no = #{insureNo},
 			</if>
-			<if test="insureBizCode != null and insureBizCode != ''">
+			<if test="insureBizCode != null">
 				insure_biz_code = #{insureBizCode},
 			</if>
 			<if test="insureTreatCode != null and insureTreatCode != ''">

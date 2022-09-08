@@ -28,7 +28,7 @@ public interface InsureUnifiedPayReversalTradeService {
     /**冲正交易
      * 可被冲正的交易包括：【2102】药店结算、【2103】药店结算撤销、【2207】门诊结算、【2208】门诊结算撤销、【2304】住院结算、【2207】住院结算撤销、【2401】入院办理
     * @Method UP_2601
-    * @Desrciption 
+    * @Desrciption
     * @param map
     * @Author liuqi1
     * @Date   2021/4/12 11:09
@@ -202,4 +202,14 @@ public interface InsureUnifiedPayReversalTradeService {
      **/
     @GetMapping("/service/insure/upOutptService/queryDeclareInfos")
     WrapperResponse<Map<String, Object>> queryDeclareInfosPrint(Map<String, Object> paraMap);
+    /**
+     * @Method queryDeclareInfos
+     * @Desrciption 清算申报报表打印
+     * @param map
+     * @Author liuhuiming
+     * @Date 2022/3/16 09:01
+     * @Return
+     **/
+    @GetMapping("/service/insure/upOutptService/queryDeclareInfos1")
+    WrapperResponse<Map<String, Object>> queryDeclareInfosPrint1(Map map);
 }

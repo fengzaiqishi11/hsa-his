@@ -90,6 +90,7 @@ public enum FunctionEnum {
     MR_PATIENT_SETTL_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4101, "上传结算清单信息"),
     MR_PATIENT_SETTL_UPLOAD_A(Constant.UnifiedPay.REGISTER.UP_4101A, "上传结算清单信息"),
     MR_PATIENT_SETTL_UPLOAD_UPDATE(Constant.UnifiedPay.REGISTER.UP_4102, "上传结算清单信息状态修改"),
+    MR_PATIENT_SETTL_UPLOAD_QUERY(Constant.UnifiedPay.REGISTER.UP_4103, "医疗保障基金结算清单信息查询"),
     INSUR_MRI_UPLOAD(Constant.UnifiedPay.INPT.UP_4401, "住院病案首页上传"),
     INSUR_EMR_UPLOAD(Constant.UnifiedPay.REGISTER.UP_4701, "上传电子病历信息"),
 

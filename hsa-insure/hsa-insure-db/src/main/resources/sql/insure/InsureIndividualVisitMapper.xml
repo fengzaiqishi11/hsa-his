@@ -841,6 +841,13 @@
         update insure_individual_visit set medical_reg_no =#{medicalRegNo}
         where hosp_code =#{hospCode} and visit_id =#{visitId}
     </update>
+    <update id="updateInsureMedicalRegNoGS"
+            parameterType="cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO">
+        update insure_individual_visit
+        set medical_reg_no =#{medicalRegNo}
+        where hosp_code = #{hospCode}
+          and visit_id = #{visitId}
+    </update>
     <!-- 根据主键删除表信息 -->
     <delete id="deleteById" parameterType="java.lang.String">
         DELETE
@@ -1065,6 +1072,114 @@
                  join outpt_register r on iiv.visit_id = r.visit_id and r.hosp_code = iiv.hosp_code
         where iiv.hosp_code = #{hospCode}
           and iiv.visit_id = #{visitId}
+
+    </select>
+
+    <select id="queryInsureIndividualVisits"
+            resultType="cn.hsa.module.inpt.doctor.dto.InptVisitDTO" parameterType="java.util.Map">
+        select id,
+        hosp_code,
+        profile_id,
+        in_profile,
+        in_no,
+        name,
+        gender_code,
+        age,
+        age_unit_code,
+        birthday,
+        nationality_cation,
+        occupation_code,
+        education_code,
+        contact_name,
+        contact_rela_code,
+        contact_address,
+        contact_phone,
+        nation_code,
+        cert_code,
+        cert_no,
+        marry_code,
+        phone,
+        address,
+        preferential_type_id,
+        patient_code,
+        receive_hosp_name,
+        bed_id,
+        bed_name,
+        nursing_code,
+        diet_type,
+        Illness_code,
+        status_code,
+        in_ward_id,
+        in_dept_id,
+        in_dept_name,
+        in_time,
+        zz_doctor_id,
+        zz_doctor_name,
+        jz_doctor_id,
+        jz_doctor_name,
+        zg_doctor_id,
+        zg_doctor_name,
+        in_remark,
+        in_mode_code,
+        in_disease_id,
+        in_disease_name,
+        in_disease_icd10,
+        in_situation_code,
+        outpt_visit_no,
+        outpt_doctor_id,
+        outpt_doctor_name,
+        outpt_disease_id,
+        outpt_disease_name,
+        outpt_disease_icd10,
+        out_ward_id,
+        out_dept_id,
+        out_dept_name,
+        out_time,
+        out_disease_id,
+        out_disease_name,
+        out_disease_icd10,
+        out_oper_id,
+        out_oper_name,
+        out_oper_time,
+        out_situation_code,
+        out_remark,
+        out_mode_code,
+        is_archive,
+        archive_time,
+        archive_id,
+        archive_name,
+        insure_code,
+        insure_org_code,
+        insure_no,
+        insure_biz_code,
+        insure_treat_code,
+        insure_patient_id,
+        insure_remark,
+        total_advance,
+        total_cost,
+        total_balance,
+        crte_id,
+        crte_name,
+        crte_time,
+        IF(LEFT ( in_time, 10 ) = LEFT ( out_time, 10 ),1,DATEDIFF( out_time, in_time )) as inDays
+        from inpt_visit
+        where hosp_code = #{hospCode}
+            <if test="list != null and list.size != 0">
+                and
+                <foreach collection="list" index="indexList" item="id"
+                         open="(" separator=" " close=")">
+                    <if test="id != null and id.size != 0">
+                        <if test="indexList != 0">
+                            or
+                        </if>
+                        id  in
+                        <foreach collection="id" index="indexSet" item="item"
+                                 open="(" separator="," close=")">
+                            #{item}
+                        </foreach>
+                    </if>
+                </foreach>
+            </if>
 
     </select>
     <delete id="deleteByVisitId" parameterType="java.lang.String">

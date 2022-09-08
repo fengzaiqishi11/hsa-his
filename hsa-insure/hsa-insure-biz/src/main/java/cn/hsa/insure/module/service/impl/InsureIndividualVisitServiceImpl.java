@@ -63,7 +63,7 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
      * @Desrciption 编辑医保就诊信息
      * @param param 请求参数
      * @Author Ou·Mr
-     * @Date 2020/12/1 14:59 
+     * @Date 2020/12/1 14:59
      * @Return int 受影响行数
      */
     @Override
@@ -251,5 +251,14 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
     @Override
     public InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam) {
       return insureIndividualVisitBO.getInsureIndividualVisitByMdtrtCertNo(insureVisitParam);
+    }
+    /***
+     * 根据visitId集合查询医保登记信息
+     * @param paramMap
+     * @return
+     */
+    @Override
+    public List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap) {
+        return insureIndividualVisitBO.queryInsureIndividualVisits(paramMap);
     }
 }

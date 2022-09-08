@@ -231,5 +231,16 @@ public class StroStockServiceImpl extends HsafBO implements StroStockService {
 
     }
 
+    /**
+     * @Author gory
+     * @Description 同步占用库存
+     * @Date 2022/9/6 17:29
+     * @Param [map]
+     **/
+    @Override
+    public WrapperResponse<Boolean> updateOccupyByExpire(Map map) {
+        return WrapperResponse.success(stroStockBO.updateOccupyByExpire(MapUtils.get(map,"hospCode")));
+    }
+
 
 }

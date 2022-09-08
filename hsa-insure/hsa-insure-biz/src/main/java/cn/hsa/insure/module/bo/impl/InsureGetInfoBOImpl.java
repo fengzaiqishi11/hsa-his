@@ -2160,10 +2160,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(zxCollect)) {
-                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(zyIsMain)) {
-                    zxCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(zyIsMain)) {
+//                    zxCollect.get(0).put("isMain", "1");
+//                }
                 zxCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
                         item.put("typeCode", "2");
@@ -2183,10 +2184,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(xiCollect)) {
-                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(xiIsMain)) {
-                    xiCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(xiIsMain)) {
+//                    xiCollect.get(0).put("isMain", "1");
+//                }
                 System.out.println("--------------" + xiCollect);
                 xiCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
@@ -4578,6 +4580,55 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map.put("fail",e);
         }
         return map;
+    }
+
+    /**
+     * @Method queryInsureSettleInfo
+     * @Desrciption 医疗保障结算清单信息医保信息查询
+     * @Param
+     * @Author liuhuiming
+     * @Date 2022/04/22 13:58
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryInsureSettleInfo(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        // 获取患者信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        //获取医保配置
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureOrgCode());
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("根据" + insureIndividualVisitDTO.getInsureOrgCode() + "医保机构编码获取医保机构配置信息为空");
+        }
+        //查询是否上传
+        InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
+        if (insureSettleInfoDTO == null || StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
+            throw new AppException("请先上传医保再查询医保结算清单信息");
+        }
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        dataMap.put("setl_id", MapUtils.get(map, "insureSettleId"));
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("data", dataMap);
+
+        paramMap.put("hospCode", hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", MapUtils.get(map, "isHospital"));
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.MR_PATIENT_SETTL_UPLOAD_QUERY.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(MapUtils.get(map, "isHospital"));
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        // 调用统一支付平台接口
+        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_QUERY, interfaceParamDTO);
+
+        return resultMap;
     }
 
     //字典转义

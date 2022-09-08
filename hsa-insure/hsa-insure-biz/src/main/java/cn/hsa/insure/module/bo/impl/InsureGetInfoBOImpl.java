@@ -2160,10 +2160,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(zxCollect)) {
-                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(zyIsMain)) {
-                    zxCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(zyIsMain)) {
+//                    zxCollect.get(0).put("isMain", "1");
+//                }
                 zxCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
                         item.put("typeCode", "2");
@@ -2183,10 +2184,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(xiCollect)) {
-                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(xiIsMain)) {
-                    xiCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(xiIsMain)) {
+//                    xiCollect.get(0).put("isMain", "1");
+//                }
                 System.out.println("--------------" + xiCollect);
                 xiCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {

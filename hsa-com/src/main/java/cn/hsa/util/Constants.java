@@ -1391,4 +1391,27 @@ public interface Constants {
         public static final String ZJZF_HJSF="5"; // 诊间支付（划价收费：患者付款码被扫）
         public static final String ZJZF_CFZF="6"; // 诊间支付（处方：扫描处方二维码）
     }
+
+    /**
+     * @Desrciption 处方状态更改调用方法
+     * @Author yuelong.chen
+     * @Date 2022/09/06 10:02
+     */
+    class CFTJZT{
+        public static final String SAVE_PRESC = "0"; // 保存处方
+        public static final String SUBMIT_PRESC = "1"; // 提交处方
+        public static final String DELETE_PRESC = "2"; // 删除处方
+        public static final String UNSUBMIT_PRESC = "3"; // 取消提交
+    }
+
+    /**
+     * @Desrciption 处方提交状态
+     * @Author yuelong.chen
+     * @Date 2022/09/06 10:02
+     */
+    class IS_SUBMIT{
+        public static final String NO_PRESC = "0"; // 无处方
+        public static final String EXIST_UNSUBMIT_PRESC = "1"; // 存在处方未提交
+        public static final String ALL_SUBMIT_PRESC = "2"; // 全部提交
+    }
 }

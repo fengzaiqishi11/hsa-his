@@ -923,5 +923,7 @@ public interface InptAdviceDAO {
 
     List<MedicalAdviceDTO> getMedicalAdvicesNew(MedicalAdviceDTO medicalAdviceDTO);
 
-    List<InptAdviceDTO> checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO);
+    List<InptAdviceDTO> checkFirstAndSecoundIsSameNew(MedicalAdviceDTO medicalAdviceDTO);
+
+    List<InptAdviceDTO> checkFirstAndSecoundIsSameStop(MedicalAdviceDTO medicalAdviceDTO);
 }

@@ -949,12 +949,15 @@
         CONCAT(ib.name, '/', (ifnull((case ib.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
         concat(b.NAME,'/', (ifnull((case b.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')),'/', b.age,(ifnull((case b.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end), '岁' )))
         ) as visitInfo,
+        (select count(1)>0 from inpt_advice_exec iae where iae.advice_id = a.id and iae.visit_id = a.visit_id and iae.hosp_code = a.hosp_code and date(iae.plan_exec_time) = date(a.stop_time) and iae.sign_code ='2') as newSignCode ,
         (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
         (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
         (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
         (case when a.item_code = '1' then c.nation_code when a.item_code = '2' then bm.nation_code else '' end) as nation_code,
         (case when a.item_code = '1' then c.nation_name when a.item_code = '2' then bm.nation_name else '' end) as nation_name,
         a.is_new_status as isNewStatus,
+        a.decoction_method as decoctionMethod,
+        a.herb_note_code as herbNoteCode,
         a.check_name as checkName,
         a.check_second_name  as checkSecondName,
         a.stop_doctor_name as stopDoctorName,
@@ -2557,6 +2560,9 @@
             a.check_second_name = #{checkSecondName},
             a.check_second_time = #{checkSecondTime},
             </if>
+            <if test="rejectRemark != null and rejectRemark != ''">
+            a.reject_remark = #{rejectRemark},
+            </if>
             a.is_new_status = #{isNewStatus}
         where a.id in
             <foreach collection="kzIds" item="id" open="(" close=")" separator=",">
@@ -2581,6 +2587,9 @@
                 a.stop_check_second_name =#{stopCheckSecondName},
                 a.stop_check_second_time =#{stopCheckSecondTime},
             </if>
+            <if test="rejectRemark != null and rejectRemark != ''">
+                a.reject_remark = #{rejectRemark},
+            </if>
             a.is_new_status = #{isNewStatus}
         where a.id in
             <foreach collection="stopIds" item="id" open="(" close=")" separator=",">
@@ -2601,6 +2610,7 @@
         CONCAT(ib.name, '/', (ifnull((case ib.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')), '/', DATE_FORMAT(ib.birth_time,'%Y-%m-%d %H:%i:%s')),
         concat(b.NAME,'/', (ifnull((case b.gender_code when '1' then '男' when '2' then '女' when '0' then '未知' when '9' then '未说明的性别' else '' end), '')),'/', b.age,(ifnull((case b.age_unit_code when '1' then '岁' when '2' then '月' when '3' then '周' when '4' then '周' else '' end), '岁' )))
         ) as visitInfo,
+        (select count(1)>0 from inpt_advice_exec iae where iae.advice_id = a.id and iae.visit_id = a.visit_id and iae.hosp_code = a.hosp_code and date(iae.plan_exec_time) = date(a.stop_time) and iae.sign_code ='2') as newSignCode ,
         (select name from base_rate where hosp_code=a.hosp_code and id=a.rate_id) rateName,
         (select name from base_dept where hosp_code=a.hosp_code and id=a.exec_dept_id) execDeptName,
         (case c.big_type_code when '2' then '3' end) type,b.bed_name bedName,
@@ -2609,7 +2619,9 @@
         (case
         when (a.is_check = '1' and a.is_stop = '0') then '1'
         when (a.is_stop_check = '1' and a.is_stop = '1') then '1'
-        else a.is_new_status end ) as isNewStatus,
+        else ifnull(a.is_new_status,'0') end ) as isNewStatus,
+        a.decoction_method as decoctionMethod,
+        a.herb_note_code as herbNoteCode,
         a.check_name as checkName,
         a.check_second_name  as checkSecondName,
         a.stop_doctor_name as stopDoctorName,
@@ -2644,18 +2656,30 @@
         order by a.crte_time, a.visit_id, a.baby_id, group_no, group_seq_no asc, a.long_start_time desc
     </select>
 
-    <select id="checkFirstAndSecoundIsSame" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+    <select id="checkFirstAndSecoundIsSameNew" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
         select
             *
         from
             inpt_advice ia
         where
             id in
-            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            <foreach collection="kzIds" item="id" open="(" close=")" separator=",">
                 #{id}
             </foreach>
-            and ((check_id = #{checkSecondId})
-            or (stop_check_id = #{stopCheckSecondId}))
+            and check_id = #{checkSecondId}
+    </select>
+
+    <select id="checkFirstAndSecoundIsSameStop" resultType="cn.hsa.module.inpt.doctor.dto.InptAdviceDTO">
+        select
+        *
+        from
+        inpt_advice ia
+        where
+        id in
+        <foreach collection="stopIds" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and  stop_check_id = #{stopCheckSecondId}
     </select>
 
 

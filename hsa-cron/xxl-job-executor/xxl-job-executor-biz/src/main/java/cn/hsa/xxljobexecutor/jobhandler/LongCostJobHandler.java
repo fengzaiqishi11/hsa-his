@@ -70,6 +70,10 @@ public class LongCostJobHandler extends IJobHandler {
     private List<CenterHospitalDTO> queryValidCenterHospital() {
         CenterHospitalDTO dto = new CenterHospitalDTO();
         dto.setIsValid(Constants.SF.S);
+        // 迁移状态（0:未迁移；1:待迁移；2:已迁移）
+        // 迁移过的医院长期费用不用生成了
+        dto.setMigrationStatus("0");
+        dto.setIsLong("1");
         WrapperResponse<List<CenterHospitalDTO>> wr = centerHospitalService_consumer.queryAll(dto);
         if (wr.getCode() != 0) {
             XxlJobLogger.log("长期费用滚动失败：" + wr.getMessage());

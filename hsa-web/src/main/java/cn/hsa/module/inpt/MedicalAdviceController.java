@@ -183,6 +183,10 @@ public class MedicalAdviceController extends BaseController {
                 medicalAdviceDTO.setStopCheckName(medicalAdviceDTO.getStopCheckName());
                 medicalAdviceDTO.setStopCheckTime(new Date());
             }
+            map.put("hospCode", sysUserDTO.getHospCode());
+            map.put("medicalAdviceDTO", medicalAdviceDTO);
+
+            return medicalAdviceService_consumer.updateAdviceInChecked(map);
 
         }else if ("3".equals(medicalAdviceDTO.getIsNewStatus())){
             /**
@@ -207,7 +211,7 @@ public class MedicalAdviceController extends BaseController {
             }
             map.put("hospCode", sysUserDTO.getHospCode());
             map.put("medicalAdviceDTO", medicalAdviceDTO);
-            medicalAdviceService_consumer.refuseMedicalAdvices(map);
+            return medicalAdviceService_consumer.refuseMedicalAdvices(map);
 
         } else if ("4".equals(medicalAdviceDTO.getIsNewStatus())) {
             /**
@@ -235,6 +239,8 @@ public class MedicalAdviceController extends BaseController {
             map.put("medicalAdviceDTO", medicalAdviceDTO);
             //纯校验，有问题就报错
             doctorAdviceService_consumer.checkFirstAndSecoundIsSame(map);
+
+            return medicalAdviceService_consumer.updateAdviceInChecked(map);
 
         } else if ("1".equals(medicalAdviceDTO.getIsNewStatus())) {
             /**
@@ -265,12 +271,9 @@ public class MedicalAdviceController extends BaseController {
             //纯校验，有问题就报错
             doctorAdviceService_consumer.checkFirstAndSecoundIsSame(map);
 
-            medicalAdviceService_consumer.acceptMedicalAdvices(map);
+            return medicalAdviceService_consumer.acceptMedicalAdvices(map);
         }
-        map.put("hospCode", sysUserDTO.getHospCode());
-        map.put("medicalAdviceDTO", medicalAdviceDTO);
-
-        return medicalAdviceService_consumer.updateAdviceInChecked(map);
+        return WrapperResponse.error(500,"后台请求出错,请联系管理员！",null);
     }
 
 

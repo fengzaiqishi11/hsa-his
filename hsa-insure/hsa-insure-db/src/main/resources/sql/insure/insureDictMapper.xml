@@ -244,5 +244,22 @@
           and b.hosp_code = #{hospCode}
           AND b.code = #{code}
     </select>
+    <select id="querySysCodeByCodeList" resultType="java.util.Map">
+        SELECT b.name, b.value,b.code
+        from insure_dict b
+        where
+            b.hosp_code = #{hospCode}
+          and b.insure_reg_code=#{insureRegCode}
+        AND b.code in
+        <foreach collection="list" item="code" open="(" close=")" separator=",">
+            #{code}
+        </foreach>
 
+    </select>
+    <select id="queryInsuplcAdmdvs" resultType="java.util.Map">
+        select admdvs_code,admdvs_name from insure_admdvs where hosp_code=#{hospCode} and admdvs_code in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

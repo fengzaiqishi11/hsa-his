@@ -30,6 +30,9 @@ public class ReportDataDownLoadServiceImpl extends HsafService implements Report
     @Value("${ureport.hospCode}")
     private String ureportHospCode;
 
+    @Value("${report.hospCode}")
+    private String reportHospCode;
+
     @Autowired
     private ReportDataDownLoadBO reportDataDownLoadBO;
 
@@ -42,6 +45,12 @@ public class ReportDataDownLoadServiceImpl extends HsafService implements Report
         if(StringUtils.isNotEmpty(ureportHospCode)){
             if(ureportHospCode.contains(hospCode)&&"settleDeclareDetlSheetBOImpl".equals(map.get("businessType"))){
                 map.put("businessType","settleDeclareDetlSheetmlyBOImpl");
+            }
+        }
+        //益阳子仲肾脏病医院
+        if(StringUtils.isNotEmpty(reportHospCode)){
+            if(reportHospCode.contains(hospCode)&&"settleDeclareDetlSheetBOImpl".equals(map.get("businessType"))){
+                map.put("businessType","settleDeclareDetlZZSheetBOImpl");
             }
         }
         ReportBusinessBO reportBusinessProcess = reportBusinessFactory.getReportBusinessProcess(map.get("businessType").toString());

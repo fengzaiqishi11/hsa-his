@@ -170,7 +170,7 @@ public class OutptBoImpl extends HsafBO implements OutptBo {
                     logger.info("insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getHospCode()+ "insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getVisitId()+ "insureIndividualVisitDTO-------visitId = " +insureIndividualVisitDTO.getMedicalRegNo());
                     logger.info(insureIndividualVisitDTO.toString());
                     logger.info("++++++++++++++++++++++++工伤结算支付信息打印结束++++++++++++++++++++++++++++");
-                int x = insureIndividualVisitDAO.updateInsureMedicalRegNo(insureIndividualVisitDTO);
+                int x = insureIndividualVisitDAO.updateInsureMedicalRegNoGS(insureIndividualVisitDTO);
                 logger.info("++++++++++++++++++++++++修改成功条数---=== .........."+x+"........===---+++++++++++++++++++++++");
                 if (trialMap.containsKey("insureIndividualCostDOList")) {
                     List<InsureIndividualCostDO> insureIndividualCostDOList = (List<InsureIndividualCostDO>) trialMap.get("insureIndividualCostDOList");

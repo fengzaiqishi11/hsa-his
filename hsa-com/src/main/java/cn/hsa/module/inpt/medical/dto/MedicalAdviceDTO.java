@@ -81,10 +81,15 @@ public class MedicalAdviceDTO extends InptAdviceDO implements Serializable {
     /**
      * 停嘱
      */
-    private String [] stopIds;
+    private List<String> stopIds;
     /**
      * 开嘱
      */
-    private String [] kzIds;
+    private List<String> kzIds;
+
+    /**
+     * 医嘱执行标识[新] 0未执行，1已执行
+     */
+    private String newSignCode;
 
 }

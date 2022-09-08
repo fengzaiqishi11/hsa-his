@@ -1815,12 +1815,18 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
 
     @Override
     public void checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO) {
-            if (ListUtils.isEmpty(medicalAdviceDTO.getIds())){
-            throw new RuntimeException("未获取到相关医嘱信息");
-            }
-            List<InptAdviceDTO>  list =  inptAdviceDAO.checkFirstAndSecoundIsSame(medicalAdviceDTO);
+        List<InptAdviceDTO>  list =  new ArrayList<>();
+        if (!ListUtils.isEmpty(medicalAdviceDTO.getKzIds())){
+          list =  inptAdviceDAO.checkFirstAndSecoundIsSameNew(medicalAdviceDTO);
             if (!ListUtils.isEmpty(list)){
-              throw new RuntimeException("【核收人】与【核对人】不能相同，请检查!");
+                throw new RuntimeException("新开医嘱【核收人】与【核对人】不能相同，请检查!");
             }
+        }
+        if (!ListUtils.isEmpty(medicalAdviceDTO.getStopIds())){
+            list =  inptAdviceDAO.checkFirstAndSecoundIsSameStop(medicalAdviceDTO);
+            if (!ListUtils.isEmpty(list)){
+                throw new RuntimeException("停嘱核收【核收人】与【核对人】不能相同，请检查!");
+            }
+        }
     }
 }

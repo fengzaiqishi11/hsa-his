@@ -225,6 +225,15 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
             throw new AppException("拒收备注为空,拒收失败");
         }
 
+        Map<String,Object> sysParameterMap = new HashMap<>();
+        sysParameterMap.put("hospCode",medicalAdviceDTO.getHospCode());
+        sysParameterMap.put("code","IS_USE_NEW_CHECK_YZ");
+        SysParameterDTO  sysParameterDTO  =  sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
+        // 0是开启新医嘱核收   那么就需要调用次方法
+        if (sysParameterDTO != null && "0".equals(sysParameterDTO.getValue())){
+            this.updateAdviceInChecked(medicalAdviceDTO);
+        }
+
         int count =inptAdviceDAO.modifyMedicalAdvices(medicalAdviceDTO);
 
         // 医嘱拒收写入消息
@@ -258,6 +267,19 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     @Override
     public  Boolean modifyAcceptMedicalAdvices(MedicalAdviceDTO medicalAdviceDTO) {
         try {
+
+
+            //保持事务统一，写在里面  核收新增核对流程，不影响现有功能
+            Map<String,Object> sysParameterMap = new HashMap<>();
+            sysParameterMap.put("hospCode",medicalAdviceDTO.getHospCode());
+            sysParameterMap.put("code","IS_USE_NEW_CHECK_YZ");
+            SysParameterDTO  sysParameterDTO  =  sysParameterService_consumer.getParameterByCode(sysParameterMap).getData();
+            if (sysParameterDTO != null && "0".equals(sysParameterDTO.getValue())){
+                    this.updateAdviceInChecked(medicalAdviceDTO);
+            }
+
+
+
             logger.info("====长期费用1："+DateUtils.format());
             //校验
             if(medicalAdviceDTO == null) {
@@ -1253,10 +1275,20 @@ public class MedicalAdviceBOImpl extends HsafBO implements MedicalAdviceBO {
     @Override
     public Boolean updateAdviceInChecked(MedicalAdviceDTO medicalAdviceDTO) {
 
-        if(medicalAdviceDTO.getKzIds() != null && medicalAdviceDTO.getKzIds().length>0 ){
+        //根据医嘱ID获取医嘱记录
+        List<InptAdviceDTO> inptAdviceDTOList = new ArrayList<>();
+        List<String> ids = new ArrayList<>();
+
+        if( !ListUtils.isEmpty(medicalAdviceDTO.getKzIds())){
+            inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(medicalAdviceDTO.getHospCode(),medicalAdviceDTO.getKzIds());
+            ids = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).collect(Collectors.toList()) ;
+            medicalAdviceDTO.setKzIds(ids);
             inptAdviceDAO.updateNewAdviceInChecked(medicalAdviceDTO);
         }
-        if(medicalAdviceDTO.getStopIds() != null && medicalAdviceDTO.getStopIds().length>0 ){
+        if(!ListUtils.isEmpty(medicalAdviceDTO.getStopIds())){
+            inptAdviceDTOList = inptAdviceDAO.getInptAdviceByIds(medicalAdviceDTO.getHospCode(),medicalAdviceDTO.getStopIds());
+            ids = inptAdviceDTOList.stream().map(InptAdviceDTO::getId).collect(Collectors.toList()) ;
+            medicalAdviceDTO.setStopIds(ids);
             inptAdviceDAO.updateStopAdviceInChecked(medicalAdviceDTO);
         }
 

@@ -118,6 +118,9 @@
             <if test="isValid != null and isValid != ''">
                 and is_valid = #{isValid}
             </if>
+            <if test="isLong  != null and isLong  != '' and migrationStatus != null and migrationStatus != ''">
+                and ifnull(migration_status,'0')  = '0'
+            </if>
         </where>
     </select>
     <!--分页查询-->

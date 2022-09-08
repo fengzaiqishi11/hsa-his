@@ -34,10 +34,10 @@
         <!-- 报表子系统 -->
         <module>hsa-report</module>
         <!--         定时任务子系统-->
-<!--                        <module>hsa-cron</module>-->
+                        <module>hsa-cron</module>
                         <!-- 定时任务子系统执行器 -->
         <module>hsa-cron/xxl-job-executor</module>
-        <module>hsa-medical-payment</module>
+<!--        <module>hsa-medical-payment</module>-->
         <!--        <module>hsa-dynamic</module>-->
     </modules>
 

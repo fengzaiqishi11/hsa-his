@@ -713,14 +713,13 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
 
         } else {
             if (Constants.SF.F.equals(isHospital)) {
-                insureIndividualVisitDTO.setInsureSettleId(insureSettleId);
+                insureIndividualVisitDTO.setInsureSettleId(null);
             } else {
                 insureIndividualVisitDTO.setInsureSettleId(null);
             }
             if (!jxSettle) {
-                //sumInfoMapList = insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
-                Map<String, Object> sumInfoMap = insureUnifiedBaseService.queryPatientSumInfo(map).getData();
-                sumInfoMapList = MapUtils.get(sumInfoMap, "resultDataMap");
+                // 查找本地库
+                sumInfoMapList = insureIndividualVisitDAO.querySelectInsureSumInfo(insureIndividualVisitDTO);
             }
         }
 

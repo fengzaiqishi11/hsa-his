@@ -596,6 +596,31 @@
             )
         </foreach>
     </insert>
+<insert id="insertPatientSumInfoAll">
+        insert into	insure_patient_sum (id, hosp_code, medis_code, psn_no, visit_id,
+        medical_reg_no, insutype, year,
+        cum_type_code, cum_ym, crte_id, cum, crte_name, crte_time,insure_settle_id)
+        values
+        <foreach collection="resultDataMap" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.hospCode},
+            #{item.medisCode},
+            #{item.psnNo},
+            #{item.visitId},
+            #{item.medicalRegNo},
+            #{item.insutype},
+            #{item.year},
+            #{item.cum_type_code},
+            #{item.cum_ym},
+            #{item.crteId},
+            #{item.cum},
+            #{item.crteName},
+            #{item.crteTime},
+            #{item.insureSettleId}
+            )
+        </foreach>
+    </insert>
 
     <!-- 修改表信息 -->
     <update id="updateByPrimaryKey" parameterType="cn.hsa.module.insure.module.entity.InsureIndividualVisitDO">
@@ -1108,6 +1133,12 @@
     <delete id="deletePatientSumInfo">
         delete  from insure_patient_sum where visit_id  = #{visitId} and hosp_code =#{hospCode} and insure_settle_id is null;
     </delete>
+
+    <delete id="deletePatientSumInfoByPsnNo">
+        delete  from insure_patient_sum where psn_no  = #{psnNo} and hosp_code =#{hospCode} and insure_settle_id is null;
+    </delete>
+
+
     <!-- 根据主键查询表信息 -->
     <select id="selectOutptRegisterById" resultType="java.util.HashMap" parameterType="java.util.Map">
         select

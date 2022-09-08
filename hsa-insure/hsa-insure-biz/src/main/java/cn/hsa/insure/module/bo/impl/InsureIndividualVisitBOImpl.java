@@ -454,6 +454,29 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
         return insureIndividualVisitDAO.deleteByVisitId(visitId) > 0;
     }
 
+    /**
+     * @Method deletePatientSumInfo
+     * @Desrciption 删除个人累计信息
+     * @Param
+     * @Author wangqiao
+     * @Date 2022/09/29 10:58
+     * @Return
+     **/
+    public Integer deletePatientSumInfoByPsnNo(Map<String, Object> map){
+        return insureIndividualVisitDAO.deletePatientSumInfoByPsnNo(map);
+    }
+    /**
+     * @Method insertPatientSumInfoAll
+     * @Desrciption 医保登记的时候, 保存个人年度累计信息
+     * @Param resultDataMap
+     * @Author wangqiao
+     * @Date 2022/09/08 10:58
+     * @Return
+     **/
+    @Override
+    public Integer insertPatientSumInfoAll(List<Map<String, Object>> resultDataMap){
+        return insureIndividualVisitDAO.insertPatientSumInfoAll(resultDataMap);
+    }
 
     /**
      * @param insureVisitParam

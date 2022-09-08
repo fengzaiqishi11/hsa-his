@@ -119,7 +119,18 @@ public interface InsureUnifiedBaseService {
      **/
     WrapperResponse<Map<String, Object>> queryPatientSumInfo(Map<String, Object> map);
 
+
     /**
+     * @Method queryPatientSumInfo
+     * @Desrciption 人员累计信息查询(本年累计信息)
+     * @Param
+     * @Author wangqiao
+     * @Date 2022/09/07
+     * @Return
+     **/
+	WrapperResponse<Map<String, Object>> queryPatientSumInfoAllYears(Map<String, Object> map);
+
+	/**
      * @Method queryItemConfirm
      * @Desrciption 项目互认信息查询
      * @Param

@@ -23,6 +23,7 @@ import cn.hsa.module.inpt.doctor.dto.InptDiagnoseDTO;
 import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.inpt.inregister.bo.InptVisitBO;
 import cn.hsa.module.insure.inpt.service.InptService;
+import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedPayInptService;
 import cn.hsa.module.insure.module.dto.*;
 import cn.hsa.module.insure.module.entity.InsureDictDO;
@@ -106,6 +107,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
     private BaseProfileFileService baseProfileFileService_consumer;
     @Resource
     private InsureIndividualCostService insureIndividualCostService_consumer;
+
+    @Resource
+    private InsureUnifiedBaseService insureUnifiedBaseService_consumer;
 
     private static final String JX_ORGCODE = "H36";
 
@@ -808,7 +812,45 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         insureIndividualVisitService_consumer.deleteByVisitId(insertMap);
         // 再重新插入
         insureIndividualVisitService_consumer.insertIndividualVisit(insertMap);
+        // 处理当前就诊人员的人员累计信息
+        this.dealCumInfo(insureIndividualVisitDTO, inptVisitDTO);
         return true;
+    }
+
+
+    public void dealCumInfo(InsureIndividualVisitDTO insureIndividualVisitDTO,InptVisitDTO inptVisitDTO){
+        Map<String, Object> param = new HashMap<>();
+        param.put("hospCode", insureIndividualVisitDTO.getHospCode());
+        param.put("psnNo", insureIndividualVisitDTO.getAac001());
+        param.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+        // 先根据个人电脑号删除本地累计信息
+        Integer delete = insureIndividualVisitService_consumer.deletePatientSumInfoByPsnNo(param);
+        // 从医保查询年度人员累计信息
+        Map<String, Object> data = insureUnifiedBaseService_consumer.queryPatientSumInfoAllYears(param).getData();
+        List<Map<String, Object>> resultMap = MapUtils.get(data, "resultDataMap");
+        if (!ListUtils.isEmpty(resultMap)) {
+            resultMap.stream().forEach(item -> {
+                item.put("id", SnowflakeUtils.getId());
+                item.put("crteName", inptVisitDTO.getCrteName());
+                item.put("medicalRegNo", insureIndividualVisitDTO.getMedicalRegNo());
+                item.put("crteId", inptVisitDTO.getCrteId());
+                item.put("visitId", insureIndividualVisitDTO.getVisitId());
+                item.put("hospCode", inptVisitDTO.getHospCode());
+                item.put("psnNo", insureIndividualVisitDTO.getAac001());
+                item.put("medisCode", insureIndividualVisitDTO.getMedicineOrgCode());
+                item.put("insureSettleId", null);
+                item.put("crteTime", DateUtils.getNow());
+                Object cum = item.get("cum");
+                if (cum == null || StringUtils.isEmpty(cum.toString())) {
+                    item.put("cum", 0);
+                }
+            });
+        }
+        // 将查出来个人累计信息插入到数据库
+        param.put("resultMap", resultMap);
+        if(resultMap != null){
+            insureIndividualVisitService_consumer.insertPatientSumInfoAll(param);
+        }
     }
 
     /**
@@ -1175,6 +1217,9 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             Map<String, Object> insertMap = new HashMap<>();
             insertMap.put("hospCode", inptVisitDto.getHospCode());
             insertMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
+
+            // 处理当前就诊人员的人员累计信息
+            this.dealCumInfo(insureIndividualVisitDTO, inptVisitDTO);
             return insureIndividualVisitService_consumer.insertIndividualVisit(insertMap);
         } catch (Exception e) { // TODO 出现异常，医保端取消入院登记
             inptVisitDTO.setMedicalRegNo(medicalegNo);

@@ -97,6 +97,17 @@ public class InsureIndividualVisitServiceImpl extends HsafService implements Ins
     public Boolean deleteByVisitId(Map<String, Object> insertMap) {
         return insureIndividualVisitBO.deleteByVisitId(MapUtils.get(insertMap,"visitId"));
     }
+
+    @Override
+    public Integer deletePatientSumInfoByPsnNo(Map<String, Object> map) {
+        return insureIndividualVisitBO.deletePatientSumInfoByPsnNo(map);
+    }
+
+    @Override
+    public Integer insertPatientSumInfoAll(Map<String, Object> resultDataMap) {
+        return insureIndividualVisitBO.insertPatientSumInfoAll(MapUtils.get(resultDataMap,"resultMap"));
+    }
+
     /**
      * @param insureVisitParam
      * @Method getInsureIndividualVisitById

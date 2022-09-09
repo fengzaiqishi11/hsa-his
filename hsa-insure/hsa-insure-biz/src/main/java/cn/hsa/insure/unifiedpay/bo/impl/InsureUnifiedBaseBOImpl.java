@@ -1057,6 +1057,71 @@ public class InsureUnifiedBaseBOImpl extends HsafBO implements InsureUnifiedBase
     }
 
     /**
+     * @Method queryPatientSumInfo
+     * @Desrciption 人员累计信息查询(本年累计信息)
+     * @Param
+     * @Author wangqiao
+     * @Date    2022/09/07
+     * @Return
+     **/
+    public Map<String, Object> queryPatientSumInfoAllYears(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+
+        InsureIndividualVisitDTO insureIndividualVisitDTO =null;
+        insureIndividualVisitDTO = MapUtils.get(map,"insureIndividualVisitDTO");
+        if(insureIndividualVisitDTO ==null){
+            insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        }
+        /**
+         * 获取访问的url地址
+         */
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureRegCode());
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());
+        insureConfigurationDTO = getInsureConfiguration(insureConfigurationDTO);
+        Map<String, Object> dataMap = new HashMap<>();
+        Map<String, Object> paramMap = new HashMap<>();
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        Object cumYm = MapUtils.get(map, "cumYm");
+        if (cumYm == null || StringUtils.isEmpty(cumYm.toString())) {
+            cumYm = DateUtils.format(DateUtils.getNow(),DateUtils.YM);
+        }
+        // 取出年份
+        StringBuilder year = new StringBuilder(DateUtils.format(DateUtils.getNow(), "yyyy"));
+
+        map.put("msgName","人员累计信息查询");
+        map.put("isHospital","");
+        map.put("visitId",insureIndividualVisitDTO.getVisitId());
+        // 取出月份
+        Integer ym = Integer.parseInt(cumYm.toString().substring(4));
+        Map<String, Object> resultMap = null;
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        //  对月份进行循环 直到1月打止
+        for(int i=1;i<=ym;i++){
+            if(i<10){
+                year.append("0");
+                year.append(i);
+            }else{
+                year.append(i);
+            }
+            // 将年份和月份拼接
+            dataMap.put("cum_ym", year);
+            paramMap.put("data", dataMap);
+
+            resultMap = insureUnifiedCommonUtil.commonInsureUnified(hospCode, insureConfigurationDTO.getRegCode(), Constant.UnifiedPay.REGISTER.UP_5206, paramMap,map);
+            Map<String, Object> outptMap = MapUtils.get(resultMap, "output");
+            List<Map<String, Object>> resultDataMap = MapUtils.get(outptMap, "cuminfo");
+            for (int i1 = 0; i1 < resultDataMap.size(); i1++) {
+                resultList.add(resultDataMap.get(i1));
+            }
+            year.delete(4,6);
+        }
+        map.put("resultDataMap", resultList);
+        return map;
+    }
+
+    /**
      * @Method queryItemConfirm
      * @Desrciption 项目互认信息查询
      * @Param

@@ -896,6 +896,9 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         InsureIndividualVisitDTO insureIndividualVisitDTO = this.commonGetVisitInfo(map);
         String psnNo = insureIndividualVisitDTO.getAac001();
         String visitId = insureIndividualVisitDTO.getVisitId();
+        String isReadCard = MapUtils.get(map, "isReadCard");  // 是否读卡
+        String bka895  = MapUtils.get(map, "bka895");     // 就诊凭证类型
+        String bka896 = MapUtils.get(map, "bka896");     //  就诊凭证编号
         //读卡原始信息赋值
         InsureIndividualVisitDTO visitDTO = MapUtil.get(map, "insureIndividualVisitDTO",InsureIndividualVisitDTO.class);
         if (ObjectUtil.isNotEmpty(visitDTO)) {
@@ -933,6 +936,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
         paramMap.put("orgCode", insureIndividualVisitDTO.getMedicineOrgCode());
         paramMap.put("configCode", insureIndividualVisitDTO.getInsureRegCode());
         paramMap.put("configRegCode", insureIndividualVisitDTO.getInsureRegCode());
+        //  读卡支付把读卡内容更新到接口
+        if(Constants.SF.S.equals(isReadCard) && StringUtils.isNotEmpty(bka895) && StringUtils.isNotEmpty(bka896)){
+            paramMap.put("bka895", bka895);
+            paramMap.put("bka896", bka896);
+        }
         //参数校验,规则校验和请求初始化
         BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.INPATIENT_SETTLE.getCode());
         InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);

@@ -69,8 +69,26 @@ public interface InsureIndividualVisitBO {
      */
     Boolean deleteByVisitId(String visitId);
 
-
     /**
+     * @Method deletePatientSumInfo
+     * @Desrciption 删除个人累计信息
+     * @Param
+     * @Author wangqiao
+     * @Date 2022/09/29 10:58
+     * @Return
+     **/
+    Integer deletePatientSumInfoByPsnNo(Map<String, Object> map);
+    /**
+     * @Method insertPatientSumInfoAll
+     * @Desrciption 医保登记的时候, 保存个人年度累计信息
+     * @Param resultDataMap
+     * @Author wangqiao
+     * @Date 2022/09/08 10:58
+     * @Return
+     **/
+	Integer insertPatientSumInfoAll(List<Map<String, Object>> resultDataMap);
+
+	/**
      * @param insureVisitParam
      * @Method getInsureIndividualVisitById
      * @Desrciption 根据就诊id和医院编码查询医保就诊信息

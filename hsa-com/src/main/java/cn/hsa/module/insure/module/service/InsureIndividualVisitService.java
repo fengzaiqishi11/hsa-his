@@ -73,6 +73,25 @@ public interface InsureIndividualVisitService {
      */
     Boolean deleteByVisitId(Map<String, Object> param);
 
+    /**
+     * @Method deletePatientSumInfo
+     * @Desrciption 根据psnNo删除个人累计信息
+     * @Param
+     * @Author wangqiao
+     * @Date 2022/09/29 10:58
+     * @Return
+     **/
+    Integer deletePatientSumInfoByPsnNo(Map<String, Object> map);
+
+    /**
+     * @Method insertPatientSumInfoAll
+     * @Desrciption 医保登记的时候, 保存个人年度累计信息
+     * @Param resultDataMap
+     * @Author wangqiao
+     * @Date 2022/09/08 10:58
+     * @Return
+     **/
+    Integer insertPatientSumInfoAll(Map<String, Object> resultDataMap);
 
     /**
      * @Method

@@ -4,7 +4,6 @@ import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import cn.hsa.module.inpt.doctor.dto.InptVisitDTO;
 import cn.hsa.module.insure.inpt.bo.InsureUnifiedBaseBO;
 import cn.hsa.module.insure.inpt.service.InsureUnifiedBaseService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
@@ -158,6 +157,20 @@ public class InsureUnifiedBaseServiceImpl extends HsafService implements InsureU
     public WrapperResponse<Map<String, Object>> queryPatientSumInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureUnifiedBaseBO.queryPatientSumInfo(map));
     }
+
+    /**
+     * @Method queryPatientSumInfo
+     * @Desrciption 人员累计信息查询(本年累计信息)
+     * @Param
+     * @Author wangqiao
+     * @Date 2022/09/07
+     * @Return
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> queryPatientSumInfoAllYears(Map<String, Object> map) {
+        return WrapperResponse.success(insureUnifiedBaseBO.queryPatientSumInfoAllYears(map));
+    }
+
 
     /**
      * @param map

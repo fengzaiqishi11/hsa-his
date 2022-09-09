@@ -391,6 +391,7 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     void deletePatientSumInfo(Map<String, Object> map);
+    int deletePatientSumInfoByPsnNo(Map<String, Object> map);
 
     /**
      * @Method insertPatientSumInfo
@@ -402,6 +403,16 @@ public interface InsureIndividualVisitDAO {
      * @Return
     **/
     void insertPatientSumInfo(@Param("resultDataMap") List<Map<String, Object>> resultDataMap);
+
+    /**
+     * @Method insertPatientSumInfoAll
+     * @Desrciption 医保登记的时候, 保存个人年度累计信息
+     * @Param resultDataMap
+     * @Author wangqiao
+     * @Date 2022/09/08 10:58
+     * @Return
+     **/
+    int insertPatientSumInfoAll(@Param("resultDataMap") List<Map<String, Object>> resultDataMap);
 
     /**
      * @Description: 根据科室id查询科室信息

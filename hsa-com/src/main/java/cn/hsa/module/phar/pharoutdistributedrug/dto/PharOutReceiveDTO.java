@@ -1,6 +1,7 @@
 package cn.hsa.module.phar.pharoutdistributedrug.dto;
 
 import cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
 * @Package_name: cn.hsa.module.phar.pharoutdistributedrug.entity
@@ -76,4 +78,8 @@ public class PharOutReceiveDTO extends PharOutReceiveDO implements Serializable 
     private Date startDate;        //开始日期
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;         //结束日期
+    // 返回数据
+    List<StroStockDetailDTO> resultList;
+    // 返回标识：警告0,或者错误1
+    String flag;
 }

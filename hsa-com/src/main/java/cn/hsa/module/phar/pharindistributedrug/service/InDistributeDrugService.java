@@ -95,7 +95,7 @@ public interface InDistributeDrugService {
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @PostMapping("/service/stro/inDistributeDrug/inDispense")
-    WrapperResponse<List<StroStockDetailDTO>> inDispense(Map map);
+    WrapperResponse<PharInReceiveDTO> inDispense(Map map);
 
     /**
      * @Method: cancelInDispense

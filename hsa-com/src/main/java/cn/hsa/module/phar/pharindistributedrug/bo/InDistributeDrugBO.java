@@ -84,7 +84,7 @@ public interface InDistributeDrugBO {
      * @Date: 2020/9/10 15:54
      * @Return: java.lang.Boolean
      **/
-    List<StroStockDetailDTO> updateInDispense(PharInReceiveDTO pharInReceiveDTO);
+    PharInReceiveDTO updateInDispense(PharInReceiveDTO pharInReceiveDTO);
 
     /**
      * @Method: cancelInDispense

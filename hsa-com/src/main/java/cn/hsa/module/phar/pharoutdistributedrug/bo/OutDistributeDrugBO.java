@@ -85,7 +85,7 @@ public interface OutDistributeDrugBO {
      * @Date: 2020/9/3 10:59
      * @Return: java.lang.Boolean
      **/
-    List<StroStockDetailDTO> updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO);
+    PharOutReceiveDTO updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO);
 
     /**
      * @Method: updateOutEnabelDispense

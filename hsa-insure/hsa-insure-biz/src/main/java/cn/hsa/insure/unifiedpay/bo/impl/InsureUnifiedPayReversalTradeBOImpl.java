@@ -1052,6 +1052,11 @@ public class InsureUnifiedPayReversalTradeBOImpl extends HsafBO implements Insur
      **/
     public Map<String, Object> checkOneSettle(Map<String, Object> map, InsureIndividualVisitDTO insureIndividualVisitDTO) {
         Map<String, Object> infoMap = new HashMap<>();
+        //如果是电子凭证登记的改成身份证去查人
+        if (Constant.UnifiedPay.CKLX.DZPZ.equals(insureIndividualVisitDTO.getMdtrtCertType())) {
+            insureIndividualVisitDTO.setMdtrtCertType(Constant.UnifiedPay.CKLX.SFZ);
+            insureIndividualVisitDTO.setMdtrtCertNo(insureIndividualVisitDTO.getAac003());
+        }
         map.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
         Map<String, Object> dataMap = insureUnifiedBaseService.checkOneSettle(map).
                 getData();

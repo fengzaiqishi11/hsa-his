@@ -184,7 +184,7 @@
       finl_tcmsymp_code, finl_tcmsymp, dise_plan, 
       prnp_trt, ipdr_code, ipdr_name, 
       prnt_doc_name, vali_flag, source, 
-      create_time, update_time, hosp_code
+      create_time, update_time, hosp_code, emr_template_id
       )
     values (#{uuid,jdbcType=BIGINT}, #{orgUuid,jdbcType=BIGINT}, #{mdtrtSn,jdbcType=VARCHAR}, 
       #{mdtrtId,jdbcType=VARCHAR}, #{psnNo,jdbcType=VARCHAR}, #{deptCode,jdbcType=VARCHAR}, 
@@ -197,7 +197,8 @@
       #{finlTcmsympCode,jdbcType=VARCHAR}, #{finlTcmsymp,jdbcType=VARCHAR}, #{disePlan,jdbcType=VARCHAR}, 
       #{prnpTrt,jdbcType=VARCHAR}, #{ipdrCode,jdbcType=VARCHAR}, #{ipdrName,jdbcType=VARCHAR}, 
       #{prntDocName,jdbcType=VARCHAR}, #{valiFlag,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{hospCode,jdbcType=VARCHAR}
+      #{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP}, #{hospCode,jdbcType=VARCHAR},
+      #{emrTemplateId,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" parameterType="cn.hsa.module.insure.emr.entity.InsureEmrCoursrinfoDO" >

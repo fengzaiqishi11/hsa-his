@@ -173,7 +173,7 @@
       agre_corp_dset, ipdr_name, chfpdr_code, 
       chfpdr_name, chfdr_name, sign_time, 
       vali_flag, source, create_time, 
-      update_time, hosp_code)
+      update_time, hosp_code, emr_template_id)
     values (#{uuid,jdbcType=BIGINT}, #{orgUuid,jdbcType=BIGINT}, #{mdtrtSn,jdbcType=VARCHAR}, 
       #{mdtrtId,jdbcType=VARCHAR}, #{psnNo,jdbcType=VARCHAR}, #{dept,jdbcType=VARCHAR}, 
       #{deptName,jdbcType=VARCHAR}, #{wardareaName,jdbcType=VARCHAR}, #{bedno,jdbcType=VARCHAR}, 
@@ -183,7 +183,7 @@
       #{agreCorpDset,jdbcType=VARCHAR}, #{ipdrName,jdbcType=VARCHAR}, #{chfpdrCode,jdbcType=VARCHAR}, 
       #{chfpdrName,jdbcType=VARCHAR}, #{chfdrName,jdbcType=VARCHAR}, #{signTime,jdbcType=VARCHAR}, 
       #{valiFlag,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{hospCode,jdbcType=VARCHAR})
+      #{updateTime,jdbcType=TIMESTAMP}, #{hospCode,jdbcType=VARCHAR},#{emrTemplateId,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="cn.hsa.module.insure.emr.entity.InsureEmrDieinfoDO" >
     <!--

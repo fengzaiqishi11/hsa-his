@@ -204,8 +204,16 @@
         where  t.id = p.classify_template_id and t.dept_id = c.dept_id and t.hosp_code = c.hosp_code and c.classinfo_code = t.classify_code-->
         select e.code, e.patient_code_ref, e.name, e.sys_code_default, e.name,e.is_sys_date,e.type_code from emr_element e join emr_classify_element c on e.code = c.element_code
         join emr_classify_template t on c.classinfo_code = t.classify_code
-        where  t.id = #{classifyTemplateId} and t.hosp_code = #{hospCode} and c.dept_id = #{deptId} and  t.dept_id = c.dept_id and t.hosp_code = c.hosp_code
+        where  t.id = #{classifyTemplateId} and t.hosp_code = #{hospCode} and c.dept_id  = #{deptId} and
+        t.dept_id = c.dept_id and t.hosp_code = c.hosp_code
     </select>
+
+    <select id="getEmrTemplateHtmlByTemplateId" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultMap="EmrPatientDTOMap" >
+       select ep.id,ep.visit_id ,ep.classify_template_id ,ep.patient_record_id ,eph.html from emr_patient ep
+       left join emr_patient_html eph on ep.patient_record_id = eph.patient_record_id
+        where ep.id = #{id}
+    </select>
+
 
     <!-- 根据就诊ID查询住院病人基本信息 -->
     <select id="getInptVisit" parameterType="cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO" resultType="java.util.Map">

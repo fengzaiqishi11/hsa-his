@@ -1262,6 +1262,22 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
     }
 
     /**
+     * 根据模板id获取电子病历模板
+     * @param emrPatientDTO
+     * @Author 医保开发二部-湛康
+     * @Date 2022-09-08 8:46
+     * @return cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO
+     */
+    @Override
+    public EmrPatientDTO getEmrTemplateHtmlByTemplateId(EmrPatientDTO emrPatientDTO) {
+      if (ObjectUtil.isEmpty(emrPatientDTO.getId())){
+        return null;
+      }
+      EmrPatientDTO dto = emrPatientDAO.getEmrTemplateHtmlByTemplateId(emrPatientDTO);
+      return dto;
+    }
+
+  /**
      * 保存元素到医保电子病历相关表
      * @Author 医保开发二部-湛康
      * @Date 2022-08-18 15:02
@@ -1276,8 +1292,11 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
       //入参
       Map<String, Object> resultMap = new HashMap<>();
       //病历文档节点
-      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+/*      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
         throw new AppException("请先在病历文档分类中维护对应的医保节点!");
+      }*/
+      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+        throw null;
       }
       String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
 
@@ -1568,6 +1587,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             InsureEmrDieinfoDTO.class);
         dto.setMdtrtSn(emrPatientDTO.getVisitId());
         dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("insureEmrDieinfoDTO",dto);
         map.put("hospCode",emrPatientDTO.getHospCode());
@@ -1601,6 +1621,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             InsureEmrCoursrinfoDTO.class);
         dto.setMdtrtSn(emrPatientDTO.getVisitId());
         dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("insureEmrCoursrinfoDTO",dto);
         map.put("hospCode",emrPatientDTO.getHospCode());

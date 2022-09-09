@@ -10,9 +10,11 @@ import cn.hsa.module.phar.pharinbackdrug.entity.PharInDistributeDetailDO;
 import cn.hsa.module.phar.pharinbackdrug.entity.PharInReceiveDO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDTO;
 import cn.hsa.module.phar.pharindistributedrug.dto.PharInReceiveDetailDTO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
 * @Package_name: cn.hsa.module.phar.pharoutdistributedrug.dao
@@ -387,4 +389,11 @@ public interface InDistributeDrugDAO {
      * @Return:
      **/
     List<InptVisitDTO> queryDMPatientInfoByVitsitId(InptVisitDTO inptVisitDTO);
+    /**
+     * @Author gory
+     * @Description 查询过期数量
+     * @Date 2022/9/9 15:56
+     * @Param [map]
+     **/
+    List<StroStockDetailDTO> queryNumShortage(Map map);
 }

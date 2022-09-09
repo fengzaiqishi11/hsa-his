@@ -588,4 +588,20 @@
         where a.id = #{visitId}
           and a.hosp_code = #{hospCode}
     </select>
+    <!--查询过期的药品明细-->
+    <select id="queryNumShortage" resultType="cn.hsa.module.stro.stock.dto.StroStockDetailDTO">
+        select a.item_name,a.num as totalNum,a.split_num as totalSplitNum,
+               b.num as expiryNum,b.split_num as expirySplitNum,b.batch_no,b.expiry_date,a.stock_occupy AS stockOccupy,
+               case  a.item_code when '1' then bd.code  when  '2' then bm.code  end code,
+               case  a.item_code when '1' then bd.prod_code  when  '2' then bm.prod_code  end prod_code
+        from stro_stock a
+            join stro_stock_detail b on a.item_id = b.item_id and a.biz_id = b.biz_id and a.hosp_code = b.hosp_code
+                and b.expiry_date &lt; now() and b.num > 0
+            left join base_drug bd on bd.id = a.item_id
+            left join base_material bm on bm.id = a.id
+        where  a.biz_id = #{bizId} and a.hosp_code = #{hospCode} and a.item_id in
+        <foreach collection="itemIds" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

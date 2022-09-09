@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.bo.OutDistributeDrugBO;
+import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.service.OutDistributeDrugService;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
@@ -114,7 +115,7 @@ public class OutDistributeDrugServiceImpl extends HsafService implements OutDist
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
-    public WrapperResponse<List<StroStockDetailDTO>> outDispense(Map map) {
+    public WrapperResponse<PharOutReceiveDTO> outDispense(Map map) {
         return WrapperResponse.success(outDistributeDrugBO.updateOutDispense(MapUtils.get(map,"pharOutReceiveDTO")));
     }
 

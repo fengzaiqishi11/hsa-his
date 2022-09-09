@@ -1,6 +1,7 @@
 package cn.hsa.module.phar.pharindistributedrug.dto;
 
 import cn.hsa.module.phar.pharinbackdrug.entity.PharInReceiveDO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,4 +51,8 @@ public class PharInReceiveDTO extends PharInReceiveDO implements Serializable {
     private String canclePremedication;
     // 配药明细
     private List<PharInReceiveDetailDTO> pharInReceiveDetailDTOList;
+    // 返回数据
+    List<StroStockDetailDTO> resultList;
+    // 返回标识：警告0,或者错误1
+    String flag;
 }

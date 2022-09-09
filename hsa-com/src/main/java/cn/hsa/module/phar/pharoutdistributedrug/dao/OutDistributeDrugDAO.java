@@ -10,6 +10,7 @@ import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDetailDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDO;
 import cn.hsa.module.phar.pharoutdistributedrug.entity.PharOutReceiveDetailDO;
+import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -262,4 +263,11 @@ public interface OutDistributeDrugDAO {
     List<Map> getPrescribeDetailPrint(OutptPrescribeDTO outptPrescribeDTO);
 
     Map<String, Object> queryVistitInfo(OutptPrescribeDTO visitParam);
+    /**
+     * @Author gory
+     * @Description 查询过期的药品明细
+     * @Date 2022/9/9 11:48
+     * @Param [map]
+     **/
+    List<StroStockDetailDTO> queryNumShortage(Map map);
 }

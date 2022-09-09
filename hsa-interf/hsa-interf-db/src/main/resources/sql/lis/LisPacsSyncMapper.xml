@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.hsa.module.interf.lis.dao.LisPacsSyncDAO">
+
+    <!--获取门诊pacs检查申请单-->
+    <select id="listOutptPacsApply" resultType="java.util.Map">
+        select
+            ma.id as applyId, -- 申请单id
+            ma.hosp_code as hospCode, -- 医院编码
+            ma.apply_no as applyNo, -- 申请单号
+            ma.opd_id as adviceId, -- 医嘱id/处方单详情id
+            ma.visit_id as visitId, -- 就诊者id
+            ma.bar_code as barCode, -- 条码号
+            ov.out_profile as cardNumber, -- 门诊档案号（挂号时生成）
+            ov.cert_no as patientIdentityCardNum,-- Y身份证号
+            '门诊' as patientFrom,-- Y病人来源
+            ov.visit_no as clinicalNum,-- Y门诊号
+            '' as InHospitalNum,-- 住院号
+            ov.name as PatientName,-- Y病人姓名
+            (case when ov.gender_code ='1' then '男'
+            when ov.gender_code ='2' then '女'
+            else '未知' end ) as PatientSex,-- Y病人性别
+            ov.age as PatientAge,-- Y病人年龄
+            '岁' as PatientAgeUnit, -- Y年龄单位
+            (select name from sys_code_detail scd where scd.c_code='MZ' and scd.value = ov.nation_code and scd.hosp_code = ma.hosp_code) as patientNation,-- 民族
+            ov.birthday as patientBirthday,-- 出生日期
+            (select case code
+            when 'D03' then 'CT'
+            when 'D06' then '黑白超'
+            when 'D07' then '彩超'
+            when 'D02' then 'DR'
+            when 'D04' then 'MR'
+            else '其他' end
+            from base_finance_classify bfc where bfc.id = opd.bfc_id) as examineType,-- 检查类型 Y
+            opd.item_name as examineParts,-- 检查部位 Y
+            sum(oc.reality_price) as fee,-- 费用
+            '' as bedNum,-- 床号
+            ma.dept_name as sentByDepartment,-- 送检科室
+            ma.crte_name as sentByDoctor,-- 送检医生
+            ov.phone as patientTelephone,-- 联系电话
+            ov.now_address as patientAddress,-- 病人地址
+            os.settle_time as orderEntryTime,-- 缴费时间 Y
+            (select group_concat(bd.name) disease_names from base_disease bd where find_in_set(bd.id,op.diagnose_ids)) as clinicalDiagnosis,-- 临床诊断
+            (case when ov.visit_code ='01' then '平诊'
+            when ov.visit_code ='02' then '急诊' else '平诊' end) as areeMergency  -- Y急诊、平诊
+        from medic_apply ma
+            join outpt_visit ov on ma.visit_id = ov.id and ov.hosp_code = ma.hosp_code
+            join outpt_prescribe_detail opd on opd.id = ma.opd_id  and opd.hosp_code = ma.hosp_code
+            join outpt_prescribe op on op.id = opd.op_id  and op.hosp_code = ma.hosp_code
+            join outpt_cost oc on oc.opd_id = opd.id and oc.status_code='0' and oc.hosp_code = ma.hosp_code
+            join outpt_settle os on os.id = oc.settle_id and os.hosp_code = ma.hosp_code
+            where ma.hosp_code = #{hospCode} and ma.is_inpt != '1' and ma.type_code ='5' and ma.document_sta ='02'
+        <if test="startTime != null and startTime != ''">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt;= #{endTime}
+        </if>
+        group by ma.id
+    </select>
+    <!--获取住院pacs检查申请单-->
+    <select id="listInptPacsApply" resultType="java.util.Map">
+        select
+            ma.id as applyId, -- 申请单id
+            ma.hosp_code as hospCode, -- 医院编码
+            ma.apply_no as applyNo, -- 申请单号
+            ma.bar_code as barCode, -- 条码号
+            ma.opd_id as adviceId, -- 医嘱id/处方单详情id
+            ma.visit_id as visitId, -- 就诊者id
+            ma.bar_code as barCode, -- 条码号
+            iv.in_profile as cardNumber, -- 病案号/住院档案号（入院登记回写）
+            iv.cert_no as patientIdentityCardNum,-- 身份证号
+            '住院' as patientFrom,-- 病人来源
+            '' as clinicalNum,-- 门诊号
+            iv.in_no as inHospitalNum,-- 住院号
+            iv.name as patientName,-- 病人姓名
+            (case when iv.gender_code ='1' then '男'
+            when iv.gender_code ='2' then '女'
+            else '未知' end ) as patientSex,-- 病人性别
+            iv.age as patientAge,-- 病人年龄
+            '岁' as patientAgeUnit, -- 年龄单位
+            (select name from sys_code_detail scd where scd.c_code='MZ' and scd.value = iv.nation_code and scd.hosp_code = ma.hosp_code) as patientNation,-- 民族
+            iv.birthday as patientBirthday,-- 出生日期
+            (select case code
+            when 'D03' then 'CT'
+            when 'D06' then '黑白超'
+            when 'D07' then '彩超'
+            when 'D02' then 'DR'
+            when 'D04' then 'MR'
+            else '其他' end
+            from base_finance_classify bfc where bfc.id = iad.bfc_id and bfc.hosp_code = ma.hosp_code) as examineType,-- 检查类型 Y
+            iad.item_name as examineParts,-- 检查部位 Y
+            sum(ic.reality_price) as fee,-- 费用
+            iv.bed_name as bedNum,-- 床号
+            ma.dept_name as sentByDepartment,-- 送检科室
+            ma.crte_name as sentByDoctor,-- 送检医生
+            iv.phone as patientTelephone,-- 联系电话
+            iv.address as patientAddress,-- 病人地址
+            ic.cost_time as orderEntryTime,-- 缴费时间 Y
+            iv.in_disease_name as clinicalDiagnosis,-- 临床诊断
+            '平诊' as areeMergency -- 急平诊 Y
+        from medic_apply ma
+            join inpt_advice_detail iad  on iad.id = ma.opd_id and iad.hosp_code = ma.hosp_code
+            join inpt_visit iv on iv.id = ma.visit_id and iv.status_code ='2' and iv.hosp_code = ma.hosp_code
+            join inpt_cost ic on ic.iat_id = iad.ia_id and ic.hosp_code = ma.hosp_code
+            where ma.hosp_code = #{hospCode} and ma.is_inpt = '1' and ma.type_code ='5' and ma.document_sta ='01'
+        <if test="startTime != null and startTime != ''">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and ma.crte_time &lt;= #{endTime}
+        </if>
+        group by ma.id
+    </select>
+    <!--插入pacs影像检查结果-->
+    <insert id="insertPacsResult">
+        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        crte_name, crte_time, apply_no, checker, check_time, reviewer, audit_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
+            #{entity.testitemName}, #{entity.reportText}, #{entity.picUrl}, #{entity.isPositive},
+            #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
+            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo},
+            #{entity.checker}, #{entity.checkTime}, #{entity.reviewer}, #{entity.auditTime})
+        </foreach>
+    </insert>
+    <!--修改申请单状态-->
+    <update id="updateApplyDocumentSta">
+        update medic_apply set document_sta = #{documentSta}
+        where hosp_code= #{hospCode} and id in
+        <foreach collection="mapList" item="map" open="(" separator="," close=")">
+            #{map.applyId}
+        </foreach>
+    </update>
+    <!--获取科室字典信息集合-->
+    <select id="listLisDept" resultType="java.util.Map">
+        select
+            bd.hosp_code as hospCode, -- 医院编码
+            bd.name as name, -- 科室名称
+            bd.code as code, -- 科室编码
+            'HIS' as source, -- 来源
+            bd.is_valid as isUse -- 是否使用
+        from base_dept bd
+        where bd.hosp_code = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and bd.crte_time &gt;= #{startTime}
+        </if>
+    </select>
+    <!--获取医生字典信息集合-->
+    <select id="listLisDoctor" resultType="java.util.Map">
+        select
+            su.hosp_code as hospCode, -- 医院编码
+            su.name as name, -- 医生名称
+            su.code as code, -- 医生编码
+            'HIS' as source, -- 来源
+            su.is_in_job as isUse -- 是否使用
+        from sys_user su
+        where su.hosp_code = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and su.crte_time &gt;= #{startTime}
+        </if>
+
+    </select>
+    <!--获取收费项目字典信息集合-->
+    <select id="listLisAdvice" resultType="java.util.Map">
+        select
+            ba.hosp_code as hospCode, -- 医院编码
+            ba.name as name, -- 项目名称
+            ba.code as code, -- 项目编码
+            'HIS' as source, -- 来源
+            ba.is_valid as isUse, -- 是否使用
+            ba.price as money -- 收费金额
+        from base_advice ba
+        where ba.hosp_code = #{hospCode}
+        <if test="startTime != null and startTime != ''">
+            and ba.crte_time &gt;= #{startTime}
+        </if>
+    </select>
+    <!--获取lis检验申请单集合-->
+    <select id="listLisApply" resultType="java.util.Map">
+        select
+            ma.hosp_code as areaCode, -- 医院编码
+            ma.id as applyId, -- 申请单Id
+            ma.apply_no as applyNo, -- 申请单号
+            ma.visit_id as visitId, -- 就诊者id
+            ma.opd_id as adviceId, -- 处方/医嘱详情id
+            ma.bar_code as barCode, -- 条码号
+            ov.visit_no as pid,-- 门诊/住院/体检号
+            ov.name as name,-- 姓名
+            ov.age as age,-- 年龄
+            '岁' as ageUnit,-- 年龄单位
+            (case when ov.gender_code ='1' then '男'
+            when ov.gender_code ='2' then '女'
+            else '未知' end ) as sex,-- 性别
+            '门诊' as patTypeName,-- 就诊类型
+            (select code from base_dept where id = ma.dept_id and hosp_code = ma.hosp_code limit 1) as dptCode,-- 开单科室编码
+            ma.dept_name as dptName,-- 开单科室名称
+            (select code from sys_user where id = ma.dept_id and hosp_code = ma.hosp_code limit 1) as dctCode,-- 开单医生编码
+            ma.crte_name as dctName,-- 开单医生名称
+            date_format(ma.crte_time,'%Y-%m-%d %T') as orderTime,-- 申请日期(YYYY-MM-DD HH24:MI:SS)
+            date_format(ma.crte_time,'%Y-%m-%d') as orderDate,-- 申请日期(YYYY-MM-DD)
+            (select ba.code from base_advice ba where ba.id = opd.item_id AND ba.hosp_code = ma.hosp_code limit 1) as feeItemCode,-- 收费项目编码
+            opd.item_name as feeItemName,-- 收费项目名称
+            '1' as feeItemCount,-- 收费次数
+            sum(oc.reality_price) as feeItemMoney,-- 收费金额
+            '1' as feeState,-- 申请状态:1:正常申请;2:退费申请
+            oc.id as hisId,-- 申请状态:1:正常申请;2:退费申请
+            'HIS' as source-- 数据来源 HIS,体检,送检平台
+        from medic_apply ma
+            join outpt_visit ov on ma.visit_id = ov.id and ov.hosp_code = ma.hosp_code
+            join outpt_prescribe_detail opd on opd.id = ma.opd_id  and opd.hosp_code = ma.hosp_code
+            join outpt_prescribe op on op.id = opd.op_id  and op.hosp_code = ma.hosp_code
+            join outpt_cost oc on oc.opd_id = opd.id and oc.status_code='0' and oc.hosp_code = ma.hosp_code
+            join outpt_settle os on os.id = oc.settle_id and os.hosp_code = ma.hosp_code
+        where ma.hosp_code = #{hospCode} and ma.is_inpt != '1' and ma.type_code ='4' and ma.document_sta ='02'
+        <if test="startTime != null and startTime != ''">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        group by ma.id
+        union all
+        select
+            ma.hosp_code as areaCode, -- 医院编码
+            ma.id as applyId, -- 申请单Id
+            ma.apply_no as applyNo, -- 申请单号
+            ma.visit_id as visitId, -- 就诊者id
+            ma.opd_id as adviceId, -- 处方/医嘱详情id
+            ma.bar_code as barCode, -- 条码号
+            ma.in_no as pid,-- 门诊/住院/体检号
+            iv.name as name,-- 姓名
+            iv.age as age,-- 年龄
+            '岁' as ageUnit,-- 年龄单位
+            (case when iv.gender_code ='1' then '男'
+                  when iv.gender_code ='2' then '女'
+                  else '未知' end ) as sex,-- 性别
+            '住院' as patTypeName,-- 就诊类型
+            (select code from base_dept where id = ma.dept_id and hosp_code = ma.hosp_code limit 1) as dptCode,-- 开单科室编码
+            ma.dept_name as dptName,-- 开单科室名称
+            (select code from sys_user where id = ma.dept_id and hosp_code = ma.hosp_code limit 1) as dctCode,-- 开单医生编码
+            ma.crte_name as dctName,-- 开单医生名称
+            date_format(ma.crte_time,'%Y-%m-%d %T') as orderTime,-- 申请日期(YYYY-MM-DD HH24:MI:SS)
+            date_format(ma.crte_time,'%Y-%m-%d') as orderDate,-- 申请日期(YYYY-MM-DD)
+            (select ba.code from base_advice ba where ba.id = iad.ba_id AND ba.hosp_code = ma.hosp_code limit 1) as feeItemCode,-- 收费项目编码
+            iad.item_name as feeItemName,-- 收费项目名称
+            '1' as feeItemCount,-- 收费次数
+            sum(ic.reality_price) as feeItemMoney,-- 收费金额
+            '1' as feeState,-- 申请状态:1:正常申请;2:退费申请
+            ic.id as hisId,-- his唯一id请状态:1:正常申请;2:退费申请
+            'HIS' as source-- 数据来源 HIS,体检,送检平台
+        from medic_apply ma
+            join inpt_advice_detail iad  on iad.id = ma.opd_id and iad.hosp_code = ma.hosp_code
+            join inpt_visit iv on iv.id = ma.visit_id and iv.status_code ='2' and iv.hosp_code = ma.hosp_code
+            join inpt_cost ic on ic.iat_id = iad.ia_id and ic.hosp_code = ma.hosp_code
+        where ma.hosp_code = #{hospCode} and ma.is_inpt = '1' and ma.type_code ='4' and ma.document_sta ='01'
+        <if test="startTime != null and startTime != ''">
+            and ma.crte_time &gt;= #{startTime}
+        </if>
+        group by ma.id
+    </select>
+    <!--插入lis检验结果-->
+    <insert id="insertLisResult">
+        insert into medic_result(id, hosp_code, visit_id, in_no, advice_id, bar_code, type_code, item_id,
+        item_name, result_type, result, result_detail, reporte_text, pic_url, is_positive, reference_value, result_unit,
+        range_state, range_state_color, check_part, check_ways, check_type, diagnosis_id, diagnosis_name, crte_id,
+        crte_name, crte_time, apply_no, checker, check_time, reviewer, audit_time)
+        values
+        <foreach collection="list" item="entity" separator=",">
+            (#{entity.id}, #{entity.hospCode}, #{entity.visitId}, #{entity.inNo}, #{entity.adviceId}, #{entity.barCode},
+            #{entity.typeCode}, #{entity.itemId}, #{entity.itemName}, #{entity.resultType}, #{entity.result},
+            #{entity.testitemName}, #{entity.reportText}, #{entity.picUrl}, #{entity.isPositive},
+            #{entity.referenceValue}, #{entity.resultUnit}, #{entity.rangeState}, #{entity.rangeStateColor},
+            #{entity.checkPart}, #{entity.checkWays}, #{entity.checkType}, #{entity.diagnosisId},
+            #{entity.diagnosisName}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime}, #{entity.applyNo},
+            #{entity.checker}, #{entity.checkTime}, #{entity.reviewer}, #{entity.auditTime})
+        </foreach>
+    </insert>
+
+</mapper>

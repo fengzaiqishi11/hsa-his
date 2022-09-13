@@ -699,41 +699,43 @@
     <!--根据就诊id查询出患者在院期间所有护理三测单记录-->
     <select id="queryAllByVisitId" parameterType="java.util.Map" resultType="cn.hsa.module.inpt.inptnursethird.dto.InptNurseThirdDTO">
         select
-            a.visit_id,
-            c.aac001,
-            c.medical_reg_no,
-            b.patient_code,
-            b.in_dept_id,
-            b.name,
-            (select code from base_dept bd where b.hosp_code = bd.hosp_code and b.in_dept_id = bd.id) as in_dept_code,
-            b.in_dept_name,
-            b.in_ward_id,
-            (select name from base_dept bd where b.hosp_code = bd.hosp_code and b.in_ward_id = bd.id) as in_ward_name,
-            b.bed_name,
-            b.in_disease_id,
-            (select code from base_disease bd where b.hosp_code = bd.hosp_code and b.in_disease_id = bd.id) as in_disease_code,
-            b.in_disease_name,
-            b.in_time as in_time_batch,
-            b.out_time,
-            a.record_time,
-            (date_format(a.record_time, '%Y-%m-%d')) as record_date,
-            a.breath,
-            a.is_ventilator,
-            a.pulse,
-            a.heart_rate,
-            a.blood_sugar,
-            a.temperature,
-            a.am_bp,
-            a.weight,
-            a.girth,
-            a.height,
-            a.crte_name,
-            a.crte_time
+        a.visit_id,
+        c.aac001,
+        c.medical_reg_no,
+        b.patient_code,
+        b.in_dept_id,
+        b.name,
+        (select code from base_dept bd where b.hosp_code = bd.hosp_code and b.in_dept_id = bd.id) as in_dept_code,
+        b.in_dept_name,
+        b.in_ward_id,
+        (select name from base_dept bd where b.hosp_code = bd.hosp_code and b.in_ward_id = bd.id) as in_ward_name,
+        b.bed_name,
+        b.in_disease_id,
+        (select code from base_disease bd where b.hosp_code = bd.hosp_code and b.in_disease_id = bd.id) as
+        in_disease_code,
+        b.in_disease_name,
+        b.in_time as in_time_batch,
+        b.out_time,
+        a.record_time,
+        (date_format(a.record_time, '%Y-%m-%d')) as record_date,
+        a.breath,
+        a.is_ventilator,
+        a.pulse,
+        a.heart_rate,
+        a.blood_sugar,
+        a.temperature,
+        a.am_bp,
+        a.weight,
+        a.girth,
+        a.height,
+        a.crte_name,
+        a.crte_time
         from inpt_nurse_third a
         left join inpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
         left join insure_individual_visit c on b.hosp_code = c.hosp_code and b.id = c.visit_id
         where a.hosp_code = #{hospCode}
-          and a.visit_id = #{visitId}
+        and a.visit_id = #{visitId}
+        and (a.pulse is not null or a.breath is not null or a.heart_rate is not null)
         <!--医保护理生命特征上传，默认查询大人的，婴儿的排除-->
         <if test="babyId == null or babyId == ''">
           <![CDATA[

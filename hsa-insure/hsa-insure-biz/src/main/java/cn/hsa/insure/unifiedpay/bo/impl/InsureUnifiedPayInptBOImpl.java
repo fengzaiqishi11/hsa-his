@@ -1803,7 +1803,11 @@ public class InsureUnifiedPayInptBOImpl extends HsafBO implements InsureUnifiedP
                     map.put("diag_code", dto.getInDiseaseCode()); // 诊断代码
                     map.put("adm_time", dto.getInTimeBatch()); // 入院时间
                     map.put("act_ipt_days", dto.getInDays()); // 实际住院天数
-                    map.put("afpn_days", dto.getOperationDays()); // 手术后天数
+                    if(ObjectUtil.isNotEmpty(dto.getOperationDays())){
+                        map.put("afpn_days", dto.getOperationDays()); // 手术后天数
+                    }else{
+                        map.put("afpn_days", 0); // 手术后天数
+                    }
                     map.put("rcd_time", dto.getRecordTime()); // 记录日期时间
                     map.put("vent_frqu", dto.getBreath()); // 呼吸频率（次/min）
                     map.put("use_vent_flag", dto.getIsVentilator()); // 使用呼吸机标志

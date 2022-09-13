@@ -4534,9 +4534,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                         insureSettleInfoDTO.setProvince(province);
                         insureSettleInfoDTO.setConProvince(province);
                         //详细地址
-                        detailAddress = detailAddress.replace(admdvsName,"");
-                        detailAddress = detailAddress.replace(cityName,"");
-                        detailAddress = detailAddress.replace(provinceName,"");
+                        detailAddress = detailAddress.substring(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)+admdvsName.length(),insureSettleInfoDTO.getConerAddr().length());
                         insureSettleInfoDTO.setDetailAddress(detailAddress);
                         insureSettleInfoDTO.setConDetailAddress(detailAddress);
                     }
@@ -4577,9 +4575,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             insureSettleInfoDTO.setProvince(province);
                             insureSettleInfoDTO.setConProvince(province);
                             //详细地址
-                            detailAddress = detailAddress.replace(admdvsName,"");
-                            detailAddress = detailAddress.replace(cityName,"");
-                            detailAddress = detailAddress.replace(provinceName,"");
+                            detailAddress = detailAddress.substring(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)+admdvsName.length(),insureSettleInfoDTO.getConerAddr().length());
                             insureSettleInfoDTO.setDetailAddress(detailAddress);
                             insureSettleInfoDTO.setConDetailAddress(detailAddress);
                         }

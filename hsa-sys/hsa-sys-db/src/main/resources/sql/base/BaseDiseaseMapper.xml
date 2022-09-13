@@ -106,7 +106,10 @@
 					and code like concat('%','M','%')
 				</when>
 				<when test="queryType == 'icd-v'">
-					and (code like concat('','V','%') or code like concat('','Y','%'))
+					and (code like concat('','V','%')
+					or code like concat('','W','%')
+					or code like concat('','X','%')
+					or code like concat('','Y','%'))
 				</when>
 				<when test="queryType !=null and queryType != ''">
 					and type_code in ('1','2','4')

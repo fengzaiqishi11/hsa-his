@@ -4483,7 +4483,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择第三级医保机构");
         }
         String city = null;//市级
+        String cityName = null;//市级名称
         String province = null;//省级
+        String provinceName = null;//省级名称
         String upAdmdvscCode = null;//市级编码
         Map<String, Object> admdvscMap = new HashMap<>();
         List<Map<String, Object>> upAdmdvscList = new ArrayList<>();
@@ -4497,11 +4499,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
             if(!ListUtils.isEmpty(upAdmdvscList)){
                 city = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                cityName = (String) upAdmdvscList.get(0).get("admdvsName");
                 //查询省级
                 admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
                 upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
                 if(!ListUtils.isEmpty(upAdmdvscList)){
                     province = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                    provinceName = (String) upAdmdvscList.get(0).get("admdvsName");
                 }
             }
         }
@@ -4517,6 +4521,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 String admdvsName = (String) admdvs.get("admdvsName");
                 String admdvsCode = (String) admdvs.get("admdvsCode");
                 for(InsureSettleInfoDTO insureSettleInfoDTO:setlList){
+                    String detailAddress = insureSettleInfoDTO.getConerAddr();
                     //以联系人地址为准
                     if(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)>=0){
                         //县级
@@ -4528,6 +4533,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                         //省级
                         insureSettleInfoDTO.setProvince(province);
                         insureSettleInfoDTO.setConProvince(province);
+                        //详细地址
+                        detailAddress = detailAddress.replace(admdvsName,"");
+                        detailAddress = detailAddress.replace(cityName,"");
+                        detailAddress = detailAddress.replace(provinceName,"");
+                        insureSettleInfoDTO.setDetailAddress(detailAddress);
+                        insureSettleInfoDTO.setConDetailAddress(detailAddress);
                     }
 
                 }
@@ -4550,6 +4561,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 Map<String, Object> admdvsMap = new HashMap<>();
                 List<Map<String, Object>> upAdmdvsList = new ArrayList<>();
                 for (InsureSettleInfoDTO insureSettleInfoDTO : setlList) {
+                    String detailAddress = insureSettleInfoDTO.getConerAddr();
                     //以联系人地址为准
                     if (insureSettleInfoDTO.getConerAddr().indexOf(admdvsName.substring(0, admdvsName.length() - 1)) >= 0) {
                         //查询县级
@@ -4564,6 +4576,12 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             //省级
                             insureSettleInfoDTO.setProvince(province);
                             insureSettleInfoDTO.setConProvince(province);
+                            //详细地址
+                            detailAddress = detailAddress.replace(admdvsName,"");
+                            detailAddress = detailAddress.replace(cityName,"");
+                            detailAddress = detailAddress.replace(provinceName,"");
+                            insureSettleInfoDTO.setDetailAddress(detailAddress);
+                            insureSettleInfoDTO.setConDetailAddress(detailAddress);
                         }
                     }
                 }

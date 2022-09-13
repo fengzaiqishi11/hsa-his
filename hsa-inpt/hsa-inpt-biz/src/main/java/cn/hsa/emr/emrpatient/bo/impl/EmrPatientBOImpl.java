@@ -1295,60 +1295,58 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
 /*      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
         throw new AppException("请先在病历文档分类中维护对应的医保节点!");
       }*/
-      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
-        throw null;
-      }
-      String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
-
-      Map<String, Object> param = new HashMap<>();
-      param.put("insureTypeCode",insureTypeCode);
-      param.put("hospCode",emrPatientDTO.getHospCode());
-      // 查询出元素内容的匹配数据
-      List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfo(param);
-      if (ListUtils.isEmpty(emrMatchList)) {
-        throw new AppException("元素匹配医保内容信息为空,请先匹配");
-      }
-      Map nrMap = emrPatientDTO.getNrMap();
-      // 寻找与医保关联匹配的字段信息
-      for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
-        // his的电子病历元素
-        String hisEmrCode = emrElementMatchDO.getEmrElementCode();
-        // 对应的医保节点字段
-        String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
-        // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
-        if (nrMap.containsKey(hisEmrCode)) {
-          //去除html样式
-          String emrValue = delHTMLTag(nrMap.get(hisEmrCode).toString());
-          resultMap.put(insureEmrCode, emrValue);
+      if (ObjectUtil.isNotEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+        String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
+        Map<String, Object> param = new HashMap<>();
+        param.put("insureTypeCode",insureTypeCode);
+        param.put("hospCode",emrPatientDTO.getHospCode());
+        // 查询出元素内容的匹配数据
+        List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfo(param);
+        if (ListUtils.isEmpty(emrMatchList)) {
+          throw new AppException("元素匹配医保内容信息为空,请先匹配");
         }
-      }
+        Map nrMap = emrPatientDTO.getNrMap();
+        // 寻找与医保关联匹配的字段信息
+        for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
+          // his的电子病历元素
+          String hisEmrCode = emrElementMatchDO.getEmrElementCode();
+          // 对应的医保节点字段
+          String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
+          // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
+          if (nrMap.containsKey(hisEmrCode)) {
+            //去除html样式
+            String emrValue = delHTMLTag(nrMap.get(hisEmrCode).toString());
+            resultMap.put(insureEmrCode, emrValue);
+          }
+        }
 
-      //获取医保就诊信息
-      Map<String, String> map1 = new HashMap<>();
-      map1.put("visitId",emrPatientDTO.getVisitId());
-      InsureEmrUnifiedDTO insureEmrUnifiedDTO = emrPatientDAO.queryInsureVisitEmrInfo(map1);
-      if (ObjectUtil.isNotEmpty(insureEmrUnifiedDTO)){
-        resultMap.put("mdtrt_id",insureEmrUnifiedDTO.getMdtrtId());
-      }
-      //保存进对应的医保电子病历表
-      //入院记录
-      if (insureTypeCode.equals(Constants.BLLX.YYJL)){
-        saveInsureAdminfo(emrPatientDTO,resultMap);
-      //首次病程记录
-      }else if(insureTypeCode.equals(Constants.BLLX.BCJL)){
-        saveCoursrinfo(emrPatientDTO,resultMap);
-        //死亡记录
-      }else if(insureTypeCode.equals(Constants.BLLX.SWJL)){
-        saveDieInfo(emrPatientDTO,resultMap);
-        //出院小结
-      }else if(insureTypeCode.equals(Constants.BLLX.CYXJ)){
-        saveDscginfo(emrPatientDTO,resultMap);
-        //手术记录
-      }else if(insureTypeCode.equals(Constants.BLLX.SSJL)){
-        saveOprnInfo(emrPatientDTO,resultMap);
-        //病情抢救
-      }else if(insureTypeCode.equals(Constants.BLLX.BQQJ)){
-        saveRescinfo(emrPatientDTO,resultMap);
+        //获取医保就诊信息
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("visitId",emrPatientDTO.getVisitId());
+        InsureEmrUnifiedDTO insureEmrUnifiedDTO = emrPatientDAO.queryInsureVisitEmrInfo(map1);
+        if (ObjectUtil.isNotEmpty(insureEmrUnifiedDTO)){
+          resultMap.put("mdtrt_id",insureEmrUnifiedDTO.getMdtrtId());
+        }
+        //保存进对应的医保电子病历表
+        //入院记录
+        if (insureTypeCode.equals(Constants.BLLX.YYJL)){
+          saveInsureAdminfo(emrPatientDTO,resultMap);
+          //首次病程记录
+        }else if(insureTypeCode.equals(Constants.BLLX.BCJL)){
+          saveCoursrinfo(emrPatientDTO,resultMap);
+          //死亡记录
+        }else if(insureTypeCode.equals(Constants.BLLX.SWJL)){
+          saveDieInfo(emrPatientDTO,resultMap);
+          //出院小结
+        }else if(insureTypeCode.equals(Constants.BLLX.CYXJ)){
+          saveDscginfo(emrPatientDTO,resultMap);
+          //手术记录
+        }else if(insureTypeCode.equals(Constants.BLLX.SSJL)){
+          saveOprnInfo(emrPatientDTO,resultMap);
+          //病情抢救
+        }else if(insureTypeCode.equals(Constants.BLLX.BQQJ)){
+          saveRescinfo(emrPatientDTO,resultMap);
+        }
       }
     }
 

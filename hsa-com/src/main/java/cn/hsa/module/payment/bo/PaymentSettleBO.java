@@ -1,10 +1,12 @@
 package cn.hsa.module.payment.bo;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptPayDO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
 import cn.hsa.module.payment.entity.PaymentSettleDO;
 import org.apache.ibatis.annotations.Param;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Map;
@@ -99,4 +101,14 @@ public interface PaymentSettleBO {
      * @return Map
      */
     Map updatePaymentSettleStatus(Map param);
+
+    /**@Menthod saveSettleInfo
+     * @description 生成预结算数据
+     * @param outptVisitDTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/09/05 16:44
+     * @return Map
+     */
+    Boolean saveSettleInfo(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDO> outptPayDTOList);
 }

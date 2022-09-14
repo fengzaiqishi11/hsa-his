@@ -1,13 +1,23 @@
 package cn.hsa.medical.payment.bo.impl;
 
 import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.exception.AppException;
+import cn.hsa.medical.payment.enums.PaymentExceptionEnums;
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
+import cn.hsa.module.outpt.fees.entity.OutptPayDO;
+import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
 import cn.hsa.module.payment.bo.PaymentSettleBO;
+import cn.hsa.module.payment.dao.PaymentOrderDAO;
 import cn.hsa.module.payment.dao.PaymentSettleDAO;
+import cn.hsa.module.payment.dto.PaymentInterfParamDTO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
+import cn.hsa.module.payment.entity.PaymentOrderDO;
 import cn.hsa.module.payment.entity.PaymentSettleDO;
+import cn.hsa.util.*;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +35,9 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
 
     @Resource
     PaymentSettleDAO paymentSettleDAO;
+
+    @Resource
+    PaymentOrderDAO paymentOrderDAO;
 
     @Resource
     PaymentTransferBoImpl paymentTransferBo;
@@ -134,6 +147,61 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
     @Override
     public Map updatePaymentSettleStatus(Map param) {
         /*todo 调用支付平台支付*/
-        return paymentTransferBo.transferPayment();
+        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,new PaymentInterfParamDTO());
+    }
+
+    @Override
+    public Boolean saveSettleInfo(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDO> outptPayDTOList) {
+        BigDecimal wxPrice = new BigDecimal(0.00);
+        if (outptPayDTOList!=null&&outptPayDTOList.size()>0){
+            for (OutptPayDO dto : outptPayDTOList) {
+                if (dto!=null&& Constants.ZFFS.WX.equals(dto.getPayCode())){
+                    wxPrice=dto.getPrice();
+                    break;
+                }
+            }
+        }
+        if (BigDecimalUtils.isZero(wxPrice)){
+            throw new AppException("微信实付金额不能为0");
+        }
+        if (StringUtils.isEmpty(outptVisitDTO.getPatientCode())){
+            outptVisitDTO.setPatientCode("0");
+        }
+        Integer patientValueCode = Integer.parseInt(outptVisitDTO.getPatientCode());
+        if (patientValueCode!=null&&patientValueCode>0){
+            throw new AppException("微信扫码支付暂不支持医保病人，请走线下支付");
+        }
+       // 生成诊间支付预结算信息
+        PaymentSettleDO paymentSettleDO =new PaymentSettleDO();
+        paymentSettleDO.setId(SnowflakeUtils.getId());
+        paymentSettleDO.setHospCode(outptSettleDTO.getHospCode()); // 医院编码
+        paymentSettleDO.setPayCode(Constants.ZFFS.WX);   // 支付方式： 微信
+        paymentSettleDO.setPaymentPrice(wxPrice); // 微信支付实际金额
+        paymentSettleDO.setTotalPrice(outptSettleDTO.getTotalPrice()); // 订单总费用
+        paymentSettleDO.setStateCode(Constants.ZTBZ.ZC); // 状态标志： 正常
+        paymentSettleDO.setSettleCode(Constants.JSZT.YUJS); // 结算状态： 预结算
+        paymentSettleDO.setSettleId(outptSettleDTO.getId()); // his结算id
+        paymentSettleDO.setCrteId(outptVisitDTO.getCrteId());
+        paymentSettleDO.setCrteName(outptVisitDTO.getCrteName());
+        paymentSettleDO.setCrteTime(DateUtils.getNow());
+        paymentSettleDAO.insert(paymentSettleDO);
+        // 生成诊间支付订单预结算信息
+        PaymentOrderDO paymentOrderDO =new PaymentOrderDO();
+        paymentOrderDO.setId(SnowflakeUtils.getId()); // id
+        paymentOrderDO.setHospCode(outptSettleDTO.getHospCode()); // 医院编码
+        paymentOrderDO.setPayCode(Constants.ZFFS.WX); // 支付方式： 微信
+        paymentOrderDO.setPaymentPrice(wxPrice);  // 微信支付实际金额
+        paymentOrderDO.setTotalPrice(outptSettleDTO.getTotalPrice()); // 订单总费用
+        paymentOrderDO.setStateCode(Constants.ZTBZ.ZC);    // 状态标志： 正常
+        paymentOrderDO.setSettleCode(Constants.JSZT.YUJS); // 结算状态： 预结算
+        paymentOrderDO.setSettleId(outptSettleDTO.getId()); // his结算id
+        paymentOrderDO.setCrteId(outptVisitDTO.getCrteId());
+        paymentOrderDO.setCrteName(outptVisitDTO.getCrteName());
+        paymentOrderDO.setCrteTime(DateUtils.getNow());
+        paymentOrderDO.setUpdateName(outptVisitDTO.getCrteName());
+        paymentOrderDO.setUpdateTime(DateUtils.getNow());
+        paymentOrderDO.setUpdateId(outptVisitDTO.getCrteId());
+        paymentOrderDAO.insert(paymentOrderDO);
+        return true;
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.List;
 import java.util.Map;
 
@@ -201,5 +203,31 @@ public class InsureIndividualBasicServiceImpl extends HsafService implements Ins
     @Override
     public WrapperResponse<PageDTO> queryOutptSettleInfo(Map<String, Object> map) {
         return WrapperResponse.success(insureIndividualBasicBO.queryOutptSettleInfo(map));
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @method signIn
+     * @author powersi
+     * @date 2022/9/13 19:29
+     * @description 签到
+     **/
+    @Override
+    public WrapperResponse signIn(Map<String, Object> map) {
+        return WrapperResponse.success(insureIndividualBasicBO.signIn(map));
+    }
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @method signIn
+     * @author powersi
+     * @date 2022/9/13 19:29
+     * @description 签退
+     **/
+    @Override
+    public WrapperResponse signOut(Map<String, Object> map) {
+        return WrapperResponse.success(insureIndividualBasicBO.signOut(map));
     }
 }

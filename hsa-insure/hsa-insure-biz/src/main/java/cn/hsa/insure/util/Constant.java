@@ -304,6 +304,14 @@ public interface Constant {
                 put("17","特殊门诊审批");
                 put("20","城居两病定点审批");
             }};
+
+            /**
+             * 签到签退
+             */
+            public static final HashMap<String, String> SIGNOURORIN = new HashMap<String, String>() {{
+                put("9001", "签到");
+                put("9002", "签退");
+            }};
             /**
              * 病种分型
              */

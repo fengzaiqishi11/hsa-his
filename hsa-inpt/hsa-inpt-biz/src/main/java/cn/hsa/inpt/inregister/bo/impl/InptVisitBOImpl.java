@@ -848,7 +848,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         // 将查出来个人累计信息插入到数据库
         param.put("resultMap", resultMap);
-        if(resultMap != null){
+        if(ObjectUtil.isNotEmpty(resultMap)){
             insureIndividualVisitService_consumer.insertPatientSumInfoAll(param);
         }
     }
@@ -1217,9 +1217,10 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
             Map<String, Object> insertMap = new HashMap<>();
             insertMap.put("hospCode", inptVisitDto.getHospCode());
             insertMap.put("insureIndividualVisitDTO", insureIndividualVisitDTO);
-
-            // 处理当前就诊人员的人员累计信息
-            this.dealCumInfo(insureIndividualVisitDTO, inptVisitDTO);
+            if (StringUtils.isNotEmpty(isUnifiedPay) && "1".equals(isUnifiedPay)) {
+                // 处理当前就诊人员的人员累计信息
+                this.dealCumInfo(insureIndividualVisitDTO, inptVisitDTO);
+            }
             return insureIndividualVisitService_consumer.insertIndividualVisit(insertMap);
         } catch (Exception e) { // TODO 出现异常，医保端取消入院登记
             inptVisitDTO.setMedicalRegNo(medicalegNo);

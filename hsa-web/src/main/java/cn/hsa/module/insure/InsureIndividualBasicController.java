@@ -325,4 +325,38 @@ public class InsureIndividualBasicController extends BaseController {
         map.put("hospCode",sysUserDTO.getHospCode());
         return insureIndividualBasicService_consumer.queryOutptSettleInfo(map);
     }
+
+
+    /**
+      * @method signIn
+      * @author powersi
+      * @date 2022/9/13 19:39
+      *	@description 	签到
+      * @param  req, res
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @PostMapping("/signIn")
+    public WrapperResponse signIn(@RequestBody Map<String, Object> map,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("creteId", sysUserDTO.getCrteId());
+        return insureIndividualBasicService_consumer.signIn(map);
+    }
+    /**
+      * @method signIn
+      * @author powersi
+      * @date 2022/9/13 19:39
+      *	@description 	签退
+      * @param  req, res
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+    @PostMapping("/signOut")
+    public WrapperResponse signOut(@RequestBody Map<String, Object> map,HttpServletRequest req, HttpServletResponse res){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode", sysUserDTO.getHospCode());
+        map.put("creteId", sysUserDTO.getCrteId());
+        return insureIndividualBasicService_consumer.signOut(map);
+    }
 }

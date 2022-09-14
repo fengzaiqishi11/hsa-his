@@ -59,4 +59,14 @@ public interface InsureUnifiedLogDAO {
      * @Return 
     **/
     InsureFunctionLogDO selectFunctionLogById(InsureFunctionLogDO insureFunctionLogDO);
+
+    /**
+     * @Method
+     * @Desrciption
+     * @Param
+     * @Author wq
+     * @Date 2022/09/14 10:29
+     * @Return
+     **/
+	InsureFunctionLogDO selctSignInLog(InsureFunctionLogDO insureFunctionLogDO);
 }

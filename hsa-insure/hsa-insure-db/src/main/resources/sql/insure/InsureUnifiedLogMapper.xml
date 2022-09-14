@@ -70,5 +70,27 @@
         where id =#{id} and hosp_code = #{hospCode}
         order by crte_time desc limit 1
     </select>
+    <select id="selctSignInLog" resultType="cn.hsa.module.insure.module.entity.InsureFunctionLogDO"
+            parameterType="cn.hsa.module.insure.module.entity.InsureFunctionLogDO">
+        select id,
+               hosp_code,
+               visit_id,
+               msg_id,
+               msg_info,
+               msg_name,
+               in_params,
+               out_params,
+               code,
+               crte_id,
+               crte_name,
+               crte_time,
+               error_msg,
+               is_hospital,
+               status,
+               medis_code
+        from insure_function_log
+        where msg_info = #{msgInfo}
+        order by crte_time desc limit 1
+    </select>
 
 </mapper>

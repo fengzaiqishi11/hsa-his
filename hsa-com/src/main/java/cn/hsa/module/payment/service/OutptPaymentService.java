@@ -1,5 +1,6 @@
 package cn.hsa.module.payment.service;
 
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 
 import java.util.Map;
@@ -23,7 +24,7 @@ public interface OutptPaymentService {
      * @Param [map]
      * @return Boolean
      **/
-    Boolean checkOutptPhonePayAuthority(Map param);
+    WrapperResponse checkOutptPhonePayAuthority(Map param);
 
     /**@Method checkOutptPrescriptionPayAuthority
      * @Author liuliyun

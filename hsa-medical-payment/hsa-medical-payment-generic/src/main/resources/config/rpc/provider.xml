@@ -6,5 +6,11 @@
        http://dubbo.apache.org/schema/dubbo http://dubbo.apache.org/schema/dubbo/dubbo.xsd">
 
     <!-- 生产者：暴露接口 -->
+    <!--诊间支付授权服务接口-->
+    <dubbo:service interface="cn.hsa.module.payment.service.OutptPaymentService" ref="outptPaymentService_provider"/>
+    <!--诊间支付结算服务接口-->
+    <dubbo:service interface="cn.hsa.module.payment.service.PaymentSettleService" ref="paymentSettleService_provider"/>
+    <!--诊间支付订单服务接口-->
+    <dubbo:service interface="cn.hsa.module.payment.service.PaymentOrderService" ref="paymentOrderService_provider"/>
 
 </beans>

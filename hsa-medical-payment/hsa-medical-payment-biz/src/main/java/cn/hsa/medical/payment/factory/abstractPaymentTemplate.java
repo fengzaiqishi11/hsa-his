@@ -1,6 +1,12 @@
 package cn.hsa.medical.payment.factory;
 
+import cn.hsa.medical.payment.bo.impl.PaymentTransferBoImpl;
+import cn.hsa.medical.payment.enums.PaymentExceptionEnums;
+import cn.hsa.module.payment.dto.PaymentInterfParamDTO;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.medical.payment.factory
@@ -12,6 +18,11 @@ import org.springframework.stereotype.Component;
  **/
 @Component
 public abstract class abstractPaymentTemplate {
+    @Resource
+    private BasePaymentFactory basePaymentFactory;
+
+    @Resource
+    private PaymentTransferBoImpl paymentTransferBo;
 
     /**
      * his结算方法,写好调用,提供模板给子类使用
@@ -23,20 +34,26 @@ public abstract class abstractPaymentTemplate {
     /**
      * 支付平台结算接口,写好调用,提供模板给子类使用
      */
-    public void paymentSettle(){
-
+    public void paymentSettle(Map param){
+        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算");
+        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
     }
     /**
      * his退款方法,写好调用,提供模板给子类使用
      */
-    public void hisRefund(){
-
+    public void paymentRefundQuery(Map param){
+        BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("退款查询");
+        PaymentInterfParamDTO paymentInterfParamDTO=paymentRefundQueryRequest.initParam(param);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
     }
 
     /**
      * 支付平台退款方法接口,写好调用,提供模板给子类使用
      */
-    public void paymentRefund(){
-
+    public void paymentRefund(Map param){
+        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("退款");
+        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
     }
 }

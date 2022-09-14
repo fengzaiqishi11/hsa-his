@@ -1,5 +1,6 @@
 package cn.hsa.module.payment.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -56,11 +57,11 @@ public class PaymentOrderDO implements Serializable {
     /**
      * 总费用
      */
-    private Double totalPrice;
+    private BigDecimal totalPrice;
     /**
      * 平台支付费用
      */
-    private Double paymentPrice;
+    private BigDecimal paymentPrice;
     /**
      * 支付方式（ZFFS）
      */

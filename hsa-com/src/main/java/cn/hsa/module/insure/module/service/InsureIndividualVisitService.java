@@ -20,13 +20,13 @@ import java.util.Map;
  */
 @FeignClient(value = "hsa-insure")
 public interface InsureIndividualVisitService {
-    
+
     /**
      * @Menthod addInsureIndividualVisit
      * @Desrciption 新增医保就诊信息
      * @param param 请求参数
      * @Author Ou·Mr
-     * @Date 2020/11/18 20:16 
+     * @Date 2020/11/18 20:16
      * @Return int 受影响行数
      */
     InsureIndividualVisitDO addInsureIndividualVisit(Map<String,Object> param);
@@ -149,26 +149,26 @@ public interface InsureIndividualVisitService {
      * @Return
      **/
     WrapperResponse<Boolean> updateInsureSettleId(Map<String, Object> settleMap);
-    
+
     /**
      * @Method queryAllInsureIndiviualVisit
      * @Desrciption  根据就诊id 查询医保就诊信息
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/8/9 19:59 
-     * @Return 
+     * @Date   2021/8/9 19:59
+     * @Return
     **/
     WrapperResponse<List<InsureIndividualVisitDTO>> queryAllInsureIndiviualVisit(Map<String, Object> insureUnifiedPayParam);
-    
+
     /**
      * @Method selectMaxAndMinRegisterTime
      * @Desrciption
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
-     * @Date   2021/8/9 20:56 
-     * @Return 
+     * @Date   2021/8/9 20:56
+     * @Return
     **/
     WrapperResponse<InsureIndividualVisitDTO> selectMaxAndMinRegisterTime(Map<String, Object> insureUnifiedPayParam);
 
@@ -182,15 +182,15 @@ public interface InsureIndividualVisitService {
      * @Return
     **/
     WrapperResponse<Integer> selectHalfVisit(Map<String,Object> map);
-    
+
     /**
      * @Method updateInsureSettleCounts
      * @Desrciption  更新中途结算医保标志和次数
-     * @Param 
-     * 
+     * @Param
+     *
      * @Author fuhui
      * @Date   2022/2/16 8:55
-     * @Return 
+     * @Return
     **/
     void updateInsureSettleCounts(Map<String, Object> param);
 
@@ -211,4 +211,11 @@ public interface InsureIndividualVisitService {
      * @return cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO
      */
     InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam);
+
+    /***
+     * 根据visitId集合查询医保登记信息
+     * @param paramMap
+     * @return
+     */
+    List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap);
 }

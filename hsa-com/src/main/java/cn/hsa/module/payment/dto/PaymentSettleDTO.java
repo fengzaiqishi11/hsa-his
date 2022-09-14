@@ -27,4 +27,5 @@ public class  PaymentSettleDTO extends PaymentSettleDO implements Serializable {
     private String startTime;
     private String endTime;
     private String keyword;
+    private String authCode; // 付款码
 }

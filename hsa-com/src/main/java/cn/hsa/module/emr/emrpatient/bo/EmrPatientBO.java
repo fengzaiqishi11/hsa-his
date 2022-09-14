@@ -288,4 +288,13 @@ public interface EmrPatientBO {
 	 * @Return
 	 */
 	Map<String, Object> updateHisEmrJosnInfo(InptVisitDTO inptVisitDTO);
+
+	/**
+	 * 根据模板id获取电子病历模板
+	 * @param emrPatientDTO
+	 * @Author 医保开发二部-湛康
+	 * @Date 2022-09-08 8:42
+	 * @return cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO
+	 */
+  EmrPatientDTO getEmrTemplateHtmlByTemplateId(EmrPatientDTO emrPatientDTO);
 }

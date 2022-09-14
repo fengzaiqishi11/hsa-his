@@ -180,7 +180,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
      * @Return: java.lang.Boolean
      **/
     @Override
-    public List<StroStockDetailDTO> updateInDispense(PharInReceiveDTO pharInReceiveDTO) {
+    public PharInReceiveDTO updateInDispense(PharInReceiveDTO pharInReceiveDTO) {
 
         String redisKey = new StringBuilder(pharInReceiveDTO.getHospCode()).append("ZYPY").
                 append(pharInReceiveDTO.getId()).append(Constants.INPT_DISPENSE_REDIS_KEY).toString();
@@ -255,10 +255,23 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
                     }
                 }
             }
-            if (!ListUtils.isEmpty(resultList)){
-                return resultList;
-            }
 
+            PharInReceiveDTO resultDTO = new PharInReceiveDTO();
+            if (!ListUtils.isEmpty(resultList)){
+                resultDTO.setResultList(resultList);
+                resultDTO.setFlag(Constants.SF.S);
+                return resultDTO;
+            }
+            // 判断是否存在过期药品
+            List<String> itemIds = pharInReceiveDetailDOList.stream().map(PharInReceiveDetailDTO::getItemId)
+                    .collect(Collectors.toList());
+            Map map = new HashMap();
+            map.put("itemIds",itemIds);
+            map.put("hospCode",pharInReceiveDTO.getHospCode());
+            map.put("bizId",inReceiveDO.getPharId());
+            resultList = inDistributeDrugDAO.queryNumShortage(map);
+            resultDTO.setResultList(resultList);
+            resultDTO.setFlag(Constants.SF.F);
             //占用库存
             if (!ListUtils.isEmpty(list)) {
                 stroStockBO.updateStockOccupy(list);
@@ -269,7 +282,7 @@ public class InDistributeDrugBOImpl extends HsafBO implements InDistributeDrugBO
 
             //更新住院待领表 配药信息
             inDistributeDrugDAO.updateInWaitReceiveAssign(pharInReceiveDetailDOList);
-            return resultList;
+            return resultDTO;
         } catch (AppException e) {
             log.error("配药失败",e.getMessage());
             throw new AppException(e.getMessage());

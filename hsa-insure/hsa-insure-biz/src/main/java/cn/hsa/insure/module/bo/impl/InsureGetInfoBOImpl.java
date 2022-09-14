@@ -2160,10 +2160,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(zxCollect)) {
-                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(zyIsMain)) {
-                    zxCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> zyIsMain = zxCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(zyIsMain)) {
+//                    zxCollect.get(0).put("isMain", "1");
+//                }
                 zxCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
                         item.put("typeCode", "2");
@@ -2183,10 +2184,11 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             (item -> StringUtils.isNotEmpty(MapUtils.get(item, "diseaseName")) && StringUtils.isNotEmpty(MapUtils.get(item, "diseaseCode"))).
                     collect(Collectors.toList());
             if (!ListUtils.isEmpty(xiCollect)) {
-                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
-                if (ListUtils.isEmpty(xiIsMain)) {
-                    xiCollect.get(0).put("isMain", "1");
-                }
+                //不需要给默认主诊断
+//                List<Map<String, Object>> xiIsMain = xiCollect.stream().filter(item -> "1".equals(MapUtils.get(item, "isMain"))).collect(Collectors.toList());
+//                if (ListUtils.isEmpty(xiIsMain)) {
+//                    xiCollect.get(0).put("isMain", "1");
+//                }
                 System.out.println("--------------" + xiCollect);
                 xiCollect.stream().forEach(item -> {
                     if (StringUtils.isEmpty(MapUtils.get(item, "typeCode"))) {
@@ -2510,11 +2512,99 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         setlinfo.put("certno", MapUtils.getMapVS(mriBaseInfo, "cert_no", (String) MapUtils.getMapVS(baseInfoMap, "cert_no", insureIndividualVisitDTO.getMdtrtCertNo()))); // 证件号码
         setlinfo.put("prfs", MapUtils.getMapVS(mriBaseInfo, "occupation_code", MapUtils.get(baseInfoMap, "occupation_code"))); // 职业
         setlinfo.put("currAddr", MapUtils.getMapVS(mriBaseInfo, "now_adress", MapUtils.get(baseInfoMap, "address"))); // 现住址
+        Object currAddr =  MapUtils.getMapVS(mriBaseInfo, "now_adress", MapUtils.get(baseInfoMap, "address")); // 现住址
         //现住址四级地址
         setlinfo.put("province", MapUtils.getMapVS(mriBaseInfo, "province", MapUtils.get(baseInfoMap, "province"))); // 现住址-省
         setlinfo.put("city", MapUtils.getMapVS(mriBaseInfo, "city", MapUtils.get(baseInfoMap, "city"))); // 现住址-市
         setlinfo.put("county", MapUtils.getMapVS(mriBaseInfo, "county", MapUtils.get(baseInfoMap, "county"))); // 现住址-县
         setlinfo.put("detailAddress", MapUtils.getMapVS(mriBaseInfo, "detail_address", MapUtils.get(baseInfoMap, "detail_address"))); // 现住址-详细地址
+        //如果没有三级地址拆分现住址
+        String city = null;//市级
+        String province = null;//省级
+        String upAdmdvscCode = null;//市级编码
+        Map<String, Object> admdvscMap = new HashMap<>();
+        List<Map<String, Object>> upAdmdvscList = new ArrayList<>();
+        //查询县级
+        admdvscMap.put("admdvsCode", map.get("insureRegCode"));
+        upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+        if(!ListUtils.isEmpty(upAdmdvscList)){
+            upAdmdvscCode = (String) upAdmdvscList.get(0).get("upAdmdvsCode");
+            //查询市级
+            admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
+            upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+            if(!ListUtils.isEmpty(upAdmdvscList)){
+                city = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                //查询省级
+                admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
+                upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
+                if(!ListUtils.isEmpty(upAdmdvscList)){
+                    province = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                }
+            }
+        }
+        //如果没有三级地址拆分现住址
+        if(ObjectUtil.isEmpty(setlinfo.get("province")) && ObjectUtil.isEmpty(setlinfo.get("city"))
+                && ObjectUtil.isEmpty(setlinfo.get("county")) && ObjectUtil.isNotEmpty(currAddr)){
+            setlinfo.put("detailAddress",currAddr);
+            //从县级查起
+            if(StringUtils.isNotEmpty(city)) {
+                map.put("upAdmdvsCode", upAdmdvscCode);
+                List<Map<String, Object>> admdvsList = insureGetInfoDAO.queryAllAdmdvs(map);
+                upAdmdvscList = admdvsList;
+                for (Map<String, Object> admdvs : admdvsList) {
+                    String admdvsName = (String) admdvs.get("admdvsName");
+                    String admdvsCode = (String) admdvs.get("admdvsCode");
+                    String detailAddress = (String) currAddr;
+                    //以联系人地址为准
+                    if (detailAddress.indexOf(admdvsName) >= 0) {
+                        //县级
+                        setlinfo.put("county", admdvsCode + "," + admdvsName);
+                        //市级
+                        setlinfo.put("city", city);
+                        //省级
+                        setlinfo.put("province", province);
+                        //详细地址
+                        detailAddress = detailAddress.substring(detailAddress.indexOf(admdvsName) + admdvsName.length(), detailAddress.length());
+                        setlinfo.put("detailAddress", detailAddress);
+                    }
+                }
+            }
+            //如果·县级不成功从镇再开始
+            if(ObjectUtil.isEmpty(setlinfo.get("province")) && ObjectUtil.isEmpty(setlinfo.get("city"))
+                    && ObjectUtil.isEmpty(setlinfo.get("county")) && ObjectUtil.isNotEmpty(currAddr)){
+                //从镇查起
+                Map<String, Object> admdvssMap = new HashMap<>();
+                List<Map<String, Object>> admdvscList = new ArrayList<>();
+                for (Map<String, Object> admdvs : upAdmdvscList) {
+                    admdvssMap.put("admdvsLv", "4");
+                    admdvssMap.put("upAdmdvsCode", admdvs.get("admdvsCode"));
+                    admdvscList.addAll(insureGetInfoDAO.queryAllAdmdvs(admdvssMap));
+                }
+                for (Map<String, Object> admdvs : admdvscList) {
+                    String admdvsName = (String) admdvs.get("admdvsName");
+                    String upAdmdvsCode = (String) admdvs.get("upAdmdvsCode");
+                    Map<String, Object> admdvsMap = new HashMap<>();
+                    List<Map<String, Object>> upAdmdvsList = new ArrayList<>();
+                    String detailAddress = (String) currAddr;
+                    //以联系人地址为准
+                    if (detailAddress.indexOf(admdvsName.substring(0, admdvsName.length() - 1)) >= 0) {
+                        //查询县级
+                        admdvsMap.put("admdvsCode", upAdmdvsCode);
+                        upAdmdvsList = insureGetInfoDAO.queryAllAdmdvs(admdvsMap);
+                        if (!ListUtils.isEmpty(upAdmdvsList)) {
+                            setlinfo.put("county",upAdmdvsList.get(0).get("admdvsCode") + "," + upAdmdvsList.get(0).get("admdvsName"));
+                            //市级
+                            setlinfo.put("city", city);
+                            //省级
+                            setlinfo.put("province",province);
+                            //详细地址
+                            detailAddress = detailAddress.substring(detailAddress.indexOf(admdvsName)+admdvsName.length(),detailAddress.length());
+                            setlinfo.put("detailAddress",detailAddress);
+                        }
+                    }
+                }
+            }
+        }
         setlinfo.put("empName", MapUtils.getMapVS(mriBaseInfo, "work_info", null)); // 单位名称
         setlinfo.put("empAddr", MapUtils.getMapVS(mriBaseInfo, "work_info", null)); // 单位地址
         setlinfo.put("empTel", MapUtils.getMapVS(mriBaseInfo, "work_phone", null)); // 单位电话
@@ -2544,11 +2634,75 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
         }
         setlinfo.put("patnRlts", contactRelaCode); // 与患者关系  默认患者本人
         setlinfo.put("conerAddr", MapUtils.getMapVS(mriBaseInfo, "contact_address", MapUtils.get(baseInfoMap, "contact_address"))); // 联系人地址
+        Object conerAddr = MapUtils.getMapVS(mriBaseInfo, "contact_address", MapUtils.get(baseInfoMap, "contact_address")); // 联系人地址
         //联系人地址四级地址
         setlinfo.put("conProvince", MapUtils.getMapVS(mriBaseInfo, "con_province", MapUtils.get(baseInfoMap, "con_province"))); // 联系人地址-省
         setlinfo.put("conCity", MapUtils.getMapVS(mriBaseInfo, "con_city", MapUtils.get(baseInfoMap, "con_city"))); // 联系人地址-市
         setlinfo.put("conCounty", MapUtils.getMapVS(mriBaseInfo, "con_county", MapUtils.get(baseInfoMap, "con_county"))); // 联系人地址-县
         setlinfo.put("conDetailAddress", MapUtils.getMapVS(mriBaseInfo, "con_detail_address", MapUtils.get(baseInfoMap, "con_detail_address"))); // 联系人地址-详细地址
+        //如果没有三级地址拆分联系人地址
+        if(ObjectUtil.isEmpty(setlinfo.get("conProvince")) && ObjectUtil.isEmpty(setlinfo.get("conCity"))
+                && ObjectUtil.isEmpty(setlinfo.get("conCounty")) && ObjectUtil.isNotEmpty(conerAddr)){
+            setlinfo.put("conDetailAddress",conerAddr);
+            //从县级查起
+            if(StringUtils.isNotEmpty(city)) {
+                map.put("upAdmdvsCode", upAdmdvscCode);
+                List<Map<String, Object>> admdvsList = insureGetInfoDAO.queryAllAdmdvs(map);
+                upAdmdvscList = admdvsList;
+                for (Map<String, Object> admdvs : admdvsList) {
+                    String admdvsName = (String) admdvs.get("admdvsName");
+                    String admdvsCode = (String) admdvs.get("admdvsCode");
+                    String detailAddress = (String) conerAddr;
+                    //以联系人地址为准
+                    if (detailAddress.indexOf(admdvsName) >= 0) {
+                        //县级
+                        setlinfo.put("conCounty", admdvsCode + "," + admdvsName);
+                        //市级
+                        setlinfo.put("conCity", city);
+                        //省级
+                        setlinfo.put("conProvince", province);
+                        //详细地址
+                        detailAddress = detailAddress.substring(detailAddress.indexOf(admdvsName) + admdvsName.length(), detailAddress.length());
+                        setlinfo.put("conDetailAddress", detailAddress);
+                    }
+                }
+            }
+            //如果·县级不成功从镇再开始
+            if(ObjectUtil.isEmpty(setlinfo.get("conProvince")) && ObjectUtil.isEmpty(setlinfo.get("conCity"))
+                    && ObjectUtil.isEmpty(setlinfo.get("conCounty")) && ObjectUtil.isNotEmpty(conerAddr)){
+                //从镇查起
+                Map<String, Object> admdvssMap = new HashMap<>();
+                List<Map<String, Object>> admdvscList = new ArrayList<>();
+                for (Map<String, Object> admdvs : upAdmdvscList) {
+                    admdvssMap.put("admdvsLv", "4");
+                    admdvssMap.put("upAdmdvsCode", admdvs.get("admdvsCode"));
+                    admdvscList.addAll(insureGetInfoDAO.queryAllAdmdvs(admdvssMap));
+                }
+                for (Map<String, Object> admdvs : admdvscList) {
+                    String admdvsName = (String) admdvs.get("admdvsName");
+                    String upAdmdvsCode = (String) admdvs.get("upAdmdvsCode");
+                    Map<String, Object> admdvsMap = new HashMap<>();
+                    List<Map<String, Object>> upAdmdvsList = new ArrayList<>();
+                    String detailAddress = (String) conerAddr;
+                    //以联系人地址为准
+                    if (detailAddress.indexOf(admdvsName.substring(0, admdvsName.length() - 1)) >= 0) {
+                        //查询县级
+                        admdvsMap.put("admdvsCode", upAdmdvsCode);
+                        upAdmdvsList = insureGetInfoDAO.queryAllAdmdvs(admdvsMap);
+                        if (!ListUtils.isEmpty(upAdmdvsList)) {
+                            setlinfo.put("conCounty",upAdmdvsList.get(0).get("admdvsCode") + "," + upAdmdvsList.get(0).get("admdvsName"));
+                            //市级
+                            setlinfo.put("conCity", city);
+                            //省级
+                            setlinfo.put("conProvince",province);
+                            //详细地址
+                            detailAddress = detailAddress.substring(detailAddress.indexOf(admdvsName)+admdvsName.length(),detailAddress.length());
+                            setlinfo.put("conDetailAddress",detailAddress);
+                        }
+                    }
+                }
+            }
+        }
         setlinfo.put("conerTel", MapUtils.getMapVS(mriBaseInfo, "contact_phone", MapUtils.get(baseInfoMap, "contact_phone"))); // 联系人电话
         setlinfo.put("hiType", insureIndividualVisitDTO.getAae140()); // 医保类型  也就是险种   sp_psn_type
         String insuplcAdmdvs = insureIndividualVisitDTO.getInsuplcAdmdvs();
@@ -4481,7 +4635,9 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             throw new AppException("请选择第三级医保机构");
         }
         String city = null;//市级
+        String cityName = null;//市级名称
         String province = null;//省级
+        String provinceName = null;//省级名称
         String upAdmdvscCode = null;//市级编码
         Map<String, Object> admdvscMap = new HashMap<>();
         List<Map<String, Object>> upAdmdvscList = new ArrayList<>();
@@ -4495,11 +4651,13 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
             if(!ListUtils.isEmpty(upAdmdvscList)){
                 city = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                cityName = (String) upAdmdvscList.get(0).get("admdvsName");
                 //查询省级
                 admdvscMap.put("admdvsCode", upAdmdvscList.get(0).get("upAdmdvsCode"));
                 upAdmdvscList = insureGetInfoDAO.queryAllAdmdvs(admdvscMap);
                 if(!ListUtils.isEmpty(upAdmdvscList)){
                     province = upAdmdvscList.get(0).get("admdvsCode") + "," + upAdmdvscList.get(0).get("admdvsName");
+                    provinceName = (String) upAdmdvscList.get(0).get("admdvsName");
                 }
             }
         }
@@ -4515,6 +4673,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 String admdvsName = (String) admdvs.get("admdvsName");
                 String admdvsCode = (String) admdvs.get("admdvsCode");
                 for(InsureSettleInfoDTO insureSettleInfoDTO:setlList){
+                    String detailAddress = insureSettleInfoDTO.getConerAddr();
                     //以联系人地址为准
                     if(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)>=0){
                         //县级
@@ -4526,6 +4685,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                         //省级
                         insureSettleInfoDTO.setProvince(province);
                         insureSettleInfoDTO.setConProvince(province);
+                        //详细地址
+                        detailAddress = detailAddress.substring(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)+admdvsName.length(),insureSettleInfoDTO.getConerAddr().length());
+                        insureSettleInfoDTO.setDetailAddress(detailAddress);
+                        insureSettleInfoDTO.setConDetailAddress(detailAddress);
                     }
 
                 }
@@ -4548,6 +4711,7 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                 Map<String, Object> admdvsMap = new HashMap<>();
                 List<Map<String, Object>> upAdmdvsList = new ArrayList<>();
                 for (InsureSettleInfoDTO insureSettleInfoDTO : setlList) {
+                    String detailAddress = insureSettleInfoDTO.getConerAddr();
                     //以联系人地址为准
                     if (insureSettleInfoDTO.getConerAddr().indexOf(admdvsName.substring(0, admdvsName.length() - 1)) >= 0) {
                         //查询县级
@@ -4562,6 +4726,10 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
                             //省级
                             insureSettleInfoDTO.setProvince(province);
                             insureSettleInfoDTO.setConProvince(province);
+                            //详细地址
+                            detailAddress = detailAddress.substring(insureSettleInfoDTO.getConerAddr().indexOf(admdvsName)+admdvsName.length(),insureSettleInfoDTO.getConerAddr().length());
+                            insureSettleInfoDTO.setDetailAddress(detailAddress);
+                            insureSettleInfoDTO.setConDetailAddress(detailAddress);
                         }
                     }
                 }
@@ -4578,6 +4746,55 @@ public class InsureGetInfoBOImpl extends HsafBO implements InsureGetInfoBO {
             map.put("fail",e);
         }
         return map;
+    }
+
+    /**
+     * @Method queryInsureSettleInfo
+     * @Desrciption 医疗保障结算清单信息医保信息查询
+     * @Param
+     * @Author liuhuiming
+     * @Date 2022/04/22 13:58
+     * @Return
+     **/
+    @Override
+    public Map<String, Object> queryInsureSettleInfo(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        // 获取患者信息
+        InsureIndividualVisitDTO insureIndividualVisitDTO = insureUnifiedCommonUtil.commonGetVisitInfo(map);
+        //获取医保配置
+        InsureConfigurationDTO insureConfigurationDTO = new InsureConfigurationDTO();
+        insureConfigurationDTO.setHospCode(hospCode);
+        insureConfigurationDTO.setOrgCode(insureIndividualVisitDTO.getMedicineOrgCode());  // 医疗机构编码
+        insureConfigurationDTO.setRegCode(insureIndividualVisitDTO.getInsureOrgCode());
+        insureConfigurationDTO = insureConfigurationDAO.queryInsureIndividualConfig(insureConfigurationDTO);
+        if (insureConfigurationDTO == null) {
+            throw new AppException("根据" + insureIndividualVisitDTO.getInsureOrgCode() + "医保机构编码获取医保机构配置信息为空");
+        }
+        //查询是否上传
+        InsureSettleInfoDTO insureSettleInfoDTO = insureGetInfoDAO.querySettlInfo(map);
+        if (insureSettleInfoDTO == null || StringUtils.isEmpty(insureSettleInfoDTO.getSettleNo())) {
+            throw new AppException("请先上传医保再查询医保结算清单信息");
+        }
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put("psn_no", insureIndividualVisitDTO.getAac001());
+        dataMap.put("setl_id", MapUtils.get(map, "insureSettleId"));
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("data", dataMap);
+
+        paramMap.put("hospCode", hospCode);
+        paramMap.put("configRegCode", insureConfigurationDTO.getRegCode());
+        paramMap.put("orgCode", insureConfigurationDTO.getOrgCode());
+        paramMap.put("isHospital", MapUtils.get(map, "isHospital"));
+        //参数校验,规则校验和请求初始化
+        BaseReqUtil reqUtil = baseReqUtilFactory.getBaseReqUtil("newInsure" + FunctionEnum.MR_PATIENT_SETTL_UPLOAD_QUERY.getCode());
+        InsureInterfaceParamDTO interfaceParamDTO = reqUtil.initRequest(paramMap);
+        interfaceParamDTO.setHospCode(hospCode);
+        interfaceParamDTO.setIsHospital(MapUtils.get(map, "isHospital"));
+        interfaceParamDTO.setVisitId(insureIndividualVisitDTO.getVisitId());
+        // 调用统一支付平台接口
+        Map<String, Object> resultMap = insureItfBO.executeInsur(FunctionEnum.MR_PATIENT_SETTL_UPLOAD_QUERY, interfaceParamDTO);
+
+        return resultMap;
     }
 
     //字典转义

@@ -689,4 +689,15 @@ public class EmrPatientController extends BaseController {
 		map.put("reportFormDTO",reportFormDTO);
 		return emrPatientService_consumer.queryPatientEmrReportForm(map);
 	}
-}
+
+  @PostMapping("/getEmrTemplateHtmlByTemplateId")
+  public WrapperResponse<EmrPatientDTO> getEmrTemplateHtmlByTemplateId(@RequestBody EmrPatientDTO emrPatientDTO,
+                                                                 HttpServletRequest req,HttpServletResponse res) {
+    SysUserDTO sysUserDTO = getSession(req, res);
+    emrPatientDTO.setHospCode(sysUserDTO.getHospCode());
+    Map map= new HashMap();
+    map.put("hospCode", sysUserDTO.getHospCode());
+    map.put("emrPatientDTO",emrPatientDTO);
+    return WrapperResponse.success(emrPatientService_consumer.getEmrTemplateHtmlByTemplateId(map));
+	}
+  }

@@ -525,8 +525,8 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
                 String wjsykc = this.getSysParameter(inptAdviceDTO.getHospCode() , "MZYS_CF_WJSFYKC");
                 inptAdviceDTO.setWjsykc(wjsykc);
                 //判断库存
-                if (ListUtils.isEmpty(inptAdviceDAO.checkStock(inptAdviceDTO))) {
-                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足");
+                if (ListUtils.isEmpty(inptAdviceDAO.checkStock2(inptAdviceDTO))) {
+                    throw new AppException(inptAdviceDTO.getItemName() + ":库存不足,请检查药品过期数量");
                 }
 
             }
@@ -1815,12 +1815,18 @@ public class DoctorAdviceBOImpl extends HsafBO implements DoctorAdviceBO {
 
     @Override
     public void checkFirstAndSecoundIsSame(MedicalAdviceDTO medicalAdviceDTO) {
-            if (ListUtils.isEmpty(medicalAdviceDTO.getIds())){
-            throw new RuntimeException("未获取到相关医嘱信息");
-            }
-            List<InptAdviceDTO>  list =  inptAdviceDAO.checkFirstAndSecoundIsSame(medicalAdviceDTO);
+        List<InptAdviceDTO>  list =  new ArrayList<>();
+        if (!ListUtils.isEmpty(medicalAdviceDTO.getKzIds())){
+          list =  inptAdviceDAO.checkFirstAndSecoundIsSameNew(medicalAdviceDTO);
             if (!ListUtils.isEmpty(list)){
-              throw new RuntimeException("【核收人】与【核对人】不能相同，请检查!");
+                throw new RuntimeException("新开医嘱【核收人】与【核对人】不能相同，请检查!");
             }
+        }
+        if (!ListUtils.isEmpty(medicalAdviceDTO.getStopIds())){
+            list =  inptAdviceDAO.checkFirstAndSecoundIsSameStop(medicalAdviceDTO);
+            if (!ListUtils.isEmpty(list)){
+                throw new RuntimeException("停嘱核收【核收人】与【核对人】不能相同，请检查!");
+            }
+        }
     }
 }

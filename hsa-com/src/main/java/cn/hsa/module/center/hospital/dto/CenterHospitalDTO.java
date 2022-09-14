@@ -35,5 +35,6 @@ public class CenterHospitalDTO extends CenterHospitalDO implements Serializable 
     private String registNum ;
     private String visitNum;
     private String deptNams;
-
+    // 长期医嘱费用查询专用，直接加迁移标志怕影响其他地方查询，所以再加一个是否未长期费用的标志
+    private String isLong;
 }

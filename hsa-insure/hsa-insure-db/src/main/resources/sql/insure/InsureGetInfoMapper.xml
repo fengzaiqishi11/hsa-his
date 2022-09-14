@@ -2318,7 +2318,8 @@
         <foreach collection="setlList" item="item" index="index" open="" close="" separator=";">
             update insure_setl_info
             <set>
-                city = #{item.city},county = #{item.county}, province = #{item.province},con_county =#{item.conCounty},con_city =#{item.conCity},con_province = #{item.conProvince}
+                city = #{item.city},county = #{item.county}, province = #{item.province},con_county =#{item.conCounty},con_city =#{item.conCity},
+                con_province = #{item.conProvince}, detail_address = #{item.detailAddress}, con_detail_address = #{item.conDetailAddress}
             </set>
             where  visit_id =#{item.visitId} and insure_settle_id = #{item.insureSettleId}
         </foreach>

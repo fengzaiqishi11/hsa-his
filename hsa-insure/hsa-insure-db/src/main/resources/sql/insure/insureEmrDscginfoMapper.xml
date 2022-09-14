@@ -242,6 +242,9 @@
       <if test="hospCode != null" >
         hosp_code,
       </if>
+      <if test="emrTemplateId != null" >
+          emr_template_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="uuid != null" >
@@ -306,6 +309,9 @@
       </if>
       <if test="hospCode != null" >
         #{hospCode,jdbcType=VARCHAR},
+      </if>
+      <if test="emrTemplateId != null" >
+        #{emrTemplateId,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>

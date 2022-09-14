@@ -161,7 +161,7 @@ public class OutDistributeController extends BaseController {
      **/
     @PostMapping("/outDispense")
     @NoRepeatSubmit
-    public WrapperResponse<List<StroStockDetailDTO>> outDispense(@RequestBody PharOutReceiveDTO pharOutReceiveDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<PharOutReceiveDTO> outDispense(@RequestBody PharOutReceiveDTO pharOutReceiveDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         //配药人信息
         pharOutReceiveDTO.setHospCode(sysUserDTO.getHospCode());

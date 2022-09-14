@@ -917,4 +917,10 @@ public interface OutptDoctorPrescribeDAO {
     int checkCostIsSettle(OutptPrescribeDTO outptPrescribeDTO);
 
     List<OutptVisitDTO> getCountbyCertNo(@Param("collect") List<String> collect, @Param("hospCode")String hospCode, @Param("certNo")String certNo);
+
+    void updateVisitCFSubmit(@Param("visitId") String visitId, @Param("hospCode")String hospCode, @Param("statusCode")String statusCode);
+
+    int getUnsubmitPrescribeCount(@Param("visitId") String visitId,@Param("hospCode") String hospCode);
+
+    int getPrescribeCount(@Param("visitId")String visitid, @Param("hospCode") String hospCode);
 }

@@ -367,4 +367,37 @@
         </if>
     </select>
 
+    <select id="queryAllMessageInfoByHospCode" resultMap="MessageInfoMap">
+        SELECT
+        id,
+        hosp_code,
+        source_id,
+        visit_id,
+        dept_id,
+        type,
+        content,
+        LEVEL,
+        receiver_id,
+        start_time,
+        end_time,
+        interval_time,
+        send_count,
+        status_code,
+        url,
+        last_time,
+        crte_time,
+        crte_name,
+        crte_id,
+        count
+        FROM
+        sys_msg
+        WHERE
+        hosp_code = #{hospCode}
+        AND end_time > NOW()
+        and start_time &lt;= NOW()
+        and send_count > count
+        AND TIMESTAMPDIFF(Minute,ifnull(last_time,date_sub(NOW(),interval 1 day)),NOW()) > interval_time
+
+    </select>
+
 </mapper>

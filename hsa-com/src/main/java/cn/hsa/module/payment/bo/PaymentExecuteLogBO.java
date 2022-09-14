@@ -52,13 +52,13 @@ public interface PaymentExecuteLogBO {
 
     /**@Menthod insert
      * @Describe:新增日志
-     * @param PaymentExecuteLogDO
+     * @param param
      * @Author: liuliyun
      * @Eamil: liyun.liu@powersi.com
      * @Date: 2022-08-31 15:15
      * @return boolean
      */
-    Boolean insert(PaymentExecuteLogDO PaymentExecuteLogDO);
+    Boolean insert(Map<String,Object> param);
 
     /**@Menthod insertBatch
      * @Describe:批量新增

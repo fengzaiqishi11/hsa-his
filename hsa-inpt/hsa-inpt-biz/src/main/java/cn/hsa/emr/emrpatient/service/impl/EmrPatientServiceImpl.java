@@ -427,4 +427,17 @@ public class EmrPatientServiceImpl extends HsafService implements EmrPatientServ
 		InptVisitDTO inptVisitDTO = MapUtils.get(map, "inptVisitDTO");
 		return emrPatientBO.updateHisEmrJosnInfo(inptVisitDTO);
 	}
+
+	/**
+	 * 根据模板id获取电子病历模板
+	 * @param map
+	 * @Author 医保开发二部-湛康
+	 * @Date 2022-09-08 8:36
+	 * @return cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO
+	 */
+  @Override
+  public EmrPatientDTO getEmrTemplateHtmlByTemplateId(Map map) {
+    EmrPatientDTO emrPatientDTO = MapUtils.get(map, "emrPatientDTO");
+    return emrPatientBO.getEmrTemplateHtmlByTemplateId(emrPatientDTO);
+  }
 }

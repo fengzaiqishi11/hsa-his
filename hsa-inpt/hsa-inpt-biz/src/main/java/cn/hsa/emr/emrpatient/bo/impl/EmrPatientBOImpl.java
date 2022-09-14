@@ -1262,6 +1262,22 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
     }
 
     /**
+     * 根据模板id获取电子病历模板
+     * @param emrPatientDTO
+     * @Author 医保开发二部-湛康
+     * @Date 2022-09-08 8:46
+     * @return cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO
+     */
+    @Override
+    public EmrPatientDTO getEmrTemplateHtmlByTemplateId(EmrPatientDTO emrPatientDTO) {
+      if (ObjectUtil.isEmpty(emrPatientDTO.getId())){
+        return null;
+      }
+      EmrPatientDTO dto = emrPatientDAO.getEmrTemplateHtmlByTemplateId(emrPatientDTO);
+      return dto;
+    }
+
+  /**
      * 保存元素到医保电子病历相关表
      * @Author 医保开发二部-湛康
      * @Date 2022-08-18 15:02
@@ -1276,60 +1292,61 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
       //入参
       Map<String, Object> resultMap = new HashMap<>();
       //病历文档节点
-      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+/*      if (ObjectUtil.isEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
         throw new AppException("请先在病历文档分类中维护对应的医保节点!");
-      }
-      String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
-
-      Map<String, Object> param = new HashMap<>();
-      param.put("insureTypeCode",insureTypeCode);
-      param.put("hospCode",emrPatientDTO.getHospCode());
-      // 查询出元素内容的匹配数据
-      List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfo(param);
-      if (ListUtils.isEmpty(emrMatchList)) {
-        throw new AppException("元素匹配医保内容信息为空,请先匹配");
-      }
-      Map nrMap = emrPatientDTO.getNrMap();
-      // 寻找与医保关联匹配的字段信息
-      for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
-        // his的电子病历元素
-        String hisEmrCode = emrElementMatchDO.getEmrElementCode();
-        // 对应的医保节点字段
-        String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
-        // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
-        if (nrMap.containsKey(hisEmrCode)) {
-          //去除html样式
-          String emrValue = delHTMLTag(nrMap.get(hisEmrCode).toString());
-          resultMap.put(insureEmrCode, emrValue);
+      }*/
+      if (ObjectUtil.isNotEmpty(MapUtils.get(emrClassifyMap, "insureTypeCode"))){
+        String insureTypeCode = MapUtils.get(emrClassifyMap, "insureTypeCode");
+        Map<String, Object> param = new HashMap<>();
+        param.put("insureTypeCode",insureTypeCode);
+        param.put("hospCode",emrPatientDTO.getHospCode());
+        // 查询出元素内容的匹配数据
+        List<EmrElementMatchDO> emrMatchList = emrElementDAO.queryInsureEmrElementMatchInfo(param);
+        if (ListUtils.isEmpty(emrMatchList)) {
+          throw new AppException("元素匹配医保内容信息为空,请先匹配");
         }
-      }
+        Map nrMap = emrPatientDTO.getNrMap();
+        // 寻找与医保关联匹配的字段信息
+        for (EmrElementMatchDO emrElementMatchDO : emrMatchList) {
+          // his的电子病历元素
+          String hisEmrCode = emrElementMatchDO.getEmrElementCode();
+          // 对应的医保节点字段
+          String insureEmrCode = emrElementMatchDO.getInsureEmrCode();
+          // 判断his的电子病历元素是否 存在病历内容当中 则取出值，并且把键进行替换
+          if (nrMap.containsKey(hisEmrCode)) {
+            //去除html样式
+            String emrValue = delHTMLTag(nrMap.get(hisEmrCode).toString());
+            resultMap.put(insureEmrCode, emrValue);
+          }
+        }
 
-      //获取医保就诊信息
-      Map<String, String> map1 = new HashMap<>();
-      map1.put("visitId",emrPatientDTO.getVisitId());
-      InsureEmrUnifiedDTO insureEmrUnifiedDTO = emrPatientDAO.queryInsureVisitEmrInfo(map1);
-      if (ObjectUtil.isNotEmpty(insureEmrUnifiedDTO)){
-        resultMap.put("mdtrt_id",insureEmrUnifiedDTO.getMdtrtId());
-      }
-      //保存进对应的医保电子病历表
-      //入院记录
-      if (insureTypeCode.equals(Constants.BLLX.YYJL)){
-        saveInsureAdminfo(emrPatientDTO,resultMap);
-      //首次病程记录
-      }else if(insureTypeCode.equals(Constants.BLLX.BCJL)){
-        saveCoursrinfo(emrPatientDTO,resultMap);
-        //死亡记录
-      }else if(insureTypeCode.equals(Constants.BLLX.SWJL)){
-        saveDieInfo(emrPatientDTO,resultMap);
-        //出院小结
-      }else if(insureTypeCode.equals(Constants.BLLX.CYXJ)){
-        saveDscginfo(emrPatientDTO,resultMap);
-        //手术记录
-      }else if(insureTypeCode.equals(Constants.BLLX.SSJL)){
-        saveOprnInfo(emrPatientDTO,resultMap);
-        //病情抢救
-      }else if(insureTypeCode.equals(Constants.BLLX.BQQJ)){
-        saveRescinfo(emrPatientDTO,resultMap);
+        //获取医保就诊信息
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("visitId",emrPatientDTO.getVisitId());
+        InsureEmrUnifiedDTO insureEmrUnifiedDTO = emrPatientDAO.queryInsureVisitEmrInfo(map1);
+        if (ObjectUtil.isNotEmpty(insureEmrUnifiedDTO)){
+          resultMap.put("mdtrt_id",insureEmrUnifiedDTO.getMdtrtId());
+        }
+        //保存进对应的医保电子病历表
+        //入院记录
+        if (insureTypeCode.equals(Constants.BLLX.YYJL)){
+          saveInsureAdminfo(emrPatientDTO,resultMap);
+          //首次病程记录
+        }else if(insureTypeCode.equals(Constants.BLLX.BCJL)){
+          saveCoursrinfo(emrPatientDTO,resultMap);
+          //死亡记录
+        }else if(insureTypeCode.equals(Constants.BLLX.SWJL)){
+          saveDieInfo(emrPatientDTO,resultMap);
+          //出院小结
+        }else if(insureTypeCode.equals(Constants.BLLX.CYXJ)){
+          saveDscginfo(emrPatientDTO,resultMap);
+          //手术记录
+        }else if(insureTypeCode.equals(Constants.BLLX.SSJL)){
+          saveOprnInfo(emrPatientDTO,resultMap);
+          //病情抢救
+        }else if(insureTypeCode.equals(Constants.BLLX.BQQJ)){
+          saveRescinfo(emrPatientDTO,resultMap);
+        }
       }
     }
 
@@ -1568,6 +1585,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             InsureEmrDieinfoDTO.class);
         dto.setMdtrtSn(emrPatientDTO.getVisitId());
         dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("insureEmrDieinfoDTO",dto);
         map.put("hospCode",emrPatientDTO.getHospCode());
@@ -1601,6 +1619,7 @@ public class EmrPatientBOImpl extends HsafBO implements EmrPatientBO {
             InsureEmrCoursrinfoDTO.class);
         dto.setMdtrtSn(emrPatientDTO.getVisitId());
         dto.setHospCode(emrPatientDTO.getHospCode());
+        dto.setEmrTemplateId(emrPatientDTO.getId());
         Map<String, Object> map = new HashMap<>();
         map.put("insureEmrCoursrinfoDTO",dto);
         map.put("hospCode",emrPatientDTO.getHospCode());

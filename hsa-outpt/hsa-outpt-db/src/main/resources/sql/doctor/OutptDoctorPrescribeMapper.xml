@@ -357,7 +357,7 @@
         a.visit_time visitTime, a.remark, a.is_visit isVisit, a.is_first_visit isFirstVisit,a.doctor_id doctorId,a.doctor_name doctorName,
         a.crte_time, a.now_address as nowAddress,ifnull(a.tran_in_code,'0') as tranInCode,
         otv.triage_start_code as triageStatusCode,
-        otv.is_call as isCanCall,
+        otv.is_call as isCanCall,a.is_submit as isSubmit,
         case when b.doctor_id = #{doctorId} then '1' else '2' end type,c.disease_id diseaseId, d.name diseaseName, e.id isEk
         from outpt_visit a
         left join outpt_register b on a.id = b.visit_id and a.hosp_code = b.hosp_code
@@ -561,6 +561,7 @@
                                doctor_name = #{doctorName},
                                dept_id = #{deptId},
                                dept_name = #{deptName},
+                               is_submit = '1',
                                visit_time = now()
         where id = #{id} and hosp_code = #{hospCode}
     </update>
@@ -890,7 +891,10 @@
         ifnull(c.id,'') rateId, d.id bfcId, ifnull(e.exec_dept_id, #{loginDeptId}) execDeptId,
         <!-- typeCode：用于住院存typeCode，跟具体字段typeCode无关-->
         '1' typeCode, #{loginDeptId} outDeptId, a.out_unit_code outUnitCode, a.in_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, a.big_type_code bigTypeCode,
-        a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,stock.split_num splitNum, '0' isWz,
+        a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum,
+        convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,
+        convert((stock.expire_stock_occupy/a.split_ratio), decimal(10, 4)) expireStockOccupy,
+        stock.split_num splitNum, '0' isWz,
         a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.nation_name  nation_name, a.reimbursement_ratio
         from base_drug a
         left join(
@@ -948,7 +952,9 @@
         a.split_unit_code ouUtnitCode,
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
-        f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy, stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
+        f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy,
+        convert((stock.expire_stock_occupy/a.split_ratio), decimal(10, 4)) expireStockOccupy,
+        stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
         a.pym usual_pym ,'' as technology_code,a.nation_code, a.nation_name nation_name, a.reimbursement_ratio
         from base_material a
         left join(
@@ -990,7 +996,8 @@
         pharId, '' rateId, '' bfcId, b.id execDeptId,
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
-        '' prodName, null stockNum, null stockOccupy,null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
+        '' prodName, null stockNum, null stockOccupy,null expireStockOccupy,
+        null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
         usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.union_nation_name as nation_name, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a
         left join base_dept b on a.out_dept_code = b.code and a.hosp_code = b.hosp_code
@@ -1972,7 +1979,10 @@
         left join base_drug b on a.item_id = b.id and a.hosp_code = b.hosp_code and a.item_code = '1'
         left join base_material c on a.item_id = c.id and a.hosp_code = c.hosp_code and a.item_code = '2'
         where a.hosp_code = #{hospCode} and ifnull(a.is_dist,'0') = '0' and date_add(a.crte_time, INTERVAL #{wjsykc} hour) &gt; now() and a.phar_id = #{pharId} and a.item_id = #{itemId}
-
+        union all
+        select a.biz_id, a.item_id, a.hosp_code, ifnull(a.expire_stock_occupy, 0) totalNum
+        from stro_stock a
+        where a.hosp_code = #{hospCode} and a.biz_id = #{pharId} and a.item_id = #{itemId}
         union all
         select a.biz_id, a.item_id, a.hosp_code, ifnull(a.stock_occupy, 0) totalNum
         from stro_stock a
@@ -2637,5 +2647,17 @@
                 #{item}
             </foreach>
         </if>
+    </select>
+
+    <update id="updateVisitCFSubmit">
+        update outpt_visit set is_submit = #{statusCode} where hosp_code = #{hospCode} and id = #{visitId}
+    </update>
+
+    <select id="getUnsubmitPrescribeCount" resultType="int">
+        select  count(*) num  from  outpt_prescribe op where op.hosp_code = #{hospCode}  and op.visit_id  = #{visitId} and op.is_submit ='0'
+    </select>
+
+    <select id="getPrescribeCount" resultType="int">
+        select  count(*) num  from  outpt_prescribe op where op.hosp_code = #{hospCode}  and op.visit_id  = #{visitId}
     </select>
 </mapper>

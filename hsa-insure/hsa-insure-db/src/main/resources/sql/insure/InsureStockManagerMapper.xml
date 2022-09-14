@@ -1236,7 +1236,7 @@
     <select id="queryStockUpBatch" resultType="cn.hsa.module.insure.stock.entity.InsureGoodInfoDelete">
         select id, hosp_code,insure_type, fixmedins_bchno, inv_data_type, upload_time, cert_id from insure_stock_upload
         where fixmedins_bchno in
-        <foreach collection="ids" open="(" separator="," close=")" item="item">
+        <foreach collection="list" open="(" separator="," close=")" item="item">
             #{item}
         </foreach>
     </select>

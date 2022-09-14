@@ -235,4 +235,8 @@ public class OutptVisitDO extends PageDO implements Serializable {
      * 自费病人上传完成标志
      */
     private String cpltFlag;
+    /**
+     * 0：无处方  1：存在处方未提交  2：全部提交
+     */
+    private String isSubmit;
 }

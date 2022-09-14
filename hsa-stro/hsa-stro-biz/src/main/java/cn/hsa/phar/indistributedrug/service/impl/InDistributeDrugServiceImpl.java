@@ -116,7 +116,7 @@ public class InDistributeDrugServiceImpl extends HsafService implements InDistri
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<java.lang.Boolean>
      **/
     @Override
-    public WrapperResponse<List<StroStockDetailDTO>> inDispense(Map map) {
+    public WrapperResponse<PharInReceiveDTO> inDispense(Map map) {
         return WrapperResponse.success(inDistributeDrugBO.updateInDispense(MapUtils.get(map,"pharInReceiveDTO")));
     }
 

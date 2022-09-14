@@ -427,4 +427,13 @@ public interface EmrPatientDAO {
    * @return java.util.List<cn.hsa.module.insure.emr.dto.InsureEmrUnifiedDTO>
    */
   InsureEmrUnifiedDTO queryInsureVisitEmrInfo(Map<String, String> selectMap);
+
+  /**
+   * 根据模板id获取电子病历模板
+   * @param emrPatientDTO
+   * @Author 医保开发二部-湛康
+   * @Date 2022-09-08 9:03
+   * @return cn.hsa.module.emr.emrpatient.dto.EmrPatientDTO
+   */
+  EmrPatientDTO getEmrTemplateHtmlByTemplateId(EmrPatientDTO emrPatientDTO);
 }

@@ -80,6 +80,13 @@ public interface MessageInfoDao extends BaseMapper<MessageInfoModel> {
     */
    List<MessageInfoModel> queryPersonalMessageInfoByType(MessageInfoModel messageInfoDTO);
 
+   /**
+    *  根据医院编码查询该医院待推送的所有类型的数据
+    * @param messageInfoDTO
+    * @return
+    */
+   List<MessageInfoModel> queryAllMessageInfoByHospCode(MessageInfoModel messageInfoDTO);
+
 
 
 }

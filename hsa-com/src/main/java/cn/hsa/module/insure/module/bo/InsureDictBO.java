@@ -165,4 +165,12 @@ public interface InsureDictBO {
      */
     Map<String, String> querySysCodeByCode(Map map);
 
+    /***
+     * 根据code查询字典值
+     * @param map
+     * @return
+     */
+    Map<String, List<Map<String,Object>>> querySysCodeByCodeList(Map map);
+
+    Map<String, String>  queryInsuplcAdmdvs(Map<String, Object> amdvsMap);
 }

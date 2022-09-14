@@ -30,6 +30,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.apache.commons.beanutils.PropertyUtils.copyProperties;
 
@@ -187,7 +188,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
      * @Return: java.lang.Boolean
      **/
     @Override
-    public List<StroStockDetailDTO> updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO) {
+    public PharOutReceiveDTO updateOutDispense(PharOutReceiveDTO pharOutReceiveDTO) {
         try {
             //校验必填信息
             if(StringUtils.isEmpty(pharOutReceiveDTO.getId())){
@@ -238,7 +239,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
                 }
             }
             List<StroStockDetailDTO> resultList = new LinkedList<>();
-            //判断库存
+            //判断库存是否充足
             if (kcjyMap!=null && kcjyMap.size()>0) {
                 for (String key:kcjyMap.keySet()) {
                     List<StroStockDetailDTO> stockDetailDTOList = new ArrayList<>();
@@ -248,9 +249,22 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
                     }
                 }
             }
+            PharOutReceiveDTO resultDTO = new PharOutReceiveDTO();
             if (!ListUtils.isEmpty(resultList)){
-                return resultList;
+                resultDTO.setResultList(resultList);
+                resultDTO.setFlag(Constants.SF.S);
+                return resultDTO;
             }
+            // 判断是否存在过期药品
+            List<String> itemIds = pharOutReceiveDetailDOList.stream().map(PharOutReceiveDetailDO::getItemId)
+                    .collect(Collectors.toList());
+            Map map = new HashMap();
+            map.put("itemIds",itemIds);
+            map.put("hospCode",pharOutReceiveDTO.getHospCode());
+            map.put("bizId",receiveDTO.getPharId());
+            resultList = outDistributeDrugDAO.queryNumShortage(map);
+            resultDTO.setResultList(resultList);
+            resultDTO.setFlag(Constants.SF.F);
             //占用库存
             if (!ListUtils.isEmpty(list)) {
                 stroStockBO.updateStockOccupy(list);
@@ -258,7 +272,7 @@ public class OutDistributeDrugBOImpl  extends HsafBO implements OutDistributeDru
 
             //配药
             outDistributeDrugDAO.updateReceive(pharOutReceiveDTO);
-            return resultList;
+            return resultDTO;
         } catch (AppException e) {
             throw new AppException(e.getMessage());
         }

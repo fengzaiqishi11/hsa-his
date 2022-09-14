@@ -153,7 +153,7 @@ public class InDistributeController  extends BaseController {
      **/
     @PostMapping("/inDispense")
     @NoRepeatSubmit
-    public WrapperResponse<List<StroStockDetailDTO>> inDispense(@RequestBody PharInReceiveDTO pharInReceiveDTO, HttpServletRequest req, HttpServletResponse res){
+    public WrapperResponse<PharInReceiveDTO> inDispense(@RequestBody PharInReceiveDTO pharInReceiveDTO, HttpServletRequest req, HttpServletResponse res){
         SysUserDTO sysUserDTO = getSession(req, res);
         //配药信息
         pharInReceiveDTO.setHospCode(sysUserDTO.getHospCode());

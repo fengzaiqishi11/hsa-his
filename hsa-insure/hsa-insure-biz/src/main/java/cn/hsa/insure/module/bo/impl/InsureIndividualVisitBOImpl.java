@@ -629,4 +629,13 @@ public class InsureIndividualVisitBOImpl extends HsafBO implements InsureIndivid
     public InsureIndividualVisitDTO getInsureIndividualVisitByMdtrtCertNo(Map<String, Object> insureVisitParam) {
       return insureIndividualVisitDAO.getInsureIndividualVisitByMdtrtCertNo(insureVisitParam);
     }
+    /***
+     * 根据visitId集合查询医保登记信息
+     * @param paramMap
+     * @return
+     */
+    @Override
+    public List<InptVisitDTO> queryInsureIndividualVisits(Map<String, Object> paramMap) {
+        return insureIndividualVisitDAO.queryInsureIndividualVisits(paramMap);
+    }
 }

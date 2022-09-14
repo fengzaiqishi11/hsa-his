@@ -443,6 +443,23 @@ public class InsureGetInfoController extends BaseController {
         return insureGetInfoService_consumer.updateHistoricalData(map);
     }
 
+    /**
+     * @Method queryInsureSettleInfo
+     * @Desrciption  医疗保障结算清单信息医保信息查询
+     *
+     * @Param
+     *
+     * @Author liuhuiming
+     * @Date   2022/04/22 13:58
+     * @Return
+     **/
+    @PostMapping("/queryInsureSettleInfo")
+    public WrapperResponse<Map<String, Object>> queryInsureSettleInfo(@RequestBody Map<String,Object> map, HttpServletRequest req, HttpServletResponse res ){
+        SysUserDTO sysUserDTO = getSession(req, res);
+        map.put("hospCode",sysUserDTO.getHospCode());
+        return insureGetInfoService_consumer.queryInsureSettleInfo(map);
+    }
+
 
 
 

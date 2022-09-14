@@ -848,7 +848,7 @@ public class InptVisitBOImpl extends HsafBO implements InptVisitBO {
         }
         // 将查出来个人累计信息插入到数据库
         param.put("resultMap", resultMap);
-        if(resultMap != null){
+        if(ObjectUtil.isNotEmpty(resultMap)){
             insureIndividualVisitService_consumer.insertPatientSumInfoAll(param);
         }
     }

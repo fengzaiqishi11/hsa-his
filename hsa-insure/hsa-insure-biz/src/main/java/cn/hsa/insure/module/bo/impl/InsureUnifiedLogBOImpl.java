@@ -178,6 +178,19 @@ public class InsureUnifiedLogBOImpl extends HsafBO implements InsureUnifiedLogBO
         return resultJson;
     }
 
+    /**
+     * @Method
+     * @Desrciption
+     * @Param
+     * @Author wq
+     * @Date 2022/09/14 10:29
+     * @Return
+     **/
+    @Override
+    public InsureFunctionLogDO selctSignInLog(InsureFunctionLogDO insureFunctionLogDO) {
+        return insureUnifiedLogDAO.selctSignInLog(insureFunctionLogDO);
+    }
+
     /** 截取字符串的指定字节长度
      * @Param [str, bengin, end]
      * @return java.lang.String

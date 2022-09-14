@@ -8,13 +8,16 @@ import cn.hsa.insure.util.Constant;
 import cn.hsa.insure.util.Transpond;
 import cn.hsa.insure.xiangtan.inpt.InptFunction;
 import cn.hsa.module.insure.module.bo.InsureIndividualBasicBO;
+import cn.hsa.module.insure.module.bo.InsureUnifiedLogBO;
 import cn.hsa.module.insure.module.dao.InsureConfigurationDAO;
 import cn.hsa.module.insure.module.dao.InsureIndividualBasicDAO;
 import cn.hsa.module.insure.module.dto.InsureConfigurationDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualBasicDTO;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
+import cn.hsa.module.insure.module.entity.InsureFunctionLogDO;
 import cn.hsa.module.insure.outpt.service.InsureVisitInfoService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSONObject;
 
 import com.github.pagehelper.PageHelper;
@@ -26,6 +29,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +59,9 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
 
     @Resource
     private InsureVisitInfoService insureVisitInfoService_consumer;
+
+    @Resource
+    private InsureUnifiedLogBO insureUnifiedLogBO;
 
 
     @Resource
@@ -241,6 +249,64 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         return PageDTO.of(list);
     }
 
+    @Override
+    public Map signIn(Map<String, Object> map) {
+        String createId = MapUtils.get(map,"creteId");
+        String hospCode = MapUtils.get(map,"hospCode");
+        String mac = getMac();
+        String info = "9001";
+        String orgCode = MapUtils.get(map, "orgCode");
+        // 入参拼接
+        Map<String,Object> httpParam = new HashMap<>();
+        httpParam.put("opter_no", createId);
+        httpParam.put("mac", mac);
+        httpParam.put("ip", "11.11.11.11");
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, info, httpParam);
+
+
+        return resultMap;
+    }
+
+    @Override
+    public Map signOut(Map<String, Object> map) {
+        String createId = MapUtils.get(map, "creteId");
+        String hospCode = MapUtils.get(map, "hospCode");
+        String info = "9002";
+        String orgCode = MapUtils.get(map, "orgCode");
+        // 入参拼接
+        Map<String, Object> httpParam = new HashMap<>();
+        httpParam.put("opter_no", createId);
+        InsureFunctionLogDO insureFunctionLogDO = new InsureFunctionLogDO();
+        insureFunctionLogDO.setMsgInfo("9001");
+        // 获取签到编号
+        InsureFunctionLogDO result = insureUnifiedLogBO.selctSignInLog(insureFunctionLogDO);
+        if (ObjectUtil.isEmpty(result)) {
+            throw new AppException("签到编码为空，请先去签到");
+        }
+        String outParams = result.getOutParams();
+        Map parseObject = JSONObject.parseObject(outParams, Map.class);
+        Map signinoutb ;
+        String signNo = "";
+        if(ObjectUtil.isNotEmpty(parseObject)){
+            Map output = MapUtils.get(parseObject, "output");
+            if(ObjectUtil.isNotEmpty(output)){
+                signinoutb = MapUtils.get(output, "signinoutb");
+                if (ObjectUtil.isNotEmpty(signinoutb)) {
+                    signNo = MapUtils.get(signinoutb,"sign_no");
+                }
+            }
+        }
+        httpParam.put("sign_no", signNo);
+        if(ObjectUtil.isEmpty(signNo)){
+            throw new AppException("签到编码为空，请先去签到");
+        }
+        Map<String, Object> outMap = new HashMap<>();
+        outMap.put("signOut",httpParam);
+        Map<String, Object> resultMap = commonInsureUnified(hospCode, orgCode, info, outMap);
+
+        return resultMap;
+    }
+
 
     /**
      * @Method commonInsureUnified
@@ -267,20 +333,38 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         httpParam.put("mdtrtarea_admvs", insureConfigurationDTO.getMdtrtareaAdmvs());
         httpParam.put("msgid", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
         httpParam.put("input", paramMap);
+
+
+        httpParam.put("msgInfo", functionCode);
+        httpParam.put("msgName", Constant.ChangSha.DefaultValue.SIGNOURORIN.get(functionCode));
+        httpParam.put("hospCode", hospCode);
+        httpParam.put("msgId", StringUtils.createMsgId(insureConfigurationDTO.getOrgCode()));
+        httpParam.put("medisCode", insureConfigurationDTO.getOrgCode());
         String json = JSONObject.toJSONString(httpParam);
         LOGGER.info("调用功能号【" + functionCode + "】的入参为" + json);
+        httpParam.put("paramMapJson", json);
         String resultJson = HttpConnectUtil.unifiedPayPostUtil(insureConfigurationDTO.getUrl(), json);
+        httpParam.put("resultStr", resultJson);
         if (StringUtils.isEmpty(resultJson)) {
+            httpParam.put("resultStr", "null");
+            httpParam.put("infcode", "null");
             throw new AppException("无法访问统一支付平台");
         }
         LOGGER.info("调用功能号【" + functionCode + "】的反参为" + resultJson);
         Map<String, Object> resultMap = JSONObject.parseObject(resultJson, Map.class);
         if ("999".equals(MapUtils.get(resultMap, "code"))) {
+            httpParam.put("infcode", resultMap.get("code"));
+            String errMsg = (String) resultMap.get("msg");
+            httpParam.put("resultStr", errMsg == null ? "null" : errMsg.length() > 4000 ? errMsg.substring(0, 4000) : errMsg);
             throw new AppException((String) resultMap.get("msg"));
         }
         if (!MapUtils.get(resultMap, "infcode").equals("0")) {
+            String errMsg = (String) resultMap.get("err_msg");
+            httpParam.put("resultStr", errMsg == null ? "null" : errMsg.length() > 4000 ? errMsg.substring(0, 4000) : errMsg);
             throw new AppException((String) resultMap.get("err_msg"));
         }
+        // 插入日志表
+        insureUnifiedLogBO.insertInsureFunctionLog(httpParam);
         return resultMap;
     }
     /**
@@ -297,4 +381,33 @@ public class InsureIndividualBasicBOImpl extends HsafBO implements InsureIndivid
         return insureIndividualBasicDAO.queryPersonInfo(map);
     }
 
+    /**
+     * 获取本机的Mac地址
+     *
+     * @return string
+     */
+    public String getMac() {
+        InetAddress ia;
+        byte[] mac = null;
+        try {
+            // 获取本地IP对象
+            ia = InetAddress.getLocalHost();
+            // 获得网络接口对象（即网卡），并得到mac地址，mac地址存在于一个byte数组中。
+            mac = NetworkInterface.getByInetAddress(ia).getHardwareAddress();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        // 下面代码是把mac地址拼装成String
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < mac.length; i++) {
+            if (i != 0) {
+                sb.append("-");
+            }
+            // mac[i] & 0xFF 是为了把byte转化为正整数
+            String s = Integer.toHexString(mac[i] & 0xFF);
+            sb.append(s.length() == 1 ? 0 + s : s);
+        }
+        // 把字符串所有小写字母改为大写成为正规的mac地址并返回
+        return sb.toString().toUpperCase();
+    }
 }

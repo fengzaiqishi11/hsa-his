@@ -894,6 +894,8 @@
         a.drug_remark drugRemark, a.drug_img_path drugImgPath, f.name prodName, stock.num stockNum,
         convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) as stockOccupy,
         convert((stock.expire_stock_occupy/a.split_ratio), decimal(10, 4)) expireStockOccupy,
+        (select expiry_date from stro_stock_detail where item_id = stock.item_id and biz_id = stock.biz_id
+                                                     and num> 0 order by expiry_date asc limit 1) as expiryDate,
         stock.split_num splitNum, '0' isWz,
         a.usual_name,a.usual_wbm, a.usual_pym, '' as technology_code, a.nation_code, a.nation_name  nation_name, a.reimbursement_ratio
         from base_drug a
@@ -953,7 +955,7 @@
         a.split_unit_code inUnitCode, null isStopSame, null isStopSameNot, null isStopMyself, '3' bigTypeCode, ''
         drugRemark, '' drugImgPath,
         f.name prodName, stock.num stockNum, convert((stock.stock_occupy/a.split_ratio), decimal(10, 4)) stockOccupy,
-        convert((stock.expire_stock_occupy/a.split_ratio), decimal(10, 4)) expireStockOccupy,
+        convert((stock.expire_stock_occupy/a.split_ratio), decimal(10, 4)) expireStockOccupy,'' as expiryDate,
         stock.split_num splitNum, '0' isWz, a.name usual_name,a.wbm usual_wbm,
         a.pym usual_pym ,'' as technology_code,a.nation_code, a.nation_name nation_name, a.reimbursement_ratio
         from base_material a
@@ -996,7 +998,7 @@
         pharId, '' rateId, '' bfcId, b.id execDeptId,
         a.type_code typeCode,c.id outDeptId, a.unit_code outUnitCode, a.unit_code inUnitCode, a.is_stop_same isStopSame,
         a.is_stop_same_not isStopSameNot, a.is_stop_myself isStopMyself, '4' bigTypeCode, '' drugRemark, '' drugImgPath,
-        '' prodName, null stockNum, null stockOccupy,null expireStockOccupy,
+        '' prodName, null stockNum, null stockOccupy,null expireStockOccupy,'' as expiryDate,
         null splitNum, case when e.id is null then '0' else '1' end isWz, a.name
         usual_name,a.wbm usual_wbm, a.pym usual_pym, a.technology_code, a.union_nation_code as nation_code, a.union_nation_name as nation_name, a.reimbursement_ratio as reimbursement_ratio
         from base_advice a

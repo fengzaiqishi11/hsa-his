@@ -66,6 +66,8 @@
       <result property="acceptanceId" column="acceptance_id" jdbcType="TIMESTAMP"/>
       <result property="qualifiedStatus" column="qualified_status" jdbcType="TIMESTAMP"/>
       <result property="acceptanceResult" column="acceptance_result" jdbcType="TIMESTAMP"/>
+      <result property="oldSellPrice" column="old_sell_price" jdbcType="TIMESTAMP"/>
+      <result property="oldSplitPrice" column="old_split_price" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--查询单个-->
@@ -186,7 +188,7 @@
     <!--新增入库-->
     <insert id="insertStroIn">
         insert into stro_in(id,hosp_code, in_code, order_no, stock_id, supplier_id, buy_price_all, sell_price_all, remark, audit_code, audit_id, audit_name, audit_time, crte_id, crte_name, crte_time,in_order_no,acceptance_status, acceptance_name, acceptance_time, acceptance_id, qualified_status, acceptance_result)
-        values (#{id},#{hospCode}, #{inCode}, #{orderNo}, #{stockId}, #{supplierId}, #{buyPriceAll}, #{sellPriceAll}, #{remark}, '0', #{auditId}, #{auditName}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime},#{inOrderNo},#{acceptanceStatus},#{acceptanceName},#{acceptanceTime},#{acceptanceId},#{qualifiedStatus},#{acceptanceResult})
+        values (#{id},#{hospCode}, #{inCode}, #{orderNo}, #{stockId}, #{supplierId}, #{buyPriceAll}, #{sellPriceAll}, #{remark}, #{auditCode}, #{auditId}, #{auditName}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime},#{inOrderNo},#{acceptanceStatus},#{acceptanceName},#{acceptanceTime},#{acceptanceId},#{qualifiedStatus},#{acceptanceResult})
     </insert>
 
     <!--修改入库信息-->
@@ -275,7 +277,7 @@
           audit_time = #{auditTime}
         </if>
       </set>
-      where hosp_code = #{hospCode} and audit_code = '0'
+      where hosp_code = #{hospCode} and (audit_code = '0' or audit_code = '3')
       <if test="inCode != null and inCode != ''">
         and in_code = #{inCode}
       </if>
@@ -309,7 +311,9 @@
       b.acceptance_time ,
       b.acceptance_id ,
       b.qualified_status ,
-      b.acceptance_result
+      b.acceptance_result,
+      a.old_sell_price,
+      a.old_split_price
       from stro_in_detail a
       left join stro_in b on a.in_id = b.id
       left join base_drug bd on bd.id = a.item_id and bd.hosp_code = #{hospCode}
@@ -486,10 +490,11 @@
 
     <!--批量新增入库明细数据-->
     <insert id="insertStroInDetail" parameterType="java.util.List">
-          insert into stro_in_detail(id,hosp_code, in_id, item_code, item_id, item_name, spec, num, unit_code, dosage, dosage_unit_code, buy_price, sell_price, buy_price_all, sell_price_all, split_ratio, split_num, split_price, split_unit_code, batch_no, expiry_date,ndan,prod_code)
+          insert into stro_in_detail(id,hosp_code, in_id, item_code, item_id, item_name, spec, num, unit_code, dosage, dosage_unit_code, buy_price, sell_price, buy_price_all, sell_price_all, split_ratio, split_num, split_price, split_unit_code, batch_no, expiry_date,ndan,prod_code,old_sell_price,old_split_price)
           values
           <foreach collection="list" item="item" index="index" separator=",">
-            (#{item.id},#{item.hospCode}, #{item.inId}, #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.spec}, #{item.num}, #{item.unitCode}, #{item.dosage}, #{item.dosageUnitCode}, #{item.buyPrice}, #{item.sellPrice}, #{item.buyPriceAll}, #{item.sellPriceAll}, #{item.splitRatio}, #{item.splitNum}, #{item.splitPrice}, #{item.splitUnitCode}, #{item.batchNo}, #{item.expiryDate},#{item.ndan},#{item.prodCode})
+            (#{item.id},#{item.hospCode}, #{item.inId}, #{item.itemCode}, #{item.itemId}, #{item.itemName}, #{item.spec}, #{item.num}, #{item.unitCode}, #{item.dosage}, #{item.dosageUnitCode}, #{item.buyPrice}, #{item.sellPrice}, #{item.buyPriceAll}, #{item.sellPriceAll}, #{item.splitRatio}, #{item.splitNum}, #{item.splitPrice}, #{item.splitUnitCode}, #{item.batchNo},
+             #{item.expiryDate},#{item.ndan},#{item.prodCode},#{item.oldSellPrice},#{item.oldSplitPrice})
           </foreach>
     </insert>
 

@@ -10,7 +10,12 @@ import cn.hsa.module.base.bmm.service.BaseMaterialService;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.base.drug.dto.BaseDrugDTO;
 import cn.hsa.module.base.drug.service.BaseDrugService;
+import cn.hsa.module.stro.adjust.dao.StroAdjustDao;
+import cn.hsa.module.stro.adjust.dao.StroAdjustDetailDao;
+import cn.hsa.module.stro.adjust.dto.StroAdjustDTO;
+import cn.hsa.module.stro.adjust.dto.StroAdjustDetailDTO;
 import cn.hsa.module.stro.stock.bo.StroStockBO;
+import cn.hsa.module.stro.stock.dto.StroStockDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
 import cn.hsa.module.stro.stroin.bo.StroInBO;
 import cn.hsa.module.stro.stroin.dao.StroInDAO;
@@ -27,10 +32,13 @@ import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -59,12 +67,20 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
   @Resource
   private StroOutDAO stroOutDAO;
 
+  @Resource
+  private StroAdjustDao stroAdjustDao;
+
+  @Resource
+  private StroAdjustDetailDao stroAdjustDetailDao;
+
   /**
    * 药库入库BO访问接口
    */
   @Resource
   private StroInBOImpl stroInBO;
 
+  @Resource
+  BaseOrderRuleService baseOrderRuleService_consumer;
   /**
    * 单据生成规则dubbo消费者接口
    */
@@ -207,7 +223,6 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
     StroInDTO stroInDTO1 = checkMoney(stroInDTO);
 
     List<StroInDetailDTO> stroInDetailDTOS = stroInDTO1.getStroInDetailDTOS();
-
     //新增建立一个新增的明细List: addStroInDetailDTOS
     List<StroInDetailDTO> addStroInDetailDTOS = new ArrayList<>();
 
@@ -218,6 +233,26 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       Map map = new HashMap();
       if(Constants.CRFS.ZJRK.equals(stroInDTO.getInCode())){//直接入库
         map.put("typeCode", "02");//生成的单据类型，直接入库单据号生成规则
+        Optional.ofNullable(stroInDetailDTOS).orElseThrow(() -> new AppException("入库单明细不能为空"));
+        List<StroInDetailDTO> adjustList = stroInDetailDTOS.stream().filter(
+                        x -> !BigDecimalUtils.equals(x.getSellPrice(), x.getOldSellPrice()))
+                .collect(Collectors.toList());
+        if (!ListUtils.isEmpty(adjustList)) {//入库单据变成暂存状态
+          StroAdjustDTO stroAdjustDTO = new StroAdjustDTO();
+          stroAdjustDTO.setHospCode(stroInDTO.getHospCode());
+          stroAdjustDTO.setBizId(stroInDTO.getStockId());
+          stroAdjustDTO.setAdjustCode("0");// 调价来源方式，直接入库生成
+          stroAdjustDTO.setSourceId(stroInDTO.getId());
+          stroAdjustDTO.setStroDetailDTOs(adjustList);
+          stroAdjustDTO.setCrteId(stroInDTO.getCrteId());
+          stroAdjustDTO.setCrteName(stroInDTO.getCrteName());
+          stroAdjustDTO.setCrteTime(DateUtils.getNow());
+          // 生成调价单
+          saveAdjustOrder(stroAdjustDTO);
+          stroInDTO.setAuditCode(Constants.SHZT.ZC);
+        } else {
+          stroInDTO.setAuditCode(Constants.SHZT.WSH);
+        }
       } else if(Constants.CRFS.TJTB.equals(stroInDTO.getInCode())) {// 平级出库
         map.put("typeCode", "08");
       } else{//退供应商
@@ -242,6 +277,29 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
         stroInDao.insertStroInDetail(addStroInDetailDTOS);
       }
     } else{
+      Optional.ofNullable(stroInDetailDTOS).orElseThrow(() -> new AppException("入库单明细不能为空"));
+      List<StroInDetailDTO> adjustList = stroInDetailDTOS.stream().filter(
+                      x -> !BigDecimalUtils.equals(x.getSellPrice(), x.getOldSellPrice()))
+              .collect(Collectors.toList());
+      StroAdjustDTO stroAdjustDTO = new StroAdjustDTO();
+      stroAdjustDTO.setHospCode(stroInDTO.getHospCode());
+      stroAdjustDTO.setBizId(stroInDTO.getStockId());
+      stroAdjustDTO.setAdjustCode("0");// 调价来源方式，直接入库生成
+      stroAdjustDTO.setSourceId(stroInDTO.getId());
+      stroAdjustDTO.setStroDetailDTOs(adjustList);
+      stroAdjustDTO.setCrteId(stroInDTO.getCrteId());
+      stroAdjustDTO.setCrteName(stroInDTO.getCrteName());
+      stroAdjustDTO.setCrteTime(DateUtils.getNow());
+      //通过sourceId删除掉未审核的调价单据，再重新生成调价单据
+      stroAdjustDao.deleteAdjustBySourceId(stroAdjustDTO);
+      stroAdjustDao.deleteAdjustDetailBySourceId(stroAdjustDTO);
+      if (!ListUtils.isEmpty(adjustList) && Constants.CRFS.ZJRK.equals(stroInDTO.getInCode())) {//入库单据变成暂存状态
+        // 生成调价单
+        saveAdjustOrder(stroAdjustDTO);
+        stroInDTO.setAuditCode(Constants.SHZT.ZC);
+      } else {
+        stroInDTO.setAuditCode(Constants.SHZT.WSH);
+      }
       //新增建立一个修改的的明细List: editStroInDetailDTOS
       List<StroInDetailDTO> editStroInDetailDTOS = new ArrayList<>();
       //修改入库单据信息
@@ -271,6 +329,130 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
       }
     }
     return true;
+  }
+
+  /**
+   * @Author gory
+   * @Description
+   * @Date 2022/9/13 15:30
+   * @Param [adjustList]
+   **/
+  private void saveAdjustOrder(StroAdjustDTO stroAdjustDTO) {
+    HashMap map = new HashMap();
+    map.put("hospCode", stroAdjustDTO.getHospCode());
+    map.put("typeCode", Constants.ORDERRULE.TJ);
+    WrapperResponse<String> orderNo = baseOrderRuleService_consumer.getOrderNo(map);
+    //新增
+    stroAdjustDTO.setOrderNo(orderNo.getData());
+    stroAdjustDTO.setId(SnowflakeUtils.getId());
+    stroAdjustDTO.setAuditCode("0");
+    stroAdjustDao.insertStroAdjustDto(stroAdjustDTO);
+    // 将入库明细转化为 调价单明细
+    List<StroInDetailDTO> stroDetailDTOs = stroAdjustDTO.getStroDetailDTOs();
+    List<StroAdjustDetailDTO> stroAdjustDetailDTOs = new ArrayList<>();
+    for (StroInDetailDTO stroInDetailDTO : stroDetailDTOs) {
+      StroAdjustDetailDTO stroAdjustDetailDTO = new StroAdjustDetailDTO();
+      stroAdjustDetailDTO.setId(SnowflakeUtils.getId());
+      stroAdjustDetailDTO.setHospCode(stroAdjustDTO.getHospCode());
+      stroAdjustDetailDTO.setAdjustId(stroAdjustDTO.getId());
+      stroAdjustDetailDTO.setItemCode(stroInDetailDTO.getItemCode());
+      stroAdjustDetailDTO.setItemId(stroInDetailDTO.getItemId());
+      stroAdjustDetailDTO.setItemName(stroInDetailDTO.getItemName());
+      stroAdjustDetailDTO.setNum(stroInDetailDTO.getNum());
+      stroAdjustDetailDTO.setUnitCode(stroInDetailDTO.getUnitCode());
+      stroAdjustDetailDTO.setBeforePrice(stroInDetailDTO.getOldSellPrice());
+      stroAdjustDetailDTO.setAfterPrice(stroInDetailDTO.getSellPrice());
+      // todo 找一个空的数据，看是否需要加 校验=>防止空指针
+      stroAdjustDetailDTO.setSplitRatio(stroInDetailDTO.getSplitRatio().intValue());
+      stroAdjustDetailDTO.setSplitNum(stroInDetailDTO.getSplitNum());
+      stroAdjustDetailDTO.setSplitUnitCode(stroInDetailDTO.getSplitUnitCode());
+      BigDecimal splitBuyPrice = BigDecimalUtils.divide(stroInDetailDTO.getBuyPrice(), stroInDetailDTO.getSplitRatio());
+      stroAdjustDetailDTO.setSplitBuyPrice(splitBuyPrice);
+      stroAdjustDetailDTO.setBuyPrice(stroInDetailDTO.getBuyPrice());
+      stroAdjustDetailDTO.setSplitBeforePrice(stroInDetailDTO.getOldSplitPrice());
+      stroAdjustDetailDTO.setSplitAfterPrice(stroInDetailDTO.getSplitPrice());
+      stroAdjustDetailDTO.setBizId(stroInDetailDTO.getBizId());
+      stroAdjustDetailDTOs.add(stroAdjustDetailDTO);
+    }
+    //更新调价明细数据
+    stroAdjustDTO.setStroAdjustDetailDTOs(stroAdjustDetailDTOs);
+    updateStroAdjustDetailDTO(stroAdjustDTO);
+  }
+  private void updateStroAdjustDetailDTO(StroAdjustDTO stroAdjustDTO){
+    // 调价是否过滤掉科室库存，注意我们虽然没有科室库存的概念，但是出库到科室确认之后，库存表中的biz_id就是科室的
+    Map<String, String> sfdeptFilterMap = this.getParameterValue(stroAdjustDTO.getHospCode(),
+            new String[]{"SF_DEPTFILTER"});
+    String sfdeptFilter = MapUtils.get(sfdeptFilterMap, "SF_DEPTFILTER", "0");
+    List<StroAdjustDetailDTO> lists = stroAdjustDTO.getStroAdjustDetailDTOs();
+    //根据项目id进行分组，filter是为了防止空指针
+    Map<String, List<StroAdjustDetailDTO>> listsMap = lists.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
+            .collect(Collectors.groupingBy(StroAdjustDetailDTO::getItemId));
+    // 得到项目id集合
+    List<String> items = lists.stream().map(StroAdjustDetailDTO::getItemId).collect(Collectors.toList());
+    //根据项目id查询所有库存
+    List<StroStockDTO> stroStockDTOS = stroAdjustDetailDao.queryStockByItemIds(stroAdjustDTO.getHospCode(),items,sfdeptFilter);
+    //根据项目id进行分组，项目id作为key
+    Map<String, List<StroStockDTO>> stroStocksMap = stroStockDTOS.stream().filter(x -> StringUtils.isNotEmpty(x.getItemId()))
+            .collect(Collectors.groupingBy(StroStockDTO::getItemId));
+    // 插入的明细集合
+    List<StroAdjustDetailDTO> listInsert = new ArrayList<>();
+    // 调价单调价前总金额
+    BigDecimal sumBeforePrice = BigDecimal.valueOf(0);
+    // 调价单调价后总金额
+    BigDecimal sumAfterPrice = BigDecimal.valueOf(0);
+    //遍历map,同一个药，不同的库位
+    for (Map.Entry<String, List<StroStockDTO>> entry : stroStocksMap.entrySet()) {
+      String itemId = entry.getKey();
+      List<StroStockDTO> value = entry.getValue();
+      if (listsMap.containsKey(itemId)) {
+        // 取调价前后的金额
+        List<StroAdjustDetailDTO> stroAdjustDetailDTOS = listsMap.get(itemId);
+        StroAdjustDetailDTO adjustDetailDTO = stroAdjustDetailDTOS.get(0);
+        // 封装数据
+        for (StroStockDTO x : value) {
+          StroAdjustDetailDTO newStroAdjustDetailDTO = new StroAdjustDetailDTO();
+          BeanUtils.copyProperties(adjustDetailDTO,newStroAdjustDetailDTO);
+          newStroAdjustDetailDTO.setNum(x.getNum());
+          newStroAdjustDetailDTO.setSplitNum(x.getSplitNum());
+          newStroAdjustDetailDTO.setId(SnowflakeUtils.getId());
+          newStroAdjustDetailDTO.setAdjustId(stroAdjustDTO.getId());
+          newStroAdjustDetailDTO.setBizId(x.getBizId());
+          newStroAdjustDetailDTO.setHospCode(stroAdjustDTO.getHospCode());
+          listInsert.add(newStroAdjustDetailDTO);
+          // 调价前总金额
+          sumBeforePrice = BigDecimalUtils.add(sumBeforePrice,BigDecimalUtils.multiply(x.getNum(),newStroAdjustDetailDTO.getBeforePrice()));
+          // 调价后总金额
+          sumAfterPrice = BigDecimalUtils.add(sumAfterPrice,BigDecimalUtils.multiply(x.getNum(),newStroAdjustDetailDTO.getAfterPrice()));
+        }
+      }
+    }
+
+    //批量新增调价明细
+    stroAdjustDetailDao.insertStroAdjustDetailDTO(listInsert);
+    // 回写主表总金额
+    // 调价单调价前总金额
+    stroAdjustDTO.setAfterPrice(sumAfterPrice);
+    // 调价单调价后总金额
+    stroAdjustDTO.setBeforePrice(sumBeforePrice);
+    // 回写主表总价格
+    stroAdjustDao.updateAdjustDTOPriceById(stroAdjustDTO);
+
+  }
+  /**
+   * @Author gory
+   * @Description 获取系统参数
+   * @Date 2022/9/14 9:55
+   * @Param [hospCode, code]
+   **/
+  public Map<String, String> getParameterValue(String hospCode, String[] code) {
+    List<SysParameterDTO> list = stroAdjustDao.getParameterValue(hospCode, code);
+    Map<String, String> retMap = new HashMap<>();
+    if (!MapUtils.isEmpty(list)) {
+      for (SysParameterDTO hit : list) {
+        retMap.put(hit.getCode(), hit.getValue());
+      }
+    }
+    return retMap;
   }
   /**
    * @Meth: validExpiryDate
@@ -423,6 +605,9 @@ public class StroInBOImpl extends HsafBO implements StroInBO {
         List<StroStockDetailDTO> returnSuppStockS = queryStroInDetailByOrder(stroInDTO,parallelDeliveryIds, stroInDTO.getHospCode(),"9");
         handleStock(returnSuppStockS,"9",stroInDTO.getHospCode());
       }
+    }
+    if (Constants.SHZT.ZF.equals(stroInDTO.getAuditCode()) && Constants.CRFS.ZJRK.equals(stroInDTO.getInCode())){ // 作废生成的调价单
+        stroAdjustDao.updateAdjustDTOBySourceIds(stroInDTO);
     }
     stroInDao.updateAuditCode(stroInDTO);
     return true;

@@ -1,7 +1,9 @@
 package cn.hsa.module.stro.adjust.dao;
 
 import cn.hsa.module.stro.adjust.dto.StroAdjustDTO;
+import cn.hsa.module.stro.adjust.dto.StroAdjustDetailDTO;
 import cn.hsa.module.stro.stock.dto.StroStockDetailDTO;
+import cn.hsa.module.stro.stroin.dto.StroInDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -165,4 +167,47 @@ public interface StroAdjustDao {
      * @Date: 2022/4/14
      */
     void updateAdjustDTOPriceById(StroAdjustDTO stroAdjustDTO);
+    /**
+     * @Author gory
+     * @Description 回写入库明细单
+     * @Date 2022/9/14 15:32
+     * @Param [stroAdjustDetailDTOs, sourceId]
+     **/
+    void updateStroInDetail(@Param("list") List<StroAdjustDetailDTO> stroAdjustDetailDTOs,
+                            @Param("sourceId") String sourceId);
+    /**
+     * @Author gory
+     * @Description 回写入库单据主表
+     * @Date 2022/9/14 15:58
+     * @Param [stroAdjustDetailDTOs, sourceId]
+     **/
+    void updateStroIn(@Param("sourceId") String sourceId);
+    /**
+     * @Author gory 更新入库单明细
+     * @Description
+     * @Date 2022/9/14 16:16
+     * @Param [stroAdjustDetailDTOs, sourceId]
+     **/
+    void updateStroInDetailByBefore(@Param("sourceId") String sourceId);
+    /**
+     * @Author gory
+     * @Description 通过sourceID删除调价单
+     * @Date 2022/9/15 11:38
+     * @Param [stroAdjustDTO]
+     **/
+    void deleteAdjustBySourceId(StroAdjustDTO stroAdjustDTO);
+    /**
+     * @Author gory
+     * @Description 删除明细
+     * @Date 2022/9/15 11:50
+     * @Param [stroAdjustDTO]
+     **/
+    void deleteAdjustDetailBySourceId(StroAdjustDTO stroAdjustDTO);
+    /**
+     * @Author gory
+     * @Description 当入库单作废的时候，同时作废生成的调价单
+     * @Date 2022/9/16 9:08
+     * @Param [stroInDTO]
+     **/
+    void updateAdjustDTOBySourceIds(StroInDTO stroInDTO);
 }

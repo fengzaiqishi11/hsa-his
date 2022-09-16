@@ -352,6 +352,11 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
                 stroAdjustDetailDao.deleteStroAdjustDetailDTO(stroAdjustDTO1);
                 stroAdjustDTO1.setStroAdjustDetailDTOs(stroAdjustDetailDTOList);
                 updateStroAdjustDetailDTO(stroAdjustDTO1);
+                // 如果来源方式为入库调价，回写入库单数据
+                if("0".equals(stroAdjustDTO1.getAdjustCode())){
+                    stroAdjustDTO1.setOperateStatus("1");
+                    updateStroIn(stroAdjustDTO1);
+                }
             }
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
             List<StroAdjustDetailDTO> drugList = new ArrayList<>();
@@ -392,6 +397,22 @@ public class StroAdjustBOImpl extends HsafBO implements StroAdjustBO {
         }
         return isSuccess;
     }
+    /**
+     * @Author gory
+     * @Description 回写入库单
+     * @Date 2022/9/14 15:02
+     * @Param [stroAdjustDTO]
+     **/
+    private void updateStroIn(StroAdjustDTO stroAdjustDTO) {
+        List<StroAdjustDetailDTO> stroAdjustDetailDTOs = stroAdjustDTO.getStroAdjustDetailDTOs();
+        if ("1".equals(stroAdjustDTO.getOperateStatus())){// 如果是入库审核，则回写入库单为最新的零售价
+            // 更新入库单明细: 售价 + 零售总金额 + 拆零单价,暂存状态改成未审核状态
+            stroAdjustDao.updateStroInDetail(stroAdjustDetailDTOs,stroAdjustDTO.getSourceId());
+            // 更新入库单: 零售总金额
+            stroAdjustDao.updateStroIn(stroAdjustDTO.getSourceId());
+        }
+    }
+
     /**
      * @Method judgeAdjustDruag
      * @Desrciption 校验是否能够审核

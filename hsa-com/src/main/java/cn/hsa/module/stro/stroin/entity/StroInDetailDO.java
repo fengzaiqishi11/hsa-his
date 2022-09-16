@@ -118,4 +118,13 @@ public class StroInDetailDO extends PageDO implements Serializable {
    * 生产厂家编码
    */
   private String prodCode;
+
+  /**
+   * 原零售单价
+   */
+  private BigDecimal oldSellPrice;
+  /**
+   * 原零售拆零单价
+   */
+  private BigDecimal oldSplitPrice;
 }

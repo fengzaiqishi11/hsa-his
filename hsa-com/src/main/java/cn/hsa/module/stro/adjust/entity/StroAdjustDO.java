@@ -86,6 +86,12 @@ public class StroAdjustDO extends PageDO implements Serializable {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")
     private Date crteTime;
-
-
+    /**
+     * 调价来源方式
+     */
+    private String adjustCode;
+    /**
+     * 来源ID
+     */
+    private String sourceId;
 }

@@ -29,7 +29,7 @@
 	'' as csdxzqhd,
 	'' as csdmc,
 	nation_code as mzdm,
-	'' as mzmc,
+	(select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='GB 3304-1991' and hb.cm_value =nation_code limit 1)  as mzmc,
 	nationality_cation as gjdm,
 	'' as gjmc,
 	allergy_disease as gms,
@@ -233,11 +233,12 @@
    a.num as SL,
    a.price as DJ,
    a.total_price as JE,
-   a.num_unit_code as YPDW,
+   (select name from sys_code_detail scd where scd.c_code='DW' and scd.value=a.num_unit_code and scd.hosp_code = a.hosp_code and scd.is_valid = '1' limit 1) as YPDW,
    a.group_no as YZZH,
    case when bd.id is null then '0' else '1' end as SFYP,
-   '' as YL,
-   a.rate_id as SYPC,
+   a.num as YL,
+   (select name from sys_code_detail scd where scd.c_code='DW' and scd.value=a.num_unit_code and scd.hosp_code = a.hosp_code and scd.is_valid = '1' limit 1) as YLDW,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.056' and hb.cm_value = br.code limit 1) as SYPC,
    a.speed_code as YYSD,
    a.use_days as YYTS,
    a.is_skin as SFPS,
@@ -245,8 +246,8 @@
    a.spec as YPGG,
    a.dosage as JL,
    a.dosage_unit_code as DW,
-   '' as MCSL,
-   '' as MCDW,
+   a.num as MCSL,
+   (select name from sys_code_detail scd where scd.c_code='DW' and scd.value=a.num_unit_code and scd.hosp_code = a.hosp_code and scd.is_valid = '1' limit 1) as MCDW,
    ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1),a.usage_code) as YYTJDM,
    (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1) as YYTJMC,
    a.prep_code as YWJX,
@@ -257,8 +258,8 @@
    '' as ZZZF,
    a.herb_note_code as ZYSYLBDM,
    case when bd.antibacterial_code is null then '0' else '1' end as KJYWBZ,
-   bd.durg_code as JBYWBZ,
-   bd.ph_code as TSYPFL,
+   bd.is_basic as JBYWBZ,
+   (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.013' and hb.cm_value = bd.ph_code  limit 1) as TSYPFL,
    bd.is_lvp  as JMSYBZ,
    bd.basic_code as YLLB,
    bd.ddd as DDD,
@@ -275,6 +276,7 @@
    join outpt_visit b on a.visit_id = b.id and a.hosp_code = b.hosp_code
    left join outpt_prescribe c on a.op_id =c.id and a.hosp_code =c.hosp_code
    left join base_drug bd on a.item_id = bd.id and a.hosp_code = bd.hosp_code
+   left join base_rate br on a.rate_id = br.id and a.hosp_code = br.hosp_code and br.is_valid = '1'
     where c.crte_time &gt;= date(#{startTime}) and c.crte_time &lt;= date(#{endTime}) and c.hosp_code =#{hospCode}
     order by c.crte_time asc
 	</select>
@@ -389,6 +391,7 @@
        a.status_code as tfbz,
        (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
        v.profile_id as hzjgnwyid,
+       s.settle_no as mzsfjsdh,
        a.visit_id as mzlsh,
        o.order_no as cfh,
        case when a.item_code='1' then '1' else '0' end as sfypbz,

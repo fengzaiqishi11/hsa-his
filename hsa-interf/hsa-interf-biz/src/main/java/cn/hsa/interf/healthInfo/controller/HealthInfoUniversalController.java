@@ -203,7 +203,7 @@ public class HealthInfoUniversalController {
     }
 
     /**
-     * 查询病案首页业务相关数据接口
+     * 查询诊断信息业务相关数据接口
      * @Author liuliyun
      * @Param [map]
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
@@ -229,7 +229,7 @@ public class HealthInfoUniversalController {
     }
 
     /**
-     * 查询手术业务相关数据接口
+     * 查询结算业务相关数据接口
      * @Author liuliyun
      * @Param [map]
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse

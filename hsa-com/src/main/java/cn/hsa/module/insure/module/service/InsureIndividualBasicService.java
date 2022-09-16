@@ -141,4 +141,26 @@ public interface InsureIndividualBasicService {
      * @Return
      */
     WrapperResponse<PageDTO> queryOutptSettleInfo(Map<String, Object> map);
+
+
+    /**
+      * @method signIn
+      * @author powersi
+      * @date 2022/9/13 19:29
+      *	@description   签到
+      * @param  map
+      * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+      *
+     **/
+	WrapperResponse signIn(Map<String, Object> map);
+
+    /**
+     * @param map
+     * @return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     * @method signIn
+     * @author powersi
+     * @date 2022/9/13 19:29
+     * @description 签退
+     **/
+    WrapperResponse signOut(Map<String, Object> map);
 }

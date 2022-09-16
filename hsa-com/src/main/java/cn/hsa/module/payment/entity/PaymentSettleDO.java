@@ -1,7 +1,9 @@
 package cn.hsa.module.payment.entity;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
+import cn.hsa.base.PageDO;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +25,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PaymentSettleDO implements Serializable {
+public class PaymentSettleDO extends PageDO implements Serializable {
     private static final long serialVersionUID = -72675184541908659L;
     /**
      * 主键
@@ -52,11 +54,11 @@ public class PaymentSettleDO implements Serializable {
     /**
      * 总费用
      */
-    private Double totalPrice;
+    private BigDecimal totalPrice;
     /**
      * 平台支付费用
      */
-    private Double paymentPrice;
+    private BigDecimal paymentPrice;
     /**
      * 支付方式（ZFFS）
      */
@@ -96,5 +98,23 @@ public class PaymentSettleDO implements Serializable {
      */
     private Date crteTime;
 
+    /**
+     * 第一次结算的id
+     */
+    private String oneSettleId;
+
+    /**
+     * 冲红id
+     */
+    private String redId;
+    /**
+     * 原结算id
+     */
+    private String oldSettleId;
+
+    /**
+     * 结算时间
+     */
+    private Date settleTime;
 
 }

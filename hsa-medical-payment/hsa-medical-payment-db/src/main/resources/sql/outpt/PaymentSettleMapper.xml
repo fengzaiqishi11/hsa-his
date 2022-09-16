@@ -20,12 +20,16 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="settleCode" column="settle_code" jdbcType="VARCHAR"/>
+        <result property="oneSettleId" column="one_settle_id" jdbcType="VARCHAR"/>
+        <result property="redId" column="red_id" jdbcType="VARCHAR"/>
+        <result property="oldSettleId" column="old_settle_id" jdbcType="VARCHAR"/>
+        <result property="settleTime" column="settle_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="PaymentSettleMap">
         select
-          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time
         from payment_settle
         where id = #{id}
     </select>
@@ -34,7 +38,8 @@
     <select id="queryAllPaymentSettle" resultMap="PaymentSettleMap">
         select
         id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code,
-        state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code
+        state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id,
+        old_settle_id, settle_time
         from payment_settle
         <where>
             <if test="id != null and id != ''">
@@ -87,6 +92,18 @@
             </if>
             <if test="settleCode != null and settleCode != ''">
                 and settle_code = #{settleCode}
+            </if>
+            <if test="oneSettleId != null and oneSettleId != ''">
+                and one_settle_id = #{oneSettleId}
+            </if>
+            <if test="redId != null and redId != ''">
+                and red_id = #{redId}
+            </if>
+            <if test="oldSettleId != null and oldSettleId != ''">
+                and old_settle_id = #{oldSettleId}
+            </if>
+            <if test="settleTime != null">
+                and settle_time = #{settleTime}
             </if>
         </where>
         limit #{pageable.offset}, #{pageable.pageSize}
@@ -148,24 +165,37 @@
             <if test="settleCode != null and settleCode != ''">
                 and settle_code = #{settleCode}
             </if>
+            <if test="oneSettleId != null and oneSettleId != ''">
+                and one_settle_id = #{oneSettleId}
+            </if>
+            <if test="redId != null and redId != ''">
+                and red_id = #{redId}
+            </if>
+            <if test="oldSettleId != null and oldSettleId != ''">
+                and old_settle_id = #{oldSettleId}
+            </if>
+            <if test="settleTime != null">
+                and settle_time = #{settleTime}
+            </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code)
-        values (#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{stateCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode})
+        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time)
+        values (#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{stateCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
         insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price,
-        payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code)
+        payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code,
+        one_settle_id, red_id, old_settle_id, settle_time)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId}, #{entity.visitNo},
             #{entity.totalPrice}, #{entity.paymentPrice}, #{entity.payCode}, #{entity.stateCode}, #{entity.omsgid},
             #{entity.oinfno}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime},
-            #{entity.settleCode})
+            #{entity.settleCode}, #{entity.oneSettleId}, #{entity.redId}, #{entity.oldSettleId}, #{entity.settleTime})
         </foreach>
     </insert>
 
@@ -220,6 +250,18 @@
             </if>
             <if test="settleCode != null and settleCode != ''">
                 settle_code = #{settleCode},
+            </if>
+            <if test="oneSettleId != null and oneSettleId != ''">
+                one_settle_id = #{oneSettleId},
+            </if>
+            <if test="redId != null and redId != ''">
+                red_id = #{redId},
+            </if>
+            <if test="oldSettleId != null and oldSettleId != ''">
+                old_settle_id = #{oldSettleId},
+            </if>
+            <if test="settleTime != null">
+                settle_time = #{settleTime},
             </if>
         </set>
         where hosp_code =#{hospCode}

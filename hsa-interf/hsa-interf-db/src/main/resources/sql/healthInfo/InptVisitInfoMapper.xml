@@ -134,7 +134,7 @@
   a.spec as ypgg,
   ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1),a.usage_code)  as yptjdm,
   (select hb.c_meaning from healthinfo_base_code hb where hb.c_code ='CV06.00.102' and hb.cm_value =a.usage_code limit 1) as ywsytjmc,
-  a.rate_id as yypd,
+  (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.056' and hb.cm_value = br.code limit 1) as yypd,
   a.dosage as jl,
   a.dosage_unit_code as jldw,
   a.num as sysl,
@@ -144,11 +144,12 @@
   a.total_num as ypsl,
   a.price as dj,
   a.total_price as zj,
-  '' as sftycgypjy,
+  d.is_basic as sftycgypjy,
   case when d.antibacterial_code is null then '0' else '1' end as kjywbz,
   ifnull((select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.013' and hb.cm_value =d.ph_code limit 1),d.ph_code) as tsypfl,
   d.basic_code as yllb,
   d.ddd as ddd,
+  d.antibacterial_code as KJYWDJDM,
   d.is_lvp as jmsybz,
   a.total_num_unit_code as fysldw,
   a.herb_use_code as zyjzff,
@@ -165,6 +166,7 @@
   left join inpt_advice_detail c on a.id = c.ia_id and a.visit_id = c.visit_id and a.hosp_code = c.hosp_code
   left join inpt_visit b on a.visit_id =b.id and a.hosp_code = b.hosp_code
   left join base_drug d on c.item_id = d.id and c.hosp_code =d.hosp_code
+  left join base_rate br on a.rate_id = br.id and a.hosp_code = br.hosp_code and br.is_valid = '1'
   where  a.crte_time &gt;= date(#{startTime}) and a.crte_time &lt; date(#{endTime}) and a.hosp_code =#{hospCode}
   order by a.crte_time asc
     </select>
@@ -360,7 +362,7 @@
         select
         distinct
         max(c.id) as blwdlsh,
-       (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code=a.hosp_code limit 1) as yljgdm,
+       (select	value from	sys_parameter sp where	sp.code = 'HOSP_INSURE_NATION_INFO' and sp.hosp_code = a.hosp_code limit 1) as yljgdm,
 	   (select name from sys_parameter scd where scd.code  ='HOSP_INSURE_NATION_INFO' and scd.hosp_code = a.hosp_code limit 1) as yljgmc,
 	   '3' as hzlxdm,
 	   b.visit_id as jzlsh,
@@ -401,8 +403,8 @@
        c.crte_id  as modifytcode,
        c.crte_name as modifytname
       from inpt_visit a
-      join emr_patient b on  b.visit_id=a.id and a.hosp_code =b.hosp_code
-      JOIN emr_classify_template et on b.classify_template_id = et.id and b.dept_id =et.dept_id and et.hosp_code =#{hospCode}
+      join emr_patient b on  b.visit_id=a.id and a.hosp_code = #{hospCode}
+      join emr_classify_template et on b.classify_template_id = et.id and b.dept_id =et.dept_id and et.hosp_code =#{hospCode}
       join emr_patient_html c on b.patient_html_id = c.id and c.hosp_code =#{hospCode}
       join emr_classify d on et.classify_code=d.code and et.dept_id = d.dept_id and  d.hosp_code =#{hospCode} and d.is_valid='1'
       where c.crte_time &gt;= date(#{startTime})

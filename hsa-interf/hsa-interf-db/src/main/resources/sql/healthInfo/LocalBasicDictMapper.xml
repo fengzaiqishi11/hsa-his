@@ -104,7 +104,7 @@
             bd.antibacterial_code as kjlypfj, -- 抗菌类药品分级
             kjypjb.name as kjfjms, -- 抗菌类分级描述
             '' as sfydbz, -- 是否有毒标识
-            bd.ph_code as mzjslfldm, -- 麻醉精神类药品分类代码
+            (select hb.c_value from healthinfo_base_code hb where hb.c_code ='CX02.01.013' and hb.cm_value = bd.ph_code  limit 1) as mzjslfldm, -- 麻醉精神类药品分类代码
             dmtx.name as mzjslms, -- 麻醉精神类药品标识描述
             '' as kssbz, -- 抗生素标识
             ypfl.name as ylfl, -- 药理分类

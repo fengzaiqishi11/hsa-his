@@ -1,5 +1,7 @@
 package cn.hsa.module.payment.service;
 
+import cn.hsa.base.PageDTO;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
 import cn.hsa.module.payment.entity.PaymentSettleDO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -32,12 +34,13 @@ public interface PaymentSettleService {
 
     /**
      * 分页查询
-     *
-     * @param paymentSettle 筛选条件
-     * @param pageRequest   分页对象
+     * @param param   筛选条件
+     * @author liuliyun
+     * @date 2022-09-15 10:47
+     * @email liyun.liu@powersi.com
      * @return 查询结果
      */
-    Page<PaymentSettleDO> queryByPage(PaymentSettleDO paymentSettle, PageRequest pageRequest);
+    WrapperResponse<PageDTO> queryByPage(Map<String,Object> param);
 
     /**
      * 新增数据

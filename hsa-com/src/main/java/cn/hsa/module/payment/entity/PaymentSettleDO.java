@@ -66,7 +66,7 @@ public class PaymentSettleDO extends PageDO implements Serializable {
     /**
      * 状态标志,0正常，2冲红，1，被冲红
      */
-    private String stateCode;
+    private String statusCode;
 
     /**
      * 结算状态（0：未结算 1预结算 2已结算）
@@ -116,5 +116,10 @@ public class PaymentSettleDO extends PageDO implements Serializable {
      * 结算时间
      */
     private Date settleTime;
+
+    /**
+     * 是否结算（SF）
+     */
+    private String isSettle;
 
 }

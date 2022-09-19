@@ -12,7 +12,7 @@
         <result property="totalPrice" column="total_price" jdbcType="NUMERIC"/>
         <result property="paymentPrice" column="payment_price" jdbcType="NUMERIC"/>
         <result property="payCode" column="pay_code" jdbcType="VARCHAR"/>
-        <result property="stateCode" column="state_code" jdbcType="VARCHAR"/>
+        <result property="statusCode" column="status_code" jdbcType="VARCHAR"/>
         <result property="omsgid" column="omsgid" jdbcType="VARCHAR"/>
         <result property="oinfno" column="oinfno" jdbcType="VARCHAR"/>
         <result property="remark" column="remark" jdbcType="VARCHAR"/>
@@ -29,7 +29,7 @@
     <!--查询单个-->
     <select id="queryById" resultMap="PaymentSettleMap">
         select
-          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time
         from payment_settle
         where id = #{id}
     </select>
@@ -38,8 +38,8 @@
     <select id="queryAllPaymentSettle" resultMap="PaymentSettleMap">
         select
         id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code,
-        state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id,
-        old_settle_id, settle_time
+        status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id,
+        old_settle_id, settle_time,is_settle
         from payment_settle
         <where>
             <if test="id != null and id != ''">
@@ -69,8 +69,8 @@
             <if test="payCode != null and payCode != ''">
                 and pay_code = #{payCode}
             </if>
-            <if test="stateCode != null and stateCode != ''">
-                and state_code = #{stateCode}
+            <if test="statusCode != null and statusCode != ''">
+                and status_code = #{statusCode}
             </if>
             <if test="omsgid != null and omsgid != ''">
                 and omsgid = #{omsgid}
@@ -104,6 +104,9 @@
             </if>
             <if test="settleTime != null">
                 and settle_time = #{settleTime}
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                and is_settle = #{isSettle}
             </if>
         </where>
         limit #{pageable.offset}, #{pageable.pageSize}
@@ -141,8 +144,8 @@
             <if test="payCode != null and payCode != ''">
                 and pay_code = #{payCode}
             </if>
-            <if test="stateCode != null and stateCode != ''">
-                and state_code = #{stateCode}
+            <if test="statusCode != null and statusCode != ''">
+                and status_code = #{statusCode}
             </if>
             <if test="omsgid != null and omsgid != ''">
                 and omsgid = #{omsgid}
@@ -181,21 +184,21 @@
     </select>
 
     <!--新增所有列-->
-    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time)
-        values (#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{stateCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime})
+    <insert id="insert">
+        insert into payment_settle(id,hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,is_settle)
+        values (#{id},#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{statusCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime},#{isSettle})
     </insert>
 
-    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into payment_settle(hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price,
-        payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code,
-        one_settle_id, red_id, old_settle_id, settle_time)
+    <insert id="insertBatch">
+        insert into payment_settle(id,osp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price,
+        payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code,
+        one_settle_id, red_id, old_settle_id, settle_time,is_settle)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId}, #{entity.visitNo},
-            #{entity.totalPrice}, #{entity.paymentPrice}, #{entity.payCode}, #{entity.stateCode}, #{entity.omsgid},
+            (#{entity.id},#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId}, #{entity.visitNo},
+            #{entity.totalPrice}, #{entity.paymentPrice}, #{entity.payCode}, #{entity.statusCode}, #{entity.omsgid},
             #{entity.oinfno}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime},
-            #{entity.settleCode}, #{entity.oneSettleId}, #{entity.redId}, #{entity.oldSettleId}, #{entity.settleTime})
+            #{entity.settleCode}, #{entity.oneSettleId}, #{entity.redId}, #{entity.oldSettleId}, #{entity.settleTime},#{entity.isSettle})
         </foreach>
     </insert>
 
@@ -227,8 +230,8 @@
             <if test="payCode != null and payCode != ''">
                 pay_code = #{payCode},
             </if>
-            <if test="stateCode != null and stateCode != ''">
-                state_code = #{stateCode},
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
             </if>
             <if test="omsgid != null and omsgid != ''">
                 omsgid = #{omsgid},
@@ -263,6 +266,9 @@
             <if test="settleTime != null">
                 settle_time = #{settleTime},
             </if>
+            <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle},
+            </if>
         </set>
         where hosp_code =#{hospCode}
         and settle_id =#{settleId}
@@ -274,15 +280,115 @@
         delete from payment_settle where id = #{id}
     </delete>
         <!--根据就诊id 医院编码 结算id查询诊间支付结算信息-->
-    <select id="quyeryPaymentInfoByCondition" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultMap="PaymentSettleMap">
+    <select id="quyeryPaymentInfoByCondition" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">
         select
-          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, state_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time
         from payment_settle
         where hosp_code =#{hospCode}
         and settle_id =#{settleId}
         and visit_id =#{visitId}
-        and state_code ='1'
+        and settle_code ='1'
     </select>
+
+  <select id="queryPaymentBillList" resultType="java.util.Map" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO">
+      select
+      ifnull(sum(b.total_price),0.00) as totalPrice,
+      ifnull(sum(ps.payment_price),0.00) as paymentPrice,
+      ps.pay_code as payCode,
+      count(1) as totalBillNum
+      from
+      outpt_visit a
+      join  outpt_settle b on a.id =b.visit_id  and a.hosp_code = b.hosp_code
+      join payment_settle ps on ps.settle_id = b.id and ps.hosp_code = b.hosp_code
+      where
+      b.is_settle ='1'
+      and b.status_code ='0'
+      and ps.settle_code ='2'
+      and ps.status_code ='0'
+      /*开始日期*/
+      <if test="startTime != null and startTime != '' ">
+          and date(pa.settle_time) &gt;= date(#{startTime})
+      </if>
+      /*结束日期*/
+      <if test="endTime != null and endTime != ''">
+          and date(ps.settle_time) &lt;= date(#{endTime})
+      </if>
+      /*支付类型*/
+      <if test="payCode != null and payCode != ''">
+          and ps.pay_code =#{PayCode}
+      </if>
+      group by ps.pay_code
+  </select>
+   <select id="queryPaymentBillDetailList" resultType="java.util.Map" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO">
+       select
+      a.id as visitId,
+      a.visit_no as visitNo,
+      b.settle_no as settleNo,
+      b.id as settleId,
+      ps.payment_settle_id as paymentSettleId,
+      ps.total_price as totalPrice,
+      ps.payment_price as paymentPrice,
+      ps.pay_code as payCode
+      from
+      outpt_visit a
+      join  outpt_settle b on a.id =b.visit_id  and a.hosp_code = b.hosp_code
+      join payment_settle ps on ps.settle_id = b.id and ps.hosp_code = b.hosp_code
+      where
+      b.is_settle ='1'
+      and b.status_code ='0'
+      and ps.settle_code ='2'
+      and ps.status_code ='0'
+      and ps.settle_time
+      and ps.pay_code =#{PayCode}
+       /*开始日期*/
+       <if test="startTime != null and startTime != '' ">
+           and date(pa.settle_time) &gt;= date(#{startTime})
+       </if>
+       /*结束日期*/
+       <if test="endTime != null and endTime != ''">
+           and date(ps.settle_time) &lt;= date(#{endTime})
+       </if>
+      group by b.id
+   </select>
+
+    <!--查询一种支付方式的总账单-->
+    <select id="queryPaymentBillInfo" resultType="java.util.Map" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO">
+        select
+        ifnull(sum(b.total_price),0.00) as totalPrice,
+        ifnull(sum(ps.payment_price),0.00) as paymentPrice,
+        ps.pay_code as payCode,
+        count(1) as totalBillNum
+        from
+        outpt_visit a
+        join  outpt_settle b on a.id =b.visit_id  and a.hosp_code = b.hosp_code
+        join payment_settle ps on ps.settle_id = b.id and ps.hosp_code = b.hosp_code
+        where
+        b.is_settle ='1'
+        and b.status_code ='0'
+        and ps.settle_code ='2'
+        and ps.status_code ='0'
+        and ps.pay_code =#{PayCode}
+        /*开始日期*/
+        <if test="startTime != null and startTime != '' ">
+            and date(pa.settle_time) &gt;= date(#{startTime})
+        </if>
+        /*结束日期*/
+        <if test="endTime != null and endTime != ''">
+            and date(ps.settle_time) &lt;= date(#{endTime})
+        </if>
+    </select>
+
+    <!--删除试算产生的脏数据-->
+    <delete id="delOutptPaymentSettleByParam" parameterType="java.util.Map">
+        DELETE
+        FROM
+          payment_settle
+        WHERE
+        hosp_code = #{hospCode}
+        AND visit_id = #{visitId}
+        AND is_settle = #{isSettle}
+        AND status_code = #{statusCode}
+    </delete>
 
 </mapper>
 

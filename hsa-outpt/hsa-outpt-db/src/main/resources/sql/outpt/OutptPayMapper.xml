@@ -304,5 +304,13 @@
         select order_no as orderNo, price from outpt_pay where hosp_code = #{hospCode} and visit_id = #{visitId} and settle_id = #{settleId} and pay_code = #{payCode}
     </select>
 
+    <select id="selectPaymentSettlePay" resultType="cn.hsa.module.outpt.fees.dto.OutptPayDTO">
+        select pay_code as payCode, price from outpt_pay
+        where hosp_code = #{hospCode}
+        and visit_id = #{visitId}
+        and settle_id = #{settleId}
+        and pay_code ='5'
+    </select>
+
 
 </mapper>

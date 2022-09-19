@@ -499,4 +499,14 @@ public interface OutptTmakePriceFormBO {
      * @description 用户在平台的收银台上完成结算后，平台会将结算的“结果明细”回写给机构，机构进行内部的充值结算流程
      **/
     Map<String, Object> updateRechargeSettle(Map param);
+
+    /***@Menthod saveOutptPaymentSettleInvoice
+     * @Description 诊间支付结算接口
+     * @param map
+     * @author: liuliyun
+     * @email liyun.liu@powersi.com
+     * @date: 2022/09/02 13:44
+     * @return: WrapperResponse
+     **/
+    WrapperResponse saveOutptPaymentSettleInvoice(Map<String, Object> map);
 }

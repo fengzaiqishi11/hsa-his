@@ -4,6 +4,7 @@ import cn.hsa.module.payment.entity.PaymentOrderDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.payment.dao
@@ -85,6 +86,16 @@ public interface PaymentOrderDAO {
      * @return int
      */
     int updatePaymentOrder(PaymentOrderDO paymentOrderDO);
+
+    /**
+     * @Menthod delOutptPaymentOrderByParam
+     * @Desrciption 根据条件删除诊间支付订单试算数据
+     * @param param 请求参数
+     * @Author liuliyun
+     * @Date 2022/9/19 09:33
+     * @Return int 受影响行数
+     */
+    int delOutptPaymentOrderByParam(Map<String,String> param);
 
 }
 

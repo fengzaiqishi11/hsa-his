@@ -1,40 +1,17 @@
-package cn.hsa.module.payment.service;
-
-import cn.hsa.hsaf.core.framework.web.WrapperResponse;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.PostMapping;
+package cn.hsa.module.payment.bo;
 
 import java.util.Map;
 
 /**
- * @Package_name: cn.hsa.module.outpt.fees.service
- * @Class_name: OutptPaymentService
- * @Describe(描述):诊间支付Service接口
+ * @Package_name: cn.hsa.module.payment.bo
+ * @Class_name: OutptPaymentBO
+ * @Describe:
  * @Author: liuliyun
  * @Eamil: liyun.liu@powersi.com
- * @Date: 2022/08/30 19:19
+ * @Date: 2022-09-14 14:14
  * @Company: CopyRight@2014 POWERSI Inc.All Rights Reserverd
  */
-@FeignClient(value = "hsa-payment")
-public interface OutptPaymentService {
-
-    /**@Method checkOutptPhonePayAuthority
-     * @Author liuliyun
-     * @Description 诊间支付权限校验
-     * @Date 2022/08/30 19:17
-     * @Param [map]
-     * @return Boolean
-     **/
-    WrapperResponse<Boolean> checkOutptPhonePayAuthority(Map param);
-
-    /**@Method checkOutptPrescriptionPayAuthority
-     * @Author liuliyun
-     * @Description 诊间支付(扫处方二维码)权限校验
-     * @Date 2022/08/30 19:26
-     * @Param [map]
-     * @return Boolean
-     **/
-    Boolean checkOutptPrescriptionPayAuthority(Map param);
+public interface OutptPaymentBO {
 
     /**@Method updatePaymentRefund
      * @Author liuliyun
@@ -54,15 +31,14 @@ public interface OutptPaymentService {
      **/
     Map<String,Object> updatePaymentRefundQuery(Map param);
 
-    /**@Menthod updatePaymentSettle
-     * @description 诊间支付结算接口
-     * @param param
-     * @Author: liuliyun
-     * @Email: liyun.liu@powersi.com
-     * @Date: 2022/09/05 11:33
-     * @return map
-     */
-    Map<String,Object> updatePaymentSettle(Map<String, Object> param);
+    /**@Method updatePaymentSettle
+     * @Author liuliyun
+     * @Description 诊间支付结算接口
+     * @Date 2022/09/14 14:07
+     * @Param [map]
+     * @return  Map<String,Object>
+     **/
+    Map<String,Object> updatePaymentSettle(Map param);
 
     /**@Method updatePaymentSettleQuery
      * @Author liuliyun
@@ -89,7 +65,7 @@ public interface OutptPaymentService {
      * @Param [map]
      * @return  Map<String,Object>
      **/
-    WrapperResponse<Map<String,Object>> updatePaymentBill(Map param);
+    Map<String,Object> updatePaymentBill(Map param);
 
 
     /**@Method updatePaymentBillDetail
@@ -99,7 +75,5 @@ public interface OutptPaymentService {
      * @Param [map]
      * @return  Map<String,Object>
      **/
-    WrapperResponse<Map<String,Object>> updatePaymentBillDetail(Map param);
-
-
+    Map<String,Object> updatePaymentBillDetail(Map param);
 }

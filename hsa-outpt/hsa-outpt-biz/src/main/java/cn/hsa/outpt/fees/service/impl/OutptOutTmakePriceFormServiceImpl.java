@@ -202,4 +202,27 @@ public class OutptOutTmakePriceFormServiceImpl extends HsafService implements Ou
         return WrapperResponse.success(outptOutTmakePriceFormBO.saveBackCostWithOutpt(map));
     }
 
+
+    /**
+     * @Menthod updateOutptOnlinePayOutFee
+     * @Desrciption 门诊诊间支付退费
+     * @param param
+     * @Author liuliyun
+     * @Date 2022/9/19 10:09
+     * @email liyun.liu@powersi.com
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    public WrapperResponse updateOutptOnlinePayOutFee(Map param) {
+        // 获取个人信息
+        OutptVisitDTO outptVisitDTO = MapUtils.get(param,"outptVisitDTO");
+
+        // 获取结算信息
+        OutptSettleDTO outptSettleDTO = MapUtils.get(param,"outptSettleDTO");
+
+        // 支付信息
+        List<OutptPayDTO> outptPayDOList = MapUtils.get(param,"outptPayDOList");
+        return outptOutTmakePriceFormBO.updateOutptOnlinePayOutFee(outptVisitDTO,outptSettleDTO,outptPayDOList);
+    }
+
 }

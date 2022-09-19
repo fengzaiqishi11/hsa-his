@@ -28,6 +28,9 @@ import cn.hsa.module.outpt.register.dao.OutptRegisterDAO;
 import cn.hsa.module.outpt.register.dto.OutptRegisterDTO;
 import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.payment.dto.PaymentSettleDTO;
+import cn.hsa.module.payment.entity.PaymentSettleDO;
+import cn.hsa.module.payment.service.OutptPaymentService;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeAllDetailDTO;
 import cn.hsa.module.phar.pharoutdistribute.dto.PharOutDistributeDTO;
 import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
@@ -120,6 +123,9 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
 
     @Resource
     private RedisUtils  redisUtils;
+
+    @Resource
+    private OutptPaymentService outptPaymentService_consumer;
 
 
     /**
@@ -1392,6 +1398,12 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 门诊结算信息对冲
         this.outptSettleInfoChangeRed(selectDTO,redSettleId);
 
+        // 是否为在线支付
+        if (Constants.SF.S.equals(outptSettleDTO.getOnlinePay())) {
+            // 诊间支付结算信息对冲
+            this.outptPaymentSettleChangeRed(selectDTO, redSettleId);
+        }
+
         // 门诊退费时需要更新消费异动表
         if (outptSettleDTO.getCardPrice() != null && BigDecimalUtils.greaterZero(outptSettleDTO.getCardPrice())) {
             Map<String, Object> map = new HashMap<>();
@@ -1683,6 +1695,31 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 for (OutptCostDTO outptCostDTO : outptCostDTOList) {
                     //为0的退药数据不计算
                     if(BigDecimalUtils.compareTo(outptCostDTO.getBackNum(), BigDecimal.ZERO ) <= 0){
+                        // 药品已全退，或者部分退时，校验退费数量是否与退药数量一致
+                        if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
+                                && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
+                                && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
+                            /**
+                             *  退药数量核对逻辑处理
+                             *  药房未退药数量 = 总数量 - 累计退药数量
+                             *  前端未退药数量 = 新费用记录数量 - 回退数量
+                             */
+
+                            // 药房未退药数量
+                            BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(), pharOutDistributeBatchDetailDTO.getTotalBackNum());
+
+                            // 前端未退药数量
+                            BigDecimal lastNum = BigDecimalUtils.subtract(outptCostDTO.getTotalNum(), outptCostDTO.getBackNum());
+                            Boolean isFlag = BigDecimalUtils.equals(pharLastNum, lastNum);
+                            if (!isFlag) {
+                                if (pharOutDistributeBatchDetailDTO.getTotalBackNum().compareTo(BigDecimal.ZERO) == 0) {
+                                    throw new AppException("退费提示：【" + outptCostDTO.getItemName() + "】已发药，请先去药房退药");
+                                } else {
+                                    BigDecimal infactackNum = BigDecimalUtils.subtract(outptCostDTO.getBackNum(), BigDecimalUtils.subtract(pharLastNum, lastNum));
+                                    throw new AppException("退费提示：【" + outptCostDTO.getItemName() + "】药房退药数量为【" + infactackNum + "】,请核对数量");
+                                }
+                            }
+                        }
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
@@ -1725,6 +1762,30 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 for (OutptCostDTO outptCostDTO : outptCostDTOList) {
                     //为0的退药数据不计算
                     if(BigDecimalUtils.compareTo(outptCostDTO.getBackNum(), BigDecimal.ZERO ) <= 0){
+                        // 药品已全退，或者部分退时，校验退费数量是否与退药数量一致
+                        if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
+                                && ((pharOutDistributeBatchDetailDTO.getOpdId() == null && outptCostDTO.getOpdId() == null) || (StringUtils.isNotEmpty(pharOutDistributeBatchDetailDTO.getOpdId())&&pharOutDistributeBatchDetailDTO.getOpdId().equals(outptCostDTO.getOpdId())))
+                                && pharOutDistributeBatchDetailDTO.getItemId().equals(outptCostDTO.getItemId()) && pharOutDistributeBatchDetailDTO.getCostId().equals(outptCostDTO.getId())) {
+                            /**
+                             *  退药数量核对逻辑处理
+                             *  药房未退药数量 = 总数量 - 累计退药数量
+                             *  前端未退药数量 = 新费用记录数量 - 回退数量
+                             */
+                            // 药房未退药数量
+                            BigDecimal pharLastNum = BigDecimalUtils.subtract(pharOutDistributeBatchDetailDTO.getNum(), pharOutDistributeBatchDetailDTO.getTotalBackNum());
+
+                            // 前端未退药数量
+                            BigDecimal lastNum = BigDecimalUtils.subtract(outptCostDTO.getTotalNum(), outptCostDTO.getBackNum());
+                            Boolean isFlag = BigDecimalUtils.equals(pharLastNum, lastNum);
+                            if (!isFlag) {
+                                if (pharOutDistributeBatchDetailDTO.getTotalBackNum().compareTo(BigDecimal.ZERO) == 0) {
+                                    throw new AppException("退费提示：【" + outptCostDTO.getItemName() + "】已发药，请先去药房退药");
+                                } else {
+                                    BigDecimal infactackNum = BigDecimalUtils.subtract(outptCostDTO.getBackNum(), BigDecimalUtils.subtract(pharLastNum, lastNum));
+                                    throw new AppException("退费提示：【" + outptCostDTO.getItemName() + "】药房退药数量为【" + infactackNum + "】,请核对数量");
+                                }
+                            }
+                        }
                         continue;
                     }
                     if (Constants.TYZT.YFY.equals(pharOutDistributeBatchDetailDTO.getStatusCode())
@@ -1855,6 +1916,426 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         if (!"0".equals(code)) {
             throw new AppException((String) resultObj.get("message"));
         }
+    }
+
+    /**
+     * @param outptVisitDTO,outptSettleDTO
+     * @Menthod updateOutptOnlinePayOutFee
+     * @Desrciption  诊间支付支付门诊退费
+     * * 2021年5月11日15:06:25 退费修改，支持部分退费自动收费，关键点：
+     * 1、医保病人部分退费时，先全退，再自动生成未退部分的收费信息，再由收费员去收费
+     * 2、自费病人部分退费时，只退要退的部分（暂不考虑支付方式，只需要校验输入金额与应退金额相等即可），未退部分自动收费，不再由收费员收费
+     * @Author liuliyun
+     * @Date 2022/09/06 09:35
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
+     */
+    @Override
+    @Async
+    public synchronized WrapperResponse updateOutptOnlinePayOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDTO> tkOutptPayDTOList) {
+        // TODO 必要入参获取 [就诊ID：visitId , 医院编码：hospCode , 结算ID：settleId , 费用列表信息：allCostDTOList]
+        Map selectMap = new HashMap<>();
+        boolean isInsurePaitentPartBack = false;
+        String visitId = outptSettleDTO.getVisitId();
+        String hospCode = outptSettleDTO.getHospCode();
+        String settleId = outptSettleDTO.getId();
+        String crteId = outptVisitDTO.getCrteId();
+        String hospName = outptVisitDTO.getHospName();
+        String crteName = outptVisitDTO.getCrteName();
+        BigDecimal settleSelfPrice = outptSettleDTO.getSelfPrice() == null? new BigDecimal(0) : outptSettleDTO.getSelfPrice();  // 已经支付的总金额
+        BigDecimal settleCardPrice = outptSettleDTO.getCardPrice() == null? new BigDecimal(0) : outptSettleDTO.getCardPrice(); // 已结算记录卡支付金额
+        BigDecimal settleActualPrice = outptSettleDTO.getActualPrice() == null ? new BigDecimal(0) : outptSettleDTO.getActualPrice();  // 已经支付的划价收费记录中 个人自付金额除一卡通支付后的其他方式支付总和
+
+        selectMap.put("visitId", visitId);
+        selectMap.put("hospCode", hospCode);
+        selectMap.put("settleId", settleId);
+        selectMap.put("oneSettleId", outptSettleDTO.getOneSettleId());
+
+        // 门诊费用信息列表入参获取
+        List<OutptCostDTO> allCostDTOList = outptVisitDTO.getOutptCostDTOList();
+
+        // 部分退剩下要收费的项目
+        List<OutptCostDTO> costDTOList = new ArrayList<>();
+
+        // TODO 基本异常情况判断 - 获取原始结算数据
+        OutptSettleDTO oldOutptSettleDTO = outptSettleDAO.selectByPrimaryKey(settleId);
+        // 获取原始诊间结算数据
+        outptSettleDTO.setSettleId(settleId);
+        outptSettleDTO.setVisitId(visitId);
+        PaymentSettleDTO paymentSettleDTO = outptSettleDAO.queryPaymentSettle(outptSettleDTO);
+        // 获取要退费的病人类型
+        if (StringUtils.isEmpty(oldOutptSettleDTO.getPatientCode())){
+            oldOutptSettleDTO.setPatientCode("0");
+        }
+        Integer patientCode = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
+        if (oldOutptSettleDTO == null) {
+            throw new AppException("退费失败：未找到结算信息");
+        }
+
+        // 2021-9-10 14:21:58  官红强  门诊退费时，如果退了医技，需要将医技申请表数据删除  start===============================
+        List<OutptCostDTO> deleteMedicApplyList = new ArrayList<>();
+        // 2021-9-10 14:21:58  官红强  门诊退费时，如果退了医技，需要将医技申请表数据删除  end  ===============================
+
+        // TODO 回退数量异常判断 - 回退总数量
+        BigDecimal backNumSum = BigDecimal.ZERO;
+        BigDecimal moneyAgain = new BigDecimal(0);
+        for (OutptCostDTO outptCostDTO : allCostDTOList) {
+            // 应收数量 = 收费数量 - 回退数量
+            BigDecimal lastNum = BigDecimalUtils.subtract(outptCostDTO.getTotalNum(), outptCostDTO.getBackNum());
+            int compNum = BigDecimalUtils.compareTo(lastNum, BigDecimal.ZERO);
+            if (compNum == -1) {
+                throw new AppException(outptCostDTO.getItemName() + "退费数量不能大于已收费数量");
+            }
+
+            // 部分退: 获取未退项目
+            if (compNum == 1) {
+                costDTOList.add(this.getLastFeeList(outptCostDTO, lastNum,crteId,crteName,patientCode));
+                BigDecimal rePrice = BigDecimalUtils.divide(outptCostDTO.getRealityPrice(), outptCostDTO.getTotalNum());
+                moneyAgain = BigDecimalUtils.add(moneyAgain, BigDecimalUtils.multiply(rePrice, lastNum));
+            } else { // 全退的记录下来，关于医技的需要更新状态（已退费）
+                deleteMedicApplyList.add(outptCostDTO);
+            }
+            backNumSum = BigDecimalUtils.add(backNumSum,outptCostDTO.getBackNum());
+        }
+        if (BigDecimalUtils.compareTo(backNumSum, BigDecimal.ZERO) <= 0) {
+            throw new AppException("退费数量不能全为零");
+        }
+        // 退费的项目需要更新医技申请状态
+        if (!ListUtils.isEmpty(deleteMedicApplyList)) {
+            outptCostDAO.updateMedicApply(visitId, hospCode, "05", deleteMedicApplyList);
+        }
+
+        // TODO costDTOList 为空表示全退，否则表示部分退(否:false，是:true)
+        Boolean isAllOut = false;
+        if (ListUtils.isEmpty(costDTOList)) {
+            isAllOut = true;
+        }
+
+        // TODO 根据结算ID + 就诊ID + 医院编码（selectMap）获取门诊领药申请信息（phar_out_receive）
+        List<PharOutReceiveDTO> pharOutReceiveDTOList = outptCostDAO.getPahrOutReceiceInfoBySelectMap(selectMap);
+        if (!ListUtils.isEmpty(pharOutReceiveDTOList)) {
+            for (PharOutReceiveDTO pharOutReceiveDTO : pharOutReceiveDTOList) {
+                if (Constants.FYZT.PY.equals(pharOutReceiveDTO.getStatusCode())) {
+                    throw new AppException("退费失败：已经完成配药，请先去药房取消配药");
+                }
+                // 1.处理门诊领药申请信息
+                this.updateNoSendPharOutReceiveInfo(pharOutReceiveDTO);
+            }
+        }
+
+        // TODO 是否已发药 - 能查询到发药记录说明存在发药记录,已完成退药的项目可退费
+        List<PharOutDistributeDTO> distributeList = outptCostDAO.queryPharOutDistribute(selectMap);
+
+        // 已发药项目集合
+        List<String> itemIdList = new ArrayList<>();
+        if (!ListUtils.isEmpty(distributeList)) {
+            // 查询发药批次明细汇总表
+            List<PharOutDistributeAllDetailDTO> pharOutDistributeBatchDetailDTOS = outptCostDAO.queryPharOutDistributeDetailIByList(distributeList);
+            // 3.处理门诊发药信息
+            this.updateSendPharOutDistributeInfo(outptVisitDTO,pharOutDistributeBatchDetailDTOS,isAllOut,allCostDTOList,itemIdList);
+        }
+
+        // TODO 部分退处理未退项目，更新费用信息，处方结算标志修改，已结算 -> 未结算
+        if (!isAllOut) {
+            this.insertCostInfo(costDTOList,itemIdList);
+            this.updateOutptPrescribe(oldOutptSettleDTO);
+        }
+
+        // TODO 门诊费用、结算、支付信息冲红
+        String redSettleId = this.outptChargeChangeRed(allCostDTOList,outptSettleDTO,outptVisitDTO);
+
+        /**START*****************医保病人处理********************************************************************/
+        // TODO 医保病人处理
+        selectMap.put("id",visitId);
+        OutptVisitDTO outpt = outptVisitDAO.queryByVisitID(selectMap);
+        if (outpt == null) {
+            throw new AppException("患者就诊数据出现异常【" + visitId + "】，请联系管理员");
+        }
+        // 病人类型为空 给默认值  lly 20211026
+        if (StringUtils.isEmpty(outpt.getPatientCode())){
+            outpt.setPatientCode("0");
+        }
+
+        // add 退费时获取病人结算记录中病人类型进行退费，而不是取就诊信息表中的病人类型，防止复诊时出现异常情况
+        // by liaojiguang on 2021-11-23
+        if (StringUtils.isEmpty(oldOutptSettleDTO.getPatientCode())){
+            oldOutptSettleDTO.setPatientCode("0");
+        }
+        Integer patientCodeValue = Integer.parseInt(oldOutptSettleDTO.getPatientCode());
+
+        Map<String, Object> tkMap = new HashMap<>();  // 将页面的退款支付信息转换为map
+        for (OutptPayDTO outptPayDto : tkOutptPayDTOList) {
+            tkMap.put(outptPayDto.getPayCode(), outptPayDto.getPrice());
+        }
+        // <----诊间支付退费 2022-09-06  liuliyun start-------->
+        OutptPayDTO wxOutptPayDTO = outptPayDAO.selectPaymentSettlePay(selectMap);
+        BigDecimal wxTkPrice = new BigDecimal(0.00);
+        for (Map.Entry<String, Object> entry : tkMap.entrySet()) {
+            String tkPayCode = entry.getKey(); // 支付类型
+            if(Constants.ZFFS.WX.equals(tkPayCode)){
+                wxTkPrice = (BigDecimal) entry.getValue();  // 支付金额
+                break;
+            }
+        }
+        if (BigDecimalUtils.greaterZero(wxTkPrice)){
+            BigDecimal orgWxPrice =wxOutptPayDTO.getPrice();
+            if (BigDecimalUtils.greater(wxTkPrice,orgWxPrice)){
+                throw new AppException("退费失败，微信退款金额大于结算时微信支付的金额");
+            }else {
+                /*todo 调用支付平台退款接口*/
+                Map<String,Object> paymentParam =new HashMap<>();
+                paymentSettleDTO.setOldSettleId(settleId);
+                paymentSettleDTO.setSettleId(redSettleId);
+                paymentParam.put("paymentSettleDTO",paymentSettleDTO);
+                paymentParam.put("hospCode",hospCode);
+                Map<String,Object> queryResult = outptPaymentService_consumer.updatePaymentRefund(paymentParam);
+                String refundStatus = MapUtils.get(queryResult,"refundStatus"); // 支付平台退款状态
+                if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)){ // 退款成功
+                    // 体检回调
+                    if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+                        phyIsCallBack(allCostDTOList);
+                    }
+                    Map insurePaitentInfo = new HashMap();
+                    insurePaitentInfo.put("outptVisit", outpt); // 返回病人信息
+                    insurePaitentInfo.put("isInsurePaitentPartBack", isInsurePaitentPartBack); // 是否医保病人部分退费
+                    return WrapperResponse.success(insurePaitentInfo);
+                }else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus)||Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)){ // 退款失败或退款异常
+                    String errorMessage = MapUtils.get(queryResult,"failCause",""); // 支付平台退款状态
+                    throw new AppException("退费失败，调用支付平台接口出错，错误信息如下："+errorMessage);
+                }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)){ // 退款中
+                    /*todo 退款中状态需要调用退款查询接口轮询*/
+                }
+            }
+        }else {
+            if (!ListUtils.isEmpty(costDTOList) && patientCodeValue < 1) {
+                Map<String, Object> map = new HashMap<>();
+                if (StringUtils.isEmpty(outptSettleDTO.getVisitId())) {
+                    throw new AppException("未获取到就诊信息");
+                }
+                map.put("visitId", outptSettleDTO.getVisitId());
+                map.put("hospCode", hospCode);
+                OutptVisitDTO outptVisitDTOFee = outptVisitDAO.getVisitByParams(map);
+                outptVisitDTOFee.setOutptCostDTOList(costDTOList);
+                outptVisitDTOFee.setCrteName(crteName);
+                outptVisitDTOFee.setCrteId(crteId);
+                outptVisitDTOFee.setTfcsMark("tfcs"); // 退费重收标记
+                // 退费重收取原始结算表中的病人类型  2022-03-28 lly
+                outptVisitDTOFee.setPatientCode(oldOutptSettleDTO.getPatientCode());
+                outptVisitDTOFee.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
+                Map setteleParam = new HashMap();
+                setteleParam.put("hospCode", hospCode);
+                setteleParam.put("outptVisitDTO", outptVisitDTOFee);
+                WrapperResponse wrapperResponse = outptTmakePriceFormService_consumer.saveOutptSettleMoney(setteleParam);
+                if (wrapperResponse.getCode() == (-1)) {
+                    throw new AppException(wrapperResponse.getMessage());
+                }
+
+                Map chargeMap = (Map) wrapperResponse.getData();
+                OutptSettleDO outptSettleDo = (OutptSettleDO) chargeMap.get("outptSettle");
+                OutptSettleDTO newOutptSettleDTO = new OutptSettleDTO();
+                BeanUtils.copyProperties(outptSettleDo, newOutptSettleDTO);
+
+                // 需要重新设置创建人员
+                OutptVisitDTO visitDTO = (OutptVisitDTO) chargeMap.get("outptVisit");
+                visitDTO.setCrteId(crteId);
+                visitDTO.setCrteName(crteName);
+                visitDTO.setTfcsMark("tfcs"); // 退费重收标记
+                visitDTO.setTruncPrice(outptSettleDTO.getTruncPrice()); // 退费时，原结算时舍入金额
+
+                // 2021年9月1日15:25:54 在院支付方式上扣除费用  1、先查询原支付方式 ===========官红强==start===========================================================================
+                List<OutptPayDTO> oldOutptPayList = outptPayDAO.selectOutptPatByVisitIdAndSettleId(selectMap);
+
+                Map<String, Object> oldOutptPayMap = new HashMap<>();
+                if (!ListUtils.isEmpty(oldOutptPayList)) {
+                    for (OutptPayDTO dto : oldOutptPayList) {
+                        oldOutptPayMap.put(dto.getPayCode(), dto.getPrice());
+                    }
+                }
+                BigDecimal otherPayCodePrice = new BigDecimal(0); // 需要其他支付方式扣除的金额
+                for (Map.Entry<String, Object> entry : tkMap.entrySet()) {
+                    String tkPayCode = entry.getKey(); // 支付类型
+                    BigDecimal tkPrice = (BigDecimal) entry.getValue();  // 支付金额
+                    if (oldOutptPayMap.containsKey(tkPayCode)) {
+                        BigDecimal oldPrice = (BigDecimal) oldOutptPayMap.get(tkPayCode);  // 原支付方式的支付金额
+                        // 当前支付方式的退款金额 大于 原支付方式支付金额
+                        if (!BigDecimalUtils.isZero(tkPrice) && BigDecimalUtils.greater(tkPrice, oldPrice)) {
+                            oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice)); // 更新原支付方式的支付金额为，原支付金额 - 现退款金额
+                        } else {
+                            // 当前支付方式的退款金额与原支付方式支付金额相等
+                            if (BigDecimalUtils.equals(tkPrice, oldPrice)) {
+                                oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice)); // 原支付方式金额与退款金额一致，取负数
+                            } else {
+                                oldOutptPayMap.put(tkPayCode, BigDecimalUtils.subtract(oldPrice, tkPrice));
+                            }
+                        }
+                    } else {
+                        oldOutptPayMap.put(tkPayCode, BigDecimalUtils.negate(tkPrice));
+                    }
+                }
+                for (int i = 1; i < 8; i++) {
+                    if (oldOutptPayMap.containsKey(i + "")) {
+                        BigDecimal oldPrice2 = (BigDecimal) oldOutptPayMap.get(i + "");
+                        if (BigDecimalUtils.isZero(oldPrice2)) {
+                            oldOutptPayMap.remove(i + "");
+                        }
+                    }
+                }
+                BigDecimal totalOldPriceAgain = new BigDecimal(0);
+                for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+                    totalOldPriceAgain = BigDecimalUtils.add(totalOldPriceAgain, (BigDecimal) entry.getValue());
+                }
+                // 2021年9月1日15:58:15 ==============================================官红强==end==============================================================
+
+                // 划价收费接口支付接口调用(支付方式默认为现金)
+                List<OutptPayDO> outptPayDOlist = new ArrayList();
+
+                // 没有使用卡支付,全部其他方式支付
+                if (BigDecimalUtils.isZero(settleCardPrice)) {
+//            if (!BigDecimalUtils.equals(totalOldPriceAgain, BigDecimalUtils.subtract(moneyAgain, outptSettleDo.getTruncPrice() == null? new BigDecimal(0): outptSettleDo.getTruncPrice()))) {
+//                throw new AppException("退费自动重收(未使用一卡通)时，计算各支付方式支付金额出错,刷新重试");
+//            }
+                    for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+                        OutptPayDO OutptPayDO = new OutptPayDTO();
+                        OutptPayDO.setPrice((BigDecimal) entry.getValue());
+                        OutptPayDO.setPayCode(entry.getKey());
+                        outptPayDOlist.add(OutptPayDO);
+                    }
+                    // 设置一卡通卡号与卡支付金额
+                    visitDTO.setCardNo(null);
+                    visitDTO.setCardPrice(null);
+                    visitDTO.setProfileId(null);
+                }
+                // 部分卡支付，部分其他方式支付
+                BigDecimal tempPrice = new BigDecimal(0);
+                BigDecimal cardPriceAgain = new BigDecimal(0); // 一卡通再收金额
+                if (BigDecimalUtils.greaterZero(settleCardPrice) && BigDecimalUtils.less(settleCardPrice, settleSelfPrice)) {
+                    tempPrice = BigDecimalUtils.subtract(moneyAgain, settleActualPrice); // 重收金额 - 已经付现的金额
+                    if (BigDecimalUtils.greaterZero(tempPrice)) { // 再收金额大于已经支付的现金金额
+                        cardPriceAgain = BigDecimalUtils.subtract(tempPrice, outptSettleDo.getTruncPrice() == null ? new BigDecimal(0) : outptSettleDo.getTruncPrice());
+                        // 设置一卡通卡号与卡支付金额
+                        visitDTO.setCardNo(outptSettleDTO.getCardNo());
+                        visitDTO.setCardPrice(cardPriceAgain);
+                        visitDTO.setProfileId(outptSettleDTO.getProfileId());
+                    } else {
+                        // 设置一卡通卡号与卡支付金额
+                        visitDTO.setCardNo(null);
+                        visitDTO.setCardPrice(null);
+                        visitDTO.setProfileId(null);
+                    }
+                    if (!BigDecimalUtils.equals(BigDecimalUtils.add(totalOldPriceAgain, outptSettleDo.getTruncPrice()), moneyAgain)) {
+                        throw new AppException("退费失败，自动重收时，计算一卡通与其他支付方式支付金额出错,请前往划价收费界面手动结算");
+                    }
+                    for (Map.Entry<String, Object> entry : oldOutptPayMap.entrySet()) {
+                        OutptPayDO OutptPayDO = new OutptPayDTO();
+                        OutptPayDO.setPrice((BigDecimal) entry.getValue());
+                        OutptPayDO.setPayCode(entry.getKey());
+                        outptPayDOlist.add(OutptPayDO);
+                    }
+                }
+                //  全部卡支付，退费自动收时其他支付方式为空
+                if (BigDecimalUtils.equals(settleCardPrice, settleSelfPrice)) {
+                    cardPriceAgain = BigDecimalUtils.subtract(moneyAgain, outptSettleDo.getTruncPrice() == null ? new BigDecimal(0) : outptSettleDo.getTruncPrice());
+                    // 设置一卡通卡号与卡支付金额
+                    visitDTO.setCardNo(outptSettleDTO.getCardNo());
+                    visitDTO.setCardPrice(cardPriceAgain);
+                    visitDTO.setProfileId(outptSettleDTO.getProfileId());
+                }
+
+                Map<String, Object> chargeParams = new HashMap<>();
+
+
+                // 判断是否使用发票
+//        if (StringUtils.isNotEmpty(outptSettleDTO.getInvoiceNo())) {
+//            newOutptSettleDTO.setIsInvoice(true);
+//        } else {
+//            newOutptSettleDTO.setIsInvoice(false);
+//        }
+                newOutptSettleDTO.setIsInvoice(false);
+
+                // 金额保持一致
+                newOutptSettleDTO.setActualPrice(newOutptSettleDTO.getRealityPrice());
+                newOutptSettleDTO.setCrteId(crteId);
+                newOutptSettleDTO.setCrteName(crteName);
+
+
+                chargeParams.put("outptPayDOList", outptPayDOlist);
+                chargeParams.put("outptVisitDTO", visitDTO);
+                chargeParams.put("outptSettleDTO", newOutptSettleDTO);
+                chargeParams.put("hospCode", hospCode);
+                // outptTmakePriceFormService_consumer.saveOutptSettle(chargeParams);
+
+
+                /**
+                 *   当取消结算的时候 出现医保和his单边账
+                 *   1.医保已经取消  而his没有取消结算 这个时候就需要调用单边账（取消结算单边功能）
+                 *   2.作废医保结算记录 置空医保结算id  把病人类型改完自费病人。his结算表变为自费病人
+                 *   3.再把患者变成自费病人结算，结算完成以后（需要判断医保是否有作废的数据）  再修改病人类型
+                 *   4.病人类型的值存在redis里面中（取消结算单边功能存入）
+                 */
+                selectMap.put("settleId", settleId);
+                List<InsureIndividualSettleDTO> settleDTOList = outptSettleDAO.queryOutptSettle(selectMap);
+                String redisKey = new StringBuilder().append(hospCode).append("^").append(visitId).
+                        append("2208").append("^").toString();
+                if (ListUtils.isEmpty(settleDTOList)) {
+                    String redisValue = redisUtils.get(redisKey);
+                    if (redisUtils.hasKey(redisKey) && StringUtils.isNotEmpty(redisValue)) {
+                        OutptVisitDTO dto = new OutptVisitDTO();
+                        dto.setHospCode(hospCode);//医院编码
+                        dto.setId(visitId);//就诊id
+                        dto.setPatientCode(redisValue);
+                        outptVisitDAO.updateOutptVisit(dto);
+                        redisUtils.del(redisKey);
+                    }
+                }
+                outptTmakePriceFormService_consumer.saveOutptSettleByTf(chargeParams);
+            }
+        }
+        // <----诊间支付退费 2022-09-06  liuliyun end-------->
+        Map insurePaitentInfo = new HashMap();
+        insurePaitentInfo.put("outptVisit", outpt); // 返回病人信息
+        insurePaitentInfo.put("isInsurePaitentPartBack", isInsurePaitentPartBack); // 是否医保病人部分退费
+        /***********End 医保病人退部分费用标识*********/
+
+        /***********End*****************非医保病人自动收费************************************/
+        // 体检回调
+        if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+            phyIsCallBack(allCostDTOList);
+        }
+        return WrapperResponse.success(insurePaitentInfo);
+    }
+
+    /**
+     * @param outptSettleDTO
+     * @Menthod outptPaymentSettleChangeRed
+     * @Desrciption 对冲诊间支付结算信息
+     * @Author liuliyun
+     * @Date 2022/09/06 10:40
+     */
+    private void outptPaymentSettleChangeRed(OutptSettleDTO outptSettleDTO,String redSettleId) {
+        outptSettleDTO.setSettleId(outptSettleDTO.getId());
+        // 诊间支付结算表数据对冲
+        PaymentSettleDO paymentSettleDO = outptSettleDAO.queryPaymentSettle(outptSettleDTO);
+        if (paymentSettleDO == null) {
+            throw new AppException("退费提示：未获取到诊间支付结算记录");
+        }
+        // 被冲红
+        paymentSettleDO.setStatusCode(Constants.ZTBZ.BCH);
+        outptSettleDAO.updatePaymentSettleStatus(paymentSettleDO);
+        // 冲红
+        paymentSettleDO.setId(SnowflakeUtils.getId());
+        paymentSettleDO.setSettleId(redSettleId);
+        paymentSettleDO.setRedId(paymentSettleDO.getId());
+        paymentSettleDO.setOldSettleId(outptSettleDTO.getId());
+        paymentSettleDO.setOneSettleId(paymentSettleDO.getOneSettleId());
+        paymentSettleDO.setStatusCode(Constants.ZTBZ.CH); // 状态标志： 冲红
+        // 金额置反
+        paymentSettleDO.setTotalPrice(BigDecimalUtils.negate(paymentSettleDO.getTotalPrice())); // 总金额
+        paymentSettleDO.setPaymentPrice(BigDecimalUtils.negate(paymentSettleDO.getPaymentPrice())); // 实际支付金额
+        // 创建信息
+        paymentSettleDO.setCrteId(outptSettleDTO.getCrteId());
+        paymentSettleDO.setCrteName(outptSettleDTO.getCrteName());
+        paymentSettleDO.setSettleTime(DateUtils.getNow());
+        paymentSettleDO.setCrteTime(DateUtils.getNow());
+        outptSettleDAO.insertPaymentSettleInfo(paymentSettleDO);
     }
 
 }

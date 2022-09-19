@@ -37,7 +37,7 @@ dubbo:
     name: hsa-medical-payment
   protocol:
     name: dubbo
-    port: 29005
+    port: 29016
     payload: 107374182
   provider:
     threads: 1000

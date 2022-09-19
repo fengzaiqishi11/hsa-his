@@ -457,7 +457,10 @@
                 acct_pay = #{acctPay,jdbcType=DECIMAL},
                 </if>
                 <if test="creditPrice != null">
-                    credit_price = #{creditPrice,jdbcType=DECIMAL}
+                    credit_price = #{creditPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="onlinePay != null">
+                    online_pay = #{onlinePay,jdbcType=DECIMAL}
                 </if>
         </set>
         where
@@ -599,7 +602,8 @@
         b.profile_id as profileId,
         b.is_phys as isPhys,
         a.credit_price as creditPrice,
-        a.trunc_price as truncPrice
+        a.trunc_price as truncPrice,
+        a.online_pay as onlinePay
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id
@@ -1220,7 +1224,8 @@
         b.profile_id as profileId,
         b.is_phys as isPhys,
         a.credit_price as creditPrice,
-        a.trunc_price as truncPrice
+        a.trunc_price as truncPrice,
+        a.online_pay as onlinePay
         FROM
         outpt_settle a
         left join outpt_visit b on a.visit_id = b.id
@@ -1257,4 +1262,31 @@
         </if>
         order by a.settle_no desc, a.settle_time desc
     </select>
+
+    <select id="queryPaymentSettle" parameterType="cn.hsa.module.outpt.fees.dto.OutptSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">
+        select  id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time,
+        settle_code, one_settle_id, red_id, old_settle_id, settle_time, is_settle
+        from payment_settle
+        where hosp_code =#{hospCode}
+        and visit_id =#{visitId}
+        and settle_id =#{settleId}
+        and status_code ='0'
+    </select>
+
+    <!--通过主键修改数据-->
+    <update id="updatePaymentSettleStatus">
+        update payment_settle
+        <set>
+            <if test="statusCode != null and statusCode != ''">
+                status_code = #{statusCode},
+            </if>
+        </set>
+        where hosp_code =#{hospCode} and id =#{id}
+    </update>
+
+    <!--新增被冲红信息-->
+    <insert id="insertPaymentSettleInfo">
+        insert into payment_settle(id,hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,is_settle)
+        values (#{id},#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{statusCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime},#{isSettle})
+    </insert>
 </mapper>

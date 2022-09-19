@@ -1,7 +1,9 @@
 package cn.hsa.medical.payment.service.impl;
 
+import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
+import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.payment.bo.PaymentSettleBO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
 import cn.hsa.module.payment.entity.PaymentSettleDO;
@@ -26,7 +28,7 @@ import java.util.Map;
  */
 @Slf4j
 @HsafRestPath("/service/payment/paymentSettle")
-@Service("paymentSettleServiceImpl_provider")
+@Service("paymentSettleService_provider")
 public class PaymentSettleServiceImpl extends HsafService implements PaymentSettleService {
     @Resource
     PaymentSettleBO paymentSettleBO;
@@ -36,8 +38,10 @@ public class PaymentSettleServiceImpl extends HsafService implements PaymentSett
     }
 
     @Override
-    public Page<PaymentSettleDO> queryByPage(PaymentSettleDO paymentSettle, PageRequest pageRequest) {
-        return null;
+    public WrapperResponse<PageDTO> queryByPage(Map<String,Object> param) {
+        PaymentSettleDTO paymentSettleDTO =MapUtils.get(param,"paymentSettleDTO");
+        paymentSettleDTO.setHospCode(MapUtils.get(param,"hospCode"));
+        return WrapperResponse.success(paymentSettleBO.queryAllPaymentSettle(paymentSettleDTO));
     }
 
     @Override
@@ -56,7 +60,7 @@ public class PaymentSettleServiceImpl extends HsafService implements PaymentSett
     @Override
     public Boolean updatePaymentSettleInfo(Map param) {
         String hospCode = MapUtils.get(param,"hospCode");
-        PaymentSettleDO paymentSettleDO = MapUtils.get(param,"PaymentSettleDO");
+        PaymentSettleDO paymentSettleDO = MapUtils.get(param,"paymentSettleDO");
         paymentSettleDO.setHospCode(hospCode);
         return paymentSettleBO.update(paymentSettleDO);
     }

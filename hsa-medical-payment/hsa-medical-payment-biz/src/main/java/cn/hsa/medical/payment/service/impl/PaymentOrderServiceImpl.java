@@ -1,15 +1,12 @@
 package cn.hsa.medical.payment.service.impl;
 
-import cn.hsa.base.OpenAdditionalService;
 import cn.hsa.base.PageDTO;
 import cn.hsa.hsaf.core.framework.HsafService;
 import cn.hsa.hsaf.core.framework.web.HsafRestPath;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.module.payment.bo.PaymentOrderBO;
 import cn.hsa.module.payment.entity.PaymentOrderDO;
-import cn.hsa.module.payment.service.OutptPaymentService;
 import cn.hsa.module.payment.service.PaymentOrderService;
-import cn.hsa.util.Constants;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

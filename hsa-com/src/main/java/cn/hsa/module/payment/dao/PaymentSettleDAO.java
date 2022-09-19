@@ -5,6 +5,7 @@ import cn.hsa.module.payment.entity.PaymentSettleDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.module.payment.dao
@@ -86,6 +87,46 @@ public interface PaymentSettleDAO {
      * @return PaymentSettleDTO
      */
     PaymentSettleDTO quyeryPaymentInfoByCondition(PaymentSettleDTO paymentSettleDTO);
+
+    /**@Menthod queryPaymentBillList
+     * @Describe: 查询诊间支付对账数据
+     * @Author: liuliyun
+     * @Eamil: liyun.liu@powersi.com
+     * @param paymentSettleDTO 主键
+     * @Date: 2022-09-15 11:52
+     * @return List<PaymentSettleDO>
+     */
+    List<Map<String, Object>> queryPaymentBillList(PaymentSettleDTO paymentSettleDTO);
+
+    /**@Menthod queryPaymentBillDetailList
+     * @Describe: 查询诊间支付对账明细数据
+     * @Author: liuliyun
+     * @Eamil: liyun.liu@powersi.com
+     * @param paymentSettleDTO 主键
+     * @Date: 2022-09-15 14:57
+     * @return List<PaymentSettleDO>
+     */
+    List<Map<String, Object>> queryPaymentBillDetailList(PaymentSettleDTO paymentSettleDTO);
+
+    /**@Menthod queryPaymentBillInfo
+     * @Describe: 查询诊间支付对账数据(一种支付方式)
+     * @Author: liuliyun
+     * @Eamil: liyun.liu@powersi.com
+     * @param paymentSettleDTO 主键
+     * @Date: 2022-09-16 10:40
+     * @return Map<String, Object>
+     */
+    Map<String, Object> queryPaymentBillInfo(PaymentSettleDTO paymentSettleDTO);
+
+    /**
+     * @Menthod delOutptPaymentSettleByParam
+     * @Desrciption 根据条件删除诊间支付试算数据
+     * @param param 请求参数
+     * @Author liuliyun
+     * @Date 2022/9/19 09:25
+     * @Return int 受影响行数
+     */
+    int delOutptPaymentSettleByParam(Map<String,String> param);
 
 }
 

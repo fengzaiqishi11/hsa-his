@@ -78,5 +78,11 @@
     <dubbo:reference interface="cn.hsa.module.center.syshospital.service.SysHospitalService" id="sysHospitalService_consummer" check="false"/>
     <!-- 中心端授权 -->
     <dubbo:reference id="centerFunctionAuthorizationService_consumer" interface="cn.hsa.module.center.authorization.service.CenterFunctionAuthorizationService" check="false"/>
+    <!--诊间支付结算服务-->
+    <dubbo:reference interface="cn.hsa.module.payment.service.PaymentSettleService" id="paymentSettleService_consummer" check="false"/>
+    <!--诊间支付订单服务-->
+    <dubbo:reference interface="cn.hsa.module.payment.service.PaymentOrderService" id="paymentOrderService_consummer" check="false"/>
+    <!--诊间支付接口服务-->
+    <dubbo:reference interface="cn.hsa.module.payment.service.OutptPaymentService" id="outptPaymentService_consummer" check="false"/>
 </beans>
 

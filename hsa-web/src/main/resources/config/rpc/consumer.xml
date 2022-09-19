@@ -546,6 +546,9 @@
     <dubbo:reference id="userMessageInfoService_consumer" interface="cn.hsa.module.sys.message.service.UserReadMessageService" check="false"/>
     <!-- 系统基础数据日志记录服务 -->
     <dubbo:reference id="baseDataModifyLogService_provider" interface="cn.hsa.module.base.log.service.BaseDataModifyLogService" check="false"/>
-
+    <!-- 诊间支付服务 -->
+    <dubbo:reference id="outptPaymentService_consumer" interface="cn.hsa.module.payment.service.OutptPaymentService" check="false"/>
+    <!-- 诊间支付结算服务 -->
+    <dubbo:reference id="paymentSettleService_consumer" interface="cn.hsa.module.payment.service.PaymentSettleService" check="false"/>
 </beans>
 

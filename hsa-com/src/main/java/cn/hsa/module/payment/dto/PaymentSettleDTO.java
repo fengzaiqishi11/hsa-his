@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  *@Package_name: cn.hsa.module.stro.adjust.dto
@@ -28,4 +29,5 @@ public class  PaymentSettleDTO extends PaymentSettleDO implements Serializable {
     private String endTime;
     private String keyword;
     private String authCode; // 付款码
+    private BigDecimal totalBillNum; // 总笔数
 }

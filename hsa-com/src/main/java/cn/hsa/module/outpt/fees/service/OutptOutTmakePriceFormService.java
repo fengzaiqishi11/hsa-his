@@ -139,4 +139,16 @@ public interface OutptOutTmakePriceFormService {
 
     @PostMapping(value = "/service/outpt/outTmakePriceForm/saveBackCostWithOutpt")
     WrapperResponse<Boolean> saveBackCostWithOutpt(Map<String,Object> map);
+
+    /**
+     * @Menthod updateOutptOnlinePayOutFee
+     * @Desrciption 门诊诊间支付退费
+     * @param param 请求参数
+     * @Author liuliyun
+     * @Date 2022/09/19 10:11
+     * @email liyun.liu@powersi.com
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse 请求结果
+     */
+    @PutMapping(value = "/service/outpt/outTmakePriceForm/updateOutptOnlinePayOutFee")
+    WrapperResponse updateOutptOnlinePayOutFee(Map param);
 }

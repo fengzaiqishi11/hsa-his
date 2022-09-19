@@ -135,4 +135,14 @@ public interface OutptOutTmakePriceFormBO {
     OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO);
 
     Boolean saveBackCostWithOutpt(Map<String, Object> map);
+
+    /**
+     * @Menthod saveOutptPaymentSettle
+     * @Desrciption 诊间支付门诊退费
+     * @param outptVisitDTO,outptSettleDTO,outptPayDOList 请求参数
+     * @Author liuliyun
+     * @Date 2022/09/06 09:36
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse 请求结果
+     */
+    WrapperResponse updateOutptOnlinePayOutFee(OutptVisitDTO outptVisitDTO, OutptSettleDTO outptSettleDTO, List<OutptPayDTO> outptPayDOList);
 }

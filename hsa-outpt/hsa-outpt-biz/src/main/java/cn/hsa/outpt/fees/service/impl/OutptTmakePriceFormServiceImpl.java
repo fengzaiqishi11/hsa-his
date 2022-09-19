@@ -655,4 +655,18 @@ public class OutptTmakePriceFormServiceImpl extends HsafService implements Outpt
     public Map<String, Object> updateRechargeSettle(Map param) {
         return outptTmakePriceFormBO.updateRechargeSettle(param);
     }
+
+    /**
+     * @Menthod saveOutptSettle
+     * @Desrciption  门诊划价收费支付结算
+     * @param param 请求参数
+     * @Author Ou·Mr
+     * @Date 2020/8/25 11:00
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse 请求结果
+     */
+    @Override
+    public WrapperResponse saveOutptPaymentSettleInvoice(Map param) {
+        WrapperResponse wrapperResponse = outptTmakePriceFormBO.saveOutptPaymentSettleInvoice(param);
+        return wrapperResponse;
+    }
 }

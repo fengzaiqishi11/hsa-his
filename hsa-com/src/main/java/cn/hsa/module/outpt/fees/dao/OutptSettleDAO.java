@@ -13,6 +13,8 @@ import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.payment.dto.PaymentSettleDTO;
+import cn.hsa.module.payment.entity.PaymentSettleDO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -294,5 +296,38 @@ public interface OutptSettleDAO {
      * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
      **/
     List<Map<String, Object>> queryApplyRefundCharge(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: queryPaymentSettle()
+     * @Desrciption: 根据结算id查询诊间支付结算信息
+     * @Param: OutptSettleDTO--门诊结算DTO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/09/06 10:05
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    PaymentSettleDTO queryPaymentSettle(OutptSettleDTO outptSettleDTO);
+
+    /**
+     * @Menthod: updatePaymentSettleStatus()
+     * @Desrciption: 更新诊间支付结算信息状态
+     * @Param: paymentSettleDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/09/06 10:13
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    int updatePaymentSettleStatus(PaymentSettleDO paymentSettleDO);
+
+    /**
+     * @Menthod: insertPaymentSettleInfo()
+     * @Desrciption: 新增诊间支付结算信息
+     * @Param: paymentSettleDO
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/09/06 10:21
+     * @Return: cn.hsa.hsaf.core.framework.web.WrapperResponse<cn.hsa.sys.PageDTO>
+     **/
+    int insertPaymentSettleInfo(PaymentSettleDO paymentSettleDO);
 
 }

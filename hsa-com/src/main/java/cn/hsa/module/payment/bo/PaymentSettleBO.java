@@ -33,14 +33,14 @@ public interface PaymentSettleBO {
     PaymentSettleDO queryById(String id);
 
     /**@Menthod queryAllPaymentSettle
-     * @Describe:查询诊间支付结算列表
+     * @Describe: 查询诊间支付结算列表
      * @Author: liuliyun
      * @Eamil: liyun.liu@powersi.com
-     * @param PaymentSettleDO 主键
+     * @param paymentSettleDTO
      * @Date: 2022-09-01 11：27
      * @return PageDTO
      */
-    PageDTO queryAllPaymentSettle(PaymentSettleDO PaymentSettleDO);
+    PageDTO queryAllPaymentSettle(PaymentSettleDTO paymentSettleDTO);
 
     /**@Menthod insert
      * @Describe:新增诊间支付结算信息

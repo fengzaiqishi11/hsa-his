@@ -170,4 +170,14 @@ public interface OutptPayDAO {
      * @Return:
      */
     OutptPayDTO getPayInfoByParams(OutptPayDTO outptPayDTO);
+
+    /**
+     * @Description: 根据就诊id，结算id查询支付信息
+     * @Param: selectMap
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2022/09/06 10:59
+     * @Return OutptPayDTO
+     */
+   OutptPayDTO selectPaymentSettlePay(Map selectMap);
 }

@@ -1416,4 +1416,94 @@ public interface Constants {
         public static final String EXIST_UNSUBMIT_PRESC = "1"; // 存在处方未提交
         public static final String ALL_SUBMIT_PRESC = "2"; // 全部提交
     }
+
+
+    /**
+     * @Menthod ZJ_PAY_ZFZT
+     * @Desrciption 诊间订单支付状态
+     * @Author liuliyun
+     * @Date 2022/09/14 14:44
+     */
+    class ZJ_PAY_ZFZT{
+        /**
+         * 支付中
+         */
+        public static final String ZFZ = "0";
+        /**
+         * 支付成功
+         */
+        public static final String ZFCG = "1";
+        /**
+         * 支付失败
+         */
+        public static final String ZFSB = "2";
+
+        /**
+         * 退款中
+         */
+        public static final String TKZ = "3";
+
+        /**
+         * 退款成功
+         */
+        public static final String TKCG = "4";
+        /**
+         * 退款失败
+         */
+        public static final String TKSB = "5";
+
+        /**
+         * 退款异常
+         */
+        public static final String TKYC = "6";
+
+        /**
+         * 订单关闭
+         */
+        public static final String DDGB = "7";
+    }
+
+    /**
+     * @Menthod ZJ_PAY_TYPE
+     * @Desrciption 诊间支付类型
+     * @Author liuliyun
+     * @Date 2022/09/14 14:56
+     */
+    class ZJ_PAY_TYPE{
+        /**
+         * 微信
+         */
+        public static final String WX = "1";
+        /**
+         * 支付宝
+         */
+        public static final String ZFB = "2";
+    }
+
+    /**
+     * @Menthod ZJ_PAY_TKZT
+     * @Desrciption 诊间订单退款状态
+     * @Author liuliyun
+     * @Date 2022/09/14 14:44
+     */
+    class ZJ_PAY_TKZT{
+        /**
+         * 处理中
+         */
+        public static final String TKZ = "0";
+        /**
+         * 退款成功
+         */
+        public static final String TKCG = "1";
+        /**
+         * 退款失败
+         */
+        public static final String TKSB = "2";
+
+        /**
+         * 退款异常
+         */
+        public static final String TKYC = "3";
+
+    }
 }

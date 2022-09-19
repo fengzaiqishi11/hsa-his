@@ -69,7 +69,7 @@ public class PaymentOrderDO implements Serializable {
     /**
      * 状态标志(ZTBZ),0正常，2冲红，1，被冲红
      */
-    private String stateCode;
+    private String statusCode;
     /**
      * 结算状态（JSZT）0未结算,1预结算,2已结算
      */

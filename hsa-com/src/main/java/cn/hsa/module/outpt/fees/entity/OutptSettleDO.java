@@ -102,5 +102,7 @@ public class OutptSettleDO extends PageDO implements Serializable {
         private String backPayId;
         // 补缴人姓名
         private String backPayName;
+        // 是否在线支付（SF）0: 线下支付 1：线上支付
+        private String onlinePay;
 
 }

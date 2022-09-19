@@ -524,4 +524,15 @@ public interface OutptTmakePriceFormService {
       *
      **/
     Map<String, Object> updateRechargeSettle(Map param);
+
+    /**
+     * @Menthod saveOutptPaymentSettleInvoice
+     * @Desrciption  诊间支付结算接口
+     * @param param 请求参数
+     * @Author liuliyun
+     * @Date  2022/09/02
+     * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse 请求结果
+     */
+    @PostMapping(value = "/service/outpt/tmakePriceForm/saveOutptPaymentSettleInvoice")
+    WrapperResponse saveOutptPaymentSettleInvoice(Map param);
 }

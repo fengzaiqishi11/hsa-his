@@ -137,4 +137,8 @@ public interface BaseAdviceDetailDAO {
     * @throws
     */
     List<BaseAdviceDetailDTO> queryItemAndMaterialAndDrugPage(BaseAdviceDetailDTO baseAdviceDetailDTO);
+
+    void updateGenerateStutas(@Param("code") List<String> code,@Param("hospCode") String hospCode, @Param("key")String key);
+
+    List<String> queryBaseAdviceDetailByItemCode(@Param("code")List<String> code, @Param("hospCode")String hospCode);
 }

@@ -977,7 +977,7 @@
         select a.id, a.hosp_code, a.dept_code, a.code, a.password, a.is_in_job, a.name, a.age, a.birthday, a.gender_code, a.nation_code,
         a.native_place, a.marry_code, a.is_pm, a.in_pm_date, a.cert_code, a.cert_no, a.photo_image, a.sign_image, a.introduce, a.speciality,
         a.address, a.email, a.phone, a.education_code, a.major_code, a.school, a.school_date, a.school_image, a.work_date, a.work_type_code,
-        a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, a.antibacterial_code, a.ph_code, a.opeartion_code,
+        a.duties_code, a.prac_certi_no, a.prac_certi_name, a.durg_code, ifnull(a.antibacterial_code,'') antibacterial_code, a.ph_code, a.opeartion_code,
         a.pswd_err_cnt, a.last_login_time, a.last_login_ip, a.status_code, a.pym, a.wbm, a.crte_id,a.crte_name, a.crte_time,a.signature_path, a.doctor_intro, a.is_guide,a.is_password_change,a.only_open_item
         from sys_user a where a.hosp_code = #{hospCode} and a.code = #{userCode}
     </select>

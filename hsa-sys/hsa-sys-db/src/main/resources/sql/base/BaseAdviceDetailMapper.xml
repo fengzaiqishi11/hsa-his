@@ -603,5 +603,22 @@
         and hosp_code = #{hospCode}
     </delete>
 
+    <update id="updateGenerateStutas">
+        <foreach collection="code" item="item" separator=";">
+        update base_item bi
+            set bi.is_generate_advice = #{key}
+            where bi.code = #{item} and bi.hosp_code = #{hospCode}
+        </foreach>
+    </update>
 
+    <select id="queryBaseAdviceDetailByItemCode" resultType="java.lang.String">
+        select bi.item_code from base_advice_detail bi
+        where bi.hosp_code = #{hospCode}
+        <if test="code !=null">
+            and bi.item_code in
+            <foreach collection="code" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

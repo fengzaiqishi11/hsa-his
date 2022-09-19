@@ -182,6 +182,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
         BaseModifyTraceDTO baseModifyTraceDTO = new BaseModifyTraceDTO();
         baseAdviceDTO.setId(SnowflakeUtils.getId());
         baseAdviceDTO.setCrteTime(DateUtils.getNow());
+        //修改生成状态列表
+        List<String> codeList = new ArrayList<>();
         // 根据单据规则生成医嘱编码
         Map map = new HashMap();
         map.put("hospCode", baseAdviceDTO.getHospCode());
@@ -225,6 +227,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
                 totalPriceAdvice = BigDecimalUtils.add(totalPriceAdvice, totalPrice);
 
                 item.setAdviceCode(baseAdviceDTO.getCode());
+                codeList.add(item.getItemCode());
             }
             baseAdviceDetailDAO.insert(baseAdviceDetailDTOList);
             //存入缓存
@@ -243,6 +246,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
         }
         baseAdviceDTO.setPrice(totalPriceAdvice);
         int insert = this.baseAdviceDAO.insert(baseAdviceDTO);
+        this.updateGenerateStutas(codeList,baseAdviceDTO.getHospCode(),Constants.SF.S);
         // 存入缓存
 //        cacheOperate(baseAdviceDTO,null,true);
         // 医嘱修改，写入异动记录
@@ -293,7 +297,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             List<BaseAdviceDetailDTO> insertList = new ArrayList<>();
 
             List<BaseAdviceDetailDTO> updateList = new ArrayList<>();
-
+            //修改生成状态列表
+            List<String> codeList = new ArrayList<>();
             for (BaseAdviceDetailDTO item : baseAdviceDetailDTOList) {
 
                 if (item.getPrice()==null){
@@ -325,6 +330,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
                 } else {
                     updateList.add(item);
                 }
+                codeList.add(item.getItemCode());
             }
 
             //明细数据缓存处理
@@ -340,6 +346,7 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             allList.addAll(updateList);
             if(!ListUtils.isEmpty(allList)){
 //                cacheDetailOperate(allList,bad.getHospCode(),true);
+                this.updateGenerateStutas(codeList,baseAdviceDTO.getHospCode(),Constants.SF.S);
             }
 
             if (!ListUtils.isEmpty(insertList)) {
@@ -366,14 +373,18 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
             // 根据删除详细表的ids查出所有要删除的详细数据，从总价中减去
             BaseAdviceDetailDTO baseAdviceDetailDTO = new BaseAdviceDetailDTO();
             baseAdviceDetailDTO.setIds(baseAdviceDTO.getIds());
+            baseAdviceDetailDTO.setHospCode(baseAdviceDTO.getHospCode());
             // 删除的详细数据
             List<BaseAdviceDetailDTO> baseAdviceDetailDTOS = baseAdviceDetailDAO.queryPage(baseAdviceDetailDTO);
-
+            //修改生成状态列表
+            List<String> codeList = new ArrayList<>();
             baseAdviceDetailDAO.delete(baseAdviceDTO);
 
             for (BaseAdviceDetailDTO item : baseAdviceDetailDTOS) {
                 totalPriceAdvice = BigDecimalUtils.subtract(totalPriceAdvice, item.getTotalPrice());
+                codeList.add(item.getItemCode());
             }
+            this.updateGenerateStutas(codeList,baseAdviceDTO.getHospCode(),Constants.SF.F);
         }
 
         //修改医嘱信息
@@ -642,8 +653,9 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
       List<BaseItemDTO> baseItemDTOList = MapUtils.get(map,"baseItemDTOList");
       String userName = MapUtils.get(map,"userName");
       String userId = MapUtils.get(map,"userId");
+      BaseAdviceDTO baseAdviceDTO1 = MapUtils.get(map,"baseAdviceDTO");
       // 是否检查医嘱中存在项目
-      Boolean checkFlag = MapUtils.get(map, "checkFlag");
+//      Boolean checkFlag = MapUtils.get(map, "checkFlag");
       // 定义变量
       // 新生成的医嘱主表列表
       List<BaseAdviceDTO> baseAdviceDTOList = new ArrayList<>();
@@ -651,6 +663,8 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
       List<BaseItemDTO> baseItemIsExist = new ArrayList<>();
       // 新生成的医嘱附表列表
       List<BaseAdviceDetailDTO> baseAdviceDetailDTOList = new ArrayList<>();
+      //修改生成状态列表
+      List<String> codeList = new ArrayList<>();
       // 具体业务操作
       for (BaseItemDTO item :baseItemDTOList){
           BaseAdviceDTO baseAdviceDTO = new BaseAdviceDTO();
@@ -663,55 +677,61 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
           baseAdviceDTO.setHospCode(hospCode);
           // 项目编码（查询哪些医嘱含有这个项目用）
           baseAdviceDTO.setItemCode(item.getCode());
-          List<BaseAdviceDTO> existItemInAdvice = baseAdviceDAO.isExistItemInAdvice(item);
-          if (!ListUtils.isEmpty(existItemInAdvice) && checkFlag ){
-              item.setAdviceDTOList(existItemInAdvice);
-              baseItemIsExist.add(item);
-          }else {
+          /*需求更改，无需提示*/
+//          List<BaseAdviceDTO> existItemInAdvice = baseAdviceDAO.isExistItemInAdvice(item);
+//          if (!ListUtils.isEmpty(existItemInAdvice) && checkFlag ){
+//              item.setAdviceDTOList(existItemInAdvice);
+//              baseItemIsExist.add(item);
+//          }else {
               // 根据单据规则生成医嘱编码
-              Map mapCode = new HashMap();
-              mapCode.put("hospCode", baseAdviceDTO.getHospCode());
-              mapCode.put("typeCode", Constants.ORDERRULE.YZ);
-              String orderNo = baseOrderRuleService.getOrderNo(mapCode).getData();//根据规则生成编码
-              // 项目价格
-              item.setPrice(BigDecimalUtils.nullToZero(item.getPrice()));
+          Map mapCode = new HashMap();
+          mapCode.put("hospCode", baseAdviceDTO.getHospCode());
+          mapCode.put("typeCode", Constants.ORDERRULE.YZ);
+          String orderNo = baseOrderRuleService.getOrderNo(mapCode).getData();//根据规则生成编码
+          // 项目价格
+          item.setPrice(BigDecimalUtils.nullToZero(item.getPrice()));
 
-              baseAdviceDTO.setId(SnowflakeUtils.getId());// 生成id
-              baseAdviceDTO.setCode(orderNo);//设置编码
-              baseAdviceDTO.setPrice(item.getPrice());//价格
-              baseAdviceDTO.setUnitCode(item.getUnitCode());//单位
-              baseAdviceDTO.setIsCost(Constants.SF.S);//是否计费
-              baseAdviceDTO.setIsStopMyself(Constants.SF.F);//是否停自己
-              baseAdviceDTO.setIsStopSame(Constants.SF.F);//是否停同类
-              baseAdviceDTO.setIsStopSameNot(Constants.SF.F);//是否停非同类
-              baseAdviceDTO.setWbm(WuBiUtils.getWBCode(item.getName()));// 五笔码
-              baseAdviceDTO.setPym(PinYinUtils.toFirstPY(item.getName()));// 拼音码
-              baseAdviceDTO.setIsValid(Constants.SF.S);// 有效
-              baseAdviceDTO.setCrteName(userName);// 创建人
-              baseAdviceDTO.setCrteId(userId); //创建人id
-              baseAdviceDTO.setCrteTime(DateUtils.getNow()); //创建时间
-              baseAdviceDTO.setUnionNationCode(item.getNationCode());//医嘱联合国家编码
-              baseAdviceDTO.setUnionNationName(item.getNationName());//医嘱联合国家编码名称
-              baseAdviceDTOList.add(baseAdviceDTO);//加入新增列表
-
-
-              baseAdviceDetailDTO.setId(SnowflakeUtils.getId());//id
-              baseAdviceDetailDTO.setAdviceCode(orderNo);//医嘱编码
-              baseAdviceDetailDTO.setItemName(item.getName());//项目名
-              baseAdviceDetailDTO.setHospCode(hospCode);//医院编码
-              baseAdviceDetailDTO.setNum(BigDecimal.ONE);// 数量
-              baseAdviceDetailDTO.setTypeCode(Constants.XMLB.XM);// 项目类别  1.药品 2.材料 3.项目
-              baseAdviceDetailDTO.setItemCode(item.getCode());// 项目编码
-              baseAdviceDetailDTO.setUnitCode(item.getUnitCode());// 单位
-              baseAdviceDetailDTO.setPrice(item.getPrice());// 价格
-              baseAdviceDetailDTO.setTotalPrice(item.getPrice());// 总价格
-              baseAdviceDetailDTO.setSpec(item.getSpec());//规格
-              baseAdviceDetailDTO.setIsAloneCost(Constants.SF.F);//是否数量独立计费
-              baseAdviceDetailDTO.setIsAppointRate(Constants.SF.F);//是否指定频率
-              baseAdviceDetailDTO.setIsFristCost(Constants.SF.F);// 是否仅首次计费
-              baseAdviceDetailDTOList.add(baseAdviceDetailDTO); // 加入新增列表
-
+          baseAdviceDTO.setId(SnowflakeUtils.getId());// 生成id
+          baseAdviceDTO.setCode(orderNo);//设置编码
+          baseAdviceDTO.setPrice(item.getPrice());//价格
+          baseAdviceDTO.setUnitCode(item.getUnitCode());//单位
+          baseAdviceDTO.setIsCost(Constants.SF.S);//是否计费
+          baseAdviceDTO.setIsStopMyself(Constants.SF.F);//是否停自己
+          baseAdviceDTO.setIsStopSame(Constants.SF.F);//是否停同类
+          baseAdviceDTO.setIsStopSameNot(Constants.SF.F);//是否停非同类
+          baseAdviceDTO.setWbm(WuBiUtils.getWBCode(item.getName()));// 五笔码
+          baseAdviceDTO.setPym(PinYinUtils.toFirstPY(item.getName()));// 拼音码
+          baseAdviceDTO.setIsValid(Constants.SF.S);// 有效
+          baseAdviceDTO.setCrteName(userName);// 创建人
+          baseAdviceDTO.setCrteId(userId); //创建人id
+          baseAdviceDTO.setCrteTime(DateUtils.getNow()); //创建时间
+          baseAdviceDTO.setUnionNationCode(item.getNationCode());//医嘱联合国家编码
+          baseAdviceDTO.setUnionNationName(item.getNationName());//医嘱联合国家编码名称
+          baseAdviceDTO.setTypeCode(baseAdviceDTO1.getTypeCode());//医嘱类别
+          if(StringUtils.isNotEmpty(baseAdviceDTO1.getTypeCode()) &&
+                  (Constants.YZLB.YZLB3.equals(baseAdviceDTO1.getTypeCode())||Constants.YZLB.YZLB12.equals(baseAdviceDTO1.getTypeCode()))){
+              baseAdviceDTO.setTechnologyCode(baseAdviceDTO1.getTechnologyCode());//医技类别
           }
+          baseAdviceDTOList.add(baseAdviceDTO);//加入新增列表
+
+
+          baseAdviceDetailDTO.setId(SnowflakeUtils.getId());//id
+          baseAdviceDetailDTO.setAdviceCode(orderNo);//医嘱编码
+          baseAdviceDetailDTO.setItemName(item.getName());//项目名
+          baseAdviceDetailDTO.setHospCode(hospCode);//医院编码
+          baseAdviceDetailDTO.setNum(BigDecimal.ONE);// 数量
+          baseAdviceDetailDTO.setTypeCode(Constants.XMLB.XM);// 项目类别  1.药品 2.材料 3.项目
+          baseAdviceDetailDTO.setItemCode(item.getCode());// 项目编码
+          baseAdviceDetailDTO.setUnitCode(item.getUnitCode());// 单位
+          baseAdviceDetailDTO.setPrice(item.getPrice());// 价格
+          baseAdviceDetailDTO.setTotalPrice(item.getPrice());// 总价格
+          baseAdviceDetailDTO.setSpec(item.getSpec());//规格
+          baseAdviceDetailDTO.setIsAloneCost(Constants.SF.F);//是否数量独立计费
+          baseAdviceDetailDTO.setIsAppointRate(Constants.SF.F);//是否指定频率
+          baseAdviceDetailDTO.setIsFristCost(Constants.SF.F);// 是否仅首次计费
+          baseAdviceDetailDTOList.add(baseAdviceDetailDTO); // 加入新增列表
+          codeList.add(item.getCode());// 项目编码
+//          }
       }
         if (!ListUtils.isEmpty(baseAdviceDTOList) && ListUtils.isEmpty(baseItemIsExist) ){
             baseAdviceDAO.insertList(baseAdviceDTOList);
@@ -720,12 +740,37 @@ public class BaseAdviceBOImpl extends HsafBO implements BaseAdviceBO {
         }
         if (!ListUtils.isEmpty(baseAdviceDetailDTOList) && ListUtils.isEmpty(baseItemIsExist) ){
             baseAdviceDetailDAO.insert(baseAdviceDetailDTOList);
+            /*修改生成状态*/
+            this.updateGenerateStutas(codeList,hospCode,Constants.SF.S);
             //缓存操作
 //            cacheDetailOperate(baseAdviceDetailDTOList,hospCode,true);
         }
+
       return baseItemIsExist;
     }
-
+    /**公共方法，修改生成状态
+     * code 需要修改的项目编码
+     * key 需要修改的生成状态
+     * */
+    public void updateGenerateStutas(List<String> code,String hospCode,String key){
+        if(ListUtils.isEmpty(code)){
+            return;
+        }
+        switch (key){
+            case Constants.SF.S:
+                baseAdviceDetailDAO.updateGenerateStutas(code,hospCode,key);
+                break;
+            case Constants.SF.F:
+                List<String> list = baseAdviceDetailDAO.queryBaseAdviceDetailByItemCode(code, hospCode);
+                code.removeAll(list);
+                if(!ListUtils.isEmpty(code)){
+                    baseAdviceDetailDAO.updateGenerateStutas(code,hospCode,key);
+                }
+                break;
+            default:
+                break;
+        }
+    }
     /**
      * @Method getOperationNamePage
      * @Param [baseAdviceDTO]

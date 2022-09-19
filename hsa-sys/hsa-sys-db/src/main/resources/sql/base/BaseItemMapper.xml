@@ -43,6 +43,7 @@
 		<result property="itemName" column="itemName" jdbcType="VARCHAR"/>
 		<result property="otherName" column="other_name" jdbcType="VARCHAR"/>
 		<result property="reimbursementRatio" column="reimbursement_ratio" jdbcType="VARCHAR"/>
+		<result property="isGenerateAdvice" column="is_generate_advice" jdbcType="VARCHAR"/>
 	</resultMap>
 
 	<!--查询单个-->
@@ -203,7 +204,7 @@
 		a.three_price, a.unit_code, a.intension, a.prompt, a.except, a.remark, a.is_out, a.is_in, a.is_cg, a.is_ms,
 		a.is_supp_curtain,a.other_name,
 		a.out_dept_code, a.in_dept_code, a.name_pym, a.name_wbm, a.abbr_pym, a.abbr_wbm, a.is_valid, a.crte_id,
-		a.crte_name, a.crte_time,
+		a.crte_name, a.crte_time,a.is_generate_advice,
 		b.name as outDeptName,
 		c.name as inDeptName,a.reimbursement_ratio
 		from base_item a
@@ -307,13 +308,8 @@
 					#{item}
 				</foreach>
 			</if>
-			<if test="isAdvice == '1'.toString()">
-				and EXISTS
-				(SELECT base_advice_detail.id FROM base_advice_detail where base_advice_detail.item_code  = a.code)
-			</if>
-			<if test="isAdvice == '0'.toString()">
-				and not EXISTS
-				(SELECT base_advice_detail.id FROM base_advice_detail where base_advice_detail.item_code  = a.code)
+			<if test="isAdvice != null and isAdvice != ''">
+				and a.is_generate_advice = #{isAdvice}
 			</if>
 		</where>
 		order by a.code asc

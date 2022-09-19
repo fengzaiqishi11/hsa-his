@@ -8230,7 +8230,7 @@
             ifnull(B.visit_id,'0') as visitId,
             t.name as visitName,
             t.patient_code as patientCode,
-            ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+            ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.is_valid = '1' and sc.hosp_code = #{hospCode}
             ),'其他') as patientType
             from
                 inpt_settle A
@@ -8260,7 +8260,7 @@
         ),'其他')
         as bfcName,
         ifnull(t.patient_code, '-1') as patientCode,
-        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.is_valid = '1' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from
         inpt_settle A
@@ -8290,7 +8290,7 @@
         ),'其他')
         as bfcName,
         ifnull(t.patient_code, '-1') as patientCode,
-        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ifnull((select name from sys_code_detail sc where sc.`value` = t.patient_code and sc.c_code='BRLX' and sc.is_valid = '1' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from
         outpt_settle A
@@ -8319,7 +8319,7 @@
         ),'其他')
         as bfcName,
         ifnull(v.patient_code, '-1') as patientCode,
-        ifnull((select name from sys_code_detail sc where sc.`value` = v.patient_code and sc.c_code='BRLX' and sc.hosp_code = #{hospCode}
+        ifnull((select name from sys_code_detail sc where sc.`value` = v.patient_code and sc.c_code='BRLX' and sc.is_valid = '1' and sc.hosp_code = #{hospCode}
         ),'其他') as patientType
         from
         outpt_register_settle A

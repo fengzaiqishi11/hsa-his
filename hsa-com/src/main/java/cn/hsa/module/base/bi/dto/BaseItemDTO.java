@@ -129,6 +129,7 @@ public class BaseItemDTO extends BaseItemDO implements Serializable {
     //药房
     private String pharId;
     private String downLoadFlag ; // 下载过滤标识
+    private String technologyCode ;
 
 
 }

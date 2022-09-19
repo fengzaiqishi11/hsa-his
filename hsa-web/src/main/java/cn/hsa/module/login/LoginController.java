@@ -163,6 +163,7 @@ public class LoginController extends BaseController {
             if("powersi".equals(paramMap.get("userCode"))){
                 paramMap.put("userCode","admin");
                 SysUserDTO adminDTO = getData(sysUserService_consumer.getByCode(paramMap));
+                sysUserDTO.setAntibacterialCode(adminDTO.getAntibacterialCode());
                 baseDeptDTO.setCode(adminDTO.getDeptCode());
             }
             BaseDeptDTO baseDeptDto = getData(baseDeptService.getSingleBaseDeptInfoById(map));

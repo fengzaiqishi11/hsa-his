@@ -169,4 +169,8 @@ public class BaseItemDO extends PageDO implements Serializable  {
 
     // 报销比例
     private String reimbursementRatio;
+    /**
+     * 是否生成医嘱
+     */
+    private String isGenerateAdvice;
 }

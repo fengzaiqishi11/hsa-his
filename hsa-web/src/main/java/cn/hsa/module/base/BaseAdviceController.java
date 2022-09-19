@@ -298,6 +298,7 @@ public class BaseAdviceController extends BaseController {
        // map.put("userId",userId);
         map.put("userId",sysUserDTO.getId());
         map.put("checkFlag",checkFlag);
+        map.put("baseAdviceDTO",baseAdviceDTO);
         return baseAdviceService_customer.generateAdviceByItem(map);
     }
 

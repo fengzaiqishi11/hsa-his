@@ -699,6 +699,8 @@ public interface Constants {
         public static final String WSH = "0";//未审核
         public static final String SHWC = "1";//审核完成
         public static final String ZF = "2";//作废
+
+        public static final String ZC = "3";//占存
     }
 
     /**

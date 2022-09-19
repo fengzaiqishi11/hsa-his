@@ -1,6 +1,7 @@
 package cn.hsa.module.stro.adjust.dto;
 
 import cn.hsa.module.stro.adjust.entity.StroAdjustDO;
+import cn.hsa.module.stro.stroin.dto.StroInDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,11 +31,16 @@ public class StroAdjustDTO  extends StroAdjustDO implements Serializable {
     private List<String> ids; //批量审核和作废
     private String bizName; //库房名称
     private List<StroAdjustDetailDTO> stroAdjustDetailDTOs;//调价明细
+    private List<StroInDetailDTO> stroDetailDTOs;//入库明细
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date startDate;        //开始日期
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date endDate;         //结束日期
     private String bizId;
+    /**
+     * 操作状态，1：审核，2：作废
+     */
+    private String operateStatus;
 
 }

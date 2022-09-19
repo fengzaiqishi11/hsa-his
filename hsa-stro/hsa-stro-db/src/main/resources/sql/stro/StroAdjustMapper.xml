@@ -18,7 +18,22 @@
         <result property="crteName" column="crte_name" jdbcType="VARCHAR"/>
         <result property="crteTime" column="crte_time" jdbcType="TIMESTAMP"/>
         <result property="bizName" column="biz_name" jdbcType="VARCHAR"/>
+        <result property="adjustCode" column="adjust_code" jdbcType="VARCHAR"/>
+        <result property="sourceId" column="source_id" jdbcType="VARCHAR"/>
+
     </resultMap>
+    <!--通过sourceId删除调价单-->
+    <delete id="deleteAdjustBySourceId">
+        delete from stro_adjust where source_id = #{sourceId} and adjust_code = '0' and audit_code = '0' and hosp_code = #{hospCode}
+    </delete>
+    <!--删除明细-->
+    <delete id="deleteAdjustDetailBySourceId">
+        delete from stro_adjust_detail
+        where
+            hosp_code = #{hospCode} and id in
+                (select id from stro_adjust where source_id = #{sourceId} and adjust_code = '0' and audit_code = '0'
+                                              and hosp_code = #{hospCode})
+    </delete>
 
     <!--单个查询-->
     <select id="getStroAdjustDtoById" resultMap="StroAdjustMap">
@@ -68,7 +83,7 @@
         select
         at.id, at.hosp_code, at.biz_id, at.order_no, at.before_price, at.after_price, at.remark, at.audit_id,
         at.audit_name, at.audit_code, at.audit_time, at.crte_id, at.crte_name, at.crte_time,
-        (select name from base_dept dt where dt.id = at.biz_id and hosp_code = at.hosp_code) biz_name
+        (select name from base_dept dt where dt.id = at.biz_id and hosp_code = at.hosp_code) biz_name,adjust_code,source_id
         from stro_adjust at
         where at.hosp_code = #{hospCode}
         and at.id in
@@ -80,8 +95,11 @@
 
     <!--查看出库表和明细表里面是否有未审核的药品-->
     <select id="selectJudgeStoOutDruag" resultType="java.util.Map">
-        SELECT a.out_code as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_out` a,stro_out_detail b where
-                a.id = b.out_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT a.out_code as outCode, b.item_Id as itemId,CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_out` a
+                join stro_out_detail b on a.id = b.out_id and a.hosp_code = b.hosp_code
+                left join base_dept bd on bd.id = a.in_stock_id
+                where
+                a.audit_code = '0' and a.hosp_code= #{hospCode}  and
                 b.item_id in
                 <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
                     #{item}
@@ -90,8 +108,11 @@
 
     <!--查看采购表和明细表里面是否有未审核的药品-->
     <select id="selectJudgePhrDruag" resultType="java.util.Map">
-        SELECT '1' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_purchase` a,stro_purchase_detail b where
-        a.id = b.purchase_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT '1' as outCode, b.item_Id as itemId,CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_purchase` a
+        join stro_purchase_detail b on a.id = b.purchase_id and a.hosp_code = b.hosp_code
+        left join base_dept bd on bd.id = a.biz_id
+        where
+        a.audit_code = '0' and a.hosp_code= #{hospCode} and
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
@@ -100,8 +121,11 @@
 
     <!--查看入库表和明细表里面是否有未审核的药品-->
     <select id="selectJudgeStoInDruag" resultType="java.util.Map">
-        SELECT a.in_code as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_in` a,stro_in_detail b where
-        a.id = b.in_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT a.in_code as outCode, b.item_Id as itemId,CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_in` a
+        join stro_in_detail b on a.id = b.in_id and a.hosp_code = b.hosp_code
+        left join base_dept bd on bd.id = a.stock_id
+        where
+        a.audit_code = '0' and a.hosp_code= #{hospCode} and
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
@@ -109,8 +133,11 @@
     </select>
     <!--查看盘点表和明细表里面是否有未审核的药品-->
     <select id="selectJudgeInventoryDruag" resultType="java.util.Map">
-        SELECT '7' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_inventory` a,stro_inventory_detail b where
-        a.id = b.inventory_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT '7' as outCode, b.item_Id as itemId,CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_inventory` a
+        join stro_inventory_detail b on a.id = b.inventory_id and a.hosp_code = b.hosp_code
+        left join base_dept bd on bd.id = a.biz_id
+        where
+        a.audit_code = '0' and a.hosp_code= #{hospCode}  and
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
@@ -119,8 +146,11 @@
 
     <!--查看报损表和明细表里面是否有未审核的药品-->
     <select id="selectJudgeIncdecDruag" resultType="java.util.Map">
-        SELECT '8' as outCode, b.item_Id as itemId,b.item_name as itemName FROM `stro_incdec` a,stro_incdec_detail b where
-        a.id = b.adjust_id and a.audit_code = '0' and a.hosp_code= #{hospCode} and a.hosp_code = b.hosp_code and
+        SELECT '8' as outCode, b.item_Id as itemId,CONCAT(b.item_name,':',bd.name) as itemName FROM `stro_incdec` a
+        join stro_incdec_detail b on a.id = b.adjust_id and a.hosp_code = b.hosp_code
+        left join base_dept bd on bd.id = a.biz_id
+        where
+         a.audit_code = '0' and a.hosp_code= #{hospCode} and
         b.item_id in
         <foreach collection="itemList" index="index" item="item" open="(" close=")" separator=",">
             #{item}
@@ -154,8 +184,8 @@
 
     <!--单个新增-->
     <insert id="insertStroAdjustDto" keyProperty="" useGeneratedKeys="true">
-        insert into stro_adjust(id, hosp_code, biz_id, order_no, before_price, after_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time)
-        values (#{id}, #{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime})
+        insert into stro_adjust(id, hosp_code, biz_id, order_no, before_price, after_price, remark, audit_id, audit_name, audit_code, audit_time, crte_id, crte_name, crte_time,adjust_code,source_id)
+        values (#{id}, #{hospCode}, #{bizId}, #{orderNo}, #{beforePrice}, #{afterPrice}, #{remark}, #{auditId}, #{auditName}, #{auditCode}, #{auditTime}, #{crteId}, #{crteName}, #{crteTime},#{adjustCode},#{sourceId})
     </insert>
 
     <!--调价修改-->
@@ -239,5 +269,46 @@
        after_price = #{afterPrice}
        where hosp_code = #{hospCode} and id  = #{id}
     </update>
+    <!--回写入库明细单-->
+    <update id="updateStroInDetail">
+        <foreach collection="list"  separator=";"  item="item">
+            update
+            stro_in_detail
+            set
+            sell_price = #{item.afterPrice},
+            sell_price_all  = num * #{item.afterPrice},
+            split_price = #{item.splitAfterPrice}
+            where in_id = #{sourceId} and item_id = #{item.itemId}
+        </foreach>
+    </update>
+    <!--回写入库主表-->
+    <update id="updateStroIn">
+        update
+            stro_in a,(select sum(sell_price_all) as sell_price_all  from stro_in_detail where in_id = #{sourceId} group by item_id) b
+        set
+            a.sell_price_all = b.sell_price_all,a.audit_code = '0'
+        where a.id =  #{sourceId} and a.audit_code = '3'
+    </update>
+    <!--更新入库单明细-->
+    <update id="updateStroInDetailByBefore">
+            update
+            stro_in_detail
+            set
+            sell_price = old_sell_price,
+            sell_price_all  = num * old_sell_price,
+            split_price = old_split_price
+            where in_id = #{sourceId}
+    </update>
+    <!--作废调价单-->
+    <update id="updateAdjustDTOBySourceIds">
+        update stro_adjust set
+        audit_code = '2',
+        audit_time = #{auditTime}
+        where hosp_code = #{hospCode} and audit_code ='0' and adjust_code = '0' and source_id in
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
+
 
 </mapper>

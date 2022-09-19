@@ -135,5 +135,4 @@ public class StroInDO extends PageDO implements Serializable {
    * 验收结果
    */
   private String acceptanceResult;
-
 }

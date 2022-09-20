@@ -6548,7 +6548,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         return result;
     }
 
-    public void updatePaymentSettleStatus(Map<String,Object> queryResult,Map<String,Object> paymentParam,PaymentSettleDTO paymentSettleDTO){
+    public void updatePaymentSettleStatus(Map<String,Object> queryResult,Map<String,Object> paymentParam,PaymentSettleDTO pPaymentSettleDTO){
         String orderId = MapUtils.get(queryResult,"orderId"); // 支付平台订单号
         String payType = MapUtils.get(queryResult,"payType"); // 支付平台支付类型
         String payCode ="";
@@ -6559,7 +6559,9 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         }
         //修改诊间支付结算表 payment_settle；结算状态 = 结算
         PaymentSettleDO paymentSettleDO = new PaymentSettleDO();
-        paymentSettleDO.setId(paymentSettleDTO.getId());//id
+        paymentSettleDO.setId(pPaymentSettleDTO.getId());//id
+        paymentSettleDO.setSettleId(pPaymentSettleDTO.getSettleId());
+        paymentSettleDO.setVisitId(pPaymentSettleDTO.getVisitId()); // 就诊id
         paymentSettleDO.setPaymentSettleId(orderId); // 支付平台结算id
         paymentSettleDO.setSettleCode(Constants.SETTLECODE.YJS);//结算状态 = 结算
         paymentSettleDO.setIsSettle(Constants.SF.S); // 是否结算 = 是
@@ -6569,13 +6571,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         paymentSettleService_consummer.updatePaymentSettleInfo(paymentParam);
         //修改诊间支付订单表 payment_order；结算状态 = 结算
         PaymentOrderDO paymentOrderDO = new PaymentOrderDO();
-        paymentOrderDO.setId(paymentSettleDTO.getId());//id
+        paymentOrderDO.setId(pPaymentSettleDTO.getId());//id
+        paymentOrderDO.setSettleId(pPaymentSettleDTO.getSettleId());
+        paymentOrderDO.setVisitId(pPaymentSettleDTO.getVisitId()); // 就诊id
         paymentOrderDO.setSettleCode(Constants.SETTLECODE.YJS);//结算状态 = 结算
         paymentOrderDO.setPayCode(payCode); // 支付方式: 微信
         paymentOrderDO.setPaymentSettleId(orderId); // 支付平台结算id
         paymentOrderDO.setUpdateTime(DateUtils.getNow());
-        paymentOrderDO.setUpdateId(paymentSettleDTO.getCrteId());
-        paymentOrderDO.setUpdateName(paymentSettleDTO.getCrteName());
+        paymentOrderDO.setUpdateId(pPaymentSettleDTO.getCrteId());
+        paymentOrderDO.setUpdateName(pPaymentSettleDTO.getCrteName());
         paymentParam.put("paymentOrderDO", paymentOrderDO);
         paymentOrderService_consummer.updatePaymentOrder(paymentParam);
     }

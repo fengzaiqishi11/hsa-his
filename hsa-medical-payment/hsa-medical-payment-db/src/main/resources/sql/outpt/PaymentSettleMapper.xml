@@ -209,12 +209,6 @@
             <if test="hospCode != null and hospCode != ''">
                 hosp_code = #{hospCode},
             </if>
-            <if test="visitId != null and visitId != ''">
-                visit_id = #{visitId},
-            </if>
-            <if test="settleId != null and settleId != ''">
-                settle_id = #{settleId},
-            </if>
             <if test="paymentSettleId != null and paymentSettleId != ''">
                 payment_settle_id = #{paymentSettleId},
             </if>

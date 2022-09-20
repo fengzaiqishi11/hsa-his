@@ -6427,7 +6427,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
             outptSettleDO.setCardPrice(cardPrice); // 一卡通支付金额
             outptSettleDO.setActualPrice(BigDecimalUtils.subtract(ssje, cardPrice));//实收金额
             outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
-            outptSettleDO.setSourcePayCode("0");  // 0:HIS 1:微信  2：支付宝   3：自助机
+            outptSettleDO.setSourcePayCode("1");  // 0:HIS 1:微信  2：支付宝   3：自助机
             outptSettleDO.setOnlinePay(Constants.SF.S); // 是否在线支付：是
             // 2021年11月25日20:13:53  添加挂账金额，挂账支付方式必须为8
             for (OutptPayDO dto : outptPayDOList) {
@@ -6529,21 +6529,28 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         Map<String,Object> paymentSettleParam =new HashMap<>();
         paymentSettleParam.put("paymentSettleDTO",paymentSettleDTO);
         paymentSettleParam.put("hospCode",hospCode);
-        /*todo 调用支付平台支付*/
-        Map<String,Object> result = outptPaymentService_consummer.updatePaymentSettle(paymentSettleParam);
-        if (result!=null) {
-            String orderStatus = MapUtils.get(result,"orderStatus"); // 支付平台支付状态
-            if (StringUtils.isNotEmpty(orderStatus)&&Constants.ZJ_PAY_ZFZT.ZFCG.equals(orderStatus)) {   // 支付成功
-                this.updatePaymentSettleStatus(result,paymentParam,paymentSettleDTO); // 更新结算表状态
-            }else if (StringUtils.isNotEmpty(orderStatus)&&Constants.ZJ_PAY_ZFZT.ZFSB.equals(orderStatus)) { // 支付失败
-                String errorMessage = MapUtils.get(result,"failCause"); // 支付失败返回的错误信息
-                throw new AppException("支付平台支付失败! 返回错误信息："+errorMessage);
-            }else if (StringUtils.isNotEmpty(orderStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(orderStatus)) { // 支付中
-               /*todo 这里调用支付查询接口  需要轮询*/
-               this.updateChargeQuery(paymentSettleParam,paymentParam,paymentSettleDTO);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            /*todo 调用支付平台支付*/
+            result = outptPaymentService_consummer.updatePaymentSettle(paymentSettleParam);
+            if (result != null) {
+                String orderStatus = MapUtils.get(result, "orderStatus"); // 支付平台支付状态
+                if (StringUtils.isNotEmpty(orderStatus) && Constants.ZJ_PAY_ZFZT.ZFCG.equals(orderStatus)) {   // 支付成功
+                    this.updatePaymentSettleStatus(result, paymentParam, paymentSettleDTO); // 更新结算表状态
+                } else if (StringUtils.isNotEmpty(orderStatus) && Constants.ZJ_PAY_ZFZT.ZFSB.equals(orderStatus)) { // 支付失败
+                    String errorMessage = MapUtils.get(result, "failCause"); // 支付失败返回的错误信息
+                    throw new AppException("返回错误信息：" + errorMessage);
+                } else if (StringUtils.isNotEmpty(orderStatus) && Constants.ZJ_PAY_ZFZT.ZFZ.equals(orderStatus)) { // 支付中
+                    /*todo 这里调用支付查询接口  需要轮询 异步还是其他方式有待讨论*/
+                    this.updateChargeQuery(paymentSettleParam, paymentParam, paymentSettleDTO);
+                }
+            } else {
+                throw new AppException("支付平台支付失败!");
             }
-        } else {
-            throw new AppException("支付平台支付失败!");
+        }catch (Exception e){
+            // 调用撤销接口
+            this.revokePaymentSettle(paymentParam);
+            throw new AppException("支付平台支付失败! 返回错误信息：" + e.getMessage());
         }
         return result;
     }
@@ -6584,23 +6591,37 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         paymentOrderService_consummer.updatePaymentOrder(paymentParam);
     }
 
+    // 支付平台 支付查询
     public void updateChargeQuery(Map<String,Object> paymentSettleParam,Map<String,Object> paymentParam,PaymentSettleDTO paymentSettleDTO){
         Map<String,Object> queryResult = outptPaymentService_consummer.updatePaymentSettleQuery(paymentSettleParam);
         String payStatus = MapUtils.get(queryResult,"orderStatus"); // 支付平台支付状态
         if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFCG.equals(payStatus)) {   // 支付成功
             this.updatePaymentSettleStatus(queryResult,paymentParam,paymentSettleDTO); // 更新结算表状态
         }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付中
-            updateChargeQuery(paymentSettleParam,paymentParam,paymentSettleDTO);  // 继续轮询
+            this.updateChargeQuery(paymentSettleParam,paymentParam,paymentSettleDTO);  // 继续轮询
         }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付失败
-
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.TKCG.equals(payStatus)){ // 退款成功
-
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.TKZ.equals(payStatus)){  // 退款中
-
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.TKYC.equals(payStatus)){ // 退款异常
-
+            // 调用撤销接口
+            this.revokePaymentSettle(paymentSettleParam);
         }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.DDGB.equals(payStatus)){ // 订单已关闭
+             /*todo 交易关闭 his本地结算处理*/
 
+        }
+    }
+
+    // 支付平台 支付撤销
+    public void revokePaymentSettle(Map<String,Object> paymentSettleParam){
+        Map<String,Object> revokeResult = outptPaymentService_consummer.updatePaymentRevoke(paymentSettleParam);
+        if (ObjectUtil.isNotEmpty(revokeResult)) {
+            String resultCode = MapUtils.get(revokeResult, "resultCode"); // 支付平台支付状态
+            if (StringUtils.isNotEmpty(resultCode) && "FAIL".equals(resultCode)) {
+                String recall = MapUtils.get(revokeResult, "recall"); // 是否需要重试
+                if (StringUtils.isNotEmpty(recall) && "Y".equals(recall)) { // 需要重试
+                    this.revokePaymentSettle(paymentSettleParam);
+                }
+            }else if (StringUtils.isNotEmpty(resultCode) && "SUCCESS".equals(resultCode)){
+                /*todo 撤销成功 his本地结算处理*/
+
+            }
         }
     }
 }

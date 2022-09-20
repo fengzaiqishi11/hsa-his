@@ -36,6 +36,7 @@ import cn.hsa.module.phar.pharoutdistributedrug.dto.PharOutReceiveDTO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
@@ -1923,6 +1924,7 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
      * * 2021年5月11日15:06:25 退费修改，支持部分退费自动收费，关键点：
      * 1、医保病人部分退费时，先全退，再自动生成未退部分的收费信息，再由收费员去收费
      * 2、自费病人部分退费时，只退要退的部分（暂不考虑支付方式，只需要校验输入金额与应退金额相等即可），未退部分自动收费，不再由收费员收费
+     * 3、诊间支付部分退费时，先全退，再自动生成未退部分的收费信息，再由收费员去收费
      * @Author liuliyun
      * @Date 2022/09/06 09:35
      * @Return cn.hsa.hsaf.core.framework.web.WrapperResponse
@@ -2041,7 +2043,6 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // TODO 门诊费用、结算、支付信息冲红
         String redSettleId = this.outptChargeChangeRed(allCostDTOList,outptSettleDTO,outptVisitDTO);
 
-        /**START*****************医保病人处理********************************************************************/
         // TODO 医保病人处理
         selectMap.put("id",visitId);
         OutptVisitDTO outpt = outptVisitDAO.queryByVisitID(selectMap);
@@ -2100,7 +2101,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     String errorMessage = MapUtils.get(queryResult,"failCause",""); // 支付平台退款状态
                     throw new AppException("退费失败，调用支付平台接口出错，错误信息如下："+errorMessage);
                 }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)){ // 退款中
-                    /*todo 退款中状态需要调用退款查询接口轮询*/
+                    /*todo 退款中状态需要调用退款查询接口轮询  异步还是其他方式有待讨论*/
+                    this.paymentRefundQuery(paymentParam);
                 }
             }
         }else {
@@ -2334,6 +2336,21 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         paymentSettleDO.setSettleTime(DateUtils.getNow());
         paymentSettleDO.setCrteTime(DateUtils.getNow());
         outptSettleDAO.insertPaymentSettleInfo(paymentSettleDO);
+    }
+
+    // 支付平台  退款查询
+    public void paymentRefundQuery(Map<String,Object> paymentParam){
+        Map<String,Object> result = outptPaymentService_consumer.updatePaymentRefundQuery(paymentParam);
+        if (ObjectUtil.isNotEmpty(result)){
+            String refundStatus = MapUtils.get(result, "refundStatus"); // 支付平台退款状态
+            if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)) { // 退款成功
+
+            }else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus)||Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)){ // 退款失败、退款异常
+
+            }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)) { // 退款中
+                 this.paymentRefundQuery(paymentParam);
+            }
+        }
     }
 
 }

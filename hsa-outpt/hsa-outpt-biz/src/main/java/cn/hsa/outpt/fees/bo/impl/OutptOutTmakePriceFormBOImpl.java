@@ -18,7 +18,6 @@ import cn.hsa.module.outpt.fees.dto.*;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptPrescribeDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
-import cn.hsa.module.outpt.fees.entity.PayOnlineInfoDO;
 import cn.hsa.module.outpt.fees.service.OutptTmakePriceFormService;
 import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribe.dto.OutptDiagnoseDTO;
@@ -50,7 +49,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @Package_name: cn.hsa.outpt.fees.bo.impl

@@ -235,4 +235,18 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
         paymentOrderDAO.insert(paymentOrderDO);
         return true;
     }
+
+
+    /**
+     * @Menthod queryPaymentSettle
+     * @Desrciption 查询诊间支付结算数据
+     * @param paymentSettleDTO
+     * @Author liuliyun
+     * @Date 2022/9/21 16:47
+     * @Return PaymentSettleDTO
+     */
+    @Override
+    public PaymentSettleDTO queryPaymentSettle(PaymentSettleDTO paymentSettleDTO) {
+        return paymentSettleDAO.queryPaymentSettle(paymentSettleDTO);
+    }
 }

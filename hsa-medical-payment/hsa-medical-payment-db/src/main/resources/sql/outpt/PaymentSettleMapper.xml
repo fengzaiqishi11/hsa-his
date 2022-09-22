@@ -384,5 +384,15 @@
         AND status_code = #{statusCode}
     </delete>
 
+    <select id="queryPaymentSettle" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">
+        select  id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time,
+        settle_code, one_settle_id, red_id, old_settle_id, settle_time, is_settle
+        from payment_settle
+        where hosp_code =#{hospCode}
+        and visit_id =#{visitId}
+        and settle_id =#{settleId}
+        and status_code ='0'
+    </select>
+
 </mapper>
 

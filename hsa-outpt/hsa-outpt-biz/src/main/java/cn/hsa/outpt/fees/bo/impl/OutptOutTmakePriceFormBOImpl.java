@@ -40,6 +40,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -1397,12 +1398,6 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         // 门诊结算信息对冲
         this.outptSettleInfoChangeRed(selectDTO,redSettleId);
 
-        // 是否为在线支付
-        if (Constants.SF.S.equals(outptSettleDTO.getOnlinePay())) {
-            // 诊间支付结算信息对冲
-            this.outptPaymentSettleChangeRed(selectDTO, redSettleId);
-        }
-
         // 门诊退费时需要更新消费异动表
         if (outptSettleDTO.getCardPrice() != null && BigDecimalUtils.greaterZero(outptSettleDTO.getCardPrice())) {
             Map<String, Object> map = new HashMap<>();
@@ -2089,6 +2084,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                 Map<String,Object> queryResult = outptPaymentService_consumer.updatePaymentRefund(paymentParam);
                 String refundStatus = MapUtils.get(queryResult,"refundStatus"); // 支付平台退款状态
                 if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)){ // 退款成功
+                    // 诊间支付结算信息对冲
+                    this.outptPaymentSettleChangeRed(outptSettleDTO, redSettleId);
                     // 体检回调
                     if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
                         phyIsCallBack(allCostDTOList);
@@ -2102,7 +2099,16 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     throw new AppException("退费失败，调用支付平台接口出错，错误信息如下："+errorMessage);
                 }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)){ // 退款中
                     /*todo 退款中状态需要调用退款查询接口轮询  异步还是其他方式有待讨论*/
-                    this.paymentRefundQuery(paymentParam);
+                    paymentSettleDTO.setOutptSettleDTO(outptSettleDTO);
+                    this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentRefundPoductTopicKey); // 发送退款查询消息
+                    // 体检回调
+                    if (outptSettleDTO!=null &&"1".equals(outptSettleDTO.getIsPhys())) {
+                        phyIsCallBack(allCostDTOList);
+                    }
+                    Map insurePaitentInfo = new HashMap();
+                    insurePaitentInfo.put("outptVisit", outpt); // 返回病人信息
+                    insurePaitentInfo.put("isInsurePaitentPartBack", isInsurePaitentPartBack); // 是否医保病人部分退费
+                    return WrapperResponse.success(insurePaitentInfo);
                 }
             }
         }else {
@@ -2338,19 +2344,37 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
         outptSettleDAO.insertPaymentSettleInfo(paymentSettleDO);
     }
 
-    // 支付平台  退款查询
-    public void paymentRefundQuery(Map<String,Object> paymentParam){
-        Map<String,Object> result = outptPaymentService_consumer.updatePaymentRefundQuery(paymentParam);
-        if (ObjectUtil.isNotEmpty(result)){
-            String refundStatus = MapUtils.get(result, "refundStatus"); // 支付平台退款状态
-            if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)) { // 退款成功
+//    // 支付平台  退款查询
+//    public void paymentRefundQuery(Map<String,Object> paymentParam){
+//
+//        Map<String,Object> result = outptPaymentService_consumer.updatePaymentRefundQuery(paymentParam);
+//        if (ObjectUtil.isNotEmpty(result)){
+//            String refundStatus = MapUtils.get(result, "refundStatus"); // 支付平台退款状态
+//            if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)) { // 退款成功
+//
+//            }else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus)||Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)){ // 退款失败、退款异常
+//
+//            }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)) { // 退款中
+//
+//            }
+//        }
+//    }
 
-            }else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus)||Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)){ // 退款失败、退款异常
-
-            }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)) { // 退款中
-                 this.paymentRefundQuery(paymentParam);
-            }
+    // 创建kafka 生产者 发送消息
+    public void sendMessage(PaymentSettleDTO paymentSettleDTO,String producerTopic){
+        // 获取医院kafka 的IP与端口
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", paymentSettleDTO.getHospCode());
+        sysMap.put("code", "KAFKA_MSG_IP");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sys == null || sys.getValue() == null) {
+            return;
         }
+        String server = sys.getValue();
+        // 1. 创建一个kafka生产者
+        KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+        String message = JSONObject.toJSONString(paymentSettleDTO);
+        KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
     }
 
 }

@@ -43,8 +43,9 @@ public class PaymentSettleServiceImpl extends HsafService implements PaymentSett
     }
 
     @Override
-    public Boolean insert(PaymentSettleDO paymentSettle) {
-        return paymentSettleBO.insert(paymentSettle);
+    public Boolean insert(Map<String,Object> param) {
+        PaymentSettleDO paymentSettleDO =MapUtils.get(param,"paymentSettleDO");
+        return paymentSettleBO.insert(paymentSettleDO);
     }
 
     /**@Menthod updatePaymentSettleInfo

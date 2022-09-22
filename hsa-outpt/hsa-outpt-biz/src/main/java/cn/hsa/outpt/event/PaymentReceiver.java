@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -147,6 +146,7 @@ public class PaymentReceiver {
      * @return
      */
     public void updatePaymentSettleStatus(Map<String,Object> queryResult,PaymentSettleDTO pPaymentSettleDTO){
+        try {
         String orderId = MapUtils.get(queryResult,"orderId"); // 支付平台订单号
         String payType = MapUtils.get(queryResult,"payType"); // 支付平台支付类型
         String payCode ="";
@@ -183,6 +183,11 @@ public class PaymentReceiver {
         paymentOrderDO.setUpdateName(pPaymentSettleDTO.getCrteName());
         paymentParam.put("paymentOrderDO", paymentOrderDO);
         paymentOrderService_consummer.updatePaymentOrder(paymentParam);
+        }catch (Exception e){
+            throw new AppException("诊间支付订单更新出错："+e.getMessage());
+        }finally {
+            return;
+        }
     }
 
 
@@ -250,42 +255,51 @@ public class PaymentReceiver {
      * @Date 2022/09/21 16:24
      */
     private void outptPaymentSettleChangeRed(PaymentSettleDTO paymentSettleDTO) {
-        String redSettleId = paymentSettleDTO.getSettleId();   // 冲红id
-        OutptSettleDTO outptSettleDTO = paymentSettleDTO.getOutptSettleDTO(); // his 结算信息
-        String hospCode = paymentSettleDTO.getHospCode();
-        outptSettleDTO.setSettleId(outptSettleDTO.getId());
-        paymentSettleDTO.setVisitId(outptSettleDTO.getVisitId());
-        paymentSettleDTO.setSettleId(outptSettleDTO.getSettleId());
-        Map<String,Object> queryParam = new HashMap<>();
-        queryParam.put("hospCode",hospCode);
-        queryParam.put("paymentSettleDTO",paymentSettleDTO);
-        // 诊间支付结算表数据对冲
-        PaymentSettleDTO paymentSettleDO = paymentSettleService_consummer.queryPaymentSettle(queryParam);
-        if (paymentSettleDO == null) {
-            throw new AppException("退费提示：未获取到诊间支付结算记录");
+        try {
+            String redSettleId = paymentSettleDTO.getSettleId();   // 冲红id
+            OutptSettleDTO outptSettleDTO = paymentSettleDTO.getOutptSettleDTO(); // his 结算信息
+            String hospCode = paymentSettleDTO.getHospCode();
+            outptSettleDTO.setSettleId(outptSettleDTO.getId());
+            paymentSettleDTO.setVisitId(outptSettleDTO.getVisitId());
+            paymentSettleDTO.setSettleId(outptSettleDTO.getSettleId());
+            Map<String, Object> queryParam = new HashMap<>();
+            queryParam.put("hospCode", hospCode);
+            queryParam.put("paymentSettleDTO", paymentSettleDTO);
+            // 诊间支付结算表数据对冲
+            PaymentSettleDTO paymentSettleDO = paymentSettleService_consummer.queryPaymentSettle(queryParam);
+            if (paymentSettleDO == null) {
+                throw new AppException("退费提示：未获取到诊间支付结算记录");
+            }
+            // 被冲红
+            paymentSettleDO.setStatusCode(Constants.ZTBZ.BCH);
+            Map<String, Object> updateParam = new HashMap<>();
+            updateParam.put("hospCode", hospCode);
+            updateParam.put("paymentSettleDO", paymentSettleDO);
+            paymentSettleService_consummer.updatePaymentSettleInfo(updateParam);
+            // 冲红
+            paymentSettleDO.setId(SnowflakeUtils.getId());
+            paymentSettleDO.setSettleId(redSettleId);
+            paymentSettleDO.setRedId(paymentSettleDO.getId());
+            paymentSettleDO.setOldSettleId(outptSettleDTO.getId());
+            paymentSettleDO.setOneSettleId(paymentSettleDO.getOneSettleId());
+            paymentSettleDO.setStatusCode(Constants.ZTBZ.CH); // 状态标志： 冲红
+            // 金额置反
+            paymentSettleDO.setTotalPrice(BigDecimalUtils.negate(paymentSettleDO.getTotalPrice())); // 总金额
+            paymentSettleDO.setPaymentPrice(BigDecimalUtils.negate(paymentSettleDO.getPaymentPrice())); // 实际支付金额
+            // 创建信息
+            paymentSettleDO.setCrteId(paymentSettleDO.getCrteId());
+            paymentSettleDO.setCrteName(paymentSettleDO.getCrteName());
+            paymentSettleDO.setSettleTime(DateUtils.getNow());
+            paymentSettleDO.setCrteTime(DateUtils.getNow());
+            Map<String, Object> insertParam = new HashMap<>();
+            insertParam.put("hospCode", hospCode);
+            insertParam.put("paymentSettleDO", paymentSettleDO);
+            paymentSettleService_consummer.insert(insertParam);
+        }catch (Exception e){
+            throw new AppException("诊间支付冲红出错："+e.getMessage());
+        }finally {
+            return;
         }
-        // 被冲红
-        paymentSettleDO.setStatusCode(Constants.ZTBZ.BCH);
-        Map<String,Object> updateParam = new HashMap<>();
-        updateParam.put("hospCode",hospCode);
-        updateParam.put("paymentSettleDO",paymentSettleDO);
-        paymentSettleService_consummer.updatePaymentSettleInfo(updateParam);
-        // 冲红
-        paymentSettleDO.setId(SnowflakeUtils.getId());
-        paymentSettleDO.setSettleId(redSettleId);
-        paymentSettleDO.setRedId(paymentSettleDO.getId());
-        paymentSettleDO.setOldSettleId(outptSettleDTO.getId());
-        paymentSettleDO.setOneSettleId(paymentSettleDO.getOneSettleId());
-        paymentSettleDO.setStatusCode(Constants.ZTBZ.CH); // 状态标志： 冲红
-        // 金额置反
-        paymentSettleDO.setTotalPrice(BigDecimalUtils.negate(paymentSettleDO.getTotalPrice())); // 总金额
-        paymentSettleDO.setPaymentPrice(BigDecimalUtils.negate(paymentSettleDO.getPaymentPrice())); // 实际支付金额
-        // 创建信息
-        paymentSettleDO.setCrteId(outptSettleDTO.getCrteId());
-        paymentSettleDO.setCrteName(outptSettleDTO.getCrteName());
-        paymentSettleDO.setSettleTime(DateUtils.getNow());
-        paymentSettleDO.setCrteTime(DateUtils.getNow());
-        paymentSettleService_consummer.insert(paymentSettleDO);
     }
 
     /**

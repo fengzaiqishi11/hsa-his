@@ -84,7 +84,7 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentSettle(Map param) {
-           param.put("orderStatus","1");
+           param.put("orderStatus",Constants.ZJ_PAY_ZFZT.ZFZ);
            param.put("payTime", DateUtils.getNow());
            param.put("orderId","123");
            param.put("totalFee", 60);
@@ -105,9 +105,16 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentSettleQuery(Map param) {
-        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算查询");
-        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算查询");
+//        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        param.put("orderStatus",Constants.ZJ_PAY_ZFZT.ZFCG);
+        param.put("payTime", DateUtils.getNow());
+        param.put("orderId","123");
+        param.put("totalFee", 60);
+        param.put("payType", "1");
+        param.put("failCause", "");
+        return param;
     }
 
     /**@Method updatePaymentRevoke

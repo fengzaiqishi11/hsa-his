@@ -2099,6 +2099,8 @@ public class OutptOutTmakePriceFormBOImpl implements OutptOutTmakePriceFormBO {
                     throw new AppException("退费失败，调用支付平台接口出错，错误信息如下："+errorMessage);
                 }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)){ // 退款中
                     /*todo 退款中状态需要调用退款查询接口轮询  异步还是其他方式有待讨论*/
+                    outptSettleDTO.setCrteId(crteId);
+                    outptSettleDTO.setCrteName(crteName);
                     paymentSettleDTO.setOutptSettleDTO(outptSettleDTO);
                     this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentRefundPoductTopicKey); // 发送退款查询消息
                     // 体检回调

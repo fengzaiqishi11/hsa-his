@@ -42,13 +42,16 @@ public interface PaymentSettleService {
      */
     WrapperResponse<PageDTO> queryByPage(Map<String,Object> param);
 
-    /**
-     * 新增数据
-     *
-     * @param paymentSettle 实例对象
-     * @return 实例对象
+    /**@Menthod insert
+     * @description 新增诊间支付结算信息
+     * @param param
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022/09/22 11:16
+     * @return Boolean
      */
-    Boolean insert(PaymentSettleDO paymentSettle);
+    @PostMapping("/service/payment/paymentSettle/insert")
+    Boolean insert(Map<String,Object> param);
 
     /**@Menthod updatePaymentSettleInfo
      * @description 根据医院编码、就诊id、结算id 修改诊间支付结算状态

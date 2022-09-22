@@ -1304,6 +1304,9 @@ public interface Constants {
     class MSG_TOPIC{
         public static final String producerTopicKey = "msg_product_topic";
         public static final String consumerTopicKey = "msg_consumer_topic";
+        public static final String paymentProducerTopicKey = "payment_product_topic";   // 诊间支付查询
+        public static final String paymentRefundPoductTopicKey = "payment_refund_product_topic"; // 诊间支付退款查询
+        public static final String paymentRevokePoductTopicKey = "payment_revoke_product_topic";  // 诊间支付撤销重试
     }
 
     public static class BLLX{

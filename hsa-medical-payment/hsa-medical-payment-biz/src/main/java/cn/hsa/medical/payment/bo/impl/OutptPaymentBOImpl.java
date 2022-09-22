@@ -49,7 +49,7 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentRefund(Map param) {
-        param.put("refundStatus","1");
+        param.put("refundStatus","0");
         param.put("failCause", "");
 //        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("退款");
 //        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
@@ -66,9 +66,12 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentRefundQuery(Map param) {
-        BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("退款查询");
-        PaymentInterfParamDTO paymentInterfParamDTO=paymentRefundQueryRequest.initParam(param);
-        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("退款查询");
+//        PaymentInterfParamDTO paymentInterfParamDTO=paymentRefundQueryRequest.initParam(param);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        param.put("refundStatus","1");
+        param.put("failCause", "");
+        return param;
     }
 
 

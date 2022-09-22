@@ -1,5 +1,6 @@
 package cn.hsa.module.payment.dto;
 
+import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.payment.entity.PaymentSettleDO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,4 +31,5 @@ public class  PaymentSettleDTO extends PaymentSettleDO implements Serializable {
     private String keyword;
     private String authCode; // 付款码
     private BigDecimal totalBillNum; // 总笔数
+    private OutptSettleDTO outptSettleDTO;
 }

@@ -48,7 +48,7 @@ public interface PaymentSettleService {
      * @param paymentSettle 实例对象
      * @return 实例对象
      */
-    PaymentSettleDO insert(PaymentSettleDO paymentSettle);
+    Boolean insert(PaymentSettleDO paymentSettle);
 
     /**@Menthod updatePaymentSettleInfo
      * @description 根据医院编码、就诊id、结算id 修改诊间支付结算状态
@@ -90,5 +90,16 @@ public interface PaymentSettleService {
      */
     @PostMapping("/service/payment/paymentSettle/updatePaymentSettleStatus")
     Map updatePaymentSettleStatus(Map<String, Object> param);
+
+    /**
+     * @Menthod queryPaymentSettle
+     * @Desrciption 查询诊间支付结算数据
+     * @param param
+     * @Author liuliyun
+     * @Date 2022/9/21 16:45
+     * @Return PaymentSettleDTO
+     */
+    @GetMapping("/service/payment/paymentSettle/queryPaymentSettle")
+    PaymentSettleDTO queryPaymentSettle(Map<String,Object> param);
 
 }

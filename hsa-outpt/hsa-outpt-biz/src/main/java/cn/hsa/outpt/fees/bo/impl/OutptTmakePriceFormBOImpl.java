@@ -68,6 +68,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.google.common.collect.Lists;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6542,7 +6543,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     throw new AppException("返回错误信息：" + errorMessage);
                 } else if (StringUtils.isNotEmpty(orderStatus) && Constants.ZJ_PAY_ZFZT.ZFZ.equals(orderStatus)) { // 支付中
                     /*todo 这里调用支付查询接口  需要轮询 异步还是其他方式有待讨论*/
-                    this.updateChargeQuery(paymentSettleParam, paymentParam, paymentSettleDTO);
+                    this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentProducerTopicKey);
                 }
             } else {
                 throw new AppException("支付平台支付失败!");
@@ -6591,22 +6592,22 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
         paymentOrderService_consummer.updatePaymentOrder(paymentParam);
     }
 
-    // 支付平台 支付查询
-    public void updateChargeQuery(Map<String,Object> paymentSettleParam,Map<String,Object> paymentParam,PaymentSettleDTO paymentSettleDTO){
-        Map<String,Object> queryResult = outptPaymentService_consummer.updatePaymentSettleQuery(paymentSettleParam);
-        String payStatus = MapUtils.get(queryResult,"orderStatus"); // 支付平台支付状态
-        if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFCG.equals(payStatus)) {   // 支付成功
-            this.updatePaymentSettleStatus(queryResult,paymentParam,paymentSettleDTO); // 更新结算表状态
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付中
-            this.updateChargeQuery(paymentSettleParam,paymentParam,paymentSettleDTO);  // 继续轮询
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付失败
-            // 调用撤销接口
-            this.revokePaymentSettle(paymentSettleParam);
-        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.DDGB.equals(payStatus)){ // 订单已关闭
-             /*todo 交易关闭 his本地结算处理*/
-
-        }
-    }
+//    // 支付平台 支付查询
+//    public void updateChargeQuery(Map<String,Object> paymentSettleParam,Map<String,Object> paymentParam,PaymentSettleDTO paymentSettleDTO){
+//        Map<String,Object> queryResult = outptPaymentService_consummer.updatePaymentSettleQuery(paymentSettleParam);
+//        String payStatus = MapUtils.get(queryResult,"orderStatus"); // 支付平台支付状态
+//        if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFCG.equals(payStatus)) {   // 支付成功
+//            this.updatePaymentSettleStatus(queryResult,paymentParam,paymentSettleDTO); // 更新结算表状态
+//        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付中
+//            this.updateChargeQuery(paymentSettleParam,paymentParam,paymentSettleDTO);  // 继续轮询
+//        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付失败
+//            // 调用撤销接口
+//            this.revokePaymentSettle(paymentSettleParam);
+//        }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.DDGB.equals(payStatus)){ // 订单已关闭
+//             /*todo 交易关闭 his本地结算处理*/
+//
+//        }
+//    }
 
     // 支付平台 支付撤销
     public void revokePaymentSettle(Map<String,Object> paymentSettleParam){
@@ -6623,5 +6624,22 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
 
             }
         }
+    }
+
+    // 创建kafka 生产者 发送消息
+    public void sendMessage(PaymentSettleDTO paymentSettleDTO,String producerTopic){
+        // 获取医院kafka 的IP与端口
+        Map<String, Object> sysMap = new HashMap<>();
+        sysMap.put("hospCode", paymentSettleDTO.getHospCode());
+        sysMap.put("code", "KAFKA_MSG_IP");
+        SysParameterDTO sys = sysParameterService_consumer.getParameterByCode(sysMap).getData();
+        if (sys == null || sys.getValue() == null) {
+            return;
+        }
+        String server = sys.getValue();
+        // 1. 创建一个kafka生产者
+        KafkaProducer<String, String> kafkaProducer = KafkaUtil.createProducer(server);
+        String message = JSONObject.toJSONString(paymentSettleDTO);
+        KafkaUtil.sendMessage(kafkaProducer,producerTopic,message);
     }
 }

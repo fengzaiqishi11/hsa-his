@@ -128,5 +128,16 @@ public interface PaymentSettleDAO {
      */
     int delOutptPaymentSettleByParam(Map<String,String> param);
 
+
+    /**
+     * @Menthod queryPaymentSettle
+     * @Desrciption 查询诊间支付结算数据
+     * @param paymentSettleDTO
+     * @Author liuliyun
+     * @Date 2022/9/21 16:45
+     * @Return PaymentSettleDTO
+     */
+    PaymentSettleDTO queryPaymentSettle(PaymentSettleDTO paymentSettleDTO);
+
 }
 

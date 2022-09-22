@@ -10,8 +10,6 @@ import cn.hsa.module.payment.entity.PaymentSettleDO;
 import cn.hsa.module.payment.service.PaymentSettleService;
 import cn.hsa.util.MapUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -45,8 +43,8 @@ public class PaymentSettleServiceImpl extends HsafService implements PaymentSett
     }
 
     @Override
-    public PaymentSettleDO insert(PaymentSettleDO paymentSettle) {
-        return null;
+    public Boolean insert(PaymentSettleDO paymentSettle) {
+        return paymentSettleBO.insert(paymentSettle);
     }
 
     /**@Menthod updatePaymentSettleInfo
@@ -96,5 +94,11 @@ public class PaymentSettleServiceImpl extends HsafService implements PaymentSett
     public Map updatePaymentSettleStatus(Map<String, Object> param) {
         /*todo 支付接口入参*/
       return paymentSettleBO.updatePaymentSettleStatus(param);
+    }
+
+    @Override
+    public PaymentSettleDTO queryPaymentSettle(Map<String, Object> param) {
+        PaymentSettleDTO paymentSettleDTO = MapUtils.get(param,"paymentSettleDTO");
+        return paymentSettleBO.queryPaymentSettle(paymentSettleDTO);
     }
 }

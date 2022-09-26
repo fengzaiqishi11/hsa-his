@@ -73,17 +73,20 @@ public class PaymentReceiver {
             Map<String,Object> requestParam = new HashMap<>();
             requestParam.put("paymentSettleDTO", paymentSettleDTO);
             requestParam.put("hospCode", paymentSettleDTO.getHospCode());
-            Map<String,Object> queryResult = outptPaymentService_consumer.updatePaymentSettleQuery(requestParam);
-            String payStatus = MapUtils.get(queryResult,"orderStatus"); // 支付平台支付状态
-            if (StringUtils.isNotEmpty(payStatus)&& Constants.ZJ_PAY_ZFZT.ZFCG.equals(payStatus)) {   // 支付成功
-                this.updatePaymentSettleStatus(queryResult,paymentSettleDTO); // 更新结算表状态
-            }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)){ // 支付中
-                this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentProducerTopicKey); // 发送支付查询接口消息
-            }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.ZFSB.equals(payStatus)){ // 支付失败
-                this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentRevokePoductTopicKey);   // 发送撤销接口消息
-            }else if (StringUtils.isNotEmpty(payStatus)&&Constants.ZJ_PAY_ZFZT.DDGB.equals(payStatus)){ // 订单已关闭
-                /*todo 交易关闭 his本地结算处理*/
+            PaymentSettleDTO paymentSettleDTOInfo = paymentSettleService_consummer.quyeryPaymentInfoByCondition(requestParam);
+            if (paymentSettleDTOInfo!=null&&Constants.SF.F.equals(paymentSettleDTOInfo.getIsSettle())) {  // 只有诊间支付订单为未结算时，才需要调用支付查询接口
+                Map<String, Object> queryResult = outptPaymentService_consumer.updatePaymentSettleQuery(requestParam);
+                String payStatus = MapUtils.get(queryResult, "orderStatus"); // 支付平台支付状态
+                if (StringUtils.isNotEmpty(payStatus) && Constants.ZJ_PAY_ZFZT.ZFCG.equals(payStatus)) {   // 支付成功
+                    this.updatePaymentSettleStatus(queryResult, paymentSettleDTO); // 更新结算表状态
+                } else if (StringUtils.isNotEmpty(payStatus) && Constants.ZJ_PAY_ZFZT.ZFZ.equals(payStatus)) { // 支付中
+                    this.sendMessage(paymentSettleDTO, Constants.MSG_TOPIC.paymentProducerTopicKey); // 发送支付查询接口消息
+                } else if (StringUtils.isNotEmpty(payStatus) && Constants.ZJ_PAY_ZFZT.ZFSB.equals(payStatus)) { // 支付失败
+                    this.sendMessage(paymentSettleDTO, Constants.MSG_TOPIC.paymentRevokePoductTopicKey);   // 发送撤销接口消息
+                } else if (StringUtils.isNotEmpty(payStatus) && Constants.ZJ_PAY_ZFZT.DDGB.equals(payStatus)) { // 订单已关闭
+                    /*todo 交易关闭 his本地结算处理*/
 
+                }
             }
         }
 
@@ -204,17 +207,21 @@ public class PaymentReceiver {
     public void paymentRefundQuery(Map<String,Object> paymentParam){
         PaymentSettleDTO paymentSettleDTO = MapUtils.get(paymentParam,"paymentSettleDTO");
         String hospCode = MapUtils.get(paymentParam,"hospCode");
-        Map<String,Object> result = outptPaymentService_consumer.updatePaymentRefundQuery(paymentParam);
-        if (ObjectUtil.isNotEmpty(result)){
-            String refundStatus = MapUtils.get(result, "refundStatus"); // 支付平台退款状态
-            if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)) { // 退款成功
-                log.info("退款成功");
-                this.outptPaymentSettleChangeRed(paymentSettleDTO);  // 诊间支付结算信息冲红
-            }else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus)||Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)){ // 退款失败、退款异常
+        // 校验诊间支付订单状态
+        PaymentSettleDTO paymentSettleDO = paymentSettleService_consummer.queryPaymentSettle(paymentParam);
+        if (paymentSettleDO!=null&&Constants.ZTBZ.ZC.equals(paymentSettleDO.getStatusCode())) {
+            Map<String, Object> result = outptPaymentService_consumer.updatePaymentRefundQuery(paymentParam);
+            if (ObjectUtil.isNotEmpty(result)) {
+                String refundStatus = MapUtils.get(result, "refundStatus"); // 支付平台退款状态
+                if (Constants.ZJ_PAY_TKZT.TKCG.equals(refundStatus)) { // 退款成功
+                    log.info("退款成功");
+                    this.outptPaymentSettleChangeRed(paymentSettleDTO);  // 诊间支付结算信息冲红
+                } else if (Constants.ZJ_PAY_TKZT.TKSB.equals(refundStatus) || Constants.ZJ_PAY_TKZT.TKYC.equals(refundStatus)) { // 退款失败、退款异常
 
-            }else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)) { // 退款中
-                log.info("退款中消息发送");
-                this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentRefundPoductTopicKey);
+                } else if (Constants.ZJ_PAY_TKZT.TKZ.equals(refundStatus)) { // 退款中
+                    log.info("退款中消息发送");
+                    this.sendMessage(paymentSettleDTO, Constants.MSG_TOPIC.paymentRefundPoductTopicKey);
+                }
             }
         }
     }

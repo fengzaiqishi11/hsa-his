@@ -1509,4 +1509,20 @@ public interface Constants {
         public static final String TKYC = "3";
 
     }
+
+    /**
+     * @Menthod PAYMENT
+     * @Desrciption 诊间支付接口功能号
+     * @Author liuliyun
+     * @Date 2022/09/28 15:14
+     */
+    class PAYMENT{
+        public static final String PAY_CHARGE = "01";       // 支付
+        public static final String PAY_CHARGE_QUERY = "02"; // 支付查询
+        public static final String PAY_REFUND = "03";       //退款
+        public static final String PAY_REFUND_QUERY = "04"; //退款查询
+        public static final String PAY_REVOKE = "05";       // 撤销
+        public static final String PAY_BILL = "06";         // 对总账
+        public static final String PAY_BILL_DETAIL = "07";  // 对明细
+    }
 }

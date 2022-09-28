@@ -4,6 +4,7 @@ import cn.hsa.medical.payment.factory.BasePaymentInterf;
 import cn.hsa.medical.payment.factory.PaymentInterCommonTemplate;
 import cn.hsa.module.payment.dto.PaymentInterfParamDTO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
+import cn.hsa.util.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @Date: 2022/9/13 11:24
  * @Company: 创智和宇
  **/
-@Service("paymentRefundQuery")
+@Service("payment" + Constants.PAYMENT.PAY_REFUND_QUERY)
 public class PaymentRefundQueryRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
     @Override
     public PaymentInterfParamDTO initParam(T param) {

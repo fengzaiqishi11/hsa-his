@@ -4,6 +4,7 @@ import cn.hsa.medical.payment.factory.BasePaymentInterf;
 import cn.hsa.medical.payment.factory.PaymentInterCommonTemplate;
 import cn.hsa.module.payment.dto.PaymentInterfParamDTO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
+import cn.hsa.util.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @Date: 2022/9/13 09:13
  * @Company: 创智和宇
  **/
-@Service("PaymentBill")
+@Service("payment" + Constants.PAYMENT.PAY_BILL)
 public class PaymentBillRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
     @Override
     public PaymentInterfParamDTO initParam(T param) {
@@ -31,8 +32,6 @@ public class PaymentBillRequest<T> extends PaymentInterCommonTemplate implements
         map.put("orgId",paymentSettleDTO.getHospCode()); // 医院编码
         map.put("billBeginDate",paymentSettleDTO.getStartTime()); // 账单开始日期
         map.put("billEndDate",paymentSettleDTO.getEndTime()); // 账单结束日期
-        map.put("pageNum",paymentSettleDTO.getPageNo()); // 页码
-        map.put("pageSize",paymentSettleDTO.getPageSize()); // 每页显示数量
         map.put("infno", "");
         return getInsurCommonParam(map);
     }

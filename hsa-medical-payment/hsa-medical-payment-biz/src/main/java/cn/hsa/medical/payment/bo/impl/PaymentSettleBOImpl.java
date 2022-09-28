@@ -166,7 +166,7 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
     @Override
     public Map updatePaymentSettleStatus(Map param) {
         /*todo 调用支付平台支付*/
-        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,new PaymentInterfParamDTO());
+        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_CHARGE,new PaymentInterfParamDTO());
     }
 
     @Override

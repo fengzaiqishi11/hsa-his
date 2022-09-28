@@ -12,15 +12,15 @@ import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.medical.payment.interf
- * @class_name: PaymentOrderQueryRequest
- * @Description: 诊间支付结算订单查询接口参数封装
+ * @class_name: PaymentRevokeRequest
+ * @Description: 诊间支付撤销接口参数封装
  * @Author: liuliyun
  * @Email: liyun.liu@powersi.com
- * @Date: 2022/9/13 11:34
+ * @Date: 2022/09/28 15:41
  * @Company: 创智和宇
  **/
-@Service("payment" + Constants.PAYMENT.PAY_CHARGE_QUERY)
-public class PaymentOrderQueryRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
+@Service("payment" + Constants.PAYMENT.PAY_REVOKE)
+public class PaymentRevokeRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
     @Override
     public PaymentInterfParamDTO initParam(T param) {
         Map map = (Map) param;

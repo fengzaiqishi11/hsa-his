@@ -37,7 +37,7 @@ public abstract class abstractPaymentTemplate {
     public void paymentSettle(Map param){
         BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算");
         PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_CHARGE,paymentInterfParamDTO);
     }
     /**
      * his退款方法,写好调用,提供模板给子类使用
@@ -45,7 +45,7 @@ public abstract class abstractPaymentTemplate {
     public void paymentRefundQuery(Map param){
         BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("退款查询");
         PaymentInterfParamDTO paymentInterfParamDTO=paymentRefundQueryRequest.initParam(param);
-        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_REFUND_QUERY,paymentInterfParamDTO);
     }
 
     /**
@@ -54,6 +54,6 @@ public abstract class abstractPaymentTemplate {
     public void paymentRefund(Map param){
         BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("退款");
         PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-        paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_REFUND,paymentInterfParamDTO);
     }
 }

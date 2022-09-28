@@ -8,8 +8,10 @@ import cn.hsa.module.payment.bo.OutptPaymentBO;
 import cn.hsa.module.payment.dao.PaymentSettleDAO;
 import cn.hsa.module.payment.dto.PaymentInterfParamDTO;
 import cn.hsa.module.payment.dto.PaymentSettleDTO;
-import cn.hsa.module.payment.service.PaymentSettleService;
-import cn.hsa.util.*;
+import cn.hsa.util.BigDecimalUtils;
+import cn.hsa.util.Constants;
+import cn.hsa.util.DateUtils;
+import cn.hsa.util.MapUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -17,8 +19,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @Package_name: cn.hsa.medical.payment.bo.impl
@@ -51,9 +51,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
     public Map<String, Object> updatePaymentRefund(Map param) {
         param.put("refundStatus","0");
         param.put("failCause", "");
-//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("退款");
+//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_REFUND.getCode());
 //        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_REFUND,paymentInterfParamDTO);
         return param;
     }
 
@@ -66,9 +66,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentRefundQuery(Map param) {
-//        BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("退款查询");
+//        BasePaymentInterf paymentRefundQueryRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_REFUND_QUERY.getCode());
 //        PaymentInterfParamDTO paymentInterfParamDTO=paymentRefundQueryRequest.initParam(param);
-//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_REFUND_QUERY,paymentInterfParamDTO);
         param.put("refundStatus","1");
         param.put("failCause", "");
         return param;
@@ -90,9 +90,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
            param.put("totalFee", 60);
            param.put("payType", "1");
            param.put("failCause", "");
-//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算查询");
+//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_CHARGE.getCode());
 //        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_CHARGE,paymentInterfParamDTO);
          return param;
     }
 
@@ -105,9 +105,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentSettleQuery(Map param) {
-//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("结算查询");
+//        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_CHARGE_QUERY.getCode());
 //        PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+//        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_CHARGE_QUERY,paymentInterfParamDTO);
         param.put("orderStatus",Constants.ZJ_PAY_ZFZT.ZFCG);
         param.put("payTime", DateUtils.getNow());
         param.put("orderId","123");
@@ -126,9 +126,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
      **/
     @Override
     public Map<String, Object> updatePaymentRevoke(Map param) {
-        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("撤销");
+        BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_REVOKE.getCode());
         PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-        return paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+        return paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_REVOKE,paymentInterfParamDTO);
     }
 
     /**@Method updatePaymentBill
@@ -152,9 +152,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
             Map<String,Object> hisResult = paymentSettleDAO.queryPaymentBillInfo(paymentSettleDTO);
             totalBillNum = MapUtils.get(hisResult,"totalBillNum");
             totalPamentPrice= MapUtils.get(hisResult,"paymentPrice");
-            BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("查询总账单");
+            BasePaymentInterf paymentSettleRequest= basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_BILL.getCode());
             PaymentInterfParamDTO paymentInterfParamDTO=paymentSettleRequest.initParam(param);
-            Map<String,Object> paymentResult =paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO,paymentInterfParamDTO);
+            Map<String,Object> paymentResult =paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_BILL,paymentInterfParamDTO);
             if (paymentResult!=null){
                 totalOrderNum = MapUtils.get(hisResult,"totalBillNum");
                 totalOrderFee= MapUtils.get(hisResult,"paymentPrice");
@@ -193,9 +193,9 @@ public class OutptPaymentBOImpl implements OutptPaymentBO {
             paymentSettleDTO.setHospCode(hospCode);
             List<Map<String, Object>> wxPaymentSettleInfo = paymentSettleDAO.queryPaymentBillDetailList(paymentSettleDTO);
             if (wxPaymentSettleInfo!=null&&wxPaymentSettleInfo.size()>0) {
-                BasePaymentInterf paymentSettleRequest = basePaymentFactory.getBasePaymentInterf("查询明细账单");
+                BasePaymentInterf paymentSettleRequest = basePaymentFactory.getBasePaymentInterf("payment" + PaymentExceptionEnums.PAYMENT_BILL_DETAIL.getCode());
                 PaymentInterfParamDTO paymentInterfParamDTO = paymentSettleRequest.initParam(param);
-                Map<String, Object> paymentResult = paymentTransferBo.transferPayment(PaymentExceptionEnums.INSUR_BASE_INFO, paymentInterfParamDTO);
+                Map<String, Object> paymentResult = paymentTransferBo.transferPayment(PaymentExceptionEnums.PAYMENT_BILL_DETAIL, paymentInterfParamDTO);
                 if (paymentResult != null) {
                     List<Map<String, Object>> billDataList = MapUtils.get(paymentResult, "billDataList");
                     if (billDataList != null && billDataList.size() > 0) {

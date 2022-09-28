@@ -12,15 +12,15 @@ import java.util.Map;
 
 /**
  * @Package_name: cn.hsa.medical.payment.interf
- * @class_name: PaymentOrderQueryRequest
- * @Description: 诊间支付结算订单查询接口参数封装
+ * @class_name: PaymentBillDetailRequest
+ * @Description: 诊间支付对明细接口参数封装
  * @Author: liuliyun
  * @Email: liyun.liu@powersi.com
- * @Date: 2022/9/13 11:34
+ * @Date: 2022/09/28 15:43
  * @Company: 创智和宇
  **/
-@Service("payment" + Constants.PAYMENT.PAY_CHARGE_QUERY)
-public class PaymentOrderQueryRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
+@Service("payment" + Constants.PAYMENT.PAY_BILL_DETAIL)
+public class PaymentBillDetailRequest<T> extends PaymentInterCommonTemplate implements BasePaymentInterf<T> {
     @Override
     public PaymentInterfParamDTO initParam(T param) {
         Map map = (Map) param;
@@ -30,7 +30,10 @@ public class PaymentOrderQueryRequest<T> extends PaymentInterCommonTemplate impl
         inputMap.put("data", paymentSettleDTO);
         map.put("input", inputMap);
         map.put("orgId",paymentSettleDTO.getHospCode()); // 医院编码
-        map.put("orgOrderId",paymentSettleDTO.getSettleId()); // 机构支付订单号
+        map.put("billBeginDate",paymentSettleDTO.getStartTime()); // 账单开始日期
+        map.put("billEndDate",paymentSettleDTO.getEndTime()); // 账单结束日期
+        map.put("pageNum",paymentSettleDTO.getPageNo()); // 页码
+        map.put("pageSize",paymentSettleDTO.getPageSize()); // 每页显示数量
         map.put("infno", "");
         return getInsurCommonParam(map);
     }

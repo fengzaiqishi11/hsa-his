@@ -79,7 +79,7 @@ public class PaymentTransferBoImpl {
             if (StringUtils.isEmpty(result)) {
                 params.put("resultStr", "null");
                 params.put("infcode", "null");
-                throw new AppException("调用接口异常");
+                throw new AppException("调用接口异常,返回结果信息为空");
             }
             Map<String, Object> resultMap = JSON.parseObject(result);
             /*todo 异常处理*/

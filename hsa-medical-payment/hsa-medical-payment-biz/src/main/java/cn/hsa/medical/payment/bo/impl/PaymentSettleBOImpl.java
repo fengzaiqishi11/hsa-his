@@ -209,7 +209,7 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
         paymentSettleDO.setTotalPrice(outptSettleDTO.getTotalPrice()); // 订单总费用
         paymentSettleDO.setStatusCode(Constants.ZTBZ.ZC); // 状态标志： 正常
         paymentSettleDO.setIsSettle(Constants.SF.F);
-        paymentSettleDO.setSettleCode(Constants.JSZT.YUJS); // 结算状态： 预结算
+        paymentSettleDO.setSettleCode(Constants.JSZT.WJS); // 结算状态： 未结算
         paymentSettleDO.setSettleId(outptSettleDTO.getId()); // his结算id
         paymentSettleDO.setCrteId(outptVisitDTO.getCrteId());
         paymentSettleDO.setCrteName(outptVisitDTO.getCrteName());
@@ -224,7 +224,7 @@ public class PaymentSettleBOImpl implements PaymentSettleBO {
         paymentOrderDO.setPaymentPrice(wxPrice);  // 微信支付实际金额
         paymentOrderDO.setTotalPrice(outptSettleDTO.getTotalPrice()); // 订单总费用
         paymentOrderDO.setStatusCode(Constants.ZTBZ.ZC);    // 状态标志： 正常
-        paymentOrderDO.setSettleCode(Constants.JSZT.WJS); // 结算状态： 预结算
+        paymentOrderDO.setSettleCode(Constants.JSZT.WJS); // 结算状态： 未结算
         paymentOrderDO.setSettleId(outptSettleDTO.getId()); // his结算id
         paymentOrderDO.setCrteId(outptVisitDTO.getCrteId());
         paymentOrderDO.setCrteName(outptVisitDTO.getCrteName());

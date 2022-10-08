@@ -382,6 +382,7 @@
         AND visit_id = #{visitId}
         AND is_settle = #{isSettle}
         AND status_code = #{statusCode}
+        AND settle_code = '0'
     </delete>
 
     <select id="queryPaymentSettle" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">

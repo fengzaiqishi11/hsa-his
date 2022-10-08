@@ -6437,6 +6437,15 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                 }
             }
             outptSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
+            //修改诊间支付结算表 payment_settle；结算状态 = 预结算
+            PaymentSettleDO paymentSettleDO = new PaymentSettleDO();
+            paymentSettleDO.setSettleId(settleId);
+            paymentSettleDO.setVisitId(visitId); // 就诊id
+            paymentSettleDO.setHospCode(hospCode); // 医院编码
+            paymentSettleDO.setSettleCode(Constants.SETTLECODE.SS);//结算状态 = 预结算
+            Map<String,Object> paymentParam =new HashMap<>();
+            paymentParam.put("paymentSettleDO", paymentSettleDO);
+            paymentSettleService_consummer.updatePaymentSettleInfo(paymentParam);
             // 7.1 结算后需要将结算单号返回给前端
             Map<String, Object> settleMap = new HashMap<>();
             settleMap.put("id", settleId);
@@ -6546,7 +6555,7 @@ public class OutptTmakePriceFormBOImpl implements OutptTmakePriceFormBO {
                     this.sendMessage(paymentSettleDTO,Constants.MSG_TOPIC.paymentProducerTopicKey);
                 }
             } else {
-                throw new AppException("支付平台支付失败!");
+                throw new AppException("支付平台支付失败，返回结果为空!");
             }
         }catch (Exception e){
             // 调用撤销接口

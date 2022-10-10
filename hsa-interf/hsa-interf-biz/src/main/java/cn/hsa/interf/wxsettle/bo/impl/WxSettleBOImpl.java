@@ -6,6 +6,7 @@ import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
 import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
 import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
+import cn.hsa.module.interf.wxBasicInfo.dao.WxOutptDAO;
 import cn.hsa.module.interf.wxsettle.bo.WxSettleBO;
 import cn.hsa.module.interf.wxsettle.dao.WxSettleDAO;
 import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
@@ -67,6 +68,9 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 
 	@Resource
 	private PharOutReceiveDetailService pharOutReceiveDetailService_consumer;
+
+	@Resource
+	private WxOutptDAO wxOutptDAO;
 
 
 	/**
@@ -758,6 +762,79 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			pharOutReceiveParam.put("pharOutReceiveDetailDOList", pharOutReceiveDetailDOList);
 			pharOutReceiveDetailService_consumer.batchInsert(pharOutReceiveParam);
 		}
+	}
+
+	/**
+	 * @Description: 校验处方是否结算
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 09:10
+	 * @Return WrapperResponse<String>
+	 */
+	@Override
+	public WrapperResponse checkPrescribeIsSettle(Map<String, Object> map) {
+		String hospCode = MapUtils.get(map, "hospCode");   // 医院编码
+		Map<String, Object> tempMap = MapUtils.get(map, "data");
+		String visitId = MapUtils.get(tempMap, "visitId");     // 患者就诊id
+		String opId = MapUtils.get(tempMap, "opId");  // 处方id
+        Map<String,Object> param =new HashMap<>();
+        param.put("opId",opId);
+        param.put("visitId",visitId);
+        param.put("hospCode",hospCode);
+		int prescribeSettle = wxOutptDAO.queryPrescribeIsSettle(param);
+		int costSettle = wxOutptDAO.queryCostIsSettle(param);
+		if (prescribeSettle>0 || costSettle>0){
+			throw new AppException("当前处方已结算，无需再次结算");
+		}
+		Map<String,Object> result =new HashMap<>();
+		result.put("isSettle",false);
+		// 处方校验结果加密返回给微信小程序
+		log.debug("微信小程序【门诊收费 处方校验】返参加密前：" + result.toString());
+		String res = null;
+		try {
+			res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(result));
+			log.debug("微信小程序【门诊收费 处方校验】返参加密后：" + res);
+		} catch (UnsupportedEncodingException e) {
+			throw new AppException("【门诊收费 处方校验】返参加密错误，请联系管理员！" + e.getMessage());
+		}
+		return WrapperResponse.success("成功。", res);
+	}
+
+	@Override
+	public WrapperResponse checkPrescribeCodeIsValid(Map<String, Object> map) {
+		String hospCode = MapUtils.get(map, "hospCode");   // 医院编码
+		Map<String, Object> tempMap = MapUtils.get(map, "data");
+		String visitId = MapUtils.get(tempMap, "visitId");     // 患者就诊id
+		String opId = MapUtils.get(tempMap, "opId");  // 处方id
+		String codeTime = MapUtils.get(tempMap,"codeTime"); // 打印二维码时间
+		if (StringUtils.isEmpty(codeTime)){
+			throw new AppException("参数错误：二维码打印时间codeTime参数未传！");
+		}
+		Map<String,Object> param =new HashMap<>();
+		param.put("opId",opId);
+		param.put("visitId",visitId);
+		param.put("hospCode",hospCode);
+		Map<String,Object> prescribeIsValidInfo = wxOutptDAO.queryPrescribeIsValid(param);
+		int codeValidTime = MapUtils.get(prescribeIsValidInfo,"codeValidTime",0);
+		Date validTime = DateUtils.dateAddMinute(DateUtils.parse(codeTime,DateUtils.Y_M_DH_M_S), codeValidTime);
+        if (validTime!=null){
+        	if (DateUtils.dateCompare(validTime,DateUtils.getNow())){
+				throw new AppException("失效错误：当前二维码已失效！");
+			}
+		}
+		Map<String,Object> resultInfo =new HashMap<>();
+		resultInfo.put("isValid",true);
+		// 二维码有效期校验结果加密返回给微信小程序
+		log.debug("微信小程序【门诊收费 二维码有效期校验】返参加密前：" + resultInfo.toString());
+		String res = null;
+		try {
+			res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(resultInfo));
+			log.debug("微信小程序【门诊收费 二维码有效期校验】返参加密后：" + res);
+		} catch (UnsupportedEncodingException e) {
+			throw new AppException("【门诊收费 二维码有效期校验】返参加密错误，请联系管理员！" + e.getMessage());
+		}
+		return WrapperResponse.success("成功。", res);
 	}
 
 

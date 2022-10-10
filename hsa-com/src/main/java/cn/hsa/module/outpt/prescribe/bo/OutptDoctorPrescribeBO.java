@@ -475,4 +475,14 @@ public interface OutptDoctorPrescribeBO {
      * @Return: List<Map>
      */
     List<Map> queryDrugCount(OutptPrescribeDTO outptPrescribeDTO);
+
+    /**
+     * @Menthod getPrescribeDetailForEncode
+     * @Desrciption  查询处方明细信息
+     * @param map opId：处方ID  hospCode ：医院编码 visitId：患者id
+     * @Author liuliyun
+     * @Date   2022/10/09 14:31
+     * @Return Map<String, Object>
+     **/
+    Map<String, Object> getPrescribeDetailForEncode(Map map);
 }

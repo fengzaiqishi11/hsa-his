@@ -53,4 +53,23 @@ public class WxSettleServiceImpl extends HsafService implements WxSettleService 
 	public WrapperResponse<String> saveSettle(Map<String, Object> map) {
 		return wxSettleBO.saveSettle(map);
 	}
+
+
+	/**
+	 * @Description: 校验处方是否结算
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 09:10
+	 * @Return WrapperResponse<String>
+	 */
+	@Override
+	public WrapperResponse<String> checkPrescribeIsSettle(Map<String, Object> map) {
+		return wxSettleBO.checkPrescribeIsSettle(map);
+	}
+
+	@Override
+	public WrapperResponse<String> checkPrescribeCodeValid(Map<String, Object> map) {
+		return wxSettleBO.checkPrescribeCodeIsValid(map);
+	}
 }

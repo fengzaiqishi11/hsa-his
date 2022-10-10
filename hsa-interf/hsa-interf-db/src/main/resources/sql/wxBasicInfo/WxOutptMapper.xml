@@ -1581,4 +1581,92 @@
         </foreach>
     </insert>
 
+    <!--  检查处方是否结算 -->
+    <select id="queryPrescribeIsSettle" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(id) num from outpt_prescribe a where id = #{id} and a.hosp_code = #{hospCode} and a.is_settle = '1' and ifnull(a.settle_id, '') != ''
+    </select>
+
+    <!--  检查处方费用是否结算 -->
+    <select id="queryCostIsSettle" resultType="java.lang.Integer" parameterType="java.util.Map">
+        select count(id) num from outpt_cost oc where oc.op_id =#{id} and oc.visit_id =#{visitId} and oc.hosp_code =#{hospCode}
+        and oc.settle_code='2' and oc.settle_id is not null
+    </select>
+
+    <!--  校验处方是否过期 -->
+    <select id="queryPrescribeIsValid" resultType="java.util.Map" parameterType="java.util.Map">
+   select
+	id,
+	hosp_code,
+	visit_id,
+	diagnose_ids,
+	tcm_disease_id,
+	tcm_disease_name,
+	tcm_syndromes_id,
+	tcm_syndromes_name,
+	order_no,
+	doctor_id,
+	doctor_name,
+	dept_id,
+	dept_name,
+	type_code,
+	prescribe_type_code,
+	settle_id,
+	remark,
+	is_herb_hospital,
+	herb_num,
+	herb_use_code,
+	weight,
+	agent_name,
+	agent_cert_no,
+	crte_id,
+	crte_name,
+	crte_time,
+	is_settle,
+	is_cancel,
+	is_print,
+	is_submit,
+	code_valid_time as codeValidTime
+    from
+	outpt_prescribe
+    where
+	hosp_code =	#{hospCode} and id =#{id}
+	</select>
+
+    <!--根据opId查询待缴费的开方处方信息-->
+    <select id="queryPrescribeInfoForQRcode" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        ov.out_profile,
+        ov.register_no,
+        ov.name,
+        ov.age,
+        ov.gender_code,
+        ROUND(SUM(a.reality_price),  2) as order_price,
+        ROUND(SUM(a.reality_price),  2) as zfje,
+        b.id,
+        b.visit_id,
+        b.order_no,
+        b.type_code,
+        b.prescribe_type_code,
+        b.is_settle,
+        b.doctor_id,
+        b.doctor_name,
+        b.dept_id,
+        b.dept_name,
+        b.diagnose_ids,
+        (SELECT GROUP_CONCAT(bd.name) FROM base_disease bd where bd.hosp_code = b.hosp_code and FIND_IN_SET(bd.id,b.diagnose_ids) GROUP BY b.id) as diagnose_names,
+        b.crte_time as prescribe_time
+        FROM
+        outpt_cost a
+        LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        left join outpt_visit ov on a.hosp_code = ov.hosp_code  and a.visit_id =ov.id
+        WHERE a.hosp_code = #{hospCode}
+        and b.is_settle = '0'
+        and b.is_submit = '1'
+        and b.is_cancel = '0'
+        and a.visit_id = #{data.visitId}
+        and b.id = #{data.opId}
+        GROUP BY b.id
+        ORDER BY b.order_no asc
+    </select>
+
 </mapper>

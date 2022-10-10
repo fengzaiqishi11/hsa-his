@@ -740,4 +740,18 @@ public class OutptDoctorPrescribeServiceImpl extends HsafService implements Outp
         baseDrugDTO.setPageSize(9999);
         return WrapperResponse.success(outptDoctorPrescribeBO.getCfData2(baseDrugDTO));
     }
+
+    /**
+     * @Menthod getPrescribeDetailForEncode
+     * @Desrciption  查询处方明细信息(带二维码)
+     * @param map opId：处方ID  hospCode ：医院编码
+     * @Author liuliyun
+     * @Date   2022/10/09 14:29
+     * @Return Map<String, Object>
+     **/
+    @Override
+    public WrapperResponse<Map<String, Object>> getPrescribeDetailForEncode(Map map) {
+        Map<String,Object> a = outptDoctorPrescribeBO.getPrescribeDetailForEncode(map);
+        return WrapperResponse.success(a);
+    }
 }

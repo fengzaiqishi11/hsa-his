@@ -4478,4 +4478,40 @@ public class OutptDoctorPrescribeBOImpl implements OutptDoctorPrescribeBO {
            // 门诊中医症候 lly 2022-3-03 end
         }
     }
+
+    /**
+     * @Menthod getPrescribeDetail
+     * @Desrciption  查询处方明细信息
+     * @param map opId：处方ID  hospCode ：医院编码
+     * @Author zengfeng
+     * @Date   2020/9/2 10:24
+     * @Return List<Map<String, Object>>
+     **/
+    @Override
+    public Map<String, Object> getPrescribeDetailForEncode(Map map) {
+        Map<String, Object> resultInfo =new HashMap<>();
+        String hospCode = MapUtils.get(map,"hospCode"); // 医院编码
+        String opId =MapUtils.get(map,"opId"); // 处方id
+        String visitId = MapUtils.get(map,"visitId"); // 就诊id
+        String encodeContent ="";
+        // 获取诊间支付跳转地址
+        SysParameterDTO sysParameterDTO = getSysParameterDTO(hospCode,"PAYMENT_URL");
+        if (sysParameterDTO!=null&&StringUtils.isNotEmpty(sysParameterDTO.getValue())) {
+            String paymentUrl = sysParameterDTO.getValue();
+            StringBuilder builder =new StringBuilder();
+            builder.append(paymentUrl);
+            builder.append("?hospCode="+hospCode);
+            builder.append("&opId="+opId);
+            builder.append("&visitId="+visitId);
+            builder.append("&validTime="+DateUtils.format());
+            encodeContent = builder.toString();
+        }
+        List<Map<String, Object>> prescribeDetailInfo= outptDoctorPrescribeDAO.getPrescribeDetail(map);
+        resultInfo.put("data",prescribeDetailInfo);
+        if (StringUtils.isNotEmpty(encodeContent)) {
+            String code = GenerateQRCodeUtils.createQrCodeImg(encodeContent, 150, 150);
+            resultInfo.put("code",code);
+        }
+        return resultInfo;
+    }
 }

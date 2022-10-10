@@ -450,4 +450,16 @@ public interface WxBasicInfoService  {
     WrapperResponse<String> saveHsjcApply(Map<String, Object> map);
     @PostMapping("/service/interf/wxBasicInfo/queryBaseDisease")
     WrapperResponse<String> queryBaseDisease(Map<String, Object> map);
+
+    /**
+     * @Menthod: queryPrescribeListForQRcode
+     * @Desrciption: 根据传入的处方号查询处方及处方明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 opId-处方id visiId-就诊id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-10 16:32
+     * @Return: String json串
+     **/
+    @PostMapping("/service/interf/wxBasicInfo/queryPrescribeListForQRcode")
+    WrapperResponse<String> queryPrescribeListForQRcode(Map<String, Object> map);
 }

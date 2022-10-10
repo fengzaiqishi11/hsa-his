@@ -1124,4 +1124,37 @@ public class WxBasicInfoController {
         return wxBasicInfoService_consumer.saveHsjcApply(map);
     }
 
+    /**
+     * @Menthod: queryPrescribeListForQRcode
+     * @Desrciption: 根据传入的处方号查询处方及处方明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 opId-处方id visiId-就诊id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-10 16:08
+     * @Return: String json串
+     **/
+    @PostMapping("/queryPrescribeListForQRcode")
+    public WrapperResponse<String> queryPrescribeListForQRcode(@RequestBody Map<String, Object> paramMap) {
+        String hospCode = MapUtils.get(paramMap, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("入参错误，请传入医院编码！");
+        }
+
+        String data = null;
+        try {
+            log.debug("微信小程序【查询处方明细列表】入参解密前：" + (String) paramMap.get("data"));
+
+            data = AsymmetricEncryption.pubdecrypt(paramMap.get("data").toString());
+            log.debug("微信小程序【查询处方明细列表】入参解密后：" + JSON.parse(data));
+        } catch (Exception e) {
+            throw new AppException("【查询处方明细列表】入参错误，请联系管理员！" + e.getMessage());
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        if (StringUtils.isNotEmpty(data)) {
+            map.put("data", JSON.parse(data));
+        }
+        return wxBasicInfoService_consumer.queryPrescribeListForQRcode(map);
+    }
+
 }

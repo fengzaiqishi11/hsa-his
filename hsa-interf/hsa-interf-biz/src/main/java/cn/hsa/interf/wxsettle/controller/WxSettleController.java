@@ -89,4 +89,62 @@ public class WxSettleController {
 		}
 		return wxSettleService_consumer.saveSettle(paramMap);
 	}
+
+	/**
+	 * @Description: 校验处方二维码是否失效
+	 * @method: checkPrescribeIsSettle
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 09:02
+	 * @Return WrapperResponse<String>
+	 */
+	@PostMapping("/checkPrescribeIsSettle")
+	public WrapperResponse<String> checkPrescribeIsSettle(@RequestBody Map<String, Object> paramMap) {
+		String hospCode = (String) paramMap.get("hospCode");
+		if (StringUtils.isEmpty(hospCode)) {
+			throw new AppException("入参错误，请传入医院编码！");
+		}
+		String data = null;
+		log.debug("微信小程序【门诊收费 处方校验】入参解密前：" + (String) paramMap.get("data"));
+		try {
+			data = AsymmetricEncryption.pubdecrypt((String) paramMap.get("data"));
+			log.debug("微信小程序【门诊收费 处方校验】入参解密后：" + (Map<String, Object>) JSON.parse(data));
+		} catch (Exception e) {
+			throw new AppException("【门诊收费 处方校验】入参错误，请联系管理员！" + e.getMessage());
+		}
+		if (StringUtils.isNotEmpty(data)) {
+			paramMap.put("data", (Map<String, Object>) JSON.parse(data));
+		}
+		return wxSettleService_consumer.checkPrescribeIsSettle(paramMap);
+	}
+
+	/**
+	 * @Description: 校验处方二维码是否失效
+	 * @method: checkPrescribeCodeValid
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 14:47
+	 * @Return WrapperResponse<String>
+	 */
+	@PostMapping("/checkPrescribeCodeValid")
+	public WrapperResponse<String> checkPrescribeCodeValid(@RequestBody Map<String, Object> paramMap) {
+		String hospCode = (String) paramMap.get("hospCode");
+		if (StringUtils.isEmpty(hospCode)) {
+			throw new AppException("入参错误，请传入医院编码！");
+		}
+		String data = null;
+		log.debug("微信小程序【门诊收费 处方校验】入参解密前：" + (String) paramMap.get("data"));
+		try {
+			data = AsymmetricEncryption.pubdecrypt((String) paramMap.get("data"));
+			log.debug("微信小程序【门诊收费 处方校验】入参解密后：" + (Map<String, Object>) JSON.parse(data));
+		} catch (Exception e) {
+			throw new AppException("【门诊收费 处方校验】入参错误，请联系管理员！" + e.getMessage());
+		}
+		if (StringUtils.isNotEmpty(data)) {
+			paramMap.put("data", (Map<String, Object>) JSON.parse(data));
+		}
+		return wxSettleService_consumer.checkPrescribeCodeValid(paramMap);
+	}
 }

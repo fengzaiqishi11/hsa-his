@@ -46,6 +46,7 @@ import cn.hsa.module.sys.code.service.SysCodeService;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import cn.hsa.module.sys.parameter.service.SysParameterService;
 import cn.hsa.util.*;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.fastjson.JSON;
 import com.github.pagehelper.PageHelper;
 import lombok.SneakyThrows;
@@ -3311,6 +3312,49 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         mapdata.put("listData",list);
         mapdata.put("total",total);
         return mapdata;
+    }
+
+
+    /**
+     * @Menthod: queryPrescribeListForQRcode
+     * @Desrciption: 根据opId查询待缴费的处方信息（含费用信息）
+     * @Param: 1.hospCode：医院编码 2.data：入参 visitId-就诊id(必填) opId 处方id(必填)
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-10 15:21
+     * @Return: WrapperResponse<String>
+     **/
+    @Override
+    public WrapperResponse<String> queryPrescribeListForQRcode(Map<String, Object> map) {
+        String hospCode = MapUtils.get(map, "hospCode");
+        Map<String, Object> data = MapUtils.get(map, "data");
+        if (StringUtils.isEmpty(hospCode)) {
+            return WrapperResponse.error(500, "未检测到医院信息，请核对医院信息！", null);
+        }
+        if (data == null) {
+            return null;
+        }
+        if (data.get("visitId") == null) return WrapperResponse.error(500, "未传入需要查询处方信息的患者id", null);
+        if (StringUtils.isEmpty(MapUtils.get(data, "opId"))) return WrapperResponse.error(500, "未传入需要查询处方信息的id", null);
+        // 根据visitId，opId查询已提交、未结算的处方单
+        Map<String,Object> list = wxOutptDAO.queryPrescribeInfoForQRcode(map);
+        if (ObjectUtil.isEmpty(list)){
+            return WrapperResponse.error(500, "未查询到待缴费的处方信息", null);
+        }
+        // 根据visitId，opId查询正常状态的费用
+        data.put("statusCode", Constants.ZTBZ.ZC);
+        List<OutptPrescribeDetailsDTO> outptPrescribeDetailsDTOS = wxOutptDAO.queryPrescriptionDetails(map);
+        list.put("outptPrescribeDetailsDTOS",outptPrescribeDetailsDTOS);
+        // 返参加密
+        log.debug("诊间支付【待缴费的处方信息】返参加密前：" + JSON.toJSONString(list));
+        String res = null;
+        try {
+            res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(list));
+            log.debug("诊间支付【待缴费的处方信息】返参加密后：" + res);
+        } catch (UnsupportedEncodingException e) {
+            throw new AppException("【待缴费的处方信息】返参加密错误，请联系管理员！" + e.getMessage());
+        }
+        return WrapperResponse.success(res);
     }
 
 }

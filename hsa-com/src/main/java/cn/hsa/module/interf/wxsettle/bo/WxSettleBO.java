@@ -34,4 +34,26 @@ public interface WxSettleBO {
 	 * @Return
 	 */
 	WrapperResponse saveSettle(Map<String, Object> map);
+
+	/**
+	 * @Description: 校验处方状态
+	 * @method: checkPrescribeIsSettle
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 09:11
+	 * @Return WrapperResponse<String>
+	 */
+	WrapperResponse checkPrescribeIsSettle(Map<String, Object> map);
+
+	/**
+	 * @Description: 校验处方二维码有效性
+	 * @method: checkPrescribeCodeIsValid
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 14:08
+	 * @Return WrapperResponse<String>
+	 */
+	WrapperResponse checkPrescribeCodeIsValid(Map<String, Object> map);
 }

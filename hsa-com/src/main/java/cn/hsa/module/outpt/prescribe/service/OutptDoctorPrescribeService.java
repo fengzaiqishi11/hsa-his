@@ -515,4 +515,15 @@ public interface OutptDoctorPrescribeService {
      * @Return: List<Map>
      */
     WrapperResponse<List<Map>> queryDrugCount(Map paramMap);
+
+    /**
+     * @Menthod getPrescribeDetailForEncode
+     * @Desrciption  查询处方明细信息(带二维码)
+     * @param map opId：处方ID  hospCode ：医院编码
+     * @Author liuliyun
+     * @Date   2022/10/09 14:24
+     * @Return Map<String, Object>
+     **/
+    @GetMapping("/web/outpt/outptDoctorPrescribeService/getPrescribeDetailForEncode")
+    WrapperResponse<Map<String, Object>> getPrescribeDetailForEncode(Map map);
 }

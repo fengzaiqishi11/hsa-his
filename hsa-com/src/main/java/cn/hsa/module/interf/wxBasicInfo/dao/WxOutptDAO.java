@@ -365,4 +365,45 @@ public interface WxOutptDAO {
     void insertMedicalApplyDetail(List<MedicalApplyDetailDTO> medicalApplyDetailDTOList);
 
     void batchInsert(List<OutptCostDTO> outptCostDTOList);
+
+    /**@Menthod: queryPrescribeIsSettle
+     * @Description: 校验处方是否结算
+     * @Param: paramMap
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2022/10/10 09:42
+     * @Return int
+     */
+    int queryPrescribeIsSettle(Map<String, Object> data);
+
+    /**@Menthod: queryCostIsSettle
+     * @Description: 查询处方费用是否结算
+     * @Param: paramMap
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2022/10/10 09:42
+     * @Return int
+     */
+    int queryCostIsSettle(Map<String, Object> data);
+
+    /**@Menthod: queryPrescribeIsValid
+     * @Description: 查询处方二维码有效期
+     * @Param: paramMap
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date 2022/10/10 16:00
+     * @Return Map
+     */
+    Map queryPrescribeIsValid(Map<String, Object> data);
+
+    /**
+     * @Menthod: queryPrescribeListForQRcode
+     * @Desrciption: 根据opId查询待缴费的处方信息
+     * @Param: 1.hospCode：医院编码 2.data：入参 visitId-就诊id(必填) opId 处方id(必填)
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-10 15:59
+     * @Return: Map
+     **/
+    Map queryPrescribeInfoForQRcode(Map<String, Object> data);
 }

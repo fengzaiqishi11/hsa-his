@@ -417,4 +417,16 @@ public interface WxBasicInfoBO {
     void removeLockByProfileId(Map<String, Object> map);
 
     WrapperResponse<String> saveHsjcApply(Map<String, Object> map);
+
+    /**
+     * @Menthod: queryPrescribeListForQRcode
+     * @Desrciption: 根据opId查询待缴费的处方信息
+     * @Param: 1.hospCode：医院编码 2.data：入参 visitId-就诊id(必填) opId 处方id(必填)
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-10 15:21
+     * @Return: WrapperResponse<String>
+     **/
+    WrapperResponse<String> queryPrescribeListForQRcode (Map<String, Object> map);
+
 }

@@ -1151,4 +1151,25 @@ public class OutptDoctorPrescribeController extends BaseController {
     map.put("insureItemMatchDTOS", insureItemMatchDTOS);
     return outptDoctorPrescribeService_consumer.updateOuptCostAndPreDetailExt(map);
   }
+
+  /**
+   * @Menthod getPrescribeDetailForEncode
+   * @Desrciption  查询处方明细信息(带二维码)
+   * @param map opId：处方ID  hospCode ：医院编码 visitId：患者id
+   * @Author liuliyun
+   * @Date   2022/10/09 14:24
+   * @Return Map<String, Object>
+   **/
+  @GetMapping("/getPrescribeDetailForEncode")
+  public WrapperResponse<Map<String, Object>> getPrescribeDetailForEncode( HttpServletRequest req, HttpServletResponse res){
+    SysUserDTO sysUserDTO = getSession(req, res);
+    Map paramMap = new HashMap();
+    //医院编码
+    paramMap.put("hospCode",sysUserDTO.getHospCode());
+    //处方ID
+    paramMap.put("opId", req.getParameter("opId"));
+    //处方ID
+    paramMap.put("visitId", req.getParameter("visitId"));
+    return outptDoctorPrescribeService_consumer.getPrescribeDetailForEncode(paramMap);
+  }
 }

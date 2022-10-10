@@ -41,4 +41,30 @@ public interface WxSettleService {
 	@PostMapping("/service/interf/wxsettle/saveSettle")
 	WrapperResponse<String> saveSettle(@RequestBody Map<String, Object> map);
 
+	/**
+	 * @Description: 校验处方是否结算
+	 * @method: checkPrescribeIsSettle
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 09:02
+	 * @Return WrapperResponse<String>
+	 */
+	@PostMapping("/service/interf/wxsettle/checkPrescribeIsSettle")
+	WrapperResponse<String> checkPrescribeIsSettle(@RequestBody Map<String, Object> map);
+
+
+	/**
+	 * @Description: 校验处方二维码是否失效
+	 * @method: checkPrescribeCodeValid
+	 * @Param: paramMap
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/10 14:43
+	 * @Return WrapperResponse<String>
+	 */
+	@PostMapping("/service/interf/wxsettle/checkPrescribeCodeValid")
+	WrapperResponse<String> checkPrescribeCodeValid(@RequestBody Map<String, Object> map);
+
+
 }

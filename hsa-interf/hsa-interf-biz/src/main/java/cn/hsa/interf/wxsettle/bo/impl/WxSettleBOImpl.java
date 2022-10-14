@@ -779,7 +779,7 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 		String visitId = MapUtils.get(tempMap, "visitId");     // 患者就诊id
 		String opId = MapUtils.get(tempMap, "opId");  // 处方id
         Map<String,Object> param =new HashMap<>();
-        param.put("opId",opId);
+        param.put("id",opId);
         param.put("visitId",visitId);
         param.put("hospCode",hospCode);
 		int prescribeSettle = wxOutptDAO.queryPrescribeIsSettle(param);
@@ -812,7 +812,7 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			throw new AppException("参数错误：二维码打印时间codeTime参数未传！");
 		}
 		Map<String,Object> param =new HashMap<>();
-		param.put("opId",opId);
+		param.put("id",opId);
 		param.put("visitId",visitId);
 		param.put("hospCode",hospCode);
 		Map<String,Object> prescribeIsValidInfo = wxOutptDAO.queryPrescribeIsValid(param);

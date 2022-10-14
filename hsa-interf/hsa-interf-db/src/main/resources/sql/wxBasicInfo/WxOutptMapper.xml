@@ -362,7 +362,8 @@
         a.doctor_name,
         ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.exec_dept_id ) AS exec_dept_name,
         ( SELECT NAME FROM base_dept bd WHERE bd.hosp_code = a.hosp_code AND bd.id = a.dept_id ) AS create_dept_name,
-        d.settle_time
+        d.settle_time,
+        a.id as costId
         FROM
         outpt_cost a
         LEFT JOIN outpt_visit b on a.hosp_code = b.hosp_code and a.visit_id = b.id
@@ -1666,6 +1667,48 @@
         and a.visit_id = #{data.visitId}
         and b.id = #{data.opId}
         GROUP BY b.id
+        ORDER BY b.order_no asc
+    </select>
+
+    <!--根据SettleId查询已缴费的费用信息-->
+    <select id="querySettleCostList" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        ov.out_profile,
+        ov.register_no,
+        ov.name,
+        ov.age,
+        ov.gender_code,
+        ROUND(os.reality_price,2) as order_price,
+        ROUND(os.reality_price,2) as zfje,
+        a.item_code,
+        a.item_name,
+        a.total_num as num,
+        a.num_unit_code,
+        a.dosage,
+        a.dosage_unit_code,
+        a.use_days,
+        a.usage_code,
+        a.spec,
+        ROUND(a.price, 2) as price,
+        ROUND(a.total_price, 2) as total_price,
+        ROUND(a.reality_price, 2) as reality_price,
+        a.doctor_name,
+        os.settle_time,
+        a.id as costId
+        from outpt_cost a
+        LEFT JOIN outpt_prescribe b on a.hosp_code = b.hosp_code and a.op_id = b.id
+        left join outpt_visit ov on a.hosp_code = ov.hosp_code  and a.visit_id =ov.id
+        left join outpt_settle os on a.hosp_code = os.hosp_code and a.settle_id = os.id
+        WHERE a.hosp_code = #{hospCode}
+        and b.is_settle = '1'
+        and b.is_submit = '1'
+        and b.is_cancel = '0'
+        and a.status_code ='0'
+        and a.settle_code ='2'
+        and os.status_code ='0'
+        and os.is_settle  ='1'
+        and a.settle_id = #{data.settleId}
+        and a.visit_id =#{data.visitId}
         ORDER BY b.order_no asc
     </select>
 

@@ -462,4 +462,16 @@ public interface WxBasicInfoService  {
      **/
     @PostMapping("/service/interf/wxBasicInfo/queryPrescribeListForQRcode")
     WrapperResponse<String> queryPrescribeListForQRcode(Map<String, Object> map);
+
+    /**
+     * @Menthod: querySettleCostList
+     * @Desrciption: 根据结算id查询已缴费费用明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 settleId 结算id  visitId 就诊id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-14 09:11
+     * @Return: String json串
+     **/
+    @PostMapping("/service/interf/wxBasicInfo/querySettleCostList")
+    WrapperResponse<String> querySettleCostList(Map<String, Object> map);
 }

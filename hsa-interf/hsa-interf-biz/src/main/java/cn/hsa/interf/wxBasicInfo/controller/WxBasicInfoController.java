@@ -1157,4 +1157,36 @@ public class WxBasicInfoController {
         return wxBasicInfoService_consumer.queryPrescribeListForQRcode(map);
     }
 
+    /**
+     * @Menthod: querySettleCostListForQRcode
+     * @Desrciption: 根据结算id查询已缴费费用明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 settleId 结算id  visitId 急诊id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-14 09:08
+     * @Return: String json串
+     **/
+    @PostMapping("/querySettleCostList")
+    public WrapperResponse<String> querySettleCostList(@RequestBody Map<String, Object> paramMap) {
+        String hospCode = MapUtils.get(paramMap, "hospCode");
+        if (StringUtils.isEmpty(hospCode)) {
+            throw new AppException("入参错误，请传入医院编码！");
+        }
+        String data = (String) paramMap.get("data");
+//        try {
+//            log.debug("微信小程序【查询已缴费费用明细】入参解密前：" + (String) paramMap.get("data"));
+//
+//            data = AsymmetricEncryption.pubdecrypt(paramMap.get("data").toString());
+//            log.debug("微信小程序【查询已缴费费用明细】入参解密后：" + JSON.parse(data));
+//        } catch (Exception e) {
+//            throw new AppException("【查询已缴费费用明细】入参错误，请联系管理员！" + e.getMessage());
+//        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("hospCode", hospCode);
+        if (StringUtils.isNotEmpty(data)) {
+            map.put("data", JSON.parse(data));
+        }
+        return wxBasicInfoService_consumer.querySettleCostList(map);
+    }
+
 }

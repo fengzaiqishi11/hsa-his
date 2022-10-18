@@ -406,4 +406,15 @@ public interface WxOutptDAO {
      * @Return: Map
      **/
     Map queryPrescribeInfoForQRcode(Map<String, Object> data);
+
+    /**
+     * @Menthod: querySettleCostList
+     * @Desrciption: 根据settleId查询已缴费费用明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 visitId 就诊id settleId 结算id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-14 09:42
+     * @Return: Map
+     **/
+    List<Map> querySettleCostList(Map<String, Object> map);
 }

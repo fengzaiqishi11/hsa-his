@@ -24,12 +24,14 @@
         <result property="redId" column="red_id" jdbcType="VARCHAR"/>
         <result property="oldSettleId" column="old_settle_id" jdbcType="VARCHAR"/>
         <result property="settleTime" column="settle_time" jdbcType="TIMESTAMP"/>
+        <result property="settleNo" column="settle_no" jdbcType="VARCHAR"/>
+        <result property="orderNo" column="order_no" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="PaymentSettleMap">
         select
-          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,settle_no,order_no
         from payment_settle
         where id = #{id}
     </select>
@@ -39,7 +41,7 @@
         select
         id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code,
         status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id,
-        old_settle_id, settle_time,is_settle
+        old_settle_id, settle_time,is_settle,settle_no,order_no
         from payment_settle
         <where>
             <if test="id != null and id != ''">
@@ -185,20 +187,22 @@
 
     <!--新增所有列-->
     <insert id="insert">
-        insert into payment_settle(id,hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,is_settle)
-        values (#{id},#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{statusCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime},#{isSettle})
+        insert into payment_settle(id,hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,is_settle,settle_no,order_no)
+        values (#{id},#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{statusCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime},#{isSettle},
+        #{settleNo},#{orderNo})
     </insert>
 
     <insert id="insertBatch">
         insert into payment_settle(id,osp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price,
         payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code,
-        one_settle_id, red_id, old_settle_id, settle_time,is_settle)
+        one_settle_id, red_id, old_settle_id, settle_time,is_settle,settle_no,order_no)
         values
         <foreach collection="entities" item="entity" separator=",">
             (#{entity.id},#{entity.hospCode}, #{entity.visitId}, #{entity.settleId}, #{entity.paymentSettleId}, #{entity.visitNo},
             #{entity.totalPrice}, #{entity.paymentPrice}, #{entity.payCode}, #{entity.statusCode}, #{entity.omsgid},
             #{entity.oinfno}, #{entity.remark}, #{entity.crteId}, #{entity.crteName}, #{entity.crteTime},
-            #{entity.settleCode}, #{entity.oneSettleId}, #{entity.redId}, #{entity.oldSettleId}, #{entity.settleTime},#{entity.isSettle})
+            #{entity.settleCode}, #{entity.oneSettleId}, #{entity.redId}, #{entity.oldSettleId}, #{entity.settleTime},#{entity.isSettle},
+            #{entity.settleNo},#{entity.orderNo})
         </foreach>
     </insert>
 
@@ -263,6 +267,12 @@
             <if test="isSettle != null and isSettle != ''">
                 is_settle = #{isSettle},
             </if>
+            <if test="settleNo != null and settleNo != ''">
+                settle_no = #{settleNo},
+            </if>
+            <if test="orderNo != null and orderNo != ''">
+                order_no = #{orderNo},
+            </if>
         </set>
         where hosp_code =#{hospCode}
         and settle_id =#{settleId}
@@ -276,7 +286,7 @@
         <!--根据就诊id 医院编码 结算id查询诊间支付结算信息-->
     <select id="quyeryPaymentInfoByCondition" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">
         select
-          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time
+          id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time,settle_no,order_no
         from payment_settle
         where hosp_code =#{hospCode}
         and settle_id =#{settleId}
@@ -387,7 +397,7 @@
 
     <select id="queryPaymentSettle" parameterType="cn.hsa.module.payment.dto.PaymentSettleDTO" resultType="cn.hsa.module.payment.dto.PaymentSettleDTO">
         select  id, hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time,
-        settle_code, one_settle_id, red_id, old_settle_id, settle_time, is_settle
+        settle_code, one_settle_id, red_id, old_settle_id, settle_time, is_settle,settle_no,order_no
         from payment_settle
         where hosp_code =#{hospCode}
         and visit_id =#{visitId}

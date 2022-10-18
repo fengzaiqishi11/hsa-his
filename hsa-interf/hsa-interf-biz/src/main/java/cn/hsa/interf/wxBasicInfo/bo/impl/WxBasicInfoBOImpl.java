@@ -3357,4 +3357,33 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
         return WrapperResponse.success(res);
     }
 
+    @Override
+    public WrapperResponse<String> querySettleCostList(Map<String, Object> map) {
+            String hospCode = MapUtils.get(map, "hospCode");
+            Map<String, Object> data = MapUtils.get(map, "data");
+            if (StringUtils.isEmpty(hospCode)) {
+                return WrapperResponse.error(500, "未检测到医院信息，请核对医院信息！", null);
+            }
+            if (data == null) {
+                return null;
+            }
+            if (data.get("visitId") == null) return WrapperResponse.error(500, "未传入需要查询处方信息的患者id", null);
+            if (StringUtils.isEmpty(MapUtils.get(data, "settleId"))) return WrapperResponse.error(500, "未传入需要查询费用信息的结算id", null);
+            // 根据visitId，settleId查询已提交、未结算的处方单
+            List<Map> resultInfo = wxOutptDAO.querySettleCostList(map);
+            if (ObjectUtil.isEmpty(resultInfo)){
+                return WrapperResponse.error(500, "未查询到已缴费的费用信息", null);
+            }
+            // 返参加密
+            log.debug("诊间支付【待缴费的处方信息】返参加密前：" + JSON.toJSONString(resultInfo));
+            String res = null;
+            try {
+                res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(resultInfo));
+                log.debug("诊间支付【待缴费的处方信息】返参加密后：" + res);
+            } catch (UnsupportedEncodingException e) {
+                throw new AppException("【待缴费的处方信息】返参加密错误，请联系管理员！" + e.getMessage());
+            }
+            return WrapperResponse.success(res);
+    }
+
 }

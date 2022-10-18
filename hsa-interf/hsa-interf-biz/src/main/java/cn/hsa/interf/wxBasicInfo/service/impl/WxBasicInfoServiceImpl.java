@@ -567,4 +567,18 @@ public class WxBasicInfoServiceImpl extends HsafService implements WxBasicInfoSe
         return wxBasicInfoBO.queryPrescribeListForQRcode(map);
     }
 
+    /**
+     * @Menthod: querySettleCostList
+     * @Desrciption: 根据结算id查询已缴费费用明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 settleId 结算id visitId 就诊id
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-14 09:22
+     * @Return: String json串
+     **/
+    @Override
+    public WrapperResponse<String> querySettleCostList(Map<String, Object> map) {
+        return wxBasicInfoBO.querySettleCostList(map);
+    }
+
 }

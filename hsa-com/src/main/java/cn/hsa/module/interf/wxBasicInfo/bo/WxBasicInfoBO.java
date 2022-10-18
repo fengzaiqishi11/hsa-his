@@ -429,4 +429,15 @@ public interface WxBasicInfoBO {
      **/
     WrapperResponse<String> queryPrescribeListForQRcode (Map<String, Object> map);
 
+    /**
+     * @Menthod: querySettleCostList
+     * @Desrciption: 根据结算id查询已缴费费用明细
+     * @Param: 1.hospCode：医院编码 2.data：入参 visitId-就诊id(必填) settleId 结算id(必填)
+     * @Author: liuliyun
+     * @Email: liyun.liu@powersi.com
+     * @Date: 2022-10-14 09:29
+     * @Return: WrapperResponse<String>
+     **/
+    WrapperResponse<String> querySettleCostList (Map<String, Object> map);
+
 }

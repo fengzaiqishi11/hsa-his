@@ -6,6 +6,7 @@ import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.payment.entity.PaymentSettleDO;
 import cn.hsa.module.sys.parameter.dto.SysParameterDTO;
 import org.apache.ibatis.annotations.Param;
 
@@ -193,4 +194,34 @@ public interface WxSettleDAO {
 	 * @Return int 受影响的行数
 	 */
 	int batchEditCostPrice(List<OutptCostDTO> outptCostDTOList);
+
+	/**
+	 * @Menthod delOutptPaymentSettleByParam
+	 * @Desrciption 删除试算诊间支付订单脏数据
+	 * @param param  1、hospCode-医院编码  2、visitId--就诊id 3、isSettle--是否结算 4、statusCode--正常
+	 * @Author liuliyun
+	 * @Date 2022-10-17 09:33
+	 * @Return int 受影响的行数
+	 */
+	int delOutptPaymentSettleByParam(Map<String,String> param);
+
+	/**@Menthod insertPaymentSettle
+	 * @Describe:新增诊间支付结算信息
+	 * @Author: liuliyun
+	 * @Eamil: liyun.liu@powersi.com
+	 * @param PaymentSettleDO
+	 * @Date: 2022-10-17 09:59
+	 * @return int
+	 */
+	int insertPaymentSettle(PaymentSettleDO PaymentSettleDO);
+
+	/**@Menthod updatePaymentSettle
+	 * @Describe:修改诊间支付结算状态
+	 * @Author: liuliyun
+	 * @Eamil: liyun.liu@powersi.com
+	 * @param PaymentSettleDO
+	 * @Date: 2022-10-17 11:54
+	 * @return int
+	 */
+	int updatePaymentSettle(PaymentSettleDO PaymentSettleDO);
 }

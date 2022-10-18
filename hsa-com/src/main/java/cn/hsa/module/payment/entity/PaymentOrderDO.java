@@ -115,5 +115,15 @@ public class PaymentOrderDO implements Serializable {
      */
     private Date crteTime;
 
+    /**
+     * his结算单号
+     */
+    private String settleNo;
+
+    /**
+     * 第三方支付订单号
+     */
+    private String orderNo;
+
 
 }

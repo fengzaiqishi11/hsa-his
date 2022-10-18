@@ -3375,14 +3375,14 @@ public class WxBasicInfoBOImpl extends HsafBO implements WxBasicInfoBO {
                 return WrapperResponse.error(500, "未查询到已缴费的费用信息", null);
             }
             // 返参加密
-//            log.debug("诊间支付【待缴费的处方信息】返参加密前：" + JSON.toJSONString(resultInfo));
-            String res = JSON.toJSONString(resultInfo);
-//            try {
-//                res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(resultInfo));
-//                log.debug("诊间支付【待缴费的处方信息】返参加密后：" + res);
-//            } catch (UnsupportedEncodingException e) {
-//                throw new AppException("【待缴费的处方信息】返参加密错误，请联系管理员！" + e.getMessage());
-//            }
+            log.debug("诊间支付【待缴费的处方信息】返参加密前：" + JSON.toJSONString(resultInfo));
+            String res = null;
+            try {
+                res = AsymmetricEncryption.pubencrypt(JSON.toJSONString(resultInfo));
+                log.debug("诊间支付【待缴费的处方信息】返参加密后：" + res);
+            } catch (UnsupportedEncodingException e) {
+                throw new AppException("【待缴费的处方信息】返参加密错误，请联系管理员！" + e.getMessage());
+            }
             return WrapperResponse.success(res);
     }
 

@@ -4,22 +4,16 @@ import cn.hsa.hsaf.core.framework.HsafBO;
 import cn.hsa.hsaf.core.framework.web.WrapperResponse;
 import cn.hsa.hsaf.core.framework.web.exception.AppException;
 import cn.hsa.module.base.bor.service.BaseOrderRuleService;
-import cn.hsa.module.insure.module.dto.InsureIndividualVisitDTO;
-import cn.hsa.module.insure.module.entity.InsureIndividualVisitDO;
 import cn.hsa.module.interf.wxBasicInfo.dao.WxOutptDAO;
 import cn.hsa.module.interf.wxsettle.bo.WxSettleBO;
 import cn.hsa.module.interf.wxsettle.dao.WxSettleDAO;
-import cn.hsa.module.outpt.fees.dao.OutptCostDAO;
-import cn.hsa.module.outpt.fees.dao.OutptSettleDAO;
 import cn.hsa.module.outpt.fees.dto.OutptCostDTO;
 import cn.hsa.module.outpt.fees.dto.OutptSettleDTO;
 import cn.hsa.module.outpt.fees.entity.OutptPayDO;
 import cn.hsa.module.outpt.fees.entity.OutptSettleDO;
-import cn.hsa.module.outpt.outinInvoice.dto.OutinInvoiceDTO;
-import cn.hsa.module.outpt.prescribe.dao.OutptDoctorPrescribeDAO;
 import cn.hsa.module.outpt.prescribeDetails.dto.OutptPrescribeDetailsDTO;
-import cn.hsa.module.outpt.visit.dao.OutptVisitDAO;
 import cn.hsa.module.outpt.visit.dto.OutptVisitDTO;
+import cn.hsa.module.payment.entity.PaymentSettleDO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDO;
 import cn.hsa.module.phar.pharoutreceive.entity.PharOutReceiveDetailDO;
 import cn.hsa.module.phar.pharoutreceive.service.PharOutReceiveDetailService;
@@ -108,6 +102,7 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			settleParam.put("isSettle", Constants.SF.F);//是否结算 = 否
 			settleParam.put("statusCode", Constants.ZTBZ.ZC);//状态标志 = 正常
 			wxSettleDAO.delOutptSettleByParam(settleParam);  // 删除上一次试算结果（未结算的结算表数据）
+			wxSettleDAO.delOutptPaymentSettleByParam(settleParam); // 删除上一次试算结果（未结算的诊间支付结算表数据）
 
 			// 3.根据就诊id查询病人未结算的费用集合
 			// 3.1查询处方费用
@@ -168,6 +163,7 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			settleMap.put("crteName", crteName);
 			settleMap.put("oneSettleId", oneSettleId);
 			OutptSettleDO outptSettleDO = this.saveOutptSettle(settleMap);
+			PaymentSettleDO paymentSettleDO = this.saveOutptPaymentSettle(settleMap);  // 保存移动支付订单信息
 
 			// 7、将试算结果返回给前端
 			result.put("profileId", outptVisitDTO.getProfileId());//档案id
@@ -509,6 +505,17 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 			outptSettleDO.setIsSettle(Constants.SF.S);//是否结算 = 是
 			outptSettleDO.setSourcePayCode(sourcePayCode);  // 0:HIS 1:微信  2：支付宝   3：自助机
 			wxSettleDAO.updateByPrimaryKeySelective(outptSettleDO);//修改结算状态
+			String payCode = Constants.ZFFS.WX;
+			//修改诊间支付结算表 payment_settle；结算状态 = 结算
+			PaymentSettleDO paymentSettleDO = new PaymentSettleDO();
+			paymentSettleDO.setId(settleId);
+			paymentSettleDO.setHospCode(hospCode);
+			paymentSettleDO.setVisitId(visitId); // 就诊id
+			paymentSettleDO.setSettleCode(Constants.SETTLECODE.YJS);//结算状态 = 结算
+			paymentSettleDO.setIsSettle(Constants.SF.S); // 是否结算 = 是
+			paymentSettleDO.setPayCode(payCode); // 支付方式: 微信
+			paymentSettleDO.setSettleTime(DateUtils.getNow());
+			wxSettleDAO.updatePaymentSettle(paymentSettleDO);
 			// 7.1 结算后需要将结算单号返回给前端
 			Map<String, Object> settleMap = new HashMap<>();
 			settleMap.put("id", settleId);
@@ -837,5 +844,44 @@ public class WxSettleBOImpl extends HsafBO implements WxSettleBO {
 		return WrapperResponse.success("成功。", res);
 	}
 
+	/**
+	 * @Description: (试算) 保存门诊结算数据
+	 * @method: saveOutptPaymentSettle
+	 * @Param: map
+	 * @Author: liuliyun
+	 * @Email: liyun.liu@powersi.com
+	 * @Date 2022/10/17 10:16
+	 * @Return PaymentSettleDO
+	 */
+	private PaymentSettleDO saveOutptPaymentSettle(Map<String, Object> map) {
+		SysParameterDO sysParameterDO = getSysParameter(MapUtils.get(map, "hospCode"), Constants.HOSPCODE_DISCOUNTS_KEY);//获取当前医院优惠配置
+		BigDecimal roundingCost = BigDecimalUtils.rounding(sysParameterDO.getValue(), MapUtils.get(map, "realityPrice")); //舍入费用
+		// 生成诊间支付预结算信息
+		PaymentSettleDO paymentSettleDO =new PaymentSettleDO();
+		paymentSettleDO.setId(MapUtils.get(map, "settleId"));
+		paymentSettleDO.setVisitId(MapUtils.get(map, "visitId"));
+		paymentSettleDO.setHospCode(MapUtils.get(map, "hospCode")); // 医院编码
+		paymentSettleDO.setPayCode(Constants.ZFFS.WX);   // 支付方式： 微信
+		paymentSettleDO.setTotalPrice(BigDecimalUtils.subtract(MapUtils.get(map, "totalPrice"), roundingCost)); // 订单总费用
+		paymentSettleDO.setPaymentPrice(BigDecimalUtils.subtract(MapUtils.get(map, "realityPrice"), roundingCost)); // 微信支付实际金额
+		paymentSettleDO.setStatusCode(Constants.ZTBZ.ZC); // 状态标志： 正常
+		paymentSettleDO.setIsSettle(Constants.SF.F);
+		paymentSettleDO.setSettleCode(Constants.JSZT.WJS); // 结算状态： 未结算
+		paymentSettleDO.setSettleId(MapUtils.get(map, "settleId")); // his结算id
+		paymentSettleDO.setCrteId(MapUtils.get(map, "crteId"));  // 创建人id
+		paymentSettleDO.setCrteName(MapUtils.get(map, "crteName")); // 创建人姓名
+		paymentSettleDO.setCrteTime(DateUtils.getNow()); // 创建时间
+		paymentSettleDO.setIsSettle(Constants.SF.F);//是否结算（SF）
+		paymentSettleDO.setStatusCode(Constants.ZTBZ.ZC);//状态标志代码（ZTBZ）;正常
+		paymentSettleDO.setRedId(null);//冲红ID
+		paymentSettleDO.setOldSettleId(null);//原结算ID
+		paymentSettleDO.setOrderNo(MapUtils.get(map, "outTradeNo"));//支付订单号（第三方订单号）
+		paymentSettleDO.setCrteId(MapUtils.get(map, "crteId"));//创建人id
+		paymentSettleDO.setCrteName(MapUtils.get(map, "crteName"));//创建人名称
+		paymentSettleDO.setCrteTime(new Date());//创建时间
+		paymentSettleDO.setOneSettleId(MapUtils.get(map, "oneSettleId")); // 记录下第一次结算id
+		wxSettleDAO.insertPaymentSettle(paymentSettleDO);
+		return paymentSettleDO;
+	}
 
 }

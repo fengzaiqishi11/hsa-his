@@ -122,4 +122,14 @@ public class PaymentSettleDO extends PageDO implements Serializable {
      */
     private String isSettle;
 
+    /**
+     * his结算单号
+     */
+    private String settleNo;
+
+    /**
+     * 第三方支付订单号
+     */
+    private String orderNo;
+
 }

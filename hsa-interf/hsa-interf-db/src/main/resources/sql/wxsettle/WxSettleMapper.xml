@@ -898,4 +898,43 @@
             id = #{item.id} and hosp_code = #{item.hospCode}
         </foreach>
     </update>
+
+    <delete id="delOutptPaymentSettleByParam" parameterType="java.util.Map">
+        DELETE
+        FROM
+          payment_settle
+        WHERE
+        hosp_code = #{hospCode}
+        AND visit_id = #{visitId}
+        AND is_settle = #{isSettle}
+        AND status_code = #{statusCode}
+    </delete>
+
+    <!--新增所有列-->
+    <insert id="insertPaymentSettle">
+        insert into payment_settle(id,hosp_code, visit_id, settle_id, payment_settle_id, visit_no, total_price, payment_price, pay_code, status_code, omsgid, oinfno, remark, crte_id, crte_name, crte_time, settle_code, one_settle_id, red_id, old_settle_id, settle_time,is_settle,settle_no,order_no)
+        values (#{id},#{hospCode}, #{visitId}, #{settleId}, #{paymentSettleId}, #{visitNo}, #{totalPrice}, #{paymentPrice}, #{payCode}, #{statusCode}, #{omsgid}, #{oinfno}, #{remark}, #{crteId}, #{crteName}, #{crteTime}, #{settleCode}, #{oneSettleId}, #{redId}, #{oldSettleId}, #{settleTime},#{isSettle},
+        #{settleNo},#{orderNo})
+    </insert>
+
+    <!--通过结算id修改数据-->
+    <update id="updatePaymentSettle">
+        update payment_settle
+        <set>
+            <if test="payCode != null and payCode != ''">
+                pay_code = #{payCode},
+            </if>
+            <if test="settleTime != null">
+                settle_time = #{settleTime},
+            </if>
+            <if test="isSettle != null and isSettle != ''">
+                is_settle = #{isSettle},
+            </if>
+            <if test="settleCode != null and settleCode != ''">
+                settle_code = #{settleCode},
+            </if>
+        </set>
+        where hosp_code =#{hospCode} and id =#{id} and visit_id =#{visitId}
+    </update>
+
 </mapper>

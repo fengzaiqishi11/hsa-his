@@ -1172,15 +1172,15 @@ public class WxBasicInfoController {
         if (StringUtils.isEmpty(hospCode)) {
             throw new AppException("入参错误，请传入医院编码！");
         }
-        String data = (String) paramMap.get("data");
-//        try {
-//            log.debug("微信小程序【查询已缴费费用明细】入参解密前：" + (String) paramMap.get("data"));
-//
-//            data = AsymmetricEncryption.pubdecrypt(paramMap.get("data").toString());
-//            log.debug("微信小程序【查询已缴费费用明细】入参解密后：" + JSON.parse(data));
-//        } catch (Exception e) {
-//            throw new AppException("【查询已缴费费用明细】入参错误，请联系管理员！" + e.getMessage());
-//        }
+        String data = null;
+        try {
+            log.debug("微信小程序【查询已缴费费用明细】入参解密前：" + (String) paramMap.get("data"));
+
+            data = AsymmetricEncryption.pubdecrypt(paramMap.get("data").toString());
+            log.debug("微信小程序【查询已缴费费用明细】入参解密后：" + JSON.parse(data));
+        } catch (Exception e) {
+            throw new AppException("【查询已缴费费用明细】入参错误，请联系管理员！" + e.getMessage());
+        }
         Map<String, Object> map = new HashMap<>();
         map.put("hospCode", hospCode);
         if (StringUtils.isNotEmpty(data)) {
